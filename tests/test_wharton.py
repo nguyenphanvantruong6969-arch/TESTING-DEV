@@ -13,6 +13,7 @@ Wharton được xét TRƯỚC số bốc thăm; số bốc thăm và cách chè
 
 import copy
 import inspect
+import itertools
 import random
 import re
 from types import SimpleNamespace
@@ -1013,3 +1014,149 @@ class TestW9TuHoSoTho:
         assert a.assignment == {"Lan": "Debate", "Minh": "CoVua"}
         assert b.assignment == {"Lan": "Toan", "Minh": "Debate"}
         assert a.base_rank == b.base_rank
+
+
+# ------------------------------------------------------------------ test tính chất (Bước 11)
+#
+# Các test dưới đây chạy trên mã đã viết xong. Đỏ mà test đúng thì đó là LỖI THẬT của cơ chế:
+# báo cáo bộ dữ liệu nhỏ nhất tái hiện được, không nới test.
+
+def _chay_bo(bo, bo_qua_du_tru=False, dung_tier_rank=True):
+    tr = bo.tier_rank if dung_tier_rank else None
+    return chay(bo.d, diem_wharton=bo.diem_hl, tier_rank=tr, eligible=bo.eligible,
+                bo_qua_du_tru=bo_qua_du_tru)
+
+
+class TestTinhChat:
+    def test_w2_tang_2_giu_cho_thi_khong_co_nguoi_tang_1_bi_tu_choi_va_thich_hon(self):
+        """W2: chạy KHÔNG dự trữ và KHÔNG nhóm xếp cứng. Với dự trữ, một em tầng 2 đủ diện dự
+        trữ được giữ suất trước em tầng 1 là ĐÚNG thiết kế; với `tier_rank`, nhóm đứng trước
+        cả tầng. Hai chế độ đó thuộc W6 (ổn định), không thuộc W2."""
+        kiem_tra = 0
+        for seed in range(60):
+            bo = sinh_bo(1000 + seed, n_hs=14, n_clb=4)
+            kq = _chay_bo(bo)
+            scores, prefs = bo.d[2], bo.d[4]
+            bi_tu_choi_tang_1 = {}
+            for _vong, sid, cid in kq.rejection_log:
+                if sid in scores[cid]:
+                    bi_tu_choi_tang_1.setdefault(cid, []).append(sid)
+            for sid, cid in kq.assignment.items():
+                if cid is None or sid in scores[cid]:
+                    continue                                    # chỉ xét em tầng 2 đang giữ chỗ
+                kiem_tra += 1
+                for t in bi_tu_choi_tang_1.get(cid, []):
+                    hien_tai = kq.assignment[t]
+                    vi_tri_hien_tai = (prefs[t].index(hien_tai) if hien_tai in prefs[t]
+                                       else len(prefs[t]))
+                    thich_hon = prefs[t].index(cid) < vi_tri_hien_tai
+                    assert not thich_hon, (seed, cid, sid, t)
+        assert kiem_tra >= 50                                   # test không rỗng
+
+    def test_w1_hoan_vi_nguyen_vong_khong_doi_base_rank(self):
+        rng = random.Random(101)
+        for i in range(40):
+            bo = sinh_bo(2000 + i, n_hs=12, n_clb=5, co_du_tru=(i % 2 == 0),
+                         co_nhom=(i % 3 == 0))
+            truoc = _chay_bo(bo).base_rank
+            hoan = {s: rng.sample(ds, len(ds)) for s, ds in bo.prefs.items()}
+            students, clubs, scores, _app, _prefs, stb = bo.d
+            d2 = du_lieu(bo.cap, hoan, bo.diem_thi, stb, tick=bo.tick, reserve=bo.reserve,
+                         nhom_du_tru=bo.nhom)
+            sau = chay(d2, diem_wharton=bo.diem_hl, tier_rank=bo.tier_rank,
+                       eligible=rp.default_reserve_eligible_fn(d2[0], d2[1])).base_rank
+            assert sau == truoc, i
+
+    def test_w6_on_dinh_mot_buoi_co_du_tru_nhom_xep_cung(self):
+        so_bo = 0
+        # (a) có dự trữ thật, nhóm dự trữ thật qua default_reserve_eligible_fn
+        for seed in range(20):
+            bo = sinh_bo(3000 + seed, n_hs=14, n_clb=5, co_du_tru=True)
+            kq = _chay_bo(bo)
+            students, clubs, _s, _a, prefs, _stb = bo.d
+            assert rp.verify_stability(kq, clubs, prefs, bo.eligible) == [], seed
+            so_bo += 1
+        # (b) nhóm xếp cứng + bỏ qua dự trữ, đúng cách api dùng (có cả CLB có suất dự trữ)
+        for seed in range(20):
+            bo = sinh_bo(4000 + seed, n_hs=14, n_clb=5, co_du_tru=True, co_nhom=True)
+            kq = _chay_bo(bo, bo_qua_du_tru=True)
+            assert rp.verify_stability(kq, bo.d[1], bo.d[4], bo.eligible,
+                                       bo_qua_du_tru=True) == [], seed
+            so_bo += 1
+        # (c) nhóm xếp cứng VÀ dự trữ cùng bật
+        for seed in range(10):
+            bo = sinh_bo(5000 + seed, n_hs=14, n_clb=5, co_du_tru=True, co_nhom=True)
+            kq = _chay_bo(bo)
+            assert rp.verify_stability(kq, bo.d[1], bo.d[4], bo.eligible) == [], seed
+            so_bo += 1
+        assert so_bo == 50
+
+    @pytest.mark.parametrize("co_du_tru,co_nhom,bo_qua", [
+        (False, False, False), (True, False, False), (True, True, True), (True, True, False)])
+    def test_w6_on_dinh_nhieu_buoi(self, co_du_tru, co_nhom, bo_qua):
+        for seed in range(8):
+            bo = sinh_bo(6000 + seed, n_hs=14, n_clb=6, co_du_tru=co_du_tru,
+                         co_nhom=co_nhom, so_buoi=2 + seed % 2)
+            students, clubs, scores, app, prefs, stb = bo.d
+            ket = rp.run_rbda_nhieu_buoi(
+                students, clubs, scores, app, prefs, stb, bo.eligible, seed=seed,
+                tier_rank=bo.tier_rank, bo_qua_du_tru=bo_qua, diem_wharton=bo.diem_hl)
+            assert len(ket.ds_buoi) >= 2
+            van_de = rp.verify_stability_tuan(ket, clubs, prefs, bo.eligible,
+                                              bo_qua_du_tru=bo_qua)
+            assert all(not v for v in van_de.values()), (seed, van_de)
+
+    def test_w8_khai_that_thu_tu_la_tot_nhat_moi_hoan_vi_deu_khong_hon(self):
+        rng = random.Random(808)
+        thu = doi_ket_qua = 0
+        for i in range(15):
+            bo = sinh_bo(7000 + i, n_hs=rng.randint(4, 8), n_clb=rng.randint(2, 4),
+                         co_du_tru=(i % 3 == 0))
+            students, clubs, scores, _app, prefs, stb = bo.d
+            that = _chay_bo(bo).assignment
+            for sid in bo.sids:
+                gia = prefs[sid]
+                vi_tri = lambda c, gia=gia: gia.index(c) if c in gia else len(gia)
+                for hv in itertools.permutations(gia):
+                    khai = dict(prefs)
+                    khai[sid] = list(hv)
+                    d2 = du_lieu(bo.cap, khai, bo.diem_thi, stb, tick=bo.tick,
+                                 reserve=bo.reserve, nhom_du_tru=bo.nhom)
+                    kq = chay(d2, diem_wharton=bo.diem_hl,
+                              eligible=rp.default_reserve_eligible_fn(d2[0], d2[1]))
+                    thu += 1
+                    doi_ket_qua += (kq.assignment[sid] != that[sid])
+                    assert vi_tri(kq.assignment[sid]) >= vi_tri(that[sid]), (
+                        i, sid, hv, kq.assignment[sid], that[sid])
+        assert thu >= 200 and doi_ket_qua >= 10          # đã thử đủ và có lúc khai sai là thiệt
+
+    def test_bat_bien_8_thay_the_duoc_va_luat_tong_cau(self):
+        """Hàm lựa chọn của CLB (thứ tự nền `uu_tien_wharton` + dự trữ mềm) phải thoả hai điều
+        kiện trước khi dùng (bất biến 8): với P ⊆ P', em bị loại ở P thì vẫn bị loại ở P'
+        (thay thế được), và |C(P)| ≤ |C(P')| (luật tổng cầu)."""
+        rng = random.Random(8888)
+        so_lan_loai = 0
+        for _ in range(400):
+            n = rng.randint(3, 12)
+            applicants, tested, stb = _bo_cho_mot_clb(rng, n=n)
+            wh = {s: rng.randint(0, 100) for s in applicants if rng.random() < 0.8}
+            tier_rank = ({s: rng.randint(0, 2) for s in applicants if rng.random() < 0.7}
+                         if rng.random() < 0.5 else None)
+            thu_tu = rp.uu_tien_wharton("X", applicants, tested, stb, wh, tier_rank=tier_rank)
+            rank = {s: i for i, s in enumerate(thu_tu)}
+            dien_du_tru = {s for s in applicants if rng.random() < 0.4}
+            suc_chua = rng.randint(1, 4)
+            du_tru = rng.randint(0, suc_chua)
+
+            def chon(pool):
+                return set(rp.club_choice_function(
+                    pool, suc_chua, du_tru, lambda s: s in dien_du_tru, rank)[0])
+
+            lon = [s for s in applicants if rng.random() < 0.8]
+            nho = [s for s in lon if rng.random() < 0.6]
+            c_nho, c_lon = chon(nho), chon(lon)
+            bi_loai = set(nho) - c_nho
+            so_lan_loai += len(bi_loai)
+            assert bi_loai.isdisjoint(c_lon), (nho, lon)        # thay thế được
+            assert len(c_nho) <= len(c_lon), (nho, lon)         # luật tổng cầu
+        assert so_lan_loai >= 100                               # có người bị loại để kiểm

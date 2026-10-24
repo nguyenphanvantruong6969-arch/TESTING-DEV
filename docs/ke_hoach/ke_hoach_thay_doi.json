@@ -1936,7 +1936,7 @@
    "pham_vi": "theo_nganh",
    "ten": "Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA)",
    "tep": "rbda_priority_pipeline.py, i18n_errors.py",
-   "dong": "sau uu_tien_theo_nhom (~L220); run_rbda (~L456); run_rbda_nhieu_buoi (~L1031)",
+   "dong": "khối Wharton sau uu_tien_theo_nhom (L252–L574); run_rbda (L781); run_rbda_nhieu_buoi (L1366)",
    "ham": "khoa_uu_tien_wharton, uu_tien_wharton, kiem_ho_so_wharton, tu_dien_wharton_mot_clb, diem_wharton_hieu_luc, run_rbda, run_rbda_nhieu_buoi",
    "hien_trang": "Tầng 2 xếp hoàn toàn bằng số bốc thăm; tầng 1 bằng điểm thì phá hoà bằng số bốc thăm. Học sinh không có cách nào bày tỏ mức độ muốn vào một CLB.",
    "thay_doi": "Mỗi học sinh có hai quỹ 100 điểm mỗi buổi (quỹ 1: CLB có thi, chỉ phá hoà sau điểm thi; quỹ 2: CLB không thi, tiêu chí chính tầng 2), xét TRƯỚC số bốc thăm. Gale–Shapley chạy một lần; thứ hạng nguyện vọng không vào khoá. Hàm bọc uu_tien_wharton thay nguồn base_rank khi diem_wharton khác None; mặc định None = hành vi cũ. Vòng 1 chỉ có lõi thuật toán, kiểm hồ sơ V1–V4, mã lỗi, test.",

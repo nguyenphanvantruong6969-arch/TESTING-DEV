@@ -1,5 +1,58 @@
 # CHANGELOG
 
+## 2026-10-24 — A13 Điểm Wharton (vòng 1: lõi thuật toán và test)
+
+Mục mới A13 trong sổ đăng ký (`docs/ke_hoach/`), làm theo quyết định của Truong ngày 24/10: **giữ nguyên STB**
+(bộ số đã khoá, chế độ `stb_ngay`, cách chèn em đến muộn), điểm Wharton xét **TRƯỚC** STB, mỗi quỹ **100 điểm
+MỖI BUỔI**, vòng này **chỉ làm lõi thuật toán, test, mã lỗi và tài liệu sổ**. Không đổi schema, `api*.py`, sổ nhập,
+giao diện hay `compute_club_priority` (không đổi một ký tự). Mọi số liệu dưới đây là dữ liệu MÔ PHỎNG.
+- **Cơ chế.** Mỗi học sinh có hai quỹ cho mỗi buổi: quỹ 1 chia cho CLB có thi (chỉ phá hoà khi bằng điểm thi),
+  quỹ 2 chia cho CLB không thi (tiêu chí chính tầng 2). Khoá ưu tiên: tầng 1 `(0, -điểm thi, (), -w1, stb, mã)`,
+  tầng 2 `(1, -w2, stb, mã)`; `()` là chỗ dành cho tiêu chí phụ của mục A1. Gale–Shapley vẫn chạy MỘT lần cho cả
+  hai tầng; thứ hạng nguyện vọng không vào khoá.
+- **Hàm mới** (`rbda_priority_pipeline.py`, khối `BƯỚC A2` L252–L574): `khoa_uu_tien_wharton`, `uu_tien_wharton`
+  (hàm bọc như `uu_tien_theo_nhom`, nhận `tier_rank`), `kiem_ho_so_wharton` (V1–V5, theo từng buổi, trả đủ mọi
+  lỗi theo thứ tự cố định), `tu_dien_wharton_mot_clb`, `diem_wharton_hieu_luc` (lúc khoá: vắng thi rơi xuống tầng
+  2, T2 chuyển lên T1 là lỗi); ba hằng `WHARTON_NGAN_SACH = 100`, `WHARTON_TU_DIEN_MOT_CLB = True`,
+  `WHARTON_VANG_THI = "tier2_zero_points"` (hai hằng sau chờ chủ dự án quyết).
+- **Hai tham số mới**, mặc định `None` = hành vi cũ: `diem_wharton` của `run_rbda` (thay NGUỒN `base_rank`; dự
+  trữ mềm, `verify_stability` giữ nguyên) và của `run_rbda_nhieu_buoi` (chuyển nguyên cho mọi buổi).
+- **7 mã lỗi song ngữ** trong `i18n_errors.py` (`wharton_nguyen_vong_chua_xep`, `wharton_chua_dung_het`,
+  `wharton_vuot_ngan_sach`, `wharton_diem_khong_hop_le`, `wharton_ngoai_tap`, `wharton_tang_lech`,
+  `wharton_vang_thi`); `i18n_loi.js` sinh lại bằng `tao_i18n_js.py`, chỉ thêm 28 dòng. Câu chữ dùng chỗ giữ nhãn
+  workspace (`{person}`, `{slot_sl}`, `{session_l}`…), không viết cứng "học sinh" / "CLB".
+- **Test mới.** Phần hàm và mã lỗi viết trước, thấy đỏ rồi mới viết mã; nhóm test tính chất viết sau, trên mã đã
+  xong, đúng theo đặc tả của bước đó. `tests/test_wharton.py`, 144 ca: khoá ưu tiên và W1, W3;
+  hàm bọc (200 bộ ngẫu nhiên: bằng điểm Wharton thì y hệt `compute_club_priority` / `uu_tien_theo_nhom`); VD1–VD5
+  qua `run_rbda`, W7, mặc định `None` trùng khít trên 30 bộ, và hai buổi khớp `run_rbda` chạy riêng; mã lỗi;
+  `kiem_ho_so_wharton` (W5, 32 ca); `tu_dien_wharton_mot_clb`; `diem_wharton_hieu_luc` (VD6, W4); VD1–VD5 đi từ
+  `w1`/`w2` thô (W9); test tính chất: W1 (hoán vị nguyện vọng không đổi `base_rank`), W2, W6 (50 bộ một buổi có
+  dự trữ / nhóm xếp cứng + bốn cấu hình nhiều buổi), W8 (mọi hoán vị nguyện vọng của từng em trên 15 bộ nhỏ,
+  không hoán vị nào cho CLB tốt hơn kết quả thật). Thử phá hoại có chủ đích: đổi dấu `w1`, đặt STB trước Wharton ở
+  tầng 2, bỏ qua `diem_wharton` trong `run_rbda`, xác định tầng bằng "điểm > 0" — cả bốn đều bị bắt.
+  `tests/test_ws_nhan.py`: chỉ THÊM 7 mã vào `MA_MOI_SAU_ANH_CHUP` (cách test đó quy định).
+- **Bất biến.** Bất biến 1: `TestTrungKhit` 7/7 qua, cùng test mặc định `None` trùng khít. Bất biến 8: test thay
+  thế được và luật tổng cầu (400 nhóm ứng viên, thứ tự nền của `uu_tien_wharton` + dự trữ mềm, có và không
+  `tier_rank`) qua. Toàn bộ test: 1.923 qua, 211 bỏ qua do máy không tìm thấy Chromium (trình trợ giúp tìm
+  `chrome-linux/chrome`, bản cài sẵn nằm ở `chrome-linux64/chrome`); chạy riêng 28 tệp giao diện với
+  `RBDA_TEST_CHROMIUM` đặt tay: 253 qua, 0 bỏ qua. `ruff check .` 0 lỗi (mốc 0); độ phủ 92,11 % (sàn 85 %).
+- **Chỗ cố ý lệch đặc tả.** (1) Điểm thi giữ `float`, không đổi `Decimal`: so `float` cho cùng thứ tự với
+  `Decimal(str(x))` và điểm đọc thẳng từ cột REAL (ghi trong docstring). (2) Không có `round_id`, không làm số bốc
+  SHA-256 / `public_value` (giữ STB). (3) Câu `wharton_chua_dung_het` mở đầu "Chưa dùng hết điểm Wharton…", không
+  phải "Bạn chưa dùng hết…": `tests/test_van_phong_tu_nhien.py` cấm xưng hô "bạn/em" trong câu báo lỗi. (4) Câu
+  `wharton_nguyen_vong_chua_xep` dùng `{session_l}` thay chữ "buổi" viết cứng, để workspace gọi là "ca" cũng đúng.
+  (5) `kiem_ho_so_wharton` có thêm tham số tuỳ chọn `tran_nguyen_vong` (mặc định `TRAN_NGUYEN_VONG_MOI_BUOI`) vì
+  workspace có thể đặt trần khác. (6) Mỗi ô điểm có tối đa một lỗi: khoá ngoài tập chỉ báo `wharton_ngoai_tap`.
+  (7) W2 chỉ kiểm khi không dự trữ và không nhóm xếp cứng: có dự trữ thì em tầng 2 đủ diện dự trữ được giữ suất
+  trước em tầng 1, có `tier_rank` thì nhóm đứng trước cả tầng — đo thử trên dữ liệu mô phỏng thấy đúng như vậy; đó
+  là đặc tính cũ của dự trữ và nhóm, không do A13. Hai chế độ ấy được canh bằng W6 (ổn định).
+- **Rủi ro đã ghi trong sổ.** "Khai thật là tốt nhất" chỉ được bảo đảm với THỨ TỰ nguyện vọng (W8), KHÔNG với
+  cách chia điểm Wharton: người biết tính có thể lợi hơn người ngây thơ; cần đo bằng mô phỏng.
+- **Việc vòng sau** (chưa làm): bảng `wharton_bids`; cột CSV / Sổ nhập (đổi hợp đồng cột, bất biến 7); nối
+  pipeline (kiểm hồ sơ ở bước "kiểm dữ liệu", TRƯỚC khoá STB; thứ tự tự điền → kiểm hồ sơ → khoá STB → điểm hiệu
+  lực → chạy); khoá luật workspace; biểu mẫu hai khung "Đã dùng X / 100"; mô phỏng VISEF; ngưỡng điểm tối thiểu;
+  công bố điểm chuẩn.
+
 ## 2026-10-15 — Workspace: Việt hoá sạch màn chọn và sửa bảng (ngoài sổ đăng ký, theo yêu cầu chủ dự án; chồng lấn Z1)
 
 Ở giao diện tiếng Việt, màn chọn workspace còn "workspace" và ".zip" lẫn trong câu, và bảng bị vỡ.
