@@ -1,5 +1,57 @@
 # CHANGELOG
 
+## 2026-10-24 — A13 Điểm Wharton (vòng 2: lưu trữ, nhập liệu, kiosk, pipeline)
+
+Làm tiếp mục A13 theo quyết định của Truong: chỉ bật được khi `priority` là `score` / `score+tier` và `score_scope` là
+`per_slot`; hồ sơ Wharton sai CHẶN cả lần chạy ở bước Kiểm tra dữ liệu, trước khi bốc hay khoá STB; nhập bằng tệp (CSV, Sổ
+nhập) và bằng một màn kiosk; lưu tầng lúc nhập; mặc định **TẮT** — mọi hành vi, tệp, dấu vân tay và kết quả giống hệt trước
+vòng 2 (bất biến 1). Giữ STB (không SHA-256, không `public_value`; bất biến 3 nguyên). Mọi số liệu trong test là dữ liệu
+MÔ PHỎNG. Ghi hợp đồng cột vào sổ đăng ký TRƯỚC khi làm (bất biến 7).
+- **Bảng `wharton_bids(student_id, club_id, tier, points)`** trong `DEFAULT_SCHEMA` (khoá chính `(student_id, club_id)`, `tier IN (1, 2)`,
+  `points >= 0`, khoá ngoại tới `students`, `clubs`); bảng mới hoàn toàn nên chỉ cần `CREATE TABLE IF NOT EXISTS`, không vào
+  `_BANG_RANG_BUOC`. `tier` = quỹ lúc NỘP (1 = lúc ghi em đang tick thi CLB đó). Đổi ô tick sau khi chia điểm thì hồ sơ thành chưa
+  hợp lệ (`wharton_ngoai_tap`); phần mềm KHÔNG tự chuyển điểm sang quỹ kia. Dọn ở mọi cửa xoá: `delete_student`, `delete_club`,
+  `reset_student_entry`, `reset_data` (`_RESET_BANG`), `submit_preferences` (bỏ CLB thì xoá điểm CLB đó), `seed_sample_data`; nạp CSV
+  nguyện vọng cũng dọn dòng của CLB bị bỏ.
+- **Thay đổi hợp đồng cột (bất biến 7), chỉ khi workspace bật Wharton:** CSV nguyện vọng thêm `wp_k` đi cặp `pref_k`, `<buoi>_wp_k`
+  đi cặp `<buoi>_pref_k`, và cột `wp` cho dạng dài (ghép theo HẬU TỐ SỐ, không theo vị trí); Sổ nhập thêm cột "Điểm W k" ngay sau
+  "Điểm k" (kèm kiểm số nguyên ở Excel, màu riêng, đoạn hướng dẫn hai quỹ). Tệp không có các cột này nạp như cũ; chưa bật mà có thì bỏ
+  qua kèm `csv_wp_bo_qua`. Xuất "dữ liệu đầu vào" ra Sổ nhập có cột W khi bật; nạp lại ra `wharton_bids` giống hệt.
+- **Khoá luật `rules.wharton`** (bool, mặc định `False`): `cau_hinh_ws` từ chối tổ hợp khác; `LUAT_XEP_MAC_DINH["wharton"]`, `dung_wharton`.
+  Khoá `wharton` chỉ vào chuỗi ghi `run_history.luat_xep` và phần băm dấu vân tay khi BẬT (`_luat_de_ghi_hoac_bam`), nên workspace
+  tuỳ biến cũ giữ nguyên từng byte. Dấu vân tay có thêm bảng `wharton_bids` khi bật.
+- **Đọc dữ liệu:** `doc_du_lieu_wharton`, `load_from_sqlite_kem_dau_van_tay_wharton` (dữ liệu, dấu vân tay và Wharton trong MỘT giao
+  dịch đọc); `_doc_du_lieu`, `load_from_sqlite_kem_dau_van_tay` giữ nguyên chữ ký và giá trị trả về.
+- **API kiosk:** `submit_wharton(student_id, w1, w2)` (kiểm ở server theo V6: tự điền một CLB → `kiem_ho_so_wharton` → thay toàn bộ dòng
+  của em; hồ sơ sai thì không ghi gì và trả đúng danh sách lỗi); `get_student_entry_state` có thêm khoá `wharton` CHỈ khi bật (tắt thì
+  y hệt trước).
+- **Nối pipeline** (`_run_pipeline_da_khoa`, chỉ bước 2 và 4): bước Kiểm tra dữ liệu đọc bằng bản có Wharton, chạy `kiem_ho_so_wharton` và
+  `diem_wharton_hieu_luc` NGAY SAU `validate_data_integrity` — trước soát buổi, bốc, khoá STB; có lỗi (mọi mã trừ `wharton_vang_thi`) thì
+  trả `wharton_ho_so_chua_hop_le` cùng đủ lỗi, không vẽ số, không ghi, không thêm dòng `run_history`. Vắng thi chỉ là cảnh báo trong chi
+  tiết bước validate. Bước 4 truyền `diem_wharton` cho `run_rbda_nhieu_buoi`. Thứ tự năm bước giữ nguyên.
+- **Sức khoẻ dữ liệu:** `health_wharton_chua_hop_le` (mức high) và `health_wharton_vang_thi` (mức medium), chỉ khi bật, đặt sau các mục sẵn có.
+- **Giao diện:** ô "Dùng điểm Wharton" ở bước luật của trình hướng dẫn workspace (khoá và tự bỏ chọn khi không dùng được) và hàng tóm tắt
+  `rvWharton`; màn "Bước 3. Điểm Wharton" ở tab Nhập tại chỗ (hai khung mỗi buổi, bộ đếm "Đã dùng X / 100", tự điền và khoá khung một CLB,
+  "Cần chia lại điểm" khi lệch tier, vẽ lại sau khi lưu Bước 1 / 2, chung cơ chế "chưa lưu"; học sinh chỉ thấy điểm của chính mình).
+- **Mã lỗi song ngữ (8):** `csv_wp_khong_hop_le`, `csv_wp_khong_co_nguyen_vong`, `csv_wp_bo_qua`, `wharton_chua_bat`,
+  `wharton_ho_so_chua_hop_le`, `health_wharton_chua_hop_le`, `health_wharton_vang_thi`, `error_saving_wharton`; `i18n_loi.js` sinh lại, chỉ thêm dòng.
+- **Test mới: 252 ca** (viết trước, thấy đỏ rồi mới viết mã): `test_wharton_luu_tru` (21), `test_wharton_luat` (30), `test_wharton_doc` (15),
+  `test_wharton_ma_loi` (56), `test_wharton_nhap` (24), `test_wharton_so_nhap` (23), `test_wharton_kiosk` (29), `test_wharton_pipeline` (24),
+  `test_wharton_suc_khoe` (6), `test_wharton_dau_cuoi` (1), `test_ws_wharton_giao_dien` (9), `test_giao_dien_wharton` (14). Bản chụp mốc
+  `tests/du_lieu_ws/wharton_moc_truoc_vong2.json` (`match_results`, `dau_van_tay_chay`, `luat_xep` của 3 bộ × 3 seed, chụp bằng mã TRƯỚC
+  vòng 2) được so trong `test_wharton_pipeline`. Đã thử phá hoại có chủ đích (bỏ truyền `diem_wharton` ở bước 4): bị bắt.
+- **Xác nhận.** Tắt Wharton: giống hệt mốc (810 dòng `match_results`, dấu vân tay, `luat_xep`); `TestTrungKhit` 7/7. Toàn bộ test (kèm Chromium
+  thật): 2.383 qua, 3 bỏ qua (thiếu `numpy`; cần người dùng không phải root), 0 đỏ; `ruff check .` 0 lỗi; độ phủ 92,43 % (sàn 85 %).
+- **Chỗ lệch yêu cầu, có lý do.** (1) Câu chữ màn kiosk không dùng "bạn" ("Các CLB bạn đã thi" thành "Các {slot_sl} đã thi") vì
+  `tests/test_van_phong_tu_nhien.py` cấm xưng hô "bạn/em" trong mọi chuỗi giao diện; câu báo lỗi vẫn là "Chưa dùng hết điểm Wharton…".
+  (2) `{detail}` của `error_saving_wharton` không nằm trong câu (test văn phong cấm); `format_message` tự thêm chi tiết ở cuối như các mã
+  `error_*` khác. (3) `tests/test_ws_nhan.py`: chỉ THÊM 8 mã mới vào `MA_MOI_SAU_ANH_CHUP` (test đó tự quy định cách này; ngoại lệ "wharton: False"
+  của luật KHÔNG phải dùng cho test nào). (4) `get_student_entry_state` có thêm `tu_dien_mot_clb` và `ds_buoi` trong khoá `wharton`.
+  (5) Khoá `wharton` chỉ được ghi vào `luat_xep` / băm khi bật, để bất biến 1 đúng cả với workspace tuỳ biến cũ.
+- **Việc sau:** cập nhật ba skill trong `.claude/skills/` (sinh dữ liệu, xử lí raw forms, tạo workspace) cho cột mới; biểu mẫu Google hai khung;
+  mô phỏng VISEF; ngưỡng điểm tối thiểu; công bố điểm chuẩn; giải trình từng em (C3). Điểm cần Truong quyết: em có quỹ chỉ một CLB mà chưa
+  bấm Lưu ở kiosk thì lần chạy bị chặn (màn kiosk tự điền 100 nhưng chưa ghi) — có muốn tự điền ngay trong pipeline không.
+
 ## 2026-10-24 — A13 Điểm Wharton (vòng 1: lõi thuật toán và test)
 
 Mục mới A13 trong sổ đăng ký (`docs/ke_hoach/`), làm theo quyết định của Truong ngày 24/10: **giữ nguyên STB**

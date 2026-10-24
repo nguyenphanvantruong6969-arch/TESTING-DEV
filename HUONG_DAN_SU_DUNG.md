@@ -23,6 +23,7 @@
 11. [Sự cố hay gặp](#11-sự-cố-hay-gặp)
 12. [Thuật toán làm gì](#12-thuật-toán-làm-gì)
 13. [Giới hạn đã biết](#13-giới-hạn-đã-biết)
+14. [Điểm Wharton (tuỳ chọn)](#14-điểm-wharton-tuỳ-chọn)
 
 ---
 
@@ -957,6 +958,67 @@ Bỏ trống nguyện vọng là tự bỏ cơ hội của chính mình.
 
 Số liệu đầy đủ: `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md` mục 3c.
 Ba câu hỏi hay gặp nhất về bốc thăm, kèm số đo: **`docs/GIAI_DAP_BOC_THAM.md`**.
+
+## 14. Điểm Wharton (tuỳ chọn)
+
+Mặc định **TẮT**: không bật thì phần mềm chạy y hệt như trước, kể cả kết quả và dấu vân tay dữ liệu.
+Khi bật, mỗi học sinh tự chia điểm để nói mình muốn CLB nào hơn. Điểm này được xét **trước** số bốc thăm
+và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hưởng thứ tự ưu tiên của CLB.
+
+### Hai quỹ điểm
+
+- Mỗi buổi, mỗi học sinh có **hai quỹ, mỗi quỹ đúng 100 điểm** (số nguyên từ 0 trở lên; ô trống tính là 0).
+- **Quỹ 1** chia cho các CLB em có thi. Chỉ dùng để phá hoà khi hai em **bằng điểm thi**.
+- **Quỹ 2** chia cho các CLB em không thi. Điểm cao hơn thì đứng trước; bằng điểm mới đến số bốc thăm.
+- Quỹ nào chỉ có một CLB thì điền 100.
+
+### Bật ở đâu
+
+Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm Wharton** (hoặc chọn một mẫu đã bật sẵn).
+Ô này chỉ dùng được khi cách xếp ưu tiên có điểm (Theo điểm, hoặc Nhóm trước rồi đến điểm) **và** điểm tính
+riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một điểm duy nhất" thì ô tự khoá và bỏ chọn.
+
+### Cột trong Sổ nhập và tệp CSV (chỉ khi đã bật)
+
+| Tệp | Cột điểm Wharton |
+|---|---|
+| Sổ nhập | mỗi nhóm thành `NV k` · `Điểm k` · `Điểm W k` (cột `Điểm W k` ngay sau `Điểm k`) |
+| CSV nguyện vọng, dạng rộng | `wp_k` đi cặp `pref_k` |
+| CSV nguyện vọng, cột theo buổi | `<buoi>_wp_k` đi cặp `<buoi>_pref_k` |
+| CSV nguyện vọng, dạng dài | thêm cột `wp` cạnh `club_id` |
+
+- Tệp **không có** các cột này thì nạp như cũ. Chưa bật mà tệp có các cột này thì chúng bị bỏ qua và phần mềm
+  báo số ô đã bỏ.
+- Nạp lại tệp cho một học sinh là **thay** mọi điểm Wharton cũ của em đó; em không có trong tệp thì giữ nguyên.
+- Ô không phải số nguyên từ 0 trở lên (ví dụ `12,5`, `-3`, `abc`) bị báo và không lưu; các ô khác vẫn lưu.
+- Nạp **không bị chặn** vì tổng chưa đủ 100: phần mềm chỉ cảnh báo. Việc chặn nằm ở bước chạy (xem dưới).
+- Xuất "dữ liệu đầu vào" ra Sổ nhập rồi nạp lại thì điểm Wharton giống hệt.
+
+### Học sinh chia điểm ở kiosk
+
+Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm Wharton**. Mỗi buổi có hai khung (CLB đã thi, CLB không
+thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm Wharton**; chưa đủ 100 thì phần mềm báo còn
+thiếu bao nhiêu ở quỹ nào và không lưu.
+
+- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của bạn khác.
+- Khung chỉ có một CLB thì ô tự điền 100 và khoá, nhưng vẫn phải bấm **Lưu** (chưa lưu thì cơ sở dữ liệu chưa có điểm).
+- Đổi ô tick thi ở Bước 1 **sau khi** đã chia điểm: điểm **không** tự chuyển sang quỹ kia. Khung hiện dòng
+  *Cần chia lại điểm* và hồ sơ chưa hợp lệ cho tới khi chia lại.
+- Bỏ một CLB khỏi nguyện vọng ở Bước 2 thì điểm đã đặt ở CLB đó bị xoá.
+
+### Khi nào lần chạy bị chặn
+
+Ở bước **Kiểm tra dữ liệu**, trước khi bốc thăm: nếu hồ sơ của **bất kỳ** học sinh nào chưa hợp lệ (tổng khác 100,
+điểm không phải số nguyên từ 0 trở lên, điểm đặt ở CLB không thuộc quỹ đó, nguyện vọng chưa xếp xong…), phần mềm
+**không bốc thăm, không ghi gì**, và trả đủ danh sách: học sinh nào, quỹ nào, thiếu hay thừa bao nhiêu. Sửa xong thì
+chạy lại. Mục **Cảnh báo dữ liệu** báo trước hai điều khi đã bật: số học sinh có hồ sơ chưa hợp lệ (mức cao, vì sẽ
+chặn chạy) và số học sinh vắng thi (mức vừa).
+
+### Cảnh báo vắng thi
+
+Một học sinh tick thi CLB X và đặt điểm quỹ 1 cho X, nhưng đến lúc xếp không có điểm thi ở X. Khi đó X được xét như
+CLB **không thi** của em: điểm quỹ 1 đã đặt cho X **không được tính**; nếu em có đặt điểm quỹ 2 cho X thì dùng điểm
+đó, không có thì tính 0. Lần chạy vẫn tiếp tục; cảnh báo nằm trong chi tiết của bước Kiểm tra dữ liệu.
 
 ---
 

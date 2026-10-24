@@ -403,7 +403,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
 ### A13 — Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA)
 - **Mức / quy mô:** Viết mới / M
 - **Tệp:** rbda_priority_pipeline.py, i18n_errors.py
-- **Dòng:** khối Wharton sau uu_tien_theo_nhom (L252–L574); run_rbda (L781); run_rbda_nhieu_buoi (L1366)
+- **Dòng:** rbda_priority_pipeline.py: khối Wharton sau uu_tien_theo_nhom (L252–L574), dung_wharton (L596), run_rbda (L815), run_rbda_nhieu_buoi (L1400), bảng wharton_bids (L1944), doc_du_lieu_wharton (L2497), load_from_sqlite_kem_dau_van_tay_wharton (L2572); api_quan_ly.py: _trang_thai_wharton (L366), submit_wharton (L394); api.py: bước Kiểm tra dữ liệu của _run_pipeline_da_khoa (~L1001–L1036), get_data_health_report (~L587–L614); api_nhap.py: _cot_wp (L1040), _soat_ho_so_wharton (L1073); js/04_nhap_tai_cho.js: renderWhartonStep (L464)
 - **Hàm:** khoa_uu_tien_wharton, uu_tien_wharton, kiem_ho_so_wharton, tu_dien_wharton_mot_clb, diem_wharton_hieu_luc, run_rbda, run_rbda_nhieu_buoi
 - **Hiện trạng:** Tầng 2 xếp hoàn toàn bằng số bốc thăm; tầng 1 bằng điểm thì phá hoà bằng số bốc thăm. Học sinh không có cách nào bày tỏ mức độ muốn vào một CLB.
 - **Thay đổi:** Mỗi học sinh có hai quỹ 100 điểm mỗi buổi (quỹ 1: CLB có thi, chỉ phá hoà sau điểm thi; quỹ 2: CLB không thi, tiêu chí chính tầng 2), xét TRƯỚC số bốc thăm. Gale–Shapley chạy một lần; thứ hạng nguyện vọng không vào khoá. Hàm bọc uu_tien_wharton thay nguồn base_rank khi diem_wharton khác None; mặc định None = hành vi cũ. Vòng 1 chỉ có lõi thuật toán, kiểm hồ sơ V1–V4, mã lỗi, test.
@@ -423,6 +423,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - **Khoá luật `rules.wharton`** (bool): bật được khi `priority` là `score` hoặc `score+tier` VÀ `score_scope` là `per_slot`; tổ hợp khác thì `cau_hinh_ws` từ chối. Bản luật đem ghi (`run_history.luat_xep`) và băm (dấu vân tay) chỉ chứa khoá `wharton` khi nó bật.
   - **Màn kiosk** "Bước 3 · Điểm Wharton" (tab Nhập tại chỗ): mỗi buổi hai khung "Đã dùng X / 100"; API mới `submit_wharton(student_id, w1, w2)` kiểm ở server; `get_student_entry_state` có thêm khoá `wharton` chỉ khi bật. Học sinh chỉ thấy điểm của chính mình.
   - **Nối pipeline:** ở bước "Kiểm tra dữ liệu", sau `validate_data_integrity` và TRƯỚC khi bốc hay khoá STB: hồ sơ sai (mọi mã `wharton_*` trừ `wharton_vang_thi`) chặn cả lần chạy và trả đủ danh sách lỗi; vắng thi chỉ cảnh báo. Điểm hiệu lực (`diem_wharton_hieu_luc`) truyền cho `run_rbda_nhieu_buoi`. `get_data_health_report` có thêm hai mục khi bật.
+  - **Việc sau vòng 2:** cập nhật ba skill trong `.claude/skills/` (sinh dữ liệu, xử lí raw forms, tạo workspace) cho cột mới (`wp_k`, "Điểm W k"); biểu mẫu Google hai khung; mô phỏng VISEF; ngưỡng điểm tối thiểu; công bố điểm chuẩn; giải trình từng em (C3).
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
 
