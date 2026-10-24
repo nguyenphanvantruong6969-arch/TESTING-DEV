@@ -119,6 +119,7 @@ class QuanLyMixin:
                     ))
                 # Con trước, cha sau: khoá ngoại chặn xoá CLB khi còn dòng
                 # đăng ký thi / điểm trỏ tới nó.
+                cur.execute("DELETE FROM wharton_bids WHERE club_id = ?", (club_id,))
                 cur.execute("DELETE FROM club_test_selection WHERE club_id = ?", (club_id,))
                 cur.execute("DELETE FROM club_scores WHERE club_id = ?", (club_id,))
                 cur.execute("DELETE FROM clubs WHERE club_id = ?", (club_id,))
@@ -478,6 +479,12 @@ class QuanLyMixin:
                     "INSERT INTO preferences (student_id, club_id, rank) VALUES (?, ?, ?)",
                     [(student_id, cid, i + 1) for i, cid in enumerate(ordered_club_ids)],
                 )
+                # Bỏ một CLB khỏi nguyện vọng thì điểm Wharton đặt ở CLB đó đi theo (đặc tả
+                # 4.2); các dòng khác giữ nguyên. Đặt SAU khi ghi nguyện vọng mới.
+                cur.execute(
+                    "DELETE FROM wharton_bids WHERE student_id = ? AND club_id NOT IN "
+                    "(SELECT club_id FROM preferences WHERE student_id = ?)",
+                    (student_id, student_id))
             return _ok({"student_id": student_id, "n_ranked": len(ordered_club_ids)})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
@@ -518,6 +525,7 @@ class QuanLyMixin:
                 ).fetchone()
                 if not exists:
                     return _fail(err("student_not_found", student_id=student_id))
+                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 n_xoa = self._xoa_diem_khong_con_tick(cur, student_id)
@@ -550,6 +558,7 @@ class QuanLyMixin:
                 ).fetchone()[0]
                 if n_matches > 0:
                     return _fail(err("cannot_delete_student_matched", student_id=student_id))
+                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_scores WHERE student_id = ?", (student_id,))
@@ -574,9 +583,9 @@ class QuanLyMixin:
 
     # Xoá theo đúng thứ tự phụ thuộc: bảng con trước, students sau cùng.
     _RESET_BANG = {
-        "hoc_sinh": ["match_results", "club_scores", "preferences",
+        "hoc_sinh": ["wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students"],
-        "tat_ca":   ["match_results", "club_scores", "preferences",
+        "tat_ca":   ["wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students", "clubs"],
     }
 
@@ -615,6 +624,10 @@ class QuanLyMixin:
                     ten: cur.execute("SELECT COUNT(*) FROM %s" % ten).fetchone()[0]
                     for ten in bang
                 }
+                # Điểm Wharton chỉ hiện trong báo cáo khi có dòng bị xoá: Wharton tắt thì phản
+                # hồi y hệt trước vòng 2.
+                if not da_xoa.get("wharton_bids"):
+                    da_xoa.pop("wharton_bids", None)
                 for ten in bang:
                     cur.execute("DELETE FROM %s" % ten)
 

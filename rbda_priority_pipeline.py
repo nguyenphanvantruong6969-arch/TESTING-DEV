@@ -574,14 +574,15 @@ def diem_wharton_hieu_luc(
     return hieu_luc, thong_bao
 
 
-# Bốn khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
-# thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ.
+# Năm khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
+# thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ. `wharton` (mục A13)
+# mặc định TẮT; xem `dung_wharton` và `_luat_de_ghi_hoac_bam`.
 LUAT_XEP_MAC_DINH = {"priority": "score", "tier_mode": "reserve",
-                     "score_scope": "per_slot", "tiers": []}
+                     "score_scope": "per_slot", "tiers": [], "wharton": False}
 
 
 def luat_xep_cua(rules) -> dict:
-    """Bốn khoá luật xếp của `rules` (thiếu khoá thì lấy mặc định trường học)."""
+    """Năm khoá luật xếp của `rules` (thiếu khoá thì lấy mặc định trường học)."""
     rules = rules or {}
     return {k: (list(rules.get(k) or []) if k == "tiers" else rules.get(k, v))
             for k, v in LUAT_XEP_MAC_DINH.items()}
@@ -590,6 +591,39 @@ def luat_xep_cua(rules) -> dict:
 def nhom_xep_cung(luat: dict) -> bool:
     """Nhóm xếp CỨNG (hạng nhóm đứng trước điểm, bỏ suất dự trữ)? `luat` từ `luat_xep_cua`."""
     return luat["tier_mode"] == "strict" or luat["priority"] == "tier"
+
+
+def dung_wharton(rules) -> bool:
+    """Workspace có dùng điểm Wharton (mục A13) không? `rules` thô hoặc đã chuẩn hoá.
+
+    Chỉ bật được khi priority là "score" hoặc "score+tier" VÀ score_scope là "per_slot" (điểm
+    Wharton cần biết em có thi CLB nào). `cau_hinh_ws` đã từ chối tổ hợp khác lúc lưu; ở đây
+    ném `ValueError` thêm một lần cho cấu hình hỏng lọt qua (sửa tay trong CSDL): chạy theo
+    kiểu khác mà không báo là loại lỗi im lặng dự án này không chấp nhận.
+    """
+    luat = luat_xep_cua(rules)
+    bat = luat["wharton"]
+    if not isinstance(bat, bool):
+        raise ValueError("rules.wharton phai la true hoac false, nhan %r" % (bat,))
+    if bat and (luat["priority"] not in ("score", "score+tier")
+                or luat["score_scope"] != "per_slot"):
+        raise ValueError(
+            "rules.wharton chi dung duoc khi priority la score hoac score+tier va "
+            "score_scope la per_slot (priority=%r, score_scope=%r)"
+            % (luat["priority"], luat["score_scope"]))
+    return bat
+
+
+def _luat_de_ghi_hoac_bam(luat: dict) -> dict:
+    """Bản của luật hiệu lực để GHI (`run_history.luat_xep`) hoặc BĂM (dấu vân tay).
+
+    Khoá `wharton` chỉ có mặt khi nó BẬT. Tắt thì bỏ đi: workspace tuỳ biến đã có từ trước
+    (nhóm xếp cứng, điểm theo người…) phải giữ nguyên từng byte chuỗi đã ghi và dấu vân tay,
+    nếu không mọi kết quả cũ của chúng tự báo "đã cũ" chỉ vì có thêm một khoá luôn bằng False.
+    """
+    if luat.get("wharton") is False:
+        return {k: v for k, v in luat.items() if k != "wharton"}
+    return luat
 
 
 def luat_xep_hieu_luc(rules) -> dict:
@@ -626,7 +660,7 @@ def luat_xep_de_ghi(rules):
     luat = luat_xep_hieu_luc(rules)
     if luat == LUAT_XEP_MAC_DINH:
         return None
-    return json.dumps(luat, sort_keys=True, ensure_ascii=False)
+    return json.dumps(_luat_de_ghi_hoac_bam(luat), sort_keys=True, ensure_ascii=False)
 
 
 def tham_so_luat(rules, students: dict[str, dict]) -> dict:
@@ -1897,6 +1931,23 @@ CREATE TABLE IF NOT EXISTS workspace_settings (
     key TEXT PRIMARY KEY,
     value TEXT
 );
+
+-- Điểm Wharton (mục A13, chỉ dùng khi rules.wharton bật): mỗi học sinh chia hai quỹ, mỗi
+-- quỹ 100 điểm MỖI BUỔI, cho các CLB trong danh sách nguyện vọng. Bảng MỚI hoàn toàn, không
+-- cột nào thêm vào bảng cũ, nên CREATE TABLE IF NOT EXISTS đã đủ cho cả CSDL cũ (như
+-- workspace_settings) và KHÔNG nằm trong _BANG_RANG_BUOC.
+--
+-- `tier` là quỹ lúc NỘP: 1 = lúc ghi em đang tick thi CLB này, 2 = không. Lưu lại chứ không
+-- suy ra từ ô tick hiện tại, vì đổi ô tick SAU khi đã chia điểm phải làm hồ sơ chưa hợp lệ
+-- (kiem_ho_so_wharton báo "ngoài tập") để em chia lại — phần mềm không được lặng lẽ chuyển
+-- điểm từ quỹ này sang quỹ kia. Ô điểm trống = không có dòng (tính là 0).
+CREATE TABLE IF NOT EXISTS wharton_bids (
+    student_id TEXT NOT NULL REFERENCES students (student_id),
+    club_id TEXT NOT NULL REFERENCES clubs (club_id),
+    tier INTEGER NOT NULL CHECK (tier IN (1, 2)),
+    points INTEGER NOT NULL CHECK (points >= 0),
+    PRIMARY KEY (student_id, club_id)
+);
 """
 
 # busy_timeout dai hon mac dinh (5s) — nhieu tien trinh cung mo app.db
@@ -2348,7 +2399,8 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
     if luat != LUAT_XEP_MAC_DINH:
         import json
 
-        h.update(("\x1eluat" + json.dumps(luat, sort_keys=True, ensure_ascii=True)).encode("utf-8"))
+        h.update(("\x1eluat" + json.dumps(_luat_de_ghi_hoac_bam(luat), sort_keys=True,
+                                          ensure_ascii=True)).encode("utf-8"))
     return h.hexdigest()
 
 
@@ -2672,6 +2724,7 @@ def seed_sample_data(
     cur = conn.cursor()
     # Con trước, cha sau — khoá ngoại chặn xoá students/clubs khi còn dòng
     # trỏ tới chúng. Cùng thứ tự với `PipelineAPI._RESET_BANG`.
+    cur.execute("DELETE FROM wharton_bids")
     cur.execute("DELETE FROM match_results")
     cur.execute("DELETE FROM club_scores")
     cur.execute("DELETE FROM preferences")
