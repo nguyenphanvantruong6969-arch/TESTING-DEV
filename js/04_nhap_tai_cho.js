@@ -100,6 +100,15 @@ function boChonHocSinhDuPhong() {
 }
 
 function initFallbackHandlers() {
+  /* Bước 3 (Wharton) là chữ do JS ghi nên applyStaticText() không dịch được; đổi ngôn ngữ thì vẽ
+     lại từ trạng thái đang có, giữ điểm đã gõ (không nạp lại CSDL, để không mất thao tác chưa lưu).
+     Nghe ở ĐÂY chứ không sửa reapplyDynamicTextForLangChange: tệp đó ngoài phạm vi của mục A13. */
+  window.addEventListener("langchange", () => {
+    if (currentFallbackStudent && whartonState) {
+      renderWhartonStep(whartonState, whartonGiuTam());
+      veDauChuaLuu();
+    }
+  });
   el("btnStudentSearch").addEventListener("click", () => {
     fallbackStudentPage = 1;
     loadFallbackStudentList();
