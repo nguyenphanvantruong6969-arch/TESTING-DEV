@@ -533,6 +533,40 @@ MESSAGES = {
         "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 Wharton point(s) ({diem_bo} fund 1 point(s) not counted).",
     },
 
+    # --- điểm Wharton, vòng 2 (A13): nhập liệu, kiosk, pipeline, sức khoẻ dữ liệu ---
+    "csv_wp_khong_hop_le": {
+        "vi": "Điểm Wharton của {person_l} {student_id} ở {slot_sl} {club_id} là “{gia_tri}”, không phải số nguyên từ 0 trở lên. Ô này chưa được lưu.",
+        "en": "The Wharton points for {person_l} {student_id} on {slot_l} {club_id} are “{gia_tri}”, not a whole number of 0 or more. This cell wasn't saved.",
+    },
+    "csv_wp_khong_co_nguyen_vong": {
+        "vi": "{student_id}: có điểm Wharton ở cột {cot} nhưng ô nguyện vọng cạnh đó để trống. Điểm này chưa được lưu.",
+        "en": "{student_id}: there are Wharton points in column {cot} but the preference cell next to it is empty. Those points weren't saved.",
+    },
+    "csv_wp_bo_qua": {
+        "vi": "Không gian làm việc này chưa bật điểm Wharton: {n} ô điểm Wharton trong tệp đã được bỏ qua, không lưu.",
+        "en": "This workspace doesn't use Wharton points yet: {n} Wharton points cell(s) in the file were skipped and not saved.",
+    },
+    "wharton_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật điểm Wharton.",
+        "en": "Wharton points aren't turned on for this workspace.",
+    },
+    "wharton_ho_so_chua_hop_le": {
+        "vi": "{n} {person_l} có hồ sơ điểm Wharton chưa hợp lệ, nên chưa chạy xếp. Hãy sửa rồi chạy lại.",
+        "en": "{n} {person_l}(s) have a Wharton points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again.",
+    },
+    "health_wharton_chua_hop_le": {
+        "vi": "{n} {person_l} có hồ sơ điểm Wharton chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",
+        "en": "{n} {person_l}(s) have a Wharton points profile that isn't valid yet, so the allocation will be blocked until it is fixed.",
+    },
+    "health_wharton_vang_thi": {
+        "vi": "{n} {person_l} vắng thi một {slot_sl} đã đặt điểm quỹ 1, nên {slot_sl} đó được xét như không thi (điểm quỹ 1 không được tính).",
+        "en": "{n} {person_l}(s) missed the test for a {slot_l} they put fund 1 points on, so it is ranked as not tested (the fund 1 points don't count).",
+    },
+    "error_saving_wharton": {
+        "vi": "Không lưu được điểm Wharton. Hãy thử lại.",
+        "en": "Couldn't save the Wharton points. Try again.",
+    },
+
     # --- CSV import row warnings (returned inside a successful "ok" response) ---
     "csv_pref_duplicate_deduped": {
         "vi": "{student_id}: có {slot_sl} bị lặp trong nguyện vọng, phần lặp đã được bỏ.",

@@ -2364,7 +2364,8 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
 
     `rules` (luật của workspace; mặc định None) chỉ làm đổi dấu vân tay khi luật xếp KHÁC
     mặc định trường học: đổi nhóm xếp, chế độ nhóm, cách ưu tiên hay phạm vi điểm làm kết
-    quả cũ đi dù không dòng dữ liệu nào đổi. Điểm theo người thì thêm cả cột điểm đó.
+    quả cũ đi dù không dòng dữ liệu nào đổi. Điểm theo người thì thêm cả cột điểm đó; luật
+    bật điểm Wharton thì thêm cả bảng `wharton_bids`.
     Luật mặc định thì dấu vân tay GIỮ NGUYÊN từng byte so với trước.
 
     Đặt CẠNH `load_from_sqlite` có chủ ý: dấu vân tay của một lần chạy phải
@@ -2392,6 +2393,11 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
     if diem_theo_nguoi(rules):
         cac_phan.append(("diem_ca_nhan", "SELECT student_id, diem_ca_nhan FROM students "
                                          "ORDER BY student_id"))
+    # Điểm Wharton chỉ vào dấu vân tay khi BẬT: tắt thì bảng wharton_bids không quyết định
+    # kết quả nào, sửa nó không được làm kết quả báo "đã cũ".
+    if dung_wharton(rules):
+        cac_phan.append(("wharton", "SELECT student_id, club_id, tier, points FROM wharton_bids "
+                                    "ORDER BY student_id, club_id"))
     for ten, sql in cac_phan:
         h.update(("\x1e" + ten).encode("utf-8"))
         for row in cur.execute(sql):
@@ -2488,6 +2494,27 @@ def _doc_du_lieu(cur, rules=None):
     return students, clubs, tested_scores, applicants, preferences, stb_lottery
 
 
+def doc_du_lieu_wharton(cur) -> dict:
+    """Hồ sơ điểm Wharton đã lưu, đúng dạng `kiem_ho_so_wharton` / `diem_wharton_hieu_luc` nhận.
+
+    Trả `{"clb_thi": {sid: set(cid)}, "w1": {sid: {cid: điểm}}, "w2": {...}}`: `w1` / `w2` tách
+    theo cột `tier` (quỹ lúc NỘP); `clb_thi` là ô tick HIỆN TẠI. Dòng có `tier` lệch với ô tick
+    hiện tại vẫn được trả nguyên — để `kiem_ho_so_wharton` báo lệch, không lặng lẽ sửa.
+    Đặt cạnh `_doc_du_lieu`; `ORDER BY` cố định để kết quả tất định.
+    """
+    clb_thi: dict = {}
+    for sid, cid in cur.execute(
+            "SELECT student_id, club_id FROM club_test_selection "
+            "ORDER BY student_id, club_id"):
+        clb_thi.setdefault(sid, set()).add(cid)
+    w: dict = {1: {}, 2: {}}
+    for sid, cid, tier, diem in cur.execute(
+            "SELECT student_id, club_id, tier, points FROM wharton_bids "
+            "ORDER BY student_id, club_id"):
+        w[tier].setdefault(sid, {})[cid] = diem
+    return {"clb_thi": clb_thi, "w1": w[1], "w2": w[2]}
+
+
 def _mo_doc_nhat_quan(db_path: str):
     """Kết nối + giao dịch ĐỌC tường minh: mọi SELECT sau đó thấy CÙNG một
     trạng thái CSDL.
@@ -2537,6 +2564,24 @@ def load_from_sqlite_kem_dau_van_tay(db_path: str, rules=None):
         cur = conn.cursor()
         du_lieu = _doc_du_lieu(cur, rules)
         return du_lieu, dau_van_tay_du_lieu(cur, rules)
+    finally:
+        conn.rollback()
+        conn.close()
+
+
+def load_from_sqlite_kem_dau_van_tay_wharton(db_path: str, rules=None):
+    """Như `load_from_sqlite_kem_dau_van_tay`, kèm hồ sơ điểm Wharton.
+
+    Trả `(du_lieu, dau_van_tay, wharton)`: dữ liệu, dấu vân tay VÀ hồ sơ Wharton đều lấy trong
+    CÙNG một giao dịch đọc. Lần chạy khi `rules.wharton` bật dùng hàm này thay vì đọc Wharton
+    một lần riêng: đọc lần hai thì một lần lưu từ kiosk chen giữa làm dấu vân tay và điểm
+    Wharton đến từ hai trạng thái khác nhau. Hàm cũ giữ nguyên chữ ký và giá trị trả về.
+    """
+    conn = _mo_doc_nhat_quan(db_path)
+    try:
+        cur = conn.cursor()
+        du_lieu = _doc_du_lieu(cur, rules)
+        return du_lieu, dau_van_tay_du_lieu(cur, rules), doc_du_lieu_wharton(cur)
     finally:
         conn.rollback()
         conn.close()

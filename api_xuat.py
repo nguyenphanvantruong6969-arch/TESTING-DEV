@@ -23,7 +23,9 @@ from i18n_errors import err
 from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
-from rbda_priority_pipeline import BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi
+from rbda_priority_pipeline import (
+    BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton,
+)
 import so_nhap
 
 
@@ -884,6 +886,15 @@ class XuatKetQuaMixin:
                 "SELECT student_id, club_id FROM preferences ORDER BY student_id, rank"):
             if sid in hs:
                 hs[sid]["nv"].append({"club_id": cid, "thi": False, "diem": ""})
+        # Workspace bật điểm Wharton: điểm đã chia của mỗi nguyện vọng đi vào cột "Điểm W k".
+        # Tắt thì không đọc bảng wharton_bids và sổ y hệt trước vòng 2.
+        if dung_wharton(self._cfg_ws(nghiem=True)["rules"]):
+            for sid, cid, diem_w in cur.execute(
+                    "SELECT student_id, club_id, points FROM wharton_bids "
+                    "ORDER BY student_id, club_id"):
+                o = next((x for x in hs.get(sid, {"nv": []})["nv"] if x["club_id"] == cid), None)
+                if o is not None:
+                    o["diem_w"] = diem_w
         n_ngoai = 0
         for sid, cid, diem in cur.execute("""
                 SELECT t.student_id, t.club_id, sc.score

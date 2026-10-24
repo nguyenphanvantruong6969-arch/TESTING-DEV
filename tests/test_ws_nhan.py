@@ -52,6 +52,10 @@ MA_MOI_SAU_ANH_CHUP = {
     "wharton_nguyen_vong_chua_xep", "wharton_chua_dung_het", "wharton_vuot_ngan_sach",
     "wharton_diem_khong_hop_le", "wharton_ngoai_tap", "wharton_tang_lech",
     "wharton_vang_thi",
+    # Vòng 2: nhập CSV / Sổ, kiosk, chặn chạy xếp, sức khoẻ dữ liệu.
+    "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
+    "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
+    "error_saving_wharton",
 }
 
 
