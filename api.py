@@ -45,6 +45,7 @@ from rbda_priority_pipeline import (
     connect_db,
     default_reserve_eligible_fn,
     diem_wharton_hieu_luc,
+    doc_du_lieu_wharton,
     dung_wharton,
     generate_stb_lottery,
     init_db,
@@ -267,6 +268,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # dùng luật mặc định, nên cảnh báo này đứng đầu và là mức cao.
                 luat, cau_hinh_hong = self._cfg_ws()["rules"], str(e)
             tran_thi = luat["max_tests"]   # trần của workspace; None = không giới hạn
+            bat_wharton = dung_wharton(luat)   # điểm Wharton (A13): thêm mục cuối báo cáo
             # Điểm theo NGƯỜI, hay không dùng điểm (priority "tier"): không còn "chấm từng
             # CLB" để mà soát — các mục 1, 2b, 8 (điểm từng CLB) bỏ qua; mục 1b thay vào.
             diem_tung_clb = (luat["score_scope"] != "per_person"
@@ -578,6 +580,37 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                              sample=", ".join(
                                  "%s (%g)" % (sid, s)
                                  for sid, s in la[:self._HEALTH_SAMPLE_LIMIT]))
+
+                # --- Điểm Wharton (A13): chỉ khi workspace bật; đặt SAU các mục sẵn có ------
+                # Cùng hai hàm mà lần chạy xếp dùng, trên dữ liệu đang lưu: hồ sơ sai sẽ CHẶN
+                # lần chạy nên là "high"; vắng thi chỉ làm em bị xét như không thi: "medium".
+                if bat_wharton:
+                    w = doc_du_lieu_wharton(cur)
+                    prefs_w: dict = {}
+                    for row in cur.execute(
+                            "SELECT student_id, club_id FROM preferences "
+                            "ORDER BY student_id, rank"):
+                        prefs_w.setdefault(row["student_id"], []).append(row["club_id"])
+                    clubs_w = {r["club_id"]: {"buoi": r["buoi"] or BUOI_MAC_DINH}
+                               for r in cur.execute("SELECT club_id, buoi FROM clubs")}
+                    diem_w: dict = {}
+                    for r in cur.execute(
+                            "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
+                            "JOIN club_test_selection t ON t.student_id = sc.student_id "
+                            "AND t.club_id = sc.club_id"):
+                        diem_w.setdefault(r["club_id"], {})[r["student_id"]] = r["score"]
+                    loi_w = kiem_ho_so_wharton(
+                        prefs_w, w["clb_thi"], w["w1"], w["w2"], clubs_w,
+                        tran_nguyen_vong=luat["max_choices"])
+                    _hl, tb_w = diem_wharton_hieu_luc(prefs_w, w["w1"], w["w2"], diem_w)
+                    loi_w += [e for e in tb_w if e["code"] != "wharton_vang_thi"]
+                    em_sai = {e["params"]["student_id"] for e in loi_w}
+                    if em_sai:
+                        warn("high", "health_wharton_chua_hop_le", n=len(em_sai))
+                    em_vang = {e["params"]["student_id"] for e in tb_w
+                               if e["code"] == "wharton_vang_thi"}
+                    if em_vang:
+                        warn("medium", "health_wharton_vang_thi", n=len(em_vang))
 
             return _ok({
                 "warnings": warnings,

@@ -169,6 +169,9 @@ function reapplyDynamicTextForLangChange() {
       renderTestSelectionGrid(daTick);
       renderRankingSourceGrid();
       renderRankingList();
+      /* Buoc 3 (Wharton) cung la chu do JS ghi; ve lai tu trang thai dang co, giu diem da go. */
+      if (whartonState) renderWhartonStep(whartonState, whartonGiuTam());
+      veDauChuaLuu();
     }
   }
 }

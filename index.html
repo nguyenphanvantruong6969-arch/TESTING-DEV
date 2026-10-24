@@ -597,6 +597,17 @@
             <span class="chua-luu" id="chuaLuuNv" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="preferencesFeedback"></span>
           </div>
+
+          <!-- Bước 3 · Điểm Wharton (mục A13): chỉ hiện khi workspace bật Wharton; js/04_nhap_tai_cho.js
+               dựng khung theo buổi trong #fbWhartonBody. -->
+          <div class="fallback-step" id="fbWhartonStep" hidden>
+            <h3 data-i18n="fallback_step3_title">Bước 3. Điểm Wharton</h3>
+            <p class="hint-text" data-i18n="fallback_step3_hint">Chia đúng 100 điểm cho các CLB đã thi và đúng 100 điểm cho các CLB không thi, ở mỗi buổi. Ô để trống tính là 0 điểm.</p>
+            <div id="fbWhartonBody"></div>
+            <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm Wharton</button>
+            <span class="chua-luu" id="chuaLuuWharton" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
+            <span class="save-feedback" role="status" aria-live="polite" id="whartonFeedback"></span>
+          </div>
         </div>
       </div>
     </section>

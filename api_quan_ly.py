@@ -22,6 +22,7 @@ from rbda_priority_pipeline import (
     dung_wharton,
     kiem_ho_so_wharton,
     loi_suc_chua,
+    sap_buoi,
     tu_dien_wharton_mot_clb,
 )
 
@@ -385,6 +386,9 @@ class QuanLyMixin:
             "w1": w[1], "w2": w[2],
             "quy_cua_clb": {c: (1 if c in tick else 2) for c in prefs},
             "buoi_cua_clb": {c: buoi.get(c, BUOI_MAC_DINH) for c in prefs},
+            # Các buổi của em theo THỨ TỰ NGÀY của trường (như phần nguyện vọng), để màn hình
+            # xếp khung theo buổi mà không phải gọi thêm.
+            "ds_buoi": sap_buoi({buoi.get(c, BUOI_MAC_DINH) for c in prefs}),
         }
 
     def submit_wharton(self, student_id: str, w1: dict, w2: dict):

@@ -55,6 +55,7 @@ def test_bat_wharton_trang_thai_co_khoa_wharton_dung_dang(w):
         "w1": {"A": 100}, "w2": {"B": 60, "C": 40},
         "quy_cua_clb": {"A": 1, "B": 2, "C": 2},
         "buoi_cua_clb": {"A": rp.BUOI_MAC_DINH, "B": rp.BUOI_MAC_DINH, "C": rp.BUOI_MAC_DINH},
+        "ds_buoi": [rp.BUOI_MAC_DINH],
     }
 
 
@@ -74,11 +75,12 @@ def test_quy_theo_o_tick_hien_tai_con_dong_da_luu_giu_tier_cu_de_man_hinh_biet_l
 
 def test_trang_thai_nhieu_buoi_co_buoi_cua_tung_clb(api):
     bat_wharton(api)
-    dung_clb(api, A=(5, "thu_3"), B=(5, "thu_5"))
+    dung_clb(api, A=(5, "thu_5"), B=(5, "thu_3"))              # thứ 5 đứng trước trong nguyện vọng
     dung_hs(api, "HS1")
     assert api.submit_preferences("HS1", ["A", "B"])["ok"]
     st = api.get_student_entry_state("HS1")["data"]["wharton"]
-    assert st["buoi_cua_clb"] == {"A": "thu_3", "B": "thu_5"}
+    assert st["buoi_cua_clb"] == {"A": "thu_5", "B": "thu_3"}
+    assert st["ds_buoi"] == ["thu_3", "thu_5"]                  # đã sắp theo thứ tự ngày
 
 
 # ------------------------------------------------------------------ submit_wharton: hợp lệ

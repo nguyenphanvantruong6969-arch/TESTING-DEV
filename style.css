@@ -2548,6 +2548,58 @@ html.tat-hieu-ung .status-strip:hover {
 .xuat-muc[hidden],
 .chua-luu[hidden] { display: none; }
 
+/* Bước 3 · Điểm Wharton (mục A13) — hai khung mỗi buổi, mỗi CLB một ô số, bộ đếm "Đã dùng X / 100".
+   Chỉ dùng token ở :root. */
+.wh-buoi-ten {
+  margin: 14px 0 4px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.wh-khung {
+  margin: 8px 0 12px;
+  padding: 10px 14px 6px;
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+}
+.wh-khung-dau {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.wh-khung-ten { font-weight: 600; }
+.wh-dem {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--slate);
+}
+.wh-dem.is-du { color: var(--moss); }
+.wh-dem.is-vuot { color: var(--rust-text); }
+.wh-ghi-chu {
+  margin: 2px 0 6px;
+  font-size: 12.5px;
+  color: var(--slate);
+}
+.wh-lech {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gold-text);
+}
+.wh-dong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.wh-dong:last-child { border-bottom: 0; }
+.wh-dong-ten { flex: 1; }
+.wh-diem { width: 6rem; text-align: right; }
+
 /* ============================= WORKSPACE =============================
    Nút đổi ở thanh bên, màn chọn và trình hướng dẫn (js/075_workspace.js).
    Chỉ dùng token ở :root — không có màu riêng. */
