@@ -249,6 +249,123 @@ def uu_tien_theo_nhom(
     return ra
 
 
+# ----- BƯỚC A2 — ĐIỂM WHARTON (A13) -----
+#
+# Mỗi học sinh có HAI quỹ điểm ảo cho mỗi buổi, mỗi quỹ 100 điểm, chia cho các CLB trong
+# danh sách nguyện vọng của em:
+#
+#   * quỹ 1 chia cho các CLB em có thi (T1). Quỹ này CHỈ để phá hoà: điểm thi đã quyết định
+#     trước, nên 100 điểm Wharton không bao giờ mua được chỗ đứng trước một người điểm thi
+#     cao hơn. Điểm Wharton chỉ có nghĩa khi hai người BẰNG điểm thi.
+#   * quỹ 2 chia cho các CLB em không thi (T2). Tầng 2 vốn không có tiêu chí nào ngoài số bốc
+#     thăm, nên quỹ này là tiêu chí chính của tầng 2.
+#
+# Điểm Wharton được xét TRƯỚC số bốc thăm: bằng điểm Wharton thì mới đến STB. Số bốc thăm,
+# bộ số đã khoá và cách chèn em đến muộn giữ nguyên (bất biến 3).
+#
+# KHÔNG có thứ hạng nguyện vọng trong khoá — kể cả ở vị trí phụ. Điểm Wharton là điểm em tự
+# chia cho từng CLB (khoá theo CLB), không phải vị trí của CLB trong danh sách; hoán vị danh
+# sách nguyện vọng mà giữ nguyên điểm thì thứ tự ưu tiên của mọi CLB không đổi. Đây là ràng
+# buộc chống nội sinh giống `compute_club_priority`.
+#
+# Gale–Shapley vẫn chạy MỘT lần cho cả hai tầng: chỉ đổi NGUỒN thứ tự nền `base_rank` của
+# `run_rbda`; dự trữ mềm và `verify_stability` dùng lại nguyên.
+
+# Ngân sách của MỖI quỹ, MỖI BUỔI (quyết định của chủ dự án 24/10/2026). Trường chỉ có một
+# buổi thì mỗi quỹ có đúng 100 điểm.
+WHARTON_NGAN_SACH = 100
+
+# Quỹ nào chỉ có đúng một CLB mà em chưa đặt điểm thì tự điền cả ngân sách vào CLB đó.
+# Chờ quyết của chủ dự án (mặc định bật).
+WHARTON_TU_DIEN_MOT_CLB = True
+
+# Em tick thi mà vắng (lúc khoá không có điểm thi): CLB đó chuyển sang tầng 2, lấy điểm quỹ 2
+# của CLB đó nếu có, không thì 0, kèm cảnh báo. Chờ quyết của chủ dự án.
+WHARTON_VANG_THI = "tier2_zero_points"
+
+
+def khoa_uu_tien_wharton(
+    student_id: str,
+    diem_thi: Optional[float],
+    w1: int,
+    w2: int,
+    stb: int,
+) -> tuple:
+    """Khoá sắp xếp của MỘT học sinh ở MỘT CLB; khoá nhỏ hơn thì ưu tiên cao hơn.
+
+        tầng 1 (có điểm thi): (0, -diem_thi, (), -w1, stb, student_id)
+        tầng 2 (không điểm):  (1, -w2, stb, student_id)
+
+    `diem_thi is None` là tầng 2. Tầng 1 luôn đứng trước tầng 2: phần tử đầu khác nhau nên
+    hai tuple dài khác nhau không bao giờ bị so tới phần tử sau. Mã học sinh là khoá phá hoà
+    cuối, cùng lý do với `compute_club_priority`.
+
+    Phần tử `()` ở tầng 1 là CHỖ DÀNH cho tiêu chí phụ (mục A1); mã hiện chưa có tiêu chí
+    phụ nào.
+
+    Điểm thi giữ dạng `float`, không đổi sang `Decimal`: điểm đọc thẳng từ cột REAL của CSDL
+    chứ không qua tính toán, nên không có sai số làm tròn, và so `float` cho ra cùng thứ tự
+    với `Decimal(str(x))`.
+
+    Hàm KHÔNG nhận thứ hạng nguyện vọng dưới bất kỳ hình thức nào (chống nội sinh).
+    """
+    if diem_thi is not None:
+        return (0, -diem_thi, (), -w1, stb, student_id)
+    return (1, -w2, stb, student_id)
+
+
+def uu_tien_wharton(
+    club_id: str,
+    applicants_for_club: list[str],
+    tested_scores_for_club: dict[str, float],
+    stb_lottery: dict[str, int],
+    diem_wharton_clb: dict[str, int],
+    tier_rank: Optional[dict[str, int]] = None,
+) -> list[str]:
+    """Thứ tự ưu tiên của MỘT CLB khi có điểm Wharton; thay `compute_club_priority` (hay
+    `uu_tien_theo_nhom` khi có `tier_rank`) làm nguồn `base_rank` của `run_rbda`.
+
+    `diem_wharton_clb` là điểm HIỆU LỰC của CLB này: {student_id: điểm}, lấy từ quỹ 1 nếu em ở
+    tầng 1 (có điểm thi ở CLB này) và từ quỹ 2 nếu em ở tầng 2 — do `diem_wharton_hieu_luc`
+    tính. Em không có trong dict thì điểm là 0. Hàm dùng chung một điểm cho cả hai vị trí của
+    khoá (`w1` ở tầng 1, `w2` ở tầng 2) vì mỗi em chỉ ở đúng một tầng.
+
+    Tầng của em được xác định bằng `sid in tested_scores_for_club`, không bằng giá trị điểm,
+    nên điểm thi `0.0` vẫn là tầng 1. Khi có `tier_rank`, hạng nhóm đứng đầu khoá (nhóm tốt
+    hơn đứng trước mọi nhóm kém hơn, em không có nhóm đứng cuối), đúng như `uu_tien_theo_nhom`.
+
+    Cố ý là hàm BỌC, giống `uu_tien_theo_nhom`: không thêm tham số cho `compute_club_priority`
+    (có test canh chữ ký — chống nội sinh). Hàm này cũng KHÔNG nhận thứ hạng nguyện vọng; điểm
+    Wharton là điểm em chia cho từng CLB, không phải vị trí CLB trong danh sách.
+
+    Raises:
+        ValueError: nếu có applicant thiếu STB, cùng thông điệp với `compute_club_priority`.
+    """
+    # Chép nguyên khối kiểm của compute_club_priority (không gọi nó, không sửa nó): `is None`
+    # cũng là thiếu, vì cột stb_number cho phép NULL.
+    missing_stb = [
+        sid for sid in applicants_for_club if stb_lottery.get(sid) is None
+    ]
+    if missing_stb:
+        raise ValueError(
+            f"[{club_id}] Có {len(missing_stb)} học sinh thiếu số bốc "
+            f"thăm STB: {missing_stb[:5]}{'...' if len(missing_stb) > 5 else ''}"
+        )
+
+    cuoi = (max(tier_rank.values(), default=-1) + 1) if tier_rank is not None else 0
+
+    def khoa(sid: str) -> tuple:
+        diem = diem_wharton_clb.get(sid, 0)
+        k = khoa_uu_tien_wharton(
+            sid,
+            tested_scores_for_club[sid] if sid in tested_scores_for_club else None,
+            diem, diem, stb_lottery[sid],
+        )
+        return k if tier_rank is None else (tier_rank.get(sid, cuoi),) + k
+
+    return sorted(applicants_for_club, key=khoa)
+
+
 # Bốn khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
 # thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ.
 LUAT_XEP_MAC_DINH = {"priority": "score", "tier_mode": "reserve",
@@ -464,6 +581,7 @@ def run_rbda(
     max_rounds: int = 1000,
     tier_rank: Optional[dict[str, int]] = None,
     bo_qua_du_tru: bool = False,
+    diem_wharton: Optional[dict[str, dict[str, int]]] = None,
 ) -> MatchResult:
     """
     Chạy thuật toán RB-DA đầy đủ (student-proposing deferred
@@ -488,6 +606,10 @@ def run_rbda(
         bo_qua_du_tru: True thì BỎ lượt xếp suất dự trữ mềm — mọi suất là suất thường, xếp
             hoàn toàn theo thứ hạng ưu tiên nền. Dùng cùng `tier_rank` (nhóm đã cho ưu tiên
             rồi, giữ thêm suất dự trữ là ưu tiên hai lần). Mặc định False = như cũ.
+        diem_wharton: {club_id: {student_id: điểm}} — điểm Wharton HIỆU LỰC (mục A13, xem
+            `diem_wharton_hieu_luc`); có nó thì thứ tự nền xếp bằng `uu_tien_wharton` (điểm
+            Wharton xét trước STB; vẫn tôn trọng `tier_rank` nếu có). Khoá theo CLB nên truyền
+            nguyên cho mọi buổi được. Mặc định None = như cũ, kết quả trùng khít.
 
     Returns:
         MatchResult
@@ -508,8 +630,13 @@ def run_rbda(
             tested_scores_for_club=tested_scores.get(club_id, {}),
             stb_lottery=stb_lottery,
         )
-        base_order = (compute_club_priority(**chung) if tier_rank is None
-                      else uu_tien_theo_nhom(tier_rank=tier_rank, **chung))
+        if diem_wharton is not None:
+            base_order = uu_tien_wharton(
+                diem_wharton_clb=diem_wharton.get(club_id, {}),
+                tier_rank=tier_rank, **chung)
+        else:
+            base_order = (compute_club_priority(**chung) if tier_rank is None
+                          else uu_tien_theo_nhom(tier_rank=tier_rank, **chung))
         base_rank[club_id] = {sid: i for i, sid in enumerate(base_order)}
 
     unassigned = [
@@ -1042,6 +1169,7 @@ def run_rbda_nhieu_buoi(
     chi_buoi: Optional[list[str]] = None,
     tier_rank: Optional[dict[str, int]] = None,
     bo_qua_du_tru: bool = False,
+    diem_wharton: Optional[dict[str, dict[str, int]]] = None,
 ) -> KetQuaTuan:
     """Xếp CLB cho cả tuần: cắt theo buổi, gọi run_rbda từng buổi, ghép lại.
 
@@ -1084,8 +1212,10 @@ def run_rbda_nhieu_buoi(
     đầu vào. Chế độ đó chỉ còn dùng cho phép đo TN7, và TN7 không dùng
     `chi_buoi`.
 
-    `tier_rank`, `bo_qua_du_tru`: chuyển nguyên cho `run_rbda` ở MỌI buổi (xem ở đó). Cả hai
-    mặc định như cũ, nên lời gọi cũ cho ra đúng kết quả cũ.
+    `tier_rank`, `bo_qua_du_tru`, `diem_wharton`: chuyển nguyên cho `run_rbda` ở MỌI buổi (xem
+    ở đó). Cả ba mặc định như cũ, nên lời gọi cũ cho ra đúng kết quả cũ. `diem_wharton` khoá
+    theo CLB nên không cần cắt theo buổi: mỗi buổi chỉ đọc điểm của các CLB thuộc buổi đó, và
+    điểm hiệu lực đã tính riêng cho từng buổi (mỗi quỹ 100 điểm mỗi buổi).
     """
     if che_do_boc_tham not in CHE_DO_BOC_THAM:
         raise ValueError(
@@ -1133,6 +1263,7 @@ def run_rbda_nhieu_buoi(
             students, clubs_b, scores_b, app_b, prefs_b, stb_b,
             is_reserve_eligible_fn, max_rounds=max_rounds,
             tier_rank=tier_rank, bo_qua_du_tru=bo_qua_du_tru,
+            diem_wharton=diem_wharton,
         )
 
         ket.per_buoi[buoi] = kq
