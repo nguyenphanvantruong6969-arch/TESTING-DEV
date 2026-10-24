@@ -1,4 +1,4 @@
-# Sổ đăng ký 33 mục sửa mã nguồn
+# Sổ đăng ký 33 mục sửa mã nguồn (+ A13, thêm 24/10/2026)
 
 Nguồn duy nhất: `ke_hoach_thay_doi.json` (tệp này sinh từ đó). Số dòng lấy từ bản build — định vị theo **tên hàm**.
 Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không cần. Quy mô: S/M/L/XL (xem CLAUDE.md).
@@ -26,6 +26,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
 | A10 | Cặp cấm / xung đột lợi ích | Sửa mã · M | Z3, A5 | O | – | R | – | O | – | – | – | – | O | – | R |
 | A11 | Đăng ký theo nhóm / cặp đôi | Viết mới · XL | A3 | – | O | – | O | R | – | – | – | – | – | – | – |
 | A12 | Ổn định là chỉ số chất lượng, không phải điều kiện chặn | Sửa mã · M | Z3 | – | – | – | O | O | – | O | O | – | – | R | R |
+| A13 | Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA) | Viết mới · M | – | O | – | O | O | – | – | – | O | – | – | – | – |
 | B1 | Điểm và thuộc tính theo cặp (đang là một số thực ≥ 0) | Sửa mã · M | Z6 | – | R | – | – | O | R | R | – | R | R | R | R |
 | B2 | Bảng thực thể mới theo ngành | Viết mới · M mỗi ngành | Z6 | R | R | R | R | R | R | R | R | R | R | R | R |
 | B3 | Sinh danh sách sở thích từ dữ liệu | Viết mới · L | B1, Z3 | – | O | – | – | – | R | R | – | – | O | R | R |
@@ -398,6 +399,24 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - HP (Học phần): Khi có ràng buộc xuyên buổi.
   - LG (Logistics): Tải trọng / thể tích kiểu ba lô: đo cặp phá vỡ như chỉ số.
   - TC (Tài chính): Sức chứa theo khối lượng hồ sơ.
+
+### A13 — Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA)
+- **Mức / quy mô:** Viết mới / M
+- **Tệp:** rbda_priority_pipeline.py, i18n_errors.py
+- **Dòng:** sau uu_tien_theo_nhom (~L220); run_rbda (~L456); run_rbda_nhieu_buoi (~L1031)
+- **Hàm:** khoa_uu_tien_wharton, uu_tien_wharton, kiem_ho_so_wharton, tu_dien_wharton_mot_clb, diem_wharton_hieu_luc, run_rbda, run_rbda_nhieu_buoi
+- **Hiện trạng:** Tầng 2 xếp hoàn toàn bằng số bốc thăm; tầng 1 bằng điểm thì phá hoà bằng số bốc thăm. Học sinh không có cách nào bày tỏ mức độ muốn vào một CLB.
+- **Thay đổi:** Mỗi học sinh có hai quỹ 100 điểm mỗi buổi (quỹ 1: CLB có thi, chỉ phá hoà sau điểm thi; quỹ 2: CLB không thi, tiêu chí chính tầng 2), xét TRƯỚC số bốc thăm. Gale–Shapley chạy một lần; thứ hạng nguyện vọng không vào khoá. Hàm bọc uu_tien_wharton thay nguồn base_rank khi diem_wharton khác None; mặc định None = hành vi cũ. Vòng 1 chỉ có lõi thuật toán, kiểm hồ sơ V1–V4, mã lỗi, test.
+- **Rủi ro:** Khai thật là tốt nhất CHỈ được bảo đảm với THỨ TỰ nguyện vọng, KHÔNG với cách chia điểm Wharton: học sinh biết tính có thể lợi hơn học sinh ngây thơ (cần đo bằng mô phỏng). Vòng sau đổi hợp đồng cột CSV/Sổ nhập (bất biến 7) và thêm bảng wharton_bids — phải ghi trong mục này trước khi làm.
+- **Kiểm nhận:** tests/test_wharton.py: W1–W9 của đặc tả, thay thế được + luật tổng cầu (bất biến 8); TestTrungKhit qua với diem_wharton=None (bất biến 1).
+- **Phụ thuộc:** không
+- **Ngành cần (R):** — · **tuỳ chọn (O):** DT, SK, NT, HP
+- **Khác nhau theo ngành:**
+  - HP (Học phần): Gốc của cơ chế (course bidding, Sönmez & Ünver 2010) — đề xuất, chờ Truong duyệt.
+  - DT (Đề tài): Sinh viên chia điểm cho đề tài / người hướng dẫn — đề xuất, chờ Truong duyệt.
+  - SK (Sự kiện): Người tham dự chia điểm cho phiên workshop — đề xuất, chờ Truong duyệt.
+  - NT (Ngoài trường): Chia điểm cho trại hè / khoá ngắn — đề xuất, chờ Truong duyệt.
+- **Việc vòng sau:** bảng `wharton_bids`; cột CSV / Sổ nhập (đổi hợp đồng cột, bất biến 7); nối pipeline (kiểm hồ sơ ở bước "kiểm dữ liệu", TRƯỚC khoá STB); khoá luật workspace; biểu mẫu hai khung "Đã dùng X / 100"; mô phỏng VISEF; ngưỡng điểm tối thiểu; công bố điểm chuẩn.
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
 

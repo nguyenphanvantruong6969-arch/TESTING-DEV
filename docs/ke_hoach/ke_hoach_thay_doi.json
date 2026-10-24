@@ -1931,6 +1931,43 @@
    }
   },
   {
+   "id": "A13",
+   "nhom": "A",
+   "pham_vi": "theo_nganh",
+   "ten": "Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA)",
+   "tep": "rbda_priority_pipeline.py, i18n_errors.py",
+   "dong": "sau uu_tien_theo_nhom (~L220); run_rbda (~L456); run_rbda_nhieu_buoi (~L1031)",
+   "ham": "khoa_uu_tien_wharton, uu_tien_wharton, kiem_ho_so_wharton, tu_dien_wharton_mot_clb, diem_wharton_hieu_luc, run_rbda, run_rbda_nhieu_buoi",
+   "hien_trang": "Tầng 2 xếp hoàn toàn bằng số bốc thăm; tầng 1 bằng điểm thì phá hoà bằng số bốc thăm. Học sinh không có cách nào bày tỏ mức độ muốn vào một CLB.",
+   "thay_doi": "Mỗi học sinh có hai quỹ 100 điểm mỗi buổi (quỹ 1: CLB có thi, chỉ phá hoà sau điểm thi; quỹ 2: CLB không thi, tiêu chí chính tầng 2), xét TRƯỚC số bốc thăm. Gale–Shapley chạy một lần; thứ hạng nguyện vọng không vào khoá. Hàm bọc uu_tien_wharton thay nguồn base_rank khi diem_wharton khác None; mặc định None = hành vi cũ. Vòng 1 chỉ có lõi thuật toán, kiểm hồ sơ V1–V4, mã lỗi, test.",
+   "muc": "Viết mới",
+   "quy_mo": "M",
+   "trong_so": 2,
+   "rui_ro": "Khai thật là tốt nhất CHỈ được bảo đảm với THỨ TỰ nguyện vọng, KHÔNG với cách chia điểm Wharton: học sinh biết tính có thể lợi hơn học sinh ngây thơ (cần đo bằng mô phỏng). Vòng sau đổi hợp đồng cột CSV/Sổ nhập (bất biến 7) và thêm bảng wharton_bids — phải ghi trong mục này trước khi làm.",
+   "kiem_nhan": "tests/test_wharton.py: W1–W9 của đặc tả, thay thế được + luật tổng cầu (bất biến 8); TestTrungKhit qua với diem_wharton=None (bất biến 1).",
+   "phu_thuoc": [],
+   "ap_dung": {
+    "DT": "O",
+    "KTX": "-",
+    "SK": "O",
+    "NT": "O",
+    "YT": "-",
+    "VL": "-",
+    "KT": "-",
+    "HP": "O",
+    "TS": "-",
+    "NS": "-",
+    "LG": "-",
+    "TC": "-"
+   },
+   "rieng_theo_nganh": {
+    "HP": "Gốc của cơ chế (course bidding, Sönmez & Ünver 2010) — đề xuất, chờ Truong duyệt.",
+    "DT": "Sinh viên chia điểm cho đề tài / người hướng dẫn — đề xuất, chờ Truong duyệt.",
+    "SK": "Người tham dự chia điểm cho phiên workshop — đề xuất, chờ Truong duyệt.",
+    "NT": "Chia điểm cho trại hè / khoá ngắn — đề xuất, chờ Truong duyệt."
+   }
+  },
+  {
    "id": "B1",
    "nhom": "B",
    "pham_vi": "theo_nganh",
