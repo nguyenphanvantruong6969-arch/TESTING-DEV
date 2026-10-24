@@ -470,6 +470,34 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Có thể chưa công bằng: {person_l} {student_id} thích {slot_sl} {club_id} hơn {slot_sl} đang được xếp ({current_club}) và đủ điều kiện vào {club_id}. {slot_s} {club_id} hiện đã nhận {n_holders}/{capacity} chỗ.",
     "en": "Possible unfair result: {person_l} {student_id} prefers {slot_l} {club_id} to the assigned {slot_l} ({current_club}) and qualifies for {club_id}. {slot} {club_id} has filled {n_holders}/{capacity} seats."
   },
+  "wharton_nguyen_vong_chua_xep": {
+    "vi": "Nguyện vọng chưa được sắp xếp xong. {person} {student_id} cần từ 1 đến {tran} {slot_sl} mỗi {session_l}, không trùng nhau (hiện có {n}, trùng {n_trung}).",
+    "en": "Preferences aren't complete yet. {person} {student_id} needs 1 to {tran} {slot_pl} per {session_l}, with no repeats (now {n}, repeated {n_trung})."
+  },
+  "wharton_chua_dung_het": {
+    "vi": "Chưa dùng hết điểm Wharton: {person_l} {student_id} còn thiếu {thieu} điểm ở quỹ {quy}.",
+    "en": "Wharton points not fully used: {person_l} {student_id} still has {thieu} point(s) left in fund {quy}."
+  },
+  "wharton_vuot_ngan_sach": {
+    "vi": "{person} {student_id} đặt {tong} điểm Wharton ở quỹ {quy}, nhiều hơn {ngan_sach} điểm được phép.",
+    "en": "{person} {student_id} placed {tong} Wharton points in fund {quy}, more than the {ngan_sach} allowed."
+  },
+  "wharton_diem_khong_hop_le": {
+    "vi": "{person} {student_id} đặt “{gia_tri}” điểm Wharton cho {slot_sl} {club_id}. Điểm Wharton phải là số nguyên từ 0 trở lên.",
+    "en": "{person} {student_id} placed “{gia_tri}” Wharton points on {slot_l} {club_id}. Wharton points must be a whole number of 0 or more."
+  },
+  "wharton_ngoai_tap": {
+    "vi": "{person} {student_id} đặt điểm Wharton quỹ {quy} cho {slot_sl} {club_id}, nhưng {slot_sl} này không thuộc quỹ {quy} (không có trong nguyện vọng, hoặc sai loại có thi / không thi).",
+    "en": "{person} {student_id} placed fund {quy} Wharton points on {slot_l} {club_id}, but that {slot_l} isn't in fund {quy} (not in the preferences, or the wrong tested / not-tested group)."
+  },
+  "wharton_tang_lech": {
+    "vi": "{person} {student_id} có {score_l} thi ở {slot_sl} {club_id} nhưng chỉ đặt điểm Wharton cho {slot_sl} này ở quỹ không thi. Cần chia lại điểm.",
+    "en": "{person} {student_id} has a test {score_l} for {slot_l} {club_id} but placed Wharton points for it only in the not-tested fund. The points need to be split again."
+  },
+  "wharton_vang_thi": {
+    "vi": "{person} {student_id} vắng thi {slot_sl} {club_id}, nên được xét như không thi với {diem} điểm Wharton quỹ 2 ({diem_bo} điểm quỹ 1 không được tính).",
+    "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 Wharton point(s) ({diem_bo} fund 1 point(s) not counted)."
+  },
   "csv_pref_duplicate_deduped": {
     "vi": "{student_id}: có {slot_sl} bị lặp trong nguyện vọng, phần lặp đã được bỏ.",
     "en": "{student_id}: {slot_la} was listed twice in the preferences. The repeat was removed."

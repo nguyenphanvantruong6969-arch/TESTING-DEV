@@ -11,13 +11,16 @@ Wharton được xét TRƯỚC số bốc thăm; số bốc thăm và cách chè
   * Dữ liệu dưới đây là dữ liệu MÔ PHỎNG, không phải khảo sát thật.
 """
 
+import copy
 import inspect
 import random
+import re
 from types import SimpleNamespace
 
 import pytest
 
 import rbda_priority_pipeline as rp
+from i18n_errors import MESSAGES, format_message
 
 
 # ------------------------------------------------------------------ hàm dựng dữ liệu
@@ -435,3 +438,578 @@ class TestNoiVaoRunRbda:
                                     ket.stb_theo_buoi[buoi], bo.eligible, diem_wharton=dw)
                 assert ket.per_buoi[buoi].assignment == rieng.assignment, (seed, buoi)
                 assert ket.per_buoi[buoi].base_rank == rieng.base_rank, (seed, buoi)
+
+
+# ------------------------------------------------------------------ mã lỗi song ngữ (Bước 7)
+
+MA_WHARTON = [
+    "wharton_nguyen_vong_chua_xep", "wharton_chua_dung_het", "wharton_vuot_ngan_sach",
+    "wharton_diem_khong_hop_le", "wharton_ngoai_tap", "wharton_tang_lech", "wharton_vang_thi",
+]
+
+# Tham số mà câu cần (ngoài các chỗ giữ nhãn {person}, {slot}…); các bước sau gọi err() đúng
+# những tên này.
+THAM_SO_WHARTON = {
+    "wharton_nguyen_vong_chua_xep": {"student_id", "tran", "n", "n_trung"},
+    "wharton_chua_dung_het": {"student_id", "thieu", "quy"},
+    "wharton_vuot_ngan_sach": {"student_id", "tong", "quy", "ngan_sach"},
+    "wharton_diem_khong_hop_le": {"student_id", "gia_tri", "club_id"},
+    "wharton_ngoai_tap": {"student_id", "quy", "club_id"},
+    "wharton_tang_lech": {"student_id", "club_id"},
+    "wharton_vang_thi": {"student_id", "club_id", "diem", "diem_bo"},
+}
+
+NHAN_CONG_TY = {
+    "person": {"vi": "Nhân viên", "en": "Employee"},
+    "slot": {"vi": "Dự án", "en": "Project"},
+    "session": {"vi": "Ca", "en": "Shift"},
+    "group": {"vi": "Cấp bậc", "en": "Level"},
+    "score": {"vi": "Điểm", "en": "Score"},
+}
+
+
+class TestMaLoi:
+    @pytest.mark.parametrize("ma", MA_WHARTON)
+    def test_co_du_vi_va_en(self, ma):
+        assert ma in MESSAGES
+        assert MESSAGES[ma].get("vi") and MESSAGES[ma].get("en")
+
+    def test_cau_vi_mo_dau_dung_giong(self):
+        assert MESSAGES["wharton_nguyen_vong_chua_xep"]["vi"].startswith(
+            "Nguyện vọng chưa được sắp xếp xong.")
+        assert MESSAGES["wharton_chua_dung_het"]["vi"].startswith(
+            "Chưa dùng hết điểm Wharton")
+
+    @pytest.mark.parametrize("ma", MA_WHARTON)
+    def test_khong_viet_cung_nhan_trong_cau(self, ma):
+        vi = re.sub(r"\{\w+\}", "", MESSAGES[ma]["vi"]).lower()    # bỏ chỗ giữ như {club_id}
+        en = re.sub(r"\{\w+\}", "", MESSAGES[ma]["en"]).lower()
+        for tu in ("học sinh", "câu lạc bộ", "clb"):
+            assert tu not in vi, (ma, tu)
+        for tu in ("student", "club"):
+            assert tu not in en, (ma, tu)
+
+    @pytest.mark.parametrize("ma", MA_WHARTON)
+    @pytest.mark.parametrize("nhan", [None, NHAN_CONG_TY], ids=["truong_hoc", "cong_ty"])
+    @pytest.mark.parametrize("lang", ["vi", "en"])
+    def test_dien_duoc_tham_so_va_nhan(self, ma, nhan, lang):
+        tham_so = {ten: "X" for ten in THAM_SO_WHARTON[ma]}
+        cau = format_message(ma, tham_so, lang, nhan)
+        assert cau != ma
+        assert "{" not in cau and "}" not in cau, cau
+        assert cau.count("X") >= len(THAM_SO_WHARTON[ma])      # mọi tham số đều hiện ra
+        if nhan is NHAN_CONG_TY:
+            # nhãn của workspace thay chỗ giữ: câu công ty không còn chữ của trường học
+            assert "học sinh" not in cau.lower() and "câu lạc bộ" not in cau.lower()
+
+
+# ------------------------------------------------------------------ kiểm hồ sơ (Bước 8, W5)
+
+BM = rp.BUOI_MAC_DINH
+
+
+def loi(ma, **tham_so):
+    return {"code": ma, "params": tham_so}
+
+
+def _clb(*ten, buoi=None):
+    return {c: ({"capacity": 1, "reserve_capacity": 0, **({"buoi": buoi[c]} if buoi else {})})
+            for c in ten}
+
+
+def kiem(prefs, thi, w1, w2, clubs=None, **kw):
+    """Gọi `kiem_ho_so_wharton` với bộ CLB một buổi suy ra từ chính hồ sơ nếu không đưa vào."""
+    if clubs is None:
+        moi = {c for ds in prefs.values() for c in ds}
+        clubs = _clb(*sorted(moi))
+    return rp.kiem_ho_so_wharton(prefs, thi, w1, w2, clubs, **kw)
+
+
+class TestKiemHoSo:
+    def test_ho_so_hop_le_tra_rong(self):
+        assert kiem({"a": ["X", "Y", "Z"]}, {"a": {"X"}},
+                    {"a": {"X": 100}}, {"a": {"Y": 60, "Z": 40}}) == []
+
+    def test_v5_dan_100_diem_vao_mot_clb_la_hop_le(self):
+        assert kiem({"a": ["X", "Y", "Z"]}, {}, {}, {"a": {"X": 100, "Y": 0, "Z": 0}}) == []
+        assert kiem({"a": ["X", "Y"]}, {"a": {"X"}}, {"a": {"X": 100}}, {"a": {"Y": 100}}) == []
+
+    # ---- V1
+    def test_v1_nguyen_vong_rong(self):
+        assert kiem({"a": []}, {}, {}, {}) == [
+            loi("wharton_nguyen_vong_chua_xep", student_id="a", tran=10, n=0, n_trung=0,
+                buoi=BM)]
+
+    def test_v1_co_diem_nhung_khong_co_nguyen_vong(self):
+        # em chỉ xuất hiện ở w1: báo thiếu nguyện vọng và điểm đặt vào tập rỗng
+        ra = kiem({}, {}, {"a": {"X": 100}}, {}, clubs=_clb("X"))
+        assert ra == [
+            loi("wharton_nguyen_vong_chua_xep", student_id="a", tran=10, n=0, n_trung=0,
+                buoi=BM),
+            loi("wharton_ngoai_tap", student_id="a", quy=1, club_id="X", buoi=BM)]
+
+    def test_v1_11_clb_trong_mot_buoi(self):
+        ds = ["c%02d" % i for i in range(11)]
+        ra = kiem({"a": ds}, {}, {}, {"a": {"c00": 100}})
+        assert ra == [loi("wharton_nguyen_vong_chua_xep", student_id="a", tran=10, n=11,
+                          n_trung=0, buoi=BM)]
+
+    def test_v1_10_clb_la_du(self):
+        ds = ["c%02d" % i for i in range(10)]
+        assert kiem({"a": ds}, {}, {}, {"a": {"c00": 100}}) == []
+
+    def test_v1_mot_clb_lap_lai(self):
+        ra = kiem({"a": ["X", "Y", "X"]}, {}, {}, {"a": {"X": 50, "Y": 50}})
+        assert ra == [loi("wharton_nguyen_vong_chua_xep", student_id="a", tran=10, n=3,
+                          n_trung=1, buoi=BM)]
+
+    def test_v1_tran_tuy_chinh(self):
+        ra = kiem({"a": ["X", "Y", "Z"]}, {}, {}, {"a": {"X": 100}}, tran_nguyen_vong=2)
+        assert ra == [loi("wharton_nguyen_vong_chua_xep", student_id="a", tran=2, n=3,
+                          n_trung=0, buoi=BM)]
+
+    # ---- V2 / V3
+    def test_tong_90_bao_thieu_10(self):
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 50, "Y": 40}})
+        assert ra == [loi("wharton_chua_dung_het", student_id="a", thieu=10, quy=2, buoi=BM)]
+        ra = kiem({"a": ["X", "Y"]}, {"a": {"X", "Y"}}, {"a": {"X": 50, "Y": 40}}, {})
+        assert ra == [loi("wharton_chua_dung_het", student_id="a", thieu=10, quy=1, buoi=BM)]
+
+    def test_tong_110_bao_vuot_ngan_sach(self):
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 60, "Y": 50}})
+        assert ra == [loi("wharton_vuot_ngan_sach", student_id="a", tong=110, quy=2,
+                          ngan_sach=100, buoi=BM)]
+
+    def test_ngan_sach_tuy_chinh(self):
+        assert kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 30, "Y": 20}}, ngan_sach=50) == []
+
+    @pytest.mark.parametrize("xau", [12.5, True, -5, "10", 100.0, None])
+    def test_gia_tri_khong_hop_le(self, xau):
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": xau, "Y": 50}})
+        assert ra == [
+            loi("wharton_diem_khong_hop_le", student_id="a", club_id="X", gia_tri=repr(xau),
+                buoi=BM),
+            loi("wharton_chua_dung_het", student_id="a", thieu=50, quy=2, buoi=BM)]
+
+    def test_so_nguyen_bang_0_la_hop_le(self):
+        assert kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 100, "Y": 0}}) == []
+
+    def test_khoa_ngoai_nguyen_vong_bao_ngoai_tap(self):
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 50, "Y": 50, "Q": 10}},
+                  clubs=_clb("X", "Y", "Q"))
+        assert ra == [loi("wharton_ngoai_tap", student_id="a", quy=2, club_id="Q", buoi=BM)]
+
+    def test_clb_la_khong_co_trong_bang_clb_roi_vao_buoi_mac_dinh(self):
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 50, "Y": 50, "Ghost": 1}},
+                  clubs=_clb("X", "Y"))
+        assert ra == [loi("wharton_ngoai_tap", student_id="a", quy=2, club_id="Ghost",
+                          buoi=BM)]
+
+    def test_diem_quy_1_dat_cho_clb_khong_tick_thi_la_ngoai_tap(self):
+        ra = kiem({"a": ["X", "Y"]}, {"a": {"X"}}, {"a": {"X": 50, "Y": 50}}, {})
+        assert ra == [
+            loi("wharton_ngoai_tap", student_id="a", quy=1, club_id="Y", buoi=BM),
+            loi("wharton_chua_dung_het", student_id="a", thieu=50, quy=1, buoi=BM),
+            loi("wharton_chua_dung_het", student_id="a", thieu=100, quy=2, buoi=BM)]
+
+    def test_ma_tran_diem_o_o_moi_o_chi_mot_loi(self):
+        # khoá ngoài tập mang giá trị xấu: chỉ báo ngoài tập, không báo thêm giá trị
+        ra = kiem({"a": ["X"]}, {}, {}, {"a": {"X": 100, "Q": 12.5}}, clubs=_clb("X", "Q"))
+        assert ra == [loi("wharton_ngoai_tap", student_id="a", quy=2, club_id="Q", buoi=BM)]
+
+    # ---- V4
+    def test_v4_t1_rong_thi_w1_phai_rong(self):
+        ra = kiem({"a": ["X"]}, {}, {"a": {"X": 100}}, {"a": {"X": 100}})
+        assert ra == [loi("wharton_ngoai_tap", student_id="a", quy=1, club_id="X", buoi=BM)]
+
+    def test_v4_t2_rong_thi_w2_phai_rong(self):
+        ra = kiem({"a": ["X"]}, {"a": {"X"}}, {"a": {"X": 100}}, {"a": {"X": 5}})
+        assert ra == [loi("wharton_ngoai_tap", student_id="a", quy=2, club_id="X", buoi=BM)]
+
+    def test_bo_clb_khoi_nguyen_vong_thi_diem_cu_thanh_ngoai_tap(self):
+        truoc = kiem({"a": ["X", "Y", "Z"]}, {}, {}, {"a": {"X": 40, "Y": 30, "Z": 30}})
+        assert truoc == []
+        sau = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 40, "Y": 30, "Z": 30}},
+                   clubs=_clb("X", "Y", "Z"))
+        assert sau == [
+            loi("wharton_ngoai_tap", student_id="a", quy=2, club_id="Z", buoi=BM),
+            loi("wharton_chua_dung_het", student_id="a", thieu=30, quy=2, buoi=BM)]
+
+    # ---- nhiều lỗi, thứ tự cố định
+    def test_nhieu_loi_day_du_theo_thu_tu_co_dinh(self):
+        prefs = {"b": ["X", "Y"], "a": ["X", "Y"]}
+        w2 = {"b": {"X": 10, "Y": 10}, "a": {"X": 70, "Y": 70}}
+        ra = kiem(prefs, {}, {}, w2)
+        assert ra == [
+            loi("wharton_vuot_ngan_sach", student_id="a", tong=140, quy=2, ngan_sach=100,
+                buoi=BM),
+            loi("wharton_chua_dung_het", student_id="b", thieu=80, quy=2, buoi=BM)]
+        assert kiem(prefs, {}, {}, w2) == ra                      # chạy lại: cùng danh sách
+        # đảo thứ tự khoá trong dict đầu vào: kết quả không đổi
+        dao = {"a": dict(reversed(list(w2["a"].items()))), "b": w2["b"]}
+        assert kiem({"a": prefs["a"], "b": prefs["b"]}, {}, {}, dao) == ra
+
+    # ---- nhiều buổi
+    def _hai_buoi(self):
+        buoi = {"X1": "thu_2", "Y1": "thu_2", "X2": "thu_3", "Y2": "thu_3"}
+        return _clb("X1", "Y1", "X2", "Y2", buoi=buoi)
+
+    def test_hai_buoi_moi_buoi_tong_100_moi_quy_la_hop_le(self):
+        clubs = self._hai_buoi()
+        prefs = {"a": ["X1", "Y1", "X2", "Y2"]}
+        thi = {"a": {"X1", "X2"}}
+        w1 = {"a": {"X1": 100, "X2": 100}}
+        w2 = {"a": {"Y1": 100, "Y2": 100}}
+        assert kiem(prefs, thi, w1, w2, clubs=clubs) == []
+
+    def test_50_cong_50_chia_cho_hai_buoi_thi_moi_buoi_thieu_50(self):
+        clubs = self._hai_buoi()
+        prefs = {"a": ["X1", "Y1", "X2", "Y2"]}
+        thi = {"a": {"X1", "X2"}}
+        w1 = {"a": {"X1": 50, "X2": 50}}
+        w2 = {"a": {"Y1": 100, "Y2": 100}}
+        assert kiem(prefs, thi, w1, w2, clubs=clubs) == [
+            loi("wharton_chua_dung_het", student_id="a", thieu=50, quy=1, buoi="thu_2"),
+            loi("wharton_chua_dung_het", student_id="a", thieu=50, quy=1, buoi="thu_3")]
+
+    def test_buoi_khong_co_clb_quy_2_thi_khong_doi_100_diem_quy_2(self):
+        clubs = self._hai_buoi()
+        prefs = {"a": ["X1", "X2"]}
+        thi = {"a": {"X1", "X2"}}
+        assert kiem(prefs, thi, {"a": {"X1": 100, "X2": 100}}, {}, clubs=clubs) == []
+
+    def test_loi_o_mot_buoi_khong_lan_sang_buoi_kia(self):
+        clubs = self._hai_buoi()
+        prefs = {"a": ["X1", "Y1", "X2", "Y2"]}
+        thi = {"a": {"X1", "X2"}}
+        w1 = {"a": {"X1": 100, "X2": 100}}
+        w2 = {"a": {"Y1": 100, "Y2": 90}}
+        assert kiem(prefs, thi, w1, w2, clubs=clubs) == [
+            loi("wharton_chua_dung_het", student_id="a", thieu=10, quy=2, buoi="thu_3")]
+
+    def test_v1_dem_theo_tung_buoi_khong_dem_ca_tuan(self):
+        # 6 buổi x 2 CLB = 12 nguyện vọng cả tuần nhưng mỗi buổi chỉ 2: hợp lệ
+        buoi = {}
+        prefs_a, w2_a = [], {}
+        for i in range(2, 8):
+            for k in range(2):
+                c = "c%d_%d" % (i, k)
+                buoi[c] = "thu_%d" % i
+                prefs_a.append(c)
+            w2_a["c%d_0" % i] = 100
+        clubs = _clb(*buoi, buoi=buoi)
+        assert kiem({"a": prefs_a}, {}, {}, {"a": w2_a}, clubs=clubs) == []
+
+    def test_moi_loi_deu_co_buoi_va_truong_mot_buoi_la_buoi_mac_dinh(self):
+        ra = kiem({"a": [], "b": ["X", "Y"], "c": ["X"]}, {"c": {"X"}},
+                  {"c": {"X": 90}}, {"b": {"X": 1, "Y": 1, "Q": 5}}, clubs=_clb("X", "Y", "Q"))
+        assert ra
+        assert all(e["params"]["buoi"] == BM for e in ra)
+
+
+# ------------------------------------------------------------------ tự điền một CLB (Bước 9)
+
+def tu_dien(prefs, thi, w1, w2, clubs=None, **kw):
+    if clubs is None:
+        moi = {c for ds in prefs.values() for c in ds}
+        clubs = _clb(*sorted(moi))
+    return rp.tu_dien_wharton_mot_clb(prefs, thi, w1, w2, clubs, **kw)
+
+
+class TestTuDien:
+    def test_quy_chi_co_mot_clb_va_trong_thi_dien_100(self):
+        w1, w2 = tu_dien({"a": ["X", "Y"]}, {"a": {"X"}}, {}, {})
+        assert w1 == {"a": {"X": 100}}
+        assert w2 == {"a": {"Y": 100}}
+
+    def test_mot_quy_mot_clb_quy_kia_nhieu_clb_chi_dien_quy_mot_clb(self):
+        w1, w2 = tu_dien({"a": ["X", "Y", "Z"]}, {"a": {"X"}}, {}, {})
+        assert w1 == {"a": {"X": 100}}
+        assert w2 == {}                      # T2 có hai CLB: em tự chia
+
+    def test_tap_co_hai_clb_khong_dien(self):
+        assert tu_dien({"a": ["X", "Y"]}, {"a": {"X", "Y"}}, {}, {}) == ({}, {})
+        assert tu_dien({"a": ["X", "Y"]}, {}, {}, {}) == ({}, {})
+
+    def test_quy_da_co_khoa_ke_ca_gia_tri_0_thi_khong_dien(self):
+        w1, w2 = tu_dien({"a": ["X", "Y"]}, {"a": {"X"}}, {"a": {"X": 0}}, {"a": {"Y": 0}})
+        assert w1 == {"a": {"X": 0}} and w2 == {"a": {"Y": 0}}
+
+    def test_quy_da_co_khoa_ngoai_tap_cung_khong_dien(self):
+        # có khoá (dù sai chỗ) nghĩa là em đã đụng tới quỹ này: để kiem_ho_so_wharton báo
+        w1, _ = tu_dien({"a": ["X", "Y"]}, {"a": {"X"}}, {"a": {"Y": 100}}, {})
+        assert w1 == {"a": {"Y": 100}}
+
+    def test_nhieu_buoi_dien_rieng_tung_buoi(self):
+        buoi = {"X1": "thu_2", "Y1": "thu_2", "X2": "thu_3", "Z2": "thu_3", "Y2": "thu_3"}
+        clubs = _clb(*buoi, buoi=buoi)
+        prefs = {"a": ["X1", "Y1", "X2", "Z2", "Y2"]}
+        thi = {"a": {"X1", "X2", "Z2"}}
+        w1, w2 = tu_dien(prefs, thi, {}, {}, clubs=clubs)
+        # thứ 2: T1={X1}, T2={Y1} cùng một CLB -> điền cả hai; thứ 3: T1 hai CLB -> không,
+        # T2={Y2} -> điền
+        assert w1 == {"a": {"X1": 100}}
+        assert w2 == {"a": {"Y1": 100, "Y2": 100}}
+
+    def test_nhieu_buoi_buoi_nay_da_co_khoa_buoi_kia_van_dien(self):
+        buoi = {"X1": "thu_2", "X2": "thu_3"}
+        clubs = _clb(*buoi, buoi=buoi)
+        prefs = {"a": ["X1", "X2"]}
+        thi = {"a": {"X1", "X2"}}
+        w1, w2 = tu_dien(prefs, thi, {"a": {"X1": 100}}, {}, clubs=clubs)
+        assert w1 == {"a": {"X1": 100, "X2": 100}} and w2 == {}
+
+    def test_khong_sua_dict_dau_vao(self):
+        prefs = {"a": ["X", "Y"], "b": ["X", "Y"]}
+        thi = {"a": {"X"}, "b": {"X"}}
+        w1 = {"b": {"X": 100}}
+        w2 = {"b": {"Y": 100}, "c": {"Q": 3}}
+        truoc = copy.deepcopy((prefs, thi, w1, w2))
+        ra1, ra2 = tu_dien(prefs, thi, w1, w2)
+        assert (prefs, thi, w1, w2) == truoc
+        assert ra1 is not w1 and ra2 is not w2
+        assert ra1["b"] is not w1["b"]
+        assert ra1 == {"a": {"X": 100}, "b": {"X": 100}}
+        assert ra2 == {"a": {"Y": 100}, "b": {"Y": 100}, "c": {"Q": 3}}
+
+    def test_tat_bang_bat_false_tra_ban_sao_y_het(self):
+        w1, w2 = {"b": {"X": 5}}, {"c": {"Q": 3}}
+        ra1, ra2 = tu_dien({"a": ["X", "Y"]}, {"a": {"X"}}, w1, w2, bat=False)
+        assert (ra1, ra2) == (w1, w2)
+        assert ra1 is not w1 and ra1["b"] is not w1["b"]
+
+    def test_mac_dinh_la_bat(self):
+        assert rp.WHARTON_TU_DIEN_MOT_CLB is True
+        assert tu_dien({"a": ["X"]}, {}, {}, {}) == ({}, {"a": {"X": 100}})
+
+    def test_ngan_sach_tuy_chinh(self):
+        assert tu_dien({"a": ["X"]}, {}, {}, {}, ngan_sach=50) == ({}, {"a": {"X": 50}})
+
+    def test_em_khong_co_nguyen_vong_giu_nguyen(self):
+        w1, w2 = tu_dien({"a": []}, {}, {"z": {"X": 1}}, {})
+        assert (w1, w2) == ({"z": {"X": 1}}, {})
+
+    def test_ho_so_da_tu_dien_qua_kiem_khong_con_loi_ve_quy_do(self):
+        prefs = {"a": ["X", "Y", "Z"]}
+        thi = {"a": {"X"}}
+        w1, w2 = tu_dien(prefs, thi, {}, {"a": {"Y": 70, "Z": 30}})
+        assert kiem(prefs, thi, w1, w2) == []
+        # chưa tự điền: quỹ 1 thiếu 100
+        assert kiem(prefs, thi, {}, {"a": {"Y": 70, "Z": 30}}) == [
+            loi("wharton_chua_dung_het", student_id="a", thieu=100, quy=1, buoi=BM)]
+
+    def test_chay_lap_cho_cung_ket_qua(self):
+        prefs = {"a": ["X", "Y"], "b": ["X"]}
+        thi = {"a": {"X"}}
+        mot = tu_dien(prefs, thi, {}, {})
+        hai = tu_dien(prefs, thi, *mot)
+        assert hai == mot
+
+
+# ------------------------------------------------------------------ điểm hiệu lực (Bước 10)
+
+def chia_diem(rng, ds, ngan_sach=100):
+    """Chia ngẫu nhiên `ngan_sach` điểm nguyên không âm cho các CLB trong `ds`."""
+    ds = list(ds)
+    if not ds:
+        return {}
+    cat = sorted(rng.randint(0, ngan_sach) for _ in range(len(ds) - 1))
+    bien = [0] + cat + [ngan_sach]
+    return {c: bien[i + 1] - bien[i] for i, c in enumerate(ds)}
+
+
+def sinh_bo(seed, n_hs=12, n_clb=5, co_du_tru=False, co_nhom=False, so_buoi=1):
+    """Bộ dữ liệu mô phỏng CÓ hồ sơ Wharton hợp lệ.
+
+    `w1` chia 100 điểm cho các CLB em có điểm thi, `w2` chia 100 điểm cho các CLB còn lại, mỗi
+    buổi một lần; rồi đi qua `diem_wharton_hieu_luc` thành `bo.diem_hl`.
+    """
+    rng = random.Random(seed)
+    bo = sinh_du_lieu(rng, n_hs, n_clb, co_du_tru, co_nhom, so_buoi)
+    scores, clubs = bo.d[2], bo.d[1]
+    w1, w2 = {}, {}
+    for s in bo.sids:
+        for ds in rp.gom_theo_buoi(bo.prefs[s], clubs).values():
+            t1 = [c for c in ds if s in scores[c]]
+            t2 = [c for c in ds if s not in scores[c]]
+            if t1:
+                w1.setdefault(s, {}).update(chia_diem(rng, t1))
+            if t2:
+                w2.setdefault(s, {}).update(chia_diem(rng, t2))
+    bo.w1, bo.w2 = w1, w2
+    bo.tick = {s: {c for c in bo.prefs[s] if s in scores[c]} for s in bo.sids}
+    bo.diem_hl, bo.canh_bao = rp.diem_wharton_hieu_luc(bo.prefs, w1, w2, scores)
+    return bo
+
+
+class TestDiemHieuLuc:
+    def test_bo_sinh_ra_la_ho_so_hop_le_va_khong_co_canh_bao(self):
+        for seed in range(20):
+            bo = sinh_bo(seed, so_buoi=1 + seed % 3, n_clb=6)
+            assert rp.kiem_ho_so_wharton(bo.prefs, bo.tick, bo.w1, bo.w2, bo.d[1]) == []
+            assert bo.canh_bao == []
+
+    def test_vd6_vang_thi_roi_xuong_tang_2_voi_diem_quy_2(self):
+        d = du_lieu(
+            cap={"Ly": 1},
+            prefs={"An": ["Ly"], "Binh": ["Ly"], "Quan": ["Ly"]},
+            diem_thi={"Ly": {"An": 5.0, "Binh": 4.0}},          # Quân tick thi mà vắng
+            stb={"Quan": 0, "An": 1, "Binh": 2},                # STB của Quân nhỏ nhất
+            tick={"An": {"Ly"}, "Binh": {"Ly"}, "Quan": {"Ly"}},
+        )
+        prefs, scores = d[4], d[2]
+        w1 = {"An": {"Ly": 100}, "Binh": {"Ly": 100}, "Quan": {"Ly": 100}}
+        hl, thong_bao = rp.diem_wharton_hieu_luc(prefs, w1, {}, scores)
+        assert hl["Ly"]["Quan"] == 0
+        assert thong_bao == [loi("wharton_vang_thi", student_id="Quan", club_id="Ly",
+                                 diem=0, diem_bo=100)]
+        kq = chay(d, diem_wharton=hl)
+        order = sorted(kq.base_rank["Ly"], key=kq.base_rank["Ly"].get)
+        assert order == ["An", "Binh", "Quan"]
+        assert kq.assignment == {"An": "Ly", "Binh": None, "Quan": None}
+
+    def test_vang_thi_ma_w2_co_khoa_clb_do_thi_lay_diem_w2_van_canh_bao(self):
+        hl, thong_bao = rp.diem_wharton_hieu_luc(
+            {"Quan": ["Ly"]}, {"Quan": {"Ly": 100}}, {"Quan": {"Ly": 30}}, {"Ly": {}})
+        assert hl == {"Ly": {"Quan": 30}}
+        assert thong_bao == [loi("wharton_vang_thi", student_id="Quan", club_id="Ly",
+                                 diem=30, diem_bo=100)]
+
+    def test_t2_chuyen_len_t1_bao_tang_lech_va_diem_la_0(self):
+        hl, thong_bao = rp.diem_wharton_hieu_luc(
+            {"a": ["X", "Y"]}, {}, {"a": {"X": 60, "Y": 40}}, {"X": {"a": 7.0}})
+        assert hl == {"X": {"a": 0}, "Y": {"a": 40}}
+        assert thong_bao == [loi("wharton_tang_lech", student_id="a", club_id="X")]
+
+    def test_co_diem_thi_ma_khong_co_trong_w1_lan_w2_thi_la_0_khong_bao_loi(self):
+        hl, thong_bao = rp.diem_wharton_hieu_luc(
+            {"a": ["X", "Y"]}, {}, {"a": {"Y": 100}}, {"X": {"a": 7.0}})
+        assert hl["X"]["a"] == 0 and thong_bao == []
+
+    def test_diem_thi_0_van_la_tang_1(self):
+        hl, _ = rp.diem_wharton_hieu_luc(
+            {"a": ["X"]}, {"a": {"X": 100}}, {"a": {"X": 9}}, {"X": {"a": 0.0}})
+        assert hl == {"X": {"a": 100}}
+
+    def test_moi_cap_clb_hoc_sinh_trong_nguyen_vong_deu_co_diem(self):
+        bo = sinh_bo(3, n_hs=10, n_clb=4)
+        for s, ds in bo.prefs.items():
+            for c in ds:
+                assert s in bo.diem_hl[c]
+
+    def test_thong_bao_theo_thu_tu_co_dinh_khong_phu_thuoc_thu_tu_nhap(self):
+        prefs = {"b": ["Y", "X"], "a": ["Y", "X"]}
+        w1 = {"b": {"X": 100, "Y": 100}, "a": {"X": 100, "Y": 100}}
+        thi = {"X": {}, "Y": {}}
+        _, mot = rp.diem_wharton_hieu_luc(prefs, w1, {}, thi)
+        _, hai = rp.diem_wharton_hieu_luc(
+            {"a": ["X", "Y"], "b": ["X", "Y"]}, w1, {}, thi)
+        assert [(e["params"]["student_id"], e["params"]["club_id"]) for e in mot] == [
+            ("a", "X"), ("a", "Y"), ("b", "X"), ("b", "Y")]
+        assert mot == hai
+
+    def test_chinh_sach_la_thi_nem_value_error(self):
+        with pytest.raises(ValueError):
+            rp.diem_wharton_hieu_luc({"a": ["X"]}, {}, {}, {}, chinh_sach="khac")
+
+    def test_mac_dinh_dung_hang_cau_hinh(self):
+        assert inspect.signature(rp.diem_wharton_hieu_luc).parameters[
+            "chinh_sach"].default == rp.WHARTON_VANG_THI
+
+    def test_w4_hai_quy_khong_tron_lan(self):
+        rng = random.Random(404)
+        doi_w1 = doi_w2 = 0
+        for _ in range(25):
+            bo = sinh_bo(rng.randrange(10 ** 6), n_hs=10, n_clb=5)
+            _, _, scores, applicants, prefs, stb = bo.d
+            for s in bo.sids:
+                t1 = [c for c in prefs[s] if s in scores[c]]
+                t2 = [c for c in prefs[s] if s not in scores[c]]
+                # đổi w1 của em s: điểm hiệu lực ở mọi CLB tầng 2 của s không đổi
+                w1_doi = copy.deepcopy(bo.w1)
+                if t1:
+                    w1_doi[s] = chia_diem(rng, t1)
+                    doi_w1 += (w1_doi[s] != bo.w1[s])
+                moi, _ = rp.diem_wharton_hieu_luc(prefs, w1_doi, bo.w2, scores)
+                for c in t2:
+                    assert moi[c][s] == bo.diem_hl[c][s]
+                    assert (rp.uu_tien_wharton(c, applicants[c], scores[c], stb, moi[c])
+                            == rp.uu_tien_wharton(c, applicants[c], scores[c], stb,
+                                                  bo.diem_hl[c]))
+                # và ngược lại: đổi w2 thì các CLB tầng 1 không đổi
+                w2_doi = copy.deepcopy(bo.w2)
+                if t2:
+                    w2_doi[s] = chia_diem(rng, t2)
+                    doi_w2 += (w2_doi[s] != bo.w2[s])
+                moi, _ = rp.diem_wharton_hieu_luc(prefs, bo.w1, w2_doi, scores)
+                for c in t1:
+                    assert moi[c][s] == bo.diem_hl[c][s]
+                    assert (rp.uu_tien_wharton(c, applicants[c], scores[c], stb, moi[c])
+                            == rp.uu_tien_wharton(c, applicants[c], scores[c], stb,
+                                                  bo.diem_hl[c]))
+        assert doi_w1 >= 20 and doi_w2 >= 20           # test thật sự có đổi điểm
+
+
+class TestW9TuHoSoTho:
+    """VD1–VD5 đi từ w1/w2 thô: kiểm hồ sơ -> điểm hiệu lực -> run_rbda; phải trùng Bước 6."""
+
+    def _chay(self, d, tick, w1, w2, **kw):
+        prefs, scores, clubs = d[4], d[2], d[1]
+        assert rp.kiem_ho_so_wharton(prefs, tick, w1, w2, clubs) == []
+        hl, thong_bao = rp.diem_wharton_hieu_luc(prefs, w1, w2, scores)
+        assert thong_bao == []
+        return chay(d, diem_wharton=hl, **kw), hl
+
+    def test_vd1(self):
+        d = du_lieu(cap={"Debate": 1, "NhiepAnh": 5, "Robotics": 5},
+                    prefs={"An": ["Debate", "NhiepAnh"], "Binh": ["Debate", "Robotics"]},
+                    diem_thi={}, stb={"An": 1, "Binh": 0})
+        w2 = {"An": {"Debate": 70, "NhiepAnh": 30}, "Binh": {"Debate": 30, "Robotics": 70}}
+        kq, hl = self._chay(d, {}, {}, w2)
+        assert kq.assignment == {"An": "Debate", "Binh": "Robotics"}
+        assert hl == {"Debate": {"An": 70, "Binh": 30}, "NhiepAnh": {"An": 30},
+                      "Robotics": {"Binh": 70}}
+
+    def test_vd2(self):
+        d = du_lieu(cap={"Robotics": 1, "VanHoc": 5},
+                    prefs={"Chi": ["Robotics"], "Dung": ["Robotics", "VanHoc"]},
+                    diem_thi={"Robotics": {"Chi": 6.5}}, stb={"Dung": 0, "Chi": 1})
+        tick = {"Chi": {"Robotics"}}
+        kq, _ = self._chay(d, tick, {"Chi": {"Robotics": 100}},
+                           {"Dung": {"Robotics": 100, "VanHoc": 0}})
+        assert kq.assignment == {"Chi": "Robotics", "Dung": "VanHoc"}
+
+    def test_vd3(self):
+        d = du_lieu(cap={"Toan": 1, "Hoa": 1, "Ly": 1},
+                    prefs={"Em": ["Toan", "Hoa"], "Giang": ["Toan", "Ly"]},
+                    diem_thi={"Toan": {"Em": 8.25, "Giang": 8.25}, "Hoa": {"Em": 7.0},
+                              "Ly": {"Giang": 9.0}},
+                    stb={"Giang": 0, "Em": 1})
+        tick = {"Em": {"Toan", "Hoa"}, "Giang": {"Toan", "Ly"}}
+        kq, hl = self._chay(d, tick, {"Em": {"Toan": 60, "Hoa": 40},
+                                      "Giang": {"Toan": 40, "Ly": 60}}, {})
+        assert kq.assignment == {"Em": "Toan", "Giang": "Ly"}
+        assert hl == {"Toan": {"Em": 60, "Giang": 40}, "Hoa": {"Em": 40}, "Ly": {"Giang": 60}}
+
+    @pytest.mark.parametrize("stb,nguoi_duoc", [({"Ha": 0, "Khoa": 1}, "Ha"),
+                                                ({"Ha": 1, "Khoa": 0}, "Khoa")])
+    def test_vd4(self, stb, nguoi_duoc):
+        d = du_lieu(cap={"Debate": 1, "CoVua": 5},
+                    prefs={"Ha": ["Debate", "CoVua"], "Khoa": ["Debate", "CoVua"]},
+                    diem_thi={}, stb=stb)
+        w2 = {"Ha": {"Debate": 50, "CoVua": 50}, "Khoa": {"Debate": 50, "CoVua": 50}}
+        kq, _ = self._chay(d, {}, {}, w2)
+        assert kq.assignment[nguoi_duoc] == "Debate"
+
+    def test_vd5_hai_thu_tu_nguyen_vong_cung_diem(self):
+        def lam(prefs_lan):
+            d = du_lieu(cap={"Toan": 5, "Debate": 1, "CoVua": 5},
+                        prefs={"Lan": prefs_lan, "Minh": ["Debate", "CoVua"]},
+                        diem_thi={"Toan": {"Lan": 9.0}}, stb={"Minh": 0, "Lan": 1})
+            return self._chay(
+                d, {"Lan": {"Toan"}}, {"Lan": {"Toan": 100}},
+                {"Lan": {"Debate": 100}, "Minh": {"Debate": 80, "CoVua": 20}})[0]
+        a, b = lam(["Debate", "Toan"]), lam(["Toan", "Debate"])
+        assert a.assignment == {"Lan": "Debate", "Minh": "CoVua"}
+        assert b.assignment == {"Lan": "Toan", "Minh": "Debate"}
+        assert a.base_rank == b.base_rank

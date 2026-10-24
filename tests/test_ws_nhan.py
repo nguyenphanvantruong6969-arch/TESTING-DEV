@@ -48,6 +48,10 @@ MA_MOI_SAU_ANH_CHUP = {
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).
     "scoring_not_per_slot", "csv_score_ignored_mode", "so_nhap_diem_sai_che_do",
+    # Điểm Wharton (mục A13, vòng 1): lỗi kiểm hồ sơ và cảnh báo vắng thi.
+    "wharton_nguyen_vong_chua_xep", "wharton_chua_dung_het", "wharton_vuot_ngan_sach",
+    "wharton_diem_khong_hop_le", "wharton_ngoai_tap", "wharton_tang_lech",
+    "wharton_vang_thi",
 }
 
 
