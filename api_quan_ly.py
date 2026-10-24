@@ -17,7 +17,12 @@ from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
     BUOI_MAC_DINH,
+    WHARTON_NGAN_SACH,
+    WHARTON_TU_DIEN_MOT_CLB,
+    dung_wharton,
+    kiem_ho_so_wharton,
     loi_suc_chua,
+    tu_dien_wharton_mot_clb,
 )
 
 
@@ -319,6 +324,9 @@ class QuanLyMixin:
         'Nhập dự phòng' hiển thị lại nếu học sinh quay lại kiosk.
         """
         try:
+            # Đọc cấu hình TRƯỚC khi mở kết nối đọc; chỉ để HIỂN THỊ nên đọc kiểu không nghiêm
+            # (cấu hình hỏng thì coi như tắt, màn hình vẫn mở được như trước).
+            bat_wharton = dung_wharton(self._cfg_ws()["rules"])
             with self._ket_noi_doc() as cur:
                 student = cur.execute(
                     "SELECT student_id, name FROM students WHERE student_id = ?",
@@ -341,14 +349,93 @@ class QuanLyMixin:
                         (student_id,),
                     ).fetchall()
                 ]
-                return _ok({
+                du_lieu = {
                     "student_id": student["student_id"],
                     "name": student["name"],
                     "tested_clubs": tested,
                     "ranked_clubs": prefs,
-                })
+                }
+                if bat_wharton:
+                    du_lieu["wharton"] = self._trang_thai_wharton(cur, student_id, tested, prefs)
+                return _ok(du_lieu)
         except Exception as e:
             return _fail(err("error_reading_student_state", detail=str(e)))
+
+    @staticmethod
+    def _trang_thai_wharton(cur, student_id: str, tested: list, prefs: list) -> dict:
+        """Khoá `wharton` của `get_student_entry_state` (chỉ có khi workspace bật Wharton).
+
+        `quy_cua_clb` tính theo ô tick HIỆN TẠI; `w1` / `w2` lấy theo cột `tier` ĐÃ LƯU. Dòng
+        có tier lệch với ô tick hiện tại (em đổi tick sau khi chia điểm) vẫn được trả nguyên để
+        màn hình nhận ra hồ sơ đang lệch và nhắc chia lại — không tự chuyển điểm sang quỹ kia.
+        Chỉ trả điểm của CHÍNH em này.
+        """
+        w: dict = {1: {}, 2: {}}
+        for cid, tier, diem in cur.execute(
+                "SELECT club_id, tier, points FROM wharton_bids WHERE student_id = ? "
+                "ORDER BY club_id", (student_id,)):
+            w[tier][cid] = diem
+        buoi = {r[0]: (r[1] or BUOI_MAC_DINH) for r in cur.execute(
+            "SELECT club_id, buoi FROM clubs")}
+        tick = set(tested)
+        return {
+            "bat": True,
+            "ngan_sach": WHARTON_NGAN_SACH,
+            "tu_dien_mot_clb": WHARTON_TU_DIEN_MOT_CLB,
+            "w1": w[1], "w2": w[2],
+            "quy_cua_clb": {c: (1 if c in tick else 2) for c in prefs},
+            "buoi_cua_clb": {c: buoi.get(c, BUOI_MAC_DINH) for c in prefs},
+        }
+
+    def submit_wharton(self, student_id: str, w1: dict, w2: dict):
+        """BƯỚC 3 (điểm Wharton) — học sinh chia hai quỹ điểm cho các CLB trong nguyện vọng.
+
+        `w1` {club_id: điểm} chia cho các CLB em có thi, `w2` cho các CLB không thi. KIỂM Ở
+        SERVER (đặc tả V6), không tin dữ liệu từ trình duyệt: ghép với nguyện vọng và ô tick
+        đang lưu của em rồi chạy `kiem_ho_so_wharton`. Hồ sơ sai thì không ghi gì và trả đúng
+        danh sách lỗi của hàm đó. Một quỹ chỉ có MỘT CLB mà chưa đặt điểm thì tự điền 100
+        (`tu_dien_wharton_mot_clb`) TRƯỚC khi kiểm. Hợp lệ thì thay TOÀN BỘ dòng của em trong
+        `wharton_bids`, `tier` theo ô tick lúc ghi. Workspace chưa bật Wharton thì từ chối.
+        """
+        try:
+            luat = self._luat_nghiem()           # đọc TRƯỚC khi mở giao dịch ghi
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            if not isinstance(w1, dict) or not isinstance(w2, dict):
+                return _fail(err("error_saving_wharton",
+                                 detail="w1 va w2 phai la dict {club_id: diem}"))
+            with self._ket_noi_ghi() as cur:
+                exists = cur.execute(
+                    "SELECT 1 FROM students WHERE student_id = ?", (student_id,)).fetchone()
+                if not exists:
+                    return _fail(err("student_not_found", student_id=student_id))
+                prefs = [r[0] for r in cur.execute(
+                    "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
+                    (student_id,))]
+                tick = {r[0] for r in cur.execute(
+                    "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+                    (student_id,))}
+                clubs = {r[0]: {"buoi": r[1] or BUOI_MAC_DINH} for r in cur.execute(
+                    "SELECT club_id, buoi FROM clubs")}
+                preferences, clb_thi = {student_id: prefs}, {student_id: tick}
+                moi1, moi2 = tu_dien_wharton_mot_clb(
+                    preferences, clb_thi, {student_id: dict(w1)}, {student_id: dict(w2)}, clubs)
+                loi = kiem_ho_so_wharton(
+                    preferences, clb_thi, moi1, moi2, clubs,
+                    tran_nguyen_vong=luat["max_choices"])
+                if loi:
+                    return _fail(loi)
+                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+                dong = ([(student_id, cid, 1, diem) for cid, diem in moi1.get(student_id, {}).items()]
+                        + [(student_id, cid, 2, diem) for cid, diem in moi2.get(student_id, {}).items()])
+                cur.executemany(
+                    "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
+                    "VALUES (?, ?, ?, ?)", dong)
+            return _ok({"student_id": student_id, "n_saved": len(dong)})
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_saving_wharton", detail=str(e)))
     @staticmethod
     def _xoa_diem_khong_con_tick(cur, student_id: str) -> int:
         """Xoá điểm của em ở những CLB em KHÔNG còn tick "muốn thi".

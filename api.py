@@ -44,10 +44,14 @@ from rbda_priority_pipeline import (
     chen_stb_cho_hoc_sinh_moi,
     connect_db,
     default_reserve_eligible_fn,
+    diem_wharton_hieu_luc,
+    dung_wharton,
     generate_stb_lottery,
     init_db,
+    kiem_ho_so_wharton,
     load_from_sqlite,
     load_from_sqlite_kem_dau_van_tay,
+    load_from_sqlite_kem_dau_van_tay_wharton,
     nhom_theo_buoi,
     run_rbda_nhieu_buoi,
     sanity_check_result,
@@ -959,14 +963,40 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 loi_ch = err("ws_cau_hinh_hong", detail=str(e))
                 steps_log.append({"step": "validate", "status": "error", "detail": loi_ch})
                 return _fail_co_buoc(steps_log, [loi_ch])
-            (students, clubs, tested_scores, applicants, preferences, _), \
-                dau_van_tay = load_from_sqlite_kem_dau_van_tay(self.db_path, luat)
+            # Điểm Wharton (mục A13) bật: dữ liệu, dấu vân tay VÀ hồ sơ Wharton cùng đến từ MỘT
+            # lần đọc (không đọc riêng lần hai). Tắt thì đường cũ từng dòng.
+            wharton = None
+            if dung_wharton(luat):
+                du_lieu, dau_van_tay, wharton = load_from_sqlite_kem_dau_van_tay_wharton(
+                    self.db_path, luat)
+            else:
+                du_lieu, dau_van_tay = load_from_sqlite_kem_dau_van_tay(self.db_path, luat)
+            (students, clubs, tested_scores, applicants, preferences, _) = du_lieu
             errors = validate_data_integrity(
                 students, clubs, preferences, applicants,
                 tran_nguyen_vong=luat["max_choices"])
             if errors:
                 steps_log.append({"step": "validate", "status": "error", "detail": errors})
                 return _fail_co_buoc(steps_log, errors)
+            # Hồ sơ điểm Wharton sai thì CHẶN cả lần chạy, ở đây — TRƯỚC khi soát buổi, bốc hay
+            # khoá số bốc thăm, như `validate_data_integrity` ngay trên: không vẽ số, không ghi
+            # gì, trả đủ danh sách lỗi. Mọi mã trừ `wharton_vang_thi` là lỗi chặn; vắng thi chỉ
+            # là cảnh báo và đi vào chi tiết của bước này.
+            diem_wharton, canh_bao_wharton = None, []
+            if wharton is not None:
+                loi_wharton = kiem_ho_so_wharton(
+                    preferences, wharton["clb_thi"], wharton["w1"], wharton["w2"], clubs,
+                    tran_nguyen_vong=luat["max_choices"])
+                diem_wharton, thong_bao = diem_wharton_hieu_luc(
+                    preferences, wharton["w1"], wharton["w2"], tested_scores)
+                loi_wharton += [e for e in thong_bao if e["code"] != "wharton_vang_thi"]
+                canh_bao_wharton = [e for e in thong_bao if e["code"] == "wharton_vang_thi"]
+                if loi_wharton:
+                    n_em = len({e["params"].get("student_id") for e in loi_wharton})
+                    loi_wharton = [err("wharton_ho_so_chua_hop_le", n=n_em)] + loi_wharton
+                    steps_log.append({"step": "validate", "status": "error",
+                                      "detail": loi_wharton})
+                    return _fail_co_buoc(steps_log, loi_wharton)
             # Soat danh sach buoi TRUOC khi ve so boc tham. Ve roi moi phat
             # hien tham so sai la da tieu mat mot bo so — cung ly do vi sao
             # buoc kiem tra du lieu nam truoc buoc boc tham.
@@ -1061,7 +1091,10 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     return _fail(err("hat_giong_da_khoa",
                                      cu=_khoa["seed"], moi=seed))
 
-            steps_log.append({"step": "validate", "status": "done"})
+            buoc_validate = {"step": "validate", "status": "done"}
+            if canh_bao_wharton:
+                buoc_validate["detail"] = canh_bao_wharton
+            steps_log.append(buoc_validate)
 
             # ---------------- Bước 3/6 · SỐ BỐC THĂM ----------------
             # Ba nhánh: chưa khoá -> vẽ toàn bộ rồi khoá; đã khoá + có em
@@ -1179,6 +1212,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 che_do_boc_tham=CHE_DO_BOC_THAM_MAC_DINH, seed=seed,
                 chi_buoi=chi_buoi_chuan,
                 tier_rank=tham_so["tier_rank"], bo_qua_du_tru=tham_so["bo_qua_du_tru"],
+                diem_wharton=diem_wharton,
             )
             sanity_problems = []
             stability_problems = []
