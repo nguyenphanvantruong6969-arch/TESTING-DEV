@@ -1,0 +1,34 @@
+{
+  "name": "Công ty Bình Minh",
+  "industry": "company",
+  "labels": {
+    "person": {
+      "vi": "Nhân viên",
+      "en": "Employee"
+    },
+    "slot": {
+      "vi": "Dự án",
+      "en": "Project"
+    },
+    "session": {
+      "vi": "Ngày",
+      "en": "Day"
+    },
+    "group": {
+      "vi": "Diện ưu tiên",
+      "en": "Priority group"
+    },
+    "score": {
+      "vi": "Điểm phỏng vấn",
+      "en": "Interview score"
+    }
+  },
+  "rules": {
+    "max_choices": 5,
+    "max_tests": 2,
+    "priority": "score",
+    "tier_mode": "reserve",
+    "score_scope": "per_slot",
+    "tiers": []
+  }
+}

@@ -1,0 +1,15 @@
+# Tiến độ
+
+Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
+
+| Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
+|---|---|---|---|---|---|
+| GĐ0 | xong | 2026-10-10 | CHANGELOG.md, docs/ke_hoach/DOI_CHIEU_KHO_MA.md, docs/ke_hoach/TIEN_DO.md, docs/ke_hoach/tham_khao/*, tests/test_tham_khao_verify_nhanh.py, CLAUDE.md, pyproject.toml | tests/test_tham_khao_verify_nhanh.py (228 ca) | Đọc và đo: 1.287 test đạt, phủ 91,06 %; verify nhanh khớp 7/7; 5.000 HS verify ~92 % thời gian (K=10); sổ 33 mục: 29 đúng, 3 khác, 1 sai. Việc tiếp, ngoài sổ (Truong yêu cầu qua /code-review), chuẩn bị Z4, G1, Z6: các lượt rà soát mã — xem CHANGELOG.md |
+| Z6 | chưa | | | | Bộ test và dữ liệu mô phỏng cho từng hàm mới (Giai đoạn 1, thứ tự đầu tiên) |
+| Z3 | chưa | | | | Tách _run_pipeline_da_khoa (581 dòng, không phải 573) |
+| Z7 | chưa | | | | Cổng cắm; lõi không cần Z3, chỉ điểm gọi api.py cần (xem DOI_CHIEU Q6); không nhắm run_full_pipeline |
+| Z4 | chưa | | | | Verify nhanh; cần chủ sở hữu cho điều hướng bản chậm (xem DOI_CHIEU Q6); số đo lại trên máy này |
+| Z5 | chưa | | | | Sửa docstring số vòng (bị bác bỏ bởi ket_qua_thu_tai.csv); trần max_rounds theo cận chứng minh được |
+| Z2 | chưa | | | | Một nguồn cho giới hạn 10 nguyện vọng / 5 CLB thi (hiện hai bản sao Python và JS). *Lưu ý 14/10: nhánh workspace (hàng WS) đã đưa trần vào `rules.max_choices` / `rules.max_tests` của từng workspace và mọi chỗ nhập đọc từ đó; còn bản sao `TRAN_NV_MOI_BUOI` / `TRAN_THI_MOI_BUOI` trong `so_nhap.py` (cố ý, để tệp chạy một mình) và mặc định phía JS. Mục chưa đóng theo sổ.* |
+| Z1 | chưa | | | | Gói từ vựng giao diện; số đếm trong sổ phải ghi phương pháp. *Lưu ý 14/10: nhánh workspace (hàng WS) đã làm phần từ vựng 5 danh từ vi/en (`nhan_ws.py`, `cau_hinh_ws.py`, `i18n.js`); chưa đối chiếu với tiêu chí kiểm nhận của Z1. Mục chưa đóng theo sổ.* |
+| WS | xong (ngoài sổ) | 2026-10-14 | workspace.py, cau_hinh_ws.py, nhan_ws.py, api_workspace.py, api.py, api_nhap.py, api_quan_ly.py, api_cham_diem.py, api_xuat.py, so_nhap.py, so_excel.py, rbda_priority_pipeline.py, main.py, js/075_workspace.js, i18n*.py/js | tests/test_ws_*.py (nhiều tệp), tests/test_ws_sua_loi.py, test_ws_sua_loi_2.py, test_ws_sua_loi_3.py | Tính năng nhiều không gian làm việc (workspace): từ vựng + luật xếp (nhóm cứng, chỉ theo nhóm, điểm theo người) lưu trong app.db từng workspace. Làm theo yêu cầu của Truong, KHÔNG thuộc mã mục nào trong sổ 33 mục (chồng lấn Z1, Z2). Cấu hình mặc định giữ kết quả trùng khít (bất biến 1); `run_history` thêm cột `luat_xep` (ADD COLUMN, không dựng lại bảng — bất biến 4). Ba vòng sửa lỗi sau review: xem CHANGELOG.md. *15/10: Việt hoá sạch màn chọn (không gian làm việc, tệp nén) và sửa bảng vỡ; giao diện tiếng Anh giữ nguyên; xem CHANGELOG.md. Vẫn không đóng Z1.* |

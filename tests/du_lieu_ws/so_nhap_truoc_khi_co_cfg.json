@@ -1,0 +1,1512 @@
+{
+ "co_du_lieu": {
+  "active": "1. CLB",
+  "sheets": [
+   "1. CLB",
+   "2. Học sinh",
+   "Hướng dẫn"
+  ],
+  "trang": {
+   "1. CLB": {
+    "cao_hang_1": 30.0,
+    "dieu_kien": [
+     [
+      "A2:A60",
+      [
+       "AND(A2<>\"\",COUNTIF($A$2:$A$60,A2)>1)"
+      ],
+      "expression"
+     ]
+    ],
+    "dinh_dang_ma_hs": "General",
+    "khoa": "A2",
+    "kiem": [
+     [
+      "list",
+      "B2:B60",
+      "\"Thứ 2,Thứ 3,Thứ 4,Thứ 5,Thứ 6,Thứ 7,Chủ nhật\"",
+      null,
+      null,
+      true,
+      false,
+      null,
+      null,
+      null
+     ],
+     [
+      "whole",
+      "C2:C60",
+      "0",
+      null,
+      "greaterThan",
+      true,
+      true,
+      "Chỉ tiêu",
+      "Chỉ tiêu phải là số nguyên lớn hơn 0.",
+      null
+     ],
+     [
+      "whole",
+      "D2:D60",
+      "0",
+      null,
+      "greaterThanOrEqual",
+      true,
+      true,
+      "Suất ưu tiên",
+      "Suất ưu tiên là số nguyên, không lớn hơn Chỉ tiêu.",
+      null
+     ]
+    ],
+    "mau_dau": {
+     "A1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "B1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "C1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "D1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "E1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "F1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ]
+    },
+    "max": [
+     60,
+     6
+    ],
+    "nen": {
+     "A2": "00FFF8DC",
+     "B2": "00FFF8DC",
+     "C2": "00FFF8DC",
+     "D2": "00FFF8DC",
+     "E2": "00FFF8DC",
+     "F2": "00FFF8DC",
+     "G2": "00000000"
+    },
+    "o": {
+     "A1": "Tên CLB",
+     "A2": "Cờ vua",
+     "A3": "Bóng đá",
+     "B1": "Buổi",
+     "B2": "Thứ 2",
+     "B3": "Thứ 3",
+     "C1": "Chỉ tiêu",
+     "C2": 5,
+     "C3": 6,
+     "D1": "Suất ưu tiên",
+     "D2": 1,
+     "E1": "Nhóm ưu tiên",
+     "E2": "cs",
+     "F1": "Mã CLB",
+     "F2": "a",
+     "F3": "b"
+    },
+    "rong_cot": {
+     "A": 30.0,
+     "B": 12.0,
+     "C": 10.0,
+     "D": 13.0,
+     "E": 16.0,
+     "F": 18.0
+    }
+   },
+   "2. Học sinh": {
+    "cao_hang_1": 30.0,
+    "dieu_kien": [
+     [
+      "A2:A1500",
+      [
+       "AND(A2<>\"\",COUNTIF($A$2:$A$1500,A2)>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AB2:AB1500",
+      [
+       "AND(AB2<>\"\",(($D2=AB2)+($F2=AB2)+($H2=AB2)+($J2=AB2)+($L2=AB2)+($N2=AB2)+($P2=AB2)+($R2=AB2)+($T2=AB2)+($V2=AB2)+($X2=AB2)+($Z2=AB2)+($AB2=AB2)+($AD2=AB2)+($AF2=AB2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AD2:AD1500",
+      [
+       "AND(AD2<>\"\",(($D2=AD2)+($F2=AD2)+($H2=AD2)+($J2=AD2)+($L2=AD2)+($N2=AD2)+($P2=AD2)+($R2=AD2)+($T2=AD2)+($V2=AD2)+($X2=AD2)+($Z2=AD2)+($AB2=AD2)+($AD2=AD2)+($AF2=AD2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AF2:AF1500",
+      [
+       "AND(AF2<>\"\",(($D2=AF2)+($F2=AF2)+($H2=AF2)+($J2=AF2)+($L2=AF2)+($N2=AF2)+($P2=AF2)+($R2=AF2)+($T2=AF2)+($V2=AF2)+($X2=AF2)+($Z2=AF2)+($AB2=AF2)+($AD2=AF2)+($AF2=AF2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "D2:D1500",
+      [
+       "AND(D2<>\"\",(($D2=D2)+($F2=D2)+($H2=D2)+($J2=D2)+($L2=D2)+($N2=D2)+($P2=D2)+($R2=D2)+($T2=D2)+($V2=D2)+($X2=D2)+($Z2=D2)+($AB2=D2)+($AD2=D2)+($AF2=D2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "F2:F1500",
+      [
+       "AND(F2<>\"\",(($D2=F2)+($F2=F2)+($H2=F2)+($J2=F2)+($L2=F2)+($N2=F2)+($P2=F2)+($R2=F2)+($T2=F2)+($V2=F2)+($X2=F2)+($Z2=F2)+($AB2=F2)+($AD2=F2)+($AF2=F2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "H2:H1500",
+      [
+       "AND(H2<>\"\",(($D2=H2)+($F2=H2)+($H2=H2)+($J2=H2)+($L2=H2)+($N2=H2)+($P2=H2)+($R2=H2)+($T2=H2)+($V2=H2)+($X2=H2)+($Z2=H2)+($AB2=H2)+($AD2=H2)+($AF2=H2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "J2:J1500",
+      [
+       "AND(J2<>\"\",(($D2=J2)+($F2=J2)+($H2=J2)+($J2=J2)+($L2=J2)+($N2=J2)+($P2=J2)+($R2=J2)+($T2=J2)+($V2=J2)+($X2=J2)+($Z2=J2)+($AB2=J2)+($AD2=J2)+($AF2=J2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "L2:L1500",
+      [
+       "AND(L2<>\"\",(($D2=L2)+($F2=L2)+($H2=L2)+($J2=L2)+($L2=L2)+($N2=L2)+($P2=L2)+($R2=L2)+($T2=L2)+($V2=L2)+($X2=L2)+($Z2=L2)+($AB2=L2)+($AD2=L2)+($AF2=L2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "N2:N1500",
+      [
+       "AND(N2<>\"\",(($D2=N2)+($F2=N2)+($H2=N2)+($J2=N2)+($L2=N2)+($N2=N2)+($P2=N2)+($R2=N2)+($T2=N2)+($V2=N2)+($X2=N2)+($Z2=N2)+($AB2=N2)+($AD2=N2)+($AF2=N2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "P2:P1500",
+      [
+       "AND(P2<>\"\",(($D2=P2)+($F2=P2)+($H2=P2)+($J2=P2)+($L2=P2)+($N2=P2)+($P2=P2)+($R2=P2)+($T2=P2)+($V2=P2)+($X2=P2)+($Z2=P2)+($AB2=P2)+($AD2=P2)+($AF2=P2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "R2:R1500",
+      [
+       "AND(R2<>\"\",(($D2=R2)+($F2=R2)+($H2=R2)+($J2=R2)+($L2=R2)+($N2=R2)+($P2=R2)+($R2=R2)+($T2=R2)+($V2=R2)+($X2=R2)+($Z2=R2)+($AB2=R2)+($AD2=R2)+($AF2=R2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "T2:T1500",
+      [
+       "AND(T2<>\"\",(($D2=T2)+($F2=T2)+($H2=T2)+($J2=T2)+($L2=T2)+($N2=T2)+($P2=T2)+($R2=T2)+($T2=T2)+($V2=T2)+($X2=T2)+($Z2=T2)+($AB2=T2)+($AD2=T2)+($AF2=T2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "V2:V1500",
+      [
+       "AND(V2<>\"\",(($D2=V2)+($F2=V2)+($H2=V2)+($J2=V2)+($L2=V2)+($N2=V2)+($P2=V2)+($R2=V2)+($T2=V2)+($V2=V2)+($X2=V2)+($Z2=V2)+($AB2=V2)+($AD2=V2)+($AF2=V2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "X2:X1500",
+      [
+       "AND(X2<>\"\",(($D2=X2)+($F2=X2)+($H2=X2)+($J2=X2)+($L2=X2)+($N2=X2)+($P2=X2)+($R2=X2)+($T2=X2)+($V2=X2)+($X2=X2)+($Z2=X2)+($AB2=X2)+($AD2=X2)+($AF2=X2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "Z2:Z1500",
+      [
+       "AND(Z2<>\"\",(($D2=Z2)+($F2=Z2)+($H2=Z2)+($J2=Z2)+($L2=Z2)+($N2=Z2)+($P2=Z2)+($R2=Z2)+($T2=Z2)+($V2=Z2)+($X2=Z2)+($Z2=Z2)+($AB2=Z2)+($AD2=Z2)+($AF2=Z2))>1)"
+      ],
+      "expression"
+     ]
+    ],
+    "dinh_dang_ma_hs": "@",
+    "khoa": "D2",
+    "kiem": [
+     [
+      "custom",
+      "AA2:AA1500",
+      "OR(ISNUMBER(AA2),LOWER(AA2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AC2:AC1500",
+      "OR(ISNUMBER(AC2),LOWER(AC2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AE2:AE1500",
+      "OR(ISNUMBER(AE2),LOWER(AE2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AG2:AG1500",
+      "OR(ISNUMBER(AG2),LOWER(AG2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "E2:E1500",
+      "OR(ISNUMBER(E2),LOWER(E2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "G2:G1500",
+      "OR(ISNUMBER(G2),LOWER(G2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "I2:I1500",
+      "OR(ISNUMBER(I2),LOWER(I2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "K2:K1500",
+      "OR(ISNUMBER(K2),LOWER(K2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "M2:M1500",
+      "OR(ISNUMBER(M2),LOWER(M2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "O2:O1500",
+      "OR(ISNUMBER(O2),LOWER(O2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "Q2:Q1500",
+      "OR(ISNUMBER(Q2),LOWER(Q2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "S2:S1500",
+      "OR(ISNUMBER(S2),LOWER(S2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "U2:U1500",
+      "OR(ISNUMBER(U2),LOWER(U2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "W2:W1500",
+      "OR(ISNUMBER(W2),LOWER(W2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "Y2:Y1500",
+      "OR(ISNUMBER(Y2),LOWER(Y2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "list",
+      "D2:D1500 F2:F1500 H2:H1500 J2:J1500 L2:L1500 N2:N1500 P2:P1500 R2:R1500 T2:T1500 V2:V1500 X2:X1500 Z2:Z1500 AB2:AB1500 AD2:AD1500 AF2:AF1500",
+      "'1. CLB'!$A$2:$A$60",
+      null,
+      null,
+      true,
+      true,
+      "Tên CLB",
+      "Hãy chọn tên CLB trong danh sách (sheet 1. CLB).",
+      "warning"
+     ]
+    ],
+    "mau_dau": {
+     "A1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AA1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AB1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AC1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AD1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AE1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AF1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AG1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "B1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "C1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "D1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "E1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "F1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "G1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "H1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "I1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "J1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "K1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "L1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "M1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "N1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "O1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "P1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Q1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "R1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "S1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "T1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "U1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "V1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "W1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "X1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Y1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Z1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ]
+    },
+    "max": [
+     1500,
+     33
+    ],
+    "nen": {
+     "A2": "00FFF8DC",
+     "B2": "00FFF8DC",
+     "C2": "00FFF8DC",
+     "D2": "00FFF8DC",
+     "E2": "00EAF4EA",
+     "F2": "00FFF8DC",
+     "G2": "00EAF4EA"
+    },
+    "o": {
+     "A1": "Mã HS",
+     "A2": "H1",
+     "A3": "H2",
+     "AA1": "Điểm 12",
+     "AB1": "NV13",
+     "AC1": "Điểm 13",
+     "AD1": "NV14",
+     "AE1": "Điểm 14",
+     "AF1": "NV15",
+     "AG1": "Điểm 15",
+     "B1": "Họ tên",
+     "B2": "An",
+     "B3": "Bình",
+     "C1": "Nhóm ưu tiên",
+     "C2": "cs",
+     "D1": "NV1",
+     "D2": "Cờ vua",
+     "D3": "Bóng đá",
+     "E1": "Điểm 1",
+     "E2": 9.5,
+     "E3": "thi",
+     "F1": "NV2",
+     "F2": "Bóng đá",
+     "G1": "Điểm 2",
+     "H1": "NV3",
+     "I1": "Điểm 3",
+     "J1": "NV4",
+     "K1": "Điểm 4",
+     "L1": "NV5",
+     "M1": "Điểm 5",
+     "N1": "NV6",
+     "O1": "Điểm 6",
+     "P1": "NV7",
+     "Q1": "Điểm 7",
+     "R1": "NV8",
+     "S1": "Điểm 8",
+     "T1": "NV9",
+     "U1": "Điểm 9",
+     "V1": "NV10",
+     "W1": "Điểm 10",
+     "X1": "NV11",
+     "Y1": "Điểm 11",
+     "Z1": "NV12"
+    },
+    "rong_cot": {
+     "A": 11.0,
+     "AA": 8.0,
+     "AB": 22.0,
+     "AC": 8.0,
+     "AD": 22.0,
+     "AE": 8.0,
+     "AF": 22.0,
+     "AG": 8.0,
+     "B": 24.0,
+     "C": 13.0,
+     "D": 22.0,
+     "E": 8.0,
+     "F": 22.0,
+     "G": 8.0,
+     "H": 22.0,
+     "I": 8.0,
+     "J": 22.0,
+     "K": 8.0,
+     "L": 22.0,
+     "M": 8.0,
+     "N": 22.0,
+     "O": 8.0,
+     "P": 22.0,
+     "Q": 8.0,
+     "R": 22.0,
+     "S": 8.0,
+     "T": 22.0,
+     "U": 8.0,
+     "V": 22.0,
+     "W": 8.0,
+     "X": 22.0,
+     "Y": 8.0,
+     "Z": 22.0
+    }
+   },
+   "Hướng dẫn": {
+    "cao_hang_1": null,
+    "dieu_kien": [],
+    "dinh_dang_ma_hs": "General",
+    "khoa": null,
+    "kiem": [],
+    "mau_dau": {
+     "A1": [
+      "00000000",
+      true,
+      "001F3A5F"
+     ]
+    },
+    "max": [
+     35,
+     1
+    ],
+    "nen": {
+     "A2": "00000000",
+     "B2": "00000000",
+     "C2": "00000000",
+     "D2": "00000000",
+     "E2": "00000000",
+     "F2": "00000000",
+     "G2": "00000000"
+    },
+    "o": {
+     "A1": "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
+     "A10": "        Mã HS là bắt buộc và không được trùng.",
+     "A11": "        Nhóm ưu tiên: chỉ điền với học sinh thuộc nhóm đó.",
+     "A13": "Bước 3. NV1, NV2, NV3…: chọn tên CLB trong danh sách thả xuống,",
+     "A14": "        theo thứ tự em thích nhất trước. Không cần điền kín.",
+     "A15": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+     "A16": "        theo buổi của từng CLB.",
+     "A18": "Bước 4. Điểm 1, Điểm 2…: điểm thi của CLB ngay bên trái.",
+     "A19": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
+     "A20": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
+     "A22": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
+     "A24": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
+     "A25": "        → xem lại phần tóm tắt → bấm Nhập.",
+     "A27": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
+     "A28": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
+     "A29": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A3": "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
+     "A31": "Ví dụ một dòng học sinh:",
+     "A32": "  Mã HS   Họ tên          NV1          Điểm 1   NV2           Điểm 2",
+     "A33": "  HS001   Nguyễn Văn An   CLB Tin học  9,5      CLB Bóng rổ",
+     "A34": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
+     "A35": "    CLB không thi tuyển.",
+     "A4": "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
+     "A5": "        (trường chỉ có một buổi thì để trống cả cột).",
+     "A6": "        Suất ưu tiên / Nhóm ưu tiên: chỉ điền nếu CLB giữ chỗ cho một nhóm",
+     "A7": "        học sinh (ví dụ nhóm chinh_sach). Mã CLB để trống, phần mềm tự tạo.",
+     "A9": "Bước 2. Sheet \"2. Học sinh\": mỗi học sinh một dòng."
+    },
+    "rong_cot": {
+     "A": 90.0
+    }
+   }
+  }
+ },
+ "trong": {
+  "active": "1. CLB",
+  "sheets": [
+   "1. CLB",
+   "2. Học sinh",
+   "Hướng dẫn"
+  ],
+  "trang": {
+   "1. CLB": {
+    "cao_hang_1": 30.0,
+    "dieu_kien": [
+     [
+      "A2:A60",
+      [
+       "AND(A2<>\"\",COUNTIF($A$2:$A$60,A2)>1)"
+      ],
+      "expression"
+     ]
+    ],
+    "dinh_dang_ma_hs": "General",
+    "khoa": "A2",
+    "kiem": [
+     [
+      "list",
+      "B2:B60",
+      "\"Thứ 2,Thứ 3,Thứ 4,Thứ 5,Thứ 6,Thứ 7,Chủ nhật\"",
+      null,
+      null,
+      true,
+      false,
+      null,
+      null,
+      null
+     ],
+     [
+      "whole",
+      "C2:C60",
+      "0",
+      null,
+      "greaterThan",
+      true,
+      true,
+      "Chỉ tiêu",
+      "Chỉ tiêu phải là số nguyên lớn hơn 0.",
+      null
+     ],
+     [
+      "whole",
+      "D2:D60",
+      "0",
+      null,
+      "greaterThanOrEqual",
+      true,
+      true,
+      "Suất ưu tiên",
+      "Suất ưu tiên là số nguyên, không lớn hơn Chỉ tiêu.",
+      null
+     ]
+    ],
+    "mau_dau": {
+     "A1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "B1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "C1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "D1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "E1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "F1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ]
+    },
+    "max": [
+     60,
+     6
+    ],
+    "nen": {
+     "A2": "00FFF8DC",
+     "B2": "00FFF8DC",
+     "C2": "00FFF8DC",
+     "D2": "00FFF8DC",
+     "E2": "00FFF8DC",
+     "F2": "00FFF8DC",
+     "G2": "00000000"
+    },
+    "o": {
+     "A1": "Tên CLB",
+     "B1": "Buổi",
+     "C1": "Chỉ tiêu",
+     "D1": "Suất ưu tiên",
+     "E1": "Nhóm ưu tiên",
+     "F1": "Mã CLB"
+    },
+    "rong_cot": {
+     "A": 30.0,
+     "B": 12.0,
+     "C": 10.0,
+     "D": 13.0,
+     "E": 16.0,
+     "F": 18.0
+    }
+   },
+   "2. Học sinh": {
+    "cao_hang_1": 30.0,
+    "dieu_kien": [
+     [
+      "A2:A1500",
+      [
+       "AND(A2<>\"\",COUNTIF($A$2:$A$1500,A2)>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AB2:AB1500",
+      [
+       "AND(AB2<>\"\",(($D2=AB2)+($F2=AB2)+($H2=AB2)+($J2=AB2)+($L2=AB2)+($N2=AB2)+($P2=AB2)+($R2=AB2)+($T2=AB2)+($V2=AB2)+($X2=AB2)+($Z2=AB2)+($AB2=AB2)+($AD2=AB2)+($AF2=AB2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AD2:AD1500",
+      [
+       "AND(AD2<>\"\",(($D2=AD2)+($F2=AD2)+($H2=AD2)+($J2=AD2)+($L2=AD2)+($N2=AD2)+($P2=AD2)+($R2=AD2)+($T2=AD2)+($V2=AD2)+($X2=AD2)+($Z2=AD2)+($AB2=AD2)+($AD2=AD2)+($AF2=AD2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "AF2:AF1500",
+      [
+       "AND(AF2<>\"\",(($D2=AF2)+($F2=AF2)+($H2=AF2)+($J2=AF2)+($L2=AF2)+($N2=AF2)+($P2=AF2)+($R2=AF2)+($T2=AF2)+($V2=AF2)+($X2=AF2)+($Z2=AF2)+($AB2=AF2)+($AD2=AF2)+($AF2=AF2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "D2:D1500",
+      [
+       "AND(D2<>\"\",(($D2=D2)+($F2=D2)+($H2=D2)+($J2=D2)+($L2=D2)+($N2=D2)+($P2=D2)+($R2=D2)+($T2=D2)+($V2=D2)+($X2=D2)+($Z2=D2)+($AB2=D2)+($AD2=D2)+($AF2=D2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "F2:F1500",
+      [
+       "AND(F2<>\"\",(($D2=F2)+($F2=F2)+($H2=F2)+($J2=F2)+($L2=F2)+($N2=F2)+($P2=F2)+($R2=F2)+($T2=F2)+($V2=F2)+($X2=F2)+($Z2=F2)+($AB2=F2)+($AD2=F2)+($AF2=F2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "H2:H1500",
+      [
+       "AND(H2<>\"\",(($D2=H2)+($F2=H2)+($H2=H2)+($J2=H2)+($L2=H2)+($N2=H2)+($P2=H2)+($R2=H2)+($T2=H2)+($V2=H2)+($X2=H2)+($Z2=H2)+($AB2=H2)+($AD2=H2)+($AF2=H2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "J2:J1500",
+      [
+       "AND(J2<>\"\",(($D2=J2)+($F2=J2)+($H2=J2)+($J2=J2)+($L2=J2)+($N2=J2)+($P2=J2)+($R2=J2)+($T2=J2)+($V2=J2)+($X2=J2)+($Z2=J2)+($AB2=J2)+($AD2=J2)+($AF2=J2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "L2:L1500",
+      [
+       "AND(L2<>\"\",(($D2=L2)+($F2=L2)+($H2=L2)+($J2=L2)+($L2=L2)+($N2=L2)+($P2=L2)+($R2=L2)+($T2=L2)+($V2=L2)+($X2=L2)+($Z2=L2)+($AB2=L2)+($AD2=L2)+($AF2=L2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "N2:N1500",
+      [
+       "AND(N2<>\"\",(($D2=N2)+($F2=N2)+($H2=N2)+($J2=N2)+($L2=N2)+($N2=N2)+($P2=N2)+($R2=N2)+($T2=N2)+($V2=N2)+($X2=N2)+($Z2=N2)+($AB2=N2)+($AD2=N2)+($AF2=N2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "P2:P1500",
+      [
+       "AND(P2<>\"\",(($D2=P2)+($F2=P2)+($H2=P2)+($J2=P2)+($L2=P2)+($N2=P2)+($P2=P2)+($R2=P2)+($T2=P2)+($V2=P2)+($X2=P2)+($Z2=P2)+($AB2=P2)+($AD2=P2)+($AF2=P2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "R2:R1500",
+      [
+       "AND(R2<>\"\",(($D2=R2)+($F2=R2)+($H2=R2)+($J2=R2)+($L2=R2)+($N2=R2)+($P2=R2)+($R2=R2)+($T2=R2)+($V2=R2)+($X2=R2)+($Z2=R2)+($AB2=R2)+($AD2=R2)+($AF2=R2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "T2:T1500",
+      [
+       "AND(T2<>\"\",(($D2=T2)+($F2=T2)+($H2=T2)+($J2=T2)+($L2=T2)+($N2=T2)+($P2=T2)+($R2=T2)+($T2=T2)+($V2=T2)+($X2=T2)+($Z2=T2)+($AB2=T2)+($AD2=T2)+($AF2=T2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "V2:V1500",
+      [
+       "AND(V2<>\"\",(($D2=V2)+($F2=V2)+($H2=V2)+($J2=V2)+($L2=V2)+($N2=V2)+($P2=V2)+($R2=V2)+($T2=V2)+($V2=V2)+($X2=V2)+($Z2=V2)+($AB2=V2)+($AD2=V2)+($AF2=V2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "X2:X1500",
+      [
+       "AND(X2<>\"\",(($D2=X2)+($F2=X2)+($H2=X2)+($J2=X2)+($L2=X2)+($N2=X2)+($P2=X2)+($R2=X2)+($T2=X2)+($V2=X2)+($X2=X2)+($Z2=X2)+($AB2=X2)+($AD2=X2)+($AF2=X2))>1)"
+      ],
+      "expression"
+     ],
+     [
+      "Z2:Z1500",
+      [
+       "AND(Z2<>\"\",(($D2=Z2)+($F2=Z2)+($H2=Z2)+($J2=Z2)+($L2=Z2)+($N2=Z2)+($P2=Z2)+($R2=Z2)+($T2=Z2)+($V2=Z2)+($X2=Z2)+($Z2=Z2)+($AB2=Z2)+($AD2=Z2)+($AF2=Z2))>1)"
+      ],
+      "expression"
+     ]
+    ],
+    "dinh_dang_ma_hs": "@",
+    "khoa": "D2",
+    "kiem": [
+     [
+      "custom",
+      "AA2:AA1500",
+      "OR(ISNUMBER(AA2),LOWER(AA2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AC2:AC1500",
+      "OR(ISNUMBER(AC2),LOWER(AC2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AE2:AE1500",
+      "OR(ISNUMBER(AE2),LOWER(AE2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "AG2:AG1500",
+      "OR(ISNUMBER(AG2),LOWER(AG2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "E2:E1500",
+      "OR(ISNUMBER(E2),LOWER(E2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "G2:G1500",
+      "OR(ISNUMBER(G2),LOWER(G2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "I2:I1500",
+      "OR(ISNUMBER(I2),LOWER(I2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "K2:K1500",
+      "OR(ISNUMBER(K2),LOWER(K2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "M2:M1500",
+      "OR(ISNUMBER(M2),LOWER(M2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "O2:O1500",
+      "OR(ISNUMBER(O2),LOWER(O2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "Q2:Q1500",
+      "OR(ISNUMBER(Q2),LOWER(Q2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "S2:S1500",
+      "OR(ISNUMBER(S2),LOWER(S2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "U2:U1500",
+      "OR(ISNUMBER(U2),LOWER(U2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "W2:W1500",
+      "OR(ISNUMBER(W2),LOWER(W2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "custom",
+      "Y2:Y1500",
+      "OR(ISNUMBER(Y2),LOWER(Y2)=\"thi\")",
+      null,
+      null,
+      true,
+      true,
+      "Điểm",
+      "Điểm là một số (vd 8,5) hoặc chữ  thi  nếu chưa có điểm.",
+      null
+     ],
+     [
+      "list",
+      "D2:D1500 F2:F1500 H2:H1500 J2:J1500 L2:L1500 N2:N1500 P2:P1500 R2:R1500 T2:T1500 V2:V1500 X2:X1500 Z2:Z1500 AB2:AB1500 AD2:AD1500 AF2:AF1500",
+      "'1. CLB'!$A$2:$A$60",
+      null,
+      null,
+      true,
+      true,
+      "Tên CLB",
+      "Hãy chọn tên CLB trong danh sách (sheet 1. CLB).",
+      "warning"
+     ]
+    ],
+    "mau_dau": {
+     "A1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AA1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AB1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AC1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AD1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AE1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AF1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "AG1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "B1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "C1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "D1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "E1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "F1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "G1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "H1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "I1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "J1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "K1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "L1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "M1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "N1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "O1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "P1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Q1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "R1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "S1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "T1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "U1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "V1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "W1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "X1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Y1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ],
+     "Z1": [
+      "001F3A5F",
+      true,
+      "00FFFFFF"
+     ]
+    },
+    "max": [
+     1500,
+     33
+    ],
+    "nen": {
+     "A2": "00FFF8DC",
+     "B2": "00FFF8DC",
+     "C2": "00FFF8DC",
+     "D2": "00FFF8DC",
+     "E2": "00EAF4EA",
+     "F2": "00FFF8DC",
+     "G2": "00EAF4EA"
+    },
+    "o": {
+     "A1": "Mã HS",
+     "AA1": "Điểm 12",
+     "AB1": "NV13",
+     "AC1": "Điểm 13",
+     "AD1": "NV14",
+     "AE1": "Điểm 14",
+     "AF1": "NV15",
+     "AG1": "Điểm 15",
+     "B1": "Họ tên",
+     "C1": "Nhóm ưu tiên",
+     "D1": "NV1",
+     "E1": "Điểm 1",
+     "F1": "NV2",
+     "G1": "Điểm 2",
+     "H1": "NV3",
+     "I1": "Điểm 3",
+     "J1": "NV4",
+     "K1": "Điểm 4",
+     "L1": "NV5",
+     "M1": "Điểm 5",
+     "N1": "NV6",
+     "O1": "Điểm 6",
+     "P1": "NV7",
+     "Q1": "Điểm 7",
+     "R1": "NV8",
+     "S1": "Điểm 8",
+     "T1": "NV9",
+     "U1": "Điểm 9",
+     "V1": "NV10",
+     "W1": "Điểm 10",
+     "X1": "NV11",
+     "Y1": "Điểm 11",
+     "Z1": "NV12"
+    },
+    "rong_cot": {
+     "A": 11.0,
+     "AA": 8.0,
+     "AB": 22.0,
+     "AC": 8.0,
+     "AD": 22.0,
+     "AE": 8.0,
+     "AF": 22.0,
+     "AG": 8.0,
+     "B": 24.0,
+     "C": 13.0,
+     "D": 22.0,
+     "E": 8.0,
+     "F": 22.0,
+     "G": 8.0,
+     "H": 22.0,
+     "I": 8.0,
+     "J": 22.0,
+     "K": 8.0,
+     "L": 22.0,
+     "M": 8.0,
+     "N": 22.0,
+     "O": 8.0,
+     "P": 22.0,
+     "Q": 8.0,
+     "R": 22.0,
+     "S": 8.0,
+     "T": 22.0,
+     "U": 8.0,
+     "V": 22.0,
+     "W": 8.0,
+     "X": 22.0,
+     "Y": 8.0,
+     "Z": 22.0
+    }
+   },
+   "Hướng dẫn": {
+    "cao_hang_1": null,
+    "dieu_kien": [],
+    "dinh_dang_ma_hs": "General",
+    "khoa": null,
+    "kiem": [],
+    "mau_dau": {
+     "A1": [
+      "00000000",
+      true,
+      "001F3A5F"
+     ]
+    },
+    "max": [
+     35,
+     1
+    ],
+    "nen": {
+     "A2": "00000000",
+     "B2": "00000000",
+     "C2": "00000000",
+     "D2": "00000000",
+     "E2": "00000000",
+     "F2": "00000000",
+     "G2": "00000000"
+    },
+    "o": {
+     "A1": "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
+     "A10": "        Mã HS là bắt buộc và không được trùng.",
+     "A11": "        Nhóm ưu tiên: chỉ điền với học sinh thuộc nhóm đó.",
+     "A13": "Bước 3. NV1, NV2, NV3…: chọn tên CLB trong danh sách thả xuống,",
+     "A14": "        theo thứ tự em thích nhất trước. Không cần điền kín.",
+     "A15": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+     "A16": "        theo buổi của từng CLB.",
+     "A18": "Bước 4. Điểm 1, Điểm 2…: điểm thi của CLB ngay bên trái.",
+     "A19": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
+     "A20": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
+     "A22": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
+     "A24": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
+     "A25": "        → xem lại phần tóm tắt → bấm Nhập.",
+     "A27": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
+     "A28": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
+     "A29": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A3": "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
+     "A31": "Ví dụ một dòng học sinh:",
+     "A32": "  Mã HS   Họ tên          NV1          Điểm 1   NV2           Điểm 2",
+     "A33": "  HS001   Nguyễn Văn An   CLB Tin học  9,5      CLB Bóng rổ",
+     "A34": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
+     "A35": "    CLB không thi tuyển.",
+     "A4": "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
+     "A5": "        (trường chỉ có một buổi thì để trống cả cột).",
+     "A6": "        Suất ưu tiên / Nhóm ưu tiên: chỉ điền nếu CLB giữ chỗ cho một nhóm",
+     "A7": "        học sinh (ví dụ nhóm chinh_sach). Mã CLB để trống, phần mềm tự tạo.",
+     "A9": "Bước 2. Sheet \"2. Học sinh\": mỗi học sinh một dòng."
+    },
+    "rong_cot": {
+     "A": 90.0
+    }
+   }
+  }
+ }
+}
