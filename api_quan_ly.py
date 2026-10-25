@@ -398,8 +398,11 @@ class QuanLyMixin:
         SERVER (đặc tả V6), không tin dữ liệu từ trình duyệt: ghép với nguyện vọng và ô tick
         đang lưu của em rồi chạy `kiem_ho_so_wharton`. Hồ sơ sai thì không ghi gì và trả đúng
         danh sách lỗi của hàm đó. Một quỹ chỉ có MỘT CLB mà chưa đặt điểm thì tự điền 100
-        (`tu_dien_wharton_mot_clb`) TRƯỚC khi kiểm. Hợp lệ thì thay TOÀN BỘ dòng của em trong
-        `wharton_bids`, `tier` theo ô tick lúc ghi. Workspace chưa bật Wharton thì từ chối.
+        (`tu_dien_wharton_mot_clb`) TRONG BỘ NHỚ để kiểm (cách A): ô tự điền KHÔNG được ghi,
+        chỉ ô em đã gửi mới vào `wharton_bids`. Nhờ vậy em thêm CLB thứ hai vào quỹ đó sau này
+        thì hồ sơ bị coi là chưa chia, thay vì "hợp lệ" nhờ một ô 100 em chưa từng đặt. Hợp lệ
+        thì thay TOÀN BỘ dòng của em, `tier` theo ô tick lúc ghi. Workspace chưa bật Wharton
+        thì từ chối.
         """
         try:
             luat = self._luat_nghiem()           # đọc TRƯỚC khi mở giao dịch ghi
@@ -430,8 +433,8 @@ class QuanLyMixin:
                 if loi:
                     return _fail(loi)
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
-                dong = ([(student_id, cid, 1, diem) for cid, diem in moi1.get(student_id, {}).items()]
-                        + [(student_id, cid, 2, diem) for cid, diem in moi2.get(student_id, {}).items()])
+                dong = ([(student_id, cid, 1, diem) for cid, diem in w1.items()]
+                        + [(student_id, cid, 2, diem) for cid, diem in w2.items()])
                 cur.executemany(
                     "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
                     "VALUES (?, ?, ?, ?)", dong)

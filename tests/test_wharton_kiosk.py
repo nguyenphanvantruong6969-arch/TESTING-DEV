@@ -99,15 +99,16 @@ def test_ho_so_hop_le_thay_toan_bo_dong_cua_em(w):
 
 
 def test_tu_dien_khi_quy_chi_co_mot_clb(w):
-    # T1 = {A} chỉ một CLB, em không gửi gì cho quỹ 1: tự điền 100
+    # T1 = {A} chỉ một CLB, em không gửi gì cho quỹ 1: tự điền 100 TRONG BỘ NHỚ để kiểm (cách A,
+    # A13.3 Bước 2) — hợp lệ nhưng ô tự điền KHÔNG được ghi vào CSDL
     kq = w.submit_wharton("HS1", {}, {"B": 70, "C": 30})
     assert kq["ok"], kq["errors"]
-    assert dong_bids(w)[:3] == [("HS1", "A", 1, 100), ("HS1", "B", 2, 70), ("HS1", "C", 2, 30)]
-    # em chỉ có một CLB mỗi quỹ: gửi rỗng cả hai vẫn hợp lệ
+    assert dong_bids(w)[:2] == [("HS1", "B", 2, 70), ("HS1", "C", 2, 30)]
+    # em chỉ có một CLB mỗi quỹ: gửi rỗng cả hai vẫn hợp lệ, không ghi dòng nào
     dung_hs(w, "HS3", tick={"HS3": ["A"]})
     assert w.submit_preferences("HS3", ["A"])["ok"]
     assert w.submit_wharton("HS3", {}, {})["ok"]
-    assert [d for d in dong_bids(w) if d[0] == "HS3"] == [("HS3", "A", 1, 100)]
+    assert [d for d in dong_bids(w) if d[0] == "HS3"] == []
 
 
 def test_diem_0_la_hop_le_va_duoc_luu(w):

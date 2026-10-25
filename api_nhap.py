@@ -24,6 +24,7 @@ from rbda_priority_pipeline import (
     loi_suc_chua,
     luat_xep_cua,
     nhom_xep_cung,
+    tu_dien_wharton_mot_clb,
 )
 
 
@@ -1084,11 +1085,13 @@ class NhapDuLieuMixin:
             for sid in sids}
         tap = set(sids)
         clubs = {cid: {"buoi": b} for cid, b in buoi_cua_clb.items()}
+        w1 = {s: dict(v) for s, v in w["w1"].items() if s in tap}
+        w2 = {s: dict(v) for s, v in w["w2"].items() if s in tap}
+        # Quỹ chỉ có MỘT CLB mà để trống: tự điền 100 trong bộ nhớ (cách A), cùng hàm với
+        # pipeline và báo cáo sức khoẻ, để ba nơi nói cùng một điều.
+        w1, w2 = tu_dien_wharton_mot_clb(prefs, w["clb_thi"], w1, w2, clubs)
         return kiem_ho_so_wharton(
-            prefs, w["clb_thi"],
-            {s: v for s, v in w["w1"].items() if s in tap},
-            {s: v for s, v in w["w2"].items() if s in tap},
-            clubs, tran_nguyen_vong=tran_nv)
+            prefs, w["clb_thi"], w1, w2, clubs, tran_nguyen_vong=tran_nv)
 
     # -----------------------------------------------------------------
     # BA BƯỚC DÙNG CHUNG CHO HAI TỆP HỌC SINH (nguyện vọng / chọn thi)
