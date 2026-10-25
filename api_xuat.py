@@ -93,6 +93,17 @@ class XuatKetQuaMixin:
     # -----------------------------------------------------------------
     TRANG_SO_EXCEL = ("Hướng dẫn", "Danh sách {person_l}", "Theo {slot_sl}",
                       "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)")
+    # Chỉ có khi workspace bật điểm quyết tâm (A13.4); đứng sau "Chưa có chỗ". Tắt thì sổ có đúng
+    # sáu trang như trước.
+    TRANG_DIEM_CHUAN = "Điểm chuẩn"
+
+    def _khoa_trang_so_excel(self) -> tuple:
+        """Các trang của sổ kết quả, theo thứ tự: sáu trang cũ, thêm "Điểm chuẩn" khi bật."""
+        if not dung_wharton(self._cfg_ws(nghiem=True)["rules"]):
+            return self.TRANG_SO_EXCEL
+        cu = self.TRANG_SO_EXCEL
+        i = cu.index("Chưa có chỗ") + 1
+        return cu[:i] + (self.TRANG_DIEM_CHUAN,) + cu[i:]
 
     def _nhan_xuat(self) -> dict:
         """Nhãn tiếng Việt của workspace đang mở, cho chữ trong tệp xuất.
@@ -136,11 +147,12 @@ class XuatKetQuaMixin:
         # Khoá trong `TRANG_SO_EXCEL` là tên MẪU (có chỗ giữ danh từ); tên thật điền
         # nhãn của workspace. `du["ten_trang"]` đưa tên thật cho các trang liên kết nhau.
         da_dung: set = set()
+        du["khoa_trang"] = self._khoa_trang_so_excel()
         du["ten_trang"] = {
             khoa: self._ten_trang_hop_le(dien_nhan(khoa, nhan), da_dung)
-            for khoa in self.TRANG_SO_EXCEL}
+            for khoa in du["khoa_trang"]}
         trang = {khoa: Trang(wb.create_sheet(du["ten_trang"][khoa]), nhan)
-                 for khoa in self.TRANG_SO_EXCEL}
+                 for khoa in du["khoa_trang"]}
 
         bao = self._bang_bao_cao(so=True)
         xuat_luc = _now()
@@ -153,12 +165,14 @@ class XuatKetQuaMixin:
         self._trang_danh_sach(trang["Danh sách {person_l}"], du, co_ket_qua)
         self._trang_theo_clb(trang["Theo {slot_sl}"], du)
         self._trang_chua_co_cho(trang["Chưa có chỗ"], bao, co_ket_qua)
+        if self.TRANG_DIEM_CHUAN in trang:
+            self._trang_diem_chuan(trang[self.TRANG_DIEM_CHUAN], du, co_ket_qua, ket_qua_cu)
         self._trang_thong_ke(trang["Thống kê"], bao, du)
         self._trang_dau_vet(trang["Dấu vết (kỹ thuật)"], du, xuat_luc)
 
         wb.active = 0
         wb.save(path)
-        return [du["ten_trang"][khoa] for khoa in self.TRANG_SO_EXCEL]
+        return [du["ten_trang"][khoa] for khoa in du["khoa_trang"]]
 
     def _luu_so_excel(self, path: str, du: dict) -> list:
         """Ghi sổ vào tệp TẠM cạnh `path`, xong mới đổi tên đè lên `path`.
@@ -228,12 +242,14 @@ class XuatKetQuaMixin:
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
             "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
+            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo tầng "
+                          "và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
             "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu em được "
                         "nguyện vọng 1, suất dự trữ dùng tới đâu.",
             "Dấu vết (kỹ thuật)": "Hạt giống và số bốc thăm để tính lại kết quả. "
                                   "Không cần đọc trang này để dùng kết quả.",
         }
-        for ten in self.TRANG_SO_EXCEL[1:]:
+        for ten in du["khoa_trang"][1:]:
             t.lien_ket(du["ten_trang"][ten], mo_ta[ten])
 
         t.muc("LƯU Ý")
@@ -324,6 +340,52 @@ class XuatKetQuaMixin:
         for h in range(dau + 1, cuoi + 1):
             t.ws.cell(row=h, column=len(cot)).alignment = Alignment(wrap_text=True)
         t.xong(lap_hang=dau, rong_co_dinh={len(cot): 70})
+
+    @staticmethod
+    def _so_chuan(x) -> str:
+        """Số trong ô điểm chuẩn: bỏ phần thập phân thừa, dấu phẩy như người Việt viết."""
+        if isinstance(x, float) and not x.is_integer():
+            return ("%g" % x).replace(".", ",")
+        return str(int(x))
+
+    def _o_diem_chuan(self, muc, tang) -> str:
+        if muc is None:
+            return "—"
+        if muc.get("con_cho"):
+            return "0 (còn %d chỗ)" % muc["con_cho"]
+        if tang == 1:
+            return "%s điểm thi · %s điểm quyết tâm" % (
+                self._so_chuan(muc["diem_thi"]), self._so_chuan(muc["diem_quyet_tam"]))
+        return self._so_chuan(muc["diem_quyet_tam"])
+
+    def _trang_diem_chuan(self, t, du, co_ket_qua, ket_qua_cu):
+        """Điểm chuẩn từng {slot_l} (A13.4): mỗi {slot_l} (và {session_l}) một dòng, hai tầng x
+        hai mức. Dùng `get_diem_chuan`, cùng nguồn với màn hình quản trị."""
+        from so_excel import CHU_CANH_BAO
+
+        t.tieu_de("ĐIỂM CHUẨN TỪNG {slot_u}",
+                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo tầng và theo suất thường hay "
+                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở tầng đó. Chỉ dành cho nhà "
+                  "trường, không phát cho {person_l}.")
+        if ket_qua_cu:
+            t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, điểm chuẩn có thể đã cũ.",
+                      CHU_CANH_BAO)
+        cot = ["Mã {slot_sl}", "Tên {slot_l}"] + (["{session}"] if du["nhieu_buoi"] else []) \
+            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Tầng 2, suất thường",
+               "Tầng 2, suất dự trữ", "Tầng 1, suất thường", "Tầng 1, suất dự trữ"]
+        kq = self.get_diem_chuan()
+        rows = kq["data"]["rows"] if kq.get("ok") else []
+        dong = []
+        for r in rows:
+            dong.append([r["club_id"], r["ten"]] + ([r["buoi"]] if du["nhieu_buoi"] else [])
+                        + [r["suc_chua"], r["so_don"], r["so_nhan"], r["con_cho"],
+                           self._o_diem_chuan(r["tang2"]["thuong"], 2),
+                           self._o_diem_chuan(r["tang2"]["du_tru"], 2),
+                           self._o_diem_chuan(r["tang1"]["thuong"], 1),
+                           self._o_diem_chuan(r["tang1"]["du_tru"], 1)])
+        dau, _ = t.bang(cot, dong, khoa=True, loc=True,
+                        rong="" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)")
+        t.xong(lap_hang=dau)
 
     def _trang_thong_ke(self, t, bao, du):
         t.tieu_de("THỐNG KÊ",

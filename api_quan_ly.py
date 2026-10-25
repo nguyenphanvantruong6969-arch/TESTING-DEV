@@ -24,11 +24,93 @@ from rbda_priority_pipeline import (
     diem_wharton_hieu_luc,
     doc_du_lieu_wharton,
     dung_wharton,
+    khoa_uu_tien_wharton,
     kiem_ho_so_wharton,
+    load_from_sqlite_kem_dau_van_tay_wharton,
     loi_suc_chua,
     sap_buoi,
     tu_dien_wharton_mot_clb,
 )
+
+
+def tinh_diem_chuan(clubs, tested_scores, applicants, hieu_luc, stb_lottery, match_rows,
+                    ten_clb=None) -> list:
+    """Điểm chuẩn từng CLB sau khi chạy (A13.4), tính từ kết quả đã có. KHÔNG phải thuật toán:
+    chỉ đọc, không chọn ai, không đổi gì.
+
+    Đầu vào (đúng dạng `load_from_sqlite` và `diem_wharton_hieu_luc` trả):
+      clubs {cid: {capacity, reserve_capacity, buoi}} · tested_scores {cid: {sid: điểm thi}} ·
+      applicants {cid: [sid]} · hieu_luc {cid: {sid: điểm quyết tâm hiệu lực}} ·
+      stb_lottery {sid: số bốc thăm} · match_rows [(student_id, buoi, club_id, matched_tier)].
+
+    Mỗi (CLB, buổi) cho một dòng `{club_id, buoi, ten, suc_chua, so_don, so_nhan, con_cho,
+    tang1, tang2}`; `tang1` / `tang2` là `{"thuong": muc, "du_tru": muc}` theo `matched_tier`
+    (`general` / `reserve`). Một mức là None khi không có em nào ở tầng và mức đó, hoặc
+    `{diem_quyet_tam, ma_hoc_sinh_cuoi, so_nhan[, diem_thi][, con_cho]}`:
+
+      * tầng 2 (em không có điểm thi ở CLB này, kể cả em vắng thi): `diem_quyet_tam` là điểm
+        hiệu lực THẤP NHẤT trong số em đã được nhận;
+      * tầng 1: `diem_thi` thấp nhất, và `diem_quyet_tam` là điểm quỹ 1 của chính em cuối đó.
+        Em cuối là em xếp sau cùng theo đúng khoá của thuật toán (`khoa_uu_tien_wharton`):
+        thấp điểm thi nhất, rồi thấp điểm quỹ 1, rồi số bốc thăm lớn hơn;
+      * mức còn chỗ (nhận ít hơn chỗ của mức đó, nên không từ chối ai): điểm là 0 và có
+        `con_cho` = số chỗ còn. Chỗ của mức thường là sức chứa trừ số suất dự trữ đã dùng, vì
+        suất dự trữ bỏ trống được nhả cho mức thường (dự trữ mềm).
+    """
+    ten_clb = ten_clb or {}
+    nhan: dict = {}
+    for sid, _buoi, cid, tier in match_rows:
+        if cid:
+            nhan.setdefault(cid, {"reserve": [], "general": []})[
+                "reserve" if tier == "reserve" else "general"].append(sid)
+
+    def muc(ds, cid, tang, con_cho):
+        thi = tested_scores.get(cid) or {}
+        diem = hieu_luc.get(cid) or {}
+        ds = [s for s in ds if (s in thi) == (tang == 1)]
+        if not ds:
+            return None
+
+        def stb(s):
+            return stb_lottery.get(s) or 0
+
+        if tang == 1:
+            cuoi = max(ds, key=lambda s: khoa_uu_tien_wharton(
+                s, thi[s], diem.get(s, 0), diem.get(s, 0), stb(s)))
+            ra = {"diem_thi": min(thi[s] for s in ds), "diem_quyet_tam": diem.get(cuoi, 0)}
+        else:
+            cuoi = max(ds, key=lambda s: khoa_uu_tien_wharton(
+                s, None, 0, diem.get(s, 0), stb(s)))
+            ra = {"diem_quyet_tam": min(diem.get(s, 0) for s in ds)}
+        ra.update(ma_hoc_sinh_cuoi=cuoi, so_nhan=len(ds))
+        if con_cho > 0:
+            ra.update(diem_quyet_tam=0, con_cho=con_cho)
+            if tang == 1:
+                ra["diem_thi"] = 0
+        return ra
+
+    ra = []
+    thu_tu_buoi = {b: i for i, b in enumerate(sap_buoi({
+        (c.get("buoi") or BUOI_MAC_DINH) for c in clubs.values()}))}
+    for cid in sorted(clubs, key=lambda c: (
+            thu_tu_buoi.get(clubs[c].get("buoi") or BUOI_MAC_DINH, 0), c)):
+        c = clubs[cid]
+        buoi = c.get("buoi") or ""
+        suc_chua, du_tru = c.get("capacity") or 0, c.get("reserve_capacity") or 0
+        ds_du_tru = nhan.get(cid, {}).get("reserve", [])
+        ds_thuong = nhan.get(cid, {}).get("general", [])
+        con_du_tru = max(0, du_tru - len(ds_du_tru))
+        con_thuong = max(0, suc_chua - len(ds_du_tru) - len(ds_thuong))
+        ra.append({
+            "club_id": cid, "buoi": buoi, "ten": ten_clb.get(cid) or cid,
+            "suc_chua": suc_chua, "so_don": len(set(applicants.get(cid) or [])),
+            "so_nhan": len(ds_du_tru) + len(ds_thuong), "con_cho": con_thuong,
+            "tang1": {"thuong": muc(ds_thuong, cid, 1, con_thuong),
+                      "du_tru": muc(ds_du_tru, cid, 1, con_du_tru)},
+            "tang2": {"thuong": muc(ds_thuong, cid, 2, con_thuong),
+                      "du_tru": muc(ds_du_tru, cid, 2, con_du_tru)},
+        })
+    return ra
 
 
 class QuanLyMixin:
@@ -556,6 +638,47 @@ class QuanLyMixin:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
+
+    def get_diem_chuan(self):
+        """Điểm chuẩn từng CLB sau lần chạy gần nhất (A13.4), CHỈ cho quản trị.
+
+        Chỉ có khi workspace bật điểm quyết tâm (không thì `wharton_chua_bat`). Chưa có kết quả
+        thì trả `co_ket_qua` False và `rows` rỗng. Điểm hiệu lực lấy đúng cách lần chạy lấy:
+        đọc dữ liệu và hồ sơ điểm trong MỘT giao dịch, tự điền quỹ một CLB trong bộ nhớ, rồi
+        `diem_wharton_hieu_luc`. `ket_qua_cu` True khi dữ liệu đã đổi sau lần chạy (dấu vân tay
+        khác), như các màn kết quả khác. Không có đường nào cho kiosk gọi hàm này.
+        """
+        try:
+            luat = self._luat_nghiem()
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            du_lieu, dau_van_tay, w = load_from_sqlite_kem_dau_van_tay_wharton(self.db_path, luat)
+            students, clubs, tested_scores, applicants, preferences, stb_lottery = du_lieu
+            with self._ket_noi_doc() as cur:
+                match = [(r[0], r[1], r[2], r[3]) for r in cur.execute(
+                    "SELECT student_id, buoi, club_id, matched_tier FROM match_results "
+                    "WHERE club_id IS NOT NULL ORDER BY student_id, buoi")]
+                luu = cur.execute(
+                    "SELECT dau_van_tay FROM dau_van_tay_chay WHERE id = 1").fetchone()
+                meta = cur.execute("SELECT run_at FROM run_meta WHERE id = 1").fetchone()
+                ten_clb = {r[0]: r[1] or r[0] for r in cur.execute(
+                    "SELECT club_id, name FROM clubs")}
+            ds_buoi = sap_buoi({(c.get("buoi") or BUOI_MAC_DINH) for c in clubs.values()})
+            ra = {"co_ket_qua": bool(match), "ket_qua_cu": False, "luc_chay": meta[0] if meta else None,
+                  "nhieu_buoi": len(ds_buoi) > 1, "ds_buoi": ds_buoi, "rows": []}
+            if not match:
+                return _ok(ra)
+            w1, w2 = tu_dien_wharton_mot_clb(
+                preferences, w["clb_thi"], w["w1"], w["w2"], clubs)
+            hieu_luc, _tb = diem_wharton_hieu_luc(preferences, w1, w2, tested_scores)
+            ra["ket_qua_cu"] = luu is None or luu[0] != dau_van_tay
+            ra["rows"] = tinh_diem_chuan(clubs, tested_scores, applicants, hieu_luc, stb_lottery,
+                                         match, ten_clb)
+            return _ok(ra)
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_reading_results", detail=str(e)))
 
     def list_wharton_canh_bao(self):
         """Em có hồ sơ cần xử lý: [{student_id, name, loai: "chua_hop_le" | "vang_thi", ma_loi}].
