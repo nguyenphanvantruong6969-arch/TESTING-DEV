@@ -72,3 +72,44 @@ def test_chi_dung_tham_so_da_khai_bao(ma):
         dung = set(re.findall(r"\{(\w+?)(?:_[lpsacuv]+)?\}", MESSAGES[ma][lang]))
         nhan = {"person", "slot", "session", "group", "score"}
         assert dung - nhan <= THAM_SO[ma], (ma, lang, dung)
+
+
+# ====================================================================== Vòng 3 (A13.3)
+
+MA_VONG_3 = {
+    "wharton_da_khoa": set(),
+    "wharton_mo_khoa_sai_xac_nhan": {"can_go"},
+    "wharton_xoa_sai_xac_nhan": {"can_go"},
+    "wharton_da_xoa": {"n"},
+    "wharton_da_mo_khoa": set(),
+    "error_wharton_quan_ly": set(),
+}
+
+
+@pytest.mark.parametrize("ma", sorted(MA_VONG_3))
+def test_vong_3_co_du_vi_va_en(ma):
+    assert MESSAGES[ma].get("vi") and MESSAGES[ma].get("en")
+
+
+@pytest.mark.parametrize("ma", sorted(MA_VONG_3))
+def test_vong_3_khong_viet_cung_nhan_va_khong_co_detail(ma):
+    for lang, cam in (("vi", ("học sinh", "câu lạc bộ", "clb")), ("en", ("student", "club"))):
+        chu = re.sub(r"\{\w+\}", "", MESSAGES[ma][lang]).lower()
+        for tu in cam:
+            assert tu not in chu, (ma, tu)
+        assert "{detail}" not in MESSAGES[ma][lang]
+
+
+@pytest.mark.parametrize("ma", sorted(MA_VONG_3))
+@pytest.mark.parametrize("nhan", [None, NHAN_CONG_TY], ids=["truong_hoc", "cong_ty"])
+@pytest.mark.parametrize("lang", ["vi", "en"])
+def test_vong_3_dien_duoc_tham_so_va_nhan(ma, nhan, lang):
+    tham_so = {ten: "X" for ten in MA_VONG_3[ma]}
+    cau = format_message(ma, tham_so, lang, nhan)
+    assert cau != ma and "{" not in cau and "}" not in cau, cau
+
+
+def test_vong_3_chu_xac_nhan_di_qua_tham_so_khong_nam_cung_trong_cau():
+    for ma in ("wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan"):
+        assert "{can_go}" in MESSAGES[ma]["vi"] and "{can_go}" in MESSAGES[ma]["en"]
+    assert "MO" in format_message("wharton_mo_khoa_sai_xac_nhan", {"can_go": "MO"}, "vi")

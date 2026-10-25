@@ -45,7 +45,6 @@ from rbda_priority_pipeline import (
     connect_db,
     default_reserve_eligible_fn,
     diem_wharton_hieu_luc,
-    doc_du_lieu_wharton,
     dung_wharton,
     generate_stb_lottery,
     init_db,
@@ -586,33 +585,12 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # Cùng hai hàm mà lần chạy xếp dùng, trên dữ liệu đang lưu: hồ sơ sai sẽ CHẶN
                 # lần chạy nên là "high"; vắng thi chỉ làm em bị xét như không thi: "medium".
                 if bat_wharton:
-                    w = doc_du_lieu_wharton(cur)
-                    prefs_w: dict = {}
-                    for row in cur.execute(
-                            "SELECT student_id, club_id FROM preferences "
-                            "ORDER BY student_id, rank"):
-                        prefs_w.setdefault(row["student_id"], []).append(row["club_id"])
-                    clubs_w = {r["club_id"]: {"buoi": r["buoi"] or BUOI_MAC_DINH}
-                               for r in cur.execute("SELECT club_id, buoi FROM clubs")}
-                    diem_w: dict = {}
-                    for r in cur.execute(
-                            "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
-                            "JOIN club_test_selection t ON t.student_id = sc.student_id "
-                            "AND t.club_id = sc.club_id"):
-                        diem_w.setdefault(r["club_id"], {})[r["student_id"]] = r["score"]
-                    # Cùng cách tự điền trong bộ nhớ như lần chạy xếp (một CLB mỗi quỹ).
-                    w1_d, w2_d = tu_dien_wharton_mot_clb(
-                        prefs_w, w["clb_thi"], w["w1"], w["w2"], clubs_w)
-                    loi_w = kiem_ho_so_wharton(
-                        prefs_w, w["clb_thi"], w1_d, w2_d, clubs_w,
-                        tran_nguyen_vong=luat["max_choices"])
-                    _hl, tb_w = diem_wharton_hieu_luc(prefs_w, w1_d, w2_d, diem_w)
-                    loi_w += [e for e in tb_w if e["code"] != "wharton_vang_thi"]
-                    em_sai = {e["params"]["student_id"] for e in loi_w}
+                    # MỘT hàm dùng chung với thẻ Quản lý (`list_wharton_canh_bao`): cùng em, cùng số.
+                    ho_so = self._ho_so_wharton_tat_ca(cur, luat)
+                    em_sai = {sid for sid, loi_em in ho_so["loi"].items() if loi_em}
                     if em_sai:
                         warn("high", "health_wharton_chua_hop_le", n=len(em_sai))
-                    em_vang = {e["params"]["student_id"] for e in tb_w
-                               if e["code"] == "wharton_vang_thi"}
+                    em_vang = {sid for sid, ds in ho_so["vang_thi"].items() if ds}
                     if em_vang:
                         warn("medium", "health_wharton_vang_thi", n=len(em_vang))
 
