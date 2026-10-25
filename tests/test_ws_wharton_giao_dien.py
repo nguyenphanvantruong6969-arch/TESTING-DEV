@@ -77,7 +77,7 @@ def test_buoc_luat_co_o_wharton_tat_san_va_nhan_dung(mo_trang):
     assert page.locator("#wzWharton").count() == 1
     assert not page.locator("#wzWharton").is_checked()
     assert page.locator("#wzWharton").is_enabled()
-    assert page.locator('label[for="wzWharton"]').inner_text() == "Dùng điểm Wharton"
+    assert page.locator('label[for="wzWharton"]').inner_text() == "Dùng điểm quyết tâm"
     assert "100" in page.locator("#wzWharton").locator("xpath=../..").inner_text()
     assert not loi, loi
 
@@ -87,7 +87,7 @@ def test_nhan_tieng_anh(mo_trang):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     _toi_buoc_luat(page)
-    assert page.locator('label[for="wzWharton"]').inner_text() == "Use Wharton points"
+    assert page.locator('label[for="wzWharton"]').inner_text() == "Use preference points"
     assert not loi, loi
 
 
@@ -170,7 +170,7 @@ def test_tieng_viet_khong_lan_chu_tieng_anh_o_bo_loc_cua_buoc_luat(mo_trang):
     buoc = _chu_cac_buoc_wizard(page, 4)
     for chu in buoc:
         assert not re.search(r"workspace|zip", chu, re.I), chu
-    assert "Dùng điểm Wharton" in buoc[2]
+    assert "Dùng điểm quyết tâm" in buoc[2]
     assert not loi, loi
 
 
@@ -181,7 +181,7 @@ def test_tieng_anh_khong_lan_chu_co_dau_o_buoc_luat(mo_trang):
     page.locator("#btnWorkspace").click()
     page.wait_for_selector("#wsTieuDe")
     buoc = _chu_cac_buoc_wizard(page, 3)
-    assert "Use Wharton points" in buoc[2]
+    assert "Use preference points" in buoc[2]
     for chu in buoc:
         assert not DAU_VIET.search(chu), chu
     assert not loi, loi

@@ -13,7 +13,7 @@ Kết quả là ba tệp trong một thư mục **ngoài kho mã**:
 | Tệp | Người dùng làm gì |
 |---|---|
 | `<slug>.zip` | Màn chọn workspace → **Nhập workspace** → mở → bấm chạy. Đã có cấu hình + dữ liệu. |
-| `SO_NHAP_<SLUG>.xlsx` | Sổ nhập theo nhãn của workspace — sửa tay rồi nạp lại vào **đúng** workspace đó. |
+| `SO_NHAP_<SLUG>.xlsx` | Sổ nhập theo nhãn của workspace (sheet học sinh có hai hàng tiêu đề, dữ liệu từ hàng 3) — sửa tay rồi nạp lại vào **đúng** workspace đó. |
 | `BAO_CAO_SOAT.md` | Số liệu, độ chọi từng buổi, giả định đã duyệt, cảnh báo đã cho qua. |
 
 ## Nguyên tắc — không thương lượng
@@ -187,7 +187,9 @@ Luật nhóm: `reserve` → mọi nhóm của người phải có chỗ dành su
 - **Nhãn buổi ngoài thứ trong tuần** ("Sáng", "Ca 1") được lưu nguyên dạng chữ thường (`sáng`) và
   sắp theo vần chữ cái trên màn hình (`chiều` trước `sáng`). Dùng "Thứ 2…Chủ nhật" khi có thể.
 - Sổ nhập của workspace đổi tên sheet, cột nhóm, cột điểm theo nhãn, nhưng các cột khác vẫn là
-  "Tên CLB", "Buổi", "Mã HS", "NV1" (hành vi của `so_nhap.py`).
+  "Tên CLB", "Buổi", "Mã HS", và ô gộp "Nguyện vọng k" ở hàng 1 của sheet học sinh (hành vi của
+  `so_nhap.py`). Workspace bật **điểm quyết tâm** thì mỗi nhóm có thêm cột "Điểm quyết tâm"; kỹ
+  năng này không bắt buộc sinh điểm đó (trong mã gọi là `wharton`).
 - Zip **chưa chạy** lần nào: số bốc thăm khoá ở lần chạy đầu của người dùng (đúng bất biến STB).
 
 ## Kiểm skill này

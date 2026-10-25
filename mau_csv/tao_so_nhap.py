@@ -14,6 +14,10 @@ Tạo ra:
     du_lieu_test/SO_NHAP_TEST.xlsx                   120 em, cạnh tranh cao
     du_lieu_test/SO_NHAP_CO_LOI_CO_Y.xlsx            cố ý sai 5 chỗ: thử bảng lỗi
 
+Từ A13.4 sheet học sinh có HAI hàng tiêu đề. Các sổ trong `du_lieu_test/` được giữ nguyên ở
+dạng MỘT hàng cũ (phần mềm vẫn đọc được, và chúng thử luôn đường đọc dạng cũ); chạy lại
+kịch bản này sẽ ghi chúng ở dạng hai hàng, và `LOI_CO_Y` bên dưới đã theo dạng hai hàng.
+
 Các sổ ví dụ sinh THẲNG từ bộ ba tệp cũ cùng thư mục, nên nạp sổ hay nạp ba
 tệp đều ra cùng một CSDL — `tests/test_so_nhap.py` canh điều đó.
 """
@@ -94,10 +98,11 @@ def tao_du_lieu_test() -> list:
 # Sổ cố ý sai: từ bộ 10 em, mỗi lỗi một chỗ, để thử bảng lỗi của màn hình
 # nạp. (sheet, ô, giá trị mới, lỗi phần mềm phải báo)
 LOI_CO_Y = [
-    (so_nhap.SHEET_HS, "D3", "CLB Bóng chuyền", "so_nhap_clb_khong_co"),
-    (so_nhap.SHEET_HS, "E4", "tám", "so_nhap_diem_sai"),
-    (so_nhap.SHEET_HS, "A6", "HS04", "so_nhap_hs_trung"),
-    (so_nhap.SHEET_HS, "F8", "=D8", "so_nhap_nv_trung"),
+    # Sheet học sinh có hai hàng tiêu đề: dữ liệu bắt đầu từ hàng 3.
+    (so_nhap.SHEET_HS, "D4", "CLB Bóng chuyền", "so_nhap_clb_khong_co"),
+    (so_nhap.SHEET_HS, "E5", "tám", "so_nhap_diem_sai"),
+    (so_nhap.SHEET_HS, "A7", "HS04", "so_nhap_hs_trung"),
+    (so_nhap.SHEET_HS, "F9", "=D9", "so_nhap_nv_trung"),
     (so_nhap.SHEET_CLB, "C3", 0, "so_nhap_chi_tieu_sai"),
 ]
 
@@ -109,7 +114,7 @@ def tao_so_co_loi() -> str:
     so_nhap.ghi_so_nhap(p, clubs, students)
     wb = openpyxl.load_workbook(p)
     for sheet, o, gia_tri, _ in LOI_CO_Y:
-        # "=D8": chép đúng tên ở NV1 sang NV2 — chọn một CLB hai lần.
+        # "=D9": chép đúng tên ở NV1 sang NV2 — chọn một CLB hai lần.
         if isinstance(gia_tri, str) and gia_tri.startswith("="):
             gia_tri = wb[sheet][gia_tri[1:]].value
         wb[sheet][o] = gia_tri

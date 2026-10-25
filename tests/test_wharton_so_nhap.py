@@ -58,6 +58,27 @@ def _doc(du_lieu, cfg=None):
         wb.close()
 
 
+def _ve_mot_hang(du_lieu):
+    """Chuyển sổ hai hàng (A13.4) về sổ MỘT hàng cũ ("NV1", "Điểm 1", "Điểm W 1") để thử đường
+    đọc dạng cũ: gỡ ô gộp, ghép hai hàng tiêu đề thành một, xoá hàng 2."""
+    wb = openpyxl.load_workbook(io.BytesIO(du_lieu))
+    ws = wb["2. Học sinh"]
+    for rng in list(ws.merged_cells.ranges):
+        ws.unmerge_cells(str(rng))
+    mau = {"CLB": "NV%d", "Điểm thi": "Điểm %d", "Điểm quyết tâm": "Điểm W %d"}
+    k = 0
+    for c in range(1, ws.max_column + 1):
+        v1, v2 = ws.cell(row=1, column=c).value, ws.cell(row=2, column=c).value
+        if str(v1 or "").startswith("Nguyện vọng"):
+            k = int(str(v1).split()[-1])
+        if v2:
+            ws.cell(row=1, column=c).value = mau[v2] % k
+    ws.delete_rows(2)
+    b = io.BytesIO()
+    wb.save(b)
+    return b.getvalue()
+
+
 def _hang(du_lieu, sheet, so_hang):
     wb = openpyxl.load_workbook(io.BytesIO(du_lieu))
     return [c.value for c in wb[sheet][so_hang]]
@@ -92,16 +113,19 @@ def test_per_person_khong_bao_gio_co_cot_w():
 
 def test_bat_wharton_nhom_cot_thanh_nv_diem_diem_w():
     du = _bytes(students=SV_CO_W, cfg=CFG_W)
+    # Hai hàng tiêu đề (A13.4): hàng 1 ô gộp "Nguyện vọng k", hàng 2 CLB / Điểm thi / Điểm quyết tâm.
     dau = _hang(du, "2. Học sinh", 1)
-    assert dau[:9] == ["Mã HS", "Họ tên", "Nhóm ưu tiên", "NV1", "Điểm 1", "Điểm W 1",
-                       "NV2", "Điểm 2", "Điểm W 2"]
+    hang_2 = _hang(du, "2. Học sinh", 2)
+    assert dau[:9] == ["Mã HS", "Họ tên", "Nhóm ưu tiên", "Nguyện vọng 1", None, None,
+                       "Nguyện vọng 2", None, None]
+    assert hang_2[3:9] == ["CLB", "Điểm thi", "Điểm quyết tâm"] * 2
     n_nv = (len(dau) - 3) // 3
     assert len(dau) == 3 + 3 * n_nv and n_nv >= 10
-    assert dau[3 + 3 * (n_nv - 1):] == [f"NV{n_nv}", f"Điểm {n_nv}", f"Điểm W {n_nv}"]
-    hs1 = _hang(du, "2. Học sinh", 2)
+    assert dau[3 + 3 * (n_nv - 1):] == [f"Nguyện vọng {n_nv}", None, None]
+    hs1 = _hang(du, "2. Học sinh", 3)
     assert hs1[:12] == ["HS1", "Em HS1", None, "CLB A", 7.5, 100, "CLB B", None, 60,
                         "CLB C", None, 40]
-    hs2 = _hang(du, "2. Học sinh", 3)
+    hs2 = _hang(du, "2. Học sinh", 4)
     assert hs2[3:9] == ["CLB B", None, 70, "CLB A", None, 30]
 
 
@@ -109,28 +133,29 @@ def test_bat_wharton_co_kiem_so_nguyen_o_cot_w_va_to_mau_rieng():
     du = _bytes(students=SV_CO_W, cfg=CFG_W)
     wb = openpyxl.load_workbook(io.BytesIO(du))
     ws = wb["2. Học sinh"]
-    cot_w = [i for i, c in enumerate(ws[1], start=1) if str(c.value).startswith("Điểm W")]
+    cot_w = [i for i, c in enumerate(ws[2], start=1) if c.value == "Điểm quyết tâm"]
     assert cot_w[:2] == [6, 9]
     cac_kiem = [(dv.type, str(dv.sqref)) for dv in ws.data_validations.dataValidation]
-    assert any(t == "whole" and "F2:F" in s for t, s in cac_kiem)       # cột "Điểm W 1"
-    assert ws.cell(row=2, column=6).fill.fgColor.rgb != ws.cell(row=2, column=4).fill.fgColor.rgb
+    assert any(t == "whole" and "F3:F" in s for t, s in cac_kiem)       # cột "Điểm quyết tâm" nhóm 1
+    assert ws.cell(row=3, column=6).fill.fgColor.rgb != ws.cell(row=3, column=4).fill.fgColor.rgb
 
 
 def test_bat_wharton_sheet_huong_dan_giai_thich_hai_quy():
     du = _bytes(students=SV_CO_W, cfg=CFG_W)
     hd = "\n".join(str(r[0].value) for r in openpyxl.load_workbook(io.BytesIO(du))["Hướng dẫn"].iter_rows()
                    if r[0].value)
-    assert "Điểm W" in hd and "100" in hd and "quỹ" in hd
+    assert "Điểm quyết tâm" in hd and "100" in hd and "quỹ" in hd
     tat = "\n".join(str(r[0].value) for r in openpyxl.load_workbook(
         io.BytesIO(_bytes(students=SV_THUONG)))["Hướng dẫn"].iter_rows() if r[0].value)
-    assert "Điểm W" not in tat
+    assert "Điểm quyết tâm" not in tat and "Điểm W" not in tat
 
 
 def test_bat_wharton_so_nv_theo_tran_thap_van_du_3_cot_moi_nhom():
     cfg = {"rules": {"wharton": True, "max_choices": 3, "max_tests": 5}}
-    dau = _hang(_bytes(students=SV_CO_W, cfg=cfg), "2. Học sinh", 1)
-    assert dau == ["Mã HS", "Họ tên", "Nhóm ưu tiên"] + [
-        x for k in (1, 2, 3) for x in (f"NV{k}", f"Điểm {k}", f"Điểm W {k}")]
+    du = _bytes(students=SV_CO_W, cfg=cfg)
+    assert _hang(du, "2. Học sinh", 1) == ["Mã HS", "Họ tên", "Nhóm ưu tiên"] + [
+        x for k in (1, 2, 3) for x in (f"Nguyện vọng {k}", None, None)]
+    assert _hang(du, "2. Học sinh", 2) == [None] * 3 + ["CLB", "Điểm thi", "Điểm quyết tâm"] * 3
 
 
 # ------------------------------------------------------------------ đọc
@@ -146,7 +171,7 @@ def test_doc_so_nhap_nhan_diem_w_vao_nv():
 
 @pytest.mark.parametrize("tieu_de", ["diem w 1", "ĐIỂM W1", "Điểm  W   1", "điểm w1"])
 def test_doc_nhan_tieu_de_khong_dau_hoa_thuong_lan_lon(tieu_de):
-    du = _bytes(students=SV_CO_W, cfg=CFG_W)
+    du = _ve_mot_hang(_bytes(students=SV_CO_W, cfg=CFG_W))      # dạng một hàng của vòng 2
     wb = openpyxl.load_workbook(io.BytesIO(du))
     wb["2. Học sinh"].cell(row=1, column=6).value = tieu_de
     b = io.BytesIO()
@@ -180,11 +205,19 @@ def test_doc_o_w_sai_khong_chan_ca_so_chuyen_nguyen_van_xuong_duoi():
 def test_doc_o_w_ma_nv_trong_duoc_ghi_lai_de_canh_bao():
     du = _bytes(students=[_hs("HS1", [_nv("A", diem_w=100)])], cfg=CFG_W)
     wb = openpyxl.load_workbook(io.BytesIO(du))
-    wb["2. Học sinh"].cell(row=2, column=9).value = 50          # "Điểm W 2" mà NV2 trống
+    wb["2. Học sinh"].cell(row=3, column=9).value = 50          # "Điểm quyết tâm" nhóm 2 mà CLB trống
     b = io.BytesIO()
     wb.save(b)
     kq = _doc(b.getvalue(), CFG_W)
-    assert kq["loi"] == [] and kq["students"][0]["diem_w_mo_coi"] == ["Điểm W 2"]
+    assert kq["loi"] == []
+    assert kq["students"][0]["diem_w_mo_coi"] == ["Điểm quyết tâm (Nguyện vọng 2)"]
+    # sổ MỘT hàng cũ vẫn gọi cột bằng tên cũ
+    cu = _ve_mot_hang(_bytes(students=[_hs("HS1", [_nv("A", diem_w=100)])], cfg=CFG_W))
+    wb = openpyxl.load_workbook(io.BytesIO(cu))
+    wb["2. Học sinh"].cell(row=2, column=9).value = 50
+    b = io.BytesIO()
+    wb.save(b)
+    assert _doc(b.getvalue(), CFG_W)["students"][0]["diem_w_mo_coi"] == ["Điểm W 2"]
 
 
 def test_per_person_cot_w_co_chu_thi_bi_chan_nhu_cot_diem_sai_che_do():
@@ -193,7 +226,7 @@ def test_per_person_cot_w_co_chu_thi_bi_chan_nhu_cot_diem_sai_che_do():
     wb = openpyxl.load_workbook(io.BytesIO(du))
     ws = wb["2. Học sinh"]
     ws.cell(row=1, column=ws.max_column + 1).value = "Điểm W 1"
-    ws.cell(row=2, column=ws.max_column).value = 50
+    ws.cell(row=3, column=ws.max_column).value = 50
     b = io.BytesIO()
     wb.save(b)
     kq = _doc(b.getvalue(), cfg)
@@ -241,8 +274,7 @@ def test_xuat_roi_nap_lai_vao_workspace_moi_wharton_bids_giong_het(api, tmp_path
     assert xuat["ok"], xuat["errors"]
     with open(xuat["data"]["path"], "rb") as f:
         du = f.read()
-    dau = _hang(du, "2. Học sinh", 1)
-    assert "Điểm W 1" in dau                                   # cột có mặt vì workspace bật
+    assert "Điểm quyết tâm" in _hang(du, "2. Học sinh", 2)     # cột có mặt vì workspace bật
 
     (tmp_path / "moi").mkdir()
     moi = PipelineAPI(str(tmp_path / "moi" / "app.db"))
@@ -256,8 +288,9 @@ def test_xuat_roi_nap_lai_vao_workspace_moi_wharton_bids_giong_het(api, tmp_path
 def test_xuat_khi_tat_wharton_khong_co_cot_w(api):
     _dung_du_lieu(api)                                         # bảng có dòng nhưng workspace tắt
     with open(api.export_du_lieu_dau_vao()["data"]["path"], "rb") as f:
-        dau = _hang(f.read(), "2. Học sinh", 1)
-    assert not any(str(c).startswith("Điểm W") for c in dau)
+        du = f.read()
+    dau = _hang(du, "2. Học sinh", 1) + _hang(du, "2. Học sinh", 2)
+    assert not any(str(c).startswith(("Điểm W", "Điểm quyết tâm")) for c in dau)
 
 
 def test_nap_so_o_w_sai_thanh_canh_bao_csv_wp_khong_hop_le(api):
@@ -275,13 +308,14 @@ def test_nap_so_o_w_mo_coi_thanh_canh_bao_khong_co_nguyen_vong(api):
     bat_wharton(api)
     du = _bytes(students=[_hs("HS1", [_nv("A", diem_w=100)])], cfg=CFG_W)
     wb = openpyxl.load_workbook(io.BytesIO(du))
-    wb["2. Học sinh"].cell(row=2, column=9).value = 50
+    wb["2. Học sinh"].cell(row=3, column=9).value = 50
     b = io.BytesIO()
     wb.save(b)
     kq = api.import_so_nhap(_b64(b.getvalue()))
     assert kq["ok"], kq["errors"]
     ds = canh_bao(kq, "csv_wp_khong_co_nguyen_vong")
-    assert [(e["params"]["student_id"], e["params"]["cot"]) for e in ds] == [("HS1", "Điểm W 2")]
+    assert [(e["params"]["student_id"], e["params"]["cot"]) for e in ds] == [
+        ("HS1", "Điểm quyết tâm (Nguyện vọng 2)")]
 
 
 def test_nap_so_khi_workspace_tat_bo_qua_kem_canh_bao_va_xem_truoc_noi_truoc(api):

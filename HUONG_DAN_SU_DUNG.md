@@ -23,7 +23,7 @@
 11. [Sự cố hay gặp](#11-sự-cố-hay-gặp)
 12. [Thuật toán làm gì](#12-thuật-toán-làm-gì)
 13. [Giới hạn đã biết](#13-giới-hạn-đã-biết)
-14. [Điểm Wharton (tuỳ chọn)](#14-điểm-wharton-tuỳ-chọn)
+14. [Điểm quyết tâm (tuỳ chọn)](#14-điểm-quyết-tâm-tuỳ-chọn)
 
 ---
 
@@ -959,7 +959,9 @@ Bỏ trống nguyện vọng là tự bỏ cơ hội của chính mình.
 Số liệu đầy đủ: `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md` mục 3c.
 Ba câu hỏi hay gặp nhất về bốc thăm, kèm số đo: **`docs/GIAI_DAP_BOC_THAM.md`**.
 
-## 14. Điểm Wharton (tuỳ chọn)
+## 14. Điểm quyết tâm (tuỳ chọn)
+
+> Dành cho người bảo trì: trong mã và trong tên cột tệp, tính năng này vẫn gọi là `wharton` (ví dụ `rules.wharton`, cột `wp_k`).
 
 Mặc định **TẮT**: không bật thì phần mềm chạy y hệt như trước, kể cả kết quả và dấu vân tay dữ liệu.
 Khi bật, mỗi học sinh tự chia điểm để nói mình muốn CLB nào hơn. Điểm này được xét **trước** số bốc thăm
@@ -974,13 +976,13 @@ và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hư�
 
 ### Bật ở đâu
 
-Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm Wharton** (hoặc chọn một mẫu đã bật sẵn).
+Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã bật sẵn).
 Ô này chỉ dùng được khi cách xếp ưu tiên có điểm (Theo điểm, hoặc Nhóm trước rồi đến điểm) **và** điểm tính
 riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một điểm duy nhất" thì ô tự khoá và bỏ chọn.
 
 ### Cột trong Sổ nhập và tệp CSV (chỉ khi đã bật)
 
-| Tệp | Cột điểm Wharton |
+| Tệp | Cột điểm quyết tâm |
 |---|---|
 | Sổ nhập | mỗi nhóm thành `NV k` · `Điểm k` · `Điểm W k` (cột `Điểm W k` ngay sau `Điểm k`) |
 | CSV nguyện vọng, dạng rộng | `wp_k` đi cặp `pref_k` |
@@ -989,15 +991,15 @@ riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một 
 
 - Tệp **không có** các cột này thì nạp như cũ. Chưa bật mà tệp có các cột này thì chúng bị bỏ qua và phần mềm
   báo số ô đã bỏ.
-- Nạp lại tệp cho một học sinh là **thay** mọi điểm Wharton cũ của em đó; em không có trong tệp thì giữ nguyên.
+- Nạp lại tệp cho một học sinh là **thay** mọi điểm quyết tâm cũ của em đó; em không có trong tệp thì giữ nguyên.
 - Ô không phải số nguyên từ 0 trở lên (ví dụ `12,5`, `-3`, `abc`) bị báo và không lưu; các ô khác vẫn lưu.
 - Nạp **không bị chặn** vì tổng chưa đủ 100: phần mềm chỉ cảnh báo. Việc chặn nằm ở bước chạy (xem dưới).
-- Xuất "dữ liệu đầu vào" ra Sổ nhập rồi nạp lại thì điểm Wharton giống hệt.
+- Xuất "dữ liệu đầu vào" ra Sổ nhập rồi nạp lại thì điểm quyết tâm giống hệt.
 
 ### Học sinh chia điểm ở kiosk
 
-Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm Wharton**. Mỗi buổi có hai khung (CLB đã thi, CLB không
-thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm Wharton**; chưa đủ 100 thì phần mềm báo còn
+Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm quyết tâm**. Mỗi buổi có hai khung (CLB đã thi, CLB không
+thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo còn
 thiếu bao nhiêu ở quỹ nào và không lưu.
 
 - Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của bạn khác.
@@ -1005,23 +1007,23 @@ thiếu bao nhiêu ở quỹ nào và không lưu.
 - Đổi ô tick thi ở Bước 1 **sau khi** đã chia điểm: điểm **không** tự chuyển sang quỹ kia. Khung hiện dòng
   *Cần chia lại điểm* và hồ sơ chưa hợp lệ cho tới khi chia lại.
 - Bỏ một CLB khỏi nguyện vọng ở Bước 2 thì điểm đã đặt ở CLB đó bị xoá.
-- Sau khi đã chạy xếp, điểm Wharton bị **khoá**: Bước 3 chỉ xem được, kèm dòng nhắc nhờ người quản lý mở khoá ở thẻ Quản lý (xem mục "Quản lý điểm Wharton" bên dưới).
+- Sau khi đã chạy xếp, điểm quyết tâm bị **khoá**: Bước 3 chỉ xem được, kèm dòng nhắc nhờ người quản lý mở khoá ở thẻ Quản lý (xem mục "Quản lý điểm quyết tâm" bên dưới).
 
-### Quản lý điểm Wharton (thẻ Quản lý)
+### Quản lý điểm quyết tâm (thẻ Quản lý)
 
-Khối **Điểm Wharton** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm Wharton; tắt thì thẻ Quản lý giống hệt như cũ. Khối nằm dưới danh sách học sinh.
+Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Khối nằm dưới danh sách học sinh.
 
 **Xem bảng điểm.** Mỗi dòng là một học sinh: điểm đã chia cho từng CLB, tách theo quỹ (Quỹ 1: CLB đã thi, Quỹ 2: CLB không thi) và theo buổi, kèm **Tổng** của từng quỹ (phải đúng 100). Ô được phần mềm tự điền 100 vì quỹ chỉ có một CLB thì ghi *tự điền*; ô chưa đặt hiện dấu —. Dùng ô tìm (gõ không dấu cũng được), các ô lọc Quỹ / Buổi / CLB và ô **Chỉ hồ sơ có vấn đề**; có phân trang. Dòng có vấn đề được tô viền đỏ và ghi *Chưa hợp lệ*, *Vắng thi* hoặc *Cần chia lại*.
 
 **Đọc cảnh báo.** Phía trên bảng là danh sách **Hồ sơ cần xử lý**, chia hai nhóm: *Chưa chia đủ* (mọi lỗi sẽ chặn lần chạy xếp, như tổng khác 100) và *Vắng thi* (chỉ là cảnh báo, không chặn). Số liệu trùng với mục Cảnh báo dữ liệu ở thẻ Vận hành. Bấm vào một tên thì mở màn sửa của học sinh đó.
 
-**Sửa điểm một học sinh.** Màn sửa có hai khung giống Bước 3 ở kiosk. Sửa xong bấm **Lưu điểm Wharton**; chưa đủ 100 thì phần mềm báo thiếu bao nhiêu ở quỹ nào và không lưu gì. Luật kiểm là đúng luật của kiosk.
+**Sửa điểm một học sinh.** Màn sửa có hai khung giống Bước 3 ở kiosk. Sửa xong bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo thiếu bao nhiêu ở quỹ nào và không lưu gì. Luật kiểm là đúng luật của kiosk.
 
 **Xoá điểm.**
 - Một học sinh: bấm **Xoá điểm của học sinh này** hai lần liên tiếp.
-- Tất cả: bấm **Xoá điểm Wharton của tất cả học sinh**, gõ đúng chữ `XOA` rồi bấm xác nhận. Phần mềm tự sao lưu cơ sở dữ liệu trước khi xoá.
+- Tất cả: bấm **Xoá điểm quyết tâm của tất cả học sinh**, gõ đúng chữ `XOA` rồi bấm xác nhận. Phần mềm tự sao lưu cơ sở dữ liệu trước khi xoá.
 
-**Vì sao bị khoá, và mở khoá.** Mỗi lần chạy xếp thành công khi bật điểm Wharton, điểm tự **khoá** để kết quả không đổi âm thầm sau đó. Khoá này riêng, không liên quan tới khoá số bốc thăm. Đang khoá thì không ghi được điểm ở đâu cả (thẻ Quản lý, Bước 3 ở kiosk, nạp cột điểm từ tệp; nạp tệp vẫn lưu nguyện vọng và cảnh báo rằng phần điểm bị bỏ). Việc xoá học sinh, xoá CLB, làm lại từ đầu hay xoá dữ liệu vẫn làm được. Muốn sửa: bấm **Mở khoá sửa điểm Wharton**, gõ đúng chữ `MO` rồi xác nhận. Kết quả đã xếp không tự đổi; lần chạy xếp tiếp theo sẽ khoá lại. Xoá dữ liệu (**Vùng nguy hiểm**) cũng mở khoá.
+**Vì sao bị khoá, và mở khoá.** Mỗi lần chạy xếp thành công khi bật điểm quyết tâm, điểm tự **khoá** để kết quả không đổi âm thầm sau đó. Khoá này riêng, không liên quan tới khoá số bốc thăm. Đang khoá thì không ghi được điểm ở đâu cả (thẻ Quản lý, Bước 3 ở kiosk, nạp cột điểm từ tệp; nạp tệp vẫn lưu nguyện vọng và cảnh báo rằng phần điểm bị bỏ). Việc xoá học sinh, xoá CLB, làm lại từ đầu hay xoá dữ liệu vẫn làm được. Muốn sửa: bấm **Mở khoá sửa điểm quyết tâm**, gõ đúng chữ `MO` rồi xác nhận. Kết quả đã xếp không tự đổi; lần chạy xếp tiếp theo sẽ khoá lại. Xoá dữ liệu (**Vùng nguy hiểm**) cũng mở khoá.
 
 **Xem nhật ký.** Khi mở màn sửa của một học sinh, cuối màn là **Nhật ký thay đổi** của em đó (10 dòng mới nhất, bấm **Xem thêm** để xem tiếp): lúc nào, từ đâu (thẻ Quản lý, nhập tại chỗ, nạp tệp, xoá dữ liệu, hệ thống), tên tài khoản máy, và điểm trước và sau. Nhật ký chỉ ghi thêm, không bao giờ bị xoá hay sửa, kể cả khi xoá dữ liệu.
 

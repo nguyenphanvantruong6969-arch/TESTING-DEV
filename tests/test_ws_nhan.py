@@ -59,6 +59,8 @@ MA_MOI_SAU_ANH_CHUP = {
     # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
     "wharton_da_khoa", "wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan",
     "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",
+    # A13.4: Sổ nhập hai hàng tiêu đề, lệch nhóm cột.
+    "so_nhap_cot_lech_nhom", "so_nhap_nhom_thieu_cot",
 }
 
 

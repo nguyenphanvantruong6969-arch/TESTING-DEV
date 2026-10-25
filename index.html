@@ -601,11 +601,11 @@
           <!-- Bước 3 · Điểm Wharton (mục A13): chỉ hiện khi workspace bật Wharton; js/04_nhap_tai_cho.js
                dựng khung theo buổi trong #fbWhartonBody. -->
           <div class="fallback-step" id="fbWhartonStep" hidden>
-            <h3 data-i18n="fallback_step3_title">Bước 3. Điểm Wharton</h3>
+            <h3 data-i18n="fallback_step3_title">Bước 3. Điểm quyết tâm</h3>
             <p class="hint-text" data-i18n="fallback_step3_hint">Chia đúng 100 điểm cho các CLB đã thi và đúng 100 điểm cho các CLB không thi, ở mỗi buổi. Ô để trống tính là 0 điểm.</p>
-            <p class="wh-khoa-ghi-chu" id="fbWhartonKhoa" role="status" hidden data-i18n="wharton_da_khoa_kiosk">Điểm Wharton đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.</p>
+            <p class="wh-khoa-ghi-chu" id="fbWhartonKhoa" role="status" hidden data-i18n="wharton_da_khoa_kiosk">Điểm quyết tâm đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.</p>
             <div id="fbWhartonBody"></div>
-            <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm Wharton</button>
+            <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm quyết tâm</button>
             <span class="chua-luu" id="chuaLuuWharton" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="whartonFeedback"></span>
           </div>
@@ -707,11 +707,11 @@
       <!-- Điểm Wharton (mục A13.3): chỉ hiện khi workspace bật điểm Wharton; js/05_quan_ly.js
            (loadAdminWharton) dựng bảng, cảnh báo, màn sửa và nhật ký. -->
       <div class="panel" id="adminWhartonBlock" hidden>
-        <div class="panel-head"><h2 data-i18n="wh_ql_title">Điểm Wharton</h2></div>
-        <p class="hint-text" data-i18n="wh_ql_desc">Xem, sửa và xoá điểm Wharton mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
+        <div class="panel-head"><h2 data-i18n="wh_ql_title">Điểm quyết tâm</h2></div>
+        <p class="hint-text" data-i18n="wh_ql_desc">Xem, sửa và xoá điểm quyết tâm mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
         <div class="wh-ql-khoa">
           <span class="wh-ql-khoa-chu" id="whQlKhoa" role="status"></span>
-          <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm Wharton</button>
+          <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm quyết tâm</button>
         </div>
         <div class="wh-ql-xacnhan" id="whMoKhoaHop" hidden>
           <p class="hint-text" id="whMoKhoaHoi"></p>
@@ -734,7 +734,7 @@
           <p class="hint-text" id="whQlSuaRong" hidden data-i18n="wh_sua_rong">Học sinh này chưa có nguyện vọng nên chưa có gì để chia.</p>
           <div id="whQlSuaKhung"></div>
           <div class="search-row">
-            <button class="btn btn-primary" id="btnWhLuu" data-i18n="btn_save_wharton">Lưu điểm Wharton</button>
+            <button class="btn btn-primary" id="btnWhLuu" data-i18n="btn_save_wharton">Lưu điểm quyết tâm</button>
             <span class="chua-luu" id="whQlChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <button class="btn-icon-danger" id="btnWhXoaMot" data-i18n="btn_wh_xoa_mot">Xoá điểm của học sinh này</button>
             <span class="save-feedback" role="status" aria-live="polite" id="whQlSuaPhanHoi"></span>
@@ -776,7 +776,7 @@
         </div>
 
         <div class="search-row">
-          <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm Wharton của tất cả học sinh</button>
+          <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm quyết tâm của tất cả học sinh</button>
         </div>
         <div class="wh-ql-xacnhan" id="whXoaTatCaHop" hidden>
           <p class="hint-text" id="whXoaTatCaHoi"></p>

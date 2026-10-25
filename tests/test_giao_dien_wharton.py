@@ -171,7 +171,7 @@ def test_luu_thieu_40_bao_loi_va_khong_ghi_gi_roi_luu_dung_100_thi_co_dong(mo):
     page.wait_for_function(
         "() => document.getElementById('whartonFeedback').textContent.includes('40')")
     assert dong_bids(api) == []
-    assert "Chưa dùng hết điểm Wharton" in page.locator("#whartonFeedback").inner_text()
+    assert "Chưa dùng hết điểm quyết tâm" in page.locator("#whartonFeedback").inner_text()
 
     _o(page, "C").fill("40")
     page.locator("#btnSubmitWharton").click()
@@ -317,7 +317,7 @@ def test_tieng_anh_chu_buoc_3_doi_theo_ngon_ngu_va_khong_con_chu_co_dau(mo):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     van_ban = page.locator("#fbWhartonStep").inner_text()
-    assert "Step 3" in van_ban and "Wharton" in van_ban
+    assert "Step 3" in van_ban and "Preference points" in van_ban
     assert _dem(page, 1) == "Used 100 / 100"
     assert not DAU_VIET.search(van_ban), van_ban
     assert not loi, loi
@@ -333,5 +333,5 @@ def test_hai_cau_chinh_thong_bao_cho_hoc_sinh(mo):
     page.wait_for_function(
         "() => document.getElementById('whartonFeedback').textContent.includes('50')")
     chu = page.locator("#whartonFeedback").inner_text()
-    assert chu.startswith("Chưa dùng hết điểm Wharton") and "quỹ 2" in chu
+    assert chu.startswith("Chưa dùng hết điểm quyết tâm") and "quỹ 2" in chu
     assert not loi, loi

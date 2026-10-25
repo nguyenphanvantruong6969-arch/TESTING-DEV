@@ -273,18 +273,19 @@ def _so_co(sua):
 
 
 @pytest.mark.parametrize("sua,ma_loi,tham_so", [
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("D3", "CLB Không Có"),
-     "so_nhap_clb_khong_co", {"dong": 3, "k": 1, "gia_tri": "CLB Không Có"}),
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("F2", "CLB Tin học"),
-     "so_nhap_nv_trung", {"dong": 2, "k": 2, "k_truoc": 1}),
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("E2", "tám"),
-     "so_nhap_diem_sai", {"dong": 2, "k": 1}),
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("G3", 8),
-     "so_nhap_diem_khong_nv", {"dong": 3, "k": 2}),
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("A3", "HS1"),
-     "so_nhap_hs_trung", {"dong": 3, "dong_truoc": 2}),
-    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("A3", None),
-     "so_nhap_thieu_ma_hs", {"dong": 3}),
+    # Sheet học sinh có hai hàng tiêu đề (A13.4): dữ liệu bắt đầu từ hàng 3.
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("D4", "CLB Không Có"),
+     "so_nhap_clb_khong_co", {"dong": 4, "k": 1, "gia_tri": "CLB Không Có"}),
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("F3", "CLB Tin học"),
+     "so_nhap_nv_trung", {"dong": 3, "k": 2, "k_truoc": 1}),
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("E3", "tám"),
+     "so_nhap_diem_sai", {"dong": 3, "k": 1}),
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("G4", 8),
+     "so_nhap_diem_khong_nv", {"dong": 4, "k": 2}),
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("A4", "HS1"),
+     "so_nhap_hs_trung", {"dong": 4, "dong_truoc": 3}),
+    (lambda wb: wb[so_nhap.SHEET_HS].__setitem__("A4", None),
+     "so_nhap_thieu_ma_hs", {"dong": 4}),
     # Dòng 4 (Robotics): không em nào chọn, nên lỗi trùng tên đứng một mình.
     (lambda wb: wb[so_nhap.SHEET_CLB].__setitem__("A4", "CLB Tin học"),
      "so_nhap_clb_trung_ten", {"dong": 4, "dong_truoc": 2}),
@@ -330,7 +331,8 @@ def test_tep_khong_phai_excel(api):
 def test_tieu_de_go_lai_khong_dau_van_nhan(api):
     def sua(wb):
         ws = wb[so_nhap.SHEET_HS]
-        ws["A1"], ws["B1"], ws["D1"], ws["E1"] = "MA HOC SINH", "ho va ten", "nv 1", "DIEM 1"
+        ws["A1"], ws["B1"], ws["D1"] = "MA HOC SINH", "ho va ten", "nguyen vong 1"
+        ws["D2"], ws["E2"] = "clb", "DIEM THI"
         wb[so_nhap.SHEET_CLB].title = "CLB"
     kq = api.import_so_nhap(_so_co(sua))
     assert kq["ok"], kq
@@ -672,8 +674,8 @@ def test_nv_ghi_ten_clb_thang_ma_trung_chu_cua_clb_khac(api, tmp_path):
     so_nhap.ghi_so_nhap(buf, clubs, [])
     wb = openpyxl.load_workbook(io.BytesIO(buf.getvalue()))
     ws = wb[so_nhap.SHEET_HS]
-    cot_nv = [c.column for c in ws[1] if c.value == "NV1"][0]
-    for i, (sid, o) in enumerate([("HS1", "robot"), ("HS2", "Lego")], start=2):
+    cot_nv = [c.column for c in ws[1] if c.value == "Nguyện vọng 1"][0]
+    for i, (sid, o) in enumerate([("HS1", "robot"), ("HS2", "Lego")], start=3):
         ws.cell(i, 1, sid)
         ws.cell(i, cot_nv, o)
     kq = api.import_so_nhap(b64_wb(wb))

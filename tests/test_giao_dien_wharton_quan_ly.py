@@ -321,11 +321,11 @@ def test_sau_khi_chay_xep_khoi_khoa_man_sua_va_buoc_3_kiosk_chi_doc_roi_mo_khoa(
 def test_tieng_anh_chu_cua_khoi_doi_theo_va_khong_con_chu_co_dau(mo):
     page, api, loi = mo()
     _mo_man_sua(page, "HS2")
-    assert "Điểm Wharton" in page.locator("#adminWhartonBlock h2").inner_text()
+    assert "Điểm quyết tâm" in page.locator("#adminWhartonBlock h2").inner_text()
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     page.wait_for_function(
-        "() => document.querySelector('#adminWhartonBlock h2').textContent === 'Wharton points'")
+        "() => document.querySelector('#adminWhartonBlock h2').textContent === 'Preference points'")
     page.wait_for_function(
         "() => document.querySelector('#whQlBody tr[data-student-id=\"HS2\"]').textContent"
         ".includes('Not valid')")

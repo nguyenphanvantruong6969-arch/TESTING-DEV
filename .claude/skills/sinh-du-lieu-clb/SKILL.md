@@ -65,19 +65,29 @@ Một tệp Excel, hai sheet dữ liệu và một sheet `Hướng dẫn`.
 
 ### Sheet `2. Học sinh` — mỗi học sinh một dòng
 
-| Mã HS | Họ tên | Nhóm ưu tiên | NV1 | Điểm 1 | NV2 | Điểm 2 | … |
+Sheet này có **hai hàng tiêu đề** (từ A13.4) và dữ liệu bắt đầu từ **hàng 3**. Hàng 1 là
+ô gộp "Nguyện vọng 1", "Nguyện vọng 2"… trên mỗi nhóm cột; hàng 2 là tên cột trong
+nhóm. Ba cột đầu gộp dọc hai hàng. Kỹ năng không tự viết tiêu đề: nó ghi sổ bằng
+`so_nhap.ghi_so_nhap`, nên bố cục luôn theo `so_nhap.py`.
+
+| Mã HS | Họ tên | Nhóm ưu tiên | Nguyện vọng 1 | | Nguyện vọng 2 | | … |
 |---|---|---|---|---|---|---|---|
+| | | | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** | |
 | HS001 | Nguyễn Văn An | | CLB Tin học | 9,5 | CLB Bóng rổ | | |
 
-- **NV1, NV2, …**: tên câu lạc bộ theo thứ tự ưu tiên. **Một danh sách chung
+- **Cột CLB của mỗi nhóm**: tên câu lạc bộ theo thứ tự ưu tiên. **Một danh sách chung
   cho mọi buổi** — phần mềm tự chia theo buổi của từng câu lạc bộ. Kỹ năng ghi
   lần lượt nguyện vọng buổi 1, rồi buổi 2, …
-- **Điểm k** nằm ngay cạnh **NV k**: có điểm = em đã thi câu lạc bộ đó; trống =
-  không thi; chữ `thi` = đã thi, chấm sau trong phần mềm.
+- **Điểm thi** nằm ngay bên phải **CLB** cùng nhóm: có điểm = em đã thi câu lạc bộ đó;
+  trống = không thi; chữ `thi` = đã thi, chấm sau trong phần mềm.
+- **Điểm quyết tâm** (tuỳ chọn): khi workspace bật tính năng này, sổ có thêm cột
+  "Điểm quyết tâm" trong mỗi nhóm. Kỹ năng **không bắt buộc** sinh điểm này; để trống thì
+  học sinh tự chia ở kiosk. (Trong mã tính năng này gọi là `wharton`, cột CSV `wp_k`.)
+- Sổ cũ chỉ có một hàng tiêu đề (`NV1`, `Điểm 1`…) vẫn được phần mềm đọc và `soat` nhận.
 - Câu lạc bộ **không em nào có điểm** = câu lạc bộ **không tổ chức thi**.
 - Em không xếp câu lạc bộ nào của một buổi = **em bận ngày đó**. Hợp lệ.
 - Điểm cho câu lạc bộ em không xếp nguyện vọng thì sổ **không chứa được** (điểm
-  luôn nằm cạnh một NV) — điều 8 dưới đây chặn nó từ trước.
+  luôn nằm cạnh một cột CLB) — điều 8 dưới đây chặn nó từ trước.
 
 ## Chín điều phải đúng, nếu không thì không ghi
 
