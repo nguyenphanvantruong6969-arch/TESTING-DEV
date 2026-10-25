@@ -1948,6 +1948,29 @@ CREATE TABLE IF NOT EXISTS wharton_bids (
     points INTEGER NOT NULL CHECK (points >= 0),
     PRIMARY KEY (student_id, club_id)
 );
+
+-- Nhật ký điểm Wharton (A13.3): CHỈ GHI THÊM, không bao giờ xoá hay sửa (như run_history).
+-- KHÔNG có khoá ngoại: đây là dấu vết, phải còn sau khi học sinh / CLB bị xoá. Bảng MỚI hoàn
+-- toàn như wharton_bids: CREATE TABLE IF NOT EXISTS đã đủ cho CSDL cũ, không vào _BANG_RANG_BUOC.
+CREATE TABLE IF NOT EXISTS wharton_nhat_ky (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    luc TEXT NOT NULL,
+    nguon TEXT NOT NULL CHECK (nguon IN ('quan_ly', 'kiosk', 'nap_tep', 'xoa_du_lieu', 'he_thong')),
+    nguoi TEXT NOT NULL DEFAULT '',
+    hanh_dong TEXT NOT NULL,        -- 'luu' | 'xoa_mot_em' | 'xoa_tat_ca' | 'tia_nguyen_vong' | 'khoa' | 'mo_khoa' ...
+    student_id TEXT,                -- NULL cho thao tác cả bảng (khoá, mở khoá, xoá tất cả)
+    cu_json TEXT,                   -- {"w1": {...}, "w2": {...}} trước thao tác, hoặc NULL
+    moi_json TEXT                   -- sau thao tác, hoặc NULL
+);
+
+-- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
+-- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
+CREATE TABLE IF NOT EXISTS wharton_lock (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    is_locked INTEGER NOT NULL DEFAULT 0,
+    locked_at TEXT,
+    unlocked_at TEXT
+);
 """
 
 # busy_timeout dai hon mac dinh (5s) — nhieu tien trinh cung mo app.db

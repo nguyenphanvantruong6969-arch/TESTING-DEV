@@ -56,6 +56,9 @@ MA_MOI_SAU_ANH_CHUP = {
     "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
     "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
     "error_saving_wharton",
+    # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
+    "wharton_da_khoa", "wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan",
+    "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",
 }
 
 

@@ -1448,6 +1448,15 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                  1 if stb_redrawn else 0, result.che_do_boc_tham,
                  len(result.ds_buoi), buoi_da_chay, luat_xep_de_ghi(luat)),
             )
+            # Điểm Wharton bật: lần chạy thành công KHOÁ điểm (khoá riêng, không dính STB), trong
+            # CÙNG giao dịch với kết quả — chạy hỏng rollback thì không khoá. Tắt thì không đụng
+            # bảng khoá. Đã khoá sẵn (chạy lại khi chưa mở) thì giữ nguyên, không ghi nhật ký thừa.
+            if wharton is not None and not self._wharton_dang_khoa(cur):
+                cur.execute(
+                    "INSERT INTO wharton_lock (id, is_locked, locked_at) VALUES (1, 1, ?) "
+                    "ON CONFLICT(id) DO UPDATE SET is_locked = 1, locked_at = excluded.locked_at",
+                    (run_at,))
+                self._ghi_nhat_ky_wharton(cur, "he_thong", "khoa")
 
             # Diem commit DUY NHAT cua toan bo pipeline: neu bat ky dong
             # nao o tren (ve STB, ghi ket qua, ghi run_meta/run_history)

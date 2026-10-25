@@ -530,6 +530,30 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không lưu được điểm Wharton. Hãy thử lại.",
     "en": "Couldn't save the Wharton points. Try again."
   },
+  "wharton_da_khoa": {
+    "vi": "Điểm Wharton đang khoá vì đã chạy xếp. Mở khoá ở thẻ Quản lý để sửa.",
+    "en": "Wharton points are locked because the allocation has run. Unlock them in the Manage tab to edit."
+  },
+  "wharton_mo_khoa_sai_xac_nhan": {
+    "vi": "Cần gõ đúng chữ {can_go} để mở khoá sửa điểm Wharton.",
+    "en": "Type {can_go} exactly to unlock editing of the Wharton points."
+  },
+  "wharton_xoa_sai_xac_nhan": {
+    "vi": "Cần gõ đúng chữ {can_go} để xoá điểm Wharton của tất cả {person_pl}.",
+    "en": "Type {can_go} exactly to delete the Wharton points of all {person_pl}."
+  },
+  "wharton_da_xoa": {
+    "vi": "Đã xoá điểm Wharton của {n} {person_l}.",
+    "en": "Deleted the Wharton points of {n} {person_l}(s)."
+  },
+  "wharton_da_mo_khoa": {
+    "vi": "Đã mở khoá. Lần chạy xếp tiếp theo sẽ khoá lại.",
+    "en": "Unlocked. The next allocation run will lock them again."
+  },
+  "error_wharton_quan_ly": {
+    "vi": "Không thực hiện được thao tác với điểm Wharton. Hãy thử lại.",
+    "en": "Couldn't complete that action on the Wharton points. Try again."
+  },
   "csv_pref_duplicate_deduped": {
     "vi": "{student_id}: có {slot_sl} bị lặp trong nguyện vọng, phần lặp đã được bỏ.",
     "en": "{student_id}: {slot_la} was listed twice in the preferences. The repeat was removed."

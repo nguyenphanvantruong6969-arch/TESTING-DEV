@@ -1260,6 +1260,9 @@ class NhapDuLieuMixin:
             with self._ket_noi_ghi() as cur:
                 khop_club = self._khop_club_id(cur)
                 existing_students = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+                # Điểm Wharton đang KHOÁ (đã chạy xếp, A13.3): nguyện vọng vẫn nạp, chỉ phần điểm
+                # trong tệp bị bỏ. Đọc trong chính giao dịch ghi này, để không có khe giữa kiểm và ghi.
+                khoa_w = bat_wharton and co_wp and self._wharton_dang_khoa(cur)
 
                 n_created, n_updated, n_skipped = 0, 0, 0
                 sids_da_ghi: list = []
@@ -1343,7 +1346,8 @@ class NhapDuLieuMixin:
                     # `submit_preferences`). Wharton BẬT và tệp có cột wp: THAY mọi dòng cũ của
                     # em bằng dòng trong tệp; `tier` theo ô tick HIỆN TẠI (Sổ nhập và tệp chọn thi
                     # đã được nạp trước nguyện vọng, nên ô tick đã có).
-                    if bat_wharton and co_wp:
+                    cu_w = self._doc_diem_wharton_cua_em(cur, sid)
+                    if bat_wharton and co_wp and not khoa_w:
                         tick = {r[0] for r in cur.execute(
                             "SELECT club_id FROM club_test_selection WHERE student_id = ?",
                             (sid,))}
@@ -1368,8 +1372,13 @@ class NhapDuLieuMixin:
                     cur.execute(
                         "DELETE FROM wharton_bids WHERE student_id = ? AND club_id NOT IN "
                         "(SELECT club_id FROM preferences WHERE student_id = ?)", (sid, sid))
+                    moi_w = self._doc_diem_wharton_cua_em(cur, sid)
+                    if moi_w != cu_w:
+                        self._ghi_nhat_ky_wharton(cur, "nap_tep", "luu", sid, cu_w, moi_w)
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
+                if khoa_w and any(wp_tho.values()):
+                    row_errors.append(err("wharton_da_khoa"))
                 if bat_wharton:
                     row_errors.extend(loi_wp_som)
                     row_errors.extend(self._soat_ho_so_wharton(

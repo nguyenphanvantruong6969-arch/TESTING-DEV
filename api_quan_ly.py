@@ -5,6 +5,8 @@ Một phần của PipelineAPI (xem api.py) — tách riêng cho dễ đọc; m�
 public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được như cũ.
 """
 
+import getpass
+import json
 import os
 
 from api_chung import (
@@ -125,7 +127,15 @@ class QuanLyMixin:
                     ))
                 # Con trước, cha sau: khoá ngoại chặn xoá CLB khi còn dòng
                 # đăng ký thi / điểm trỏ tới nó.
+                bi_anh_huong = [r[0] for r in cur.execute(
+                    "SELECT DISTINCT student_id FROM wharton_bids WHERE club_id = ? "
+                    "ORDER BY student_id", (club_id,))]
+                cu_w = {sid: self._doc_diem_wharton_cua_em(cur, sid) for sid in bi_anh_huong}
                 cur.execute("DELETE FROM wharton_bids WHERE club_id = ?", (club_id,))
+                for sid in bi_anh_huong:
+                    self._ghi_nhat_ky_wharton(
+                        cur, "quan_ly", "xoa_theo_clb", sid, cu_w[sid],
+                        self._doc_diem_wharton_cua_em(cur, sid))
                 cur.execute("DELETE FROM club_test_selection WHERE club_id = ?", (club_id,))
                 cur.execute("DELETE FROM club_scores WHERE club_id = ?", (club_id,))
                 cur.execute("DELETE FROM clubs WHERE club_id = ?", (club_id,))
@@ -362,6 +372,98 @@ class QuanLyMixin:
         except Exception as e:
             return _fail(err("error_reading_student_state", detail=str(e)))
 
+    # -----------------------------------------------------------------
+    # NHẬT KÝ ĐIỂM WHARTON (A13.3)
+    #
+    # Mọi lần ghi hoặc xoá `wharton_bids` ghi thêm MỘT dòng vào `wharton_nhat_ky`, trong CÙNG giao
+    # dịch với thao tác (thao tác hỏng, rollback thì không có dòng ma). Bảng chỉ có INSERT và
+    # SELECT: không đường nào xoá hay sửa nó, kể cả `reset_data`.
+    # -----------------------------------------------------------------
+
+    @staticmethod
+    def _nguoi_may() -> str:
+        """Tên tài khoản máy đang chạy phần mềm; lỗi thì rỗng — không bao giờ làm hỏng thao tác."""
+        try:
+            return str(getpass.getuser() or "")
+        except Exception:
+            return ""
+
+    @staticmethod
+    def _doc_diem_wharton_cua_em(cur, student_id: str) -> dict:
+        """Điểm đã lưu của một em: {"w1": {club_id: điểm}, "w2": {...}} (quỹ 1 = đã thi)."""
+        ra: dict = {"w1": {}, "w2": {}}
+        for cid, tier, diem in cur.execute(
+                "SELECT club_id, tier, points FROM wharton_bids WHERE student_id = ? "
+                "ORDER BY club_id", (student_id,)):
+            ra["w%d" % tier][cid] = diem
+        return ra
+
+    @classmethod
+    def _ghi_nhat_ky_wharton(cls, cur, nguon: str, hanh_dong: str, student_id=None,
+                             cu=None, moi=None) -> None:
+        """Ghi thêm một dòng nhật ký (chỉ INSERT). `cu` / `moi` là dict hoặc None."""
+        def _json(x):
+            return None if x is None else json.dumps(x, sort_keys=True, ensure_ascii=False)
+        cur.execute(
+            "INSERT INTO wharton_nhat_ky (luc, nguon, nguoi, hanh_dong, student_id, cu_json, moi_json) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (_now(), nguon, cls._nguoi_may(), hanh_dong, student_id, _json(cu), _json(moi)))
+
+    @staticmethod
+    def _co_diem(d: dict) -> bool:
+        return bool(d["w1"] or d["w2"])
+
+    # -----------------------------------------------------------------
+    # KHOÁ ĐIỂM WHARTON (A13.3)
+    #
+    # Khoá RIÊNG (`wharton_lock`), không dính `stb_lock`. Lần chạy phân bổ thành công khi Wharton bật
+    # tự khoá (xem `_run_pipeline_da_khoa`). Đang khoá thì mọi cửa GHI điểm trả `wharton_da_khoa`;
+    # các cửa XOÁ dữ liệu vẫn chạy (và ghi nhật ký). Mở bằng `mo_khoa_wharton`.
+    # -----------------------------------------------------------------
+
+    @staticmethod
+    def _wharton_dang_khoa(cur) -> bool:
+        """Có đang khoá không. Gọi TRONG giao dịch ghi của từng cửa: không có khe giữa kiểm và ghi."""
+        r = cur.execute("SELECT is_locked FROM wharton_lock WHERE id = 1").fetchone()
+        return bool(r and r[0])
+
+    def get_wharton_lock_status(self):
+        """{is_locked, locked_at, unlocked_at} của khoá điểm Wharton (như `get_stb_lock_status`)."""
+        try:
+            with self._ket_noi_doc() as cur:
+                r = cur.execute(
+                    "SELECT is_locked, locked_at, unlocked_at FROM wharton_lock WHERE id = 1"
+                ).fetchone()
+            if not r:
+                return _ok({"is_locked": False, "locked_at": None, "unlocked_at": None})
+            return _ok({"is_locked": bool(r[0]), "locked_at": r[1], "unlocked_at": r[2]})
+        except Exception as e:
+            return _fail(err("error_wharton_quan_ly", detail=str(e)))
+
+    _MO_KHOA_WHARTON_CHU = "MO"
+
+    def mo_khoa_wharton(self, xac_nhan: str = ""):
+        """Mở khoá sửa điểm Wharton; cần gõ đúng "MO". Ghi nhật ký. KHÔNG đụng STB. Lần chạy xếp
+        sau đó khoá lại. Đang mở sẵn thì không đổi gì và không ghi nhật ký."""
+        try:
+            luat = self._luat_nghiem()
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            if xac_nhan != self._MO_KHOA_WHARTON_CHU:
+                return _fail(err("wharton_mo_khoa_sai_xac_nhan",
+                                 can_go=self._MO_KHOA_WHARTON_CHU))
+            with self._ket_noi_ghi() as cur:
+                dang_khoa = self._wharton_dang_khoa(cur)
+                if dang_khoa:
+                    cur.execute("UPDATE wharton_lock SET is_locked = 0, unlocked_at = ? WHERE id = 1",
+                                (_now(),))
+                    self._ghi_nhat_ky_wharton(cur, "quan_ly", "mo_khoa")
+            return _ok({"was_locked": dang_khoa})
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_wharton_quan_ly", detail=str(e)))
+
     @staticmethod
     def _trang_thai_wharton(cur, student_id: str, tested: list, prefs: list) -> dict:
         """Khoá `wharton` của `get_student_entry_state` (chỉ có khi workspace bật Wharton).
@@ -402,8 +504,13 @@ class QuanLyMixin:
         chỉ ô em đã gửi mới vào `wharton_bids`. Nhờ vậy em thêm CLB thứ hai vào quỹ đó sau này
         thì hồ sơ bị coi là chưa chia, thay vì "hợp lệ" nhờ một ô 100 em chưa từng đặt. Hợp lệ
         thì thay TOÀN BỘ dòng của em, `tier` theo ô tick lúc ghi. Workspace chưa bật Wharton
-        thì từ chối.
+        thì từ chối. Mọi lần lưu làm đổi điểm ghi một dòng nhật ký (`nguon = "kiosk"`).
         """
+        return self._luu_wharton(student_id, w1, w2, "kiosk")
+
+    def _luu_wharton(self, student_id: str, w1: dict, w2: dict, nguon: str):
+        """Lõi lưu điểm Wharton của một em, dùng chung cho kiosk (`submit_wharton`) và thẻ Quản lý
+        (`admin_save_wharton`): MỘT bản luật kiểm, MỘT chỗ ghi, khác nhau chỉ ở `nguon` của nhật ký."""
         try:
             luat = self._luat_nghiem()           # đọc TRƯỚC khi mở giao dịch ghi
             if not dung_wharton(luat):
@@ -412,6 +519,8 @@ class QuanLyMixin:
                 return _fail(err("error_saving_wharton",
                                  detail="w1 va w2 phai la dict {club_id: diem}"))
             with self._ket_noi_ghi() as cur:
+                if self._wharton_dang_khoa(cur):
+                    return _fail(err("wharton_da_khoa"))
                 exists = cur.execute(
                     "SELECT 1 FROM students WHERE student_id = ?", (student_id,)).fetchone()
                 if not exists:
@@ -432,17 +541,22 @@ class QuanLyMixin:
                     tran_nguyen_vong=luat["max_choices"])
                 if loi:
                     return _fail(loi)
+                cu = self._doc_diem_wharton_cua_em(cur, student_id)
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
                 dong = ([(student_id, cid, 1, diem) for cid, diem in w1.items()]
                         + [(student_id, cid, 2, diem) for cid, diem in w2.items()])
                 cur.executemany(
                     "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
                     "VALUES (?, ?, ?, ?)", dong)
+                moi = self._doc_diem_wharton_cua_em(cur, student_id)
+                if moi != cu:
+                    self._ghi_nhat_ky_wharton(cur, nguon, "luu", student_id, cu, moi)
             return _ok({"student_id": student_id, "n_saved": len(dong)})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:
             return _fail(err("error_saving_wharton", detail=str(e)))
+
     @staticmethod
     def _xoa_diem_khong_con_tick(cur, student_id: str) -> int:
         """Xoá điểm của em ở những CLB em KHÔNG còn tick "muốn thi".
@@ -575,10 +689,16 @@ class QuanLyMixin:
                 )
                 # Bỏ một CLB khỏi nguyện vọng thì điểm Wharton đặt ở CLB đó đi theo (đặc tả
                 # 4.2); các dòng khác giữ nguyên. Đặt SAU khi ghi nguyện vọng mới.
+                cu_w = self._doc_diem_wharton_cua_em(cur, student_id)
                 cur.execute(
                     "DELETE FROM wharton_bids WHERE student_id = ? AND club_id NOT IN "
                     "(SELECT club_id FROM preferences WHERE student_id = ?)",
                     (student_id, student_id))
+                if self._co_diem(cu_w):
+                    moi_w = self._doc_diem_wharton_cua_em(cur, student_id)
+                    if moi_w != cu_w:
+                        self._ghi_nhat_ky_wharton(cur, "kiosk", "tia_nguyen_vong",
+                                                  student_id, cu_w, moi_w)
             return _ok({"student_id": student_id, "n_ranked": len(ordered_club_ids)})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
@@ -619,7 +739,10 @@ class QuanLyMixin:
                 ).fetchone()
                 if not exists:
                     return _fail(err("student_not_found", student_id=student_id))
+                cu_w = self._doc_diem_wharton_cua_em(cur, student_id)
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+                if self._co_diem(cu_w):
+                    self._ghi_nhat_ky_wharton(cur, "kiosk", "xoa_mot_em", student_id, cu_w, None)
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 n_xoa = self._xoa_diem_khong_con_tick(cur, student_id)
@@ -652,7 +775,10 @@ class QuanLyMixin:
                 ).fetchone()[0]
                 if n_matches > 0:
                     return _fail(err("cannot_delete_student_matched", student_id=student_id))
+                cu_w = self._doc_diem_wharton_cua_em(cur, student_id)
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+                if self._co_diem(cu_w):
+                    self._ghi_nhat_ky_wharton(cur, "quan_ly", "xoa_mot_em", student_id, cu_w, None)
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_scores WHERE student_id = ?", (student_id,))
@@ -722,6 +848,14 @@ class QuanLyMixin:
                 # hồi y hệt trước vòng 2.
                 if not da_xoa.get("wharton_bids"):
                     da_xoa.pop("wharton_bids", None)
+                else:
+                    # Một dòng tổng trong nhật ký TRƯỚC khi xoá: số dòng và mã các em bị xoá điểm.
+                    self._ghi_nhat_ky_wharton(
+                        cur, "xoa_du_lieu", "xoa_tat_ca", None,
+                        {"so_dong": da_xoa["wharton_bids"],
+                         "ma_hoc_sinh": [r[0] for r in cur.execute(
+                             "SELECT DISTINCT student_id FROM wharton_bids ORDER BY student_id")]},
+                        None)
                 for ten in bang:
                     cur.execute("DELETE FROM %s" % ten)
 
@@ -740,6 +874,13 @@ class QuanLyMixin:
                     "UPDATE stb_lock SET is_locked = 0, unlocked_at = ? WHERE id = 1",
                     (_now(),),
                 )
+                # Khoá điểm Wharton mở theo (như khoá STB): dữ liệu đã xoá thì khoá không còn nghĩa.
+                # Chỉ khi ĐANG khoá mới đụng tới, nên Wharton tắt thì không có gì đổi.
+                if self._wharton_dang_khoa(cur):
+                    cur.execute(
+                        "UPDATE wharton_lock SET is_locked = 0, unlocked_at = ? WHERE id = 1",
+                        (_now(),))
+                    self._ghi_nhat_ky_wharton(cur, "xoa_du_lieu", "mo_khoa")
                 # Đếm CLB CÒN LẠI ở đây chứ không để giao diện tự suy ra từ
                 # phạm vi — suy ra là đoán, và đoán sai thì toast báo một con
                 # số không ai kiểm chứng được.
