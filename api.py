@@ -60,6 +60,7 @@ from rbda_priority_pipeline import (
     soat_vi_pham_rang_buoc,
     luat_xep_de_ghi,
     tham_so_luat,
+    tu_dien_wharton_mot_clb,
     validate_data_integrity,
     verify_stability,
     xay_tier_rank,
@@ -599,10 +600,13 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                             "JOIN club_test_selection t ON t.student_id = sc.student_id "
                             "AND t.club_id = sc.club_id"):
                         diem_w.setdefault(r["club_id"], {})[r["student_id"]] = r["score"]
+                    # Cùng cách tự điền trong bộ nhớ như lần chạy xếp (một CLB mỗi quỹ).
+                    w1_d, w2_d = tu_dien_wharton_mot_clb(
+                        prefs_w, w["clb_thi"], w["w1"], w["w2"], clubs_w)
                     loi_w = kiem_ho_so_wharton(
-                        prefs_w, w["clb_thi"], w["w1"], w["w2"], clubs_w,
+                        prefs_w, w["clb_thi"], w1_d, w2_d, clubs_w,
                         tran_nguyen_vong=luat["max_choices"])
-                    _hl, tb_w = diem_wharton_hieu_luc(prefs_w, w["w1"], w["w2"], diem_w)
+                    _hl, tb_w = diem_wharton_hieu_luc(prefs_w, w1_d, w2_d, diem_w)
                     loi_w += [e for e in tb_w if e["code"] != "wharton_vang_thi"]
                     em_sai = {e["params"]["student_id"] for e in loi_w}
                     if em_sai:
@@ -1017,11 +1021,16 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             # là cảnh báo và đi vào chi tiết của bước này.
             diem_wharton, canh_bao_wharton = None, []
             if wharton is not None:
+                # Quỹ chỉ có MỘT CLB mà em chưa đặt điểm thì tự điền 100 TRONG BỘ NHỚ (quyết định
+                # của Truong, cách A): không ghi `wharton_bids`, và là hàm thuần của (nguyện vọng,
+                # ô tick, điểm đã lưu) — tất cả đã nằm trong dấu vân tay — nên kết quả vẫn tất định.
+                w1_dien, w2_dien = tu_dien_wharton_mot_clb(
+                    preferences, wharton["clb_thi"], wharton["w1"], wharton["w2"], clubs)
                 loi_wharton = kiem_ho_so_wharton(
-                    preferences, wharton["clb_thi"], wharton["w1"], wharton["w2"], clubs,
+                    preferences, wharton["clb_thi"], w1_dien, w2_dien, clubs,
                     tran_nguyen_vong=luat["max_choices"])
                 diem_wharton, thong_bao = diem_wharton_hieu_luc(
-                    preferences, wharton["w1"], wharton["w2"], tested_scores)
+                    preferences, w1_dien, w2_dien, tested_scores)
                 loi_wharton += [e for e in thong_bao if e["code"] != "wharton_vang_thi"]
                 canh_bao_wharton = [e for e in thong_bao if e["code"] == "wharton_vang_thi"]
                 if loi_wharton:

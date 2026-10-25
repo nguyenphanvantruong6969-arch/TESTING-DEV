@@ -320,3 +320,65 @@ def test_tat_roi_bat_lai_ket_qua_chi_phu_thuoc_du_lieu_hien_tai(tmp_path):
     bat_wharton(api, bat=False)
     kq = api.run_pipeline(seed=2)
     assert kq["ok"], kq["errors"]
+
+
+# ------------------------------------------------------------------ tự điền trong bộ nhớ (cách A)
+
+def _hai_clb_moi_quy_mot(api):
+    """Mỗi quỹ của HS1 chỉ có MỘT CLB (A thi, B không thi) và HS1 chưa hề bấm Lưu Bước 3."""
+    bat_wharton(api)
+    dung_clb(api, A=5, B=5)
+    dung_hs(api, "HS1", tick={"HS1": ["A"]})
+    assert api.submit_preferences("HS1", ["A", "B"])["ok"]
+
+
+def test_quy_mot_clb_chua_luu_van_chay_duoc_va_khong_ghi_gi_vao_wharton_bids(api):
+    _hai_clb_moi_quy_mot(api)
+    from _wharton import dong_bids
+    assert dong_bids(api) == []
+    kq = api.run_pipeline(seed=3)
+    assert kq["ok"], kq["errors"]
+    assert dong_bids(api) == []                    # tự điền chỉ trong bộ nhớ, CSDL không đổi
+
+
+def test_tu_dien_trong_bo_nho_cho_ket_qua_nhu_da_luu_100(tmp_path):
+    """Chạy khi chưa lưu = chạy khi đã lưu 100 điểm vào CLB duy nhất của mỗi quỹ."""
+    ket = {}
+    for ten, da_luu in (("chua_luu", False), ("da_luu", True)):
+        api = api_mod.PipelineAPI(str(tmp_path / (ten + ".db")))
+        bat_wharton(api)
+        dung_clb(api, A=1, B=1)
+        dung_hs(api, "HS1", "HS2", tick={"HS1": ["A"], "HS2": ["A"]})
+        for sid in ("HS1", "HS2"):
+            assert api.submit_preferences(sid, ["A", "B"])["ok"]
+        if da_luu:
+            for sid in ("HS1", "HS2"):
+                assert api.submit_wharton(sid, {"A": 100}, {"B": 100})["ok"]
+        assert api.run_pipeline(seed=5)["ok"]
+        ket[ten] = _ket_qua(api)
+    assert ket["chua_luu"] == ket["da_luu"]
+
+
+def test_tu_dien_khong_che_loi_that_quy_da_co_khoa_van_bi_chan(api):
+    _hai_clb_moi_quy_mot(api)
+    with api._ket_noi_ghi() as cur:
+        cur.execute("INSERT INTO wharton_bids VALUES ('HS1', 'B', 2, 40)")   # đã đụng quỹ 2, thiếu 60
+    kq = api.run_pipeline(seed=3)
+    assert kq["ok"] is False
+    assert "wharton_chua_dung_het" in [e["code"] for e in kq["errors"]]
+
+
+def test_tu_dien_khong_che_quy_nhieu_clb_chua_chia(api):
+    bat_wharton(api)
+    dung_clb(api, A=5, B=5, C=5)
+    dung_hs(api, "HS1")
+    assert api.submit_preferences("HS1", ["A", "B", "C"])["ok"]          # quỹ 2 có ba CLB, chưa chia
+    kq = api.run_pipeline(seed=3)
+    assert kq["ok"] is False
+    assert [e["code"] for e in kq["errors"]][:2] == ["wharton_ho_so_chua_hop_le", "wharton_chua_dung_het"]
+
+
+def test_suc_khoe_du_lieu_cung_coi_quy_mot_clb_la_hop_le(api):
+    _hai_clb_moi_quy_mot(api)
+    ma = [w["code"] for w in api.get_data_health_report()["data"]["warnings"]]
+    assert "health_wharton_chua_hop_le" not in ma

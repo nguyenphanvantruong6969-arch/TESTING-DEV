@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-10-25 — A13 Điểm Wharton: pipeline tự điền quỹ một CLB trong bộ nhớ (theo quyết định của Truong, cách A)
+
+Quỹ (mỗi buổi) chỉ có MỘT CLB mà em chưa đặt điểm: lúc chạy xếp và lúc lập báo cáo sức khoẻ dữ liệu, `api.py` gọi `tu_dien_wharton_mot_clb`
+trong bộ nhớ TRƯỚC `kiem_ho_so_wharton` / `diem_wharton_hieu_luc`. Không ghi `wharton_bids`; kết quả vẫn tất định (hàm thuần của nguyện vọng,
+ô tick và điểm đã lưu, đều nằm trong dấu vân tay). Quỹ đã có khoá (kể cả 0) hoặc có từ hai CLB mà chưa chia thì vẫn bị chặn. Tắt Wharton: không đổi.
+Test mới (5 ca, trong `tests/test_wharton_pipeline.py`): chạy được khi chưa lưu, CSDL không đổi, bằng kết quả khi đã lưu 100, không che lỗi thật,
+sức khoẻ dữ liệu cùng cách tính. Sửa mục 14 của `HUONG_DAN_SU_DUNG.md` cho khớp.
+
 ## 2026-10-24 — A13 Điểm Wharton (vòng 2: lưu trữ, nhập liệu, kiosk, pipeline)
 
 Làm tiếp mục A13 theo quyết định của Truong: chỉ bật được khi `priority` là `score` / `score+tier` và `score_scope` là
