@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## 2026-10-25 — A13.3 Quản lý điểm Wharton
+
+Thêm khối **Điểm Wharton** vào thẻ Quản lý (chỉ hiện khi workspace bật `rules.wharton`): bảng điểm, sửa từng em, xoá, cảnh báo hồ sơ có vấn đề; kèm nhật ký và khoá riêng.
+Tắt Wharton thì thẻ Quản lý, mọi API cũ, kết quả, dấu vân tay và `run_history` y hệt trước vòng 3 (bất biến 1). Mọi số liệu trong test là dữ liệu MÔ PHỎNG.
+- **Quyết định đã chốt (25/10/2026):** (1) nhật ký mọi lần ghi hoặc xoá điểm: lúc nào, nguồn (`quan_ly`, `kiosk`, `nap_tep`, `xoa_du_lieu`, `he_thong`), tên tài khoản máy
+  (`getpass.getuser()`, lỗi thì rỗng), giá trị cũ và mới; không bao giờ bị xoá hay ghi đè, kể cả `reset_data`. (2) Khoá Wharton RIÊNG (không dính STB): lần chạy xếp thành công
+  khi Wharton bật tự khoá, kể cả chạy riêng một số buổi; đang khoá thì mọi cửa GHI điểm trả `wharton_da_khoa`; mở bằng `mo_khoa_wharton("MO")`. (3) Các cửa xoá dữ liệu
+  vẫn chạy khi khoá nhưng ghi nhật ký; `reset_data` mở luôn khoá Wharton. (4) Chỉ hiện khi bật Wharton. (5) Màn dành cho quản trị. (6) Giữ STB; thứ tự 5 bước pipeline không đổi.
+- **Sửa "cách A" (Bước 2, Truong đã duyệt):** `submit_wharton` chỉ ghi ô em đã GỬI (ô 100 tự điền chỉ có trong bộ nhớ), nên thêm CLB thứ hai vào quỹ đó sau này thì hồ sơ bị coi là
+  chưa chia thay vì "hợp lệ" nhờ một ô em chưa từng đặt; cảnh báo sau khi nạp tệp (`_soat_ho_so_wharton`) cũng tự điền trong bộ nhớ như pipeline và báo cáo sức khoẻ dữ liệu.
+- **Hai bảng mới** trong `DEFAULT_SCHEMA` (chỉ `CREATE TABLE IF NOT EXISTS`, không vào `_BANG_RANG_BUOC`; `di_tru_schema` chạy lặp an toàn): `wharton_nhat_ky(id, luc, nguon, nguoi, hanh_dong, student_id, cu_json, moi_json)`,
+  không khoá ngoại, `nguon` bị CHECK; `wharton_lock(id = 1, is_locked, locked_at, unlocked_at)`. Không câu `DELETE` / `UPDATE` nào chạm nhật ký.
+- **API mới** (`api_quan_ly.py`): `list_wharton_admin`, `list_wharton_canh_bao`, `get_wharton_nhat_ky`, `admin_save_wharton` (dùng lại lõi `_luu_wharton` với `submit_wharton`), `clear_wharton`
+  (một em, hoặc tất cả khi gõ `XOA`, có sao lưu), `mo_khoa_wharton`, `get_wharton_lock_status`; `get_student_entry_state` có thêm cờ `khoa` trong khoá `wharton`. `_ho_so_wharton_tat_ca` là MỘT hàm đọc
+  một lần, dùng chung cho bảng điểm, danh sách cảnh báo và `get_data_health_report` (số liệu báo cáo không đổi).
+- **Cửa có nhật ký:** `submit_wharton` (`kiosk` / `luu`), `admin_save_wharton` (`quan_ly` / `luu`), nạp tệp kể cả Sổ nhập (`nap_tep` / `luu`), tỉa trong `submit_preferences` (`kiosk` / `tia_nguyen_vong`),
+  `reset_student_entry` (`kiosk` / `xoa_mot_em`), `delete_student` (`quan_ly` / `xoa_mot_em`), `delete_club` (`quan_ly` / `xoa_theo_clb`, mỗi em một dòng), `reset_data` (`xoa_du_lieu` / `xoa_tat_ca`, một dòng tổng),
+  `clear_wharton`, khoá sau khi chạy (`he_thong` / `khoa`) và mở khoá (`mo_khoa`). Nhật ký nằm trong CÙNG giao dịch với thao tác. Cửa ghi có kiểm khoá trong giao dịch ghi: `submit_wharton`, `admin_save_wharton`,
+  `clear_wharton`, nạp cột `wp_*` (nguyện vọng vẫn nạp, phần điểm bị bỏ kèm cảnh báo `wharton_da_khoa`).
+- **Pipeline** (`api.py`, chỉ bước 5/6): đặt khoá trong cùng giao dịch ghi `run_history` khi Wharton bật; thứ tự năm bước không đổi; khoá và nhật ký không vào dấu vân tay.
+- **Giao diện:** `js/04_nhap_tai_cho.js` tách `whartonVeKhung` / `whartonThuThapTu` / `whartonChuoiTu` / `whartonGiuTamTu` dùng chung (hành vi kiosk không đổi) và Bước 3 chỉ đọc khi khoá;
+  `js/05_quan_ly.js` khối mới (bảng, lọc, phân trang, cảnh báo, màn sửa, nhật ký, hộp xác nhận `MO` / `XOA`); `index.html`, `style.css`, `i18n.js` (vi/en).
+- **Mã lỗi** (`i18n_errors.py` rồi `python tao_i18n_js.py`, `i18n_loi.js` chỉ thêm dòng): `wharton_da_khoa`, `wharton_mo_khoa_sai_xac_nhan`, `wharton_xoa_sai_xac_nhan`, `wharton_da_xoa`,
+  `wharton_da_mo_khoa`, `error_wharton_quan_ly`; thêm vào `MA_MOI_SAU_ANH_CHUP` của `tests/test_ws_nhan.py`.
+- **Test cũ đã sửa theo ngoại lệ A.3:** `tests/test_wharton_kiosk.py::test_tu_dien_khi_quy_chi_co_mot_clb` (ô tự điền không còn được ghi, Bước 2) và
+  `tests/test_wharton_kiosk.py::test_bat_wharton_trang_thai_co_khoa_wharton_dung_dang` (khoá `khoa` do vòng này cố ý thêm). `tests/test_ws_nhan.py`: chỉ thêm 6 mã vào danh sách cho phép.
+- **Test mới (141 ca):** `test_wharton_cach_a` (6), `test_wharton_nhat_ky` (22), `test_wharton_khoa` (21), `test_wharton_quan_ly` (23), `test_wharton_quan_ly_ghi` (21),
+  `test_wharton_quan_ly_dau_cuoi` (1), `test_giao_dien_wharton_quan_ly` (10, Chromium thật), cộng 37 ca vòng 3 trong `test_wharton_ma_loi`.
+- **Trùng khít (bất biến 1):** Wharton tắt: 15 lần chạy `run_pipeline` (3 bộ trong `du_lieu_test/do_anh_huong_seed.BO_DU_LIEU` × seed 1, 7, 42, 3, 11) cho `match_results` đầy đủ cột (1.350 dòng),
+  `dau_van_tay_chay` và `run_history.luat_xep` GIỐNG HỆT bản chụp lấy trước khi sửa (đỉnh vòng 2, `a8b077d`); `tests/test_nhieu_buoi.py::TestTrungKhit` 7/7 xanh. Toàn bộ: 2.529 ca xanh, 3 ca bỏ qua (2 do thiếu
+  `numpy`, 1 do cần người dùng thường trên POSIX; không ca giao diện nào bị bỏ qua, 212 ca giao diện chạy bằng Chromium thật), `ruff check .` sạch, độ phủ 92,34 % (sàn của CI: 85 %). Một ca trợ năng
+  (`test_giao_dien_tro_nang::test_moi_o_nhap_deu_co_ten_doc_duoc`) bắt được hai ô gõ chữ xác nhận thiếu tên đọc được; đã sửa bằng `aria-label` qua `i18n.js`.
+- **Cần biết:** ở màn (kiosk và thẻ Quản lý) khung chỉ có một CLB tự điền 100 và khoá ô; giao diện gửi cả ô đó khi bấm Lưu nên server GHI ô đó (đúng với "ô người dùng gửi thì được ghi"). Cách A (không ghi ô tự điền)
+  vì vậy giữ trọn với gọi API trực tiếp, nạp tệp và Sổ nhập; đường bấm Lưu trên giao diện vẫn ghi ô 100 như vòng 2 (`js/04_nhap_tai_cho.js` ngoài phạm vi vòng này để sửa phần thu thập).
+
+
 ## 2026-10-25 — A13 Điểm Wharton: pipeline tự điền quỹ một CLB trong bộ nhớ (theo quyết định của Truong, cách A)
 
 Quỹ (mỗi buổi) chỉ có MỘT CLB mà em chưa đặt điểm: lúc chạy xếp và lúc lập báo cáo sức khoẻ dữ liệu, `api.py` gọi `tu_dien_wharton_mot_clb`

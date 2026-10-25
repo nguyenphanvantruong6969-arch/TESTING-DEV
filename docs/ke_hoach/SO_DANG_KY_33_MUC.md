@@ -432,6 +432,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - **Khối giao diện** (`js/05_quan_ly.js`): bảng điểm theo quỹ và buổi kèm tổng, ô tìm, bộ lọc quỹ / buổi / CLB / "chỉ hồ sơ có vấn đề", phân trang; danh sách cảnh báo (chưa chia đủ, vắng thi), bấm vào mở màn sửa; màn sửa dùng chung phần vẽ hai khung với kiosk; xoá một em, xoá tất cả (gõ `XOA`); nhật ký của em đang mở.
   - **Sửa "cách A" (Bước 2):** `submit_wharton` chỉ ghi ô em đã gửi (ô tự điền 100 chỉ có trong bộ nhớ); cảnh báo sau khi nạp tệp cũng tự điền trong bộ nhớ như pipeline và báo cáo sức khoẻ dữ liệu.
   - **Quyết định đã chốt (25/10/2026):** không đổi thứ tự 5 bước của pipeline (bất biến 5); giữ STB hiện có; màn này dành cho quản trị, không phải học sinh.
+  - **Dòng (đối chiếu 25/10/2026):** rbda_priority_pipeline.py: `wharton_nhat_ky` (L1955), `wharton_lock` (L1968); api_quan_ly.py: `_ghi_nhat_ky_wharton` (L404), `_ho_so_wharton_tat_ca` (L427), `list_wharton_admin` (L502), `list_wharton_canh_bao` (L560), `get_wharton_nhat_ky` (L588), `_wharton_dang_khoa` (L623), `get_wharton_lock_status` (L628), `mo_khoa_wharton` (L643), `submit_wharton` (L696), `admin_save_wharton` (L711), `clear_wharton` (L716), `_luu_wharton` (L768); api.py: khoá sau khi chạy, cùng giao dịch với `run_history` (~L1434); api_nhap.py: `_soat_ho_so_wharton` (L1074); js/04_nhap_tai_cho.js: `whartonVeKhung` (L497), `renderWhartonStep` (L578); js/05_quan_ly.js: `loadAdminWharton` (L642), `moManSuaWharton` (L845), `initWhartonQuanLy` (L916).
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
 
