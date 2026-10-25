@@ -86,6 +86,18 @@ def mo(tmp_path, api):
         pw.stop()
 
 
+def _mo_thao_tac_khac(page):
+    """Mục "Thao tác khác" (A13.4) đóng sẵn: mở ra trước khi bấm mở khoá, xoá tất cả, xem nhật ký."""
+    if not page.locator("#whThaoTacKhac").evaluate("d => d.open"):
+        page.locator("#whThaoTacKhac > summary").click()
+
+
+def _xem_nhat_ky(page):
+    _mo_thao_tac_khac(page)
+    if page.locator("#whNkHop").is_hidden():
+        page.locator("#btnWhXemNhatKy").click()
+
+
 def _hang(page, sid):
     return page.locator('#whQlBody tr[data-student-id="%s"]' % sid)
 
@@ -191,7 +203,8 @@ def test_bam_dong_canh_bao_mo_man_sua_sua_cho_du_100_va_luu(mo):
     nk = _nk(api)
     assert [(n[0], n[1], n[2]) for n in nk] == [("quan_ly", "luu", "HS2")]
     assert nk[0][3]["w2"] == {"B": 60, "C": 30} and nk[0][4]["w2"] == {"B": 60, "C": 40}
-    # nhật ký của em hiện trong màn sửa
+    # nhật ký của em: bấm "Xem nhật ký" trong mục "Thao tác khác"
+    _xem_nhat_ky(page)
     page.wait_for_selector('#whQlNhatKy li[data-hanh-dong="luu"]')
     assert not loi, loi
 
@@ -229,6 +242,7 @@ def test_xoa_diem_mot_em_hai_buoc(mo):
 def test_xoa_tat_ca_go_sai_chu_khong_xoa_go_xoa_thi_xoa_het(mo):
     page, api, loi = mo()
     n_truoc = len(dong_bids(api))
+    _mo_thao_tac_khac(page)
     page.locator("#btnWhXoaTatCa").click()
     assert page.locator("#whXoaTatCaHop").is_visible()
     page.locator("#whXoaTatCaGo").fill("xoa")                 # sai chữ (thường)
@@ -272,6 +286,7 @@ def test_sau_khi_chay_xep_khoi_khoa_man_sua_va_buoc_3_kiosk_chi_doc_roi_mo_khoa(
     page.locator('[data-tab="admin"]').click()              # mở lại thẻ: đọc trạng thái mới
     page.wait_for_function(
         "() => document.getElementById('whQlKhoa').textContent.startsWith('Đang khoá từ')")
+    _mo_thao_tac_khac(page)
     assert page.locator("#btnWhMoKhoa").is_visible()
     # màn sửa chỉ đọc
     page.locator('#whQlBody tr[data-student-id="%s"]' % sid).click()
@@ -294,6 +309,7 @@ def test_sau_khi_chay_xep_khoi_khoa_man_sua_va_buoc_3_kiosk_chi_doc_roi_mo_khoa(
     # mở khoá: nút -> hộp xác nhận -> gõ sai chữ không mở -> gõ MO mới mở
     page.locator('[data-tab="admin"]').click()
     page.wait_for_selector("#btnWhMoKhoa:not([hidden])")
+    _mo_thao_tac_khac(page)
     page.locator("#btnWhMoKhoa").click()
     assert page.locator("#whMoKhoaHop").is_visible()
     page.locator("#whMoKhoaGo").fill("mo")

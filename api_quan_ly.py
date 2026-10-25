@@ -639,42 +639,107 @@ class QuanLyMixin:
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
+    def _ngu_canh_diem_chuan(self):
+        """Đọc MỘT lần mọi thứ điểm chuẩn cần. Trả `(None, ngữ cảnh)` hoặc `(lỗi, None)`.
+
+        Điểm hiệu lực lấy đúng cách lần chạy lấy: dữ liệu, dấu vân tay và hồ sơ điểm trong MỘT
+        giao dịch đọc, tự điền quỹ một CLB trong bộ nhớ, rồi `diem_wharton_hieu_luc`.
+        """
+        luat = self._luat_nghiem()
+        if not dung_wharton(luat):
+            return _fail(err("wharton_chua_bat")), None
+        du_lieu, dau_van_tay, w = load_from_sqlite_kem_dau_van_tay_wharton(self.db_path, luat)
+        students, clubs, tested_scores, applicants, preferences, stb_lottery = du_lieu
+        with self._ket_noi_doc() as cur:
+            match = [(r[0], r[1], r[2], r[3]) for r in cur.execute(
+                "SELECT student_id, buoi, club_id, matched_tier FROM match_results "
+                "WHERE club_id IS NOT NULL ORDER BY student_id, buoi")]
+            luu = cur.execute("SELECT dau_van_tay FROM dau_van_tay_chay WHERE id = 1").fetchone()
+            meta = cur.execute("SELECT run_at FROM run_meta WHERE id = 1").fetchone()
+            ten_clb = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+            ten_hs = {r[0]: r[1] or "" for r in cur.execute("SELECT student_id, name FROM students")}
+        ctx = {
+            "clubs": clubs, "tested_scores": tested_scores, "applicants": applicants,
+            "preferences": preferences, "stb_lottery": stb_lottery, "match": match,
+            "ten_clb": ten_clb, "ten_hs": ten_hs, "hieu_luc": {},
+            "co_ket_qua": bool(match), "luc_chay": meta[0] if meta else None,
+            "ket_qua_cu": bool(match) and (luu is None or luu[0] != dau_van_tay),
+            "ds_buoi": sap_buoi({(c.get("buoi") or BUOI_MAC_DINH) for c in clubs.values()}),
+        }
+        if match:
+            w1, w2 = tu_dien_wharton_mot_clb(preferences, w["clb_thi"], w["w1"], w["w2"], clubs)
+            ctx["hieu_luc"], _tb = diem_wharton_hieu_luc(preferences, w1, w2, tested_scores)
+        return None, ctx
+
     def get_diem_chuan(self):
         """Điểm chuẩn từng CLB sau lần chạy gần nhất (A13.4), CHỈ cho quản trị.
 
         Chỉ có khi workspace bật điểm quyết tâm (không thì `wharton_chua_bat`). Chưa có kết quả
-        thì trả `co_ket_qua` False và `rows` rỗng. Điểm hiệu lực lấy đúng cách lần chạy lấy:
-        đọc dữ liệu và hồ sơ điểm trong MỘT giao dịch, tự điền quỹ một CLB trong bộ nhớ, rồi
-        `diem_wharton_hieu_luc`. `ket_qua_cu` True khi dữ liệu đã đổi sau lần chạy (dấu vân tay
-        khác), như các màn kết quả khác. Không có đường nào cho kiosk gọi hàm này.
+        thì trả `co_ket_qua` False và `rows` rỗng. `ket_qua_cu` True khi dữ liệu đã đổi sau lần
+        chạy (dấu vân tay khác), như các màn kết quả khác. Không có đường nào cho kiosk gọi hàm
+        này. Cách tính: xem `tinh_diem_chuan`.
         """
         try:
-            luat = self._luat_nghiem()
-            if not dung_wharton(luat):
-                return _fail(err("wharton_chua_bat"))
-            du_lieu, dau_van_tay, w = load_from_sqlite_kem_dau_van_tay_wharton(self.db_path, luat)
-            students, clubs, tested_scores, applicants, preferences, stb_lottery = du_lieu
-            with self._ket_noi_doc() as cur:
-                match = [(r[0], r[1], r[2], r[3]) for r in cur.execute(
-                    "SELECT student_id, buoi, club_id, matched_tier FROM match_results "
-                    "WHERE club_id IS NOT NULL ORDER BY student_id, buoi")]
-                luu = cur.execute(
-                    "SELECT dau_van_tay FROM dau_van_tay_chay WHERE id = 1").fetchone()
-                meta = cur.execute("SELECT run_at FROM run_meta WHERE id = 1").fetchone()
-                ten_clb = {r[0]: r[1] or r[0] for r in cur.execute(
-                    "SELECT club_id, name FROM clubs")}
-            ds_buoi = sap_buoi({(c.get("buoi") or BUOI_MAC_DINH) for c in clubs.values()})
-            ra = {"co_ket_qua": bool(match), "ket_qua_cu": False, "luc_chay": meta[0] if meta else None,
-                  "nhieu_buoi": len(ds_buoi) > 1, "ds_buoi": ds_buoi, "rows": []}
-            if not match:
-                return _ok(ra)
-            w1, w2 = tu_dien_wharton_mot_clb(
-                preferences, w["clb_thi"], w["w1"], w["w2"], clubs)
-            hieu_luc, _tb = diem_wharton_hieu_luc(preferences, w1, w2, tested_scores)
-            ra["ket_qua_cu"] = luu is None or luu[0] != dau_van_tay
-            ra["rows"] = tinh_diem_chuan(clubs, tested_scores, applicants, hieu_luc, stb_lottery,
-                                         match, ten_clb)
-            return _ok(ra)
+            loi, c = self._ngu_canh_diem_chuan()
+            if loi:
+                return loi
+            return _ok({"co_ket_qua": c["co_ket_qua"], "ket_qua_cu": c["ket_qua_cu"],
+                        "luc_chay": c["luc_chay"], "nhieu_buoi": len(c["ds_buoi"]) > 1,
+                        "ds_buoi": c["ds_buoi"],
+                        "rows": tinh_diem_chuan(
+                            c["clubs"], c["tested_scores"], c["applicants"], c["hieu_luc"],
+                            c["stb_lottery"], c["match"], c["ten_clb"]) if c["co_ket_qua"] else []})
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_reading_results", detail=str(e)))
+
+    def get_diem_chuan_clb(self, club_id):
+        """Chi tiết MỘT CLB cho biểu đồ phân bố: điểm hiệu lực của từng em tầng 2 đã xin vào.
+
+        `em`: [{student_id, ho_ten, diem, ket_qua: "duoc" | "khong", dien}], `diem` là điểm quyết
+        tâm hiệu lực. "duoc" = đang ở CLB này; "khong" = đã bị CLB này từ chối (em xin vào mà
+        không được: chưa có chỗ nào ở buổi đó, hoặc đang ở CLB xếp SAU CLB này). Em đã vào một CLB
+        xếp TRƯỚC thì chưa từng xin CLB này nên không tính, chỉ đếm vào `so_khong_xet`. Em tầng 1
+        (có điểm thi ở CLB này) không nằm trên thang này. Kèm `chuan`: đúng dòng của
+        `get_diem_chuan`. Chỉ cho quản trị, giống `get_diem_chuan`.
+        """
+        try:
+            loi, c = self._ngu_canh_diem_chuan()
+            if loi:
+                return loi
+            if club_id not in c["clubs"]:
+                return _fail(err("club_not_found", club_id=club_id))
+            buoi = c["clubs"][club_id].get("buoi") or BUOI_MAC_DINH
+            chuan = next((r for r in tinh_diem_chuan(
+                c["clubs"], c["tested_scores"], c["applicants"], c["hieu_luc"], c["stb_lottery"],
+                c["match"], c["ten_clb"]) if r["club_id"] == club_id), None)
+            thi = c["tested_scores"].get(club_id) or {}
+            diem = c["hieu_luc"].get(club_id) or {}
+            dang_o = {(s, b): (cid, tier) for s, b, cid, tier in c["match"]}
+            em, so_khong_xet = [], 0
+            for sid in sorted(set(c["applicants"].get(club_id) or [])):
+                if sid in thi:
+                    continue
+                if not c["co_ket_qua"]:
+                    continue
+                ds = [x for x in c["preferences"].get(sid, [])
+                      if (c["clubs"].get(x, {}).get("buoi") or BUOI_MAC_DINH) == buoi]
+                hien = dang_o.get((sid, buoi), (None, None))
+                if hien[0] == club_id:
+                    ket_qua = "duoc"
+                elif hien[0] is None or club_id not in ds or ds.index(club_id) < ds.index(hien[0]):
+                    ket_qua = "khong"
+                else:
+                    so_khong_xet += 1
+                    continue
+                em.append({"student_id": sid, "ho_ten": c["ten_hs"].get(sid, ""),
+                           "diem": diem.get(sid, 0), "ket_qua": ket_qua, "dien": hien[1]
+                           if ket_qua == "duoc" else None})
+            return _ok({"club_id": club_id, "ten": c["ten_clb"].get(club_id) or club_id,
+                        "buoi": buoi if len(c["ds_buoi"]) > 1 else "",
+                        "co_ket_qua": c["co_ket_qua"], "ket_qua_cu": c["ket_qua_cu"],
+                        "chuan": chuan, "em": em, "so_khong_xet": so_khong_xet})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:

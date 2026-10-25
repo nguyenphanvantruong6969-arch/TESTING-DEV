@@ -510,6 +510,7 @@ function loadAdminTab(giuTrang) {
     adminCoKetQua = !!(res.ok && res.data);
   });
   loadAdminWharton(giuTrang);
+  loadAdminDiemChuan();
   return loadAdminStudents();
 }
 
@@ -670,6 +671,7 @@ function loadWhKhoa() {
       : t("wh_ql_dang_mo");
     chu.classList.toggle("is-khoa", whQl.khoa);
     el("btnWhMoKhoa").hidden = !whQl.khoa;
+    el("whMoKhoaChuaKhoa").hidden = whQl.khoa;
     if (!whQl.khoa) el("whMoKhoaHop").hidden = true;
     if (!el("whMoKhoaHop").hidden) {
       el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
@@ -882,6 +884,7 @@ function veManSuaWharton(state, giu) {
 
 function loadWhNhatKy(them) {
   const sid = whQl.sid;
+  el("whNkChonEm").hidden = !!sid;
   if (!sid) return Promise.resolve(null);
   if (!them) whQl.nkTrang = 1;
   return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
@@ -924,6 +927,22 @@ function initWhartonQuanLy() {
   el("btnWhDongSua").addEventListener("click", () => {
     whQl.sid = null;
     el("whQlSua").hidden = true;
+    clear(el("whQlNhatKy"));
+    el("whQlNhatKyRong").hidden = true;
+    el("btnWhNkThem").hidden = true;
+    el("whNkChonEm").hidden = false;
+  });
+  /* Nút (i) và "Xem nhật ký": câu giải thích dài và nhật ký chỉ hiện khi bấm. */
+  el("btnWhThongTin").addEventListener("click", () => {
+    const mo = el("whQlMoTa").hidden;
+    el("whQlMoTa").hidden = !mo;
+    el("btnWhThongTin").setAttribute("aria-expanded", mo ? "true" : "false");
+  });
+  el("btnWhXemNhatKy").addEventListener("click", () => {
+    const mo = el("whNkHop").hidden;
+    el("whNkHop").hidden = !mo;
+    el("btnWhXemNhatKy").setAttribute("aria-expanded", mo ? "true" : "false");
+    el("whNkChonEm").hidden = !!whQl.sid;
   });
   el("btnWhNkThem").addEventListener("click", () => { whQl.nkTrang += 1; loadWhNhatKy(true); });
 
@@ -1165,4 +1184,523 @@ function initAdminHandlers() {
             "toast_reset_all_done");
 
   initWhartonQuanLy();
+  initDiemChuan();
+}
+
+
+/* ==========================================================================
+   Điểm chuẩn từng CLB (A13.4)
+
+   Chỉ cho quản trị, chỉ khi workspace bật điểm quyết tâm và đã có kết quả. Số liệu do
+   `get_diem_chuan` (tổng quan) và `get_diem_chuan_clb` (từng em) trả; ở đây chỉ VẼ.
+
+   Ba biểu đồ, SVG thuần (chạy ngoại tuyến, không thư viện, không tải gì từ mạng):
+     (a) veCotPhanBoQuyetTam   cột phân bố điểm quyết tâm tầng 2 của MỘT CLB;
+     (b) veDaiChamQuyetTam     mỗi em một chấm, cùng thang;
+     (c) veTongQuanDiemChuan   bảng tổng quan mọi CLB, mỗi dòng một thanh.
+   Màu: xanh `--chart-general` cho "được nhận", xám `--chart-khong-nhan` cho "không được
+   nhận"; kênh phụ không dựa vào màu là gạch chéo (cột) và chấm rỗng (dải chấm).
+   ========================================================================== */
+
+const DC_NS = "http://www.w3.org/2000/svg";
+const dc = { rows: null, ct: null, chon: "", moKq: false };
+let dcUid = 0;
+
+function dcSvg(ten, thuocTinh, cha) {
+  const n = document.createElementNS(DC_NS, ten);
+  Object.keys(thuocTinh || {}).forEach((k) => n.setAttribute(k, String(thuocTinh[k])));
+  if (cha) cha.appendChild(n);
+  return n;
+}
+
+function dcSo(x) {
+  /* Tối đa hai chữ số thập phân, dấu phẩy kiểu Việt: 8,25. */
+  return soThapPhan(Math.round(x * 100) / 100);
+}
+
+/* Chữ trong một ô của bảng hai tầng x hai mức. */
+function dcChuoiMuc(muc, tang) {
+  if (!muc) return "—";
+  if (muc.con_cho) return t("dc_con_cho", { n: muc.con_cho });
+  if (tang === 1) return t("dc_tang1_cell", { thi: dcSo(muc.diem_thi), qt: dcSo(muc.diem_quyet_tam) });
+  return dcSo(muc.diem_quyet_tam);
+}
+
+function dcTenDong(r, nhieuBuoi) {
+  return (nhieuBuoi && r.buoi ? "[" + r.buoi + "] " : "") + r.ten;
+}
+
+function dcChuGiai(goc, muc) {
+  const ul = document.createElement("ul");
+  ul.className = "dc-chu-giai";
+  muc.forEach(([lop, khoa]) => {
+    const li = document.createElement("li");
+    const o = document.createElement("span");
+    o.className = "dc-mau " + lop;
+    o.setAttribute("aria-hidden", "true");
+    li.appendChild(o);
+    li.appendChild(document.createTextNode(t(khoa)));
+    ul.appendChild(li);
+  });
+  goc.appendChild(ul);
+}
+
+/* (c) Bảng tổng quan. Mỗi dòng: tên, thanh điểm chuẩn tầng 2 (thang 0 đến 100), số đơn / số
+   chỗ, và chấm "nóng" khi số đơn lớn hơn số chỗ. Dòng nào chưa có ai ở tầng 2 thì ghi "—". */
+function veTongQuanDiemChuan(goc, ds) {
+  clear(goc);
+  if (!ds || !ds.length) {
+    const p = document.createElement("p");
+    p.className = "hint-text";
+    p.textContent = t("dc_chua_co_ket_qua");
+    goc.appendChild(p);
+    return;
+  }
+  const nhieuBuoi = new Set(ds.map((r) => r.buoi)).size > 1;
+  const cuon = document.createElement("div");
+  cuon.className = "scroll-x";
+  const bang = document.createElement("table");
+  bang.className = "data-table dc-tq";
+  const cap = document.createElement("caption");
+  cap.className = "dc-an-chu";
+  cap.textContent = t("dc_tong_quan_tieu_de");
+  bang.appendChild(cap);
+  const dau = bang.createTHead().insertRow();
+  [["dc_cot_ten", ""], ["dc_cot_chuan", ""], ["dc_cot_don", "num"]].forEach(([khoa, lop]) => {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.className = lop;
+    th.textContent = t(khoa);
+    dau.appendChild(th);
+  });
+  const tb = bang.createTBody();
+  ds.forEach((r) => {
+    const tr = tb.insertRow();
+    tr.dataset.clubId = r.club_id;
+    const ten = tr.insertCell();
+    const tenTxt = document.createElement("span");
+    tenTxt.className = "dc-ten";
+    tenTxt.textContent = dcTenDong(r, nhieuBuoi);
+    ten.appendChild(tenTxt);
+    if (r.tang1.thuong || r.tang1.du_tru) {
+      const phu = document.createElement("span");
+      phu.className = "dc-phu";
+      phu.textContent = t("dc_tang1") + ": " + dcChuoiMuc(r.tang1.thuong || r.tang1.du_tru, 1);
+      ten.appendChild(phu);
+    }
+
+    const o = tr.insertCell();
+    const m = r.tang2.thuong || r.tang2.du_tru;
+    if (m) {
+      const x = Math.max(0, Math.min(100, m.diem_quyet_tam));
+      const W = 200, H = 14, rong = (x / 100) * W;
+      const nhan = t("dc_thanh_nhan", { ten: r.ten, x: dcChuoiMuc(m, 2) });
+      const svg = dcSvg("svg", { class: "dc-thanh", viewBox: `0 0 ${W} ${H}`, role: "img",
+                                 preserveAspectRatio: "none" });
+      dcSvg("title", {}, svg).textContent = nhan;
+      dcSvg("rect", { class: "dc-thanh-nen", x: 0, y: 0, width: W, height: H, rx: 4 }, svg);
+      if (rong >= 8) {
+        dcSvg("path", { class: "dc-thanh-do", "data-diem": x,
+                        d: `M0 0H${rong - 4}a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H0z` }, svg);
+      } else if (rong > 0) {
+        dcSvg("rect", { class: "dc-thanh-do", "data-diem": x, x: 0, y: 0, width: rong, height: H }, svg);
+      }
+      o.appendChild(svg);
+      const g = document.createElement("span");
+      g.className = "dc-gtri";
+      g.textContent = dcChuoiMuc(m, 2);
+      o.appendChild(g);
+    } else {
+      o.textContent = "—";
+      o.title = t("dc_khong_ai");
+    }
+
+    const d = tr.insertCell();
+    d.className = "num";
+    d.appendChild(document.createTextNode(r.so_don + " / " + r.suc_chua));
+    if (r.so_don > r.suc_chua) {
+      const nong = document.createElement("span");
+      nong.className = "dc-nong";
+      nong.setAttribute("role", "img");
+      nong.setAttribute("aria-label", t("dc_nong"));
+      nong.title = t("dc_nong");
+      d.appendChild(nong);
+    }
+  });
+  cuon.appendChild(bang);
+  goc.appendChild(cuon);
+  const ghi = document.createElement("p");
+  ghi.className = "hint-text";
+  ghi.textContent = t("dc_chu_giai_thanh");
+  goc.appendChild(ghi);
+  dcChuGiai(goc, [["is-nong", "dc_nong"]]);
+}
+
+/* Thang ngang 0 đến 100 dùng chung cho (a) và (b). */
+function dcThangX(svg, W, L, R, yTren, yDuoi) {
+  const x = (v) => L + (v / 100) * (W - L - R);
+  for (let v = 0; v <= 100; v += 20) {
+    dcSvg("text", { x: x(v), y: yDuoi + 16, "text-anchor": "middle" }, svg).textContent = String(v);
+  }
+  dcSvg("text", { x: (L + W - R) / 2, y: yDuoi + 32, "text-anchor": "middle" }, svg)
+    .textContent = t("dc_truc_x");
+  return x;
+}
+
+function dcVachChuan(svg, x, chuan, yTren, yDuoi, W) {
+  if (!chuan) return;
+  const m = chuan.tang2.thuong || chuan.tang2.du_tru;
+  if (!m) return;
+  const px = x(Math.max(0, Math.min(100, m.diem_quyet_tam)));
+  dcSvg("line", { class: "dc-chuan-vach", x1: px, x2: px, y1: yTren, y2: yDuoi,
+                  "data-diem": m.diem_quyet_tam }, svg);
+  const chu = dcSvg("text", { class: "dc-chuan-nhan", x: px, y: yTren - 6,
+                              "text-anchor": px > W - 90 ? "end" : (px < 60 ? "start" : "middle") }, svg);
+  chu.textContent = t("dc_vach_chuan", { x: m.con_cho ? dcChuoiMuc(m, 2) : dcSo(m.diem_quyet_tam) });
+}
+
+function dcChuGiaiDuoiKhong(goc, laCham) {
+  dcChuGiai(goc, laCham
+    ? [["is-cham-duoc", "dc_duoc"], ["is-cham-khong", "dc_khong"]]
+    : [["is-duoc", "dc_duoc"], ["is-khong", "dc_khong"]]);
+  const ul = goc.querySelector(".dc-chu-giai:last-child");
+  const li = document.createElement("li");
+  const o = document.createElement("span");
+  o.className = "dc-mau is-vach";
+  o.setAttribute("aria-hidden", "true");
+  li.appendChild(o);
+  li.appendChild(document.createTextNode(t("dc_vach_chuan", { x: "" }).trim()));
+  ul.appendChild(li);
+}
+
+/* Bảng chữ cho người đọc màn hình: cùng số liệu với hình, không phụ thuộc màu. */
+function dcBangAn(goc, tieuDe, cot, dong) {
+  const bang = document.createElement("table");
+  bang.className = "dc-an-chu";
+  const cap = document.createElement("caption");
+  cap.textContent = tieuDe;
+  bang.appendChild(cap);
+  const h = bang.createTHead().insertRow();
+  cot.forEach((c) => { const th = document.createElement("th"); th.scope = "col"; th.textContent = c; h.appendChild(th); });
+  const tb = bang.createTBody();
+  dong.forEach((d) => {
+    const tr = tb.insertRow();
+    d.forEach((v) => { tr.insertCell().textContent = String(v); });
+  });
+  goc.appendChild(bang);
+}
+
+/* (a) Cột phân bố: trục ngang 0 đến 100, nhóm 10 điểm, mỗi cột chia hai màu. */
+function veCotPhanBoQuyetTam(goc, d) {
+  clear(goc);
+  const cap = document.createElement("figcaption");
+  cap.textContent = t("dc_cot_tieu_de", { ten: d.ten });
+  goc.appendChild(cap);
+  if (!d.em.length) {
+    const p = document.createElement("p");
+    p.className = "hint-text";
+    p.textContent = t("dc_rong_bieu_do");
+    goc.appendChild(p);
+    return;
+  }
+  const nhom = [];
+  for (let i = 0; i < 10; i++) nhom.push({ tu: i * 10, den: i * 10 + 9, duoc: 0, khong: 0 });
+  nhom[9].den = 100;
+  d.em.forEach((e) => {
+    const i = Math.min(9, Math.floor(e.diem / 10));
+    nhom[i][e.ket_qua === "duoc" ? "duoc" : "khong"] += 1;
+  });
+  const cao = Math.max(1, ...nhom.map((g) => g.duoc + g.khong));
+  const nac = cao <= 5 ? 1 : Math.ceil(cao / 5);
+  const tran = Math.ceil(cao / nac) * nac;
+
+  const W = 560, H = 270, L = 44, R = 12, yTren = 30, yDuoi = 210;
+  const id = "dcGach" + (++dcUid);
+  const svg = dcSvg("svg", { class: "dc-svg", viewBox: `0 0 ${W} ${H}`, role: "img",
+                             "aria-labelledby": id + "T", "data-bieu-do": "cot" });
+  dcSvg("title", { id: id + "T" }, svg).textContent = t("dc_cot_tieu_de", { ten: d.ten });
+  const defs = dcSvg("defs", {}, svg);
+  const pat = dcSvg("pattern", { id: id, width: 6, height: 6, patternUnits: "userSpaceOnUse",
+                                 patternTransform: "rotate(45)" }, defs);
+  dcSvg("rect", { class: "dc-gach-nen", width: 6, height: 6 }, pat);
+  dcSvg("line", { class: "dc-gach-net", x1: 0, y1: 0, x2: 0, y2: 6 }, pat);
+
+  const y = (n) => yDuoi - (n / tran) * (yDuoi - yTren);
+  for (let n = 0; n <= tran; n += nac) {
+    dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: y(n), y2: y(n) }, svg);
+    dcSvg("text", { x: L - 6, y: y(n) + 4, "text-anchor": "end" }, svg).textContent = String(n);
+  }
+  dcSvg("text", { x: 4, y: 14 }, svg).textContent = t("dc_truc_y");
+  const x = dcThangX(svg, W, L, R, yTren, yDuoi);
+  const bang = (W - L - R) / 10;
+  const DAY = 24, KHE = 2, BAN_KINH = 4;
+  nhom.forEach((g, i) => {
+    const x0 = L + i * bang + (bang - DAY) / 2;
+    const hDuoc = (g.duoc / tran) * (yDuoi - yTren);
+    const hKhong = (g.khong / tran) * (yDuoi - yTren);
+    const grp = dcSvg("g", { "data-tu": g.tu, "data-duoc": g.duoc, "data-khong": g.khong }, svg);
+    let yTop = yDuoi;
+    if (g.duoc) {
+      const co = g.khong > 0;
+      const r = co ? 0 : BAN_KINH;
+      const cao1 = hDuoc;
+      dcSvg("path", { class: "dc-duoc dc-cot-duoc",
+                      d: dcCotTronTren(x0, yDuoi - cao1, DAY, cao1, r) }, grp);
+      yTop = yDuoi - cao1 - KHE;
+    }
+    if (g.khong) {
+      const cao2 = Math.max(0, hKhong - (g.duoc ? KHE : 0));
+      dcSvg("path", { class: "dc-khong dc-cot-khong", fill: `url(#${id})`,
+                      d: dcCotTronTren(x0, yTop - cao2, DAY, cao2, BAN_KINH) }, grp);
+    }
+    const hit = dcSvg("rect", { class: "dc-vung-chi", x: L + i * bang, y: yTren, width: bang,
+                                height: yDuoi - yTren, tabindex: 0, role: "img",
+                                "aria-label": `${g.tu} - ${g.den}: ${t("dc_duoc")} ${g.duoc}, ${t("dc_khong")} ${g.khong}` }, grp);
+    ganTooltip(hit, () => ({
+      tieu_de: t("dc_tooltip_khoang") + " " + g.tu + " - " + g.den,
+      dong: [[t("dc_duoc"), String(g.duoc)], [t("dc_khong"), String(g.khong)]],
+    }));
+  });
+  dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: yDuoi, y2: yDuoi }, svg);
+  dcVachChuan(svg, x, d.chuan, yTren, yDuoi, W);
+  goc.appendChild(svg);
+  dcChuGiaiDuoiKhong(goc, false);
+  dcBangAn(goc, t("dc_cot_tieu_de", { ten: d.ten }),
+           [t("dc_tooltip_khoang"), t("dc_duoc"), t("dc_khong")],
+           nhom.map((g) => [g.tu + " - " + g.den, g.duoc, g.khong]));
+}
+
+/* Đường bao một cột: góc trên bo `r`, đáy vuông (đứng trên đường nền). */
+function dcCotTronTren(x, y, w, h, r) {
+  if (h <= 0) return "M0 0";
+  r = Math.min(r, h, w / 2);
+  if (!r) return `M${x} ${y}h${w}v${h}h${-w}z`;
+  return `M${x} ${y + h}V${y + r}a${r} ${r} 0 0 1 ${r} ${-r}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}V${y + h}z`;
+}
+
+/* (b) Dải chấm: mỗi em một chấm theo điểm quyết tâm đã đặt. Chấm đặc xanh = được nhận,
+   chấm rỗng xám = không được nhận. Chạm hay di chuột vào chấm: hiện mã và điểm. */
+function veDaiChamQuyetTam(goc, d) {
+  clear(goc);
+  const cap = document.createElement("figcaption");
+  cap.textContent = t("dc_cham_tieu_de", { ten: d.ten });
+  goc.appendChild(cap);
+  if (!d.em.length) {
+    const p = document.createElement("p");
+    p.className = "hint-text";
+    p.textContent = t("dc_rong_bieu_do");
+    goc.appendChild(p);
+    return;
+  }
+  const W = 560, L = 20, R = 20, BK = 4.5;
+  const em = d.em.slice().sort((a, b) => a.diem - b.diem || (a.student_id < b.student_id ? -1 : 1));
+  const xv = (v) => L + (v / 100) * (W - L - R);
+  /* Xếp chồng: chấm nào chạm chấm trước thì nhích lên một bậc. */
+  const cot = [];
+  const vitri = em.map((e) => {
+    const px = xv(e.diem);
+    let bac = 0;
+    while (cot.some((c) => c.bac === bac && Math.abs(c.px - px) < 2 * BK + 2)) bac += 1;
+    cot.push({ px, bac });
+    return { e, px, bac };
+  });
+  const toiDa = Math.max(...vitri.map((v) => v.bac));
+  const BUOC = Math.max(5, Math.min(11, 200 / (toiDa + 1)));
+  const yTren = 34, yDuoi = yTren + 16 + (toiDa + 1) * BUOC, H = yDuoi + 44;
+  const id = "dcCham" + (++dcUid);
+  const svg = dcSvg("svg", { class: "dc-svg", viewBox: `0 0 ${W} ${H}`, role: "img",
+                             "aria-labelledby": id + "T", "data-bieu-do": "cham" });
+  dcSvg("title", { id: id + "T" }, svg).textContent = t("dc_cham_tieu_de", { ten: d.ten });
+  for (let v = 0; v <= 100; v += 20) {
+    dcSvg("line", { class: "dc-luoi", x1: xv(v), x2: xv(v), y1: yTren, y2: yDuoi }, svg);
+  }
+  dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: yDuoi, y2: yDuoi }, svg);
+  const x = dcThangX(svg, W, L, R, yTren, yDuoi);
+  vitri.forEach(({ e, px, bac }) => {
+    const py = yDuoi - 10 - bac * BUOC;
+    const nhan = (e.ket_qua === "duoc" ? t("dc_duoc") : t("dc_khong"));
+    dcSvg("circle", { class: e.ket_qua === "duoc" ? "dc-cham dc-cham-duoc" : "dc-cham dc-cham-khong",
+                      cx: px, cy: py, r: BK, "data-student-id": e.student_id,
+                      "data-diem": e.diem, "data-ket-qua": e.ket_qua }, svg);
+    /* Vùng chạm lớn hơn chấm nhiều (24px), tới được bằng bàn phím. */
+    const hit = dcSvg("circle", { class: "dc-vung-chi dc-cham-hit", cx: px, cy: py, r: 12, tabindex: 0,
+                                  role: "img", "data-student-id": e.student_id,
+                                  "aria-label": `${e.student_id} ${e.ho_ten}: ${dcSo(e.diem)}, ${nhan}` }, svg);
+    ganTooltip(hit, () => ({
+      tieu_de: e.student_id + (e.ho_ten ? " · " + e.ho_ten : ""),
+      dong: [[t("dc_tooltip_diem"), dcSo(e.diem)], [t("dc_tooltip_kq"), nhan]],
+    }));
+  });
+  dcVachChuan(svg, x, d.chuan, yTren, yDuoi, W);
+  goc.appendChild(svg);
+  dcChuGiaiDuoiKhong(goc, true);
+  dcBangAn(goc, t("dc_cham_tieu_de", { ten: d.ten }),
+           [t("th_student_id"), t("dc_tooltip_diem"), t("dc_tooltip_kq")],
+           em.map((e) => [e.student_id, dcSo(e.diem), e.ket_qua === "duoc" ? t("dc_duoc") : t("dc_khong")]));
+}
+
+/* Bảng hai tầng x hai mức của MỘT CLB. */
+function veBangHaiTang(goc, d) {
+  clear(goc);
+  const r = d.chuan;
+  if (!r) return;
+  const bang = document.createElement("table");
+  bang.className = "data-table dc-bang-hai-tang";
+  const cap = document.createElement("caption");
+  cap.textContent = t("dc_bang_tieu_de", { ten: d.ten });
+  bang.appendChild(cap);
+  const h = bang.createTHead().insertRow();
+  ["", "dc_thuong", "dc_du_tru"].forEach((k) => {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = k ? t(k) : "";
+    h.appendChild(th);
+  });
+  const tb = bang.createTBody();
+  [["dc_tang2", r.tang2, 2], ["dc_tang1", r.tang1, 1]].forEach(([khoa, muc, tang]) => {
+    const tr = tb.insertRow();
+    const th = document.createElement("th");
+    th.scope = "row";
+    th.textContent = t(khoa);
+    tr.appendChild(th);
+    [muc.thuong, muc.du_tru].forEach((m) => {
+      const td = tr.insertCell();
+      td.textContent = dcChuoiMuc(m, tang);
+      if (!m) td.title = t("dc_khong_ai");
+      td.dataset.tang = tang;
+    });
+  });
+  goc.appendChild(bang);
+  const tom = document.createElement("p");
+  tom.className = "hint-text";
+  tom.textContent = t("dc_tom_tat", { nhan: r.so_nhan, cho: r.suc_chua, don: r.so_don });
+  goc.appendChild(tom);
+}
+
+/* ---- Tab Quản lý ---- */
+function loadAdminDiemChuan() {
+  return callApi("get_diem_chuan").then((res) => {
+    const khoi = el("adminDiemChuanBlock");
+    if (!khoi) return null;
+    if (!res.ok) {
+      khoi.hidden = true;
+      dc.rows = null;
+      return null;
+    }
+    khoi.hidden = false;
+    dc.rows = res.data.rows;
+    el("dcQlCu").hidden = !res.data.ket_qua_cu;
+    el("dcQlRong").hidden = res.data.co_ket_qua;
+    el("dcChonHop").hidden = !res.data.co_ket_qua;
+    veTongQuanDiemChuan(el("dcQlTongQuan"), res.data.co_ket_qua ? dc.rows : []);
+    el("dcQlTongQuan").hidden = !res.data.co_ket_qua;
+    const sel = el("dcChonClb");
+    const nhieu = res.data.nhieu_buoi;
+    clear(sel);
+    dc.rows.forEach((r) => {
+      const o = document.createElement("option");
+      o.value = r.club_id;
+      o.textContent = dcTenDong(r, nhieu);
+      sel.appendChild(o);
+    });
+    if (!dc.rows.some((r) => r.club_id === dc.chon)) dc.chon = dc.rows.length ? dc.rows[0].club_id : "";
+    sel.value = dc.chon;
+    return loadChiTietDiemChuan();
+  });
+}
+
+function loadChiTietDiemChuan() {
+  const hop = el("dcChiTiet");
+  if (!dc.chon || !dc.rows || !dc.rows.length) {
+    hop.hidden = true;
+    return Promise.resolve(null);
+  }
+  return callApi("get_diem_chuan_clb", dc.chon).then((res) => {
+    if (!res.ok) {
+      hop.hidden = true;
+      return null;
+    }
+    dc.ct = res.data;
+    hop.hidden = false;
+    veBangHaiTang(el("dcBang"), res.data);
+    veCotPhanBoQuyetTam(el("dcCot"), res.data);
+    veDaiChamQuyetTam(el("dcCham"), res.data);
+    const kx = el("dcKhongXet");
+    kx.hidden = !res.data.so_khong_xet;
+    kx.textContent = res.data.so_khong_xet ? t("dc_khong_xet", { n: res.data.so_khong_xet }) : "";
+    return res.data;
+  });
+}
+
+function initDiemChuan() {
+  const chon = el("dcChonClb");
+  if (chon) {
+    chon.addEventListener("change", () => {
+      dc.chon = chon.value;
+      loadChiTietDiemChuan();
+    });
+  }
+  const i = el("btnDcThongTin");
+  if (i) {
+    i.addEventListener("click", () => {
+      const mo = el("dcThongTin").hidden;
+      el("dcThongTin").hidden = !mo;
+      i.setAttribute("aria-expanded", mo ? "true" : "false");
+    });
+  }
+  initDiemChuanKetQua();
+}
+
+/* ---- Tab Kết quả: mục "Điểm chuẩn" LUÔN đóng mỗi lần vào thẻ ----
+   Khác các mục thu gọn khác (`MUC_KET_QUA`): trạng thái mở KHÔNG được ghi nhớ, vì bảng này có
+   điểm của người đã đặt và không nên hiện sẵn trên màn hình dùng chung. Rời thẻ là đóng ngay
+   (theo dõi lớp `is-active` của thẻ, nên đi bằng nút hay bằng mã đều đóng). Đổi ngôn ngữ không
+   đổi thẻ nên không đóng. */
+function dongDiemChuanKq() {
+  dc.moKq = false;
+  const than = el("dcKqBody");
+  const nut = el("btnDcKqMo");
+  if (!than || !nut) return;
+  than.hidden = true;
+  nut.setAttribute("aria-expanded", "false");
+  nut.textContent = t("dc_xem");
+  clear(el("dcKqTongQuan"));
+}
+
+function veDiemChuanKetQua() {
+  const panel = el("dcKqPanel");
+  if (!panel) return Promise.resolve(null);
+  return callApi("get_diem_chuan").then((res) => {
+    if (!res.ok || !res.data.co_ket_qua) {
+      panel.hidden = true;
+      dc.rowsKq = null;
+      dongDiemChuanKq();
+      return null;
+    }
+    panel.hidden = false;
+    dc.rowsKq = res.data.rows;
+    el("dcKqCu").hidden = !res.data.ket_qua_cu;
+    if (dc.moKq) veTongQuanDiemChuan(el("dcKqTongQuan"), dc.rowsKq);
+    el("btnDcKqMo").textContent = t(dc.moKq ? "dc_an" : "dc_xem");
+    return res.data;
+  });
+}
+
+function initDiemChuanKetQua() {
+  const nut = el("btnDcKqMo");
+  if (!nut) return;
+  nut.addEventListener("click", () => {
+    dc.moKq = !dc.moKq;
+    el("dcKqBody").hidden = !dc.moKq;
+    nut.setAttribute("aria-expanded", dc.moKq ? "true" : "false");
+    nut.textContent = t(dc.moKq ? "dc_an" : "dc_xem");
+    if (dc.moKq) veTongQuanDiemChuan(el("dcKqTongQuan"), dc.rowsKq || []);
+    else clear(el("dcKqTongQuan"));
+  });
+  const view = el("view-results");
+  if (view && window.MutationObserver) {
+    new MutationObserver(() => {
+      if (!view.classList.contains("is-active")) dongDiemChuanKq();
+    }).observe(view, { attributes: true, attributeFilter: ["class"] });
+  }
 }

@@ -481,7 +481,40 @@ function whartonCapNhatDem(khung, tong) {
   dem.textContent = t("wharton_da_dung", { x, tong });
   dem.classList.toggle("is-du", x === tong);
   dem.classList.toggle("is-vuot", x > tong);
+  /* Thanh tiến độ 0 đến 100 và lỗi NGAY TẠI CHỖ (A13.4): ô không phải số nguyên từ 0 trở lên
+     tô đỏ; thừa điểm là lỗi; còn thiếu chỉ là nhắc nhẹ (chưa chia xong thì đâu có sai). Thanh
+     đổi màu khi đủ (xanh) hoặc thừa (đỏ). Không đổi hành vi lưu: server vẫn là nơi quyết định. */
+  const thanh = khung.querySelector(".wh-thanh");
+  if (thanh) {
+    thanh.setAttribute("aria-valuenow", String(Math.min(x, tong)));
+    thanh.classList.toggle("is-du", x === tong);
+    thanh.classList.toggle("is-vuot", x > tong);
+    thanh.querySelector(".wh-thanh-day").style.width = Math.min(100, tong ? (x / tong) * 100 : 0) + "%";
+  }
+  let sai = 0;
+  let coGo = false;
+  khung.querySelectorAll("input.wh-diem").forEach((o) => {
+    const v = o.value.trim();
+    const hopLe = v === "" || /^[0-9]+$/.test(v);
+    o.classList.toggle("is-sai", !hopLe);
+    o.setAttribute("aria-invalid", hopLe ? "false" : "true");
+    if (!hopLe) sai += 1;
+    else if (v !== "") coGo = true;
+  });
+  const loi = khung.querySelector(".wh-loi");
+  if (loi) {
+    let chu = "";
+    let nang = true;
+    if (sai) chu = t("wharton_loi_so");
+    else if (x > tong) chu = t("wharton_loi_vuot", { n: x - tong, tong });
+    else if (coGo && x < tong) { chu = t("wharton_loi_thieu", { n: tong - x, tong }); nang = false; }
+    loi.textContent = chu;
+    loi.hidden = !chu;
+    loi.classList.toggle("is-nhe", !nang);
+  }
 }
+
+let whDemKhung = 0;
 
 /* Ve cac khung Wharton (moi buoi hai khung: da thi / khong thi; moi CLB mot o so; bo dem
    "Da dung X / 100") vao `goc` tu `w` (khoa `wharton` cua get_student_entry_state).
@@ -507,6 +540,10 @@ function whartonVeKhung(goc, w, tuyChon) {
       tieuDe.dataset.buoi = buoi;
       goc.appendChild(tieuDe);
     }
+    /* Hai khung của một buổi nằm CẠNH NHAU (màn hẹp thì xếp dọc); chỉ có một khung thì rộng cả hàng. */
+    const cap = document.createElement("div");
+    cap.className = "wh-cap";
+    goc.appendChild(cap);
     [1, 2].forEach((quy) => {
       const ds = ranked.filter(
         (c) => w.buoi_cua_clb[c] === buoi && w.quy_cua_clb[c] === quy);
@@ -517,18 +554,46 @@ function whartonVeKhung(goc, w, tuyChon) {
       khung.className = "wh-khung";
       khung.dataset.quy = String(quy);
       khung.dataset.buoi = buoi;
+      const idKhung = "whK" + (++whDemKhung);
       const dau = document.createElement("div");
       dau.className = "wh-khung-dau";
       const ten = document.createElement("span");
       ten.className = "wh-khung-ten";
       ten.textContent = t(quy === 1 ? "wharton_khung_thi" : "wharton_khung_khong_thi");
+      /* Câu giải thích dài nằm sau nút (i): bấm mới hiện. */
+      const nutI = document.createElement("button");
+      nutI.type = "button";
+      nutI.className = "nut-i wh-i";
+      nutI.textContent = "i";
+      nutI.setAttribute("aria-expanded", "false");
+      nutI.setAttribute("aria-controls", idKhung + "G");
+      nutI.setAttribute("aria-label", t("wharton_giai_thich"));
       const dem = document.createElement("span");
       dem.className = "wh-dem";
-      dau.append(ten, dem);
+      const trai = document.createElement("span");
+      trai.className = "wh-khung-trai";
+      trai.append(ten, nutI);
+      dau.append(trai, dem);
+      const thanh = document.createElement("div");
+      thanh.className = "wh-thanh";
+      thanh.setAttribute("role", "progressbar");
+      thanh.setAttribute("aria-valuemin", "0");
+      thanh.setAttribute("aria-valuemax", String(w.ngan_sach));
+      thanh.setAttribute("aria-valuenow", "0");
+      thanh.setAttribute("aria-label", ten.textContent);
+      const day = document.createElement("span");
+      day.className = "wh-thanh-day";
+      thanh.appendChild(day);
       const ghiChu = document.createElement("p");
       ghiChu.className = "wh-ghi-chu";
+      ghiChu.id = idKhung + "G";
+      ghiChu.hidden = true;
       ghiChu.textContent = t(quy === 1 ? "wharton_khung_thi_ghi_chu" : "wharton_khung_khong_thi_ghi_chu");
-      khung.append(dau, ghiChu);
+      nutI.addEventListener("click", () => {
+        ghiChu.hidden = !ghiChu.hidden;
+        nutI.setAttribute("aria-expanded", ghiChu.hidden ? "false" : "true");
+      });
+      khung.append(dau, thanh, ghiChu);
       /* Dong da luu o quy KIA = em doi o tick sau khi chia diem: nhac chia lai, khong tu chuyen. */
       if (ds.some((c) => c in quyKia)) {
         const lech = document.createElement("p");
@@ -554,6 +619,7 @@ function whartonVeKhung(goc, w, tuyChon) {
         o.dataset.quy = String(quy);
         o.dataset.clb = cid;
         o.setAttribute("aria-label", tenClb(cid) + " — " + ten.textContent);
+        o.setAttribute("aria-describedby", idKhung + "L");
         const daCo = cid in luu ? String(luu[cid]) : "";
         daLuu[quy + "|" + cid] = daCo;
         const khoa = !!w.tu_dien_mot_clb && motClb && (daCo === "" || daCo === String(w.ngan_sach));
@@ -567,9 +633,17 @@ function whartonVeKhung(goc, w, tuyChon) {
         dong.append(tenO, o);
         khung.appendChild(dong);
       });
-      goc.appendChild(khung);
+      const loiKhung = document.createElement("p");
+      loiKhung.className = "wh-loi";
+      loiKhung.id = idKhung + "L";
+      loiKhung.setAttribute("role", "alert");
+      loiKhung.hidden = true;
+      khung.appendChild(loiKhung);
+      cap.appendChild(khung);
       whartonCapNhatDem(khung, w.ngan_sach);
     });
+    if (!cap.children.length) cap.remove();
+    else if (cap.children.length === 1) cap.classList.add("is-mot");
   });
   return whartonChuoiTuMap(daLuu);
 }

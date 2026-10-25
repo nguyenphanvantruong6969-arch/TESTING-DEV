@@ -294,3 +294,54 @@ def test_bytes_xuat_khong_la_tep_hong(api):
     kq = api.export_ket_qua()
     with open(kq["data"]["path"], "rb") as f:
         assert openpyxl.load_workbook(io.BytesIO(f.read())).sheetnames
+
+
+# ------------------------------------------------------------------ chi tiết từng CLB (dữ liệu cho biểu đồ)
+
+def test_api_chi_tiet_tung_clb_liet_ke_tung_em_tang_2_va_ket_qua(api_factory):
+    dem_duoc = 0
+    for seed in range(6):
+        api = api_factory()
+        bo = _chay_that(api, seed)
+        for r in api.get_diem_chuan()["data"]["rows"]:
+            kq = api.get_diem_chuan_clb(r["club_id"])
+            assert kq["ok"], kq["errors"]
+            d = kq["data"]
+            assert d["club_id"] == r["club_id"] and d["chuan"] == r
+            for e in d["em"]:
+                assert e["ket_qua"] in ("duoc", "khong")
+                assert 0 <= e["diem"] <= 100 and e["student_id"] in bo.sids
+                assert e["student_id"] not in bo.diem_thi[r["club_id"]]      # chỉ em tầng 2
+                assert e["diem"] == bo.diem_hl[r["club_id"]].get(e["student_id"], 0)
+            duoc = {e["student_id"] for e in d["em"] if e["ket_qua"] == "duoc"}
+            with api._ket_noi_doc() as cur:
+                that = {x[0] for x in cur.execute(
+                    "SELECT student_id FROM match_results WHERE club_id = ?", (r["club_id"],))}
+            assert duoc == that - set(bo.diem_thi[r["club_id"]])
+            dem_duoc += len(duoc)
+    assert dem_duoc > 0
+
+
+def test_api_chi_tiet_em_chi_tinh_em_da_xin_vao_clb_do(api):
+    # em đã vào CLB xếp trước CLB này thì không bao giờ bị CLB này từ chối: không tính
+    bo = _chay_that(api, 4)
+    with api._ket_noi_doc() as cur:
+        match = {(r[0], r[1]): r[2] for r in cur.execute(
+            "SELECT student_id, buoi, club_id FROM match_results")}
+    for cid in bo.cids:
+        d = api.get_diem_chuan_clb(cid)["data"]
+        buoi = (bo.buoi or {}).get(cid, "")
+        for e in d["em"]:
+            if e["ket_qua"] == "khong":
+                ds = [c for c in bo.prefs[e["student_id"]] if (bo.buoi or {}).get(c, "") == buoi]
+                hien = match.get((e["student_id"], buoi))
+                assert hien is None or ds.index(cid) < ds.index(hien)
+        tong_tang2 = [s for s in bo.sids if cid in bo.prefs[s] and s not in bo.diem_thi[cid]]
+        assert len(d["em"]) + d["so_khong_xet"] == len(tong_tang2)
+
+
+def test_api_chi_tiet_clb_khong_co_tat_tinh_nang_va_ma_sai(api):
+    assert api.get_diem_chuan_clb("A")["errors"][0]["code"] == "wharton_chua_bat"
+    _chay_that(api, 2)
+    kq = api.get_diem_chuan_clb("khong_co_clb_nay")
+    assert not kq["ok"]

@@ -22,6 +22,7 @@ function loadResultsTab() {
   loadPhanBoNguyenVong();
   loadEmChuaCoCho();
   loadSuatDuTru();
+  veDiemChuanKetQua();       // A13.4: mục đóng sẵn, hiện khi bật điểm quyết tâm và đã có kết quả
   /* Tieu de danh sach thanh vien la chu DONG (co ten cau lac bo), nen
      applyStaticText() khong dich duoc. Mo lai dung cai dang mo — giong
      het cach `openScoringClub` duoc goi lai o the 05. */

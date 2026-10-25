@@ -280,6 +280,21 @@
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
       </div>
 
+      <!-- Điểm chuẩn (A13.4): chỉ hiện khi bật điểm quyết tâm và đã có kết quả. LUÔN đóng mỗi lần
+           vào thẻ; trạng thái mở KHÔNG được nhớ (khác các mục thu gọn bên dưới). js/05_quan_ly.js. -->
+      <div class="panel" id="dcKqPanel" hidden>
+        <div class="panel-head">
+          <h2 data-i18n="dc_title">Điểm chuẩn</h2>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnDcKqMo" type="button" aria-expanded="false" aria-controls="dcKqBody" data-i18n="dc_xem">Xem điểm chuẩn</button>
+          </div>
+        </div>
+        <div class="panel-body" id="dcKqBody" hidden>
+          <p class="canh-bao-vang" id="dcKqCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
+          <div id="dcKqTongQuan"></div>
+        </div>
+      </div>
+
       <div class="panel" id="fillPanel">
         <div class="panel-head">
           <div class="panel-head-trai">
@@ -707,19 +722,15 @@
       <!-- Điểm Wharton (mục A13.3): chỉ hiện khi workspace bật điểm Wharton; js/05_quan_ly.js
            (loadAdminWharton) dựng bảng, cảnh báo, màn sửa và nhật ký. -->
       <div class="panel" id="adminWhartonBlock" hidden>
-        <div class="panel-head"><h2 data-i18n="wh_ql_title">Điểm quyết tâm</h2></div>
-        <p class="hint-text" data-i18n="wh_ql_desc">Xem, sửa và xoá điểm quyết tâm mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
+        <div class="panel-head">
+          <h2 data-i18n="wh_ql_title">Điểm quyết tâm</h2>
+          <div class="panel-actions">
+            <button class="nut-i" id="btnWhThongTin" type="button" aria-expanded="false" aria-controls="whQlMoTa" data-i18n-aria-label="wh_ql_giai_thich" aria-label="Giải thích về điểm quyết tâm">i</button>
+          </div>
+        </div>
+        <p class="hint-text" id="whQlMoTa" hidden data-i18n="wh_ql_desc">Xem, sửa và xoá điểm quyết tâm mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
         <div class="wh-ql-khoa">
           <span class="wh-ql-khoa-chu" id="whQlKhoa" role="status"></span>
-          <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm quyết tâm</button>
-        </div>
-        <div class="wh-ql-xacnhan" id="whMoKhoaHop" hidden>
-          <p class="hint-text" id="whMoKhoaHoi"></p>
-          <div class="search-row">
-            <input type="text" id="whMoKhoaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_mo_khoa" aria-label="Gõ chữ xác nhận để mở khoá">
-            <button class="btn btn-primary" id="btnWhMoKhoaXn" data-i18n="btn_wh_mo_khoa_xn">Xác nhận mở khoá</button>
-            <button class="btn btn-ghost" id="btnWhMoKhoaHuy" data-i18n="btn_cancel">Huỷ</button>
-          </div>
         </div>
 
         <h3 class="wh-ql-muc" data-i18n="wh_canh_bao_title">Hồ sơ cần xử lý</h3>
@@ -730,7 +741,7 @@
             <h3 id="whQlSuaTen"></h3>
             <button class="btn btn-ghost" id="btnWhDongSua" data-i18n="wh_sua_dong">Đóng</button>
           </div>
-          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở đầu khối này để sửa.</p>
+          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở "Thao tác khác" để sửa.</p>
           <p class="hint-text" id="whQlSuaRong" hidden data-i18n="wh_sua_rong">Học sinh này chưa có nguyện vọng nên chưa có gì để chia.</p>
           <div id="whQlSuaKhung"></div>
           <div class="search-row">
@@ -739,13 +750,9 @@
             <button class="btn-icon-danger" id="btnWhXoaMot" data-i18n="btn_wh_xoa_mot">Xoá điểm của học sinh này</button>
             <span class="save-feedback" role="status" aria-live="polite" id="whQlSuaPhanHoi"></span>
           </div>
-          <h4 class="wh-ql-muc" data-i18n="wh_nhat_ky_title">Nhật ký thay đổi</h4>
-          <ul class="wh-ql-nk" id="whQlNhatKy"></ul>
-          <p class="hint-text" id="whQlNhatKyRong" hidden data-i18n="wh_nhat_ky_rong">Chưa có thay đổi nào.</p>
-          <button class="btn btn-ghost" id="btnWhNkThem" hidden data-i18n="btn_wh_xem_them">Xem thêm</button>
         </div>
 
-        <div class="search-row">
+        <div class="wh-ql-loc-hang">
           <input type="text" id="whQlTim" class="text-input" data-i18n-placeholder="wh_tim_placeholder" placeholder="Tìm học sinh theo mã hoặc tên…">
           <label class="wh-ql-loc"><span data-i18n="wh_loc_quy">Quỹ</span>
             <select id="whLocQuy" class="text-input text-input-sm">
@@ -775,16 +782,69 @@
           <button class="btn btn-ghost" id="btnWhSau" data-i18n="btn_next_page">Sau ›</button>
         </div>
 
-        <div class="search-row">
-          <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm quyết tâm của tất cả học sinh</button>
-        </div>
-        <div class="wh-ql-xacnhan" id="whXoaTatCaHop" hidden>
-          <p class="hint-text" id="whXoaTatCaHoi"></p>
-          <div class="search-row">
-            <input type="text" id="whXoaTatCaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_xoa" aria-label="Gõ chữ xác nhận để xoá">
-            <button class="btn btn-danger" id="btnWhXoaTatCaXn" data-i18n="btn_wh_xoa_tat_ca_xn">Xác nhận xoá</button>
-            <button class="btn btn-ghost" id="btnWhXoaTatCaHuy" data-i18n="btn_cancel">Huỷ</button>
+        <!-- Việc hiếm hay nguy hiểm gom vào đây, đóng sẵn (A13.4): mở khoá sửa điểm, xem nhật ký,
+             xoá điểm của tất cả. Hành vi và mã id y như trước. -->
+        <details class="wh-thao-tac" id="whThaoTacKhac">
+          <summary data-i18n="wh_thao_tac_khac">Thao tác khác</summary>
+          <div class="wh-thao-tac-than">
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm quyết tâm</button>
+              <span class="hint-text" id="whMoKhoaChuaKhoa" data-i18n="wh_dang_mo_khong_can">Điểm đang mở, không cần mở khoá.</span>
+              <div class="wh-ql-xacnhan" id="whMoKhoaHop" hidden>
+                <p class="hint-text" id="whMoKhoaHoi"></p>
+                <div class="search-row">
+                  <input type="text" id="whMoKhoaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_mo_khoa" aria-label="Gõ chữ xác nhận để mở khoá">
+                  <button class="btn btn-primary" id="btnWhMoKhoaXn" data-i18n="btn_wh_mo_khoa_xn">Xác nhận mở khoá</button>
+                  <button class="btn btn-ghost" id="btnWhMoKhoaHuy" data-i18n="btn_cancel">Huỷ</button>
+                </div>
+              </div>
+            </div>
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-secondary" id="btnWhXemNhatKy" type="button" aria-expanded="false" aria-controls="whNkHop" data-i18n="btn_wh_xem_nhat_ky">Xem nhật ký</button>
+              <div id="whNkHop" hidden>
+                <p class="hint-text" id="whNkChonEm" data-i18n="wh_nk_chon_em">Mở một học sinh ở bảng trên để xem nhật ký của học sinh đó.</p>
+                <h4 class="wh-ql-muc" data-i18n="wh_nhat_ky_title">Nhật ký thay đổi</h4>
+                <ul class="wh-ql-nk" id="whQlNhatKy"></ul>
+                <p class="hint-text" id="whQlNhatKyRong" hidden data-i18n="wh_nhat_ky_rong">Chưa có thay đổi nào.</p>
+                <button class="btn btn-ghost" id="btnWhNkThem" hidden data-i18n="btn_wh_xem_them">Xem thêm</button>
+              </div>
+            </div>
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm quyết tâm của tất cả học sinh</button>
+              <div class="wh-ql-xacnhan" id="whXoaTatCaHop" hidden>
+                <p class="hint-text" id="whXoaTatCaHoi"></p>
+                <div class="search-row">
+                  <input type="text" id="whXoaTatCaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_xoa" aria-label="Gõ chữ xác nhận để xoá">
+                  <button class="btn btn-danger" id="btnWhXoaTatCaXn" data-i18n="btn_wh_xoa_tat_ca_xn">Xác nhận xoá</button>
+                  <button class="btn btn-ghost" id="btnWhXoaTatCaHuy" data-i18n="btn_cancel">Huỷ</button>
+                </div>
+              </div>
+            </div>
           </div>
+        </details>
+      </div>
+
+      <!-- Điểm chuẩn chi tiết (A13.4): chỉ hiện khi bật điểm quyết tâm; js/05_quan_ly.js. -->
+      <div class="panel" id="adminDiemChuanBlock" hidden>
+        <div class="panel-head">
+          <h2 data-i18n="dc_title">Điểm chuẩn</h2>
+          <div class="panel-actions">
+            <button class="nut-i" id="btnDcThongTin" type="button" aria-expanded="false" aria-controls="dcThongTin" data-i18n-aria-label="dc_giai_thich" aria-label="Giải thích về điểm chuẩn">i</button>
+          </div>
+        </div>
+        <p class="hint-text" id="dcThongTin" hidden data-i18n="dc_mo_ta">Điểm thấp nhất đã được nhận ở từng câu lạc bộ.</p>
+        <p class="canh-bao-vang" id="dcQlCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
+        <p class="hint-text" id="dcQlRong" hidden data-i18n="dc_chua_co_ket_qua">Chưa có kết quả. Hãy chạy sắp xếp trước.</p>
+        <div id="dcQlTongQuan"></div>
+        <div class="dc-chon" id="dcChonHop" hidden>
+          <label for="dcChonClb" data-i18n="dc_chon_clb">Chọn câu lạc bộ để xem chi tiết</label>
+          <select id="dcChonClb" class="text-input"></select>
+        </div>
+        <div id="dcChiTiet" hidden>
+          <div id="dcBang"></div>
+          <figure class="dc-hinh" id="dcCot"></figure>
+          <figure class="dc-hinh" id="dcCham"></figure>
+          <p class="hint-text" id="dcKhongXet" hidden></p>
         </div>
       </div>
 

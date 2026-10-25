@@ -499,7 +499,20 @@ function wsTruong(id, nhanKhoa, oNhap, goiY) {
   return wsEl("div", { class: "ws-truong" },
     wsEl("label", { for: id, class: "ws-truong-nhan", text: t(nhanKhoa) }),
     oNhap,
-    goiY ? wsEl("div", { class: "ws-truong-goi-y", text: goiY }) : null);
+    goiY ? (goiY.nodeType ? goiY : wsEl("div", { class: "ws-truong-goi-y", text: goiY })) : null);
+}
+
+/* Gợi ý của một ô luật: MỘT dòng ngắn luôn hiện, câu giải thích dài nằm sau nút (i) (A13.4). */
+function wsGoiYNgan(id, ngan, dai) {
+  const ghiChu = wsEl("div", { class: "ws-truong-goi-y", id: id + "GhiChu", hidden: true, text: dai });
+  const nutI = wsEl("button", { type: "button", class: "nut-i", id: id + "I", "aria-expanded": "false",
+    "aria-controls": id + "GhiChu", "aria-label": t("wh_ql_giai_thich"), text: "i" });
+  nutI.addEventListener("click", () => {
+    ghiChu.hidden = !ghiChu.hidden;
+    nutI.setAttribute("aria-expanded", ghiChu.hidden ? "false" : "true");
+  });
+  return wsEl("div", { class: "ws-goi-y-ngan" },
+    wsEl("div", { class: "ws-truong-goi-y ws-goi-y-dong" }, ngan, " ", nutI), ghiChu);
 }
 
 function wsChon(id, giaTri, luaChon) {
@@ -628,7 +641,8 @@ function wsBuoc3(hop) {
     wsTruong("wzPriority", "ws_r_priority", oPriority),
     wsTruong("wzTierMode", "ws_r_tier_mode", oTierMode),
     wsTruong("wzScoreScope", "ws_r_score_scope", oScope),
-    wsTruong("wzWharton", "ws_r_wharton", oWharton, t("ws_r_wharton_ghi_chu")),
+    wsTruong("wzWharton", "ws_r_wharton", oWharton, wsGoiYNgan(
+      "wzWharton", t("ws_r_wharton_ngan"), t("ws_r_wharton_ghi_chu"))),
     wsTruong("wzTiers", "ws_r_tiers", oTiers, t("ws_r_tiers_chi_strict")),
   );
 }
