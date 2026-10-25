@@ -603,6 +603,7 @@
           <div class="fallback-step" id="fbWhartonStep" hidden>
             <h3 data-i18n="fallback_step3_title">Bước 3. Điểm Wharton</h3>
             <p class="hint-text" data-i18n="fallback_step3_hint">Chia đúng 100 điểm cho các CLB đã thi và đúng 100 điểm cho các CLB không thi, ở mỗi buổi. Ô để trống tính là 0 điểm.</p>
+            <p class="wh-khoa-ghi-chu" id="fbWhartonKhoa" role="status" hidden data-i18n="wharton_da_khoa_kiosk">Điểm Wharton đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.</p>
             <div id="fbWhartonBody"></div>
             <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm Wharton</button>
             <span class="chua-luu" id="chuaLuuWharton" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
@@ -700,6 +701,90 @@
           <button class="btn btn-ghost" id="btnAdminPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
           <span class="pagination-label" id="adminPaginationLabel">—</span>
           <button class="btn btn-ghost" id="btnAdminNextPage" data-i18n="btn_next_page">Sau ›</button>
+        </div>
+      </div>
+
+      <!-- Điểm Wharton (mục A13.3): chỉ hiện khi workspace bật điểm Wharton; js/05_quan_ly.js
+           (loadAdminWharton) dựng bảng, cảnh báo, màn sửa và nhật ký. -->
+      <div class="panel" id="adminWhartonBlock" hidden>
+        <div class="panel-head"><h2 data-i18n="wh_ql_title">Điểm Wharton</h2></div>
+        <p class="hint-text" data-i18n="wh_ql_desc">Xem, sửa và xoá điểm Wharton mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
+        <div class="wh-ql-khoa">
+          <span class="wh-ql-khoa-chu" id="whQlKhoa" role="status"></span>
+          <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm Wharton</button>
+        </div>
+        <div class="wh-ql-xacnhan" id="whMoKhoaHop" hidden>
+          <p class="hint-text" id="whMoKhoaHoi"></p>
+          <div class="search-row">
+            <input type="text" id="whMoKhoaGo" class="text-input text-input-sm" autocomplete="off" aria-labelledby="whMoKhoaHoi">
+            <button class="btn btn-primary" id="btnWhMoKhoaXn" data-i18n="btn_wh_mo_khoa_xn">Xác nhận mở khoá</button>
+            <button class="btn btn-ghost" id="btnWhMoKhoaHuy" data-i18n="btn_cancel">Huỷ</button>
+          </div>
+        </div>
+
+        <h3 class="wh-ql-muc" data-i18n="wh_canh_bao_title">Hồ sơ cần xử lý</h3>
+        <div id="whCanhBao"></div>
+
+        <div class="wh-ql-sua" id="whQlSua" hidden>
+          <div class="wh-ql-sua-dau">
+            <h3 id="whQlSuaTen"></h3>
+            <button class="btn btn-ghost" id="btnWhDongSua" data-i18n="wh_sua_dong">Đóng</button>
+          </div>
+          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở đầu khối này để sửa.</p>
+          <p class="hint-text" id="whQlSuaRong" hidden data-i18n="wh_sua_rong">Học sinh này chưa có nguyện vọng nên chưa có gì để chia.</p>
+          <div id="whQlSuaKhung"></div>
+          <div class="search-row">
+            <button class="btn btn-primary" id="btnWhLuu" data-i18n="btn_save_wharton">Lưu điểm Wharton</button>
+            <span class="chua-luu" id="whQlChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
+            <button class="btn-icon-danger" id="btnWhXoaMot" data-i18n="btn_wh_xoa_mot">Xoá điểm của học sinh này</button>
+            <span class="save-feedback" role="status" aria-live="polite" id="whQlSuaPhanHoi"></span>
+          </div>
+          <h4 class="wh-ql-muc" data-i18n="wh_nhat_ky_title">Nhật ký thay đổi</h4>
+          <ul class="wh-ql-nk" id="whQlNhatKy"></ul>
+          <p class="hint-text" id="whQlNhatKyRong" hidden data-i18n="wh_nhat_ky_rong">Chưa có thay đổi nào.</p>
+          <button class="btn btn-ghost" id="btnWhNkThem" hidden data-i18n="btn_wh_xem_them">Xem thêm</button>
+        </div>
+
+        <div class="search-row">
+          <input type="text" id="whQlTim" class="text-input" data-i18n-placeholder="wh_tim_placeholder" placeholder="Tìm học sinh theo mã hoặc tên…">
+          <label class="wh-ql-loc"><span data-i18n="wh_loc_quy">Quỹ</span>
+            <select id="whLocQuy" class="text-input text-input-sm">
+              <option value="" data-i18n="wh_loc_tat_ca">Tất cả</option>
+              <option value="1" data-i18n="wh_quy_1">Quỹ 1, đã thi</option>
+              <option value="2" data-i18n="wh_quy_2">Quỹ 2, không thi</option>
+            </select></label>
+          <label class="wh-ql-loc" id="whLocBuoiNhan"><span data-i18n="wh_loc_buoi">Buổi</span>
+            <select id="whLocBuoi" class="text-input text-input-sm"></select></label>
+          <label class="wh-ql-loc"><span data-i18n="wh_loc_clb">CLB</span>
+            <select id="whLocClb" class="text-input text-input-sm"></select></label>
+          <label class="wh-ql-loc wh-ql-loc-tick"><input type="checkbox" id="whLocChiLoi"><span data-i18n="wh_loc_chi_loi">Chỉ hồ sơ có vấn đề</span></label>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th data-i18n="th_student_id">Mã học sinh</th>
+            <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_wh_diem">Điểm đã chia</th>
+            <th data-i18n="th_wh_tt">Tình trạng</th>
+          </tr></thead>
+          <tbody id="whQlBody"></tbody>
+        </table>
+        <div id="whQlRong" class="empty-state" hidden data-i18n="wh_bang_rong">Không có hồ sơ nào khớp.</div>
+        <div class="pagination-row" id="whQlPhanTrang">
+          <button class="btn btn-ghost" id="btnWhTruoc" data-i18n="btn_prev_page">‹ Trước</button>
+          <span class="pagination-label" id="whQlNhanTrang">—</span>
+          <button class="btn btn-ghost" id="btnWhSau" data-i18n="btn_next_page">Sau ›</button>
+        </div>
+
+        <div class="search-row">
+          <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm Wharton của tất cả học sinh</button>
+        </div>
+        <div class="wh-ql-xacnhan" id="whXoaTatCaHop" hidden>
+          <p class="hint-text" id="whXoaTatCaHoi"></p>
+          <div class="search-row">
+            <input type="text" id="whXoaTatCaGo" class="text-input text-input-sm" autocomplete="off" aria-labelledby="whXoaTatCaHoi">
+            <button class="btn btn-danger" id="btnWhXoaTatCaXn" data-i18n="btn_wh_xoa_tat_ca_xn">Xác nhận xoá</button>
+            <button class="btn btn-ghost" id="btnWhXoaTatCaHuy" data-i18n="btn_cancel">Huỷ</button>
+          </div>
         </div>
       </div>
 

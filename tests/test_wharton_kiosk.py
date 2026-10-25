@@ -51,7 +51,8 @@ def test_bat_wharton_trang_thai_co_khoa_wharton_dung_dang(w):
     st = w.get_student_entry_state("HS1")["data"]
     assert st["tested_clubs"] == ["A"] and st["ranked_clubs"] == ["A", "B", "C"]
     assert st["wharton"] == {
-        "bat": True, "ngan_sach": 100, "tu_dien_mot_clb": True,
+        # `khoa` (A13.3): điểm đang khoá sau lần chạy xếp; chưa chạy thì False
+        "bat": True, "khoa": False, "ngan_sach": 100, "tu_dien_mot_clb": True,
         "w1": {"A": 100}, "w2": {"B": 60, "C": 40},
         "quy_cua_clb": {"A": 1, "B": 2, "C": 2},
         "buoi_cua_clb": {"A": rp.BUOI_MAC_DINH, "B": rp.BUOI_MAC_DINH, "C": rp.BUOI_MAC_DINH},

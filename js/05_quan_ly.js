@@ -509,6 +509,7 @@ function loadAdminTab(giuTrang) {
   callApi("get_last_run_info").then((res) => {
     adminCoKetQua = !!(res.ok && res.data);
   });
+  loadAdminWharton(giuTrang);
   return loadAdminStudents();
 }
 
@@ -615,6 +616,383 @@ function loadAdminStudents() {
 function demDanhDauAdmin() {
   const n = document.querySelectorAll(".admin-row-checkbox:checked").length;
   el("adminDemDanhDau").textContent = n ? t("admin_dem_danh_dau", { n }) : "";
+}
+
+/* ------------------------------------------------------------------ *
+ * KHỐI "ĐIỂM WHARTON" (A13.3)
+ * ------------------------------------------------------------------ *
+ * Chỉ hiện khi workspace bật điểm Wharton: các API đọc trả `wharton_chua_bat`
+ * thì khối ẩn hẳn và thẻ Quản lý y như trước. Màn sửa dùng chung phần vẽ hai
+ * khung với kiosk (`whartonVeKhung` ở js/04) và gọi `admin_save_wharton`, lõi
+ * lưu cũng là lõi của `submit_wharton`.
+ * ------------------------------------------------------------------ */
+
+const WH_TRANG = 25;
+const WH_NK_TRANG = 10;
+const WH_NGAN_SACH = 100;      // ngân sách mỗi quỹ mỗi buổi (WHARTON_NGAN_SACH ở backend)
+const whQl = { trang: 1, khoa: false, sid: null, nkTrang: 1, daLuu: "", ten: {} };
+
+/* Khoá `<tien_to><gia_tri>` chưa có trong bảng chữ thì giữ nguyên giá trị thô. */
+function whNhan(tienTo, gia) {
+  const khoa = tienTo + gia;
+  const chu = t(khoa);
+  return chu === khoa ? gia : chu;
+}
+
+function loadAdminWharton(giuTrang) {
+  if (!giuTrang) whQl.trang = 1;
+  /* Chu dang go trong man sua duoc giu lai khi ve lai (vd doi ngon ngu). */
+  const giu = whQl.sid && giuTrang ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
+  return callApi("list_wharton_canh_bao").then((res) => {
+    const khoi = el("adminWhartonBlock");
+    if (!res.ok) {
+      khoi.hidden = true;
+      whQl.sid = null;
+      return null;
+    }
+    khoi.hidden = false;
+    veCanhBaoWharton(res.data);
+    return Promise.all([loadWhKhoa(), loadWhLoc(), loadWhBang()]).then(() => {
+      if (whQl.sid) return moManSuaWharton(whQl.sid, giu);
+      el("whQlSua").hidden = true;
+      return null;
+    });
+  });
+}
+
+function loadWhKhoa() {
+  return callApi("get_wharton_lock_status").then((res) => {
+    if (!res.ok) return;
+    whQl.khoa = !!res.data.is_locked;
+    const chu = el("whQlKhoa");
+    chu.textContent = whQl.khoa
+      ? t("wh_ql_dang_khoa", { luc: (res.data.locked_at || "").replace("T", " ") })
+      : t("wh_ql_dang_mo");
+    chu.classList.toggle("is-khoa", whQl.khoa);
+    el("btnWhMoKhoa").hidden = !whQl.khoa;
+    if (!whQl.khoa) el("whMoKhoaHop").hidden = true;
+    if (!el("whMoKhoaHop").hidden) {
+      el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
+    }
+  });
+}
+
+function veCanhBaoWharton(ds) {
+  const goc = el("whCanhBao");
+  clear(goc);
+  if (!ds.length) {
+    const p = document.createElement("p");
+    p.className = "hint-text";
+    p.textContent = t("wh_cb_rong");
+    goc.appendChild(p);
+    return;
+  }
+  [["chua_hop_le", "wh_cb_chua_hop_le"], ["vang_thi", "wh_cb_vang_thi"]].forEach(([loai, khoaChu]) => {
+    const nhom = ds.filter((c) => c.loai === loai);
+    if (!nhom.length) return;
+    const div = document.createElement("div");
+    div.className = "wh-cb-nhom";
+    div.dataset.loai = loai;
+    const ten = document.createElement("div");
+    ten.className = "wh-cb-nhom-ten";
+    ten.textContent = t(khoaChu) + " (" + nhom.length + ")";
+    div.appendChild(ten);
+    nhom.forEach((c) => {
+      const nut = document.createElement("button");
+      nut.type = "button";
+      nut.className = "wh-cb-dong";
+      nut.dataset.studentId = c.student_id;
+      nut.textContent = c.name + " (" + c.student_id + ")";
+      nut.addEventListener("click", () => {
+        moManSuaWharton(c.student_id).then(() => {
+          el("whQlSua").scrollIntoView({ block: "nearest" });
+        });
+      });
+      div.appendChild(nut);
+    });
+    goc.appendChild(div);
+  });
+}
+
+/* Ba o loc buoi / CLB lay tu danh sach CLB; giu lua chon dang co neu con. */
+function loadWhLoc() {
+  return callApi("list_clubs").then((res) => {
+    if (!res.ok) return;
+    whQl.ten = {};
+    res.data.forEach((c) => { whQl.ten[c.club_id] = c.name; });
+    const dsBuoi = Array.from(new Set(res.data.map((c) => c.buoi || BUOI_MAC_DINH)));
+    const dien = (sel, muc) => {
+      const cu = sel.value;
+      clear(sel);
+      muc.forEach(([gt, chu]) => {
+        const o = document.createElement("option");
+        o.value = gt;
+        o.textContent = chu;
+        sel.appendChild(o);
+      });
+      if (muc.some(([gt]) => gt === cu)) sel.value = cu;
+    };
+    dien(el("whLocBuoi"), [["", t("wh_loc_tat_ca")]].concat(dsBuoi.map((b) => [b, nhanBuoi(b)])));
+    dien(el("whLocClb"), [["", t("wh_loc_tat_ca")]].concat(res.data.map((c) => [c.club_id, c.name])));
+    el("whLocBuoiNhan").hidden = dsBuoi.length < 2;
+  });
+}
+
+function loadWhBang() {
+  return callApiMoiNhat("wh_bang", "list_wharton_admin",
+    el("whQlTim").value.trim(), el("whLocQuy").value || null, el("whLocBuoi").value || null,
+    el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG).then((res) => {
+    const body = el("whQlBody");
+    clear(body);
+    if (!res.ok || !res.data.rows.length) {
+      el("whQlRong").hidden = false;
+      el("whQlPhanTrang").hidden = true;
+      return;
+    }
+    el("whQlRong").hidden = true;
+    el("whQlPhanTrang").hidden = false;
+    res.data.rows.forEach((r) => body.appendChild(dongBangWharton(r)));
+    el("whQlNhanTrang").textContent = t("pagination_label", {
+      page: res.data.page, total_pages: res.data.total_pages, total: res.data.total,
+    });
+    el("btnWhTruoc").disabled = res.data.page <= 1;
+    el("btnWhSau").disabled = res.data.page >= res.data.total_pages;
+  });
+}
+
+function dongBangWharton(r) {
+  const tr = document.createElement("tr");
+  const coVanDe = r.loi.length > 0 || r.vang_thi.length > 0;
+  tr.className = "wh-ql-dong" + (coVanDe ? " wh-ql-loi" : "");
+  tr.dataset.studentId = r.student_id;
+  tr.insertAdjacentHTML("beforeend", `<td>${esc(r.student_id)}</td><td>${esc(r.name)}</td>`);
+
+  const tdDiem = document.createElement("td");
+  tdDiem.className = "wh-ql-diem";
+  const theoBuoi = new Map();
+  r.diem.forEach((c) => {
+    if (!theoBuoi.has(c.buoi)) theoBuoi.set(c.buoi, { 1: [], 2: [] });
+    theoBuoi.get(c.buoi)[c.quy].push(c);
+  });
+  const nhieuBuoi = theoBuoi.size > 1;
+  theoBuoi.forEach((q, buoi) => {
+    if (nhieuBuoi) {
+      const tenBuoi = document.createElement("div");
+      tenBuoi.className = "wh-ql-nhom-buoi";
+      tenBuoi.textContent = nhanBuoi(buoi);
+      tdDiem.appendChild(tenBuoi);
+    }
+    [1, 2].forEach((quy) => {
+      if (!q[quy].length) return;
+      const hang = document.createElement("div");
+      hang.className = "wh-ql-quy";
+      hang.dataset.quy = String(quy);
+      hang.dataset.buoi = buoi;
+      const tenQuy = document.createElement("span");
+      tenQuy.className = "wh-ql-quy-ten";
+      tenQuy.textContent = t("wh_quy_ngan", { q: quy });
+      hang.appendChild(tenQuy);
+      q[quy].forEach((c) => {
+        const o = document.createElement("span");
+        o.className = "wh-ql-o";
+        o.dataset.clb = c.club_id;
+        o.textContent = c.ten_clb + ": " + (c.diem === null ? "—" : c.diem);
+        if (c.tu_dien) {
+          const td = document.createElement("span");
+          td.className = "wh-ql-tu-dien";
+          td.textContent = " (" + t("wh_o_tu_dien") + ")";
+          o.appendChild(td);
+        }
+        hang.appendChild(o);
+      });
+      const tong = (r.tong[buoi] || {})[String(quy)] || 0;
+      const chuTong = document.createElement("span");
+      chuTong.className = "wh-ql-tong" + (tong === WH_NGAN_SACH ? "" : " is-sai");
+      chuTong.textContent = t("wh_tong", { x: tong });
+      hang.appendChild(chuTong);
+      tdDiem.appendChild(hang);
+    });
+  });
+  tr.appendChild(tdDiem);
+
+  const tdTt = document.createElement("td");
+  const them = (lop, khoa) => {
+    const s = document.createElement("div");
+    s.className = "wh-ql-tt " + lop;
+    s.textContent = t(khoa);
+    tdTt.appendChild(s);
+  };
+  if (r.loi.length) them("is-loi", "wh_tt_loi");
+  if (r.vang_thi.length) them("is-vang", "wh_tt_vang");
+  if (r.lech_tick) them("is-lech", "wh_tt_lech");
+  if (!tdTt.children.length) them("is-ok", "wh_tt_ok");
+  tr.appendChild(tdTt);
+
+  tr.addEventListener("click", () => {
+    moManSuaWharton(r.student_id).then(() => {
+      el("whQlSua").scrollIntoView({ block: "nearest" });
+    });
+  });
+  return tr;
+}
+
+/* ---- Man sua diem cua mot em ---- */
+
+function capNhatChuaLuuWh() {
+  el("whQlChuaLuu").hidden = whartonChuoiTu(el("whQlSuaKhung")) === whQl.daLuu;
+}
+
+function moManSuaWharton(sid, giu) {
+  whQl.sid = sid;
+  return callApi("get_student_entry_state", sid).then((res) => {
+    if (sid !== whQl.sid) return null;
+    if (!res.ok || !res.data.wharton) {
+      /* Em da bi xoa o noi khac thi dong man sua im lang; loi khac thi bao. */
+      if (!res.ok && !res.errors.some((e) => e.code === "student_not_found")) showErrorToast(res.errors);
+      whQl.sid = null;
+      el("whQlSua").hidden = true;
+      return null;
+    }
+    veManSuaWharton(res.data, giu || null);
+    return loadWhNhatKy(false);
+  });
+}
+
+function veManSuaWharton(state, giu) {
+  const w = state.wharton;
+  const khung = el("whQlSuaKhung");
+  el("whQlSua").hidden = false;
+  el("whQlSuaTen").textContent = t("wh_sua_title", {
+    name: (state.name || state.student_id) + " (" + state.student_id + ")",
+  });
+  whQl.daLuu = whartonVeKhung(khung, w, {
+    ranked: state.ranked_clubs,
+    ten: (cid) => whQl.ten[cid] || cid,
+    giu,
+    chiDoc: !!w.khoa,
+    khiDoi: capNhatChuaLuuWh,
+  });
+  const coKhung = !!khung.querySelector(".wh-khung");
+  el("whQlSuaRong").hidden = coKhung;
+  el("whQlSuaKhoa").hidden = !w.khoa;
+  el("btnWhLuu").disabled = !!w.khoa || !coKhung;
+  el("btnWhXoaMot").disabled = !!w.khoa;
+  capNhatChuaLuuWh();
+}
+
+function loadWhNhatKy(them) {
+  const sid = whQl.sid;
+  if (!sid) return Promise.resolve(null);
+  if (!them) whQl.nkTrang = 1;
+  return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
+    if (!res.ok || sid !== whQl.sid) return;
+    const ds = el("whQlNhatKy");
+    if (!them) clear(ds);
+    const dang = (d) => {
+      if (!d || d.so_dong !== undefined) return "";
+      const phan = ["w1", "w2"].map((k) => Object.entries(d[k] || {})
+        .map(([c, v]) => (whQl.ten[c] || c) + ": " + v).join(", ")).filter(Boolean);
+      return phan.join(" | ");
+    };
+    res.data.rows.forEach((r) => {
+      const li = document.createElement("li");
+      li.dataset.hanhDong = r.hanh_dong;
+      li.dataset.nguon = r.nguon;
+      const dongChu = t("wh_nk_dong", {
+        luc: r.luc.replace("T", " "),
+        nguon: whNhan("wh_nk_", r.nguon),
+        nguoi: r.nguoi ? " (" + r.nguoi + ")" : "",
+        hanh_dong: whNhan("wh_nk_", r.hanh_dong),
+      });
+      const cu = dang(r.cu), moi = dang(r.moi);
+      li.textContent = dongChu + (cu || moi ? " [" + (cu || "—") + " → " + (moi || "—") + "]" : "");
+      ds.appendChild(li);
+    });
+    el("whQlNhatKyRong").hidden = ds.children.length > 0;
+    el("btnWhNkThem").hidden = res.data.page >= res.data.total_pages;
+  });
+}
+
+function initWhartonQuanLy() {
+  const veLaiBang = () => { whQl.trang = 1; loadWhBang(); };
+  el("whQlTim").addEventListener("input", debounce(veLaiBang, 250));
+  ["whLocQuy", "whLocBuoi", "whLocClb", "whLocChiLoi"].forEach((id) => {
+    el(id).addEventListener("change", veLaiBang);
+  });
+  el("btnWhTruoc").addEventListener("click", () => { whQl.trang = Math.max(1, whQl.trang - 1); loadWhBang(); });
+  el("btnWhSau").addEventListener("click", () => { whQl.trang += 1; loadWhBang(); });
+  el("btnWhDongSua").addEventListener("click", () => {
+    whQl.sid = null;
+    el("whQlSua").hidden = true;
+  });
+  el("btnWhNkThem").addEventListener("click", () => { whQl.nkTrang += 1; loadWhNhatKy(true); });
+
+  el("btnWhLuu").addEventListener("click", () => {
+    const sid = whQl.sid;
+    if (!sid) return;
+    const { w1, w2 } = whartonThuThapTu(el("whQlSuaKhung"));
+    khiBan(el("btnWhLuu"), () => callApi("admin_save_wharton", sid, w1, w2)).then((res) => {
+      if (res.ok) {
+        feedback(el("whQlSuaPhanHoi"), t("feedback_wharton_saved"), false);
+        loadAdminWharton(true);
+      } else {
+        feedbackErrors(el("whQlSuaPhanHoi"), res.errors);
+      }
+    });
+  });
+
+  armTwoStepConfirm(el("btnWhXoaMot"), () => t("confirm_wh_xoa_mot"), () => {
+    const sid = whQl.sid;
+    if (!sid) return;
+    callApi("clear_wharton", sid).then((res) => {
+      if (res.ok) {
+        showToast(t("toast_wh_xoa_mot", { student_id: sid }), "success");
+        loadAdminWharton(true);
+      } else {
+        showErrorToast(res.errors);
+      }
+    });
+  });
+
+  /* Mo khoa: bam nut -> hop xac nhan -> go dung chu MO. */
+  el("btnWhMoKhoa").addEventListener("click", () => {
+    el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
+    el("whMoKhoaGo").value = "";
+    el("whMoKhoaHop").hidden = false;
+    el("whMoKhoaGo").focus();
+  });
+  el("btnWhMoKhoaHuy").addEventListener("click", () => { el("whMoKhoaHop").hidden = true; });
+  el("btnWhMoKhoaXn").addEventListener("click", () => {
+    khiBan(el("btnWhMoKhoaXn"), () => callApi("mo_khoa_wharton", el("whMoKhoaGo").value.trim())).then((res) => {
+      if (res.ok) {
+        el("whMoKhoaHop").hidden = true;
+        showToast(trErr({ code: "wharton_da_mo_khoa", params: {} }), "success");
+        loadAdminWharton(true);
+      } else {
+        showErrorToast(res.errors);
+      }
+    });
+  });
+
+  /* Xoa diem cua tat ca: bam nut -> hop xac nhan -> go dung chu XOA (server kiem lai). */
+  el("btnWhXoaTatCa").addEventListener("click", () => {
+    el("whXoaTatCaHoi").textContent = t("wh_xoa_tat_ca_hoi", { can_go: "XOA" });
+    el("whXoaTatCaGo").value = "";
+    el("whXoaTatCaHop").hidden = false;
+    el("whXoaTatCaGo").focus();
+  });
+  el("btnWhXoaTatCaHuy").addEventListener("click", () => { el("whXoaTatCaHop").hidden = true; });
+  el("btnWhXoaTatCaXn").addEventListener("click", () => {
+    khiBan(el("btnWhXoaTatCaXn"), () => callApi("clear_wharton", null, el("whXoaTatCaGo").value.trim())).then((res) => {
+      if (res.ok) {
+        el("whXoaTatCaHop").hidden = true;
+        showToast(trErr({ code: "wharton_da_xoa", params: { n: res.data.n_students } }), "success");
+        loadAdminWharton(true);
+      } else {
+        showErrorToast(res.errors);
+      }
+    });
+  });
 }
 
 function initAdminHandlers() {
@@ -729,6 +1107,9 @@ function initAdminHandlers() {
     dongDanhSachCLB();
     currentScoringClub = null;
     if (el("scoringWorkArea")) el("scoringWorkArea").hidden = true;
+    /* Man sua diem Wharton dang tro toi mot em khong con ton tai. */
+    whQl.sid = null;
+    el("whQlSua").hidden = true;
   }
 
   function noiNutXoa(idNut, phamVi, khoaNhanThuong, khoaNhanCoKetQua, khoaToast) {
@@ -782,4 +1163,6 @@ function initAdminHandlers() {
   noiNutXoa("btnResetAll", "tat_ca",
             "confirm_reset_all", "confirm_reset_all_has_results",
             "toast_reset_all_done");
+
+  initWhartonQuanLy();
 }

@@ -681,6 +681,8 @@ class QuanLyMixin:
         tick = set(tested)
         return {
             "bat": True,
+            # Đang khoá (đã chạy xếp, A13.3): màn kiosk chỉ cho xem. Đọc trong cùng con trỏ.
+            "khoa": QuanLyMixin._wharton_dang_khoa(cur),
             "ngan_sach": WHARTON_NGAN_SACH,
             "tu_dien_mot_clb": WHARTON_TU_DIEN_MOT_CLB,
             "w1": w[1], "w2": w[2],

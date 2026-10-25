@@ -428,33 +428,47 @@ function whartonChuoiTuMap(m) {
   return JSON.stringify(Object.keys(m).sort().map((k) => [k, m[k]]));
 }
 
-function whartonChuoi() {
+/* Nhu `whartonChuoiTuMap` nhung doc thang cac o `input.wh-diem` ben trong `goc`. */
+function whartonChuoiTu(goc) {
   const m = {};
-  document.querySelectorAll("#fbWhartonBody input.wh-diem").forEach((o) => {
+  goc.querySelectorAll("input.wh-diem").forEach((o) => {
     m[o.dataset.quy + "|" + o.dataset.clb] = o.value.trim();
   });
   return whartonChuoiTuMap(m);
 }
 
+function whartonChuoi() {
+  return whartonChuoiTu(el("fbWhartonBody"));
+}
+
 /* Cac o dang co chu (ke ca o bi khoa): giu lai khi ve lai Buoc 3, de doi ngon ngu hay luu
    Buoc 1/2 khong lam mat diem vua go. */
-function whartonGiuTam() {
+function whartonGiuTamTu(goc) {
   const m = {};
-  document.querySelectorAll("#fbWhartonBody input.wh-diem").forEach((o) => {
+  goc.querySelectorAll("input.wh-diem").forEach((o) => {
     if (!o.disabled) m[o.dataset.quy + "|" + o.dataset.clb] = o.value;
   });
   return m;
 }
 
-/* {w1, w2} gui len server. O trong = khong dat diem. Khong lam tron: "60.5" di nguyen la 60.5. */
-function whartonThuThap() {
+function whartonGiuTam() {
+  return whartonGiuTamTu(el("fbWhartonBody"));
+}
+
+/* {w1, w2} gui len server, doc tu cac o `input.wh-diem` ben trong `goc`. O trong = khong dat diem.
+   Khong lam tron: "60.5" di nguyen la 60.5. Dung chung cho kiosk (Buoc 3) va the Quan ly. */
+function whartonThuThapTu(goc) {
   const ra = { w1: {}, w2: {} };
-  document.querySelectorAll("#fbWhartonBody input.wh-diem").forEach((o) => {
+  goc.querySelectorAll("input.wh-diem").forEach((o) => {
     const v = o.value.trim();
     if (v === "") return;
     ra[o.dataset.quy === "1" ? "w1" : "w2"][o.dataset.clb] = Number(v);
   });
   return ra;
+}
+
+function whartonThuThap() {
+  return whartonThuThapTu(el("fbWhartonBody"));
 }
 
 function whartonCapNhatDem(khung, tong) {
@@ -469,19 +483,20 @@ function whartonCapNhatDem(khung, tong) {
   dem.classList.toggle("is-vuot", x > tong);
 }
 
-/* Ve Buoc 3 tu `state` (ket qua get_student_entry_state); `giu` = chu da go can giu lai. */
-function renderWhartonStep(state, giu) {
-  const hop = el("fbWhartonStep");
-  const body = el("fbWhartonBody");
-  const w = state && state.wharton;
-  clear(body);
-  if (!w || !w.bat) {
-    whartonState = null;
-    daLuuWharton = "";
-    hop.hidden = true;
-    return;
-  }
-  whartonState = state;
+/* Ve cac khung Wharton (moi buoi hai khung: da thi / khong thi; moi CLB mot o so; bo dem
+   "Da dung X / 100") vao `goc` tu `w` (khoa `wharton` cua get_student_entry_state).
+
+   Dung chung cho kiosk (Buoc 3) va the Quan ly: KHONG dung bien toan cuc cua tab kiosk.
+   `tuyChon`:
+     ranked  — danh sach club_id theo thu tu nguyen vong cua em;
+     ten     — ham club_id -> ten hien thi;
+     giu     — {"quy|club_id": chu da go} can giu lai, hoac null;
+     chiDoc  — true: moi o chi doc (vd dang khoa);
+     khiDoi  — ham goi moi khi mot o doi gia tri (cap nhat dau "Chua luu"), hoac null.
+   Tra ve chuoi "DA LUU" (xem whartonChuoiTuMap) de ben goi biet con gi chua luu. */
+function whartonVeKhung(goc, w, tuyChon) {
+  const { ranked, ten: tenClb, giu, chiDoc, khiDoi } = tuyChon;
+  clear(goc);
   const nhieuBuoi = w.ds_buoi.length > 1;
   const daLuu = {};
   w.ds_buoi.forEach((buoi) => {
@@ -490,10 +505,10 @@ function renderWhartonStep(state, giu) {
       tieuDe.className = "wh-buoi-ten";
       tieuDe.textContent = nhanBuoi(buoi);
       tieuDe.dataset.buoi = buoi;
-      body.appendChild(tieuDe);
+      goc.appendChild(tieuDe);
     }
     [1, 2].forEach((quy) => {
-      const ds = state.ranked_clubs.filter(
+      const ds = ranked.filter(
         (c) => w.buoi_cua_clb[c] === buoi && w.quy_cua_clb[c] === quy);
       if (!ds.length) return;                         // khung rong thi khong hien
       const luu = quy === 1 ? w.w1 : w.w2;
@@ -525,12 +540,11 @@ function renderWhartonStep(state, giu) {
       /* Mot CLB trong khung thi tu dien 100 va khoa o (neu chua co diem khac 100 da luu). */
       const motClb = ds.length === 1;
       ds.forEach((cid) => {
-        const club = currentClubs.find((c) => c.club_id === cid);
         const dong = document.createElement("div");
         dong.className = "wh-dong";
-        const tenClb = document.createElement("span");
-        tenClb.className = "wh-dong-ten";
-        tenClb.textContent = club ? club.name : cid;
+        const tenO = document.createElement("span");
+        tenO.className = "wh-dong-ten";
+        tenO.textContent = tenClb(cid);
         const o = document.createElement("input");
         o.type = "number";
         o.min = "0";
@@ -539,25 +553,53 @@ function renderWhartonStep(state, giu) {
         o.className = "text-input text-input-sm wh-diem";
         o.dataset.quy = String(quy);
         o.dataset.clb = cid;
-        o.setAttribute("aria-label", (club ? club.name : cid) + " — " + ten.textContent);
+        o.setAttribute("aria-label", tenClb(cid) + " — " + ten.textContent);
         const daCo = cid in luu ? String(luu[cid]) : "";
         daLuu[quy + "|" + cid] = daCo;
         const khoa = !!w.tu_dien_mot_clb && motClb && (daCo === "" || daCo === String(w.ngan_sach));
         const go = giu && (quy + "|" + cid) in giu ? giu[quy + "|" + cid] : null;
         o.value = khoa ? String(w.ngan_sach) : (go !== null ? go : daCo);
-        o.disabled = khoa;
+        o.disabled = khoa || !!chiDoc;
         o.addEventListener("input", () => {
           whartonCapNhatDem(khung, w.ngan_sach);
-          veDauChuaLuu();
+          if (khiDoi) khiDoi();
         });
-        dong.append(tenClb, o);
+        dong.append(tenO, o);
         khung.appendChild(dong);
       });
-      body.appendChild(khung);
+      goc.appendChild(khung);
       whartonCapNhatDem(khung, w.ngan_sach);
     });
   });
-  daLuuWharton = whartonChuoiTuMap(daLuu);
+  return whartonChuoiTuMap(daLuu);
+}
+
+/* Ve Buoc 3 tu `state` (ket qua get_student_entry_state); `giu` = chu da go can giu lai. */
+function renderWhartonStep(state, giu) {
+  const hop = el("fbWhartonStep");
+  const body = el("fbWhartonBody");
+  const w = state && state.wharton;
+  clear(body);
+  if (!w || !w.bat) {
+    whartonState = null;
+    daLuuWharton = "";
+    hop.hidden = true;
+    return;
+  }
+  whartonState = state;
+  daLuuWharton = whartonVeKhung(body, w, {
+    ranked: state.ranked_clubs,
+    ten: (cid) => {
+      const club = currentClubs.find((c) => c.club_id === cid);
+      return club ? club.name : cid;
+    },
+    giu,
+    chiDoc: !!w.khoa,
+    khiDoi: veDauChuaLuu,
+  });
+  /* Dang khoa (da chay xep): chi doc, kem cau nhac mo khoa o the Quan ly. */
+  el("fbWhartonKhoa").hidden = !w.khoa;
+  el("btnSubmitWharton").disabled = !!w.khoa;
   hop.hidden = !body.querySelector(".wh-khung");
 }
 

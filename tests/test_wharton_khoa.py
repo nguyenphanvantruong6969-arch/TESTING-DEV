@@ -247,3 +247,13 @@ def test_khoa_khong_lam_doi_dau_van_tay_va_ket_qua(tmp_path):
                 json.loads(cur.execute(
                     "SELECT luat_xep FROM run_history ORDER BY rowid DESC").fetchone()[0])))
     assert ket[0] == ket[1]
+
+
+def test_trang_thai_kiosk_co_co_khoa(da_chay):
+    api, bo = da_chay
+    sid = bo.sids[0]
+    assert api.get_student_entry_state(sid)["data"]["wharton"]["khoa"] is False
+    assert api.run_pipeline(seed=3)["ok"]
+    assert api.get_student_entry_state(sid)["data"]["wharton"]["khoa"] is True
+    assert api.mo_khoa_wharton("MO")["ok"]
+    assert api.get_student_entry_state(sid)["data"]["wharton"]["khoa"] is False

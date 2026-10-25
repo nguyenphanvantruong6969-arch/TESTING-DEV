@@ -2600,6 +2600,91 @@ html.tat-hieu-ung .status-strip:hover {
 .wh-dong-ten { flex: 1; }
 .wh-diem { width: 6rem; text-align: right; }
 
+/* Kiosk Bước 3 đang khoá, và khối "Điểm Wharton" ở thẻ Quản lý (A13.3). Chỉ dùng token ở :root. */
+.wh-khoa-ghi-chu {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-text);
+}
+.wh-khoa-ghi-chu[hidden],
+.wh-ql-xacnhan[hidden],
+.wh-ql-sua[hidden] { display: none; }
+.wh-ql-khoa {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+.wh-ql-khoa-chu { font-weight: 600; color: var(--slate); }
+.wh-ql-khoa-chu.is-khoa { color: var(--gold-text); }
+.wh-ql-khoa .btn[hidden] { display: none; }
+.wh-ql-xacnhan {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+}
+.wh-ql-muc {
+  margin: 16px 0 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.wh-cb-nhom { margin: 0 0 8px; }
+.wh-cb-nhom-ten { font-weight: 600; font-size: 13px; color: var(--slate); }
+.wh-cb-dong {
+  display: inline-block;
+  margin: 4px 6px 0 0;
+  padding: 3px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wh-cb-dong:hover,
+.wh-cb-dong:focus-visible { border-color: var(--gold-text); }
+.wh-ql-loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--slate);
+}
+.wh-ql-loc[hidden] { display: none; }
+tr.wh-ql-dong { cursor: pointer; }
+tr.wh-ql-dong:hover td { background: var(--paper-raised); }
+tr.wh-ql-loi td { background: var(--paper-raised); box-shadow: inset 3px 0 0 var(--rust-text); }
+tr.wh-ql-loi td + td { box-shadow: none; }
+.wh-ql-nhom-buoi { font-weight: 600; font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 2px; }
+.wh-ql-quy { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 2px 0; font-size: 13px; }
+.wh-ql-quy-ten { font-weight: 600; color: var(--slate); }
+.wh-ql-o { font-variant-numeric: tabular-nums; }
+.wh-ql-tu-dien { font-size: 11.5px; font-style: italic; color: var(--slate); }
+.wh-ql-tong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--moss); }
+.wh-ql-tong.is-sai { color: var(--rust-text); }
+.wh-ql-tt { font-weight: 600; font-size: 13px; }
+.wh-ql-tt.is-ok { color: var(--moss); }
+.wh-ql-tt.is-loi { color: var(--rust-text); }
+.wh-ql-tt.is-vang,
+.wh-ql-tt.is-lech { color: var(--gold-text); }
+.wh-ql-sua {
+  margin: 0 0 14px;
+  padding: 10px 14px 12px;
+  background: var(--paper-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+}
+.wh-ql-sua-dau { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.wh-ql-nk { list-style: none; margin: 0 0 8px; padding: 0; font-size: 13px; }
+.wh-ql-nk li { padding: 3px 0; border-bottom: 1px solid var(--hairline); }
+
 /* ============================= WORKSPACE =============================
    Nút đổi ở thanh bên, màn chọn và trình hướng dẫn (js/075_workspace.js).
    Chỉ dùng token ở :root — không có màu riêng. */
