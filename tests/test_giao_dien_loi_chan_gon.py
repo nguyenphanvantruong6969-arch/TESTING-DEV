@@ -55,6 +55,9 @@ def _dung_du_lieu(api):
         else:
             dong += [(s, "B", 2, 50), (s, "C", 2, 30), (s, "D", 2, 20)]
     chen_bids(api, dong)
+    # mọi em đều có điểm thi A: không ai vắng thi (vắng thi cũng tính là "hồ sơ có vấn đề")
+    assert api.submit_club_scores(
+        "A", [{"student_id": s, "score": 5 + i % 5} for i, s in enumerate(ds)])["ok"]
 
 
 @pytest.fixture

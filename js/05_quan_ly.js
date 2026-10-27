@@ -688,9 +688,18 @@ function veKhoaWh() {
   if (!el("whMoKhoaHop").hidden) {
     el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
   }
+  capNhatNutHangLoat();
+}
+
+/* Hai nút hàng loạt chỉ dùng được khi có hồ sơ chưa hợp lệ; phóng điểm còn cần điểm đang mở. */
+function capNhatNutHangLoat() {
+  const co = !!(whBoNho.canhBao || []).some((c) => c.loai === "chua_hop_le");
+  el("btnWhTaiCanSua").disabled = !co;
+  el("btnWhPhong").disabled = !co || whQl.khoa;
 }
 
 function veCanhBaoWharton(ds) {
+  capNhatNutHangLoat();
   const goc = el("whCanhBao");
   clear(goc);
   if (!ds.length) {
@@ -963,8 +972,74 @@ function veLaiWhTuBoNho() {
   if (whQl.sid) veNhatKyWh();
 }
 
+/* ---- Xử lý hàng loạt hồ sơ chia thiếu hoặc thừa (A13.5) ---- */
+
+const WH_CAN_GO_PHONG = "PHONG";
+let whBoQua = [];      // em bị bỏ qua ở lần phóng gần nhất: vẽ lại được khi đổi ngôn ngữ
+
+function veKetQuaPhong() {
+  const hop = el("whPhongKetQua");
+  hop.hidden = !whBoQua.length;
+  if (!whBoQua.length) return;
+  el("whPhongTieuDe").textContent = t("wh_hl_bo_qua_tieu_de", { n: whBoQua.length });
+  const ds = el("whPhongDs");
+  clear(ds);
+  whBoQua.forEach((b) => {
+    const li = document.createElement("li");
+    li.textContent = b.student_id + " (" + b.name + "): " + t("wh_hl_ly_do_" + b.ly_do);
+    ds.appendChild(li);
+  });
+}
+
+/* Từ màn chạy xếp bị chặn: sang tab con Điểm quyết tâm, bật lọc "chỉ hồ sơ có vấn đề". */
+function moDanhSachCanXuLy() {
+  switchTab("admin");
+  datTabConQl("wh", { luu: true });
+  const loc = el("whLocChiLoi");
+  if (!loc.checked) {
+    loc.checked = true;
+    whQl.trang = 1;
+    loadWhBang();
+  }
+}
+
+function initWhHangLoat() {
+  el("btnWhTaiCanSua").addEventListener("click", () => {
+    khiBan(el("btnWhTaiCanSua"), () => callApi("export_wharton_can_sua")).then((res) => {
+      if (!res.ok) return showErrorToast(res.errors);
+      showToast(t("wh_hl_tai_xong", { n: res.data.n_hoc_sinh, path: res.data.path }), "success");
+    });
+  });
+  const dong = () => { el("whPhongHop").hidden = true; el("whPhongGo").value = ""; };
+  el("btnWhPhong").addEventListener("click", () => {
+    el("whPhongHoi").textContent = t("wh_hl_phong_hoi", { can_go: WH_CAN_GO_PHONG });
+    el("whPhongHop").hidden = false;
+    el("whPhongGo").focus();
+  });
+  el("btnWhPhongHuy").addEventListener("click", dong);
+  el("btnWhPhongXn").addEventListener("click", () => {
+    khiBan(el("btnWhPhongXn"), () => callApi("phong_wharton_hang_loat", el("whPhongGo").value.trim()))
+      .then((res) => {
+        if (!res.ok) return showErrorToast(res.errors);
+        dong();
+        whBoQua = res.data.bo_qua;
+        veKetQuaPhong();
+        showToast(trErr({ code: "wharton_da_phong",
+          params: { n: res.data.n_phong, m: res.data.bo_qua.length } }), "success");
+        loadAdminWharton(true);
+      });
+  });
+  window.addEventListener("langchange", () => {
+    veKetQuaPhong();
+    if (!el("whPhongHop").hidden) {
+      el("whPhongHoi").textContent = t("wh_hl_phong_hoi", { can_go: WH_CAN_GO_PHONG });
+    }
+  });
+}
+
 function initWhartonQuanLy() {
   window.addEventListener("langchange", veLaiWhTuBoNho);
+  initWhHangLoat();
   const veLaiBang = () => { whQl.trang = 1; loadWhBang(); };
   el("whQlTim").addEventListener("input", debounce(veLaiBang, 250));
   ["whLocQuy", "whLocBuoi", "whLocClb", "whLocChiLoi"].forEach((id) => {
@@ -1272,6 +1347,7 @@ function tabConQlDangChon() {
 function datTabConQl(ten, tuyChon) {
   const opt = tuyChon || {};
   const hien = tabConQlHien();
+  const muon = ten;           // tab được yêu cầu, giữ cả khi nó chưa hiện (mở ngay khi hiện)
   if (!hien.some((n) => n.dataset.qlTab === ten)) ten = hien.length ? hien[0].dataset.qlTab : "clb";
   document.querySelectorAll("#qlTabs [role=tab]").forEach((n) => {
     const chon = n.dataset.qlTab === ten;
@@ -1283,8 +1359,8 @@ function datTabConQl(ten, tuyChon) {
     v.hidden = v.dataset.qlTab !== ten;
   });
   if (opt.luu) {
-    tabConQlMong = ten;
-    luuTabConQl(ten);
+    tabConQlMong = muon;
+    luuTabConQl(muon);
   }
 }
 

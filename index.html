@@ -752,6 +752,26 @@
         <h3 class="wh-ql-muc" data-i18n="wh_canh_bao_title">Hồ sơ cần xử lý</h3>
         <div id="whCanhBao"></div>
 
+        <!-- Xử lý hàng loạt hồ sơ chia thiếu hoặc thừa (A13.5). -->
+        <div class="wh-hang-loat" id="whHangLoat">
+          <div class="search-row">
+            <button class="btn btn-secondary" id="btnWhTaiCanSua" type="button" data-i18n="wh_hl_tai">Tải danh sách cần sửa</button>
+            <button class="btn btn-secondary" id="btnWhPhong" type="button" data-i18n="wh_hl_phong">Phóng cho đủ 100 theo tỉ lệ</button>
+          </div>
+          <div class="wh-ql-xacnhan" id="whPhongHop" hidden>
+            <p class="hint-text" id="whPhongHoi"></p>
+            <div class="search-row">
+              <input type="text" id="whPhongGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_phong" aria-label="Gõ chữ xác nhận để phóng điểm">
+              <button class="btn btn-primary" id="btnWhPhongXn" type="button" data-i18n="wh_hl_phong_xn">Xác nhận phóng điểm</button>
+              <button class="btn btn-ghost" id="btnWhPhongHuy" type="button" data-i18n="btn_cancel">Huỷ</button>
+            </div>
+          </div>
+          <div id="whPhongKetQua" role="status" hidden>
+            <p class="hint-text" id="whPhongTieuDe"></p>
+            <ul class="wh-ql-nk" id="whPhongDs"></ul>
+          </div>
+        </div>
+
         <div class="wh-ql-sua" id="whQlSua" hidden>
           <div class="wh-ql-sua-dau">
             <h3 id="whQlSuaTen"></h3>

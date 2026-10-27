@@ -2976,3 +2976,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
   box-shadow: inset 0 2px 0 var(--gold);
 }
 .ql-tab:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* A13.5: lỗi chặn gọn ở thẻ Vận hành; hàng nút xử lý hàng loạt ở khối Điểm quyết tâm */
+.log-hang-cuoi { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.log-tom-tat { font-weight: 600; }
+.wh-hang-loat { margin: 12px 0 18px; }
