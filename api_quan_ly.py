@@ -653,7 +653,7 @@ class QuanLyMixin:
         with self._ket_noi_doc() as cur:
             match = [(r[0], r[1], r[2], r[3]) for r in cur.execute(
                 "SELECT student_id, buoi, club_id, matched_tier FROM match_results "
-                "WHERE club_id IS NOT NULL ORDER BY student_id, buoi")]
+                "WHERE club_id IS NOT NULL ORDER BY student_id, buoi COLLATE THU_TU_BUOI")]
             luu = cur.execute("SELECT dau_van_tay FROM dau_van_tay_chay WHERE id = 1").fetchone()
             meta = cur.execute("SELECT run_at FROM run_meta WHERE id = 1").fetchone()
             ten_clb = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}

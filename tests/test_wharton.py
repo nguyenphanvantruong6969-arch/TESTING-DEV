@@ -479,7 +479,7 @@ class TestMaLoi:
         assert MESSAGES["wharton_nguyen_vong_chua_xep"]["vi"].startswith(
             "Nguyện vọng chưa được sắp xếp xong.")
         assert MESSAGES["wharton_chua_dung_het"]["vi"].startswith(
-            "Chưa dùng hết điểm Wharton")
+            "Chưa dùng hết điểm quyết tâm")
 
     @pytest.mark.parametrize("ma", MA_WHARTON)
     def test_khong_viet_cung_nhan_trong_cau(self, ma):

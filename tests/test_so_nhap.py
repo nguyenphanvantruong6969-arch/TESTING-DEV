@@ -180,8 +180,8 @@ def test_mau_trong_doc_duoc_va_dung_bo_cuc():
     clb, hs_ = wb[so_nhap.SHEET_CLB], wb[so_nhap.SHEET_HS]
     assert [c.value for c in clb[1]] == so_nhap.COT_CLB
     tieu_de = [c.value for c in hs_[1]]
-    assert tieu_de[:5] == ["Mã HS", "Họ tên", "Nhóm ưu tiên", "NV1", "Điểm 1"]
-    assert tieu_de.count("NV%d" % so_nhap.SO_NV_MAC_DINH) == 1
+    assert tieu_de[:5] == ["Mã HS", "Họ tên", "Nhóm ưu tiên", "Nguyện vọng 1", None]
+    assert tieu_de.count("Nguyện vọng %d" % so_nhap.SO_NV_MAC_DINH) == 1
     # Ô NV là danh sách thả xuống lấy tên CLB từ sheet 1.
     nguon = [dv.formula1 for dv in hs_.data_validations.dataValidation if dv.type == "list"]
     assert any(so_nhap.SHEET_CLB in f for f in nguon), nguon
