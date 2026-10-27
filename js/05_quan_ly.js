@@ -1234,6 +1234,96 @@ function initAdminHandlers() {
 
   initWhartonQuanLy();
   initDiemChuan();
+  initTabConQl();
+}
+
+/* ---- Tab con của thẻ Quản lý (A13.5) ----
+ * CLB · Học sinh · Điểm quyết tâm · Điểm chuẩn · Dữ liệu. Hai tab điểm chỉ hiện khi khối của
+ * chúng hiện (tính năng bật): tab theo dõi thuộc tính `hidden` của khối, nên không phải gọi tay ở
+ * từng chỗ khối đổi trạng thái. Tab đang mở được nhớ trong localStorage (đọc ghi đều có try/catch,
+ * như `docTrangThaiThuGon`); không đọc được hoặc tab đã nhớ không còn thì mở tab đầu. */
+const KHOA_TAB_CON_QL = "rbda_ql_tab_con";
+const TAB_CON_QL = ["clb", "hs", "wh", "dc", "du_lieu"];
+let tabConQlMong = "clb";      // tab người dùng muốn mở; áp dụng ngay khi tab đó hiện
+
+function docTabConQl() {
+  try {
+    const v = window.localStorage && window.localStorage.getItem(KHOA_TAB_CON_QL);
+    return TAB_CON_QL.includes(v) ? v : "clb";
+  } catch (e) { return "clb"; }
+}
+
+function luuTabConQl(ten) {
+  try {
+    if (window.localStorage) window.localStorage.setItem(KHOA_TAB_CON_QL, ten);
+  } catch (e) { /* không ghi được thì thôi, giao diện vẫn chạy */ }
+}
+
+function tabConQlHien() {
+  return Array.from(document.querySelectorAll("#qlTabs [role=tab]")).filter((n) => !n.hidden);
+}
+
+function tabConQlDangChon() {
+  const n = document.querySelector('#qlTabs [role=tab][aria-selected="true"]');
+  return n ? n.dataset.qlTab : "clb";
+}
+
+/* Mở tab `ten` (không có thì mở tab đầu). `luu`: ghi nhớ làm tab người dùng chọn. */
+function datTabConQl(ten, tuyChon) {
+  const opt = tuyChon || {};
+  const hien = tabConQlHien();
+  if (!hien.some((n) => n.dataset.qlTab === ten)) ten = hien.length ? hien[0].dataset.qlTab : "clb";
+  document.querySelectorAll("#qlTabs [role=tab]").forEach((n) => {
+    const chon = n.dataset.qlTab === ten;
+    n.setAttribute("aria-selected", chon ? "true" : "false");
+    n.tabIndex = chon ? 0 : -1;
+    if (chon && opt.focus) n.focus();
+  });
+  document.querySelectorAll('#view-admin [role=tabpanel]').forEach((v) => {
+    v.hidden = v.dataset.qlTab !== ten;
+  });
+  if (opt.luu) {
+    tabConQlMong = ten;
+    luuTabConQl(ten);
+  }
+}
+
+/* Hai tab điểm hiện theo khối của chúng; sau đó mở lại tab người dùng muốn nếu đã có thể. */
+function capNhatTabConQl() {
+  const wh = el("adminWhartonBlock"), dc = el("adminDiemChuanBlock");
+  if (wh) el("qlTabWh").hidden = wh.hidden;
+  if (dc) el("qlTabDc").hidden = dc.hidden;
+  const hien = tabConQlHien().map((n) => n.dataset.qlTab);
+  datTabConQl(hien.includes(tabConQlMong) ? tabConQlMong : tabConQlDangChon());
+}
+
+function initTabConQl() {
+  const dai = el("qlTabs");
+  if (!dai) return;
+  tabConQlMong = docTabConQl();
+  dai.addEventListener("click", (ev) => {
+    const nut = ev.target.closest && ev.target.closest("[role=tab]");
+    if (nut && !nut.hidden) datTabConQl(nut.dataset.qlTab, { luu: true });
+  });
+  dai.addEventListener("keydown", (ev) => {
+    const hien = tabConQlHien();
+    /* Tab đang có tiêu điểm là mốc (kể cả khi vừa focus mà chưa chọn), không thì tab đang chọn. */
+    const i = Math.max(0, hien.findIndex((n) => n === document.activeElement
+      || (!hien.includes(document.activeElement) && n.dataset.qlTab === tabConQlDangChon())));
+    let j = -1;
+    if (ev.key === "ArrowRight") j = (i + 1) % hien.length;
+    else if (ev.key === "ArrowLeft") j = (i - 1 + hien.length) % hien.length;
+    else if (ev.key === "Home") j = 0;
+    else if (ev.key === "End") j = hien.length - 1;
+    if (j < 0) return;
+    ev.preventDefault();
+    datTabConQl(hien[j].dataset.qlTab, { luu: true, focus: true });
+  });
+  const theoDoi = new MutationObserver(capNhatTabConQl);
+  ["adminWhartonBlock", "adminDiemChuanBlock"].forEach((id) => {
+    if (el(id)) theoDoi.observe(el(id), { attributes: true, attributeFilter: ["hidden"] });
+  });
+  capNhatTabConQl();
 }
 
 

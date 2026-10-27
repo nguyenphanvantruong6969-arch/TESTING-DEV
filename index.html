@@ -635,6 +635,17 @@
         <p class="view-desc" data-i18n="admin_desc">Thêm, sửa CLB và gán nhãn dự trữ cho học sinh. Trường tự quyết định ai được dự trữ. Phần mềm chỉ ghép học sinh và CLB có cùng nhãn.</p>
       </header>
 
+      <!-- Tab con của thẻ Quản lý (A13.5). Hai tab điểm (wh, dc) chỉ hiện khi bật điểm quyết tâm:
+           js/05_quan_ly.js (capNhatTabConQl) bỏ thuộc tính hidden khi khối tương ứng hiện. -->
+      <div class="ql-tabs" id="qlTabs" role="tablist" data-i18n-aria-label="ql_tab_nhom_aria" aria-label="Các mục của thẻ Quản lý">
+        <button type="button" role="tab" class="ql-tab" id="qlTabClb" data-ql-tab="clb" aria-controls="qlPanelClb" aria-selected="true" tabindex="0" data-i18n="ql_tab_clb">CLB</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabHs" data-ql-tab="hs" aria-controls="qlPanelHs" aria-selected="false" tabindex="-1" data-i18n="ql_tab_hs">Học sinh</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabWh" data-ql-tab="wh" aria-controls="qlPanelWh" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_wh">Điểm quyết tâm</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabDc" data-ql-tab="dc" aria-controls="qlPanelDc" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_dc">Điểm chuẩn</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabDuLieu" data-ql-tab="du_lieu" aria-controls="qlPanelDuLieu" aria-selected="false" tabindex="-1" data-i18n="ql_tab_du_lieu">Dữ liệu</button>
+      </div>
+
+      <div role="tabpanel" id="qlPanelClb" data-ql-tab="clb" aria-labelledby="qlTabClb">
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_club_form_title">Thêm hoặc sửa CLB</h2></div>
         <div class="admin-form-grid">
@@ -690,7 +701,9 @@
         <p class="hint-text" data-i18n="admin_lich_tuan_desc">Mỗi cột là một buổi. Thanh dưới mỗi CLB là mức lấp đầy của lần sắp xếp gần nhất.</p>
         <div class="lich-tuan" id="lichTuan"></div>
       </div>
+      </div>
 
+      <div role="tabpanel" id="qlPanelHs" data-ql-tab="hs" aria-labelledby="qlTabHs" hidden>
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_reserve_assign_title">Gán nhãn dự trữ và xuất hồ sơ học sinh</h2></div>
         <div class="search-row">
@@ -719,6 +732,9 @@
         </div>
       </div>
 
+      </div>
+
+      <div role="tabpanel" id="qlPanelWh" data-ql-tab="wh" aria-labelledby="qlTabWh" hidden>
       <!-- Điểm Wharton (mục A13.3): chỉ hiện khi workspace bật điểm Wharton; js/05_quan_ly.js
            (loadAdminWharton) dựng bảng, cảnh báo, màn sửa và nhật ký. -->
       <div class="panel" id="adminWhartonBlock" hidden>
@@ -824,6 +840,9 @@
         </details>
       </div>
 
+      </div>
+
+      <div role="tabpanel" id="qlPanelDc" data-ql-tab="dc" aria-labelledby="qlTabDc" hidden>
       <!-- Điểm chuẩn chi tiết (A13.4): chỉ hiện khi bật điểm quyết tâm; js/05_quan_ly.js. -->
       <div class="panel" id="adminDiemChuanBlock" hidden>
         <div class="panel-head">
@@ -848,6 +867,9 @@
         </div>
       </div>
 
+      </div>
+
+      <div role="tabpanel" id="qlPanelDuLieu" data-ql-tab="du_lieu" aria-labelledby="qlTabDuLieu" hidden>
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="danger_zone_title">Vùng nguy hiểm: xoá dữ liệu để làm lại</h2></div>
         <p class="hint-text" data-i18n="danger_zone_desc">Nạp tệp chỉ thêm học sinh mới, không xoá học sinh cũ. Muốn làm lại với bộ dữ liệu khác, hãy xoá ở đây trước, nếu không học sinh cũ vẫn chiếm chỗ.</p>
@@ -856,6 +878,7 @@
           <button class="btn btn-danger" id="btnResetStudents" data-i18n="btn_reset_students">Xoá toàn bộ học sinh (giữ CLB)</button>
           <button class="btn btn-danger" id="btnResetAll" data-i18n="btn_reset_all">Xoá toàn bộ dữ liệu (cả CLB)</button>
         </div>
+      </div>
       </div>
     </section>
 
