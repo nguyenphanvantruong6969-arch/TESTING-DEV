@@ -146,13 +146,17 @@ nhãn `chinh_sach`. Hai chỗ còn lại cạnh tranh bình thường.
 | Mã HS | Mã học sinh. Bắt buộc, không được trùng |
 | Họ tên | Họ tên |
 | Nhóm ưu tiên | Nhãn diện ưu tiên của em này. Bỏ trống nếu không thuộc diện nào |
-| NV1 | Nguyện vọng **mong muốn nhất** — chọn tên CLB trong danh sách thả xuống |
-| NV2, NV3, … | Nguyện vọng tiếp theo |
-| Điểm 1, Điểm 2, … | Điểm thi của CLB **ngay bên trái**. Trống = không thi. Chữ `thi` = đã thi, chấm sau |
+| Nguyện vọng 1 (ô gộp, hàng 1) | Nguyện vọng **mong muốn nhất**. Dưới ô gộp có cột **CLB**: chọn tên CLB trong danh sách thả xuống |
+| Nguyện vọng 2, 3, … | Nguyện vọng tiếp theo, cùng cấu trúc |
+| Điểm thi (hàng 2, cùng nhóm) | Điểm thi của CLB **ngay bên trái**. Trống = không thi. Chữ `thi` = đã thi, chấm sau |
 
-Bộ ví dụ (3 dòng đầu và dòng cuối):
+Sheet này có **hai hàng tiêu đề** (từ A13.4): hàng 1 là các ô gộp "Nguyện vọng k", hàng 2 là tên cột trong từng
+nhóm (CLB, Điểm thi, và Điểm quyết tâm khi bật). Cột đầu gộp dọc hai hàng; dữ liệu bắt đầu từ **hàng 3**. Chèn hay
+xoá cột trong một nhóm thì phần mềm báo lỗi "cột lệch nhóm" và không nạp gì. Sổ cũ chỉ có một hàng tiêu đề vẫn nạp được.
 
-| Mã HS | Họ tên | Nhóm ưu tiên | NV1 | Điểm 1 | NV2 | Điểm 2 |
+Bộ ví dụ (3 dòng đầu và dòng cuối; mỗi nhóm có hai cột CLB và Điểm thi):
+
+| Mã HS | Họ tên | Nhóm ưu tiên | NV 1: CLB | NV 1: Điểm thi | NV 2: CLB | NV 2: Điểm thi |
 |---|---|---|---|---|---|---|
 | HS01 | Nguyễn Văn An | | CLB Bóng rổ | 9 | CLB Tin học | 7,5 |
 | HS02 | Trần Thị Bình | | CLB Bóng rổ | 8,5 | CLB Mỹ thuật | 8 |
@@ -200,11 +204,11 @@ như `thu_3_tiet_9` và `thu_3_tiet_10` — phần mềm giữ nguyên tên bu�
 
 ### Nguyện vọng: vẫn một danh sách
 
-Trang `2. Học sinh` **không đổi** khi trường có nhiều buổi: NV1, NV2, … là một
+Trang `2. Học sinh` **không đổi** khi trường có nhiều buổi: các nhóm Nguyện vọng 1, 2, … là một
 danh sách chung. Phần mềm tự chia theo buổi của từng CLB, giữ đúng thứ tự em
 đã xếp trong mỗi buổi.
 
-| Mã HS | NV1 | NV2 | NV3 |
+| Mã HS | Nguyện vọng 1 | Nguyện vọng 2 | Nguyện vọng 3 |
 |---|---|---|---|
 | HS001 | CLB Bóng đá *(Thứ 3)* | CLB Cờ vua *(Thứ 3)* | CLB Tin học *(Thứ 5)* |
 
@@ -984,7 +988,7 @@ riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một 
 
 | Tệp | Cột điểm quyết tâm |
 |---|---|
-| Sổ nhập | mỗi nhóm thành `NV k` · `Điểm k` · `Điểm W k` (cột `Điểm W k` ngay sau `Điểm k`) |
+| Sổ nhập | mỗi nhóm "Nguyện vọng k" có ba cột ở hàng 2: `CLB` · `Điểm thi` · `Điểm quyết tâm` (cột cuối ngay sau `Điểm thi`) |
 | CSV nguyện vọng, dạng rộng | `wp_k` đi cặp `pref_k` |
 | CSV nguyện vọng, cột theo buổi | `<buoi>_wp_k` đi cặp `<buoi>_pref_k` |
 | CSV nguyện vọng, dạng dài | thêm cột `wp` cạnh `club_id` |
@@ -1026,6 +1030,24 @@ Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không
 **Vì sao bị khoá, và mở khoá.** Mỗi lần chạy xếp thành công khi bật điểm quyết tâm, điểm tự **khoá** để kết quả không đổi âm thầm sau đó. Khoá này riêng, không liên quan tới khoá số bốc thăm. Đang khoá thì không ghi được điểm ở đâu cả (thẻ Quản lý, Bước 3 ở kiosk, nạp cột điểm từ tệp; nạp tệp vẫn lưu nguyện vọng và cảnh báo rằng phần điểm bị bỏ). Việc xoá học sinh, xoá CLB, làm lại từ đầu hay xoá dữ liệu vẫn làm được. Muốn sửa: bấm **Mở khoá sửa điểm quyết tâm**, gõ đúng chữ `MO` rồi xác nhận. Kết quả đã xếp không tự đổi; lần chạy xếp tiếp theo sẽ khoá lại. Xoá dữ liệu (**Vùng nguy hiểm**) cũng mở khoá.
 
 **Xem nhật ký.** Khi mở màn sửa của một học sinh, cuối màn là **Nhật ký thay đổi** của em đó (10 dòng mới nhất, bấm **Xem thêm** để xem tiếp): lúc nào, từ đâu (thẻ Quản lý, nhập tại chỗ, nạp tệp, xoá dữ liệu, hệ thống), tên tài khoản máy, và điểm trước và sau. Nhật ký chỉ ghi thêm, không bao giờ bị xoá hay sửa, kể cả khi xoá dữ liệu.
+
+### Đọc điểm chuẩn và biểu đồ
+
+Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem được **điểm chuẩn** của từng CLB. Học sinh ở kiosk **không** thấy.
+
+- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai tầng và hai mức. Mức là suất thường hoặc suất dự trữ,
+  theo đúng diện mà học sinh đã được nhận. **Tầng 2** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
+  **Tầng 1** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
+  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở tầng và mức đó.
+- **Tab Kết quả.** Mục **Điểm chuẩn** luôn **đóng** mỗi lần vào thẻ; bấm **Xem điểm chuẩn** mới mở và hiện bảng tổng
+  quan mọi CLB (thanh điểm chuẩn tầng 2, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
+- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai tầng x hai mức và hai biểu đồ:
+  *cột phân bố* điểm quyết tâm của em tầng 2 (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
+  gạch chéo) và *dải chấm* (mỗi em một chấm: đặc là được nhận, rỗng là không được nhận; di chuột hoặc chạm vào chấm để
+  xem mã học sinh và điểm). Vạch đen dọc là mức chuẩn. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
+  thì không tính (số em này được ghi bên dưới).
+- Dải vàng "kết quả có thể đã cũ" hiện khi dữ liệu đã đổi sau lần chạy gần nhất.
+- **Tệp xuất.** Sổ Excel kết quả có thêm trang **Điểm chuẩn** (mỗi CLB một dòng). Tắt điểm quyết tâm thì sổ xuất y như cũ.
 
 ### Khi nào lần chạy bị chặn
 

@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-10-25 — A13.4 Giao diện Điểm quyết tâm và điểm chuẩn
+
+Đổi tên hiển thị, đổi Sổ nhập sang hai hàng tiêu đề, thêm điểm chuẩn từng CLB (API, tab Kết quả, tab Quản lý, trang trong tệp xuất, ba biểu đồ SVG ngoại tuyến) và dọn gọn các màn của tính năng.
+Tắt `rules.wharton` thì kết quả, dấu vân tay và `run_history` y hệt trước vòng 4: 15 lần chạy (3 bộ dữ liệu x 5 seed) so từng dòng `match_results` GIỐNG HỆT bản `4c448ae`; sổ Excel kết quả so từng ô cũng giống hệt. Mọi số liệu trong test là dữ liệu MÔ PHỎNG.
+- **Tên hiển thị (Điểm quyết tâm; trong mã: wharton):** tiếng Việt "Điểm quyết tâm", tiếng Anh "Preference points" ở `i18n.js`, `i18n_errors.py` (sinh lại `i18n_loi.js`), Sổ nhập, tệp xuất, `HUONG_DAN_SU_DUNG.md`. Giữ nguyên tên hàm, bảng, mã lỗi `wharton_*`, khoá `rules.wharton`, cột CSV `wp_k`, id HTML.
+- **Sổ nhập hai hàng (đổi hợp đồng, bất biến 7):** sheet học sinh luôn có hai hàng tiêu đề (hàng 1 ô gộp "Nguyện vọng k"; hàng 2 "CLB", "Điểm thi", "Điểm quyết tâm" khi bật), cột đầu gộp dọc, dữ liệu từ hàng 3, sheet CLB một hàng. Nạp đọc ba dạng (một hàng cũ, một hàng có "Điểm W k", hai hàng), nhận dạng bằng hàng 1. Cột lệch nhóm báo `so_nhap_cot_lech_nhom` / `so_nhap_nhom_thieu_cot` (sheet, cột, nhóm) và không nạp gì. CSV không đổi. `so_nhap.py` vẫn chạy một mình. Sổ mẫu trong `mau_csv/` sinh lại; `du_lieu_test/` giữ nguyên dạng một hàng.
+- **Ba skill** `sinh-du-lieu-clb`, `xu-li-raw-forms`, `tao-workspace-tu-raw`: cập nhật SKILL.md (script đã ghi sổ qua `so_nhap.ghi_so_nhap` nên tự theo bố cục mới); chạy thử sinh sổ 60 em rồi `import_so_nhap` thành công.
+- **Điểm chuẩn:** `tinh_diem_chuan` (hàm thuần, ở `api_quan_ly.py`), API `get_diem_chuan` và `get_diem_chuan_clb` (chỉ quản trị; kiosk không có đường gọi), trang "Điểm chuẩn" trong sổ Excel kết quả (chỉ khi bật). Tầng 2: điểm hiệu lực thấp nhất đã được nhận; tầng 1: điểm thi thấp nhất kèm điểm quỹ 1 của em cuối; tách suất thường và suất dự trữ theo `matched_tier`; CLB còn chỗ ghi 0 kèm số chỗ còn.
+- **Giao diện:** mục "Điểm chuẩn" ở tab Kết quả luôn đóng mỗi lần vào thẻ (không nhớ trạng thái); khối chi tiết ở tab Quản lý; ba biểu đồ SVG (cột phân bố, dải chấm, bảng tổng quan) chọn màu theo kỹ năng dataviz, có tiêu đề, chú giải, bảng chữ ẩn, không tải gì từ mạng. Dọn gọn: hai khung Bước 3 cạnh nhau (màn hẹp xếp dọc) kèm thanh tiến độ, ô sai tô màu và dòng lỗi tại chỗ, giải thích sau nút (i); khối Quản lý có mục "Thao tác khác" đóng sẵn (mở khoá, xem nhật ký, xoá tất cả), bộ lọc một hàng; công tắc workspace một dòng ngắn kèm nút (i).
+- **Test mới (110 ca):** `test_diem_quyet_tam_chu` (18), `test_so_nhap_hai_hang` (20), `test_diem_chuan` (53), `test_giao_dien_diem_chuan` (11), `test_giao_dien_diem_quyet_tam_gon` (8).
+- **Test cũ đã sửa theo ngoại lệ:** chữ "Wharton" trong `test_giao_dien_wharton.py`, `test_giao_dien_wharton_quan_ly.py`, `test_ws_wharton_giao_dien.py`; tiêu đề và toạ độ Sổ nhập một hàng trong `test_so_nhap.py`, `test_wharton_so_nhap.py`, `test_ws_so_nhap.py` (kèm làm mới bản chụp `tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json`: chỉ sheet học sinh và sheet hướng dẫn đổi, sheet CLB giống hệt), `test_ws_so_nhap_giao_dien.py`, `test_giao_dien_upload.py`. Ngoài ngoại lệ, buộc phải thêm bước "mở mục Thao tác khác" vào ba test của `test_giao_dien_wharton_quan_ly.py` (mục đóng sẵn theo yêu cầu thiết kế); `tests/test_ws_nhan.py` thêm hai mã mới vào danh sách cho phép.
+- **Đóng vai người dùng** (chỉ báo cáo, không sửa mã): `docs/ke_hoach/BAO_CAO_DONG_VAI_DIEM_QUYET_TAM.md`.
+
 ## 2026-10-25 — A13.3 Quản lý điểm Wharton
 
 Thêm khối **Điểm Wharton** vào thẻ Quản lý (chỉ hiện khi workspace bật `rules.wharton`): bảng điểm, sửa từng em, xoá, cảnh báo hồ sơ có vấn đề; kèm nhật ký và khoá riêng.
