@@ -61,6 +61,9 @@ MA_MOI_SAU_ANH_CHUP = {
     "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",
     # A13.4: Sổ nhập hai hàng tiêu đề, lệch nhóm cột.
     "so_nhap_cot_lech_nhom", "so_nhap_nhom_thieu_cot",
+    # A13.5: lỗi chặn gọn, phóng điểm hàng loạt, khoá xuất khi chưa có kết quả.
+    "wharton_tom_tat_chua_hop_le", "wharton_phong_sai_xac_nhan", "wharton_da_phong",
+    "xuat_chua_co_ket_qua",
 }
 
 

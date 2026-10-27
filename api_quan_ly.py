@@ -33,6 +33,27 @@ from rbda_priority_pipeline import (
 )
 
 
+def phong_theo_ti_le(diem: dict, ngan_sach: int = WHARTON_NGAN_SACH):
+    """Phóng các điểm `diem` {club_id: điểm nguyên >= 0} cho tổng đúng `ngan_sach`, giữ tỉ lệ (A13.5).
+
+    Làm tròn theo phần dư lớn nhất; phần dư bằng nhau thì xét theo MÃ CLB tăng dần. Chỉ nhìn điểm
+    và mã CLB, KHÔNG nhận thứ hạng nguyện vọng (bất biến 2), nên kết quả không phụ thuộc thứ tự
+    dict. Tổng bằng 0 thì không phóng được: trả `None`. CLB điểm 0 luôn giữ 0.
+    """
+    for v in diem.values():
+        if isinstance(v, bool) or not isinstance(v, int) or v < 0:
+            raise ValueError("diem phai la so nguyen >= 0")
+    tong = sum(diem.values())
+    if tong <= 0:
+        return None
+    nen = {c: v * ngan_sach // tong for c, v in diem.items()}
+    du = {c: v * ngan_sach % tong for c, v in diem.items()}
+    con = ngan_sach - sum(nen.values())
+    for c in sorted(diem, key=lambda c: (-du[c], str(c)))[:con]:
+        nen[c] += 1
+    return nen
+
+
 def tinh_diem_chuan(clubs, tested_scores, applicants, hieu_luc, stb_lottery, match_rows,
                     ten_clb=None) -> list:
     """Điểm chuẩn từng CLB sau khi chạy (A13.4), tính từ kết quả đã có. KHÔNG phải thuật toán:
@@ -900,6 +921,83 @@ class QuanLyMixin:
         """Thẻ Quản lý: sửa điểm Wharton của một em. DÙNG LẠI lõi `_luu_wharton` của `submit_wharton`
         (cùng luật kiểm, cùng chỗ ghi, cùng kiểm khoá), chỉ khác `nguon` của nhật ký là `quan_ly`."""
         return self._luu_wharton(student_id, w1, w2, "quan_ly")
+
+    _PHONG_CONFIRM = "PHONG"
+
+    def phong_wharton_hang_loat(self, xac_nhan: str = ""):
+        """Thẻ Quản lý (A13.5): phóng điểm quyết tâm của mọi em chia thiếu hoặc thừa cho đủ 100,
+        giữ tỉ lệ các điểm em đã đặt trong đúng (buổi, quỹ) bị sai (xem `phong_theo_ti_le`).
+
+        Chỉ làm khi `xac_nhan == "PHONG"`. Sao lưu CSDL trước khi ghi. Mỗi em được phóng đi qua
+        `_luu_wharton(..., "quan_ly")`: kiểm khoá, kiểm hồ sơ, ghi nhật ký giá trị cũ và mới. Bỏ qua
+        (không đổi, liệt kê trong `bo_qua`): em tổng 0 ở quỹ sai (`ly_do = "tong_0"`) và em còn lỗi
+        khác không phóng được (`"loi_khac"`). Đang khoá thì từ chối (`wharton_da_khoa`).
+        """
+        try:
+            luat = self._luat_nghiem()
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            if xac_nhan != self._PHONG_CONFIRM:
+                return _fail(err("wharton_phong_sai_xac_nhan", can_go=self._PHONG_CONFIRM))
+            with self._ket_noi_doc() as cur:
+                if self._wharton_dang_khoa(cur):
+                    return _fail(err("wharton_da_khoa"))
+                ho_so = self._ho_so_wharton_tat_ca(cur, luat)
+                ten = {r[0]: r[1] for r in cur.execute("SELECT student_id, name FROM students")}
+            ke_hoach, bo_qua = self._ke_hoach_phong(ho_so)
+            bo_qua = [{"student_id": sid, "name": ten.get(sid, sid), "ly_do": ly_do}
+                      for sid, ly_do in bo_qua]
+            backup_path = self._backup_db() if ke_hoach else None
+            n_phong = 0
+            for sid, moi1, moi2 in ke_hoach:
+                kq = self._luu_wharton(sid, moi1, moi2, "quan_ly")
+                if kq["ok"]:
+                    n_phong += 1
+                elif any(e.get("code") == "wharton_da_khoa" for e in kq["errors"]
+                         if isinstance(e, dict)):
+                    return kq
+                else:
+                    bo_qua.append({"student_id": sid, "name": ten.get(sid, sid),
+                                   "ly_do": "loi_khac"})
+            bo_qua.sort(key=lambda b: b["student_id"])
+            return _ok({"n_phong": n_phong, "bo_qua": bo_qua, "backup_path": backup_path,
+                        "backup_name": os.path.basename(backup_path) if backup_path else None})
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(self._loi_co_ghi_vet(err("error_wharton_quan_ly", detail=str(e))))
+
+    @staticmethod
+    def _ke_hoach_phong(ho_so: dict):
+        """Từ hồ sơ của mọi em: ([(sid, w1_moi, w2_moi)] phóng được, [(sid, ly_do)] bỏ qua).
+
+        Một em CHỈ được phóng khi mọi lỗi của em là chưa dùng hết hoặc vượt ngân sách, và ở mỗi
+        (buổi, quỹ) sai em đã đặt ít nhất một điểm. `w1_moi` / `w2_moi` là điểm ĐÃ LƯU của em, chỉ
+        thay các ô của (buổi, quỹ) sai."""
+        phong_duoc = ("wharton_chua_dung_het", "wharton_vuot_ngan_sach")
+        clubs = ho_so["clubs"]
+        ke_hoach, bo_qua = [], []
+        for sid in sorted(ho_so["loi"]):
+            loi = ho_so["loi"][sid]
+            if any(e["code"] not in phong_duoc for e in loi):
+                bo_qua.append((sid, "loi_khac"))
+                continue
+            hieu_luc = {1: ho_so["w1"].get(sid, {}), 2: ho_so["w2"].get(sid, {})}
+            moi = {1: dict(ho_so["w1_luu"].get(sid, {})), 2: dict(ho_so["w2_luu"].get(sid, {}))}
+            tong_0 = False
+            for buoi, quy in sorted({(e["params"]["buoi"], e["params"]["quy"]) for e in loi}):
+                diem = {c: v for c, v in hieu_luc[quy].items()
+                        if (clubs.get(c, {}).get("buoi") or BUOI_MAC_DINH) == buoi}
+                phong = phong_theo_ti_le(diem)
+                if phong is None:
+                    tong_0 = True
+                    break
+                moi[quy].update(phong)
+            if tong_0:
+                bo_qua.append((sid, "tong_0"))
+            else:
+                ke_hoach.append((sid, moi[1], moi[2]))
+        return ke_hoach, bo_qua
 
     def clear_wharton(self, student_id=None, xac_nhan: str = ""):
         """Thẻ Quản lý: xoá điểm Wharton của MỘT em (`student_id`), hoặc của TẤT CẢ (`student_id`

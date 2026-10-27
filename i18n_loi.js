@@ -554,6 +554,22 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không thực hiện được thao tác với điểm quyết tâm. Hãy thử lại.",
     "en": "Couldn't complete that action on the preference points. Try again."
   },
+  "wharton_tom_tat_chua_hop_le": {
+    "vi": "{n} {person_pl} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp.",
+    "en": "{n} {person_pl} have a preference points profile that isn't valid yet, so the allocation hasn't run."
+  },
+  "wharton_phong_sai_xac_nhan": {
+    "vi": "Cần gõ đúng chữ {can_go} để phóng điểm quyết tâm của {person_pl} chia thiếu hoặc thừa.",
+    "en": "Type {can_go} exactly to scale the preference points of {person_pl} whose split is short or over."
+  },
+  "wharton_da_phong": {
+    "vi": "Đã phóng điểm quyết tâm cho {n} {person_pl}. {m} {person_pl} cần sửa tay.",
+    "en": "Scaled the preference points of {n} {person_pl}. {m} {person_pl} need editing by hand."
+  },
+  "xuat_chua_co_ket_qua": {
+    "vi": "Chưa có kết quả xếp. Chạy xếp trước.",
+    "en": "No allocation results yet. Run the allocation first."
+  },
   "csv_pref_duplicate_deduped": {
     "vi": "{student_id}: có {slot_sl} bị lặp trong nguyện vọng, phần lặp đã được bỏ.",
     "en": "{student_id}: {slot_la} was listed twice in the preferences. The repeat was removed."

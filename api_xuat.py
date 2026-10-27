@@ -1005,6 +1005,66 @@ class XuatKetQuaMixin:
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 
+    def export_wharton_can_sua(self, output_path: str = ""):
+        """Danh sách hồ sơ điểm quyết tâm cần sửa (A13.5) thành MỘT tệp Excel. KHÔNG đổi điểm nào.
+
+        Mỗi lỗi một dòng: mã, họ tên, buổi, quỹ, tổng hiện tại, thiếu hoặc thừa bao nhiêu, và câu lỗi
+        đã dịch. Cùng nguồn với `list_wharton_canh_bao` (`_ho_so_wharton_tat_ca`). Chỗ đặt tệp theo
+        luật của `_duong_xuat`.
+        """
+        try:
+            luat = self._luat_nghiem()
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            from openpyxl import Workbook
+
+            from i18n_errors import format_message
+            from rbda_priority_pipeline import WHARTON_NGAN_SACH
+            from so_excel import Trang
+
+            path = self._duong_xuat(output_path, "diem_quyet_tam_can_sua.xlsx")
+            nhan = self._nhan_xuat()
+            with self._ket_noi_doc() as cur:
+                ho_so = self._ho_so_wharton_tat_ca(cur, luat)
+                ten = {r[0]: r[1] for r in cur.execute("SELECT student_id, name FROM students")}
+            dong = []
+            for sid in sorted(ho_so["loi"]):
+                tong = self._dong_wharton_cua_em(sid, ho_so)["tong"]
+                for e in ho_so["loi"][sid]:
+                    p = e["params"]
+                    buoi, quy = p.get("buoi"), p.get("quy")
+                    hien_tai = (tong.get(buoi, {}).get(str(quy))
+                                if buoi is not None and quy is not None else None)
+                    thieu = p.get("thieu") if e["code"] == "wharton_chua_dung_het" else None
+                    thua = (hien_tai - WHARTON_NGAN_SACH
+                            if e["code"] == "wharton_vuot_ngan_sach" and hien_tai is not None
+                            else None)
+                    dong.append([sid, ten.get(sid, sid),
+                                 "" if buoi in (None, BUOI_MAC_DINH) else buoi,
+                                 quy if quy is not None else "",
+                                 hien_tai if hien_tai is not None else "",
+                                 thieu if thieu is not None else "",
+                                 thua if thua is not None else "",
+                                 format_message(e["code"], p, "vi", nhan)])
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Cần sửa"
+            t = Trang(ws, nhan)
+            t.tieu_de("ĐIỂM QUYẾT TÂM CẦN SỬA",
+                      "Hồ sơ chưa hợp lệ khiến lần chạy xếp bị chặn. Tệp này chỉ để xem, phần mềm "
+                      "không đổi điểm nào khi tạo nó.")
+            dau, _ = t.bang(["Mã {person_l}", "Họ tên", "{session}", "Quỹ", "Tổng hiện tại",
+                             "Thiếu", "Thừa", "Lỗi"], dong, khoa=True, loc=True,
+                            rong="Không có hồ sơ nào cần sửa.")
+            t.xong(lap_hang=dau)
+            wb.save(path)
+            return _ok({"path": path, "dir": os.path.dirname(path),
+                        "n_hoc_sinh": len({d[0] for d in dong}), "n_dong": len(dong)})
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=str(e)))
+
     def tao_so_nhap_mau(self, output_path: str = ""):
         """Tạo Sổ nhập CLB để điền, đặt vào thư mục Tải xuống.
 
