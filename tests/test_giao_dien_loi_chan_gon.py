@@ -130,6 +130,9 @@ def test_chay_bi_chan_chi_hien_tom_tat_nam_em_va_con_lai(mo):
     assert "và 21 học sinh khác" in page.locator("#logBox .log-them").inner_text()
     assert page.locator("#logBox .log-mo-ds").is_visible()
     assert page.locator("#logBox .log-dong").count() <= 6
+    # bước "Kiểm tra dữ liệu" trong danh sách bước cũng gọn, không lặp từng lỗi
+    buoc = page.locator('#stepper .step[data-step="validate"] .step-detail').inner_text()
+    assert "26" in buoc and "Chưa dùng hết" not in buoc and len(buoc) < 250, buoc
     assert not loi, loi
 
 

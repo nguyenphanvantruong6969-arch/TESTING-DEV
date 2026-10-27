@@ -259,7 +259,7 @@ function renderSteps(steps) {
     if (s.status === "running") detail.textContent = t("step_running");
     else if (s.status === "done") detail.textContent = s.detail ? trErr(s.detail) : t("step_done_default");
     else if (s.status === "error")
-      detail.textContent = Array.isArray(s.detail) ? trErrs(s.detail).join(" ") : (s.detail ? trErr(s.detail) : t("generic_error"));
+      detail.textContent = Array.isArray(s.detail) ? chuLoiBuocGon(s.detail) : (s.detail ? trErr(s.detail) : t("generic_error"));
   });
 }
 
@@ -366,6 +366,15 @@ function chuMotLoiWharton(e) {
   else cau = t("wh_loi_p_khac");
   if (p.buoi && p.buoi !== BUOI_MAC_DINH) cau += " (" + nhanBuoi(p.buoi) + ")";
   return cau;
+}
+
+/* Chữ lỗi của MỘT bước trong danh sách bước: lỗi hồ sơ điểm quyết tâm chỉ còn câu tóm tắt (chi tiết
+   từng em nằm ở khung "Các lỗi cần xử lý" và ở tab Quản lý), lỗi khác giữ nguyên. */
+function chuLoiBuocGon(errors) {
+  const { khac, em } = tachLoiWharton(errors);
+  const cau = khac.map((e) => trErr(e));
+  if (em.length) cau.push(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }));
+  return cau.join(" ");
 }
 
 function showLog(errors) {
