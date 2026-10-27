@@ -54,6 +54,7 @@ def trang(api_co_du_lieu):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="admin"]').click()
+        page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
         page.wait_for_selector("#btnResetAll")
         yield page, loi, api_co_du_lieu
         br.close()
@@ -153,6 +154,8 @@ def test_moi_o_so_tren_man_hinh_cap_nhat_ngay_sau_khi_xoa(trang):
     page.unroute("**/__api__/get_last_run_info")
 
     page.locator('[data-tab="admin"]').click()
+
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     nut = page.locator("#btnResetStudents")
     nut.click()
     page.wait_for_function(
@@ -189,6 +192,8 @@ def test_em_da_tim_truoc_khi_xoa_khong_con_tren_man_hinh(trang):
     page.wait_for_selector("#fallbackWorkArea:not([hidden])")
 
     page.locator('[data-tab="admin"]').click()
+
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     nut = page.locator("#btnResetAll")
     nut.click()
     page.wait_for_function(
@@ -258,6 +263,8 @@ def test_the_van_hanh_sach_het_sau_khi_xoa_toan_bo(trang, tmp_path):
     )
 
     page.locator('[data-tab="admin"]').click()
+
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     nut = page.locator("#btnResetAll")
     nut.click()
     page.wait_for_function(
@@ -309,6 +316,8 @@ def test_khong_xoa_duoc_khi_dang_nhap_tep(trang, tmp_path):
     assert cho, "yeu cau nhap khong bi giu — test khong kiem duoc gi"
 
     page.locator('[data-tab="admin"]').click()
+
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     nut = page.locator("#btnResetAll")
     nut.click()
     page.wait_for_function(

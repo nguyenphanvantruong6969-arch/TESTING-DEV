@@ -17,10 +17,14 @@ from rbda_priority_pipeline import (
     khoa_sap_buoi,
     sap_buoi,
     BUOI_MAC_DINH,
+    doc_du_lieu_wharton,
+    dung_wharton,
     gom_theo_buoi,
+    kiem_ho_so_wharton,
     loi_suc_chua,
     luat_xep_cua,
     nhom_xep_cung,
+    tu_dien_wharton_mot_clb,
 )
 
 
@@ -330,6 +334,13 @@ class NhapDuLieuMixin:
                    and not self.chuan_hoa_nhom_du_tru(s["reserve_group"])]
         ma_trong_so = {c["club_id"] for c in du_lieu["clubs"]}
         canh_bao = []
+        # Điểm Wharton ở ô "Điểm W k" mà NV k trống: chỉ báo khi workspace bật (tắt thì cả cột
+        # bị bỏ qua và `csv_wp_bo_qua` đã nói điều đó ở bước nạp / xem trước).
+        if dung_wharton(self._luat_nghiem()):
+            for s in du_lieu["students"]:
+                for cot in s.get("diem_w_mo_coi", []):
+                    canh_bao.append(err("csv_wp_khong_co_nguyen_vong",
+                                        student_id=s["student_id"], cot=cot))
         with self._ket_noi_doc() as cur:
             diem = {(r[0], r[1]) for r in cur.execute(
                 "SELECT student_id, club_id FROM club_scores")}
@@ -363,6 +374,12 @@ class NhapDuLieuMixin:
             kq = so_nhap.tom_tat(du_lieu)
             kq["loi"] = du_lieu["loi"]
             kq["canh_bao"] = [] if du_lieu["loi"] else self._canh_bao_so_nhap(du_lieu)[0]
+            # Workspace chưa bật điểm Wharton mà sổ có cột "Điểm W k": nói trước khi bấm Nhập
+            # rằng các ô đó sẽ bị bỏ qua (lúc nhập thật, bước nạp CSV cũng báo đúng câu này).
+            if not du_lieu["loi"] and not dung_wharton(self._luat_nghiem()):
+                n_w = sum(1 for s in du_lieu["students"] for x in s["nv"] if x.get("diem_w"))
+                if n_w:
+                    kq["canh_bao"].append(err("csv_wp_bo_qua", n=n_w))
             return _ok(kq)
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("xlsx_read_failed", detail=str(e))))
@@ -1016,6 +1033,66 @@ class NhapDuLieuMixin:
             for b, cot in theo_buoi.items()
         }
 
+    # Cột điểm Wharton (mục A13) đi cặp với cột nguyện vọng: `wp_k` với `pref_k`, và
+    # `<buoi>_wp_k` với `<buoi>_pref_k`. Dạng dài có MỘT cột `wp` cạnh `club_id`.
+    _MAU_COT_WP = re.compile(r"^(?:(?P<buoi>.+)_)?wp_(?P<k>\d+)$")
+
+    @classmethod
+    def _cot_wp(cls, fieldnames) -> dict:
+        """{(buoi | None, k): tên cột} của các cột điểm Wharton. Rỗng = tệp không có cột nào."""
+        ra: dict = {}
+        for f in fieldnames or []:
+            m = cls._MAU_COT_WP.match(f.strip())
+            if m:
+                ra[(m.group("buoi"), int(m.group("k")))] = f
+        return ra
+
+    @staticmethod
+    def _gom_wp_mot_dong(row, sid, cot_pref: dict, cot_wp: dict, loi_som: list) -> list:
+        """[(mã CLB thô, ô điểm thô, tên cột wp)] của MỘT dòng tệp.
+
+        Ghép `wp_k` với `pref_k` theo HẬU TỐ SỐ trong tên cột, KHÔNG theo vị trí (giống cách
+        `test_club_k` ghép với `score_k`): ô nguyện vọng bỏ trống bị lọc đi, nên ghép theo vị
+        trí sẽ gán nhầm điểm cho CLB khác. Có điểm mà ô nguyện vọng cạnh đó trống thì báo, không
+        đoán CLB nào.
+        """
+        ra = []
+        for khoa in sorted(cot_wp, key=lambda x: (x[0] or "", x[1])):
+            cot = cot_wp[khoa]
+            gt = (row.get(cot) or "").strip()
+            if not gt:
+                continue
+            cot_p = cot_pref.get(khoa)
+            cid = (row.get(cot_p) or "").strip() if cot_p else ""
+            if not cid:
+                loi_som.append(err("csv_wp_khong_co_nguyen_vong", student_id=sid, cot=cot))
+                continue
+            ra.append((cid, gt, cot))
+        return ra
+
+    @staticmethod
+    def _soat_ho_so_wharton(cur, sids, buoi_cua_clb: dict, tran_nv: int) -> list:
+        """Cảnh báo hồ sơ Wharton của đúng những em vừa nạp (`kiem_ho_so_wharton`).
+
+        Nạp KHÔNG bị chặn vì hồ sơ chưa hợp lệ: nạp được rồi sửa ở kiosk. Chặn là việc của
+        pipeline, ở bước Kiểm tra dữ liệu. Dùng con trỏ đang ghi nên thấy cả điểm vừa nạp.
+        """
+        if not sids:
+            return []
+        w = doc_du_lieu_wharton(cur)
+        prefs = {sid: [r[0] for r in cur.execute(
+            "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank", (sid,))]
+            for sid in sids}
+        tap = set(sids)
+        clubs = {cid: {"buoi": b} for cid, b in buoi_cua_clb.items()}
+        w1 = {s: dict(v) for s, v in w["w1"].items() if s in tap}
+        w2 = {s: dict(v) for s, v in w["w2"].items() if s in tap}
+        # Quỹ chỉ có MỘT CLB mà để trống: tự điền 100 trong bộ nhớ (cách A), cùng hàm với
+        # pipeline và báo cáo sức khoẻ, để ba nơi nói cùng một điều.
+        w1, w2 = tu_dien_wharton_mot_clb(prefs, w["clb_thi"], w1, w2, clubs)
+        return kiem_ho_so_wharton(
+            prefs, w["clb_thi"], w1, w2, clubs, tran_nguyen_vong=tran_nv)
+
     # -----------------------------------------------------------------
     # BA BƯỚC DÙNG CHUNG CHO HAI TỆP HỌC SINH (nguyện vọng / chọn thi)
     #
@@ -1072,6 +1149,7 @@ class NhapDuLieuMixin:
             luat = self._luat_nghiem()
             tran_nv = luat["max_choices"]        # trần của workspace; đọc TRƯỚC khi mở giao dịch
             nhom_cung = nhom_xep_cung(luat_xep_cua(luat))
+            bat_wharton = dung_wharton(luat)     # điểm Wharton (A13); mặc định tắt
             fieldnames, rows = self._parse_csv_rows(csv_text)
             if not rows:
                 return _fail(err("csv_empty"))
@@ -1079,6 +1157,11 @@ class NhapDuLieuMixin:
             cot_theo_buoi = self._cot_nguyen_vong_theo_buoi(fieldnames)
             is_wide = bool(cot_theo_buoi) or any(
                 f.startswith("pref_") for f in fieldnames)
+            cot_wp = self._cot_wp(fieldnames)
+            # Tệp có cột điểm Wharton không? Dạng dài dùng MỘT cột `wp`.
+            co_wp = bool(cot_wp) if is_wide else ("wp" in fieldnames)
+            wp_tho: dict = {}        # sid -> [(mã CLB thô, ô điểm thô, tên cột)]
+            loi_wp_som: list = []    # cảnh báo phát hiện lúc đọc tệp (chỉ khi Wharton bật)
 
             # Gom thanh { student_id: (name, [club_id_theo_thu_tu], nhom) }
             grouped: dict = {}
@@ -1119,6 +1202,13 @@ class NhapDuLieuMixin:
                             thu_tu.append(cid)
                     grouped[sid] = (row.get("name", ""), thu_tu,
                                     row.get("reserve_group", ""))
+                    if bat_wharton and cot_wp:
+                        cot_pref = {}
+                        for b, cs in cot_theo_buoi.items():
+                            for c in cs:
+                                cot_pref[(b, int(c.rsplit("_", 1)[1]))] = c
+                        wp_tho[sid] = self._gom_wp_mot_dong(
+                            row, sid, cot_pref, cot_wp, loi_wp_som)
             elif is_wide:
                 pref_cols = sorted(
                     [f for f in fieldnames if f.startswith("pref_")],
@@ -1131,6 +1221,11 @@ class NhapDuLieuMixin:
                     ordered = [row[c] for c in pref_cols if row.get(c)]
                     grouped[sid] = (row.get("name", ""), ordered,
                                     row.get("reserve_group", ""))
+                    if bat_wharton and cot_wp:
+                        cot_pref = {(None, int(c.split("_")[1])): c for c in pref_cols
+                                    if c.split("_")[1].isdigit()}
+                        wp_tho[sid] = self._gom_wp_mot_dong(
+                            row, sid, cot_pref, cot_wp, loi_wp_som)
             else:
                 if "student_id" not in fieldnames or "club_id" not in fieldnames:
                     return _fail(err("csv_missing_columns", fieldnames=fieldnames))
@@ -1150,12 +1245,27 @@ class NhapDuLieuMixin:
                     nhom = next((r.get("reserve_group") for r in sid_rows
                                  if r.get("reserve_group")), "")
                     grouped[sid] = (name, [r["club_id"] for r in sid_rows], nhom)
+                    if bat_wharton and co_wp:
+                        wp_tho[sid] = [(r["club_id"], (r.get("wp") or "").strip(), "wp")
+                                       for r in sid_rows if (r.get("wp") or "").strip()]
+
+            # Số ô điểm Wharton có chữ trong tệp: workspace chưa bật thì chúng bị bỏ qua và phải
+            # nói ra (không lặng lẽ nuốt dữ liệu người nhập đã gõ).
+            n_wp_bo_qua = 0
+            if co_wp and not bat_wharton:
+                cac_cot_wp = list(cot_wp.values()) if is_wide else ["wp"]
+                n_wp_bo_qua = sum(1 for row in rows for c in cac_cot_wp
+                                  if (row.get(c) or "").strip())
 
             with self._ket_noi_ghi() as cur:
                 khop_club = self._khop_club_id(cur)
                 existing_students = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+                # Điểm Wharton đang KHOÁ (đã chạy xếp, A13.3): nguyện vọng vẫn nạp, chỉ phần điểm
+                # trong tệp bị bỏ. Đọc trong chính giao dịch ghi này, để không có khe giữa kiểm và ghi.
+                khoa_w = bat_wharton and co_wp and self._wharton_dang_khoa(cur)
 
                 n_created, n_updated, n_skipped = 0, 0, 0
+                sids_da_ghi: list = []
                 # Dem RIENG voi n_skipped. "Bo mot buoi cua mot em" va "bo
                 # tron mot em" la hai chuyen khac han; gop chung la lap lai
                 # dung kieu nham lan da de ra con so "45 em trang tay".
@@ -1230,8 +1340,51 @@ class NhapDuLieuMixin:
                         [(sid, cid, i + 1) for i, cid in enumerate(deduped)],
                     )
                     n_updated += 1
+                    sids_da_ghi.append(sid)
+
+                    # Điểm Wharton. Luôn dọn dòng của CLB không còn trong nguyện vọng (như
+                    # `submit_preferences`). Wharton BẬT và tệp có cột wp: THAY mọi dòng cũ của
+                    # em bằng dòng trong tệp; `tier` theo ô tick HIỆN TẠI (Sổ nhập và tệp chọn thi
+                    # đã được nạp trước nguyện vọng, nên ô tick đã có).
+                    cu_w = self._doc_diem_wharton_cua_em(cur, sid)
+                    if bat_wharton and co_wp and not khoa_w:
+                        tick = {r[0] for r in cur.execute(
+                            "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+                            (sid,))}
+                        cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (sid,))
+                        da_gap: set = set()
+                        for cid_tho, gt, _cot in wp_tho.get(sid, []):
+                            cid = khop_club(cid_tho)
+                            if cid is None or cid not in deduped or cid in da_gap:
+                                continue      # CLB đã bị bỏ (lệch / quá trần buổi) hay lặp lại
+                            da_gap.add(cid)
+                            # Chỉ số nguyên không âm viết bằng chữ số: "30.0" và "30,0" bị từ
+                            # chối (đặc tả: không cho số lẻ). Tối đa 9 chữ số cho vừa cột INTEGER.
+                            if not (re.fullmatch(r"[0-9]{1,9}", gt)):
+                                row_errors.append(err(
+                                    "csv_wp_khong_hop_le", student_id=sid, club_id=cid,
+                                    gia_tri=gt))
+                                continue
+                            cur.execute(
+                                "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
+                                "VALUES (?, ?, ?, ?)",
+                                (sid, cid, 1 if cid in tick else 2, int(gt)))
+                    cur.execute(
+                        "DELETE FROM wharton_bids WHERE student_id = ? AND club_id NOT IN "
+                        "(SELECT club_id FROM preferences WHERE student_id = ?)", (sid, sid))
+                    moi_w = self._doc_diem_wharton_cua_em(cur, sid)
+                    if moi_w != cu_w:
+                        self._ghi_nhat_ky_wharton(cur, "nap_tep", "luu", sid, cu_w, moi_w)
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
+                if khoa_w and any(wp_tho.values()):
+                    row_errors.append(err("wharton_da_khoa"))
+                if bat_wharton:
+                    row_errors.extend(loi_wp_som)
+                    row_errors.extend(self._soat_ho_so_wharton(
+                        cur, sids_da_ghi, buoi_cua_clb, tran_nv))
+                elif n_wp_bo_qua:
+                    row_errors.append(err("csv_wp_bo_qua", n=n_wp_bo_qua))
 
             # Nguyen vong lech buoi: bao TRUOC cac canh bao khac. Day la loi
             # nguoi nhap sua duoc ngay va sua xong thi ket qua doi that, nen

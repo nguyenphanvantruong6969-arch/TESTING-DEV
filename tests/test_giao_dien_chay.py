@@ -387,6 +387,8 @@ class TestKhongLoChuoiKyThuat:
     def test_loi_goi_phan_loi_hien_cau_tieng_viet(self, api, mo_trang):
         """`callApi` từng trả nguyên `String(e)` — ví dụ "TypeError: Failed
         to fetch" — thẳng lên thông báo."""
+        # A13.5: ô xuất kết quả chỉ mở khi đã có kết quả, nên chạy xếp trước.
+        assert api.run_pipeline(seed=1)["ok"]
         page, loi = mo_trang()
         # Cầu nối trình duyệt là một Proxy: bọc nó, cho riêng export_ket_qua hỏng
         # đúng kiểu mất kết nối (fetch bị từ chối).

@@ -142,16 +142,26 @@ function esc(s) {
 }
 
 /* Thong bao noi (toast).
-   Truoc day MOI thong bao tu tat sau 3,6 giay, ke ca loi dai va duong
-   dan tep vua xuat — doc chua het cau da mat. Nay:
-     - thong bao thuong: tu tat, cau cang dai thi o cang lau (4–10 giay);
-     - loi, canh bao, hoac `sticky: true`: GIU cho toi khi bam ×.
+   Quy tac (Truong chot 27/10/2026):
+     - thanh cong (va thong bao thuong): tu dong sau 6 giay; cau dai them thoi
+       gian theo do dai, toi da 10 giay; re chuot hoac dua tieu diem vao thi
+       tam dung dem, roi dem tiep phan con lai;
+     - loi, canh bao, hoac `sticky: true`: GIU cho toi khi bam ×;
+     - thanh cong kem canh bao (`opts.canhBao` = cau, hoac {message, errors}):
+       tach thanh hai thong bao — xanh tu dong, vang rieng va giu.
    Tra ve phan tu toast de ben goi co the tu go no (vd. het che do ve lai). */
 const TOAST_TOI_DA = 4;
+const TOAST_THANH_CONG_MS = 6000;
+const TOAST_DAI_NHAT_MS = 10000;
+
+function thoiGianToastMs(message) {
+  const them = 40 * Math.max(0, String(message).length - 60);
+  return Math.min(TOAST_DAI_NHAT_MS, TOAST_THANH_CONG_MS + them);
+}
 
 function showToast(message, type, opts) {
   /* Tham so thu ba: mang loi (tu showErrorToast) hoac tuy chon
-     {sticky, ghim, khiDong, errors}. */
+     {sticky, ghim, khiDong, errors, canhBao}. */
   let errors = null;
   if (Array.isArray(opts)) {
     errors = opts;
@@ -159,12 +169,24 @@ function showToast(message, type, opts) {
   } else if (opts && opts.errors) {
     errors = opts.errors;
   }
+  /* Thanh cong kem canh bao: canh bao la thong bao vang rieng, con thong bao xanh van tu dong. */
+  if (type === "success" && opts && opts.canhBao) {
+    const cb = typeof opts.canhBao === "string" ? { message: opts.canhBao } : opts.canhBao;
+    showToast(cb.message, "warn", cb.errors || []);
+    opts = Object.assign({}, opts, { canhBao: null });
+  }
   const stack = el("toastStack");
   const toastEl = document.createElement("div");
   toastEl.className = "toast" + (type === "error" ? " is-error"
     : type === "warn" ? " is-warn"
     : type === "success" ? " is-success" : "");
-  if (type === "error") toastEl.setAttribute("role", "alert");
+  /* Loi doc ngay (assertive); thong bao khac doc khi roi (polite). */
+  if (type === "error") {
+    toastEl.setAttribute("role", "alert");
+    toastEl.setAttribute("aria-live", "assertive");
+  } else {
+    toastEl.setAttribute("aria-live", "polite");
+  }
 
   const noiDung = document.createElement("div");
   noiDung.className = "toast-noi-dung";
@@ -176,7 +198,9 @@ function showToast(message, type, opts) {
   const coChiTiet = errors ? ganChiTietKyThuat(noiDung, errors) : false;
   toastEl.appendChild(noiDung);
 
+  let hen = null;
   function go() {
+    if (hen) clearTimeout(hen);
     if (!toastEl.isConnected || toastEl.classList.contains("is-leaving")) return;
     toastEl.classList.add("is-leaving");
     setTimeout(() => toastEl.remove(), 200);
@@ -196,8 +220,25 @@ function showToast(message, type, opts) {
     nutDong.addEventListener("click", go);
     toastEl.appendChild(nutDong);
   } else {
-    const thoiGian = Math.min(10000, 4000 + 40 * String(message).length);
-    setTimeout(go, thoiGian);
+    /* Dem nguoc co the tam dung: nho phan con lai luc dung, dem tiep luc tha. */
+    let conLai = thoiGianToastMs(message);
+    let batDau = 0;
+    const chay = () => {
+      if (hen) return;
+      batDau = Date.now();
+      hen = setTimeout(go, conLai);
+    };
+    const dung = () => {
+      if (!hen) return;
+      clearTimeout(hen);
+      hen = null;
+      conLai = Math.max(0, conLai - (Date.now() - batDau));
+    };
+    toastEl.addEventListener("mouseenter", dung);
+    toastEl.addEventListener("mouseleave", chay);
+    toastEl.addEventListener("focusin", dung);
+    toastEl.addEventListener("focusout", chay);
+    chay();
   }
 
   // `ghim`: thong bao gan voi mot trang thai dang bat (vd. che do ve lai)

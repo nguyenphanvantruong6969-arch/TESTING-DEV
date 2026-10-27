@@ -42,14 +42,21 @@ không còn tên cột tiếng Anh, không phải nhớ thứ tự nạp.
 **Bước 2. Sheet `2. Học sinh`**: mỗi học sinh một dòng. **Mã HS** bắt buộc và
 không được trùng. **Nhóm ưu tiên** chỉ điền cho em thuộc nhóm đó.
 
-**Bước 3. NV1, NV2, NV3…**: chọn tên CLB trong **danh sách thả xuống**, em
-thích nhất đứng trước. Không cần điền kín.
+**Bước 3. Nguyện vọng 1, 2, 3…**: tiêu đề của sheet này có **hai hàng**. Hàng 1 là
+các ô gộp "Nguyện vọng 1", "Nguyện vọng 2"…; hàng 2 là tên các cột nằm dưới mỗi
+ô gộp (**CLB**, **Điểm thi**, và **Điểm quyết tâm** nếu trường bật điểm quyết tâm).
+Dữ liệu bắt đầu từ **hàng 3**. Ở cột **CLB**, chọn tên CLB trong **danh sách thả
+xuống**, em thích nhất đứng trước. Không cần điền kín.
+
+> Đừng chèn hay xoá cột trong một nhóm: phần mềm báo lỗi "cột lệch nhóm" và nêu
+> sheet, cột, nhóm cần sửa. Sổ cũ chỉ có **một** hàng tiêu đề ("NV1", "Điểm 1"…)
+> vẫn nạp được.
 
 > Trường nhiều buổi: cứ điền **chung một danh sách**. Phần mềm tự chia theo
 > buổi của từng CLB. Em bận buổi nào thì đơn giản là không chọn CLB nào của
 > buổi đó.
 
-**Bước 4. Điểm 1, Điểm 2…**: điểm thi của CLB **ngay bên trái**.
+**Bước 4. Điểm thi**: cột nằm **ngay bên phải** cột CLB cùng nhóm.
 
 | Ô Điểm | Nghĩa |
 |---|---|
@@ -72,8 +79,9 @@ CLB không em nào có điểm là CLB **không tổ chức thi**.
 
 ## Ví dụ một dòng học sinh
 
-| Mã HS | Họ tên | Nhóm ưu tiên | NV1 | Điểm 1 | NV2 | Điểm 2 | NV3 | Điểm 3 |
+| Mã HS | Họ tên | Nhóm ưu tiên | Nguyện vọng 1 | | Nguyện vọng 2 | | Nguyện vọng 3 | |
 |---|---|---|---|---|---|---|---|---|
+| | | | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** |
 | HS001 | Nguyễn Văn An | | CLB Tin học | 9,5 | CLB Bóng rổ | | CLB Robotics | thi |
 
 An thích Tin học nhất và đã thi được 9,5. Nguyện vọng 2 là Bóng rổ, CLB không
@@ -92,7 +100,9 @@ Excel, lưu, kéo vào lần nữa.
 | Không có CLB nào tên "…" | Ô NV gõ tay sai tên. Chọn lại trong danh sách thả xuống |
 | "…" được chọn hai lần | Một CLB chỉ chọn một lần trên một dòng (Excel đã tô đỏ ô trùng) |
 | "…" không phải điểm | Ghi một số, hoặc chữ `thi` |
-| Có Điểm k nhưng NV k trống | Điểm phải nằm ngay cạnh CLB của nó |
+| Có Điểm thi nhưng CLB cùng nhóm trống | Điểm phải nằm ngay cạnh CLB của nó |
+| Cột lệch nhóm Nguyện vọng k | Một cột trong nhóm bị chèn, đổi tên hay để trống ở hàng 2. Tải lại sổ mẫu |
+| Nhóm Nguyện vọng k thiếu cột … | Một cột bị xoá khỏi nhóm. Mọi nhóm phải có các cột giống nhau |
 | Mã HS … đã có ở dòng … | Mỗi học sinh một dòng. Gộp hai dòng làm một |
 | Thiếu Mã HS | Dòng có dữ liệu mà không có mã |
 | Tên CLB "…" đã có ở dòng … | Hai CLB trùng tên. Đặt tên khác nhau |

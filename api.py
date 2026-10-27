@@ -44,10 +44,14 @@ from rbda_priority_pipeline import (
     chen_stb_cho_hoc_sinh_moi,
     connect_db,
     default_reserve_eligible_fn,
+    diem_wharton_hieu_luc,
+    dung_wharton,
     generate_stb_lottery,
     init_db,
+    kiem_ho_so_wharton,
     load_from_sqlite,
     load_from_sqlite_kem_dau_van_tay,
+    load_from_sqlite_kem_dau_van_tay_wharton,
     nhom_theo_buoi,
     run_rbda_nhieu_buoi,
     sanity_check_result,
@@ -55,6 +59,7 @@ from rbda_priority_pipeline import (
     soat_vi_pham_rang_buoc,
     luat_xep_de_ghi,
     tham_so_luat,
+    tu_dien_wharton_mot_clb,
     validate_data_integrity,
     verify_stability,
     xay_tier_rank,
@@ -263,6 +268,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # dùng luật mặc định, nên cảnh báo này đứng đầu và là mức cao.
                 luat, cau_hinh_hong = self._cfg_ws()["rules"], str(e)
             tran_thi = luat["max_tests"]   # trần của workspace; None = không giới hạn
+            bat_wharton = dung_wharton(luat)   # điểm Wharton (A13): thêm mục cuối báo cáo
             # Điểm theo NGƯỜI, hay không dùng điểm (priority "tier"): không còn "chấm từng
             # CLB" để mà soát — các mục 1, 2b, 8 (điểm từng CLB) bỏ qua; mục 1b thay vào.
             diem_tung_clb = (luat["score_scope"] != "per_person"
@@ -574,6 +580,19 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                              sample=", ".join(
                                  "%s (%g)" % (sid, s)
                                  for sid, s in la[:self._HEALTH_SAMPLE_LIMIT]))
+
+                # --- Điểm Wharton (A13): chỉ khi workspace bật; đặt SAU các mục sẵn có ------
+                # Cùng hai hàm mà lần chạy xếp dùng, trên dữ liệu đang lưu: hồ sơ sai sẽ CHẶN
+                # lần chạy nên là "high"; vắng thi chỉ làm em bị xét như không thi: "medium".
+                if bat_wharton:
+                    # MỘT hàm dùng chung với thẻ Quản lý (`list_wharton_canh_bao`): cùng em, cùng số.
+                    ho_so = self._ho_so_wharton_tat_ca(cur, luat)
+                    em_sai = {sid for sid, loi_em in ho_so["loi"].items() if loi_em}
+                    if em_sai:
+                        warn("high", "health_wharton_chua_hop_le", n=len(em_sai))
+                    em_vang = {sid for sid, ds in ho_so["vang_thi"].items() if ds}
+                    if em_vang:
+                        warn("medium", "health_wharton_vang_thi", n=len(em_vang))
 
             return _ok({
                 "warnings": warnings,
@@ -959,14 +978,45 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 loi_ch = err("ws_cau_hinh_hong", detail=str(e))
                 steps_log.append({"step": "validate", "status": "error", "detail": loi_ch})
                 return _fail_co_buoc(steps_log, [loi_ch])
-            (students, clubs, tested_scores, applicants, preferences, _), \
-                dau_van_tay = load_from_sqlite_kem_dau_van_tay(self.db_path, luat)
+            # Điểm Wharton (mục A13) bật: dữ liệu, dấu vân tay VÀ hồ sơ Wharton cùng đến từ MỘT
+            # lần đọc (không đọc riêng lần hai). Tắt thì đường cũ từng dòng.
+            wharton = None
+            if dung_wharton(luat):
+                du_lieu, dau_van_tay, wharton = load_from_sqlite_kem_dau_van_tay_wharton(
+                    self.db_path, luat)
+            else:
+                du_lieu, dau_van_tay = load_from_sqlite_kem_dau_van_tay(self.db_path, luat)
+            (students, clubs, tested_scores, applicants, preferences, _) = du_lieu
             errors = validate_data_integrity(
                 students, clubs, preferences, applicants,
                 tran_nguyen_vong=luat["max_choices"])
             if errors:
                 steps_log.append({"step": "validate", "status": "error", "detail": errors})
                 return _fail_co_buoc(steps_log, errors)
+            # Hồ sơ điểm Wharton sai thì CHẶN cả lần chạy, ở đây — TRƯỚC khi soát buổi, bốc hay
+            # khoá số bốc thăm, như `validate_data_integrity` ngay trên: không vẽ số, không ghi
+            # gì, trả đủ danh sách lỗi. Mọi mã trừ `wharton_vang_thi` là lỗi chặn; vắng thi chỉ
+            # là cảnh báo và đi vào chi tiết của bước này.
+            diem_wharton, canh_bao_wharton = None, []
+            if wharton is not None:
+                # Quỹ chỉ có MỘT CLB mà em chưa đặt điểm thì tự điền 100 TRONG BỘ NHỚ (quyết định
+                # của Truong, cách A): không ghi `wharton_bids`, và là hàm thuần của (nguyện vọng,
+                # ô tick, điểm đã lưu) — tất cả đã nằm trong dấu vân tay — nên kết quả vẫn tất định.
+                w1_dien, w2_dien = tu_dien_wharton_mot_clb(
+                    preferences, wharton["clb_thi"], wharton["w1"], wharton["w2"], clubs)
+                loi_wharton = kiem_ho_so_wharton(
+                    preferences, wharton["clb_thi"], w1_dien, w2_dien, clubs,
+                    tran_nguyen_vong=luat["max_choices"])
+                diem_wharton, thong_bao = diem_wharton_hieu_luc(
+                    preferences, w1_dien, w2_dien, tested_scores)
+                loi_wharton += [e for e in thong_bao if e["code"] != "wharton_vang_thi"]
+                canh_bao_wharton = [e for e in thong_bao if e["code"] == "wharton_vang_thi"]
+                if loi_wharton:
+                    n_em = len({e["params"].get("student_id") for e in loi_wharton})
+                    loi_wharton = [err("wharton_ho_so_chua_hop_le", n=n_em)] + loi_wharton
+                    steps_log.append({"step": "validate", "status": "error",
+                                      "detail": loi_wharton})
+                    return _fail_co_buoc(steps_log, loi_wharton)
             # Soat danh sach buoi TRUOC khi ve so boc tham. Ve roi moi phat
             # hien tham so sai la da tieu mat mot bo so — cung ly do vi sao
             # buoc kiem tra du lieu nam truoc buoc boc tham.
@@ -1061,7 +1111,10 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     return _fail(err("hat_giong_da_khoa",
                                      cu=_khoa["seed"], moi=seed))
 
-            steps_log.append({"step": "validate", "status": "done"})
+            buoc_validate = {"step": "validate", "status": "done"}
+            if canh_bao_wharton:
+                buoc_validate["detail"] = canh_bao_wharton
+            steps_log.append(buoc_validate)
 
             # ---------------- Bước 3/6 · SỐ BỐC THĂM ----------------
             # Ba nhánh: chưa khoá -> vẽ toàn bộ rồi khoá; đã khoá + có em
@@ -1179,6 +1232,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 che_do_boc_tham=CHE_DO_BOC_THAM_MAC_DINH, seed=seed,
                 chi_buoi=chi_buoi_chuan,
                 tier_rank=tham_so["tier_rank"], bo_qua_du_tru=tham_so["bo_qua_du_tru"],
+                diem_wharton=diem_wharton,
             )
             sanity_problems = []
             stability_problems = []
@@ -1372,6 +1426,15 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                  1 if stb_redrawn else 0, result.che_do_boc_tham,
                  len(result.ds_buoi), buoi_da_chay, luat_xep_de_ghi(luat)),
             )
+            # Điểm Wharton bật: lần chạy thành công KHOÁ điểm (khoá riêng, không dính STB), trong
+            # CÙNG giao dịch với kết quả — chạy hỏng rollback thì không khoá. Tắt thì không đụng
+            # bảng khoá. Đã khoá sẵn (chạy lại khi chưa mở) thì giữ nguyên, không ghi nhật ký thừa.
+            if wharton is not None and not self._wharton_dang_khoa(cur):
+                cur.execute(
+                    "INSERT INTO wharton_lock (id, is_locked, locked_at) VALUES (1, 1, ?) "
+                    "ON CONFLICT(id) DO UPDATE SET is_locked = 1, locked_at = excluded.locked_at",
+                    (run_at,))
+                self._ghi_nhat_ky_wharton(cur, "he_thong", "khoa")
 
             # Diem commit DUY NHAT cua toan bo pipeline: neu bat ky dong
             # nao o tren (ve STB, ghi ket qua, ghi run_meta/run_history)

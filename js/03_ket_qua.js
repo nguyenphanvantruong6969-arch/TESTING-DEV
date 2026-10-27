@@ -22,6 +22,7 @@ function loadResultsTab() {
   loadPhanBoNguyenVong();
   loadEmChuaCoCho();
   loadSuatDuTru();
+  veDiemChuanKetQua();       // A13.4: mục đóng sẵn, hiện khi bật điểm quyết tâm và đã có kết quả
   /* Tieu de danh sach thanh vien la chu DONG (co ten cau lac bo), nen
      applyStaticText() khong dich duoc. Mo lai dung cai dang mo — giong
      het cach `openScoringClub` duoc goi lai o the 05. */
@@ -1252,10 +1253,30 @@ function veKetQuaXuat(o, dong, coLoi, duongMo) {
   o.appendChild(nut);
 }
 
+/* Chua co ket qua xep: muc xuat ket qua (va o kem CSV) bi khoa, bo chon, kem mot dong vang.
+   Co ket qua tro lai thi mo va chon san nhu luc dau (A13.5). Backend cung tu choi
+   (`xuat_chua_co_ket_qua`), day chi la cho nguoi dung biet truoc. */
+let xuatKetQuaDangKhoa = false;
+function khoaXuatKetQua(khoa) {
+  const o = el("xuatKetQua");
+  o.disabled = khoa;
+  if (khoa) {
+    o.checked = false;
+    el("xuatKemCsv").checked = false;
+    el("xuatKemCsv").disabled = true;
+  } else {
+    if (xuatKetQuaDangKhoa) o.checked = true;
+    el("xuatKemCsv").disabled = !o.checked;
+  }
+  xuatKetQuaDangKhoa = khoa;
+  el("xuatKetQuaKhoa").hidden = !khoa;
+}
+
 /* Dai "ket qua co the da cu" + so dong thay doi canh o tick tuong ung. */
 function veXuatPanel() {
   callApi("get_trang_thai_ket_qua").then((res) => {
     el("ketQuaCuBanner").hidden = !(res.ok && res.data.ket_qua_cu);
+    if (res.ok) khoaXuatKetQua(!res.data.co_ket_qua);
   });
   callApi("get_thay_doi_ket_qua").then((res) => {
     const oTick = el("xuatThayDoi");

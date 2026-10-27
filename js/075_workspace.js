@@ -375,6 +375,7 @@ function wsWizardTuMau(mau, ten, buoc) {
     priority: c.rules.priority,
     tierMode: c.rules.tier_mode,
     scoreScope: c.rules.score_scope,
+    wharton: c.rules.wharton === true,
     tiersText: (c.rules.tiers || []).join("\n"),
   };
 }
@@ -404,6 +405,7 @@ function wsGomBuoc() {
     w.priority = lay("wzPriority").value;
     w.tierMode = lay("wzTierMode").value;
     w.scoreScope = lay("wzScoreScope").value;
+    w.wharton = lay("wzWharton").checked;
     w.tiersText = lay("wzTiers").value;
   }
 }
@@ -414,6 +416,12 @@ function wsGomBuoc() {
    sách nhóm, và mọi người ngang nhau, chỉ còn bốc thăm. */
 function wsDungThuTuNhom(w) {
   return w.tierMode === "strict" || w.priority === "tier";
+}
+
+/* Điểm Wharton (mục A13) chỉ dùng được khi cách xếp ưu tiên CÓ điểm (không phải "chỉ theo
+   nhóm") VÀ điểm tính riêng cho từng chỗ — cùng luật với cau_hinh_ws.py. */
+function wsChoPhepWharton(w) {
+  return w.priority !== "tier" && w.scoreScope === "per_slot";
 }
 
 function wsTiers(w) {
@@ -463,6 +471,7 @@ function wsCfgTuWizard(w) {
       priority: w.priority,
       tier_mode: w.tierMode,
       score_scope: w.scoreScope,
+      wharton: w.wharton === true && wsChoPhepWharton(w),
       tiers: wsTiers(w),
     },
   };
@@ -490,7 +499,20 @@ function wsTruong(id, nhanKhoa, oNhap, goiY) {
   return wsEl("div", { class: "ws-truong" },
     wsEl("label", { for: id, class: "ws-truong-nhan", text: t(nhanKhoa) }),
     oNhap,
-    goiY ? wsEl("div", { class: "ws-truong-goi-y", text: goiY }) : null);
+    goiY ? (goiY.nodeType ? goiY : wsEl("div", { class: "ws-truong-goi-y", text: goiY })) : null);
+}
+
+/* Gợi ý của một ô luật: MỘT dòng ngắn luôn hiện, câu giải thích dài nằm sau nút (i) (A13.4). */
+function wsGoiYNgan(id, ngan, dai) {
+  const ghiChu = wsEl("div", { class: "ws-truong-goi-y", id: id + "GhiChu", hidden: true, text: dai });
+  const nutI = wsEl("button", { type: "button", class: "nut-i", id: id + "I", "aria-expanded": "false",
+    "aria-controls": id + "GhiChu", "aria-label": t("wh_ql_giai_thich"), text: "i" });
+  nutI.addEventListener("click", () => {
+    ghiChu.hidden = !ghiChu.hidden;
+    nutI.setAttribute("aria-expanded", ghiChu.hidden ? "false" : "true");
+  });
+  return wsEl("div", { class: "ws-goi-y-ngan" },
+    wsEl("div", { class: "ws-truong-goi-y ws-goi-y-dong" }, ngan, " ", nutI), ghiChu);
 }
 
 function wsChon(id, giaTri, luaChon) {
@@ -592,11 +614,24 @@ function wsBuoc3(hop) {
   const oPriority = wsChon("wzPriority", w.priority, [
     ["score", t("ws_r_priority_score")], ["tier", t("ws_r_priority_tier")],
     ["score+tier", t("ws_r_priority_both")]]);
+  const oScope = wsChon("wzScoreScope", w.scoreScope, [
+    ["per_slot", t("ws_r_ss_per_slot")], ["per_person", t("ws_r_ss_per_person")]]);
+  /* Điểm Wharton: khoá — và tự bỏ chọn — khi tổ hợp không dùng được, để không lưu một cấu
+     hình mà backend sẽ từ chối. Không tự bật lại khi tổ hợp dùng được trở lại. */
+  const oWharton = wsEl("input", { type: "checkbox", id: "wzWharton", checked: w.wharton === true,
+    disabled: !wsChoPhepWharton(w) });
+  const capNhatOWharton = () => {
+    const cho = wsChoPhepWharton({ priority: oPriority.value, scoreScope: oScope.value });
+    oWharton.disabled = !cho;
+    if (!cho) oWharton.checked = false;
+  };
   const capNhatODanhSachNhom = () => {
     oTiers.disabled = !(oTierMode.value === "strict" || oPriority.value === "tier");
   };
   oTierMode.addEventListener("change", capNhatODanhSachNhom);
   oPriority.addEventListener("change", capNhatODanhSachNhom);
+  oPriority.addEventListener("change", capNhatOWharton);
+  oScope.addEventListener("change", capNhatOWharton);
 
   hop.append(
     wsTruong("wzMaxChoices", "ws_r_max_choices", wsEl("input", { type: "number", id: "wzMaxChoices",
@@ -605,8 +640,9 @@ function wsBuoc3(hop) {
       wsEl("label", { class: "ws-kem" }, oKhong, " ", t("ws_r_khong_gioi_han")))),
     wsTruong("wzPriority", "ws_r_priority", oPriority),
     wsTruong("wzTierMode", "ws_r_tier_mode", oTierMode),
-    wsTruong("wzScoreScope", "ws_r_score_scope", wsChon("wzScoreScope", w.scoreScope, [
-      ["per_slot", t("ws_r_ss_per_slot")], ["per_person", t("ws_r_ss_per_person")]])),
+    wsTruong("wzScoreScope", "ws_r_score_scope", oScope),
+    wsTruong("wzWharton", "ws_r_wharton", oWharton, wsGoiYNgan(
+      "wzWharton", t("ws_r_wharton_ngan"), t("ws_r_wharton_ghi_chu"))),
     wsTruong("wzTiers", "ws_r_tiers", oTiers, t("ws_r_tiers_chi_strict")),
   );
 }
@@ -628,6 +664,7 @@ function wsBuoc4(hop) {
       "score+tier": "ws_r_priority_both" }[r.priority]), "rvPriority"),
     hang(t("ws_r_tier_mode"), t(r.tier_mode === "strict" ? "ws_r_tm_strict" : "ws_r_tm_reserve"), "rvTierMode"),
     hang(t("ws_r_score_scope"), t(r.score_scope === "per_person" ? "ws_r_ss_per_person" : "ws_r_ss_per_slot"), "rvScoreScope"),
+    hang(t("ws_r_wharton"), t(r.wharton ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvWharton"),
     hang(t("ws_r_tiers"), r.tiers.length ? r.tiers.join(" › ") : "—", "rvTiers"),
   ];
   hop.append(

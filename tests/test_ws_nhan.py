@@ -48,6 +48,22 @@ MA_MOI_SAU_ANH_CHUP = {
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).
     "scoring_not_per_slot", "csv_score_ignored_mode", "so_nhap_diem_sai_che_do",
+    # Điểm Wharton (mục A13, vòng 1): lỗi kiểm hồ sơ và cảnh báo vắng thi.
+    "wharton_nguyen_vong_chua_xep", "wharton_chua_dung_het", "wharton_vuot_ngan_sach",
+    "wharton_diem_khong_hop_le", "wharton_ngoai_tap", "wharton_tang_lech",
+    "wharton_vang_thi",
+    # Vòng 2: nhập CSV / Sổ, kiosk, chặn chạy xếp, sức khoẻ dữ liệu.
+    "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
+    "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
+    "error_saving_wharton",
+    # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
+    "wharton_da_khoa", "wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan",
+    "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",
+    # A13.4: Sổ nhập hai hàng tiêu đề, lệch nhóm cột.
+    "so_nhap_cot_lech_nhom", "so_nhap_nhom_thieu_cot",
+    # A13.5: lỗi chặn gọn, phóng điểm hàng loạt, khoá xuất khi chưa có kết quả.
+    "wharton_tom_tat_chua_hop_le", "wharton_phong_sai_xac_nhan", "wharton_da_phong",
+    "xuat_chua_co_ket_qua",
 }
 
 

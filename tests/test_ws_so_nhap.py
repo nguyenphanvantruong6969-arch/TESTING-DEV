@@ -121,10 +121,13 @@ def test_mac_dinh_truong_hoc_cho_ra_dung_so_nhu_truoc(cfg):
 
 def test_mau_nv_khong_doi_voi_mac_dinh():
     wb = _wb(_bytes(cfg=ch.MAC_DINH_TRUONG_HOC))
+    # Hai hàng tiêu đề (A13.4): hàng 1 là ô gộp "Nguyện vọng k", hàng 2 là tên cột trong nhóm.
     tieu_de = [c.value for c in wb["2. Học sinh"][1]]
+    hang_2 = [c.value for c in wb["2. Học sinh"][2]]
     assert tieu_de[:3] == ["Mã HS", "Họ tên", "Nhóm ưu tiên"]
-    assert tieu_de[3:7] == ["NV1", "Điểm 1", "NV2", "Điểm 2"]
-    assert len(tieu_de) == 3 + 2 * 15      # 15 cặp NV/Điểm như trước
+    assert tieu_de[3:7] == ["Nguyện vọng 1", None, "Nguyện vọng 2", None]
+    assert hang_2[3:7] == ["CLB", "Điểm thi", "CLB", "Điểm thi"]
+    assert len(hang_2) == 3 + 2 * 15      # 15 nhóm CLB/Điểm thi như trước
 
 
 def test_mac_dinh_doc_giong_het_khi_co_va_khong_co_cfg():
@@ -145,8 +148,10 @@ def test_cong_ty_sinh_mau_roi_doc_lai():
     assert [c.value for c in wb["1. Dự án"][1]] == [
         "Tên CLB", "Buổi", "Chỉ tiêu", "Suất ưu tiên", "Cấp bậc", "Mã CLB"]
     tieu_de = [c.value for c in wb["2. Nhân viên"][1]]
-    assert tieu_de[:5] == ["Mã HS", "Họ tên", "Cấp bậc", "NV1", "Điểm 1"]
-    assert tieu_de[-2:] == ["NV4", "Điểm 4"]      # đúng 4 = max_choices, không cột thừa
+    hang_2 = [c.value for c in wb["2. Nhân viên"][2]]
+    assert tieu_de[:5] == ["Mã HS", "Họ tên", "Cấp bậc", "Nguyện vọng 1", None]
+    assert hang_2[3:5] == ["Dự án", "Điểm thi"]      # cột chỗ xếp theo nhãn của workspace
+    assert tieu_de[-2:] == ["Nguyện vọng 4", None]   # đúng 4 = max_choices, không cột thừa
     # đọc lại bằng cfg: ra đúng dữ liệu đã ghi
     doc = _doc(du, cfg=CONG_TY)
     assert not doc["loi"], doc["loi"]
@@ -223,7 +228,7 @@ def test_nhan_co_ky_tu_cam_o_ten_sheet_van_ghi_va_doc_duoc():
 def test_so_cot_nv_theo_tran():
     def nv(cfg, **kw):
         return sum(1 for c in _wb(_bytes(cfg=cfg, **kw))[so_nhap.ten_sheet_hs(cfg)][1]
-                   if str(c.value or "").startswith("NV"))
+                   if str(c.value or "").startswith("Nguyện vọng"))
     assert nv({"rules": {"max_choices": 3}}) == 3
     assert nv({"rules": {"max_choices": 1}}) == 1
     assert nv({"rules": {"max_choices": 10}}) == 15            # như trước
@@ -248,9 +253,10 @@ def test_diem_theo_nguoi_mot_cot_sau_cot_nhom():
     du = _bytes([_clb("a", "Dự án A"), _clb("b", "Dự án B")], hs, cfg=CA_NHAN)
     ws_hs = _wb(du)["2. Nhân viên"]
     tieu_de = [c.value for c in ws_hs[1]]
-    assert tieu_de == ["Mã HS", "Họ tên", "Cấp bậc", "Điểm", "NV1", "NV2", "NV3"]
-    assert [c.value for c in ws_hs[2]][:6] == ["NV01", "Lan", "Cấp 1", 8.5, "Dự án A", "Dự án B"]
-    assert [c.value for c in ws_hs[3]][3] is None                  # không thi
+    assert tieu_de == ["Mã HS", "Họ tên", "Cấp bậc", "Điểm", "Nguyện vọng 1", "Nguyện vọng 2",
+                       "Nguyện vọng 3"]
+    assert [c.value for c in ws_hs[3]][:6] == ["NV01", "Lan", "Cấp 1", 8.5, "Dự án A", "Dự án B"]
+    assert [c.value for c in ws_hs[4]][3] is None                  # không thi
     doc = _doc(du, cfg=CA_NHAN)
     assert not doc["loi"], doc["loi"]
     lan, mai = doc["students"]
@@ -460,7 +466,7 @@ def test_api_company_xuat_mau_roi_nap_lai(goc, tmp_path):
     assert wb.sheetnames == ["1. Dự án", "2. Nhân viên", "Hướng dẫn"]
     assert wb["1. Dự án"]["A2"].value == "Dự án A"       # CLB đang có điền sẵn
     hs = wb["2. Nhân viên"]
-    assert [c.value for c in hs[1]][3:6] == ["NV1", "Điểm 1", "NV2"]
+    assert [c.value for c in hs[1]][3:6] == ["Nguyện vọng 1", None, "Nguyện vọng 2"]
     hs.append(["NV01", "Lan", None, "Dự án A", 8])
     b = io.BytesIO()
     wb.save(b)
@@ -480,7 +486,9 @@ def test_api_mau_truong_hoc_giong_het_truoc_day(api, tmp_path):
     wb = openpyxl.load_workbook(res["data"]["path"])
     assert wb.sheetnames == ["1. CLB", "2. Học sinh", "Hướng dẫn"]
     assert [c.value for c in wb["1. CLB"][1]] == so_nhap.COT_CLB
-    assert len([c for c in wb["2. Học sinh"][1] if c.value]) == 3 + 2 * 15
+    # Hai hàng tiêu đề: hàng 1 có 3 cột đầu + 15 ô gộp; hàng 2 có 15 cặp CLB/Điểm thi.
+    assert len([c for c in wb["2. Học sinh"][1] if c.value]) == 3 + 15
+    assert len([c for c in wb["2. Học sinh"][2] if c.value]) == 2 * 15
 
 
 def test_api_diem_theo_nguoi_nap_va_tao_mau(goc, tmp_path):
@@ -490,7 +498,8 @@ def test_api_diem_theo_nguoi_nap_va_tao_mau(goc, tmp_path):
     mau = api.tao_so_nhap_mau()
     wb = openpyxl.load_workbook(mau["data"]["path"])
     hs = wb["2. Nhân viên"]
-    assert [c.value for c in hs[1]] == ["Mã HS", "Họ tên", "Cấp bậc", "Điểm", "NV1", "NV2", "NV3"]
+    assert [c.value for c in hs[1]] == ["Mã HS", "Họ tên", "Cấp bậc", "Điểm", "Nguyện vọng 1",
+                                        "Nguyện vọng 2", "Nguyện vọng 3"]
     hs.append(["NV01", "Lan", None, 8.5, "Dự án A", "Dự án B"])
     b = io.BytesIO()
     wb.save(b)

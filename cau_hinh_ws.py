@@ -59,6 +59,8 @@ MAC_DINH_TRUONG_HOC = {
         "tier_mode": "reserve",
         "score_scope": "per_slot",
         "tiers": [],
+        # Điểm Wharton (mục A13): mặc định TẮT, xem `_chuan_hoa` về điều kiện bật.
+        "wharton": False,
     },
 }
 
@@ -170,6 +172,15 @@ def _chuan_hoa(cfg) -> dict:
                            ("score_scope", PHAM_VI_DIEM)):
         if luat[khoa] not in cho_phep:
             raise ValueError("%s phải là một trong %s, nhận %r." % (khoa, list(cho_phep), luat[khoa]))
+
+    bat_wharton = luat["wharton"]
+    if not isinstance(bat_wharton, bool):
+        raise ValueError("wharton phải là true hoặc false, nhận %r." % (bat_wharton,))
+    if bat_wharton and (luat["priority"] not in ("score", "score+tier")
+                        or luat["score_scope"] != "per_slot"):
+        raise ValueError(
+            "wharton chỉ dùng được khi priority là score hoặc score+tier và score_scope là "
+            "per_slot (điểm Wharton cần biết em có thi CLB nào).")
 
     tiers = luat["tiers"]
     if not isinstance(tiers, list) or not all(isinstance(t, str) and t.strip() for t in tiers):

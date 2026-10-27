@@ -264,6 +264,7 @@
         <div class="panel-head"><h2 data-i18n="xuat_title">Xuất dữ liệu</h2></div>
         <div class="xuat-tuy-chon">
           <label class="xuat-muc"><input type="checkbox" id="xuatKetQua" checked> <span data-i18n="xuat_opt_ket_qua">Kết quả sắp xếp: một tệp Excel (danh sách học sinh, từng CLB, học sinh chưa có chỗ, thống kê)</span></label>
+          <p class="canh-bao-vang" id="xuatKetQuaKhoa" role="status" hidden data-i18n="xuat_khoa_dong">Chưa có kết quả xếp. Chạy xếp trước.</p>
           <label class="xuat-muc xuat-muc-phu"><input type="checkbox" id="xuatKemCsv"> <span data-i18n="xuat_opt_kem_csv">Kèm các tệp CSV rời (chỉ cần khi đổ số liệu vào phần mềm khác)</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatDauVao"> <span data-i18n="xuat_opt_dau_vao">Dữ liệu đầu vào hiện tại: một Sổ nhập CLB nạp lại được</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatThayDoi"> <span data-i18n="xuat_opt_thay_doi">Thay đổi so với lần chạy trước</span> <span class="xuat-dem" id="xuatThayDoiDem"></span></label>
@@ -278,6 +279,21 @@
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
         <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 03 thì bấm "Xuất CSV em này" ngay tại đó.</p>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
+      </div>
+
+      <!-- Điểm chuẩn (A13.4): chỉ hiện khi bật điểm quyết tâm và đã có kết quả. LUÔN đóng mỗi lần
+           vào thẻ; trạng thái mở KHÔNG được nhớ (khác các mục thu gọn bên dưới). js/05_quan_ly.js. -->
+      <div class="panel" id="dcKqPanel" hidden>
+        <div class="panel-head">
+          <h2 data-i18n="dc_title">Điểm chuẩn</h2>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnDcKqMo" type="button" aria-expanded="false" aria-controls="dcKqBody" data-i18n="dc_xem">Xem điểm chuẩn</button>
+          </div>
+        </div>
+        <div class="panel-body" id="dcKqBody" hidden>
+          <p class="canh-bao-vang" id="dcKqCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
+          <div id="dcKqTongQuan"></div>
+        </div>
       </div>
 
       <div class="panel" id="fillPanel">
@@ -597,6 +613,18 @@
             <span class="chua-luu" id="chuaLuuNv" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="preferencesFeedback"></span>
           </div>
+
+          <!-- Bước 3 · Điểm Wharton (mục A13): chỉ hiện khi workspace bật Wharton; js/04_nhap_tai_cho.js
+               dựng khung theo buổi trong #fbWhartonBody. -->
+          <div class="fallback-step" id="fbWhartonStep" hidden>
+            <h3 data-i18n="fallback_step3_title">Bước 3. Điểm quyết tâm</h3>
+            <p class="hint-text" data-i18n="fallback_step3_hint">Chia đúng 100 điểm cho các CLB đã thi và đúng 100 điểm cho các CLB không thi, ở mỗi buổi. Ô để trống tính là 0 điểm.</p>
+            <p class="wh-khoa-ghi-chu" id="fbWhartonKhoa" role="status" hidden data-i18n="wharton_da_khoa_kiosk">Điểm quyết tâm đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.</p>
+            <div id="fbWhartonBody"></div>
+            <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm quyết tâm</button>
+            <span class="chua-luu" id="chuaLuuWharton" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
+            <span class="save-feedback" role="status" aria-live="polite" id="whartonFeedback"></span>
+          </div>
         </div>
       </div>
     </section>
@@ -608,6 +636,17 @@
         <p class="view-desc" data-i18n="admin_desc">Thêm, sửa CLB và gán nhãn dự trữ cho học sinh. Trường tự quyết định ai được dự trữ. Phần mềm chỉ ghép học sinh và CLB có cùng nhãn.</p>
       </header>
 
+      <!-- Tab con của thẻ Quản lý (A13.5). Hai tab điểm (wh, dc) chỉ hiện khi bật điểm quyết tâm:
+           js/05_quan_ly.js (capNhatTabConQl) bỏ thuộc tính hidden khi khối tương ứng hiện. -->
+      <div class="ql-tabs" id="qlTabs" role="tablist" data-i18n-aria-label="ql_tab_nhom_aria" aria-label="Các mục của thẻ Quản lý">
+        <button type="button" role="tab" class="ql-tab" id="qlTabClb" data-ql-tab="clb" aria-controls="qlPanelClb" aria-selected="true" tabindex="0" data-i18n="ql_tab_clb">CLB</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabHs" data-ql-tab="hs" aria-controls="qlPanelHs" aria-selected="false" tabindex="-1" data-i18n="ql_tab_hs">Học sinh</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabWh" data-ql-tab="wh" aria-controls="qlPanelWh" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_wh">Điểm quyết tâm</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabDc" data-ql-tab="dc" aria-controls="qlPanelDc" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_dc">Điểm chuẩn</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabDuLieu" data-ql-tab="du_lieu" aria-controls="qlPanelDuLieu" aria-selected="false" tabindex="-1" data-i18n="ql_tab_du_lieu">Dữ liệu</button>
+      </div>
+
+      <div role="tabpanel" id="qlPanelClb" data-ql-tab="clb" aria-labelledby="qlTabClb">
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_club_form_title">Thêm hoặc sửa CLB</h2></div>
         <div class="admin-form-grid">
@@ -663,7 +702,9 @@
         <p class="hint-text" data-i18n="admin_lich_tuan_desc">Mỗi cột là một buổi. Thanh dưới mỗi CLB là mức lấp đầy của lần sắp xếp gần nhất.</p>
         <div class="lich-tuan" id="lichTuan"></div>
       </div>
+      </div>
 
+      <div role="tabpanel" id="qlPanelHs" data-ql-tab="hs" aria-labelledby="qlTabHs" hidden>
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_reserve_assign_title">Gán nhãn dự trữ và xuất hồ sơ học sinh</h2></div>
         <div class="search-row">
@@ -692,6 +733,164 @@
         </div>
       </div>
 
+      </div>
+
+      <div role="tabpanel" id="qlPanelWh" data-ql-tab="wh" aria-labelledby="qlTabWh" hidden>
+      <!-- Điểm Wharton (mục A13.3): chỉ hiện khi workspace bật điểm Wharton; js/05_quan_ly.js
+           (loadAdminWharton) dựng bảng, cảnh báo, màn sửa và nhật ký. -->
+      <div class="panel" id="adminWhartonBlock" hidden>
+        <div class="panel-head">
+          <h2 data-i18n="wh_ql_title">Điểm quyết tâm</h2>
+          <div class="panel-actions">
+            <button class="nut-i" id="btnWhThongTin" type="button" aria-expanded="false" aria-controls="whQlMoTa" data-i18n-aria-label="wh_ql_giai_thich" aria-label="Giải thích về điểm quyết tâm">i</button>
+          </div>
+        </div>
+        <p class="hint-text" id="whQlMoTa" hidden data-i18n="wh_ql_desc">Xem, sửa và xoá điểm quyết tâm mà từng học sinh đã chia. Sau khi chạy xếp, điểm được khoá để kết quả không đổi âm thầm.</p>
+        <div class="wh-ql-khoa">
+          <span class="wh-ql-khoa-chu" id="whQlKhoa" role="status"></span>
+        </div>
+
+        <h3 class="wh-ql-muc" data-i18n="wh_canh_bao_title">Hồ sơ cần xử lý</h3>
+        <div id="whCanhBao"></div>
+
+        <!-- Xử lý hàng loạt hồ sơ chia thiếu hoặc thừa (A13.5). -->
+        <div class="wh-hang-loat" id="whHangLoat">
+          <div class="search-row">
+            <button class="btn btn-secondary" id="btnWhTaiCanSua" type="button" data-i18n="wh_hl_tai">Tải danh sách cần sửa</button>
+            <button class="btn btn-secondary" id="btnWhPhong" type="button" data-i18n="wh_hl_phong">Phóng cho đủ 100 theo tỉ lệ</button>
+          </div>
+          <div class="wh-ql-xacnhan" id="whPhongHop" hidden>
+            <p class="hint-text" id="whPhongHoi"></p>
+            <div class="search-row">
+              <input type="text" id="whPhongGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_phong" aria-label="Gõ chữ xác nhận để phóng điểm">
+              <button class="btn btn-primary" id="btnWhPhongXn" type="button" data-i18n="wh_hl_phong_xn">Xác nhận phóng điểm</button>
+              <button class="btn btn-ghost" id="btnWhPhongHuy" type="button" data-i18n="btn_cancel">Huỷ</button>
+            </div>
+          </div>
+          <div id="whPhongKetQua" role="status" hidden>
+            <p class="hint-text" id="whPhongTieuDe"></p>
+            <ul class="wh-ql-nk" id="whPhongDs"></ul>
+          </div>
+        </div>
+
+        <div class="wh-ql-sua" id="whQlSua" hidden>
+          <div class="wh-ql-sua-dau">
+            <h3 id="whQlSuaTen"></h3>
+            <button class="btn btn-ghost" id="btnWhDongSua" data-i18n="wh_sua_dong">Đóng</button>
+          </div>
+          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở "Thao tác khác" để sửa.</p>
+          <p class="hint-text" id="whQlSuaRong" hidden data-i18n="wh_sua_rong">Học sinh này chưa có nguyện vọng nên chưa có gì để chia.</p>
+          <div id="whQlSuaKhung"></div>
+          <div class="search-row">
+            <button class="btn btn-primary" id="btnWhLuu" data-i18n="btn_save_wharton">Lưu điểm quyết tâm</button>
+            <span class="chua-luu" id="whQlChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
+            <button class="btn-icon-danger" id="btnWhXoaMot" data-i18n="btn_wh_xoa_mot">Xoá điểm của học sinh này</button>
+            <span class="save-feedback" role="status" aria-live="polite" id="whQlSuaPhanHoi"></span>
+          </div>
+        </div>
+
+        <div class="wh-ql-loc-hang">
+          <input type="text" id="whQlTim" class="text-input" data-i18n-placeholder="wh_tim_placeholder" placeholder="Tìm học sinh theo mã hoặc tên…">
+          <label class="wh-ql-loc"><span data-i18n="wh_loc_quy">Quỹ</span>
+            <select id="whLocQuy" class="text-input text-input-sm">
+              <option value="" data-i18n="wh_loc_tat_ca">Tất cả</option>
+              <option value="1" data-i18n="wh_quy_1">Quỹ 1, đã thi</option>
+              <option value="2" data-i18n="wh_quy_2">Quỹ 2, không thi</option>
+            </select></label>
+          <label class="wh-ql-loc" id="whLocBuoiNhan"><span data-i18n="wh_loc_buoi">Buổi</span>
+            <select id="whLocBuoi" class="text-input text-input-sm"></select></label>
+          <label class="wh-ql-loc"><span data-i18n="wh_loc_clb">CLB</span>
+            <select id="whLocClb" class="text-input text-input-sm"></select></label>
+          <label class="wh-ql-loc wh-ql-loc-tick"><input type="checkbox" id="whLocChiLoi"><span data-i18n="wh_loc_chi_loi">Chỉ hồ sơ có vấn đề</span></label>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th data-i18n="th_student_id">Mã học sinh</th>
+            <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_wh_diem">Điểm đã chia</th>
+            <th data-i18n="th_wh_tt">Tình trạng</th>
+          </tr></thead>
+          <tbody id="whQlBody"></tbody>
+        </table>
+        <div id="whQlRong" class="empty-state" hidden data-i18n="wh_bang_rong">Không có hồ sơ nào khớp.</div>
+        <div class="pagination-row" id="whQlPhanTrang">
+          <button class="btn btn-ghost" id="btnWhTruoc" data-i18n="btn_prev_page">‹ Trước</button>
+          <span class="pagination-label" id="whQlNhanTrang">—</span>
+          <button class="btn btn-ghost" id="btnWhSau" data-i18n="btn_next_page">Sau ›</button>
+        </div>
+
+        <!-- Việc hiếm hay nguy hiểm gom vào đây, đóng sẵn (A13.4): mở khoá sửa điểm, xem nhật ký,
+             xoá điểm của tất cả. Hành vi và mã id y như trước. -->
+        <details class="wh-thao-tac" id="whThaoTacKhac">
+          <summary data-i18n="wh_thao_tac_khac">Thao tác khác</summary>
+          <div class="wh-thao-tac-than">
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-secondary" id="btnWhMoKhoa" hidden data-i18n="btn_wh_mo_khoa">Mở khoá sửa điểm quyết tâm</button>
+              <span class="hint-text" id="whMoKhoaChuaKhoa" data-i18n="wh_dang_mo_khong_can">Điểm đang mở, không cần mở khoá.</span>
+              <div class="wh-ql-xacnhan" id="whMoKhoaHop" hidden>
+                <p class="hint-text" id="whMoKhoaHoi"></p>
+                <div class="search-row">
+                  <input type="text" id="whMoKhoaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_mo_khoa" aria-label="Gõ chữ xác nhận để mở khoá">
+                  <button class="btn btn-primary" id="btnWhMoKhoaXn" data-i18n="btn_wh_mo_khoa_xn">Xác nhận mở khoá</button>
+                  <button class="btn btn-ghost" id="btnWhMoKhoaHuy" data-i18n="btn_cancel">Huỷ</button>
+                </div>
+              </div>
+            </div>
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-secondary" id="btnWhXemNhatKy" type="button" aria-expanded="false" aria-controls="whNkHop" data-i18n="btn_wh_xem_nhat_ky">Xem nhật ký</button>
+              <div id="whNkHop" hidden>
+                <p class="hint-text" id="whNkChonEm" data-i18n="wh_nk_chon_em">Mở một học sinh ở bảng trên để xem nhật ký của học sinh đó.</p>
+                <h4 class="wh-ql-muc" data-i18n="wh_nhat_ky_title">Nhật ký thay đổi</h4>
+                <ul class="wh-ql-nk" id="whQlNhatKy"></ul>
+                <p class="hint-text" id="whQlNhatKyRong" hidden data-i18n="wh_nhat_ky_rong">Chưa có thay đổi nào.</p>
+                <button class="btn btn-ghost" id="btnWhNkThem" hidden data-i18n="btn_wh_xem_them">Xem thêm</button>
+              </div>
+            </div>
+            <div class="wh-thao-tac-muc">
+              <button class="btn btn-danger" id="btnWhXoaTatCa" data-i18n="btn_wh_xoa_tat_ca">Xoá điểm quyết tâm của tất cả học sinh</button>
+              <div class="wh-ql-xacnhan" id="whXoaTatCaHop" hidden>
+                <p class="hint-text" id="whXoaTatCaHoi"></p>
+                <div class="search-row">
+                  <input type="text" id="whXoaTatCaGo" class="text-input text-input-sm" autocomplete="off" data-i18n-aria-label="aria_wh_go_xoa" aria-label="Gõ chữ xác nhận để xoá">
+                  <button class="btn btn-danger" id="btnWhXoaTatCaXn" data-i18n="btn_wh_xoa_tat_ca_xn">Xác nhận xoá</button>
+                  <button class="btn btn-ghost" id="btnWhXoaTatCaHuy" data-i18n="btn_cancel">Huỷ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      </div>
+
+      <div role="tabpanel" id="qlPanelDc" data-ql-tab="dc" aria-labelledby="qlTabDc" hidden>
+      <!-- Điểm chuẩn chi tiết (A13.4): chỉ hiện khi bật điểm quyết tâm; js/05_quan_ly.js. -->
+      <div class="panel" id="adminDiemChuanBlock" hidden>
+        <div class="panel-head">
+          <h2 data-i18n="dc_title">Điểm chuẩn</h2>
+          <div class="panel-actions">
+            <button class="nut-i" id="btnDcThongTin" type="button" aria-expanded="false" aria-controls="dcThongTin" data-i18n-aria-label="dc_giai_thich" aria-label="Giải thích về điểm chuẩn">i</button>
+          </div>
+        </div>
+        <p class="hint-text" id="dcThongTin" hidden data-i18n="dc_mo_ta">Điểm thấp nhất đã được nhận ở từng câu lạc bộ.</p>
+        <p class="canh-bao-vang" id="dcQlCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
+        <p class="hint-text" id="dcQlRong" hidden data-i18n="dc_chua_co_ket_qua">Chưa có kết quả. Hãy chạy sắp xếp trước.</p>
+        <div id="dcQlTongQuan"></div>
+        <div class="dc-chon" id="dcChonHop" hidden>
+          <label for="dcChonClb" data-i18n="dc_chon_clb">Chọn câu lạc bộ để xem chi tiết</label>
+          <select id="dcChonClb" class="text-input"></select>
+        </div>
+        <div id="dcChiTiet" hidden>
+          <div id="dcBang"></div>
+          <figure class="dc-hinh" id="dcCot"></figure>
+          <figure class="dc-hinh" id="dcCham"></figure>
+          <p class="hint-text" id="dcKhongXet" hidden></p>
+        </div>
+      </div>
+
+      </div>
+
+      <div role="tabpanel" id="qlPanelDuLieu" data-ql-tab="du_lieu" aria-labelledby="qlTabDuLieu" hidden>
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="danger_zone_title">Vùng nguy hiểm: xoá dữ liệu để làm lại</h2></div>
         <p class="hint-text" data-i18n="danger_zone_desc">Nạp tệp chỉ thêm học sinh mới, không xoá học sinh cũ. Muốn làm lại với bộ dữ liệu khác, hãy xoá ở đây trước, nếu không học sinh cũ vẫn chiếm chỗ.</p>
@@ -700,6 +899,7 @@
           <button class="btn btn-danger" id="btnResetStudents" data-i18n="btn_reset_students">Xoá toàn bộ học sinh (giữ CLB)</button>
           <button class="btn btn-danger" id="btnResetAll" data-i18n="btn_reset_all">Xoá toàn bộ dữ liệu (cả CLB)</button>
         </div>
+      </div>
       </div>
     </section>
 

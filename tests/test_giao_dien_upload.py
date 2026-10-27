@@ -86,8 +86,9 @@ def test_tha_so_hien_tom_tat_roi_nhap_vao_dung_bang(trang, api):
 
 def test_so_co_loi_liet_ke_tung_loi_va_khoa_nut_nhap(trang, api, tmp_path):
     wb = openpyxl.load_workbook(SO_VI_DU)
-    wb[so_nhap.SHEET_HS]["D2"] = "CLB Không Có"
-    wb[so_nhap.SHEET_HS]["E3"] = "chín"
+    # Sheet học sinh có hai hàng tiêu đề (A13.4): dữ liệu bắt đầu từ hàng 3.
+    wb[so_nhap.SHEET_HS]["D3"] = "CLB Không Có"
+    wb[so_nhap.SHEET_HS]["E4"] = "chín"
     hong = tmp_path / "so_loi.xlsx"
     wb.save(hong)
 
@@ -97,8 +98,8 @@ def test_so_co_loi_liet_ke_tung_loi_va_khoa_nut_nhap(trang, api, tmp_path):
     assert "2 lỗi" in page.locator(".queue-row .queue-detail").inner_text()
     ds = page.locator(".so-nhap-loi li").all_inner_texts()
     assert len(ds) == 2
-    assert "dòng 2" in ds[0] and "CLB Không Có" in ds[0]
-    assert "dòng 3" in ds[1] and "chín" in ds[1]
+    assert "dòng 3" in ds[0] and "CLB Không Có" in ds[0]
+    assert "dòng 4" in ds[1] and "chín" in ds[1]
     assert page.locator("#btnImportAll").is_hidden()
     assert api.list_clubs_admin()["data"] == []
     assert not loi, loi
