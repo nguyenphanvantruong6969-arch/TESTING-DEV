@@ -75,8 +75,9 @@ def mo(tmp_path, api):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="admin"]').click()
-        page.wait_for_selector("#btnResetAll")
+        page.wait_for_selector("#btnResetAll", state="attached")
         if bat:
+            page.locator('#qlTabs [data-ql-tab="wh"]').click()
             page.wait_for_selector("#adminWhartonBlock:not([hidden]) #whQlBody tr")
         return page, a, loi
 
@@ -129,6 +130,7 @@ def _nk(api):
 
 def test_wharton_tat_khong_co_khoi_va_the_quan_ly_con_du_khoi_cu(mo):
     page, api, loi = mo(bat=False)
+    page.locator('#qlTabs [data-ql-tab="hs"]').click()
     page.wait_for_selector("#adminStudentTableBody tr")
     page.wait_for_timeout(300)
     assert page.locator("#adminWhartonBlock").is_hidden()

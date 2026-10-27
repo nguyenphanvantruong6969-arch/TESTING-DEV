@@ -219,6 +219,7 @@ def test_nut_hai_buoc_chi_gan_mot_trinh_xu_ly(mo):
     hai chụp CSDL ĐÃ RỖNG, ăn mất một suất trong _MAX_BACKUPS = 10."""
     trang = mo(t1=20, t2=60)
     trang.page.click('.nav-item[data-tab="admin"]')
+    trang.page.click('#qlTabs [data-ql-tab="du_lieu"]')
     trang.page.click("#btnResetAll")   # lần 1: chỉ lên nòng
     trang.page.click("#btnResetAll")   # lần 2: mới thật sự xoá
     trang.page.wait_for_timeout(200)

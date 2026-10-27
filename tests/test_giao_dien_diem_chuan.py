@@ -77,6 +77,7 @@ def mo(tmp_path, api):
 
 
 def _cho_quan_ly(page):
+    page.locator('#qlTabs [data-ql-tab="dc"]').click()
     page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcChiTiet:not([hidden]) svg[data-bieu-do=cham]")
 
 
@@ -206,6 +207,7 @@ def test_khoi_quan_ly_canh_bao_cu_khi_du_lieu_doi(mo):
 
 def test_chua_chay_khong_co_bieu_do_va_nhac_chay(mo):
     page, api, loi, _ = mo(chay=False)
+    page.locator('#qlTabs [data-ql-tab="dc"]').click()
     page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlRong:not([hidden])")
     assert page.locator("#dcChiTiet").is_hidden() and page.locator("#dcChonHop").is_hidden()
     page.locator('[data-tab="results"]').click()
@@ -245,6 +247,7 @@ def test_ket_qua_muc_dong_san_mo_duoc_vao_lai_thi_dong(mo):
 
 def test_tat_tinh_nang_hai_phan_khong_hien(mo):
     page, api, loi, _ = mo(bat=False, chay=True, tab="admin")
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     page.wait_for_selector("#btnResetAll")
     assert page.locator("#adminDiemChuanBlock").is_hidden()
     page.locator('[data-tab="results"]').click()

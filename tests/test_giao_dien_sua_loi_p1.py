@@ -85,6 +85,7 @@ def test_doi_ngon_ngu_giu_diem_da_go_chua_luu(trang):
 def test_doi_ngon_ngu_giu_o_da_tick_va_trang_dang_xem(trang):
     page, loi, _ = trang
     _sang_tab(page, "admin")
+    page.locator('#qlTabs [data-ql-tab="hs"]').click()
     page.wait_for_selector(".admin-row-checkbox")
     page.locator('.admin-row-checkbox[data-student-id="HS02"]').check()
 

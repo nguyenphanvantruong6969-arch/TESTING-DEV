@@ -161,6 +161,7 @@ def mo_ql(tmp_path, api):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="admin"]').click()
+        page.locator('#qlTabs [data-ql-tab="wh"]').click()
         page.wait_for_selector("#adminWhartonBlock:not([hidden]) #whQlBody tr")
         return page, api, loi
 

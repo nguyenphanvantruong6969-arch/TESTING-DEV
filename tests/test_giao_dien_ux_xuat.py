@@ -165,6 +165,7 @@ def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
 def test_4_the_04_tieu_de_va_dem_danh_dau(trang):
     page, api, loi, mo = trang
     mo_the(page, "admin")
+    page.locator('#qlTabs [data-ql-tab="hs"]').click()
     page.wait_for_selector(".admin-row-checkbox")
     assert "xuất hồ sơ" in page.text_content('[data-i18n="admin_reserve_assign_title"]')
     assert page.text_content("#adminDemDanhDau") == ""
@@ -271,6 +272,7 @@ def test_xoa_du_lieu_thi_tap_hoc_sinh_da_chon_duoc_don(trang):
     assert "1 học sinh" in page.text_content("#xuatHocSinhDem")
 
     mo_the(page, "admin")
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     nut = page.locator("#btnResetStudents")
     nut.click()
     nut.click()                                   # xác nhận hai bước
