@@ -962,8 +962,38 @@ HUONG_DAN = [
 ]
 
 
-def huong_dan(cfg=None) -> list:
-    """Các dòng sheet "Hướng dẫn". `cfg=None` (hay mặc định trường học) cho ra đúng
+def huong_dan(cfg=None, ghi_chu_cot_w: bool = False) -> list:
+    """Các dòng sheet "Hướng dẫn". `ghi_chu_cot_w` (sổ MẪU luôn có cột Điểm quyết tâm, A13.7)
+    thêm đoạn nói cột đó chỉ dùng khi bật tính năng; workspace đã bật thì đã có đoạn riêng.
+
+    Bản gốc của hàm: `_huong_dan_goc`.
+    """
+    ra = _huong_dan_goc(cfg)
+    n = _cfg(cfg)
+    if not ghi_chu_cot_w or n["wharton"] or n["per_person"]:
+        return ra
+    slot_l = dang_chu(n["nhan"], "slot", "l", "vi")
+    diem_l = dang_chu(n["nhan"], "score", "l", "vi")
+    ghi_chu = [
+        "        Cột %s (nằm sau cột %s): CHỈ dùng khi phần mềm bật tính năng %s." % (
+            TEN_COT_QUYET_TAM, ten_cot_diem_thi(cfg), TEN_COT_QUYET_TAM),
+        "        Khi bật, mỗi người chia 100 điểm cho mỗi quỹ ở mỗi buổi: quỹ 1 cho các %s có %s," % (
+            slot_l, diem_l),
+        "        quỹ 2 cho các %s còn lại. Khi tắt: phần mềm bỏ qua cột này, kết quả xếp không đổi." % slot_l,
+    ]
+    i = next((k for k, d in enumerate(ra) if d.startswith("Bước 5.")), len(ra))
+    # chèn ngay trước dòng trống đứng trước "Bước 5."
+    return ra[:max(i - 1, 0)] + ghi_chu + ra[max(i - 1, 0):]
+
+
+def ten_cot_diem_thi(cfg=None) -> str:
+    """Tên cột điểm trong mỗi nhóm nguyện vọng: "Điểm thi" (hoặc nhãn điểm + " thi")."""
+    d = nhan_diem(cfg)
+    return d + (" thi" if d == "Điểm" else "")
+
+
+def _huong_dan_goc(cfg=None) -> list:
+    """Các dòng sheet "Hướng dẫn" khi chưa có ghi chú cột Điểm quyết tâm của sổ mẫu. `cfg=None` (hay mặc định trường học) cho ra đúng
     `HUONG_DAN` ở trên; workspace khác thì nhãn trong câu đổi theo, và điểm theo người
     có đoạn riêng. Các tiêu đề cột không đổi nhãn (Tên CLB, Chỉ tiêu, Mã HS, Mã CLB,
     Buổi) giữ nguyên chữ như trên sheet."""
@@ -1091,7 +1121,7 @@ def ten_khong_trung(clubs) -> int:
 
 
 def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=True,
-                cfg=None):
+                cfg=None, luon_co_cot_w: bool = False):
     """Ghi sổ nhập ra tệp .xlsx (đường dẫn hoặc tệp nhị phân đang mở).
 
     clubs:    dict có name, capacity, reserve_capacity, reserve_group, buoi, club_id
@@ -1111,6 +1141,9 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
                   điểm theo NGƯỜI (per_person): MỘT cột "<điểm>" sau cột nhóm;
                 * tiêu đề cột nhóm = nhãn của nhóm ưu tiên.
               Cấu hình của trường học mặc định cho ra sổ GIỐNG HỆT cfg=None.
+    luon_co_cot_w: True thì sổ CÓ cột "Điểm quyết tâm" dù workspace tắt tính năng (A13.7: sổ
+              MẪU phát cho người dùng), kèm ghi chú trong sheet Hướng dẫn. Mặc định False = như
+              cũ: cột chỉ có khi `rules.wharton` bật. Không có tác dụng với điểm theo người.
     """
     from openpyxl import Workbook
     from openpyxl.formatting.rule import FormulaRule
@@ -1195,7 +1228,8 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     if ca_nhan:
         cot_dau = cot_dau + [ten_diem]        # MỘT cột điểm chung, ngay sau cột nhóm
     nv1 = len(cot_dau) + 1                    # số thứ tự cột NV1 (tính từ 1)
-    co_w = n_cfg["wharton"]                   # thêm cột "Điểm W k" (điểm Wharton, mục A13)
+    # thêm cột "Điểm W k" (điểm Wharton, mục A13); sổ mẫu thì luôn thêm (A13.7)
+    co_w = n_cfg["wharton"] or (luon_co_cot_w and not ca_nhan)
     buoc = 1 if ca_nhan else (3 if co_w else 2)   # khoảng cách giữa hai cột NV liên tiếp
     # HAI hàng tiêu đề (A13.4). Hàng 1: các cột đầu, rồi ô gộp "Nguyện vọng k" trên mỗi nhóm.
     # Hàng 2: tên từng cột trong nhóm ("CLB", "Điểm thi", và "Điểm quyết tâm" khi bật). Cột đầu
@@ -1344,7 +1378,7 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # ---- Hướng dẫn ------------------------------------------------------
     hd = wb.create_sheet(SHEET_HD)
     hd.column_dimensions["A"].width = 90
-    for i, dong in enumerate(huong_dan(cfg), start=1):
+    for i, dong in enumerate(huong_dan(cfg, ghi_chu_cot_w=luon_co_cot_w), start=1):
         o = hd.cell(row=i, column=1, value=dong)
         if i == 1:
             o.font = Font(bold=True, size=14, color="1F3A5F")

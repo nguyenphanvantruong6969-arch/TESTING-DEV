@@ -1075,7 +1075,8 @@ class XuatKetQuaMixin:
             path = self._duong_xuat(output_path, "SO_NHAP_CLB.xlsx")
             with self._ket_noi_doc() as cur:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
-            so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True))
+            so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
+                                 luon_co_cot_w=True)       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except CauHinhHong as e:

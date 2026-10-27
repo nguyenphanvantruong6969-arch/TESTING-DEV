@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-10-27 — A13.7 Sổ nhập mẫu luôn có cột Điểm quyết tâm
+
+Theo quyết định của Truong (27/10/2026): sổ MẪU luôn có cột "Điểm quyết tâm" kèm ghi chú "chỉ dùng khi bật tính năng". Không đổi mặc định `rules.wharton` (vẫn tắt), thuật toán, schema, hợp đồng CSV. Các đường ghi sổ khác (xuất dữ liệu đầu vào, ba skill, `du_lieu_test/`) giữ hành vi cũ.
+- **Mã:** `so_nhap.ghi_so_nhap(..., luon_co_cot_w=False)` (mặc định = hành vi cũ; `True` thì `co_w` bật dù workspace tắt, trừ điểm theo người); `so_nhap.huong_dan(cfg, ghi_chu_cot_w)` thêm đoạn ghi chú trong sheet Hướng dẫn (chữ qua biến nhãn); `tao_so_nhap_mau` (`api_xuat.py`) và `mau_csv/tao_so_nhap.py` (mẫu trống và hai sổ `vi_du_*`) truyền `True`. Sinh lại ba sổ trong `mau_csv/`; các sổ trong `du_lieu_test/` (kịch bản đổi luôn chúng sang hai hàng) khôi phục bằng `git checkout`.
+- **Khi tắt tính năng mà sổ có cột:** ô trống bỏ qua hoàn toàn; ô có số chỉ báo cảnh báo `csv_wp_bo_qua`, không chặn; không có dòng `wharton_bids`. `match_results` của sổ ví dụ trùng khít nạp bộ ba CSV cũ (seed 1, 7, 42).
+- **Test mới (19 ca):** `tests/test_so_mau_co_cot_quyet_tam.py`.
+- **Test cũ được sửa (Truong đã duyệt, 27/10/2026), chỉ hai kỳ vọng trong `tests/test_ws_so_nhap.py`:** `test_api_company_xuat_mau_roi_nap_lai` (hàng 1 của sổ mẫu là `["Nguyện vọng 1", None, None, "Nguyện vọng 2"]` thay vì `["Nguyện vọng 1", None, "Nguyện vọng 2"]`) và `test_api_mau_truong_hoc_giong_het_truoc_day` (`3 * 15` ô ở hàng 2 thay vì `2 * 15`). Lý do: đó đúng là thay đổi được chọn, sổ mẫu có ba cột mỗi nhóm. Không test nào bị `skip` hay nới.
+- **Giao diện (`browser_host`):** workspace mặc định, bấm "Tải sổ nhập mẫu" ra sổ có cột ở 15/15 nhóm; nạp `vi_du_day_du` và chạy xếp xong, không lỗi JS.
+- **Kiểm toàn bộ cho A13.6 và A13.7 (27/10/2026, Chromium thật, `-rs`):** 2.761 qua, 3 bỏ qua (thiếu `numpy` ×2; cần người dùng thường trên POSIX ×1; không ca giao diện nào bị bỏ qua), `ruff check .` sạch, độ phủ 92,37 % (CI đòi 85 %). Sau đó chỉ sửa chữ ở tài liệu; các test đọc CHANGELOG / TIEN_DO / sổ đăng ký / HUONG_DAN_SO_NHAP chạy lại (2.468 qua) và xanh.
+
 ## 2026-10-27 — A13.6 Dữ liệu mẫu có Điểm quyết tâm (vòng 6)
 
 Thêm bộ sổ nhập mẫu có Điểm quyết tâm (trong mã: `wharton`, cột CSV `wp_k`), sinh lại được bằng một lệnh, và cho kỹ năng `sinh-du-lieu-clb` sinh điểm khi được yêu cầu. Mọi số liệu là dữ liệu MÔ PHỎNG. Không đổi thuật toán, schema, hợp đồng CSV, định dạng sổ; không thêm thư viện. Mặc định của kỹ năng (`--diem-quyet-tam khong`) cho đầu ra cũ từng ô.
