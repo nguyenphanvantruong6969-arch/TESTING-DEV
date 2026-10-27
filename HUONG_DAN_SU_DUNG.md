@@ -466,6 +466,10 @@ nào để chúng nói khác nhau.
 > Tệp kết quả là **dữ liệu học sinh**. Cân nhắc trước khi gửi qua email hay chép
 > lên máy dùng chung.
 
+> **Vì sao mục "Kết quả sắp xếp" bị khoá?** Mục này chỉ dùng được khi đã có kết quả xếp. Chưa chạy xếp, hoặc lần chạy bị chặn, thì ô bị khoá và có dòng vàng "Chưa có kết quả xếp. Chạy xếp trước." Chạy xếp thành công rồi quay lại thẻ Kết quả là ô mở lại. Các mục khác (dữ liệu đầu vào, hồ sơ học sinh) vẫn xuất được.
+
+**Thông báo nổi** ở góc dưới bên phải: thông báo thành công tự đóng sau 6 đến 10 giây (đưa chuột vào thì dừng đếm); lỗi và cảnh báo ở lại cho tới khi bạn bấm ×.
+
 #### Xuất thêm: dữ liệu đầu vào, thay đổi, hồ sơ học sinh
 
 Cùng mục **Xuất dữ liệu**, đánh dấu thêm ô nào thì xuất thêm thứ đó — một lần bấm:
@@ -1015,7 +1019,7 @@ thiếu bao nhiêu ở quỹ nào và không lưu.
 
 ### Quản lý điểm quyết tâm (thẻ Quản lý)
 
-Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Khối nằm dưới danh sách học sinh.
+Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Thẻ Quản lý chia thành các **tab con**: *CLB*, *Học sinh*, *Điểm quyết tâm*, *Điểm chuẩn* và *Dữ liệu* (phần xoá dữ liệu). Hai tab điểm chỉ hiện khi bật điểm quyết tâm; tắt thì chỉ còn ba tab con. Khối này nằm ở tab con *Điểm quyết tâm*. Phần mềm nhớ tab con bạn vừa mở; chuyển tab bằng chuột hoặc phím mũi tên.
 
 **Xem bảng điểm.** Mỗi dòng là một học sinh: điểm đã chia cho từng CLB, tách theo quỹ (Quỹ 1: CLB đã thi, Quỹ 2: CLB không thi) và theo buổi, kèm **Tổng** của từng quỹ (phải đúng 100). Ô được phần mềm tự điền 100 vì quỹ chỉ có một CLB thì ghi *tự điền*; ô chưa đặt hiện dấu —. Dùng ô tìm (gõ không dấu cũng được), các ô lọc Quỹ / Buổi / CLB và ô **Chỉ hồ sơ có vấn đề**; có phân trang. Dòng có vấn đề được tô viền đỏ và ghi *Chưa hợp lệ*, *Vắng thi* hoặc *Cần chia lại*.
 
@@ -1026,6 +1030,12 @@ Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không
 **Xoá điểm.**
 - Một học sinh: bấm **Xoá điểm của học sinh này** hai lần liên tiếp.
 - Tất cả: bấm **Xoá điểm quyết tâm của tất cả học sinh**, gõ đúng chữ `XOA` rồi bấm xác nhận. Phần mềm tự sao lưu cơ sở dữ liệu trước khi xoá.
+
+**Xử lý hàng loạt hồ sơ chia thiếu hoặc thừa.** Dưới danh sách *Hồ sơ cần xử lý* có hai nút:
+- **Tải danh sách cần sửa:** tạo một tệp Excel liệt kê từng lỗi (mã, họ tên, buổi, quỹ, tổng hiện tại, thiếu hay thừa bao nhiêu, và câu lỗi). Nút này **không đổi điểm nào**.
+- **Phóng cho đủ 100 theo tỉ lệ:** với mỗi học sinh chia thiếu hoặc thừa ở một quỹ, phần mềm **đổi điểm thay học sinh**: giữ tỉ lệ các điểm em đã đặt trong đúng quỹ đó và phóng cho tổng đúng 100 (làm tròn theo phần dư lớn nhất; hai CLB bằng phần dư thì CLB có mã nhỏ hơn được điểm lẻ; thứ hạng nguyện vọng không được dùng). Đây là thay đổi điểm của học sinh, nên cần gõ đúng chữ `PHONG` để xác nhận, phần mềm tự sao lưu trước, và mỗi thay đổi được ghi vào **Nhật ký thay đổi** (nguồn "thẻ Quản lý"). Học sinh chưa đặt điểm nào ở quỹ đó, hoặc còn lỗi khác (điểm ngoài nguyện vọng, cần chia lại, nguyện vọng chưa xếp xong) thì **không bị đổi** và được liệt kê lại để sửa tay. Đang khoá thì không phóng được.
+
+**Khi chạy sắp xếp bị chặn vì hồ sơ điểm.** Thẻ Vận hành chỉ hiện một dòng tóm tắt, vài học sinh đầu (mỗi em một dòng gộp mọi lỗi của em) và nút **Mở danh sách cần xử lý**. Bấm nút để sang tab con *Điểm quyết tâm* với bộ lọc "chỉ hồ sơ có vấn đề" đã bật. Phần mềm vẫn kiểm đủ mọi học sinh, chỉ cách hiện gọn hơn.
 
 **Vì sao bị khoá, và mở khoá.** Mỗi lần chạy xếp thành công khi bật điểm quyết tâm, điểm tự **khoá** để kết quả không đổi âm thầm sau đó. Khoá này riêng, không liên quan tới khoá số bốc thăm. Đang khoá thì không ghi được điểm ở đâu cả (thẻ Quản lý, Bước 3 ở kiosk, nạp cột điểm từ tệp; nạp tệp vẫn lưu nguyện vọng và cảnh báo rằng phần điểm bị bỏ). Việc xoá học sinh, xoá CLB, làm lại từ đầu hay xoá dữ liệu vẫn làm được. Muốn sửa: bấm **Mở khoá sửa điểm quyết tâm**, gõ đúng chữ `MO` rồi xác nhận. Kết quả đã xếp không tự đổi; lần chạy xếp tiếp theo sẽ khoá lại. Xoá dữ liệu (**Vùng nguy hiểm**) cũng mở khoá.
 

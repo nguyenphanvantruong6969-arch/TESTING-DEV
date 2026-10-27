@@ -451,7 +451,8 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - **#5 Thông báo (TOÀN ứng dụng, NGOÀI PHẠM VI A13, theo yêu cầu của Truong):** thông báo thành công tự đóng sau 6 giây (câu dài thêm thời gian, tối đa 10 giây; tạm dừng khi rê chuột hoặc có tiêu điểm); lỗi và cảnh báo giữ tới khi bấm ×; thành công kèm cảnh báo thì tách thành hai thông báo; không che tiêu đề và thanh tab; tôn trọng `prefers-reduced-motion`; `aria-live` phù hợp.
   - **Mã lỗi mới:** `xuat_chua_co_ket_qua`, `wharton_phong_sai_xac_nhan`, `wharton_da_phong`, `wharton_tom_tat_chua_hop_le`.
   - **Đóng vai lần 2:** thêm vai học sinh ở kiosk và bộ mô phỏng hồ sơ hợp lệ; kết quả ở mục "Lần 2 (27/10/2026)" của báo cáo đóng vai. Vấn đề #6 và #7 để sau.
-  - **Dòng:** cập nhật ở Bước 12.
+  - **Dòng (đối chiếu 27/10/2026):** api_quan_ly.py: `phong_theo_ti_le` (L36), `phong_wharton_hang_loat` (L927), `_ke_hoach_phong` (L971); api_xuat.py: `export_wharton_can_sua` (L1008), `_chua_co_ket_qua` (L1254); js/00_nen.js: `thoiGianToastMs` (L157), `showToast` (L162); js/02_van_hanh.js: `tachLoiWharton` (L342), `chuLoiBuocGon` (L373), `showLog` (L380); js/03_ket_qua.js: `khoaXuatKetQua` (L1260); js/05_quan_ly.js: `veLaiWhTuBoNho` (L963), `moDanhSachCanXuLy` (L995), `initWhHangLoat` (L1006), `initTabConQl` (L1376).
+  - **Kết quả:** 60 ca test mới; toàn bộ 2.699 qua, 3 bỏ qua; `ruff` sạch; độ phủ 92,34 %; 15 lần chạy với tính năng tắt GIỐNG HỆT bản `d85fe2c`.
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
 
