@@ -632,6 +632,9 @@ const WH_TRANG = 25;
 const WH_NK_TRANG = 10;
 const WH_NGAN_SACH = 100;      // ngân sách mỗi quỹ mỗi buổi (WHARTON_NGAN_SACH ở backend)
 const whQl = { trang: 1, khoa: false, sid: null, nkTrang: 1, daLuu: "", ten: {} };
+/* Du lieu cua lan ve gan nhat. Doi ngon ngu thi ve lai NGAY tu day (khong cho API), de khong co
+   luc nao man hinh con chu cu; loi goi API ve muon cung chi ve bang ngon ngu hien tai. */
+const whBoNho = { canhBao: null, khoa: null, loc: null, bang: null, state: null, nhatKy: [] };
 
 /* Khoá `<tien_to><gia_tri>` chưa có trong bảng chữ thì giữ nguyên giá trị thô. */
 function whNhan(tienTo, gia) {
@@ -652,6 +655,7 @@ function loadAdminWharton(giuTrang) {
       return null;
     }
     khoi.hidden = false;
+    whBoNho.canhBao = res.data;
     veCanhBaoWharton(res.data);
     return Promise.all([loadWhKhoa(), loadWhLoc(), loadWhBang()]).then(() => {
       if (whQl.sid) return moManSuaWharton(whQl.sid, giu);
@@ -664,19 +668,26 @@ function loadAdminWharton(giuTrang) {
 function loadWhKhoa() {
   return callApi("get_wharton_lock_status").then((res) => {
     if (!res.ok) return;
-    whQl.khoa = !!res.data.is_locked;
-    const chu = el("whQlKhoa");
-    chu.textContent = whQl.khoa
-      ? t("wh_ql_dang_khoa", { luc: (res.data.locked_at || "").replace("T", " ") })
-      : t("wh_ql_dang_mo");
-    chu.classList.toggle("is-khoa", whQl.khoa);
-    el("btnWhMoKhoa").hidden = !whQl.khoa;
-    el("whMoKhoaChuaKhoa").hidden = whQl.khoa;
-    if (!whQl.khoa) el("whMoKhoaHop").hidden = true;
-    if (!el("whMoKhoaHop").hidden) {
-      el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
-    }
+    whBoNho.khoa = res.data;
+    veKhoaWh();
   });
+}
+
+function veKhoaWh() {
+  const d = whBoNho.khoa;
+  if (!d) return;
+  whQl.khoa = !!d.is_locked;
+  const chu = el("whQlKhoa");
+  chu.textContent = whQl.khoa
+    ? t("wh_ql_dang_khoa", { luc: (d.locked_at || "").replace("T", " ") })
+    : t("wh_ql_dang_mo");
+  chu.classList.toggle("is-khoa", whQl.khoa);
+  el("btnWhMoKhoa").hidden = !whQl.khoa;
+  el("whMoKhoaChuaKhoa").hidden = whQl.khoa;
+  if (!whQl.khoa) el("whMoKhoaHop").hidden = true;
+  if (!el("whMoKhoaHop").hidden) {
+    el("whMoKhoaHoi").textContent = t("wh_mo_khoa_hoi", { can_go: "MO" });
+  }
 }
 
 function veCanhBaoWharton(ds) {
@@ -720,6 +731,16 @@ function veCanhBaoWharton(ds) {
 function loadWhLoc() {
   return callApi("list_clubs").then((res) => {
     if (!res.ok) return;
+    whBoNho.loc = res.data;
+    veLocWh();
+  });
+}
+
+function veLocWh() {
+  const clb = whBoNho.loc;
+  if (!clb) return;
+  {
+    const res = { data: clb };
     whQl.ten = {};
     res.data.forEach((c) => { whQl.ten[c.club_id] = c.name; });
     const dsBuoi = Array.from(new Set(res.data.map((c) => c.buoi || BUOI_MAC_DINH)));
@@ -737,29 +758,35 @@ function loadWhLoc() {
     dien(el("whLocBuoi"), [["", t("wh_loc_tat_ca")]].concat(dsBuoi.map((b) => [b, nhanBuoi(b)])));
     dien(el("whLocClb"), [["", t("wh_loc_tat_ca")]].concat(res.data.map((c) => [c.club_id, c.name])));
     el("whLocBuoiNhan").hidden = dsBuoi.length < 2;
-  });
+  }
 }
 
 function loadWhBang() {
   return callApiMoiNhat("wh_bang", "list_wharton_admin",
     el("whQlTim").value.trim(), el("whLocQuy").value || null, el("whLocBuoi").value || null,
     el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG).then((res) => {
-    const body = el("whQlBody");
-    clear(body);
-    if (!res.ok || !res.data.rows.length) {
-      el("whQlRong").hidden = false;
-      el("whQlPhanTrang").hidden = true;
-      return;
-    }
-    el("whQlRong").hidden = true;
-    el("whQlPhanTrang").hidden = false;
-    res.data.rows.forEach((r) => body.appendChild(dongBangWharton(r)));
-    el("whQlNhanTrang").textContent = t("pagination_label", {
-      page: res.data.page, total_pages: res.data.total_pages, total: res.data.total,
-    });
-    el("btnWhTruoc").disabled = res.data.page <= 1;
-    el("btnWhSau").disabled = res.data.page >= res.data.total_pages;
+    whBoNho.bang = res.ok ? res.data : null;
+    veBangWh();
   });
+}
+
+function veBangWh() {
+  const d = whBoNho.bang;
+  const body = el("whQlBody");
+  clear(body);
+  if (!d || !d.rows.length) {
+    el("whQlRong").hidden = false;
+    el("whQlPhanTrang").hidden = true;
+    return;
+  }
+  el("whQlRong").hidden = true;
+  el("whQlPhanTrang").hidden = false;
+  d.rows.forEach((r) => body.appendChild(dongBangWharton(r)));
+  el("whQlNhanTrang").textContent = t("pagination_label", {
+    page: d.page, total_pages: d.total_pages, total: d.total,
+  });
+  el("btnWhTruoc").disabled = d.page <= 1;
+  el("btnWhSau").disabled = d.page >= d.total_pages;
 }
 
 function dongBangWharton(r) {
@@ -861,6 +888,7 @@ function moManSuaWharton(sid, giu) {
 }
 
 function veManSuaWharton(state, giu) {
+  whBoNho.state = state;
   const w = state.wharton;
   const khung = el("whQlSuaKhung");
   el("whQlSua").hidden = false;
@@ -889,34 +917,54 @@ function loadWhNhatKy(them) {
   if (!them) whQl.nkTrang = 1;
   return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
     if (!res.ok || sid !== whQl.sid) return;
-    const ds = el("whQlNhatKy");
-    if (!them) clear(ds);
-    const dang = (d) => {
-      if (!d || d.so_dong !== undefined) return "";
-      const phan = ["w1", "w2"].map((k) => Object.entries(d[k] || {})
-        .map(([c, v]) => (whQl.ten[c] || c) + ": " + v).join(", ")).filter(Boolean);
-      return phan.join(" | ");
-    };
-    res.data.rows.forEach((r) => {
-      const li = document.createElement("li");
-      li.dataset.hanhDong = r.hanh_dong;
-      li.dataset.nguon = r.nguon;
-      const dongChu = t("wh_nk_dong", {
-        luc: r.luc.replace("T", " "),
-        nguon: whNhan("wh_nk_", r.nguon),
-        nguoi: r.nguoi ? " (" + r.nguoi + ")" : "",
-        hanh_dong: whNhan("wh_nk_", r.hanh_dong),
-      });
-      const cu = dang(r.cu), moi = dang(r.moi);
-      li.textContent = dongChu + (cu || moi ? " [" + (cu || "—") + " → " + (moi || "—") + "]" : "");
-      ds.appendChild(li);
-    });
-    el("whQlNhatKyRong").hidden = ds.children.length > 0;
+    if (!them) whBoNho.nhatKy = [];
+    whBoNho.nhatKy = whBoNho.nhatKy.concat(res.data.rows);
+    veNhatKyWh();
     el("btnWhNkThem").hidden = res.data.page >= res.data.total_pages;
   });
 }
 
+function veNhatKyWh() {
+  const ds = el("whQlNhatKy");
+  clear(ds);
+  const dang = (d) => {
+    if (!d || d.so_dong !== undefined) return "";
+    const phan = ["w1", "w2"].map((k) => Object.entries(d[k] || {})
+      .map(([c, v]) => (whQl.ten[c] || c) + ": " + v).join(", ")).filter(Boolean);
+    return phan.join(" | ");
+  };
+  whBoNho.nhatKy.forEach((r) => {
+    const li = document.createElement("li");
+    li.dataset.hanhDong = r.hanh_dong;
+    li.dataset.nguon = r.nguon;
+    const dongChu = t("wh_nk_dong", {
+      luc: r.luc.replace("T", " "),
+      nguon: whNhan("wh_nk_", r.nguon),
+      nguoi: r.nguoi ? " (" + r.nguoi + ")" : "",
+      hanh_dong: whNhan("wh_nk_", r.hanh_dong),
+    });
+    const cu = dang(r.cu), moi = dang(r.moi);
+    li.textContent = dongChu + (cu || moi ? " [" + (cu || "—") + " → " + (moi || "—") + "]" : "");
+    ds.appendChild(li);
+  });
+  el("whQlNhatKyRong").hidden = ds.children.length > 0;
+}
+
+/* Doi ngon ngu: ve lai moi phan da ve tu du lieu da co, KHONG cho API (xem whBoNho). */
+function veLaiWhTuBoNho() {
+  if (el("adminWhartonBlock").hidden) return;
+  if (whBoNho.canhBao) veCanhBaoWharton(whBoNho.canhBao);
+  veKhoaWh();
+  veLocWh();
+  veBangWh();
+  if (whQl.sid && whBoNho.state && whBoNho.state.student_id === whQl.sid && !el("whQlSua").hidden) {
+    veManSuaWharton(whBoNho.state, whartonGiuTamTu(el("whQlSuaKhung")));
+  }
+  if (whQl.sid) veNhatKyWh();
+}
+
 function initWhartonQuanLy() {
+  window.addEventListener("langchange", veLaiWhTuBoNho);
   const veLaiBang = () => { whQl.trang = 1; loadWhBang(); };
   el("whQlTim").addEventListener("input", debounce(veLaiBang, 250));
   ["whLocQuy", "whLocBuoi", "whLocClb", "whLocChiLoi"].forEach((id) => {
@@ -927,6 +975,7 @@ function initWhartonQuanLy() {
   el("btnWhDongSua").addEventListener("click", () => {
     whQl.sid = null;
     el("whQlSua").hidden = true;
+    whBoNho.nhatKy = [];
     clear(el("whQlNhatKy"));
     el("whQlNhatKyRong").hidden = true;
     el("btnWhNkThem").hidden = true;

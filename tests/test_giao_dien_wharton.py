@@ -323,6 +323,29 @@ def test_tieng_anh_chu_buoc_3_doi_theo_ngon_ngu_va_khong_con_chu_co_dau(mo):
     assert not loi, loi
 
 
+def test_doi_ngon_ngu_khi_loi_goi_api_con_treo_buoc_3_van_ve_lai_ngay(mo):
+    """Kiosk: đổi ngôn ngữ khi mọi lời gọi API còn treo thì Bước 3 vẫn đổi tức thì."""
+    page, api, loi = mo()
+    _chon(page, "HS1")
+    _cho_buoc_3(page)
+    giu, nha = [], []
+
+    def _treo(route):
+        route.continue_() if nha else giu.append(route)
+
+    page.route("**/__api__/*", _treo)
+    page.evaluate("window.I18N.setLang('en')")
+    page.wait_for_function("document.documentElement.lang === 'en'")
+    van_ban = page.locator("#fbWhartonStep").inner_text()
+    assert "Step 3" in van_ban and not DAU_VIET.search(van_ban), van_ban
+    nha.append(True)
+    for r in giu:
+        r.continue_()
+    page.wait_for_timeout(400)
+    assert not DAU_VIET.search(page.locator("#fbWhartonStep").inner_text())
+    assert not loi, loi
+
+
 def test_hai_cau_chinh_thong_bao_cho_hoc_sinh(mo):
     """Chia thiếu: câu chính là "Chưa dùng hết điểm Wharton" kèm số thiếu và quỹ."""
     page, api, loi = mo()

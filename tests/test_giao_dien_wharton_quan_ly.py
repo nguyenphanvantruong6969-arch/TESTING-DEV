@@ -357,6 +357,42 @@ def test_tieng_anh_chu_cua_khoi_doi_theo_va_khong_con_chu_co_dau(mo):
     assert not loi, loi
 
 
+_CHU_KHOI_JS = """() => {
+    const goc = document.getElementById('adminWhartonBlock').cloneNode(true);
+    goc.querySelectorAll('td:nth-child(2), #whCanhBao button, #whQlSuaTen').forEach(n => n.remove());
+    goc.querySelectorAll('input, select').forEach(n => n.remove());
+    return goc.innerText;
+}"""
+
+
+def test_doi_ngon_ngu_khi_loi_goi_api_con_treo_van_ve_lai_ngay(mo):
+    """Đổi ngôn ngữ NGAY khi mọi lời gọi API còn treo: chữ đã vẽ phải đổi tức thì (vẽ lại từ dữ
+    liệu đã có), và lời gọi về muộn cũng vẽ bằng ngôn ngữ hiện tại, không bật lại tiếng Việt."""
+    page, api, loi = mo()
+    _mo_man_sua(page, "HS2")
+    page.wait_for_function("document.getElementById('whQlKhoa').textContent.startsWith('Đang mở')")
+    giu, nha = [], []
+
+    def _treo(route):
+        route.continue_() if nha else giu.append(route)
+
+    page.route("**/__api__/*", _treo)
+    page.evaluate("window.I18N.setLang('en')")
+    page.wait_for_function("document.documentElement.lang === 'en'")
+    # KHÔNG chờ lời gọi nào: mọi lời gọi API đang treo
+    van_ban = page.evaluate(_CHU_KHOI_JS)
+    assert not DAU_VIET.search(van_ban), van_ban
+    # nhả các lời gọi treo: chữ vẫn là tiếng Anh
+    nha.append(True)
+    for r in giu:
+        r.continue_()
+    page.wait_for_timeout(600)
+    van_ban = page.evaluate(_CHU_KHOI_JS)
+    assert not DAU_VIET.search(van_ban), van_ban
+    assert "Total" in van_ban
+    assert not loi, loi
+
+
 def test_man_sua_chi_doc_nhat_ky_cua_chinh_em_do(mo):
     """Màn sửa của một em chỉ đọc nhật ký của chính em đó."""
     page, api, loi = mo()
