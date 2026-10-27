@@ -10,6 +10,11 @@ Ba chế độ:
 `tao`  — dựng từ một bản khai báo JSON tường minh (bạn nắm toàn quyền).
 `ngau` — dựng một trường ngẫu nhiên nhưng HỢP LỆ, tất định theo `--seed`.
 `soat` — soát một bộ đã có, không sửa gì.
+`ap`   — áp Điểm quyết tâm (mục A13; trong mã là `wharton`) lên một sổ đã có.
+
+`ngau`, `tao` và `ap` nhận thêm `--diem-quyet-tam {khong,hop_le,co_loi,trong}` và
+`--kieu-chia {tron,don_dau,deu,all_in,ngau_nhien}`. Mặc định `khong` = hành vi cũ, đầu ra
+không đổi một ô nào.
 
 Đầu ra là MỘT tệp: `SO_NHAP_CLB.xlsx` — Sổ nhập CLB, đúng tệp phần mềm nhận
 (xem `so_nhap.py` ở gốc kho mã). `soat` đọc được cả sổ lẫn bộ ba CSV cũ.
@@ -43,6 +48,18 @@ TRAN_CLB_THI_MOI_BUOI = 5
 
 # Tệp ghi ra.
 TEN_SO = "SO_NHAP_CLB.xlsx"
+
+# Điểm quyết tâm (mục A13): mỗi em có HAI quỹ cho MỖI buổi — quỹ 1 chia cho các CLB em có tick
+# thi, quỹ 2 chia cho các CLB còn lại — mỗi quỹ đúng NGAN_SACH_DQT điểm. Hằng này là bản sao của
+# `rbda_priority_pipeline.WHARTON_NGAN_SACH` (kỹ năng không nhập mã thuật toán, để đóng gói
+# riêng được); test `test_du_lieu_mau_diem_quyet_tam.py` canh hai số luôn bằng nhau.
+NGAN_SACH_DQT = 100
+CHE_DO_DQT = ("khong", "hop_le", "co_loi", "trong")
+KIEU_CHIA = ("don_dau", "deu", "all_in", "ngau_nhien")
+LOAI_LOI_DQT = ("thieu", "thua", "ngoai_nguyen_vong", "tang_lech", "toan_0")
+# Cấu hình workspace bật điểm quyết tâm; chỉ để `so_nhap.ghi_so_nhap` vẽ thêm cột.
+CFG_DQT = {"rules": {"wharton": True, "max_choices": TRAN_NGUYEN_VONG_MOI_BUOI,
+                     "max_tests": TRAN_CLB_THI_MOI_BUOI, "score_scope": "per_slot"}}
 
 # Bộ ba tệp CSV cũ — chỉ còn để `soat` đọc các bộ đã có.
 TEN_TEP = {
@@ -184,6 +201,53 @@ def canh_bao_men(clb, hs):
     return ra
 
 
+def cac_quy(clb, h):
+    """{(buoi, quy): [club_id theo thứ tự nguyện vọng]} của một em.
+
+    Quỹ 1 = CLB em có tick thi (có trong `diem`), quỹ 2 = các CLB còn lại. Mỗi buổi tách riêng,
+    cùng cách chia với `rbda_priority_pipeline.kiem_ho_so_wharton`. Chỉ nhìn TẬP CLB, không nhìn
+    thứ hạng để làm khoá của bất cứ thứ gì.
+    """
+    buoi_cua = {c["club_id"]: (c.get("buoi") or "") for c in clb}
+    thi = h.get("diem") or {}
+    ra = {}
+    for b, ds in (h.get("nguyen_vong") or {}).items():
+        for cid in ds:
+            ra.setdefault((buoi_cua.get(cid, b), 1 if cid in thi else 2), []).append(cid)
+    return ra
+
+
+def soat_diem_quyet_tam(clb, hs):
+    """Soát hồ sơ Điểm quyết tâm trong bộ nhớ; rỗng = hợp lệ.
+
+    Chỉ chạy khi chế độ là `hop_le` (hoặc khi `soat` thấy sổ có điểm). Luật: mỗi quỹ của mỗi
+    buổi có CLB thì điểm là số nguyên >= 0, khoá nằm trong đúng tập CLB của quỹ, tổng đúng
+    `NGAN_SACH_DQT`.
+    """
+    loi = []
+    for h in hs:
+        sid = h["student_id"]
+        w = h.get("diem_quyet_tam") or {}
+        quy = cac_quy(clb, h)
+        trong_quy = {cid for ds in quy.values() for cid in ds}
+        for cid in sorted(w):
+            if cid not in trong_quy:
+                loi.append("%s: điểm quyết tâm cho %s ngoài nguyện vọng" % (sid, cid))
+        for (b, q), ds in sorted(quy.items()):
+            gia_tri = [w.get(c) for c in ds]
+            if any(v is not None and (isinstance(v, bool) or not isinstance(v, int) or v < 0)
+                   for v in gia_tri):
+                loi.append("%s · %s · quỹ %d: điểm không phải số nguyên >= 0" % (sid, b, q))
+                continue
+            tong = sum(v for v in gia_tri if v is not None)
+            if tong != NGAN_SACH_DQT:
+                loi.append("%s · %s · quỹ %d: tổng điểm quyết tâm %d, phải đúng %d"
+                           % (sid, b or "(một buổi)", q, tong, NGAN_SACH_DQT))
+        if h.get("dqt_mo_coi"):
+            loi.append("%s: có điểm quyết tâm ở ô nguyện vọng trống" % sid)
+    return loi
+
+
 # ---------------------------------------------------------------------------
 # GHI
 # ---------------------------------------------------------------------------
@@ -212,21 +276,31 @@ def thanh_so(clb, hs):
         diem = h.get("diem") or {}
         thu_tu = [cid for b in ds_buoi + [b for b in nv if b not in ds_buoi]
                   for cid in nv.get(b, [])]
+        w = h.get("diem_quyet_tam")
+        nv_ra = []
+        for cid in thu_tu:
+            x = {"club_id": cid, "thi": cid in diem, "diem": diem.get(cid, "")}
+            if w is not None and cid in w:
+                x["diem_w"] = w[cid]
+            nv_ra.append(x)
+        # Điểm đặt cạnh một ô nguyện vọng TRỐNG (chỉ biến thể CO_LOI cố ý làm vậy).
+        nv_ra += [{"club_id": "", "thi": False, "diem": "", "diem_w": v}
+                  for v in (h.get("dqt_mo_coi") or [])]
         students.append({
             "student_id": h["student_id"], "name": h.get("name") or "",
-            "reserve_group": h.get("reserve_group") or "",
-            "nv": [{"club_id": cid, "thi": cid in diem, "diem": diem.get(cid, "")}
-                   for cid in thu_tu],
+            "reserve_group": h.get("reserve_group") or "", "nv": nv_ra,
         })
     return clubs, students
 
 
-def ghi_bo(thu_muc, clb, hs):
-    """Ghi Sổ nhập CLB. GỌI SAU KHI soát() đã trả về rỗng. Trả [đường dẫn]."""
+def ghi_bo(thu_muc, clb, hs, cfg=None, ten_tep=TEN_SO):
+    """Ghi Sổ nhập CLB. GỌI SAU KHI soát() đã trả về rỗng. Trả [đường dẫn].
+
+    `cfg=CFG_DQT` thì sổ có thêm cột "Điểm quyết tâm" (ô trống nếu em không có điểm)."""
     os.makedirs(thu_muc, exist_ok=True)
-    p = os.path.join(thu_muc, TEN_SO)
+    p = os.path.join(thu_muc, ten_tep)
     clubs, students = thanh_so(clb, hs)
-    so_nhap.ghi_so_nhap(p, clubs, students)
+    so_nhap.ghi_so_nhap(p, clubs, students, cfg=cfg)
     return [p]
 
 
@@ -254,13 +328,21 @@ def doc_so(duong):
     buoi_cua = {c["club_id"]: c["buoi"] for c in clb}
     hs = []
     for s in du["students"]:
-        nv, diem = {}, {}
+        nv, diem, w = {}, {}, {}
         for x in s["nv"]:
             nv.setdefault(buoi_cua.get(x["club_id"], ""), []).append(x["club_id"])
             if x["thi"]:
                 diem[x["club_id"]] = x["diem"]
-        hs.append({"student_id": s["student_id"], "name": s["name"],
-                   "reserve_group": s["reserve_group"] or "", "nguyen_vong": nv, "diem": diem})
+            o_w = str(x.get("diem_w") or "").strip()
+            if o_w:
+                w[x["club_id"]] = int(o_w) if o_w.isdigit() else o_w
+        em = {"student_id": s["student_id"], "name": s["name"],
+              "reserve_group": s["reserve_group"] or "", "nguyen_vong": nv, "diem": diem}
+        if w:
+            em["diem_quyet_tam"] = w
+        if s.get("diem_w_mo_coi"):
+            em["dqt_mo_coi"] = list(s["diem_w_mo_coi"])
+        hs.append(em)
     return clb, hs
 
 
@@ -445,6 +527,204 @@ def sinh_ngau_nhien(n_hs, ds_buoi, clb_moi_buoi, seed, do_choi=1.15,
 
 
 # ---------------------------------------------------------------------------
+# ĐIỂM QUYẾT TÂM (mục A13) — dữ liệu MÔ PHỎNG
+# ---------------------------------------------------------------------------
+
+def lam_tron_100(trong_so):
+    """{club_id: trọng số nguyên >= 0} -> {club_id: điểm nguyên}, tổng ĐÚNG `NGAN_SACH_DQT`.
+
+    Phần dư lớn nhất được cộng thêm 1 điểm; hoà thì theo mã CLB. Toàn số nguyên nên không có
+    sai số làm tròn, và cùng đầu vào luôn ra cùng đầu ra. Trọng số toàn 0 thì chia đều.
+    """
+    ma = sorted(trong_so)
+    tong = sum(trong_so.values())
+    if tong <= 0:
+        trong_so, tong = {c: 1 for c in ma}, len(ma)
+    nen = {c: NGAN_SACH_DQT * trong_so[c] // tong for c in ma}
+    du = {c: NGAN_SACH_DQT * trong_so[c] % tong for c in ma}
+    thieu = NGAN_SACH_DQT - sum(nen.values())
+    for c in sorted(ma, key=lambda c: (-du[c], c))[:thieu]:
+        nen[c] += 1
+    return nen
+
+
+def chia_mot_quy(ds, kieu, rnd):
+    """Chia `NGAN_SACH_DQT` điểm cho danh sách CLB `ds` (đã theo thứ tự nguyện vọng)."""
+    if len(ds) == 1:
+        return {ds[0]: NGAN_SACH_DQT}
+    n = len(ds)
+    if kieu == "don_dau":                  # dồn vào nguyện vọng đầu, giảm dần theo thứ hạng
+        tr = {c: 2 ** (n - 1 - i) for i, c in enumerate(ds)}
+    elif kieu == "deu":
+        tr = {c: 1 for c in ds}
+    elif kieu == "all_in":                 # toàn bộ vào MỘT CLB (chọn ngẫu nhiên, không nhất thiết đầu)
+        dich = rnd.randrange(n)
+        tr = {c: (1 if i == dich else 0) for i, c in enumerate(ds)}
+    elif kieu == "ngau_nhien":
+        tr = {c: rnd.randint(1, 100) for c in ds}
+    else:
+        raise ValueError("kiểu chia lạ: %r" % (kieu,))
+    return lam_tron_100(tr)
+
+
+def _quy_theo_thu_tu(clb, h):
+    """`cac_quy` nhưng theo thứ tự ổn định (buổi theo thứ tự câu lạc bộ, rồi quỹ 1, quỹ 2)."""
+    ds_buoi = []
+    for c in clb:
+        b = c.get("buoi") or ""
+        if b not in ds_buoi:
+            ds_buoi.append(b)
+    q = cac_quy(clb, h)
+    return sorted(q.items(), key=lambda kv: (ds_buoi.index(kv[0][0]), kv[0][1]))
+
+
+def ap_diem_quyet_tam(clb, hs, seed, che_do="hop_le", kieu_chia="tron", so_em_moi_loai=3):
+    """Áp Điểm quyết tâm lên danh sách học sinh `hs`, SỬA TẠI CHỖ. Tất định theo `seed`.
+
+    Trả `(kieu, bang_loi)`: `kieu` {student_id: kiểu chia}, `bang_loi` danh sách em lỗi (rỗng
+    nếu không phải `co_loi`). Không đụng nguyện vọng hay điểm thi của em.
+
+    `che_do`:
+      * `khong`  — không làm gì (hành vi cũ);
+      * `trong`  — không đặt điểm nào; sổ vẫn có cột (xem `ghi_bo(cfg=CFG_DQT)`);
+      * `hop_le` — mọi quỹ của mọi buổi đủ 100 cho đúng tập CLB;
+      * `co_loi` — như `hop_le`, rồi cố ý làm sai `so_em_moi_loai` em cho MỖI loại trong
+        `LOAI_LOI_DQT`; mỗi em chỉ sai một loại, ghi trong `bang_loi`.
+
+    `kieu_chia`: `tron` (mỗi em một kiểu bốc ngẫu nhiên trong `KIEU_CHIA`) hoặc đúng một kiểu
+    cho cả trường. Em có quỹ một CLB thì luôn 100 bất kể kiểu.
+    """
+    if che_do not in CHE_DO_DQT:
+        raise ValueError("chế độ lạ: %r" % (che_do,))
+    if kieu_chia != "tron" and kieu_chia not in KIEU_CHIA:
+        raise ValueError("kiểu chia lạ: %r" % (kieu_chia,))
+    if che_do in ("khong", "trong"):
+        for h in hs:
+            h.pop("diem_quyet_tam", None)
+            h.pop("dqt_mo_coi", None)
+        return {}, []
+
+    rnd = random.Random(seed)
+    kieu = {}
+    for h in hs:
+        k = rnd.choice(KIEU_CHIA) if kieu_chia == "tron" else kieu_chia
+        kieu[h["student_id"]] = k
+        h["diem_quyet_tam"] = {}
+        for (_b, _q), ds in _quy_theo_thu_tu(clb, h):
+            h["diem_quyet_tam"].update(chia_mot_quy(ds, k, rnd))
+    if che_do == "hop_le":
+        return kieu, []
+    return kieu, _lam_loi(clb, hs, rnd, so_em_moi_loai)
+
+
+def _lam_loi(clb, hs, rnd, moi_loai):
+    """Cố ý làm sai hồ sơ của `moi_loai` em cho mỗi loại lỗi. Trả bảng lỗi.
+
+    Mỗi dòng: student_id, loai, mo_ta, `loi_pipeline` (mã lỗi, quỹ, buổi mà bước Kiểm tra dữ
+    liệu phải báo) và `canh_bao_nhap` (cảnh báo lúc nạp sổ). Sổ chỉ có MỘT ô điểm cạnh mỗi
+    nguyện vọng, và tầng của ô do tick thi quyết định, nên hai loại lỗi được thể hiện như sau:
+      * `ngoai_nguyen_vong`: điểm nằm ở ô cạnh một ô nguyện vọng TRỐNG; phần mềm bỏ ô đó (cảnh
+        báo lúc nạp) và quỹ còn lại thiếu đúng số điểm ấy;
+      * `tang_lech`: em chia MỘT quỹ chung cho cả CLB có thi lẫn không thi của một buổi; mỗi
+        quỹ vì thế thiếu điểm.
+    """
+    thu_tu = list(range(len(hs)))
+    rnd.shuffle(thu_tu)
+    da_dung = set()
+    bang = []
+
+    def lay(dieu_kien):
+        for i in thu_tu:
+            if i not in da_dung and dieu_kien(hs[i]):
+                da_dung.add(i)
+                return hs[i]
+        raise SystemExit("Không đủ học sinh để cài lỗi")
+
+    def chon_quy(h, can_hai_clb=False):
+        q = [kv for kv in _quy_theo_thu_tu(clb, h) if len(kv[1]) >= (2 if can_hai_clb else 1)]
+        return q[rnd.randrange(len(q))] if q else None
+
+    def mot(loai, mo_ta, loi_pipeline, h, canh_bao_nhap=()):
+        bang.append({"student_id": h["student_id"], "loai": loai, "mo_ta": mo_ta,
+                     "loi_pipeline": [{"code": c, "quy": q, "buoi": b} for c, q, b in loi_pipeline],
+                     "canh_bao_nhap": list(canh_bao_nhap)})
+
+    for _ in range(moi_loai):
+        h = lay(lambda h: bool(cac_quy(clb, h)))
+        (b, q), ds = chon_quy(h)
+        w = h["diem_quyet_tam"]
+        cid = max(ds, key=lambda c: (w[c], c))
+        d = rnd.randint(1, min(30, w[cid]))
+        w[cid] -= d
+        mot("thieu", "quỹ %d buổi %s thiếu %d điểm (tổng %d)" % (q, b, d, NGAN_SACH_DQT - d),
+            [("wharton_chua_dung_het", q, b)], h)
+
+    for _ in range(moi_loai):
+        h = lay(lambda h: bool(cac_quy(clb, h)))
+        (b, q), ds = chon_quy(h)
+        w = h["diem_quyet_tam"]
+        cid = ds[rnd.randrange(len(ds))]
+        d = rnd.randint(1, 30)
+        w[cid] += d
+        mot("thua", "quỹ %d buổi %s thừa %d điểm (tổng %d)" % (q, b, d, NGAN_SACH_DQT + d),
+            [("wharton_vuot_ngan_sach", q, b)], h)
+
+    for _ in range(moi_loai):
+        h = lay(lambda h: bool(cac_quy(clb, h)))
+        (b, q), ds = chon_quy(h)
+        w = h["diem_quyet_tam"]
+        cid = max(ds, key=lambda c: (w[c], c))
+        d = rnd.randint(1, min(25, w[cid]))
+        w[cid] -= d
+        h["dqt_mo_coi"] = [d]
+        mot("ngoai_nguyen_vong",
+            "%d điểm đặt ở ô cạnh nguyện vọng trống; quỹ %d buổi %s còn thiếu %d" % (d, q, b, d),
+            [("wharton_chua_dung_het", q, b)], h, ["csv_wp_khong_co_nguyen_vong"])
+
+    def co_hai_tang(h):
+        q = cac_quy(clb, h)
+        return any((b0, 1) in q and (b0, 2) in q for (b0, _q) in q)
+
+    for _ in range(moi_loai):
+        h = lay(co_hai_tang)
+        q_h = cac_quy(clb, h)
+        b = next(b0 for (b0, _q) in sorted(q_h) if (b0, 1) in q_h and (b0, 2) in q_h)
+        ds = q_h[(b, 1)] + q_h[(b, 2)]
+        h["diem_quyet_tam"].update(lam_tron_100({c: 1 for c in ds}))
+        mot("tang_lech",
+            "một quỹ chung %d điểm cho cả CLB có thi và không thi của buổi %s" % (NGAN_SACH_DQT, b),
+            [("wharton_chua_dung_het", 1, b), ("wharton_chua_dung_het", 2, b)], h)
+
+    for _ in range(moi_loai):
+        h = lay(lambda h: bool(cac_quy(clb, h)))
+        for c in h["diem_quyet_tam"]:
+            h["diem_quyet_tam"][c] = 0
+        mot("toan_0", "mọi ô điểm quyết tâm bằng 0",
+            [("wharton_chua_dung_het", q, b) for (b, q), _ds in _quy_theo_thu_tu(clb, h)], h)
+    return bang
+
+
+def ap_len_so_co_san(duong_vao, thu_muc_ra, ten_tep, seed, che_do, kieu_chia,
+                     so_em_moi_loai=3):
+    """Đọc một sổ đã có, giữ nguyên CLB, nguyện vọng, điểm thi; thêm Điểm quyết tâm; ghi tệp mới.
+
+    Trả `(đường dẫn, kiểu chia, bảng lỗi)`. Sổ gốc phải qua `soat` trước, và (ở chế độ
+    `hop_le`) hồ sơ điểm phải qua `soat_diem_quyet_tam`; sai thì ném SystemExit, không ghi gì.
+    """
+    clb, hs = doc_bo(duong_vao)
+    loi = soat(clb, hs)
+    if loi:
+        raise SystemExit("Sổ gốc không hợp lệ:\n   ✗ " + "\n   ✗ ".join(loi))
+    kieu, bang = ap_diem_quyet_tam(clb, hs, seed, che_do, kieu_chia, so_em_moi_loai)
+    if che_do == "hop_le":
+        loi = soat_diem_quyet_tam(clb, hs)
+        if loi:
+            raise SystemExit("Điểm quyết tâm không hợp lệ:\n   ✗ " + "\n   ✗ ".join(loi))
+    cfg = CFG_DQT if che_do != "khong" else None
+    return ghi_bo(thu_muc_ra, clb, hs, cfg, ten_tep)[0], kieu, bang
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -462,6 +742,23 @@ def _in_ket_qua(clb, hs, loi, canh_bao):
     return 0
 
 
+def _them_tuy_chon_dqt(parser, mac_dinh="khong"):
+    parser.add_argument("--diem-quyet-tam", choices=CHE_DO_DQT, default=mac_dinh,
+                        help="sinh Điểm quyết tâm (mục A13); khong = như cũ")
+    parser.add_argument("--kieu-chia", choices=("tron",) + KIEU_CHIA, default="tron",
+                        help="kiểu chia điểm; tron = mỗi em một kiểu")
+
+
+def _ghi_json_dqt(thu_muc, ten_tep, kieu, bang, che_do):
+    """Ghi DQT_KIEU_CHIA.json (và DQT_BANG_LOI.json khi co_loi): {tên tệp: ...}."""
+    cac = [("DQT_KIEU_CHIA.json", kieu)] + (
+        [("DQT_BANG_LOI.json", bang)] if che_do == "co_loi" else [])
+    for ten, noi_dung in cac:
+        with io.open(os.path.join(thu_muc, ten), "w", encoding="utf-8") as f:
+            json.dump({ten_tep: noi_dung}, f, ensure_ascii=False, indent=1, sort_keys=True)
+            f.write("\n")
+
+
 def main(argv=None):
     # Cua so lenh / ong dan tren Windows mac dinh la cp1252: in tieng Viet
     # se nem UnicodeEncodeError va script thoat voi ma 1.
@@ -474,6 +771,7 @@ def main(argv=None):
     a = sub.add_parser("tao", help="dựng từ bản khai báo JSON")
     a.add_argument("--spec", required=True)
     a.add_argument("--ra", required=True)
+    _them_tuy_chon_dqt(a)
 
     b = sub.add_parser("ngau", help="dựng một trường ngẫu nhiên nhưng hợp lệ")
     b.add_argument("--ra", required=True)
@@ -482,15 +780,36 @@ def main(argv=None):
     b.add_argument("--clb-moi-buoi", type=int, default=3)
     b.add_argument("--seed", type=int, default=42)
     b.add_argument("--do-choi", type=float, default=1.15)
+    _them_tuy_chon_dqt(b)
+
+    d = sub.add_parser("ap", help="áp Điểm quyết tâm lên một sổ đã có (giữ nguyên nguyện vọng và điểm thi)")
+    d.add_argument("so", help="tệp .xlsx gốc")
+    d.add_argument("--ra", required=True)
+    d.add_argument("--ten-tep", default=TEN_SO)
+    d.add_argument("--seed", type=int, default=42)
+    _them_tuy_chon_dqt(d, mac_dinh="hop_le")
 
     c = sub.add_parser("soat", help="soát một sổ nhập (hoặc bộ ba CSV cũ), không sửa gì")
     c.add_argument("thu_muc", help="tệp SO_NHAP_CLB.xlsx, hoặc thư mục chứa nó / bộ ba CSV")
 
     ns = p.parse_args(argv)
 
+    if ns.lenh == "ap":
+        if ns.diem_quyet_tam == "khong":
+            print("--diem-quyet-tam khong: không có gì để áp.", file=sys.stderr)
+            return 1
+        duong, kieu, bang = ap_len_so_co_san(ns.so, ns.ra, ns.ten_tep, ns.seed,
+                                             ns.diem_quyet_tam, ns.kieu_chia)
+        _ghi_json_dqt(ns.ra, ns.ten_tep, kieu, bang, ns.diem_quyet_tam)
+        print("   →", duong)
+        return 0
+
     if ns.lenh == "soat":
         clb, hs = doc_bo(ns.thu_muc)
-        return _in_ket_qua(clb, hs, soat(clb, hs), canh_bao_men(clb, hs))
+        loi = soat(clb, hs)
+        if any(h.get("diem_quyet_tam") or h.get("dqt_mo_coi") for h in hs):
+            loi += soat_diem_quyet_tam(clb, hs)   # sổ có Điểm quyết tâm thì soát luôn hồ sơ điểm
+        return _in_ket_qua(clb, hs, loi, canh_bao_men(clb, hs))
 
     if ns.lenh == "tao":
         with io.open(ns.spec, encoding="utf-8") as f:
@@ -505,13 +824,20 @@ def main(argv=None):
         clb, hs = sinh_ngau_nhien(ns.hoc_sinh, ds_buoi, ns.clb_moi_buoi,
                                   ns.seed, ns.do_choi)
 
+    kieu, bang = ap_diem_quyet_tam(clb, hs, ns.seed if ns.lenh == "ngau" else 42,
+                                   ns.diem_quyet_tam, ns.kieu_chia)
     loi = soat(clb, hs)
+    if ns.diem_quyet_tam == "hop_le":
+        loi += soat_diem_quyet_tam(clb, hs)       # co_loi: lỗi là CỐ Ý, bảng lỗi ghi lại
     ma = _in_ket_qua(clb, hs, loi, canh_bao_men(clb, hs))
     if ma:
         print("\nKhông ghi tệp nào.", file=sys.stderr)
         return ma
-    for d in ghi_bo(ns.ra, clb, hs):
+    cfg = CFG_DQT if ns.diem_quyet_tam != "khong" else None
+    for d in ghi_bo(ns.ra, clb, hs, cfg):
         print("   →", d)
+    if cfg:
+        _ghi_json_dqt(ns.ra, TEN_SO, kieu, bang, ns.diem_quyet_tam)
     return 0
 
 

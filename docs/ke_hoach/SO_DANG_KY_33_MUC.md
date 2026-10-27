@@ -453,6 +453,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - **Đóng vai lần 2:** thêm vai học sinh ở kiosk và bộ mô phỏng hồ sơ hợp lệ; kết quả ở mục "Lần 2 (27/10/2026)" của báo cáo đóng vai. Vấn đề #6 và #7 để sau.
   - **Dòng (đối chiếu 27/10/2026):** api_quan_ly.py: `phong_theo_ti_le` (L36), `phong_wharton_hang_loat` (L927), `_ke_hoach_phong` (L971); api_xuat.py: `export_wharton_can_sua` (L1008), `_chua_co_ket_qua` (L1254); js/00_nen.js: `thoiGianToastMs` (L157), `showToast` (L162); js/02_van_hanh.js: `tachLoiWharton` (L342), `chuLoiBuocGon` (L373), `showLog` (L380); js/03_ket_qua.js: `khoaXuatKetQua` (L1260); js/05_quan_ly.js: `veLaiWhTuBoNho` (L963), `moDanhSachCanXuLy` (L995), `initWhHangLoat` (L1006), `initTabConQl` (L1376).
   - **Kết quả:** 60 ca test mới; toàn bộ 2.699 qua, 3 bỏ qua; `ruff` sạch; độ phủ 92,34 %; 15 lần chạy với tính năng tắt GIỐNG HỆT bản `d85fe2c`.
+- **A13.6 — Dữ liệu mẫu có Điểm quyết tâm (27/10/2026, vòng 6):** sáu sổ `du_lieu_test/SO_NHAP_DQT_{120HS,800HS}_{HOP_LE,CO_LOI,TRONG}.xlsx` (dữ liệu MÔ PHỎNG, seed cố định) kèm `DQT_BANG_LOI.json`, `DQT_KIEU_CHIA.json` và script `du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`; kỹ năng `sinh-du-lieu-clb` thêm `--diem-quyet-tam` và `--kieu-chia` (mặc định = hành vi cũ). Không đổi thuật toán, schema, hợp đồng CSV hay định dạng sổ. Tắt `rules.wharton` thì `match_results` trên các sổ mới trùng khít với cùng sổ bỏ cột điểm. 43 ca test mới (`tests/test_du_lieu_mau_diem_quyet_tam.py`).
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
 
