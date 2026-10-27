@@ -1251,9 +1251,18 @@ class XuatKetQuaMixin:
         """
         return self._khoa_xuat(self._export_ket_qua_da_khoa, output_path, kem_csv)
 
+    def _chua_co_ket_qua(self) -> bool:
+        """Chưa có kết quả xếp nào (cùng phép đo với `get_trang_thai_ket_qua`: bảng match_results
+        rỗng). Hai đường xuất kết quả từ chối TRƯỚC khi tạo tệp, để không có tệp rỗng mà vẫn
+        báo "Đã xuất" (A13.5)."""
+        with self._ket_noi_doc() as cur:
+            return cur.execute("SELECT COUNT(*) FROM match_results").fetchone()[0] == 0
+
     def _export_ket_qua_da_khoa(self, output_path: str, kem_csv: bool):
         path = None
         try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
             # Kem CSV thi ten goc phai con trong cho CA HAI duoi, khong thi tep
             # .csv di kem ghi de mot tep cu trung ten.
             path = self._duong_xuat(output_path, "ket_qua_phan_bo.xlsx",
@@ -1312,6 +1321,8 @@ class XuatKetQuaMixin:
         ĐỦ để giao diện hiện đúng chỗ tệp nằm.
         """
         try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
             # So Excel cung ten goc di kem -> ten goc phai trong cho ca .xlsx,
             # khong thi ghi de so ma nut tren giao dien vua de o Tai xuong.
             output_path = self._duong_xuat(output_path, "ket_qua_phan_bo.csv",
