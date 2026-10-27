@@ -442,6 +442,17 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
   - **Đóng vai người dùng:** ba vai chạy bằng Playwright sau khi xong giao diện; CHỈ BÁO CÁO, không sửa, ghi ở `docs/ke_hoach/BAO_CAO_DONG_VAI_DIEM_QUYET_TAM.md`.
   - **Dòng:** cập nhật ở Bước 14.
 
+- **A13.5 — Sửa 5 việc từ báo cáo đóng vai (27/10/2026, vòng 5):** sửa các vấn đề #1 đến #5 của `docs/ke_hoach/BAO_CAO_DONG_VAI_DIEM_QUYET_TAM.md` (#6, #7 để sau), cộng một lỗi chập chờn của vòng 4. Tắt `rules.wharton` thì kết quả, dấu vân tay và `run_history` y hệt trước vòng 5 (bất biến 1); không đụng thuật toán, `api.py`, schema, STB, thứ tự 5 bước.
+  - **Lỗi chập chờn (Bước 0b):** đổi ngôn ngữ khi khối Điểm quyết tâm ở tab Quản lý còn chờ lời gọi API thì chữ cũ còn trên màn hình đến lúc lời gọi về. Nay khối giữ dữ liệu lần vẽ gần nhất và vẽ lại ngay khi đổi ngôn ngữ.
+  - **#1 Lỗi chặn gọn lại:** màn hình chạy xếp chỉ hiện một dòng tóm tắt, 5 em đầu (mỗi em một dòng gộp mọi lỗi), "và M ... khác" và nút "Mở danh sách cần xử lý" (sang tab con Điểm quyết tâm, bộ lọc "chỉ hồ sơ có vấn đề" đã bật). Hợp đồng `{ok, data, errors}` KHÔNG đổi (bất biến 6): backend vẫn trả đủ mọi lỗi, chỉ cách hiện đổi.
+  - **#2 Xử lý hàng loạt (tab con Điểm quyết tâm):** (a) "Tải danh sách cần sửa": xuất Excel, không đổi điểm nào (`export_wharton_can_sua`, `api_xuat.py`); (b) "Phóng cho đủ 100 theo tỉ lệ" (`phong_wharton_hang_loat`, `api_quan_ly.py`): gõ `PHONG` để xác nhận, sao lưu trước, hàm thuần `phong_theo_ti_le` làm tròn theo phần dư lớn nhất, hoà phần dư xét theo mã CLB tăng dần (KHÔNG theo thứ hạng nguyện vọng, bất biến 2), mỗi em ghi qua `_luu_wharton(..., nguon="quan_ly")` nên có khoá, kiểm hồ sơ và nhật ký. Em tổng 0 hoặc còn lỗi khác (`wharton_ngoai_tap`, `wharton_tang_lech`, `wharton_diem_khong_hop_le`) được bỏ qua và liệt kê lại.
+  - **#3 Tab Quản lý chia tab con:** CLB, Học sinh, Điểm quyết tâm, Điểm chuẩn, Dữ liệu. Hai tab điểm chỉ hiện khi bật tính năng; tắt thì 3 tab con, nội dung y như cũ. Nhớ tab đang mở bằng `localStorage` (có `try/catch`); bàn phím dùng được (`role="tablist"`).
+  - **#4 Khoá xuất khi chưa có kết quả (TOÀN ứng dụng, NGOÀI PHẠM VI A13, theo yêu cầu của Truong):** mục xuất kết quả bị khoá kèm dòng vàng; `export_ket_qua` và `export_csv` từ chối với mã lỗi mới `xuat_chua_co_ket_qua`. Xuất dữ liệu đầu vào, Sổ nhập và xuất học sinh dùng như cũ.
+  - **#5 Thông báo (TOÀN ứng dụng, NGOÀI PHẠM VI A13, theo yêu cầu của Truong):** thông báo thành công tự đóng sau 6 giây (câu dài thêm thời gian, tối đa 10 giây; tạm dừng khi rê chuột hoặc có tiêu điểm); lỗi và cảnh báo giữ tới khi bấm ×; thành công kèm cảnh báo thì tách thành hai thông báo; không che tiêu đề và thanh tab; tôn trọng `prefers-reduced-motion`; `aria-live` phù hợp.
+  - **Mã lỗi mới:** `xuat_chua_co_ket_qua`, `wharton_phong_sai_xac_nhan`, `wharton_da_phong`, `wharton_tom_tat_chua_hop_le`.
+  - **Đóng vai lần 2:** thêm vai học sinh ở kiosk và bộ mô phỏng hồ sơ hợp lệ; kết quả ở mục "Lần 2 (27/10/2026)" của báo cáo đóng vai. Vấn đề #6 và #7 để sau.
+  - **Dòng:** cập nhật ở Bước 12.
+
 ## Nhóm B — Mô hình dữ liệu và CSDL
 
 ### B1 — Điểm và thuộc tính theo cặp (đang là một số thực ≥ 0)
