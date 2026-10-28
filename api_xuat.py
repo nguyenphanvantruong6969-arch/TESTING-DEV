@@ -381,7 +381,7 @@ class XuatKetQuaMixin:
             ma = ", ".join(str(e.get("code")) for e in kq.get("errors", []) if isinstance(e, dict))
             t.ghi_chu("KHÔNG ĐỌC ĐƯỢC ĐIỂM CHUẨN khi xuất (mã lỗi: %s). Trang này đang trống do lỗi, "
                       "không phải vì chưa có dữ liệu. Hãy xuất lại." % (ma or "không rõ"), CHU_CANH_BAO)
-            du.setdefault("canh_bao", []).append(err("xuat_diem_chuan_loi", detail=ma))
+            du.setdefault("canh_bao", []).append(err("xuat_diem_chuan_loi"))
         dong = []
         for r in rows:
             dong.append([r["club_id"], r["ten"]] + ([r["buoi"]] if du["nhieu_buoi"] else [])
