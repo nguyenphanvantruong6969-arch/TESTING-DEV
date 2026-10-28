@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-10-28 — A13.9 Sửa 9 vấn đề từ đợt stress test
+
+Theo danh sách Truong đã chốt (mục 1–9; #10 numpy không làm). Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78` (`kiem_nhanh.py --co-so e08af78`, 15 ca, 3 bộ × 5 seed). Test mới: `tests/test_a13_9_stress.py` (mỗi mục đỏ trước, xanh sau).
+- **1. CSDL bận:** mã lỗi mới `csdl_dang_ban` (`CsdlBan`, con của `CauHinhHong`, nên mọi nơi đang dừng vẫn dừng; `loi_cau_hinh(e)` chọn mã). `connect_db(cho_khoa_ms=)`; `cau_hinh_ws.CHO_KHOA_DOC_CAU_HINH_MS = 2500`. Tệp: `rbda_priority_pipeline.py`, `cau_hinh_ws.py`, `api_workspace.py`, `api*.py`, `i18n_errors.py`, `i18n_loi.js`. Lưu ý: `run_pipeline` vẫn chờ tới 15 s ở bước sao lưu (cố ý: rút ngắn là bỏ qua sao lưu khi khoá ngắn).
+- **2, 3, 5. `browser_host.py`:** `_Handler.timeout = 45`; `_token_khop` so token trên byte (token không ASCII ở tiêu đề / `?t=` → 403); `loi_ngoai_du_kien` chỉ trả tên kiểu ngoại lệ, thông điệp thật nằm ở `loi_ung_dung.txt`.
+- **4. `chan_doan.py`:** `loi_ung_dung.txt` trần `TRAN_LOG_UNG_DUNG_BYTE` = 1.000.000, cắt xuống 75 % giữ phần cuối ở ranh giới mục; bỏ mục trùng hệt mục ngay trước (khác giờ). Log khởi động không đổi.
+- **6. `api_xuat.py`:** `_duong_xuat` với đường tuyệt đối cũng đi qua `duong_dan_khong_de` (kể cả `kem_duoi`): `x (2).xlsx`. Áp cho mọi hàm xuất và `export_workspace`.
+- **7. `workspace.py`:** `nhap_zip` — `TRAN_SO_TEP_ZIP = 1000`, `TRAN_GIAI_NEN_BYTE` hạ 500 → 200 MB, từ chối tên trùng (chuẩn hoá dấu phân cách, hoa/thường), kiểm NUL trên `orig_filename` (trước đây `zipfile` cắt tên nên kiểm NUL không bao giờ bắt được).
+- **8. Sổ rỗng:** `so_nhap.py` bỏ lỗi `so_nhap_khong_co_clb`; `api_nhap.py` báo `so_nhap_canh_bao_khong_co_clb` / `so_nhap_canh_bao_khong_co_hs`, bỏ bước nạp CLB khi sổ không có CLB; `run_pipeline` sau đó chạy được.
+- **9. Skill `sinh-du-lieu-clb`:** quá 20 CLB tự sinh "CLB Chuyên đề N"; ≤ 20 giữ đúng từng byte (băm 6 cấu hình so với `0f13771`).
+- **Test cũ:** chỉ thêm 3 mã vào `MA_MOI_SAU_ANH_CHUP` (`tests/test_ws_nhan.py`). **Hai test cũ ĐỎ, chưa sửa, chờ Truong quyết:** `test_nap_xuat_ca_hiem.py::test_khong_con_tep_cua_lan_xuat_truoc` (mục 6: xuất đè cùng đường tuyệt đối không còn xảy ra) và `test_so_nhap.py::test_ma_trong_dung_lai_clb_cung_ten_va_bao_clb_ngoai_so` (mục 8: sổ có CLB, 0 học sinh nay có cảnh báo).
+- **Kiểm:** `kiem_nhanh.py` 7/7. Toàn bộ test có Chromium, `-rs`, phủ 93 %: 2.902 qua, 2 đỏ (như trên), 1 bỏ qua (cần người dùng thường trên POSIX). `ruff check .` sạch. **Chưa làm:** chạy lại s3/s8 `--nhanh` và cột "Đã sửa ở commit" — `VAN_DE_STRESS_TEST.md`, `BAO_CAO_STRESS_TEST.md` và kịch bản s3/s8 không có trên nhánh.
+
 ## 2026-10-28 — A13.8 Sửa 12 lỗi từ đợt soát A13
 
 Theo danh sách Truong đã chốt (báo cáo `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`, mục "Vòng sửa A13.8"). Mô phỏng. Tắt Điểm quyết tâm: kết quả, dấu vân tay, run_history trùng khít `e08af78` (`kiem_nhanh.py`: 15 ca, 3 bộ × 5 seed).
