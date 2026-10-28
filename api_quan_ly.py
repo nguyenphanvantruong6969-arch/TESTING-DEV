@@ -26,7 +26,7 @@ from rbda_priority_pipeline import (
     dung_wharton,
     khoa_uu_tien_wharton,
     kiem_ho_so_wharton,
-    load_from_sqlite_kem_dau_van_tay_wharton,
+    load_wharton_kem_doc_them,
     loi_suc_chua,
     sap_buoi,
     tu_dien_wharton_mot_clb,
@@ -669,9 +669,7 @@ class QuanLyMixin:
         luat = self._luat_nghiem()
         if not dung_wharton(luat):
             return _fail(err("wharton_chua_bat")), None
-        du_lieu, dau_van_tay, w = load_from_sqlite_kem_dau_van_tay_wharton(self.db_path, luat)
-        students, clubs, tested_scores, applicants, preferences, stb_lottery = du_lieu
-        with self._ket_noi_doc() as cur:
+        def doc_them(cur):
             match = [(r[0], r[1], r[2], r[3]) for r in cur.execute(
                 "SELECT student_id, buoi, club_id, matched_tier FROM match_results "
                 "WHERE club_id IS NOT NULL ORDER BY student_id, buoi COLLATE THU_TU_BUOI")]
@@ -679,6 +677,12 @@ class QuanLyMixin:
             meta = cur.execute("SELECT run_at FROM run_meta WHERE id = 1").fetchone()
             ten_clb = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
             ten_hs = {r[0]: r[1] or "" for r in cur.execute("SELECT student_id, name FROM students")}
+            return match, luu, meta, ten_clb, ten_hs
+
+        # Dữ liệu, hồ sơ điểm, kết quả xếp, dấu vân tay đã lưu và run_meta: MỘT giao dịch đọc (A13.8).
+        du_lieu, dau_van_tay, w, them = load_wharton_kem_doc_them(self.db_path, luat, doc_them)
+        students, clubs, tested_scores, applicants, preferences, stb_lottery = du_lieu
+        match, luu, meta, ten_clb, ten_hs = them
         ctx = {
             "clubs": clubs, "tested_scores": tested_scores, "applicants": applicants,
             "preferences": preferences, "stb_lottery": stb_lottery, "match": match,

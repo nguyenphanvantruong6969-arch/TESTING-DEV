@@ -2610,6 +2610,27 @@ def load_from_sqlite_kem_dau_van_tay_wharton(db_path: str, rules=None):
         conn.close()
 
 
+def load_wharton_kem_doc_them(db_path: str, rules=None, doc_them=None):
+    """Như `load_from_sqlite_kem_dau_van_tay_wharton`, kèm một lần đọc thêm CÙNG giao dịch.
+
+    `doc_them(cur)` chạy trên con trỏ của chính giao dịch đọc đó (con trỏ có `row_factory` là
+    `sqlite3.Row`); kết quả của nó là phần tử thứ tư. Dùng cho màn điểm chuẩn: kết quả xếp, dấu vân
+    tay đã lưu và `run_meta` phải cùng trạng thái với dữ liệu và hồ sơ điểm, không thì một lần
+    chạy chen giữa làm bảng lẫn dữ liệu cũ và mới (A13.8). Hàm kia giữ nguyên chữ ký.
+    """
+    conn = _mo_doc_nhat_quan(db_path)
+    try:
+        cur = conn.cursor()
+        du_lieu = _doc_du_lieu(cur, rules)
+        dau = dau_van_tay_du_lieu(cur, rules)
+        w = doc_du_lieu_wharton(cur)
+        them = doc_them(cur) if doc_them is not None else None
+        return du_lieu, dau, w, them
+    finally:
+        conn.rollback()
+        conn.close()
+
+
 def write_match_results_to_sqlite(db_path: str, match_result) -> None:
     """Ghi kết quả vào bảng match_results (ghi đè toàn bộ).
 
