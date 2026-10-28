@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.join(GOC, ".claude", "skills", "sinh-du-lieu-clb", "s
 sys.path.insert(0, AY)
 
 import sinh_du_lieu as sk  # noqa: E402
-import so_nhap  # noqa: E402
+import so_nhap  # noqa: E402,F401  (s7 dùng c.so_nhap)
 
 os.makedirs(KQ_DIR, exist_ok=True)
 

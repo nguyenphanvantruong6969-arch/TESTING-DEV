@@ -46,7 +46,8 @@ def do_ms(page, hanh_dong, dieu_kien, lan=3, truoc=None):
         page.wait_for_function(dieu_kien, timeout=120000)
         page.evaluate(RAF2)
         xs.append((time.perf_counter() - t) * 1000)
-    return {"trung_vi_ms": round(statistics.median(xs), 1), "lon_nhat_ms": round(max(xs), 1), "n": lan}
+    return {"trung_vi_ms": round(statistics.median(xs), 1), "lon_nhat_ms": round(max(xs), 1), "n": lan,
+            "tung_lan_ms": [round(x, 1) for x in xs]}
 
 
 def main():
@@ -126,6 +127,8 @@ def main():
         kq["lat_het_trang"] = {"so_trang_da_lat": so_trang, "tong_s": round(time.perf_counter() - t_tong, 2),
                                "moi_trang_trung_vi_ms": round(statistics.median(ms_trang), 1) if ms_trang else None,
                                "moi_trang_lon_nhat_ms": round(max(ms_trang), 1) if ms_trang else None,
+                               "trang_cham_nhat": (ms_trang.index(max(ms_trang)) + 2) if ms_trang else None,
+                               "cac_trang_tren_1s": [(i + 2, round(x)) for i, x in enumerate(ms_trang) if x > 1000],
                                "dong_moi_trang": so_dong, "nhan_trang_dau": nhan}
         # Tìm / lọc
         o_tim = page.locator("#adminStudentSearch")

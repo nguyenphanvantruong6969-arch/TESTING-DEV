@@ -1,25 +1,27 @@
 # Các vấn đề tìm thấy khi stress test (sau A13.8)
 
-> **Trạng thái: BẢN SƠ BỘ.** Các mục dưới đây có bằng chứng từ lần chạy thử (`--nhanh`) và đọc mã. Bản chạy đầy đủ cả 8 nhóm đang chạy; kết quả cuối (kèm số đo) sẽ nằm ở `docs/ke_hoach/BAO_CAO_STRESS_TEST.md`. Tệp này sẽ được cập nhật khi có thêm phát hiện.
+> **Trạng thái: bản cuối của đợt stress test.** Số đo đầy đủ và bảng TRƯỚC / SAU A13.9 nằm ở `docs/ke_hoach/BAO_CAO_STRESS_TEST.md`. Các mục 1 – 10 bên dưới giữ nguyên mô tả **TRƯỚC A13.9** (đo trên đỉnh A13.8); cột "Hiện nay" cho biết trạng thái trên đỉnh A13.9 (`1fcef81`).
 >
-> Mọi dữ liệu là **MÔ PHỎNG** (seed cố định). Chỉ đo và báo cáo; không sửa mã sản phẩm. Chưa có lỗi mức **chặn** (sập, mất dữ liệu, phá bất biến) nào.
+> Mọi dữ liệu là **MÔ PHỎNG** (seed cố định). Chỉ đo và báo cáo; không sửa mã sản phẩm. Không có lỗi mức **chặn** (sập, mất dữ liệu, phá bất biến) trong cả 8 nhóm.
 >
 > Mức: **nên sửa** / **nhỏ** / **cần Truong quyết** / **ghi nhận**.
 
 ## Tổng hợp
 
-| # | Mức | Nhóm | Vấn đề ngắn |
-|---|---|---|---|
-| 1 | nên sửa | 3 | CSDL bị khoá: báo sai nguyên nhân (`ws_cau_hinh_hong`) và chờ 15–30 giây |
-| 2 | nên sửa | 8 | Máy chủ dự phòng không đặt timeout kết nối: kết nối treo giữ luồng mãi |
-| 3 | nhỏ | 8 | Token không phải ASCII: máy chủ đóng kết nối, không trả phản hồi |
-| 4 | nhỏ | 8 | `loi_ung_dung.txt` tăng không giới hạn theo số yêu cầu lỗi |
-| 5 | nhỏ | 8 | Phản hồi lỗi chứa nguyên văn thông điệp ngoại lệ Python |
-| 6 | cần Truong quyết | 8 | Đường xuất tuyệt đối được tôn trọng nguyên văn, ghi đè được tệp có sẵn |
-| 7 | nhỏ | 8 | Nhập workspace `.zip` không giới hạn số tệp; zip lớn tới sát trần 500 MB vẫn được nhận |
-| 8 | ghi nhận | 2 | Sổ không có học sinh nào, hoặc không có CLB nào, vẫn được nhận (`ok = true`) |
-| 9 | ghi nhận | công cụ | `sinh_ngau_nhien` chỉ có 20 chủ đề CLB |
-| 10 | ghi nhận | mốc | 2 test bị bỏ qua vì môi trường đo thiếu `numpy` |
+| # | Mức | Nhóm | Vấn đề ngắn | Hiện nay (A13.9) | Đã sửa ở commit |
+|---|---|---|---|---|---|
+| 1 | nên sửa | 3 | CSDL bị khoá: báo sai nguyên nhân và chờ 15 – 30 giây | **Hết** phần mã lỗi sai (`csdl_dang_ban`, 2,5 s); còn 15 – 17,6 s ở `list_students_admin`, `reset_data`, `run_pipeline` (N3) | 814b5d4 |
+| 2 | nên sửa | 8 | Máy chủ dự phòng không timeout kết nối | **Hết** (thả sau 45 s) | 1dac117 |
+| 3 | nhỏ | 8 | Token không ASCII: đóng kết nối, không trả phản hồi | **Hết** (403) | 1dac117 |
+| 4 | nhỏ | 8 | `loi_ung_dung.txt` tăng không giới hạn | **Hết** (0,4 B/yêu cầu) | 1066456 |
+| 5 | nhỏ | 8 | Phản hồi lỗi có thông điệp ngoại lệ Python nguyên văn | **Hết** (chỉ tên kiểu) | 1dac117 |
+| 6 | cần Truong quyết | 8 | Đường xuất tuyệt đối ghi đè tệp có sẵn | **Hết** (không ghi đè, `x (2).ext`); phát sinh N1 | bf67701 |
+| 7 | nhỏ | 8 | Zip workspace: không trần số tệp, nhận tên trùng | **Hết** phần chính; tên NUL còn (vô hại) | 4a94376 |
+| 8 | ghi nhận | 2 | Sổ 0 học sinh được nhận không cảnh báo | **Hết** (cảnh báo `so_nhap_canh_bao_khong_co_hs`) | bc36bb7 |
+| 9 | ghi nhận | công cụ | `sinh_ngau_nhien` chỉ có 20 chủ đề CLB | **Hết** ở phía skill | 30f6d82 |
+| 10 | ghi nhận | mốc | 2 test bị bỏ qua vì môi trường đo thiếu `numpy` | Không đổi (đúng theo `CLAUDE.md`) | — |
+
+**Phát hiện mới trên A13.9** (chi tiết ở báo cáo, mục 10): N1 nhỏ (xuất vào đường là thư mục → tệp `ngoai (2)` cạnh thư mục), N2 nhỏ (`wharton_nhat_ky` thêm 801 dòng mỗi vòng nạp → xoá → nạp; `app.db` 1,4 → 16,7 MB sau 100 vòng), N3 nhỏ (còn chờ 15 s ở `list_students_admin` / `reset_data` khi CSDL bị khoá), N4 nên xem (5.000 × 100: lần đầu mở thẻ Kết quả ≈ 13,6 s, ba lần lật trang đầu 8 – 20 s; lặp lại 3 / 3 lần).
 
 ---
 
@@ -81,10 +83,11 @@
 - **Tái hiện.** `python du_lieu_test/stress/s8_bao_mat.py` (T5).
 - **Đề xuất.** Thêm trần số tệp (ví dụ 1.000) và cân nhắc hạ trần giải nén; từ chối tên trùng.
 
-## 8. Sổ không có học sinh / không có CLB vẫn được nhận — **ghi nhận** (nhóm 2)
+## 8. Sổ không có học sinh vẫn được nhận, không cảnh báo — **ghi nhận** (nhóm 2)
 
-- **Quan sát.** Trong lần chạy thử, các biến thể `khong_em` (0 học sinh), `khong_clb` (0 CLB) và `mot_clb` được nhận với `ok = true` (3/3 mỗi loại), không báo lỗi. Cần xác nhận ở bản đầy đủ rằng `run_pipeline` sau đó trả lỗi đúng dạng và không sập; chưa đánh giá đây là lỗi hay thiết kế.
-- **Tái hiện.** `python du_lieu_test/stress/s2_du_lieu_ban.py --lai khong_em:0` (và `khong_clb:0`).
+- **Quan sát (TRƯỚC A13.9).** Sổ 0 học sinh được nhận với `ok = true`, không cảnh báo. **Đính chính:** ghi nhận ban đầu của em nói cả 0 CLB cũng "được nhận"; thực ra sổ 0 CLB bị từ chối bằng danh sách lỗi `so_nhap_clb_khong_co` (bản xem trước trả `ok = true` kèm danh sách `loi`, em đã đọc nhầm là chấp nhận). Bộ phân loại của `s2` đã được sửa để coi "xem trước có `loi`" là từ chối.
+- **Hiện nay.** 0 học sinh: nhận kèm cảnh báo `so_nhap_canh_bao_khong_co_hs`; `run_pipeline` sau đó `ok`.
+- **Tái hiện.** `python du_lieu_test/stress/s2_du_lieu_ban.py --lai khong_em:0`.
 
 ## 9. Công cụ sinh dữ liệu giới hạn 20 chủ đề — **ghi nhận** (nhóm 1, 5, 7)
 
@@ -97,7 +100,7 @@
 
 ---
 
-## Đã kiểm và **không** thấy vấn đề (lần chạy thử, sẽ xác nhận bằng bản đầy đủ)
+## Đã kiểm và **không** thấy vấn đề (xác nhận bằng bản đầy đủ, xem báo cáo)
 
 - **Đồng thời (nhóm 3, phép A/B).** 4 và 16 luồng `submit_preferences` / `submit_wharton`: không ngoại lệ, không lỗi khoá, em ghi cùng lúc ra đúng một bản đã gửi. `run_pipeline` hai lần song song (cùng đối tượng, và hai tiến trình): đều ok, `run_history` thêm đúng 2 dòng, `integrity_check = ok`.
 - **Đĩa đầy giả lập (phép E).** Ghi vượt giới hạn khiến `run_pipeline` rollback đúng (CSDL không đổi, không để lại bản sao lưu dở); `integrity_check = ok`.

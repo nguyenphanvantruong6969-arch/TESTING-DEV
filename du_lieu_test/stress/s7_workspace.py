@@ -12,7 +12,6 @@ nhóm 4: chỉ tiêu, dự trữ, ổn định (cài lại hàm lựa chọn), c
 """
 
 import argparse
-import collections
 import copy
 import itertools
 import json

@@ -67,7 +67,6 @@ def mot_cau_hinh(n_hs, n_clb, n_buoi, dqt, lan):
     buoc_ds = []
     api_cuoi = thu_muc_cuoi = None
     ram_trace = None
-    thoi_gian_sinh = 0.0
     for i in range(lan):
         thu_muc = tempfile.mkdtemp(prefix="s1_")
         p, _clb, _hs = c.sinh_bo(n_hs, n_clb, n_buoi, 1000 + n_hs + n_buoi, dqt, thu_muc)

@@ -1,0 +1,1381 @@
+{
+ "T1_tai_dan_dap": {
+  "do_tre_ms": {
+   "max": 23.5,
+   "p50": 6.8,
+   "p95": 10.7,
+   "p99": 13.4
+  },
+  "giay": 10.02,
+  "gui": 5682,
+  "khong_200": 0,
+  "luong_sau": 3,
+  "luong_truoc": 3,
+  "ok_200": 5682,
+  "rps_thuc": 567.3,
+  "rss_sau_kb": 44912,
+  "rss_truoc_kb": 43052
+ },
+ "T2_token": {
+  "GET /%2e%2e/app.db": 404,
+  "GET /..%2f..%2fetc/passwd": 404,
+  "GET /../app.db": 404,
+  "GET /.git/config": 404,
+  "GET /CLAUDE.md": 404,
+  "GET /api.py": 404,
+  "GET /app.db": 404,
+  "GET /loi_ung_dung.txt": 404,
+  "GET /rbda_priority_pipeline.py": 404,
+  "GET /workspaces/": 404,
+  "GET_alive_token_khong_ascii": 403,
+  "GET_index_khong_token": 403,
+  "GET_index_token_khong_ascii_url": 403,
+  "GET_index_token_sai": 403,
+  "byte_ngoai_ascii": 403,
+  "dai_1MB": 431,
+  "hai_tieu_de_token(sai roi dung)": 403,
+  "host_la(token_dung)": 403,
+  "host_localhost_dung": 200,
+  "khac_do_dai": 403,
+  "khong_ascii_utf8": 403,
+  "rong": 403,
+  "sai": 403,
+  "ten_khac": 403,
+  "thieu": 403,
+  "token_chi_o_url_khi_goi_api": 403,
+  "token_dung_them_ky_tu": 403
+ },
+ "T3_ket_noi_treo": {
+  "do_tre_khi_treo_s": 0.002,
+  "luong_khi_treo": 305,
+  "luong_sau_30s_van_treo": 3,
+  "luong_sau_dong": 3,
+  "luong_truoc": 3,
+  "phuc_vu_duoc_khi_treo": true,
+  "so_ket_noi": 400
+ },
+ "T3_than_yeu_cau": {
+  "50MB_body": {
+   "giay": 0.0,
+   "ma": 413
+  },
+  "CL_32MB+1": 413,
+  "CL_am": 413,
+  "CL_khong_lo": 413,
+  "CL_khong_so": 413,
+  "CL_lớn_hơn_thân(không gửi đủ)": {
+   "giay_treo": 45.1,
+   "ma": 200
+  },
+  "CL_ngắn_hơn_thân": 200,
+  "NaN": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_reading_run_history\", \"params\": {\"detail\": \"cannot convert float NaN to integer\"}}]}"
+  },
+  "args_chuoi": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  },
+  "args_doi_tuong": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_reading_run_history\", \"params\": {\"detail\": \"invalid literal for int() with base 10: 'a'\"}}]}"
+  },
+  "args_so": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  },
+  "args_thua": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  },
+  "bình thường": 200,
+  "json_hong_rac": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"UnicodeDecodeError\"}}, {\"code\": \"xem_nhat_k"
+  },
+  "json_hong_{": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"JSONDecodeError\"}}, {\"code\": \"xem_nhat_ky\","
+  },
+  "json_la_list": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  },
+  "json_null": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  },
+  "json_so": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  },
+  "long_sau_100k": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"RecursionError\"}}, {\"code\": \"xem_nhat_ky\", "
+  },
+  "so_khong_lo": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"ValueError\"}}, {\"code\": \"xem_nhat_ky\", \"par"
+  }
+ },
+ "T4_slug_workspace": {
+  "delete_workspace['..']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"reset_confirmation_mismatch\", \"params\": {\"can_go\": \"XOA\"}}]}"
+  },
+  "duplicate_workspace['../x', 'y', True]": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../x\"}}]}"
+  },
+  "export_workspace['../x', '']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../x\"}}]}"
+  },
+  "get_workspace_config['../x']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../x\"}}]}"
+  },
+  "open_workspace['../../etc']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../../etc\"}}]}"
+  },
+  "open_workspace['../x']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../x\"}}]}"
+  },
+  "rename_workspace['../x', 'y']": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params\": {\"slug\": \"../x\"}}]}"
+  }
+ },
+ "T4_ten_phuong_thuc": {
+  "": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: \"]}"
+  },
+  "%2e%2e%2f": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: ../\"]}"
+  },
+  "..": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: ..\"]}"
+  },
+  "../x": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: ../x\"]}"
+  },
+  "GET_DASHBOARD_STATUS": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: GET_DASHBOARD_STATUS\"]}"
+  },
+  "__class__": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: __class__\"]}"
+  },
+  "__dict__": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: __dict__\"]}"
+  },
+  "__getattribute__": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: __getattribute__\"]}"
+  },
+  "__init__": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: __init__\"]}"
+  },
+  "__reduce__": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: __reduce__\"]}"
+  },
+  "_backup_db": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: _backup_db\"]}"
+  },
+  "_goc_ws": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: _goc_ws\"]}"
+  },
+  "_khoa_ghi": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: _khoa_ghi\"]}"
+  },
+  "_set_window": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: _set_window\"]}"
+  },
+  "_window": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: _window\"]}"
+  },
+  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+   "ma": 414,
+   "than": "<!DOCTYPE HTML>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>Error response</title>\n    </head>\n    <body>\n    "
+  },
+  "db_path": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"not callable: db_path\"]}"
+  },
+  "get_dashboard_status ": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: get_dashboard_status \"]}"
+  },
+  "get_dashboard_status%00x": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: get_dashboard_status\\u0000x\"]}"
+  },
+  "get_dashboard_status/..": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: get_dashboard_status/..\"]}"
+  },
+  "khong_ton_tai": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: khong_ton_tai\"]}"
+  },
+  "run_pipeline;ls": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: run_pipeline;ls\"]}"
+  },
+  "thu_muc_xuat": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"not callable: thu_muc_xuat\"]}"
+  },
+  "укр": {
+   "ma": 404,
+   "than": "{\"ok\": false, \"errors\": [\"unknown method: \\u0443\\u043a\\u0440\"]}"
+  }
+ },
+ "T5_tep_moi_ngoai_thu_muc_workspaces": [],
+ "T5_zip": {
+  "app.db_rac": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 144,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"app.db trong zip kh\\u00f4ng ph\\u1ea3i CSDL h\\u1ee3p l\\u1ec7: file is not a database\"}}]}"
+  },
+  "khong_co_app.db": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 111,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng ph\\u1ea3i workspace: thi\\u1ebfu app.db \\u1edf g\\u1ed1c.\"}}]}"
+  },
+  "nhieu_tep_50k": {
+   "giay": 0.3,
+   "kich_thuoc_zip": 5003067,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 51700,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip qu\\u00e1 nhi\\u1ec1u t\\u1ec7p: qu\\u00e1 1000 t\\u1ec7p.\"}}]}"
+  },
+  "o_dia_C:": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 25400,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn tuy\\u1ec7t \\u0111\\u1ed1i 'C:\\\\x\\\\ZIPDRIVE.txt'.\"}}]}"
+  },
+  "symlink": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 25372,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: li\\u00ean k\\u1ebft 'link'.\"}}]}"
+  },
+  "symlink_ten_app.db": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 111,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: li\\u00ean k\\u1ebft 'app.db'.\"}}]}"
+  },
+  "ten_NUL": {
+   "giay": 0.01,
+   "kich_thuoc_zip": 25368,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 54812,
+   "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-3\", \"name\": \"Thu stress\"}, \"errors\": []}"
+  },
+  "tep_trung_ten": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 50552,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 54812,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: c\\u00f3 hai m\\u1ee5c tr\\u00f9ng t\\u00ean 'app.db'.\"}}]}"
+  },
+  "thu_muc_long_sau": {
+   "giay": 0.03,
+   "kich_thuoc_zip": 33376,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 54812,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_loi_khong_ro\", \"params\": {\"detail\": \"maximum recursion depth exceeded\"}}, {\"code\": \"xem_nhat_ky\", \"params\": {\"file\": \"loi_ung_dung.txt\"}}]}"
+  },
+  "tieu_de_noi_doi(60MB khai 10 byte)": {
+   "giay": 0.08,
+   "kich_thuoc_zip": 86540,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 58204,
+   "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-4\", \"name\": \"Thu stress\"}, \"errors\": []}"
+  },
+  "tot(đối chứng)": {
+   "giay": 0.01,
+   "kich_thuoc_zip": 25287,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-2\", \"name\": \"Thu stress\"}, \"errors\": []}"
+  },
+  "tuyet_doi_/tmp": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 25396,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn tuy\\u1ec7t \\u0111\\u1ed1i '/tmp/ZIPABS.txt'.\"}}]}"
+  },
+  "zip_bomb_700MB(→~700KB)": {
+   "giay": 0.78,
+   "kich_thuoc_zip": 738822,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 58204,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip qu\\u00e1 l\\u1edbn: gi\\u1ea3i n\\u00e9n ra h\\u01a1n 200 MB.\"}}]}"
+  },
+  "zip_slip_../": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 25394,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn ch\\u1ee9a '..' ('../ZIPSLIP.txt').\"}}]}"
+  },
+  "zip_slip_..\\": {
+   "giay": 0.0,
+   "kich_thuoc_zip": 25402,
+   "luong": 3,
+   "ma_http": 200,
+   "rss_may_chu_kb": 48628,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn ch\\u1ee9a '..' ('..\\\\..\\\\ZIPSLIP2.txt').\"}}]}"
+  }
+ },
+ "T6_duong_xuat": {
+  "..\\ kiểu Windows": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\"
+  },
+  "..\\..": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+  },
+  "NUL": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_exporting_excel\", \"params\": {\"detail\": \"replace: embedded null character in dst\"}}]}"
+  },
+  "chỉ dấu chấm": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2)\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2)\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1ed"
+  },
+  "dấu ~": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+  },
+  "export_csv(../..)": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_csv\", \"tong_hop_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_csv_tong_hop.csv\", \"n_rows\": 240,"
+  },
+  "export_du_lieu_dau_vao(../..)": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_du_lieu_dau_vao\", \"dir\": \"/tmp/s8_36xvzp52/tai_ve\", \"n_clubs\": 8, \"n_hoc_sinh\": 120, \"n_prefe"
+  },
+  "export_hoc_sinh_csv(../..)": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"chua_chon_hoc_sinh\", \"params\": {}}]}"
+  },
+  "export_thay_doi_ket_qua(../..)": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"chua_co_lan_chay_truoc\", \"params\": {}}]}"
+  },
+  "rất dài 5000": {
+   "ma": 200,
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_exporting_excel\", \"params\": {\"detail\": \"[Errno 36] File name too long: '/tmp/s8_36xvzp52/tai_ve/.~d8bfb263044c4d28a834172f5d6822f2.xlsx' -> '/tmp/s8_36xvzp52/tai_ve/"
+  },
+  "rỗng": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ket_qua_phan_bo.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ket_qua_phan_bo.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\""
+  },
+  "tao_so_nhap_mau(../..)": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_tao_so_nhap_mau\", \"dir\": \"/tmp/s8_36xvzp52/tai_ve\", \"n_clubs\": 8, \"n_ten_doi\": 0}, \"errors\": []}"
+  },
+  "thu_muc_con/../..": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+  },
+  "thư mục": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai (2)\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai (2)\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1ed7\", \"Th\\"
+  },
+  "tuyệt đối ghi đè tệp có sẵn": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NHAN (2).xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NHAN (2).xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u0"
+  },
+  "tuyệt đối ra ngoài": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1"
+  },
+  "tên đặc biệt": {
+   "ma": 200,
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/con.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/con.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\"
+  }
+ },
+ "T6_tep_moi": {
+  "ngoai_thu_muc_cho_phep": [
+   "ngoai",
+   "ngoai (2)",
+   "ngoai/ABS.xlsx",
+   "ngoai/NAN_NHAN (2).xlsx",
+   "ngoai/NAN_NHAN.xlsx"
+  ],
+  "tat_ca": [
+   "ngoai",
+   "ngoai (2)",
+   "ngoai/ABS.xlsx",
+   "ngoai/NAN_NHAN (2).xlsx",
+   "ngoai/NAN_NHAN.xlsx",
+   "tai_ve",
+   "tai_ve/.. (2)",
+   "tai_ve/..\\..\\ESC2.xlsx",
+   "tai_ve/ESC1.xlsx",
+   "tai_ve/ESC3.xlsx",
+   "tai_ve/ESC4.xlsx",
+   "tai_ve/ESC5_export_csv",
+   "tai_ve/ESC5_export_csv.xlsx",
+   "tai_ve/ESC5_export_csv_so_boc_tham_theo_buoi.csv",
+   "tai_ve/ESC5_export_csv_theo_buoi",
+   "tai_ve/ESC5_export_csv_theo_buoi/thu_2.csv",
+   "tai_ve/ESC5_export_csv_theo_buoi/thu_3.csv",
+   "tai_ve/ESC5_export_csv_theo_club",
+   "tai_ve/ESC5_export_csv_theo_club/_chua_duoc_xep.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_bongda.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_bongro.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_covua.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_khieuvu.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_nhiepanh.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_tinhnguyen.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_tranhbien.csv",
+   "tai_ve/ESC5_export_csv_theo_club/clb_vanhoc.csv",
+   "tai_ve/ESC5_export_csv_thoi_khoa_bieu.csv",
+   "tai_ve/ESC5_export_csv_tong_hop.csv",
+   "tai_ve/ESC5_export_du_lieu_dau_vao"
+  ],
+  "tep_nan_nhan_sau": "TEP_CO_SAN_CUA_NAN_NHAN"
+ },
+ "T7_chi_tiet_ngoai_le_python_trong_phan_hoi": [
+  [
+   "json_hong_{",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"JSONDecodeError\"}}, {\"code\": \"xem_nhat_ky\","
+  ],
+  [
+   "json_hong_rac",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"UnicodeDecodeError\"}}, {\"code\": \"xem_nhat_k"
+  ],
+  [
+   "json_la_list",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  ],
+  [
+   "json_null",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  ],
+  [
+   "json_so",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"AttributeError\"}}, {\"code\": \"xem_nhat_ky\", "
+  ],
+  [
+   "args_so",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  ],
+  [
+   "args_chuoi",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  ],
+  [
+   "args_thua",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"TypeError\"}}, {\"code\": \"xem_nhat_ky\", \"para"
+  ],
+  [
+   "so_khong_lo",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"ValueError\"}}, {\"code\": \"xem_nhat_ky\", \"par"
+  ],
+  [
+   "long_sau_100k",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"loi_ngoai_du_kien\", \"params\": {\"ten\": \"get_run_history\", \"detail\": \"RecursionError\"}}, {\"code\": \"xem_nhat_ky\", "
+  ]
+ ],
+ "T7_ro_ri": {
+  "byte_moi_yeu_cau_loi": 0.4,
+  "mau_ro_ri": [
+   [
+    "T6",
+    "..\\..",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "..\\ kiểu Windows",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "thu_muc_con/../..",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "tuyệt đối ra ngoài",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "tuyệt đối ghi đè tệp có sẵn",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "rất dài 5000",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "thư mục",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "dấu ~",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "tên đặc biệt",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "chỉ dấu chấm",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "rỗng",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "export_csv(../..)",
+    "/tmp/s8_36xvzp52"
+   ],
+   [
+    "T6",
+    "export_du_lieu_dau_vao(../..)",
+    "/tmp/s8_36xvzp52"
+   ]
+  ],
+  "nhat_ky_loi_sau_byte": 7530,
+  "nhat_ky_loi_truoc_byte": 6726,
+  "so_tep_nhat_ky": 1,
+  "so_yeu_cau_loi": 2000
+ },
+ "bang": [
+  [
+   "T1",
+   "1000 yêu cầu/s × 10 s: máy chủ còn sống",
+   "True",
+   "OK"
+  ],
+  [
+   "T1",
+   "đạt tải / số 200",
+   "567 rps thực, 5682/5682 200, p99 13 ms",
+   "ghi nhận"
+  ],
+  [
+   "T2",
+   "token: thieu",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: rong",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: sai",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: dai_1MB",
+   "431",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: khac_do_dai",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: token_dung_them_ky_tu",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: ten_khac",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: khong_ascii_utf8",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: byte_ngoai_ascii",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: hai_tieu_de_token(sai roi dung)",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: token_chi_o_url_khi_goi_api",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: host_la(token_dung)",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: host_localhost_dung",
+   "200",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET_index_khong_token",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET_index_token_sai",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET_index_token_khong_ascii_url",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET_alive_token_khong_ascii",
+   "403",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /app.db",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /../app.db",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /%2e%2e/app.db",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /loi_ung_dung.txt",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /workspaces/",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /.git/config",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /..%2f..%2fetc/passwd",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /rbda_priority_pipeline.py",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /api.py",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "token: GET /CLAUDE.md",
+   "404",
+   "OK"
+  ],
+  [
+   "T2",
+   "còn sống sau cả nhóm token",
+   "True",
+   "OK"
+  ],
+  [
+   "T3",
+   "50 MB trong thân",
+   "{'ma': 413, 'giay': 0.0}",
+   "OK"
+  ],
+  [
+   "T3",
+   "CL_khong_so",
+   "413",
+   "OK"
+  ],
+  [
+   "T3",
+   "CL_am",
+   "413",
+   "OK"
+  ],
+  [
+   "T3",
+   "CL_khong_lo",
+   "413",
+   "OK"
+  ],
+  [
+   "T3",
+   "CL_32MB+1",
+   "413",
+   "OK"
+  ],
+  [
+   "T3",
+   "Content-Length ngắn hơn thân",
+   "200",
+   "ghi nhận"
+  ],
+  [
+   "T3",
+   "Content-Length lớn hơn thân thật (kết nối treo)",
+   "{'ma': 200, 'giay_treo': 45.1}",
+   "XEM"
+  ],
+  [
+   "T3",
+   "json_hong_{",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "json_hong_rac",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "json_la_list",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "json_null",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "json_so",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "args_so",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "args_chuoi",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "args_doi_tuong",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "args_thua",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "NaN",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "so_khong_lo",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "long_sau_100k",
+   "200",
+   "OK"
+  ],
+  [
+   "T3",
+   "còn sống sau nhóm thân yêu cầu",
+   "True",
+   "OK"
+  ],
+  [
+   "T3",
+   "400 kết nối treo (tiêu đề dở)",
+   "luồng 3→305→3 sau 60 s; còn phục vụ: True",
+   "ghi nhận"
+  ],
+  [
+   "T4",
+   "phương thức «_backup_db»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: _backup_db\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «__init__»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: __init__\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «__class__»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: __class__\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «__dict__»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: __dict__\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «_khoa_ghi»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: _khoa_ghi\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «__reduce__»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: __reduce__\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «db_path»",
+   "404 {\"ok\": false, \"errors\": [\"not callable: db_path\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «_goc_ws»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: _goc_ws\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «khong_ton_tai»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: khong_ton_tai\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: \"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «..»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: ..\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «../x»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: ../x\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «%2e%2e%2f»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: ../\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa»",
+   "414 <!DOCTYPE HTML>\n<html lang=\"en\">\n    <head>\n        <meta ch",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «get_dashboard_status%00x»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: get_dashboard_stat",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «get_dashboard_status »",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: get_dashboard_stat",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «GET_DASHBOARD_STATUS»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: GET_DASHBOARD_STAT",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «get_dashboard_status/..»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: get_dashboard_stat",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «укр»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: \\u0443\\u043a\\u0440",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «_set_window»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: _set_window\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «run_pipeline;ls»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: run_pipeline;ls\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «__getattribute__»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: __getattribute__\"]",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «thu_muc_xuat»",
+   "404 {\"ok\": false, \"errors\": [\"not callable: thu_muc_xuat\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "phương thức «_window»",
+   "404 {\"ok\": false, \"errors\": [\"unknown method: _window\"]}",
+   "OK"
+  ],
+  [
+   "T4",
+   "còn sống",
+   "True",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «open_workspace['../x']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «open_workspace['../../etc']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «delete_workspace['..']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"reset_confirmation_mi",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «export_workspace['../x', '']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «rename_workspace['../x', 'y']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «duplicate_workspace['../x', 'y', True]»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T4",
+   "slug «get_workspace_config['../x']»",
+   "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_khong_co\", \"params",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «tot(đối chứng)» (24 KB)",
+   "nhận; 0.0 s; RSS máy chủ 47 MB",
+   "ghi nhận (đối chứng)"
+  ],
+  [
+   "T5",
+   "zip «zip_slip_../» (24 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «zip_slip_..\\» (24 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «tuyet_doi_/tmp» (24 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «o_dia_C:» (24 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «symlink» (24 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «symlink_ten_app.db» (0 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «khong_co_app.db» (0 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «app.db_rac» (0 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «nhieu_tep_50k» (4885 KB)",
+   "từ chối; 0.3 s; RSS máy chủ 50 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «thu_muc_long_sau» (32 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 53 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «ten_NUL» (24 KB)",
+   "nhận; 0.0 s; RSS máy chủ 53 MB",
+   "XEM"
+  ],
+  [
+   "T5",
+   "zip «tep_trung_ten» (49 KB)",
+   "từ chối; 0.0 s; RSS máy chủ 53 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «zip_bomb_700MB(→~700KB)» (721 KB)",
+   "từ chối; 0.8 s; RSS máy chủ 56 MB",
+   "OK"
+  ],
+  [
+   "T5",
+   "zip «tieu_de_noi_doi(60MB khai 10 byte)» (84 KB)",
+   "nhận; 0.1 s; RSS máy chủ 56 MB",
+   "XEM"
+  ],
+  [
+   "T5",
+   "tệp mới ngoài thư mục workspaces/ sau mọi zip",
+   "không",
+   "OK"
+  ],
+  [
+   "T5",
+   "còn sống sau nhóm zip",
+   "True",
+   "OK"
+  ],
+  [
+   "T6",
+   "xuất «..\\..»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «..\\ kiểu Windows»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\.",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «thu_muc_con/../..»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «tuyệt đối ra ngoài»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xl",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «tuyệt đối ghi đè tệp có sẵn»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NH",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «NUL»",
+   "200 {\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_expor",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «rất dài 5000»",
+   "200 {\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_expor",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «thư mục»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai (2)\", ",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «dấu ~»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «tên đặc biệt»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/con.x",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «chỉ dấu chấm»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «rỗng»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ket_q",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «export_csv(../..)»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «export_du_lieu_dau_vao(../..)»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «export_thay_doi_ket_qua(../..)»",
+   "200 {\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"chua_co_lan",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «export_hoc_sinh_csv(../..)»",
+   "200 {\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"chua_chon_h",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "xuất «tao_so_nhap_mau(../..)»",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "ghi nhận"
+  ],
+  [
+   "T6",
+   "tệp ghi NGOÀI thư mục cho phép",
+   "ngoai",
+   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
+  ],
+  [
+   "T6",
+   "tệp ghi NGOÀI thư mục cho phép",
+   "ngoai (2)",
+   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
+  ],
+  [
+   "T6",
+   "tệp ghi NGOÀI thư mục cho phép",
+   "ngoai/ABS.xlsx",
+   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
+  ],
+  [
+   "T6",
+   "tệp ghi NGOÀI thư mục cho phép",
+   "ngoai/NAN_NHAN (2).xlsx",
+   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
+  ],
+  [
+   "T6",
+   "tệp ghi NGOÀI thư mục cho phép",
+   "ngoai/NAN_NHAN.xlsx",
+   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
+  ],
+  [
+   "T6",
+   "tệp có sẵn bị ghi đè qua đường tuyệt đối",
+   "nguyên vẹn",
+   "OK"
+  ],
+  [
+   "T6",
+   "tệp thoát ra trên cây thư mục chứa cát (../../ESC*)",
+   "không",
+   "OK"
+  ],
+  [
+   "T7",
+   "vết ngăn xếp / đường dẫn máy trong phần LỖI của phản hồi",
+   "[('T6', '..\\\\..', '/tmp/s8_36xvzp52'), ('T6', '..\\\\ kiểu Windows', '/tmp/s8_36xvzp52'), ('T6', 'thu_muc_con/..",
+   "LỆCH"
+  ],
+  [
+   "T7",
+   "thông điệp ngoại lệ Python nguyên văn (detail=str(e)) trong phản hồi lỗi",
+   "10/14 phản hồi lỗi thân yêu cầu",
+   "XEM"
+  ],
+  [
+   "T7",
+   "nhật ký lỗi tăng sau 2000 yêu cầu lỗi",
+   "6726 → 7530 byte (0 B/yêu cầu)",
+   "XEM"
+  ],
+  [
+   "T7",
+   "còn sống cuối cùng",
+   "True",
+   "OK"
+  ]
+ ],
+ "cong": 40751,
+ "may_do": {
+  "chromium": "Google Chrome for Testing 153.0.8010.12",
+  "cpu": 4,
+  "os": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
+  "python": "3.13.17",
+  "ram": "15.7 GB",
+  "sqlite": "3.45.1"
+ },
+ "rss_cuoi_kb": 78488,
+ "stderr_may_chu_cuoi": ""
+}

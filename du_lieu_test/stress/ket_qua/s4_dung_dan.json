@@ -1,0 +1,41 @@
+{
+ "bo_co_van_de": [],
+ "may_do": {
+  "chromium": "Google Chrome for Testing 153.0.8010.12",
+  "cpu": 4,
+  "os": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
+  "python": "3.13.17",
+  "ram": "15.7 GB",
+  "sqlite": "3.45.1"
+ },
+ "so_bo": 2000,
+ "tong": {
+  "bo": 2000,
+  "bo_co_dqt": 806,
+  "bo_co_du_tru": 1319,
+  "bo_nhieu_buoi": 1131
+ },
+ "trung_khit_e08af78": {
+  "chi_tiet": [
+   "60 ca (3 bộ × 20 seed) trùng khít"
+  ],
+  "ok": true,
+  "so_bo": 3,
+  "so_seed": 20
+ },
+ "tu_kiem_bo_kiem": {
+  "a_doi_clb_mot_em": [
+   "K2",
+   "K4"
+  ],
+  "b_gan_du_tru_bua": [
+   "K2",
+   "K3",
+   "K4"
+  ],
+  "c_bo_trong_het": [
+   "K4"
+  ],
+  "sach": []
+ }
+}

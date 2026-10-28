@@ -20,7 +20,6 @@ import json
 import multiprocessing as mp
 import os
 import random
-import shutil
 import signal
 import sqlite3
 import subprocess

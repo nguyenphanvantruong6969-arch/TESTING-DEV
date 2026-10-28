@@ -19,7 +19,6 @@ Biến thể được nhận (ok=True) thì chạy tiếp `run_pipeline` và `PR
 import argparse
 import base64
 import collections
-import copy
 import io
 import os
 import random
@@ -43,7 +42,7 @@ SO_LA = ["abc", "-5", "-0.5", "1e308", "1e999", "9" * 40, "٣", "²", "①", "�
          "", "  4  ", "0", "nan", "inf", "-inf", "0x10", "٣٣", "1/2", "10 điểm", "=1+1", "'4", "4.", ".5",
          10 ** 20, -3, 2 ** 53 + 1, 1e-9, True, "TRUE", "N/A", "null", "—"]
 TEN_LA = ["", " ", "A" * 5000, "=1+1", "@SUM(A1)", "+cmd", "-2", "Ç̧", "tên\ttab", "tên\nxuống dòng",
-          "😀 emoji", "‮giả", "𝔘𝔫𝔦", "x" * 300, "clb' OR '1'='1", "<script>alert(1)</script>",
+          "😀 emoji", "\u202egiả", "𝔘𝔫𝔦", "x" * 300, "clb' OR '1'='1", "<script>alert(1)</script>",
           "../../etc/passwd", "ａｂｃ", "   khoảng trắng   "]
 
 

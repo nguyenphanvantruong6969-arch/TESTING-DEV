@@ -27,7 +27,6 @@ import stat
 import subprocess
 import sys
 import tempfile
-import threading
 import urllib.parse
 import time
 import zipfile
@@ -215,7 +214,7 @@ def main():
         bang.append([nhom, kiem, str(quan_sat)[:110], dau_hieu])
 
     assert song(cong, token)
-    chup_dau = chup(cat)
+    chup(cat)
     rss0 = rss_kb(pid)
     thr0 = so_luong(pid)
 
@@ -346,10 +345,6 @@ def main():
     for k in ("json_hong_{", "json_hong_rac", "json_la_list", "json_null", "json_so", "args_so", "args_chuoi",
               "args_doi_tuong", "args_thua", "NaN", "so_khong_lo", "long_sau_100k"):
         v = t3[k]
-        try:
-            j = json.loads(v["than"]) if v["than"].strip().startswith("{") and v["than"].rstrip().endswith("}") else None
-        except Exception:
-            j = None
         ghi("T3", k, v["ma"], "OK" if v["ma"] in (200, 400, 413) else "LỆCH")
     ghi("T3", "còn sống sau nhóm thân yêu cầu", song(cong, token), "OK" if song(cong, token) else "LỆCH")
 
@@ -410,7 +405,6 @@ def main():
         ghi("T4", "slug «%s»" % k, v["than"][:70], "OK" if '"ok": false' in v["than"] else "XEM")
 
     # ---------------------------------------------------------------- T5 zip độc
-    t5 = {}
     snap5 = chup(cat)
 
     def zip_bytes(muc, nen=zipfile.ZIP_DEFLATED):
@@ -529,7 +523,6 @@ def main():
         "OK")
 
     # ---------------------------------------------------------------- T7 rò rỉ
-    log = os.path.join(root, "workspaces")
     log_files = [os.path.join(g, f) for g, _d, fs in os.walk(cat) for f in fs if f.startswith("loi_ung_dung")]
     kich_truoc = sum(os.path.getsize(p) for p in log_files)
     n_loi = 200 if a.nhanh else 2000
@@ -548,6 +541,8 @@ def main():
         if isinstance(j, dict) and j.get("ok") is False:
             blob = json.dumps(j.get("errors"), ensure_ascii=False)
         elif j is None:
+            if '"ok": false' not in than:
+                return            # thân bị cắt của phản hồi thành công (đường xuất): không phải lỗi
             blob = than
         else:
             return
