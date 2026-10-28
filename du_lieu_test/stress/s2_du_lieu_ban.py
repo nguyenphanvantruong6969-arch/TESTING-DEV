@@ -468,6 +468,10 @@ def chay_mot(op, seed, nen, thu_muc_nen, chi_tiet=False):
             return kq
         kq["van_de"] += kiem_ket_qua(r)
         ok = isinstance(r, dict) and r.get("ok")
+        if ok and isinstance(r.get("data"), dict) and r["data"].get("loi"):
+            # xem_truoc_so_nhap trả ok=True kèm danh sách `loi`: giao diện không cho bấm Nhập → coi là TỪ CHỐI
+            ok = False
+            kq["xem_truoc_co_loi"] = True
         kq["ok"] = bool(ok)
         sau = c.dau_vet_db(db)
         if not ok:
@@ -552,7 +556,9 @@ def main():
         print("  %s %s ×%d  vd. %s:%d  %s" % (op, list(vd), len(ds_k), op, ds_k[0]["seed"],
                                               (ds_k[0].get("chi_tiet") or "")[:200]))
     p = c.ghi_json("s2_du_lieu_ban_nhanh" if a.nhanh else "s2_du_lieu_ban",
-                   {"may_do": c.may_do(), "tong": dict(dem), "theo_toan_tu": {k: dict(v) for k, v in theo_op.items()},
+                   {"may_do": c.may_do(), "tong": dict(dem),
+                    "nhan_nhung_pipeline_tu_choi": [{k_: v_ for k_, v_ in k.items() if k_ != "ket_qua"} for k in tat_ca
+                                                   if k.get("ok") and k.get("pipeline_ok") is False], "theo_toan_tu": {k: dict(v) for k, v in theo_op.items()},
                     "bien_the_co_van_de": bat_thuong})
     print("\nGhi:", p)
     c.xoa(thu_muc_nen)

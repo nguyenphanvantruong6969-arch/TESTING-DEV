@@ -185,6 +185,7 @@ def pct(xs, p):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--nhanh", action="store_true")
+    ap.add_argument("--cho-treo", type=int, default=0, help="giây chờ khi có kết nối treo (mặc định 60; --nhanh: 3)")
     a = ap.parse_args()
     gay_t1 = 3 if a.nhanh else 10
 
@@ -325,7 +326,7 @@ def main():
     raw = ("POST /__api__/get_dashboard_status HTTP/1.1\r\nHost: 127.0.0.1:%d\r\nContent-Length: 1000\r\n"
            "X-Kiosk-Token: %s\r\n\r\n{}" % (cong, token)).encode()
     t = time.perf_counter()
-    r = http(cong, "", gui_tho=raw, timeout=8)
+    r = http(cong, "", gui_tho=raw, timeout=(a.cho_treo or 60) if not a.nhanh or a.cho_treo else 8)
     t3["CL_lớn_hơn_thân(không gửi đủ)"] = {"ma": r[0] or r[4], "giay_treo": round(time.perf_counter() - t, 1)}
     for ten, body in (("json_hong_{", b"{"), ("json_hong_rac", b"\xff\xfe\x00"), ("json_la_list", b"[1,2]"),
                       ("json_null", b"null"), ("json_so", b"5"), ("args_so", b'{"args": 5}'),
@@ -370,15 +371,16 @@ def main():
     t = time.perf_counter()
     song_giua = song(cong, token)
     g_song = time.perf_counter() - t
-    time.sleep(30 if not a.nhanh else 3)
+    cho_treo = a.cho_treo or (3 if a.nhanh else 60)
+    time.sleep(cho_treo)
     thr_sau30 = so_luong(pid)
     [s.close() for s in treo]
     time.sleep(2)
     KQ["T3_ket_noi_treo"] = {"so_ket_noi": len(treo), "luong_truoc": thr_truoc, "luong_khi_treo": thr_giua,
                              "luong_sau_30s_van_treo": thr_sau30, "luong_sau_dong": so_luong(pid),
                              "phuc_vu_duoc_khi_treo": song_giua, "do_tre_khi_treo_s": round(g_song, 3)}
-    ghi("T3", "%d kết nối treo (tiêu đề dở)" % len(treo), "luồng %s→%s→%s sau 30 s; còn phục vụ: %s" % (
-        thr_truoc, thr_giua, thr_sau30, song_giua), "XEM" if (thr_sau30 or 0) > (thr_truoc or 0) + len(treo) * 0.5 else "ghi nhận")
+    ghi("T3", "%d kết nối treo (tiêu đề dở)" % len(treo), "luồng %s→%s→%s sau %d s; còn phục vụ: %s" % (
+        thr_truoc, thr_giua, thr_sau30, cho_treo, song_giua), "XEM" if (thr_sau30 or 0) > (thr_truoc or 0) + len(treo) * 0.5 else "ghi nhận")
 
     # ---------------------------------------------------------------- T4 tên phương thức
     t4 = {}
