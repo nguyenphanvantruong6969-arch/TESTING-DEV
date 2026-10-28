@@ -393,3 +393,18 @@ Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–2
 | 10 | 2.6 cột W chỉ khi bật được | `90c3d5e` | |
 | 11 | 2.7 test hai bản làm tròn | `90c3d5e` | |
 | 12 | 2.8 dấu chèn trong `huong_dan` | `90c3d5e` | Hằng `CHO_CHEN_GHI_CHU_W`. |
+
+
+## Vòng sửa A13.12 — Tầng 4, cột "Đã sửa ở commit" (28/10/2026)
+
+Theo quyết định của Truong (bảng "Quyết định … vòng sửa A13.8" ở trên: 4.1, 4.5, 4.2, 4.3 và hai chuỗi đổi ngôn ngữ LÀM; 4.4, 4.6 KHÔNG làm). Mô phỏng.
+
+| # | Việc | Đã sửa ở commit | Ghi chú |
+|---|---|---|---|
+| 4.1 | `CLAUDE.md` + `docs/ke_hoach/DOI_CHIEU_KHO_MA.md` | `047b2cb` | Bản đồ mã định vị theo TÊN HÀM, bỏ số dòng; thêm hàng "Điểm quyết tâm" (lõi, API, giao diện); số tệp test là số thật (đếm bằng `glob`, có test canh). `DOI_CHIEU_KHO_MA.md`: mục "Cập nhật 28/10/2026" (cỡ tệp, bảng hàm → tệp → dòng đo ngày đó). |
+| 4.5 | Test rollback thật + biên 99/101 | `f1292c8` | `test_loi_o_buoc_nhat_ky_khoa_rollback_ca_giao_dich` làm `_ghi_nhat_ky_wharton` ném lỗi tại `hanh_dong == "khoa"` (sau khi dòng khoá đã chèn), khẳng định `match_results`, `run_history`, `wharton_lock`, `stb_lock` và nhật ký y nguyên. Gây hỏng lại M3 (`rollback()` → `commit()`): test của tệp chủ đề `test_wharton_khoa.py` nay ĐỎ (trước: 72 qua). `test_bien_ngan_sach_99_100_101` bắt M8 (`> ngan_sach + 1`) ngay trong `test_wharton.py`. |
+| 4.2 | Kỹ năng `xu-li-raw-forms` + "bạn khác" | `1ab2174` | Câu "giống hệt sổ mẫu" thành "cùng bố cục hai hàng tiêu đề; sổ mẫu có thêm cột Điểm quyết tâm"; `HUONG_DAN_SU_DUNG.md`: "điểm của em khác". Test `tests/test_a13_12_tai_lieu.py` đọc hàng 2 của sổ mẫu và của sổ ghi mặc định. |
+| 4.3 | Khoá i18n chết | `56cc766`, `9a19068` | Còn `dc_cot_buoi` (đã xoá, VI và EN); `dc_tooltip_so` đã xoá từ A13.10. Test `tests/test_i18n_khoa_dc_khong_chet.py` canh mọi khoá `dc_*` có nơi dùng (kể cả tiền tố động `dc_muc_`). |
+| (ngoài phạm vi) | `fallback_phu_buoi`, `btn_remove_ranked` không vẽ lại khi đổi ngôn ngữ lúc đang mở một học sinh | `8021916` (chỉ thêm test) | **Không tái hiện được ở mã hiện tại**: `js/07_ngon_ngu.js` đã gọi lại `renderRankingList()` (kéo theo `veChiBaoPhuBuoi`) ở nhánh tab "fallback" từ `088573d` (A13.7). Thêm `tests/test_giao_dien_a13_12_ngon_ngu.py` giữ cho nó không hỏng lại: bỏ dòng `renderRankingList()` đó thì cả hai ca ĐỎ. |
+| 4.4 | tên nội bộ `wharton` trong tài liệu | — | Truong quyết KHÔNG làm. |
+| 4.6 | 14 `wait_for_timeout` cố định | — | Truong quyết KHÔNG làm. |
