@@ -1444,7 +1444,7 @@ function initTabConQl() {
 
    Hai hình, SVG thuần (chạy ngoại tuyến, không thư viện, không tải gì từ mạng):
      (a) veTongQuanDiemChuan   bảng tổng quan mọi CLB: hai cột điểm chuẩn (xét điểm thi, xét điểm
-         quyết tâm) mỗi ô một thanh, và cột đơn / chỗ có thanh tỉ lệ màu theo mức cạnh tranh;
+         quyết tâm) mỗi ô một thanh, và cột "Đơn và chỗ" có nhãn mức bằng chữ, số đơn và chỗ, thanh chung thang;
      (b) veChiTietDiemChuan    chi tiết MỘT CLB: một biểu đồ dải chấm (beeswarm) có vạch chuẩn.
    Màu: xanh `--chart-general` cho "được nhận", xám `--chart-khong-nhan` cho "không được nhận";
    kênh phụ không dựa vào màu là chấm rỗng và độ dài thanh. Hiệu ứng vào chỉ chạy khi người dùng
@@ -1533,24 +1533,42 @@ function dcThanhDiem(o, tang, r, m, thang) {
   o.appendChild(g);
 }
 
-/* Thanh tỉ lệ đơn / chỗ: dài theo tỉ lệ (tối đa 5 lần chỗ), vạch mốc ở 1 lần, màu theo mức. */
-function dcThanhTiLe(o, r) {
+/* Ô "Đơn và chỗ": dòng trên là nhãn mức bằng chữ và "N đơn · M chỗ"; dòng dưới là thanh dùng chung
+   một thang cho mọi dòng (dài nhất = số lớn nhất giữa đơn và chỗ của cả bảng). Thanh gồm: đơn nằm
+   trong số chỗ (xám đậm), đơn vượt quá số chỗ (màu theo mức), chỗ còn trống (khung rỗng). */
+function dcThanhTiLe(o, r, toiDa) {
   const tiLe = r.suc_chua > 0 ? r.so_don / r.suc_chua : (r.so_don > 0 ? 99 : 0);
   const muc = dcMucCanhTranh(tiLe);
-  const W = 80, H = 10, TOI_DA = 5;
-  const svg = dcSvg("svg", { class: "dc-ti-le", viewBox: `0 0 ${W} ${H}`, role: "img",
-                             "data-muc": muc, "data-ti-le": Math.round(tiLe * 100) / 100 });
-  dcSvg("title", {}, svg).textContent = t("dc_ti_le_nhan", { ten: r.ten, don: r.so_don, cho: r.suc_chua })
-    + ". " + t("dc_ti_le_" + muc);
-  dcSvg("rect", { class: "dc-ti-le-nen", x: 0, y: 0, width: W, height: H, rx: 3 }, svg);
-  const rong = Math.min(tiLe, TOI_DA) / TOI_DA * W;
-  if (rong > 0) dcSvg("rect", { class: "dc-ti-le-do", x: 0, y: 0, width: Math.max(rong, 3), height: H, rx: 3 }, svg);
-  const moc = W / TOI_DA;
-  dcSvg("line", { class: "dc-ti-le-moc", x1: moc, x2: moc, y1: -1, y2: H + 1 }, svg);
+  const tenMuc = t("dc_muc_" + muc);
+  const dong = document.createElement("div");
+  dong.className = "dc-don-dong";
+  const chip = document.createElement("span");
+  chip.className = "dc-chip";
+  chip.dataset.muc = muc;
+  chip.textContent = tenMuc;
+  dong.appendChild(chip);
   const so = document.createElement("span");
   so.className = "dc-don-so";
-  so.textContent = r.so_don + " / " + r.suc_chua;
-  o.appendChild(so);
+  so.textContent = t("dc_don_chu", { don: r.so_don, cho: r.suc_chua });
+  dong.appendChild(so);
+  o.appendChild(dong);
+
+  const W = 140, H = 8;
+  const px = (n) => (n / toiDa) * W;
+  const trong = Math.min(r.so_don, r.suc_chua);
+  const vuot = Math.max(0, r.so_don - r.suc_chua);
+  const con = Math.max(0, r.suc_chua - r.so_don);
+  const svg = dcSvg("svg", { class: "dc-ti-le", viewBox: `0 0 ${W} ${H}`, role: "img",
+                             "data-muc": muc, "data-ti-le": Math.round(tiLe * 100) / 100,
+                             "data-trong": trong, "data-vuot": vuot, "data-con": con });
+  dcSvg("title", {}, svg).textContent = t("dc_ti_le_nhan", {
+    ten: r.ten, don: r.so_don, cho: r.suc_chua, x: dcSo(tiLe), muc: tenMuc });
+  const rong = (n) => (n > 0 ? Math.max(px(n), 2) : 0);
+  const wTrong = rong(trong), wVuot = rong(vuot), wCon = rong(con);
+  if (wTrong) dcSvg("rect", { class: "dc-ti-le-trong", x: 0, y: 0, width: wTrong, height: H, rx: 2 }, svg);
+  if (wVuot) dcSvg("rect", { class: "dc-ti-le-vuot", x: wTrong, y: 0, width: wVuot, height: H, rx: 2 }, svg);
+  if (wCon) dcSvg("rect", { class: "dc-ti-le-con", x: wTrong + 0.5, y: 0.5, width: Math.max(0, wCon - 1),
+                            height: H - 1, rx: 2 }, svg);
   o.appendChild(svg);
 }
 
@@ -1568,6 +1586,7 @@ function veTongQuanDiemChuan(goc, ds) {
   }
   const nhieuBuoi = new Set(ds.map((r) => r.buoi)).size > 1;
   const thangThi = dcThangThi(ds);
+  const toiDaDon = Math.max(1, ...ds.map((r) => Math.max(r.so_don, r.suc_chua)));
   const cuon = document.createElement("div");
   cuon.className = "scroll-x";
   const bang = document.createElement("table");
@@ -1577,7 +1596,7 @@ function veTongQuanDiemChuan(goc, ds) {
   cap.textContent = t("dc_tong_quan_tieu_de");
   bang.appendChild(cap);
   const dau = bang.createTHead().insertRow();
-  [["dc_cot_ten", "", ""], ["dc_tang1", "", "1"], ["dc_tang2", "", "2"], ["dc_cot_don", "num", ""]]
+  [["dc_cot_ten", "", ""], ["dc_tang1", "", "1"], ["dc_tang2", "", "2"], ["dc_cot_don", "", ""]]
     .forEach(([khoa, lop, tang]) => {
       const th = document.createElement("th");
       th.scope = "col";
@@ -1609,8 +1628,8 @@ function veTongQuanDiemChuan(goc, ds) {
     });
 
     const d = tr.insertCell();
-    d.className = "num dc-don";
-    dcThanhTiLe(d, r);
+    d.className = "dc-don";
+    dcThanhTiLe(d, r, toiDaDon);
   });
   cuon.appendChild(bang);
   goc.appendChild(cuon);
@@ -1618,8 +1637,11 @@ function veTongQuanDiemChuan(goc, ds) {
   ghi.className = "hint-text";
   ghi.textContent = t("dc_chu_giai_thanh", { thi: thangThi });
   goc.appendChild(ghi);
-  dcChuGiai(goc, [["is-ti-thap", "dc_ti_le_thap"], ["is-ti-vua", "dc_ti_le_vua"],
-                  ["is-ti-cao", "dc_ti_le_cao"]]);
+  dcChuGiai(goc, [["is-ti-trong", "dc_bar_trong"], ["is-ti-vuot", "dc_bar_vuot"], ["is-ti-con", "dc_bar_con"]]);
+  const giai = document.createElement("p");
+  giai.className = "hint-text";
+  giai.textContent = t("dc_muc_giai_thich");
+  goc.appendChild(giai);
 }
 
 /* Thang ngang 0 đến 100 dùng chung cho (a) và (b). */

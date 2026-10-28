@@ -1055,8 +1055,7 @@ Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem đư
   quan mọi CLB. Phần mềm không nhớ trạng thái mở.
 - **Bảng tổng quan.** Mỗi CLB một dòng, có hai cột điểm chuẩn riêng: **Xét điểm thi** (thanh trên thang điểm thi, thường
   là 10) và **Xét điểm quyết tâm** (thanh trên thang 0 đến 100). Mỗi thanh là điểm thấp nhất đã được nhận. Ô "—": CLB
-  chưa có ai ở cách xét đó. Cột **Đơn / chỗ** có số đơn trên số chỗ và một thanh nhỏ: vạch đứng là mốc đơn bằng chỗ;
-  thanh xanh là đơn không nhiều hơn chỗ, vàng là nhiều hơn đến gấp đôi, đỏ là nhiều hơn gấp đôi.
+  chưa có ai ở cách xét đó. Cột **Đơn và chỗ** có một nhãn mức bằng chữ (**Đủ chỗ**: đơn không nhiều hơn chỗ; **Đông**: đơn nhiều hơn chỗ, đến gấp đôi; **Rất đông**: nhiều hơn gấp đôi), số đơn và số chỗ ghi rõ đơn vị ("62 đơn · 16 chỗ"), và một thanh dùng chung một thang cho cả bảng nên so được giữa các CLB: phần xám đậm là đơn nằm trong số chỗ, phần màu là đơn vượt quá số chỗ, khung rỗng là chỗ còn trống.
 - **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai cách xét x hai mức và **một biểu đồ
   dải chấm**: mỗi em xin vào CLB đó là một chấm đặt theo điểm quyết tâm (đặc xanh là được nhận, rỗng xám là không được
   nhận; chấm cùng điểm xếp thành cột; di chuột hoặc chạm vào chấm để xem mã học sinh và điểm). Vạch đứng ghi số là điểm

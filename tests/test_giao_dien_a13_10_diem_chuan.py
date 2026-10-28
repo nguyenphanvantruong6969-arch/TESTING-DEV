@@ -69,7 +69,7 @@ def test_bang_co_hai_cot_diem_chuan_rieng_moi_o_co_thanh(mo):
     page, loi = mo()
     th = page.locator("#dcQlTongQuan thead th")
     chu = [x.strip() for x in th.all_inner_texts()]
-    assert [c.lower() for c in chu] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "đơn / chỗ"], chu
+    assert [c.lower() for c in chu] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "đơn và chỗ"], chu
     assert page.locator('#dcQlTongQuan th[data-tang="1"]').count() == 1
     assert page.locator('#dcQlTongQuan th[data-tang="2"]').count() == 1
     a = page.locator('#dcQlTongQuan tr[data-club-id="A"]')
@@ -91,23 +91,36 @@ def test_bang_khong_con_dong_chu_nho_duoi_ten_clb(mo):
     assert not loi, loi
 
 
-def test_don_tren_cho_la_thanh_ti_le_mau_theo_muc_khong_con_cham_do(mo):
+def test_don_va_cho_co_nhan_muc_bang_chu_so_ro_don_vi_va_thanh_chung_thang(mo):
     page, loi = mo()
     assert page.locator("#dcQlTongQuan .dc-nong").count() == 0
-    muc = {}
-    for cid in ("A", "B", "C"):
+    th = page.locator("#dcQlTongQuan thead th").nth(3).inner_text().strip().lower()
+    assert th == "đơn và chỗ", th
+    # A: 8 đơn cho 4 chỗ (gấp 2, "Đông"); B: 8 đơn cho 10 chỗ ("Đủ chỗ"); C: 0 đơn cho 3 chỗ
+    mong = {"A": ("Đông", "8 đơn · 4 chỗ", "vua", (4, 4, 0)),
+            "B": ("Đủ chỗ", "8 đơn · 10 chỗ", "thap", (8, 0, 2)),
+            "C": ("Đủ chỗ", "0 đơn · 3 chỗ", "thap", (0, 0, 3))}
+    mau = {}
+    for cid, (nhan, chu, muc, (trong, vuot, con)) in mong.items():
         o = page.locator('#dcQlTongQuan tr[data-club-id="%s"] td.dc-don' % cid)
+        assert o.locator(".dc-chip").inner_text().strip() == nhan
+        assert o.locator(".dc-chip").get_attribute("data-muc") == muc
+        assert o.locator(".dc-don-so").inner_text().strip() == chu
         svg = o.locator("svg.dc-ti-le")
-        assert svg.count() == 1 and svg.locator("title").text_content().strip()
-        muc[cid] = svg.get_attribute("data-muc")
-    # A: 8 đơn / 4 chỗ = 2,0 ; B: 8 / 10 ; C: 0 / 3
-    assert muc == {"A": "vua", "B": "thap", "C": "thap"}, muc
-    assert page.locator('#dcQlTongQuan tr[data-club-id="A"] td.dc-don').inner_text().strip() == "8 / 4"
-    mau = page.evaluate("""() => ['A','B'].map(c => getComputedStyle(document.querySelector(
-        '#dcQlTongQuan tr[data-club-id="' + c + '"] svg.dc-ti-le .dc-ti-le-do')).fill)""")
-    assert mau[0] != mau[1], mau                               # hai mức, hai màu
-    # chú giải mức
-    assert page.locator("#dcQlTongQuan .dc-chu-giai li").count() >= 3
+        assert svg.get_attribute("data-muc") == muc and svg.locator("title").text_content().strip()
+        assert tuple(int(svg.get_attribute("data-" + k)) for k in ("trong", "vuot", "con")) == (trong, vuot, con)
+        mau[cid] = o.locator(".dc-chip").evaluate("e => getComputedStyle(e).backgroundColor")
+    assert mau["A"] != mau["B"] and mau["B"] == mau["C"], mau          # mức khác nhau, màu khác nhau
+    # cùng một thang: đơn dài gấp đôi thì thanh dài gấp đôi (A: 8 đơn, B: 8 đơn, cùng tổng "trong + vuot")
+    dai = page.evaluate("""() => ['A','B'].map(c => [...document.querySelectorAll(
+        '#dcQlTongQuan tr[data-club-id="' + c + '"] svg.dc-ti-le rect.dc-ti-le-trong, '
+        + '#dcQlTongQuan tr[data-club-id="' + c + '"] svg.dc-ti-le rect.dc-ti-le-vuot')]
+        .reduce((t, r) => t + (+r.getAttribute('width')), 0))""")
+    assert dai[0] == pytest.approx(dai[1], abs=0.5), dai
+    # chú giải: ba phần của thanh và lời giải thích ba mức
+    assert page.locator("#dcQlTongQuan .dc-chu-giai li").count() == 3
+    chu = page.locator("#dcQlTongQuan").inner_text()
+    assert "Đủ chỗ:" in chu and "Rất đông:" in chu
     assert not loi, loi
 
 
