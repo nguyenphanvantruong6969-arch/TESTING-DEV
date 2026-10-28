@@ -169,6 +169,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
     # gan boi serve(): api object, token, resource dir, va callback ping
     api = None
     token = ""
+    # Kết nối im lặng quá ngần này giây thì bị cắt (StreamRequestHandler.setup đặt cho socket).
+    # Không có thì một máy khách gửi dở yêu cầu rồi treo giữ luồng của máy chủ mãi. Chỉ tính thời
+    # gian CHỜ DỮ LIỆU của socket — một thao tác xếp chạy lâu không bị cắt; kết nối "còn sống" ghi
+    # mỗi _ALIVE_BEAT_SECONDS (10 s) nên cũng không chạm ngưỡng.
+    timeout = 45
     on_ping = None
     on_closed = None
     on_alive_open = None
@@ -187,16 +192,20 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _authorized(self) -> bool:
+    def _token_khop(self, gui_toi: str) -> bool:
+        """So token ở thời gian không đổi, trên BYTE: `compare_digest` với chuỗi chỉ nhận ASCII và
+        ném TypeError khi tiêu đề / `?t=` mang ký tự khác (ví dụ "é") — thành lỗi 500 thay vì 403."""
         return secrets.compare_digest(
-            self.headers.get("X-Kiosk-Token", ""), self.token
-        )
+            gui_toi.encode("utf-8", "replace"), self.token.encode("utf-8", "replace"))
+
+    def _authorized(self) -> bool:
+        return self._token_khop(self.headers.get("X-Kiosk-Token", ""))
 
     def _token_trong_url(self) -> bool:
         from urllib.parse import parse_qs, urlparse
 
         sent = parse_qs(urlparse(self.path).query).get("t", [""])[0]
-        return secrets.compare_digest(sent, self.token)
+        return self._token_khop(sent)
 
     def _host_hop_le(self) -> bool:
         """Chặn DNS rebinding.
@@ -320,7 +329,9 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             # Khong tra traceback: vet ngan xep lo duong dan may va cau truc
             # ma, ma nguoi van hanh cung khong doc duoc. Vet ghi vao tep nhat
-            # ky canh app.db; giao dien hien cau da dich va ten tep do.
+            # ky canh app.db; giao dien hien cau da dich va ten tep do. Cung
+            # khong tra str(e): thong diep ngoai le co the mang duong dan may,
+            # noi dung tep... — giao dien chi nhan TEN KIEU ngoai le.
             import chan_doan
             from i18n_errors import err
 
@@ -330,7 +341,7 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             self._send_json({
                 "ok": False,
                 "data": None,
-                "errors": [err("loi_ngoai_du_kien", ten=name, detail=str(e)),
+                "errors": [err("loi_ngoai_du_kien", ten=name, detail=type(e).__name__),
                            err("xem_nhat_ky", file=chan_doan.TEN_LOG_UNG_DUNG)],
             })
             return
