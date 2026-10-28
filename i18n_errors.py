@@ -546,6 +546,10 @@ MESSAGES = {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
         "en": "This workspace doesn't use preference points yet: {n} preference points cell(s) in the file were skipped and not saved.",
     },
+    "xuat_diem_chuan_loi": {
+        "vi": "Không đọc được điểm chuẩn khi xuất ({detail}): trang \"Điểm chuẩn\" trong tệp đang trống do lỗi. Hãy xuất lại.",
+        "en": "The cut-off scores could not be read while exporting ({detail}): the \"Cut-off scores\" sheet in the file is empty because of the error. Export again.",
+    },
     "csv_wharton_khoa_giu_nguyen": {
         "vi": "Học sinh {student_id}: điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi của học sinh này được giữ nguyên, dòng trong tệp bị bỏ qua. Mở khoá ở thẻ Quản lý rồi nạp lại nếu cần đổi.",
         "en": "Student {student_id}: preference points are locked and this student already has points, so their rankings and test selection were kept as they are and the file's row was skipped. Unlock them in the Manage tab and import again to change.",

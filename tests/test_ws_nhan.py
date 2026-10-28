@@ -57,7 +57,7 @@ MA_MOI_SAU_ANH_CHUP = {
     "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
     "error_saving_wharton",
     # A13.8: khoá điểm giữ nguyện vọng / ô tick; điểm chấm sai; điểm chuẩn xuất lỗi; phóng hàng loạt.
-    "csv_wharton_khoa_giu_nguyen",
+    "csv_wharton_khoa_giu_nguyen", "xuat_diem_chuan_loi",
     # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
     "wharton_da_khoa", "wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan",
     "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",

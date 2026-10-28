@@ -375,6 +375,13 @@ class XuatKetQuaMixin:
                "Tầng 2, suất dự trữ", "Tầng 1, suất thường", "Tầng 1, suất dự trữ"]
         kq = self.get_diem_chuan()
         rows = kq["data"]["rows"] if kq.get("ok") else []
+        loi_dc = not kq.get("ok")
+        if loi_dc:
+            # Không xuất trang trống im lặng (A13.8): ghi lý do vào trang và báo ra ngoài.
+            ma = ", ".join(str(e.get("code")) for e in kq.get("errors", []) if isinstance(e, dict))
+            t.ghi_chu("KHÔNG ĐỌC ĐƯỢC ĐIỂM CHUẨN khi xuất (mã lỗi: %s). Trang này đang trống do lỗi, "
+                      "không phải vì chưa có dữ liệu. Hãy xuất lại." % (ma or "không rõ"), CHU_CANH_BAO)
+            du.setdefault("canh_bao", []).append(err("xuat_diem_chuan_loi", detail=ma))
         dong = []
         for r in rows:
             dong.append([r["club_id"], r["ten"]] + ([r["buoi"]] if du["nhieu_buoi"] else [])
@@ -384,7 +391,8 @@ class XuatKetQuaMixin:
                            self._o_diem_chuan(r["tang1"]["thuong"], 1),
                            self._o_diem_chuan(r["tang1"]["du_tru"], 1)])
         dau, _ = t.bang(cot, dong, khoa=True, loc=True,
-                        rong="" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)")
+                        rong="(không đọc được điểm chuẩn — xem dòng cảnh báo phía trên)" if loi_dc
+                        else ("" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)"))
         t.xong(lap_hang=dau)
 
     def _trang_thong_ke(self, t, bao, du):
@@ -1283,6 +1291,7 @@ class XuatKetQuaMixin:
                 "csv_path": None, "per_club_dir": None, "n_club_files": 0,
                 "tong_hop_path": None, "thoi_khoa_bieu_path": None,
                 "so_boc_tham_path": None,
+                "canh_bao": du.get("canh_bao", []),
             }
             if kem_csv:
                 # So Excel da ghi xong. CSV hong (vd tep CSV cu dang mo trong
