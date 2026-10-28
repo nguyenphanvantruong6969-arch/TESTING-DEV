@@ -23,6 +23,9 @@ class ChamDiemMixin:
     def get_scoring_overview(self):
         """Tổng quan tiến độ chấm điểm theo từng club — cho màn hình chọn club để chấm."""
         try:
+            loi = self._soat_khong_xet_nhom()
+            if loi:
+                return _fail(loi)
             with self._ket_noi_doc() as cur:
                 rows = cur.execute("""
                     SELECT c.club_id, c.name,
@@ -35,6 +38,8 @@ class ChamDiemMixin:
                     ORDER BY c.club_id
                 """).fetchall()
             return _ok([dict(r) for r in rows])
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_scoring_overview", detail=str(e)))
 
@@ -48,6 +53,14 @@ class ChamDiemMixin:
         """None nếu workspace chấm điểm theo người, ngược lại là lỗi để trả về."""
         if self._luat_nghiem()["score_scope"] != "per_person":
             return err("scoring_not_per_person")
+        return None
+
+    def _soat_khong_xet_nhom(self):
+        """Lỗi nếu workspace chỉ xét theo nhóm (`priority == "tier"`): thuật toán bỏ qua mọi điểm
+        chấm, nên lưu hay mở màn chấm ở đó đều vô nghĩa (A13.12, soát nhập 4.3 / 4.4). Cố ý KHÔNG
+        chắn `per_person` ở các hàm đọc theo CLB: workspace đó vẫn đọc được màn theo CLB."""
+        if self._luat_nghiem()["priority"] == "tier":
+            return err("scoring_not_per_slot")
         return None
 
     def get_person_scoring_list(self):
@@ -77,7 +90,7 @@ class ChamDiemMixin:
         try:
             if not isinstance(scores, list) or not scores:
                 return _fail(err("scores_must_be_nonempty_list"))
-            loi = self._soat_cham_theo_nguoi()
+            loi = self._soat_cham_theo_nguoi() or self._soat_khong_xet_nhom()
             if loi:
                 return _fail(loi)
             with self._ket_noi_ghi() as cur:
@@ -85,7 +98,9 @@ class ChamDiemMixin:
                 n_saved, skipped = 0, []
                 for entry in scores:
                     sid = entry.get("student_id") if isinstance(entry, dict) else None
-                    if sid not in co:
+                    # Mã không phải chuỗi (list / dict không băm được) là mục sai, bỏ qua mục đó
+                    # chứ không từ chối cả lượt (A13.12, 4.5).
+                    if not isinstance(sid, str) or sid not in co:
                         skipped.append(err("student_not_found", student_id=str(
                             sid if isinstance(entry, dict) else entry)))
                         continue
@@ -117,6 +132,9 @@ class ChamDiemMixin:
         kèm thứ hạng nguyện vọng — đúng yêu cầu chấm mù (blind scoring).
         """
         try:
+            loi = self._soat_khong_xet_nhom()
+            if loi:
+                return _fail(loi)
             with self._ket_noi_doc() as cur:
                 club = cur.execute(
                     "SELECT club_id, name FROM clubs WHERE club_id = ?", (club_id,)
@@ -136,6 +154,8 @@ class ChamDiemMixin:
                     "club_name": club["name"],
                     "applicants": [dict(r) for r in rows],
                 })
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_scoring_list", detail=str(e)))
 
@@ -174,8 +194,8 @@ class ChamDiemMixin:
                         continue
                     sid = entry.get("student_id")
                     score = entry.get("score")
-                    if sid not in valid_applicants:
-                        skipped.append(err("score_not_applicant", student_id=sid))
+                    if not isinstance(sid, str) or sid not in valid_applicants:
+                        skipped.append(err("score_not_applicant", student_id=str(sid)))
                         continue
                     if score is None or score == "":
                         # cho phep xoa diem (bo trong o) bang cach xoa ban ghi

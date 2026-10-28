@@ -350,6 +350,10 @@ MESSAGES = {
         "vi": "Hãy nhập mã {slot_sl}.",
         "en": "Enter {slot_la} code.",
     },
+    "student_id_required": {
+        "vi": "Hãy nhập mã {person_l}.",
+        "en": "Enter the {person_l} ID.",
+    },
     "cannot_delete_club_referenced": {
         "vi": "Không xoá được {slot_sl} {club_id} vì {slot_sl} này đang có trong {n_prefs} nguyện vọng và {n_matches} kết quả. Hãy xử lý các dữ liệu đó trước.",
         "en": "{slot} {club_id} can't be deleted because it's still in {n_prefs} preference(s) and {n_matches} result(s). Deal with that data first.",

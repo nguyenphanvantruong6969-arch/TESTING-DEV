@@ -139,21 +139,10 @@ class NhapDuLieuMixin:
     # khác hẳn pythonnet, nên không kéo theo rủi ro đóng gói đã gặp.
     # -----------------------------------------------------------------
 
-    @staticmethod
-    def _o_excel_thanh_chu(gia_tri) -> str:
-        """Đưa một ô Excel về đúng chuỗi mà phần CSV đang chờ.
-
-        Quan trọng nhất là số: Excel lưu chỉ tiêu 20 dưới dạng số thực,
-        đọc thô ra thành "20.0" và int("20.0") ném ValueError — cả dòng
-        CLB sẽ bị bỏ qua dù file hoàn toàn đúng.
-        """
-        if gia_tri is None:
-            return ""
-        if isinstance(gia_tri, bool):
-            return "1" if gia_tri else ""
-        if isinstance(gia_tri, float) and gia_tri.is_integer():
-            return str(int(gia_tri))
-        return str(gia_tri).strip()
+    # MỘT bản duy nhất, ở so_nhap.py (đường nạp Sổ). Hai bản chép tay lệch nhau là xem trước báo
+    # "sẵn sàng" còn nạp thật báo lỗi (A13.12, soát nhập 1.10). Quan trọng nhất là số: Excel lưu chỉ
+    # tiêu 20 dưới dạng số thực, đọc thô ra "20.0" và int("20.0") ném ValueError.
+    _o_excel_thanh_chu = staticmethod(so_nhap.o_thanh_chu)
 
     # Tệp .xlsx là một tệp zip. Tệp nén vài trăm KB có thể bung ra hàng
     # GB (zip bomb) và openpyxl sẽ đọc hết vào bộ nhớ — máy kiosk treo
@@ -771,24 +760,9 @@ class NhapDuLieuMixin:
     #   o co gia tri -> GHI DE nhom hien co (nguoi nhap chu dong dua vao)
     #   o trong      -> GIU NGUYEN, khong xoa (file thieu cot khong duoc
     #                   lam mat du lieu da gan truoc do)
-    @staticmethod
-    def _doc_diem(chuoi: str):
-        """Đọc một ô điểm. Trả về float, hoặc None nếu không phải số.
-
-        Chấp nhận cả dấu phẩy thập phân: Excel bản tiếng Việt lưu 8,5
-        chứ không phải 8.5. Chỉ đổi khi có ĐÚNG một dấu phẩy và không có
-        dấu chấm nào — "1,234.5" là cách viết nghìn, không đụng vào.
-        """
-        chuoi = (chuoi or "").strip()
-        if not chuoi:
-            return None
-        if chuoi.count(",") == 1 and "." not in chuoi:
-            chuoi = chuoi.replace(",", ".")
-        try:
-            so = float(chuoi)
-        except (TypeError, ValueError):
-            return None
-        return so if so == so and so not in (float("inf"), float("-inf")) else None
+    # Đọc một ô điểm (nhận dấu phẩy thập phân kiểu Việt, loại inf / nan): cùng MỘT hàm với đường
+    # nạp Sổ, xem so_nhap.doc_diem.
+    _doc_diem = staticmethod(so_nhap.doc_diem)
 
     @staticmethod
     def _soat_dong_trung(rows, is_wide: bool) -> list:

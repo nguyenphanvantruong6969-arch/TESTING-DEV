@@ -704,7 +704,7 @@ class XuatKetQuaMixin:
         return type(e).__name__
 
     def _duong_xuat(self, output_path: str, ten_mac_dinh: str,
-                    kem_duoi: tuple = ()) -> str:
+                    kem_duoi: tuple = (), thu_muc_du_phong: str = "") -> str:
         """Chỗ đặt một tệp (hoặc thư mục) xuất ra — MỘT luật cho mọi lần xuất.
 
         Rỗng hoặc TƯƠNG ĐỐI -> thư mục Tải xuống (lùi về cạnh app.db nếu
@@ -712,6 +712,10 @@ class XuatKetQuaMixin:
         Cả hai đều KHÔNG ghi đè tệp đã có: `x.csv` thành `x (2).csv` như
         trình duyệt (A13.9: trước đây đường tuyệt đối ghi đè im lặng, nên
         xuất hai lần ra cùng một chỗ là mất tệp lần trước). Xem `export_csv`.
+
+        `thu_muc_du_phong`: chỗ lùi về khi Tải xuống không ghi được; mặc định là thư mục chứa
+        app.db. Việc xuất KHÔNG thuộc workspace đang mở (export_workspace) truyền chỗ trung tính
+        để tệp không nằm lẫn trong dữ liệu của một workspace khác.
         """
         output_path = (output_path or "").strip() or ten_mac_dinh
         if os.path.isabs(output_path):
@@ -726,7 +730,7 @@ class XuatKetQuaMixin:
         thu_muc = self.thu_muc_xuat or thu_muc_tai_ve()
         if not (thu_muc and os.path.isdir(thu_muc)
                 and os.access(thu_muc, os.W_OK)):
-            thu_muc = os.path.dirname(os.path.abspath(self.db_path))
+            thu_muc = thu_muc_du_phong or os.path.dirname(os.path.abspath(self.db_path))
         # Chi tranh ghi de o duong CHUONG TRINH tu chon.
         # `kem_duoi`: tep di kem cung ten goc (so Excel + bo .csv) — ten goc
         # phai con trong cho moi duoi.

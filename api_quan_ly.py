@@ -218,6 +218,18 @@ class QuanLyMixin:
         tới club này, để tránh mất dữ liệu học sinh đã nộp.
         """
         try:
+            # Xoá CLB kéo theo điểm giáo viên đã chấm và ô tick thi của CLB đó. Còn gì để mất thì sao
+            # lưu TRƯỚC (như reset_data) và báo số dòng đã xoá (A13.12, soát nhập 3.2). Kiểm bị chặn
+            # trước, sao lưu sau: gọi nhầm một CLB còn nguyện vọng không đẻ ra tệp sao lưu rác.
+            with self._ket_noi_doc() as cur:
+                dem = {ten: cur.execute(
+                    "SELECT COUNT(*) FROM %s WHERE club_id = ?" % ten, (club_id,)).fetchone()[0]
+                    for ten in ("preferences", "match_results", "club_scores",
+                                "club_test_selection", "wharton_bids")}
+            backup_path = None
+            if not (dem["preferences"] or dem["match_results"]) and (
+                    dem["club_scores"] or dem["club_test_selection"] or dem["wharton_bids"]):
+                backup_path = self._backup_db()
             with self._ket_noi_ghi() as cur:
                 n_prefs = cur.execute(
                     "SELECT COUNT(*) FROM preferences WHERE club_id = ?", (club_id,)
@@ -241,10 +253,13 @@ class QuanLyMixin:
                     self._ghi_nhat_ky_wharton(
                         cur, "quan_ly", "xoa_theo_clb", sid, cu_w[sid],
                         self._doc_diem_wharton_cua_em(cur, sid))
-                cur.execute("DELETE FROM club_test_selection WHERE club_id = ?", (club_id,))
-                cur.execute("DELETE FROM club_scores WHERE club_id = ?", (club_id,))
+                n_tests = cur.execute(
+                    "DELETE FROM club_test_selection WHERE club_id = ?", (club_id,)).rowcount
+                n_scores = cur.execute(
+                    "DELETE FROM club_scores WHERE club_id = ?", (club_id,)).rowcount
                 cur.execute("DELETE FROM clubs WHERE club_id = ?", (club_id,))
-            return _ok({"club_id": club_id, "deleted": True})
+            return _ok({"club_id": club_id, "deleted": True, "n_scores_removed": n_scores,
+                        "n_tests_removed": n_tests, "backup_path": backup_path})
         except Exception as e:
             return _fail(err("error_deleting_club", detail=str(e)))
 
@@ -330,6 +345,10 @@ class QuanLyMixin:
                 total = cur.execute(
                     f"SELECT COUNT(*) FROM students s{where_clause}", params
                 ).fetchone()[0]
+                # Trang vượt tổng số trang (xoá em cuối của trang, hay lọc ra ít hơn) thì về
+                # trang cuối, không trả danh sách rỗng khiến giao diện mất nút quay lại.
+                page = min(page, max(1, (total + page_size - 1) // page_size))
+                offset = (page - 1) * page_size
 
                 rows = cur.execute(
                     f"""
@@ -650,6 +669,7 @@ class QuanLyMixin:
                     dong["diem"] = khop
                 rows.append(dict(dong, student_id=sid, name=r[1]))
             total = len(rows)
+            page = min(page, max(1, (total + page_size - 1) // page_size))
             return _ok({
                 "rows": rows[(page - 1) * page_size: page * page_size],
                 "page": page, "page_size": page_size, "total": total,
@@ -810,6 +830,7 @@ class QuanLyMixin:
                 dk, tham = " WHERE student_id = ?", (student_id,)
             with self._ket_noi_doc() as cur:
                 total = cur.execute("SELECT COUNT(*) FROM wharton_nhat_ky" + dk, tham).fetchone()[0]
+                page = min(page, max(1, (total + page_size - 1) // page_size))
                 dong = cur.execute(
                     "SELECT id, luc, nguon, nguoi, hanh_dong, student_id, cu_json, moi_json "
                     "FROM wharton_nhat_ky" + dk + " ORDER BY id DESC LIMIT ? OFFSET ?",
@@ -1319,8 +1340,16 @@ class QuanLyMixin:
             return _fail(err("error_saving_preferences", detail=str(e)))
 
     def create_student_if_missing(self, student_id: str, name: str):
-        """Kiosk fallback: nếu học sinh chưa có trong students, tạo mới (chưa có STB)."""
+        """Kiosk fallback: nếu học sinh chưa có trong students, tạo mới (chưa có STB).
+
+        Mã và tên bỏ khoảng trắng đầu / cuối như đường nạp Sổ (`o_thanh_chu`): "A01" và "  A01 "
+        là MỘT em. Mã rỗng bị từ chối (một dòng mã rỗng không tìm, không xoá được); tên thiếu
+        thì để rỗng."""
         try:
+            student_id = (student_id or "").strip()
+            name = (name or "").strip()
+            if not student_id:
+                return _fail(err("student_id_required"))
             with self._ket_noi_ghi() as cur:
                 exists = cur.execute(
                     "SELECT 1 FROM students WHERE student_id = ?", (student_id,)

@@ -74,6 +74,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs",
     # A13.12 (soát nhập 1.2): lỗi HTTP của máy chủ dự phòng có mã (trước đây là chuỗi trần).
     "http_bi_tu_choi", "http_khong_co_dich", "http_khong_co_ham", "http_than_qua_lon",
+    # A13.12 (soát nhập 3.1): mã rỗng khi tạo học sinh.
+    "student_id_required",
 }
 
 

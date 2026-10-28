@@ -9,6 +9,7 @@ import csv
 import functools
 import datetime
 import os
+import re
 import sys
 
 
@@ -51,13 +52,14 @@ def _nho_trong_luc_xuat(ham):
     Trả BẢN SAO để nơi gọi có sửa kết quả cũng không làm bẩn bộ nhớ.
     """
     @functools.wraps(ham)
-    def boc(self, *args):
+    def boc(self, *args, **kwargs):
         bo_nho = getattr(self, "_bo_nho_xuat", None)
         if bo_nho is None:
-            return ham(self, *args)
-        khoa = (ham.__name__,) + args
+            return ham(self, *args, **kwargs)
+        # Khoá nhớ gồm cả keyword (sắp theo tên): `bao_cao(page=2)` và `bao_cao(page=3)` khác nhau.
+        khoa = (ham.__name__,) + args + tuple(sorted(kwargs.items()))
         if khoa not in bo_nho:
-            bo_nho[khoa] = ham(self, *args)
+            bo_nho[khoa] = ham(self, *args, **kwargs)
         return copy.deepcopy(bo_nho[khoa])
     return boc
 
@@ -152,7 +154,7 @@ def duong_dan_khong_de(duong_dan: str, kem_duoi: tuple = ()) -> str:
     if not da_co(goc):
         return duong_dan
     n = 2
-    while da_co(f"{goc} ({n})") and n < 1000:
+    while da_co(f"{goc} ({n})"):     # hữu hạn: thư mục chỉ chứa hữu hạn tệp
         n += 1
     return f"{goc} ({n}){duoi}"
 def _an_toan_cho_excel(o):
@@ -167,6 +169,10 @@ def _an_toan_cho_excel(o):
     # Tab va xuong dong o dau o cung bi Excel/LibreOffice bo qua roi doc
     # tiep phan sau nhu cong thuc (OWASP CSV injection) — chan ca hai.
     if isinstance(o, str) and o[:1] in ("=", "+", "-", "@", "\t", "\r"):
+        # Số âm dạng chuỗi ("-1,5" của cột chênh lệch, qua `_so_vn`) KHÔNG là công thức: chỉ có dấu
+        # trừ rồi chữ số và tối đa một dấu thập phân. Thêm dấu nháy ở đây biến số thành chữ.
+        if re.fullmatch(r"-[0-9]+([.,][0-9]+)?", o):
+            return o
         return "'" + o
     return o
 def _ghi_csv(path: str, header, cac_dong) -> None:

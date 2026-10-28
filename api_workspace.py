@@ -263,12 +263,14 @@ class WorkspaceMixin:
         if xac_nhan != self._RESET_CONFIRM:
             return _fail(err("reset_confirmation_mismatch", can_go=self._RESET_CONFIRM))
         self._ws_db(slug)
-        # "Đang mở" là cái người dùng ĐÃ CHỌN. Lúc khởi động nhiều workspace, `db_path` chỉ là
-        # chỗ tạm cho đối tượng API sống được (xem main.khoi_dong_workspace) và giao diện đang
-        # hiện màn chọn: workspace tạm đó chưa ai mở nên xoá được như mọi cái khác.
-        if self._ws_da_chon and slug == self._ws_slug_dang_mo():
-            raise _LoiWs("ws_khong_xoa_dang_mo", slug=slug)
         with self._khoa_ghi:
+            # "Đang mở" là cái người dùng ĐÃ CHỌN. Lúc khởi động nhiều workspace, `db_path` chỉ là
+            # chỗ tạm cho đối tượng API sống được (xem main.khoi_dong_workspace) và giao diện đang
+            # hiện màn chọn: workspace tạm đó chưa ai mở nên xoá được như mọi cái khác.
+            # Kiểm TRONG khoá: `open_workspace` đổi `db_path` / `_ws_da_chon` cũng trong khoá, nên
+            # kiểm ngoài khoá thì một lần mở chen vào giữa vẫn để xoá đúng cái vừa mở (A13.12, 4.1).
+            if self._ws_da_chon and slug == self._ws_slug_dang_mo():
+                raise _LoiWs("ws_khong_xoa_dang_mo", slug=slug)
             la_cho_tam = slug == self._ws_slug_dang_mo()     # chưa ai chọn, chỉ là chỗ đứng tạm
             thung = workspace.xoa(self._goc_ws, slug)
             if la_cho_tam:
@@ -276,6 +278,11 @@ class WorkspaceMixin:
                 # kiểm tra dữ liệu...) sẽ đọc một tệp không còn. Chuyển sang workspace còn lại,
                 # cái sửa gần nhất (như main.khoi_dong_workspace).
                 con_lai = workspace.danh_sach(self._goc_ws)
+                if not con_lai:
+                    # Đã xoá hết: dựng lại "Trường học" mặc định như lúc khởi động
+                    # (main.khoi_dong_workspace), để db_path không trỏ vào thùng rác (A13.12, 4.2).
+                    workspace.tao(self._goc_ws, workspace.TEN_TRUONG_HOC, None)
+                    con_lai = workspace.danh_sach(self._goc_ws)
                 if con_lai:
                     self.db_path = max(con_lai, key=lambda w: w["modified"])["path"]
         return _ok({"slug": slug, "thung_rac": thung})
@@ -292,7 +299,9 @@ class WorkspaceMixin:
     def export_workspace(self, slug, output_path=""):
         """Nén workspace thành .zip đặt vào thư mục xuất (Tải xuống), không ghi đè."""
         self._ws_db(slug)
-        dich = self._duong_xuat(output_path, slug + ".zip")
+        # Tải xuống không ghi được thì lùi về thư mục gốc của chương trình, KHÔNG phải thư mục của
+        # workspace đang mở (có thể là workspace khác, A13.12 soát nhập 4.6).
+        dich = self._duong_xuat(output_path, slug + ".zip", thu_muc_du_phong=self._goc_ws)
         try:
             workspace.xuat_zip(self._goc_ws, slug, dich)
         except OSError as e:
