@@ -126,6 +126,7 @@ function wsCapNhatTieuDe() {
 function wsApDungCauHinh(cfg) {
   if (!cfg) return;
   const luat = cfg.rules || {};
+  WHARTON_BAT = luat.wharton === true;
   TRAN_NGUYEN_VONG_MOI_BUOI = Number.isInteger(luat.max_choices) ? luat.max_choices : 10;
   TRAN_CLB_THI_MOI_BUOI = luat.max_tests === null ? Infinity
     : (Number.isInteger(luat.max_tests) ? luat.max_tests : 5);

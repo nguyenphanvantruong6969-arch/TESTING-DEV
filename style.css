@@ -2922,6 +2922,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 }
 #dcQlTongQuan .hint-text, #dcKqTongQuan .hint-text, #dcBang .hint-text { margin-top: 10px; }
 #dcQlTongQuan .dc-chu-giai { margin-bottom: 4px; }
+/* Dòng chú thích "N học sinh không tính…" nằm sát chú giải: cách ra (A13.8). */
+#dcKhongXet { margin-top: 6px; }
 
 /* ---- Bước 3 và màn sửa điểm quyết tâm, gọn hơn (A13.4) ---- */
 .wh-cap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 8px 0 12px; }

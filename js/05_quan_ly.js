@@ -33,6 +33,9 @@ let adminCoKetQua = false;
    workspace dat tran khac thi js/075_workspace.js ghi de luc khoi dong
    (rules.max_choices / rules.max_tests; max_tests null = khong gioi han = Infinity). */
 let TRAN_NGUYEN_VONG_MOI_BUOI = 10;
+/* Diem quyet tam co bat khong, theo cau hinh da tai (wsApDungCauHinh, js/075). null = chua biet
+   (chua tai xong cau hinh): luc do cu hoi API nhu truoc. false = khong goi API diem quyet tam nao. */
+let WHARTON_BAT = null;
 let TRAN_CLB_THI_MOI_BUOI = 5;
 
 /* Buoi cua mot CLB, tra tu danh sach da nap san — khong goi them API. */
@@ -509,8 +512,13 @@ function loadAdminTab(giuTrang) {
   callApi("get_last_run_info").then((res) => {
     adminCoKetQua = !!(res.ok && res.data);
   });
-  loadAdminWharton(giuTrang);
-  loadAdminDiemChuan();
+  if (WHARTON_BAT === false) {
+    /* Tat tinh nang: khong con dau vet, ke ca loi goi API (A13.8). */
+    anKhoiWharton();
+  } else {
+    loadAdminWharton(giuTrang);
+    loadAdminDiemChuan();
+  }
   return loadAdminStudents();
 }
 
@@ -628,6 +636,17 @@ function demDanhDauAdmin() {
  * lưu cũng là lõi của `submit_wharton`.
  * ------------------------------------------------------------------ */
 
+/* Loi "tinh nang tat" (khac moi loi khac): chi khi do moi an tab (A13.8). */
+function whChuaBat(res) {
+  return !!(res && res.errors && res.errors.some((e) => e && e.code === "wharton_chua_bat"));
+}
+
+function anKhoiWharton() {
+  ["adminWhartonBlock", "adminDiemChuanBlock"].forEach((id) => { if (el(id)) el(id).hidden = true; });
+  whQl.sid = null;
+  dc.rows = null;
+}
+
 const WH_TRANG = 25;
 const WH_NK_TRANG = 10;
 const WH_NGAN_SACH = 100;      // ngân sách mỗi quỹ mỗi buổi (WHARTON_NGAN_SACH ở backend)
@@ -650,8 +669,14 @@ function loadAdminWharton(giuTrang) {
   return callApi("list_wharton_canh_bao").then((res) => {
     const khoi = el("adminWhartonBlock");
     if (!res.ok) {
-      khoi.hidden = true;
-      whQl.sid = null;
+      if (whChuaBat(res)) {
+        khoi.hidden = true;
+        whQl.sid = null;
+      } else {
+        /* Loi that (CSDL ban, cau hinh hong...): giu tab, noi ra, khong gia vo "da tat". */
+        khoi.hidden = false;
+        showErrorToast(res.errors);
+      }
       return null;
     }
     khoi.hidden = false;
@@ -667,7 +692,10 @@ function loadAdminWharton(giuTrang) {
 
 function loadWhKhoa() {
   return callApi("get_wharton_lock_status").then((res) => {
-    if (!res.ok) return;
+    if (!res.ok) {
+      if (!whChuaBat(res)) showErrorToast(res.errors);
+      return;
+    }
     whBoNho.khoa = res.data;
     veKhoaWh();
   });
@@ -925,7 +953,11 @@ function loadWhNhatKy(them) {
   if (!sid) return Promise.resolve(null);
   if (!them) whQl.nkTrang = 1;
   return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
-    if (!res.ok || sid !== whQl.sid) return;
+    if (!res.ok) {
+      if (sid === whQl.sid && !whChuaBat(res)) showErrorToast(res.errors);
+      return;
+    }
+    if (sid !== whQl.sid) return;
     if (!them) whBoNho.nhatKy = [];
     whBoNho.nhatKy = whBoNho.nhatKy.concat(res.data.rows);
     veNhatKyWh();
@@ -1798,8 +1830,13 @@ function loadAdminDiemChuan() {
     const khoi = el("adminDiemChuanBlock");
     if (!khoi) return null;
     if (!res.ok) {
-      khoi.hidden = true;
       dc.rows = null;
+      if (whChuaBat(res)) {
+        khoi.hidden = true;
+      } else {
+        khoi.hidden = false;
+        showErrorToast(res.errors);
+      }
       return null;
     }
     khoi.hidden = false;
@@ -1833,6 +1870,7 @@ function loadChiTietDiemChuan() {
   return callApi("get_diem_chuan_clb", dc.chon).then((res) => {
     if (!res.ok) {
       hop.hidden = true;
+      if (!whChuaBat(res)) showErrorToast(res.errors);
       return null;
     }
     dc.ct = res.data;
