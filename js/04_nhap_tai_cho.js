@@ -94,6 +94,9 @@ function loadFallbackTab() {
 function boChonHocSinhDuPhong() {
   currentFallbackStudent = null;
   currentRanking = [];
+  daLuuThi = [];
+  daLuuNv = [];
+  if (choRoiDi) { clearTimeout(choRoiDi); choRoiDi = null; khoaRoiDi = null; }
   renderWhartonStep(null);
   el("fallbackWorkArea").hidden = true;
   danhDauTheDangChon();
@@ -152,27 +155,33 @@ function initFallbackHandlers() {
 
   el("btnSubmitTestSelection").addEventListener("click", () => {
     if (!currentFallbackStudent) return;
+    /* Chụp em và danh sách LÚC BẤM: phản hồi về muộn thì người dùng có thể đã sang em khác, và mốc
+       "đã lưu" / dòng thông báo của em kia không được ghi đè lên em đang mở (A13.12, 1.7). */
+    const sid = currentFallbackStudent;
     const checked = Array.from(document.querySelectorAll("#testSelectionGrid .option-row.is-checked")).map(
       (row) => row.dataset.clubId
     );
-    khiBan(el("btnSubmitTestSelection"), () => callApi("submit_test_selection", currentFallbackStudent, checked)).then((res) => {
+    khiBan(el("btnSubmitTestSelection"), () => callApi("submit_test_selection", sid, checked)).then((res) => {
+      const conMo = sid === currentFallbackStudent;
       if (res.ok) {
         /* Bo tick CLB da cham diem la xoa diem do (api
            _xoa_diem_khong_con_tick) — phai NOI RA, xoa diem giao vien
            da cham ma im lang la mat du lieu khong ai hay. */
-        daLuuThi = checked.slice().sort();
-        veDauChuaLuu();
-        lamMoiBuoc3(true);          /* doi o tick la doi quy cua tung CLB o Buoc 3 */
-        const m = res.data.n_scores_removed || 0;
-        feedback(
-          el("testSelectionFeedback"),
-          m
-            ? t("feedback_test_selection_saved_removed", { n: res.data.n_selected, m })
-            : t("feedback_test_selection_saved", { n: res.data.n_selected }),
-          false
-        );
+        if (conMo) {
+          daLuuThi = checked.slice().sort();
+          veDauChuaLuu();
+          lamMoiBuoc3(true);          /* doi o tick la doi quy cua tung CLB o Buoc 3 */
+          const m = res.data.n_scores_removed || 0;
+          feedback(
+            el("testSelectionFeedback"),
+            m
+              ? t("feedback_test_selection_saved_removed", { n: res.data.n_selected, m })
+              : t("feedback_test_selection_saved", { n: res.data.n_selected }),
+            false
+          );
+        }
         loadFallbackStudentList(); // cap nhat the "n CLB thi" trong danh sach
-      } else {
+      } else if (conMo) {
         feedbackErrors(el("testSelectionFeedback"), res.errors);
       }
     });
@@ -183,6 +192,7 @@ function initFallbackHandlers() {
     const sid = currentFallbackStudent;
     const { w1, w2 } = whartonThuThap();
     khiBan(el("btnSubmitWharton"), () => callApi("submit_wharton", sid, w1, w2)).then((res) => {
+      if (sid !== currentFallbackStudent) return;   /* da sang em khac: khong de dong chu cua em nay len em kia */
       if (res.ok) {
         feedback(el("whartonFeedback"), t("feedback_wharton_saved"), false);
         lamMoiBuoc3(false);         /* ve lai tu trang thai DA LUU */
@@ -204,14 +214,21 @@ function initFallbackHandlers() {
       feedback(el("preferencesFeedback"), trErr({ code: "must_rank_at_least_one", params: {} }), true);
       return;
     }
-    khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", currentFallbackStudent, currentRanking)).then((res) => {
+    /* Mốc "đã lưu" là bản chụp LÚC BẤM, không phải xếp hạng lúc phản hồi về: bấm thêm CLB trong
+       lúc chờ thì CLB đó vẫn là "chưa lưu" (A13.12, soát nhập 2.3). */
+    const sid = currentFallbackStudent;
+    const chup = currentRanking.slice();
+    khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", sid, chup)).then((res) => {
+      const conMo = sid === currentFallbackStudent;
       if (res.ok) {
-        daLuuNv = currentRanking.slice();
-        veDauChuaLuu();
-        lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
-        feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
+        if (conMo) {
+          daLuuNv = chup;
+          veDauChuaLuu();
+          lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+          feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
+        }
         loadFallbackStudentList(); // cap nhat the "n nguyen vong" trong danh sach
-      } else {
+      } else if (conMo) {
         feedbackErrors(el("preferencesFeedback"), res.errors);
       }
     });
@@ -251,8 +268,7 @@ function initFallbackHandlers() {
       if (res.ok) {
         showToast(t("toast_student_deleted", { student_id: studentId }), "success");
         hsDaChon.delete(studentId);
-        currentFallbackStudent = null;
-        el("fallbackWorkArea").hidden = true;
+        boChonHocSinhDuPhong();     /* MỘT đường dọn: xếp hạng, Bước 3, mốc "đã lưu", hẹn giờ (A13.12, 1.9) */
         el("studentSearchInput").value = "";
         loadFallbackStudentList();
       } else {
@@ -283,6 +299,7 @@ function loadFallbackStudentList() {
       pagination.hidden = true;
       return;
     }
+    fallbackStudentPage = res.data.page;   /* máy chủ kẹp trang vượt tổng về trang cuối (A13.12, 1.6) */
     const nhieuBuoi = !!(buoiRes.ok && buoiRes.data.nhieu_buoi);
     const thuTuBuoi = nhieuBuoi ? buoiRes.data.ds_buoi : [];
     res.data.rows.forEach((s) => box.appendChild(veTheHocSinh(s, nhieuBuoi, thuTuBuoi)));
@@ -395,6 +412,8 @@ function selectFallbackStudent(studentId) {
     daLuuNv = stateRes.data.ranked_clubs.slice();
     if (choRoiDi) { clearTimeout(choRoiDi); choRoiDi = null; khoaRoiDi = null; }
     el("fallbackXuatFeedback").textContent = "";
+    /* Dòng "Đã lưu n nguyện vọng" của em trước không được còn dưới màn hình em này (A13.12, 2.5). */
+    ["testSelectionFeedback", "preferencesFeedback"].forEach((id) => feedback(el(id), "", false));
 
     el("fallbackWorkArea").hidden = false;
     const nhan = el("currentStudentLabel");
@@ -460,6 +479,10 @@ function whartonGiuTam() {
 function whartonThuThapTu(goc) {
   const ra = { w1: {}, w2: {} };
   goc.querySelectorAll("input.wh-diem").forEach((o) => {
+    /* Ô bị khoá là ô TỰ ĐIỀN 100 (cách A: máy chủ tự điền khi kiểm và khi xếp, không ghi): bỏ qua,
+       nếu không "100" đi vào CSDL và về sau thêm CLB cùng quỹ thì CLB mới nhận 0 điểm mà không ai
+       nhắc (A13.12, soát nhập 2.2). */
+    if (o.disabled) return;
     const v = o.value.trim();
     if (v === "") return;
     ra[o.dataset.quy === "1" ? "w1" : "w2"][o.dataset.clb] = Number(v);
@@ -621,8 +644,10 @@ function whartonVeKhung(goc, w, tuyChon) {
         o.setAttribute("aria-label", tenClb(cid) + " — " + ten.textContent);
         o.setAttribute("aria-describedby", idKhung + "L");
         const daCo = cid in luu ? String(luu[cid]) : "";
-        daLuu[quy + "|" + cid] = daCo;
         const khoa = !!w.tu_dien_mot_clb && motClb && (daCo === "" || daCo === String(w.ngan_sach));
+        /* Ô tự điền (khoá) KHÔNG ghi vào CSDL (cách A): mốc "đã lưu" của nó là chính giá trị tự điền,
+           để vừa chọn em đã báo "Chưa lưu" là báo giả (A13.12, soát nhập 1.8 / 2.4). */
+        daLuu[quy + "|" + cid] = khoa ? String(w.ngan_sach) : daCo;
         const go = giu && (quy + "|" + cid) in giu ? giu[quy + "|" + cid] : null;
         o.value = khoa ? String(w.ngan_sach) : (go !== null ? go : daCo);
         o.disabled = khoa || !!chiDoc;
@@ -648,12 +673,24 @@ function whartonVeKhung(goc, w, tuyChon) {
   return whartonChuoiTuMap(daLuu);
 }
 
+/* Diem quyet tam dang khoa va em nay DA co diem: server khong cho doi tick thi / nguyen vong
+   (`wharton_da_khoa`). Vo hieu hoa hai nut luu o Buoc 1-2 va hien ghi chu, thay vi de bam roi bi tu choi. */
+function capNhatKhoaNguyenVong(w) {
+  const co = (m) => !!m && Object.keys(m).length > 0;
+  const giu = !!(w && w.bat && w.khoa && (co(w.w1) || co(w.w2)));
+  el("btnSubmitTestSelection").disabled = giu;
+  el("btnSubmitPreferences").disabled = giu;
+  el("testSelectionKhoa").hidden = !giu;
+  el("preferencesKhoa").hidden = !giu;
+}
+
 /* Ve Buoc 3 tu `state` (ket qua get_student_entry_state); `giu` = chu da go can giu lai. */
 function renderWhartonStep(state, giu) {
   const hop = el("fbWhartonStep");
   const body = el("fbWhartonBody");
   const w = state && state.wharton;
   clear(body);
+  capNhatKhoaNguyenVong(w);
   if (!w || !w.bat) {
     whartonState = null;
     daLuuWharton = "";

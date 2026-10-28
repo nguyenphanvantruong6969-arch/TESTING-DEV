@@ -1,0 +1,172 @@
+{
+ "buoi": 1,
+ "clb": 100,
+ "dc_so_clb_trong_hop_chon": 100,
+ "do": {
+  "diem_chuan_chi_tiet_1_clb": {
+   "lon_nhat_ms": 60.2,
+   "n": 3,
+   "trung_vi_ms": 51.9,
+   "tung_lan_ms": [
+    44.0,
+    51.9,
+    60.2
+   ]
+  },
+  "ql_clb_tab_dau": {
+   "lon_nhat_ms": 554.2,
+   "n": 3,
+   "trung_vi_ms": 449.8,
+   "tung_lan_ms": [
+    554.2,
+    449.8,
+    449.1
+   ]
+  },
+  "ql_hoc_sinh_trang_dau": {
+   "lon_nhat_ms": 1060.1,
+   "n": 3,
+   "trung_vi_ms": 202.1,
+   "tung_lan_ms": [
+    1060.1,
+    202.1,
+    184.0
+   ]
+  },
+  "ql_tab_clb": {
+   "lon_nhat_ms": 150.2,
+   "n": 3,
+   "trung_vi_ms": 132.6,
+   "tung_lan_ms": [
+    104.1,
+    150.2,
+    132.6
+   ]
+  },
+  "ql_tab_dc": {
+   "lon_nhat_ms": 196.6,
+   "n": 3,
+   "trung_vi_ms": 166.4,
+   "tung_lan_ms": [
+    166.4,
+    150.2,
+    196.6
+   ]
+  },
+  "ql_tab_du_lieu": {
+   "lon_nhat_ms": 153.4,
+   "n": 3,
+   "trung_vi_ms": 150.6,
+   "tung_lan_ms": [
+    153.4,
+    150.6,
+    149.4
+   ]
+  },
+  "ql_tab_hs": {
+   "lon_nhat_ms": 135.2,
+   "n": 3,
+   "trung_vi_ms": 133.8,
+   "tung_lan_ms": [
+    133.8,
+    135.2,
+    131.1
+   ]
+  },
+  "ql_tab_wh": {
+   "lon_nhat_ms": 149.9,
+   "n": 3,
+   "trung_vi_ms": 149.5,
+   "tung_lan_ms": [
+    149.9,
+    149.5,
+    133.6
+   ]
+  },
+  "tab_ket_qua": {
+   "lon_nhat_ms": 1056.7,
+   "n": 3,
+   "trung_vi_ms": 764.5,
+   "tung_lan_ms": [
+    1056.7,
+    269.3,
+    764.5
+   ]
+  },
+  "tim_khong_co": {
+   "ghi_chu": "gồm thời gian chờ trễ gõ của giao diện (nếu có)",
+   "lon_nhat_ms": 396.0,
+   "n": 3,
+   "trung_vi_ms": 353.5
+  },
+  "tim_ma": {
+   "ghi_chu": "gồm thời gian chờ trễ gõ của giao diện (nếu có)",
+   "lon_nhat_ms": 387.2,
+   "n": 3,
+   "trung_vi_ms": 378.3
+  },
+  "tim_ten": {
+   "ghi_chu": "gồm thời gian chờ trễ gõ của giao diện (nếu có)",
+   "lon_nhat_ms": 360.5,
+   "n": 3,
+   "trung_vi_ms": 345.8
+  }
+ },
+ "doi_tab_ngon_ngu": {
+  "moi_vong_ms": 297.5,
+  "so_vong": 5,
+  "tong_s": 1.49
+ },
+ "em": 5000,
+ "heap": {
+  "dau_trang": [
+   2956661,
+   735
+  ],
+  "mau_moi_10_vong": [],
+  "sau_vong_lap": [
+   5197587,
+   56207
+  ],
+  "tang_heap_mb": 0.7,
+  "tang_node_dom": 0,
+  "truoc_vong_lap": [
+   4466350,
+   56207
+  ]
+ },
+ "heap_dau": [
+  2956661,
+  735
+ ],
+ "ket_qua_cuon_het_ms": 6.6,
+ "ket_qua_so_dong_ve": 5000,
+ "lat_het_trang": {
+  "cac_trang_tren_1s": [],
+  "dong_moi_trang": 50,
+  "moi_trang_lon_nhat_ms": 335.3,
+  "moi_trang_trung_vi_ms": 90.3,
+  "nhan_trang_dau": "Trang 1/100 · 5000 học sinh",
+  "so_trang_da_lat": 99,
+  "tong_s": 10.24,
+  "trang_cham_nhat": 2
+ },
+ "loi_console": [],
+ "loi_trang": [],
+ "may_do": {
+  "chromium": "Google Chrome for Testing 153.0.8010.12",
+  "cpu": 4,
+  "os": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
+  "python": "3.13.17",
+  "ram": "15.7 GB",
+  "sqlite": "3.45.1"
+ },
+ "so_loi_console": 0,
+ "so_loi_trang": 0,
+ "tac_vu_dai_ms": {
+  "lon_nhat": 360,
+  "so": 6,
+  "tong": 801
+ },
+ "tai_trang_ms": 871.4
+}

@@ -1,0 +1,597 @@
+{
+ "bien_the_co_van_de": [],
+ "may_do": {
+  "chromium": "Google Chrome for Testing 153.0.8010.12",
+  "cpu": 4,
+  "os": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
+  "python": "3.13.17",
+  "ram": "15.7 GB",
+  "sqlite": "3.45.1"
+ },
+ "nhan_nhung_pipeline_tu_choi": [
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 0,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 1,
+   "van_de": []
+  },
+  {
+   "mo_ta": "csv_auto/ma_hs_la",
+   "ok": true,
+   "op": "csv:preferences",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_vuot_ngan_sach",
+    "wharton_vuot_ngan_sach"
+   ],
+   "pipeline_ok": false,
+   "seed": 1,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 2,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 3,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 3,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "nv_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 4,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 5,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 5,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 6,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 6,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "o_gop_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 6,
+   "van_de": []
+  },
+  {
+   "mo_ta": "csv_auto/cat_giua_dong",
+   "ok": true,
+   "op": "csv:test_selection",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_ngoai_tap",
+    "wharton_ngoai_tap"
+   ],
+   "pipeline_ok": false,
+   "seed": 6,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 7,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 7,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "xoa_cot_hs",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 7,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "buoi_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 8,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 8,
+   "van_de": []
+  },
+  {
+   "mo_ta": "import_preferences_csv/ma_hs_la",
+   "ok": true,
+   "op": "csv:preferences",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_vuot_ngan_sach",
+    "wharton_vuot_ngan_sach"
+   ],
+   "pipeline_ok": false,
+   "seed": 8,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 9,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 10,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "o_gop_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 10,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 11,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 11,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "cong_thuc",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_vuot_ngan_sach"
+   ],
+   "pipeline_ok": false,
+   "seed": 12,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 12,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 12,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 13,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 13,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 14,
+   "van_de": []
+  },
+  {
+   "mo_ta": "csv_auto/cat_giua_dong",
+   "ok": true,
+   "op": "csv:preferences",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 14,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_la",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 16,
+   "van_de": []
+  },
+  {
+   "mo_ta": "nap",
+   "ok": true,
+   "op": "dqt_rac_ca_cot",
+   "pipeline_ma": [
+    "wharton_ho_so_chua_hop_le",
+    "wharton_chua_dung_het",
+    "wharton_chua_dung_het"
+   ],
+   "pipeline_ok": false,
+   "seed": 16,
+   "van_de": []
+  }
+ ],
+ "theo_toan_tu": {
+  "bo_sheet": {
+   "n": 19,
+   "tu_choi": 19
+  },
+  "buoi_la": {
+   "n": 19,
+   "ok": 19
+  },
+  "chi_tieu_0": {
+   "n": 19,
+   "tu_choi": 19
+  },
+  "chi_tieu_la": {
+   "n": 19,
+   "ok": 16,
+   "tu_choi": 3
+  },
+  "cong_thuc": {
+   "n": 19,
+   "ok": 19
+  },
+  "cot_thua": {
+   "n": 19,
+   "ok": 18,
+   "tu_choi": 1
+  },
+  "csv:clubs": {
+   "n": 18,
+   "ok": 13,
+   "tu_choi": 5
+  },
+  "csv:preferences": {
+   "n": 18,
+   "ok": 16,
+   "tu_choi": 2
+  },
+  "csv:test_selection": {
+   "n": 18,
+   "ok": 15,
+   "tu_choi": 3
+  },
+  "cung_nv1": {
+   "n": 19,
+   "tu_choi": 19
+  },
+  "diem_thi_la": {
+   "n": 19,
+   "ok": 4,
+   "tu_choi": 15
+  },
+  "doi_ten_sheet": {
+   "n": 19,
+   "ok": 16,
+   "tu_choi": 3
+  },
+  "dong_trong": {
+   "n": 19,
+   "ok": 19
+  },
+  "dqt_la": {
+   "n": 18,
+   "ok": 18
+  },
+  "dqt_rac_ca_cot": {
+   "n": 18,
+   "ok": 18
+  },
+  "khong_clb": {
+   "n": 18,
+   "tu_choi": 18
+  },
+  "khong_em": {
+   "n": 18,
+   "ok": 18
+  },
+  "ma_clb_la": {
+   "n": 18,
+   "ok": 3,
+   "tu_choi": 15
+  },
+  "ma_hs_la": {
+   "n": 18,
+   "ok": 9,
+   "tu_choi": 9
+  },
+  "mot_clb": {
+   "n": 18,
+   "tu_choi": 18
+  },
+  "nfd_hs": {
+   "n": 18,
+   "ok": 18
+  },
+  "nfd_ten_clb": {
+   "n": 18,
+   "ok": 18
+  },
+  "nhieu_sheet": {
+   "n": 18,
+   "ok": 18
+  },
+  "nv_la": {
+   "n": 18,
+   "ok": 2,
+   "tu_choi": 16
+  },
+  "nv_trung": {
+   "n": 18,
+   "tu_choi": 18
+  },
+  "o_gop_la": {
+   "n": 18,
+   "ok": 17,
+   "tu_choi": 1
+  },
+  "rat_lon": {
+   "n": 18,
+   "ok": 18
+  },
+  "suat_uu_tien_la": {
+   "n": 18,
+   "ok": 17,
+   "tu_choi": 1
+  },
+  "ten_clb_la": {
+   "n": 18,
+   "ok": 4,
+   "tu_choi": 14
+  },
+  "tep_rac": {
+   "n": 18,
+   "tu_choi": 18
+  },
+  "trung_ma_clb": {
+   "n": 18,
+   "ok": 15,
+   "tu_choi": 3
+  },
+  "trung_ma_hs": {
+   "n": 18,
+   "tu_choi": 18
+  },
+  "trung_ten_clb": {
+   "n": 18,
+   "ok": 16,
+   "tu_choi": 2
+  },
+  "xoa_cot_clb": {
+   "n": 18,
+   "ok": 11,
+   "tu_choi": 7
+  },
+  "xoa_cot_hs": {
+   "n": 18,
+   "ok": 8,
+   "tu_choi": 10
+  }
+ },
+ "tong": {
+  "nhan_nhung_pipeline_tu_choi": 33,
+  "nhan_ok": 383,
+  "tong": 640,
+  "tu_choi": 257
+ }
+}

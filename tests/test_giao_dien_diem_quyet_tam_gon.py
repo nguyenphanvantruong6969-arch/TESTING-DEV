@@ -136,7 +136,7 @@ def test_tieng_anh_khong_con_chu_co_dau_va_khong_con_wharton_o_buoc_3(mo):
     chu = page.locator("#fbWhartonStep").inner_text()
     chu_khong_ten = chu.replace("CLB", "")
     assert not DAU_VIET.search(chu_khong_ten), chu
-    assert "wharton" not in chu.lower() and "Preference points" in chu
+    assert "wharton" not in chu.lower() and "Commitment points" in chu
     assert not loi, loi
 
 

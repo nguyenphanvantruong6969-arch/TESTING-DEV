@@ -73,6 +73,10 @@ _PING_TIMEOUT_SECONDS = 120     # chỉ dùng khi EventSource chưa từng kết
 _GRACE_SECONDS = 20             # chờ sau khi kết nối cuối cùng đứt
 _ALIVE_BEAT_SECONDS = 10        # nhịp ghi vào socket để phát hiện đứt
 _PING_INTERVAL_MS = 3000
+# Sau khi trang gửi /__closed__ (pagehide) máy chủ CHƯA tắt: F5 cũng gây pagehide. Chờ ngần này giây;
+# nếu trong lúc đó trang mới ping hay mở kết nối sống thì đó là tải lại, bỏ báo đóng. Phải dài hơn
+# nhịp ping (3 s) để cửa sổ còn lại (nếu có) kịp hiện diện.
+_CHO_SAU_BAO_DONG_SECONDS = 4.5
 
 # CHỈ phục vụ các loại tệp giao diện cần. Khi chạy từ mã nguồn, thư mục
 # tài nguyên CHÍNH LÀ thư mục chứa app.db, các bản sao lưu app.db.bak-*,
@@ -147,10 +151,11 @@ _SHIM_TEMPLATE = """
   ping();
   setInterval(ping, __PING_INTERVAL__);
 
-  /* Dong cua so -> bao NGAY, khong de tien trinh chay ngam.
+  /* Dong cua so -> bao som, khong de tien trinh chay ngam.
      Dung `pagehide` (khong phai `unload`) vi day la su kien duy nhat
      trinh duyet bao dam ban ra khi trang bi dong, va sendBeacon van gui
-     duoc trong luc trang dang bi huy. */
+     duoc trong luc trang dang bi huy. Tai lai trang (F5) cung la pagehide,
+     nen may chu KHONG tat ngay: no cho vai giay, trang moi ping la huy. */
   window.addEventListener("pagehide", function () {
     /* Doi workspace tai lai trang (js/075_workspace.js dat co nay ngay truoc
        location.reload()). Do KHONG phai dong cua so — bao "dong" luc nay la
@@ -169,6 +174,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
     # gan boi serve(): api object, token, resource dir, va callback ping
     api = None
     token = ""
+    # Kết nối im lặng quá ngần này giây thì bị cắt (StreamRequestHandler.setup đặt cho socket).
+    # Không có thì một máy khách gửi dở yêu cầu rồi treo giữ luồng của máy chủ mãi. Chỉ tính thời
+    # gian CHỜ DỮ LIỆU của socket — một thao tác xếp chạy lâu không bị cắt; kết nối "còn sống" ghi
+    # mỗi _ALIVE_BEAT_SECONDS (10 s) nên cũng không chạm ngưỡng.
+    timeout = 45
     on_ping = None
     on_closed = None
     on_alive_open = None
@@ -187,16 +197,27 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _authorized(self) -> bool:
+    def _loi_http(self, ma: str, status: int, **tham_so):
+        """Lỗi HTTP theo hợp đồng chung `{ok, data, errors: [{code, params}]}` (bất biến 6): mã nằm
+        ở `i18n_errors.py`, giao diện dịch được; không trả chuỗi trần."""
+        from i18n_errors import err, phan_hoi_loi
+
+        self._send_json(phan_hoi_loi(err(ma, **tham_so)), status)
+
+    def _token_khop(self, gui_toi: str) -> bool:
+        """So token ở thời gian không đổi, trên BYTE: `compare_digest` với chuỗi chỉ nhận ASCII và
+        ném TypeError khi tiêu đề / `?t=` mang ký tự khác (ví dụ "é") — thành lỗi 500 thay vì 403."""
         return secrets.compare_digest(
-            self.headers.get("X-Kiosk-Token", ""), self.token
-        )
+            gui_toi.encode("utf-8", "replace"), self.token.encode("utf-8", "replace"))
+
+    def _authorized(self) -> bool:
+        return self._token_khop(self.headers.get("X-Kiosk-Token", ""))
 
     def _token_trong_url(self) -> bool:
         from urllib.parse import parse_qs, urlparse
 
         sent = parse_qs(urlparse(self.path).query).get("t", [""])[0]
-        return secrets.compare_digest(sent, self.token)
+        return self._token_khop(sent)
 
     def _host_hop_le(self) -> bool:
         """Chặn DNS rebinding.
@@ -263,7 +284,7 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if not self._host_hop_le():
-            self._send_json({"ok": False, "errors": ["forbidden"]}, 403)
+            self._loi_http("http_bi_tu_choi", 403)
             return
 
         if self.path == "/__ping__":
@@ -273,11 +294,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             return
 
         if self.path.split("?", 1)[0] == "/__closed__":
-            # Cua so da dong -> tat may chu ngay, khong cho het nguong.
+            # Cua so bao dong -> danh dau, may chu tu tat neu vang luu hieu (xem nen_tat).
             # Bat buoc co token: khong de mot trang web khac dang mo trong
             # cung may do trung cong roi tat app dang chay do.
             if not self._token_trong_url():
-                self._send_json({"ok": False, "errors": ["forbidden"]}, 403)
+                self._loi_http("http_bi_tu_choi", 403)
                 return
             self._send_json({"ok": True})
             if callable(self.on_closed):
@@ -285,11 +306,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             return
 
         if not self.path.startswith("/__api__/"):
-            self._send_json({"ok": False, "errors": ["unknown endpoint"]}, 404)
+            self._loi_http("http_khong_co_dich", 404)
             return
 
         if not self._authorized():
-            self._send_json({"ok": False, "errors": ["forbidden"]}, 403)
+            self._loi_http("http_bi_tu_choi", 403)
             return
 
         from urllib.parse import unquote
@@ -298,11 +319,11 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         # Chi cho goi phuong thuc cong khai — khong de lo _backup_db,
         # _move_corrupt_db_aside... ra ngoai qua HTTP.
         if name.startswith("_") or not hasattr(self.api, name):
-            self._send_json({"ok": False, "errors": [f"unknown method: {name}"]}, 404)
+            self._loi_http("http_khong_co_ham", 404, ten=name)
             return
         method = getattr(self.api, name)
         if not callable(method):
-            self._send_json({"ok": False, "errors": [f"not callable: {name}"]}, 404)
+            self._loi_http("http_khong_co_ham", 404, ten=name)
             return
 
         try:
@@ -310,7 +331,8 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         except ValueError:
             length = -1
         if not 0 <= length <= _TRAN_THAN_YEU_CAU:
-            self._send_json({"ok": False, "errors": ["payload too large"]}, 413)
+            self._loi_http("http_than_qua_lon", 413,
+                           toi_da_mb=_TRAN_THAN_YEU_CAU // (1024 * 1024))
             return
 
         try:
@@ -320,7 +342,9 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             # Khong tra traceback: vet ngan xep lo duong dan may va cau truc
             # ma, ma nguoi van hanh cung khong doc duoc. Vet ghi vao tep nhat
-            # ky canh app.db; giao dien hien cau da dich va ten tep do.
+            # ky canh app.db; giao dien hien cau da dich va ten tep do. Cung
+            # khong tra str(e): thong diep ngoai le co the mang duong dan may,
+            # noi dung tep... — giao dien chi nhan TEN KIEU ngoai le.
             import chan_doan
             from i18n_errors import err
 
@@ -330,7 +354,7 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
             self._send_json({
                 "ok": False,
                 "data": None,
-                "errors": [err("loi_ngoai_du_kien", ten=name, detail=str(e)),
+                "errors": [err("loi_ngoai_du_kien", ten=name, detail=type(e).__name__),
                            err("xem_nhat_ky", file=chan_doan.TEN_LOG_UNG_DUNG)],
             })
             return
@@ -546,7 +570,7 @@ def serve(api, resource_dir: str, start_page: str = "index.html",
     """
     token = secrets.token_urlsafe(24)
     state = {"last_ping": None, "n_song": 0, "tung_song": False,
-             "het_song_luc": None}
+             "het_song_luc": None, "bao_dong": None, "mo_song_luc": None}
     khoa = threading.Lock()
 
     def on_ping():
@@ -557,6 +581,7 @@ def serve(api, resource_dir: str, start_page: str = "index.html",
             state["n_song"] += 1
             state["tung_song"] = True
             state["het_song_luc"] = None
+            state["mo_song_luc"] = time.time()
 
     def on_alive_close():
         with khoa:
@@ -565,9 +590,10 @@ def serve(api, resource_dir: str, start_page: str = "index.html",
                 state["het_song_luc"] = time.time()
 
     def on_closed():
-        # shutdown() phai chay o thread KHAC, khong the goi tu trong
-        # chinh handler dang phuc vu request nay (se treo).
-        threading.Thread(target=lambda: httpd.shutdown(), daemon=True).start()
+        # Chi DANH DAU: F5 cung gui pagehide. Viec tat do watchdog quyet (nen_tat), khi sau dau
+        # nay khong con ping / ket noi song nao moi. shutdown() van phai chay o thread KHAC.
+        with khoa:
+            state["bao_dong"] = time.time()
 
     bound = type("_BoundHandler", (_Handler,), {
         "api": api,
@@ -598,6 +624,12 @@ def serve(api, resource_dir: str, start_page: str = "index.html",
           chặn): quay về cách cũ — chờ đủ _PING_TIMEOUT_SECONDS không
           ping. Dài, vì lúc này chỉ còn cách đoán.
         """
+        bao = state["bao_dong"]
+        if bao is not None:
+            if (state["last_ping"] or 0) > bao or (state["mo_song_luc"] or 0) > bao:
+                state["bao_dong"] = None      # tải lại / còn cửa sổ khác: huỷ báo đóng
+            elif gio - bao >= _CHO_SAU_BAO_DONG_SECONDS:
+                return True
         last = state["last_ping"]
         if last is None:
             return False            # trang chưa kịp mở
@@ -612,7 +644,7 @@ def serve(api, resource_dir: str, start_page: str = "index.html",
 
     def watchdog():
         while True:
-            time.sleep(5)
+            time.sleep(1)
             with khoa:
                 tat = nen_tat(time.time())
             if tat:

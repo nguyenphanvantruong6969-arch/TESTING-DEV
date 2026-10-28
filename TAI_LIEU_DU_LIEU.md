@@ -302,9 +302,9 @@ màn hình nào đọc tới.
 
 > ⚠️ `validate_data_integrity` **cố ý không** kiểm trần 5
 > (`rbda_priority_pipeline.py:1013`). Lý do ghi ngay trong mã: `applicants`
-> ở tầng đó **không** phải "những em đã đăng ký thi" — `load_from_sqlite` đã hợp
+> ở nhóm đó **không** phải "những em đã đăng ký thi" — `load_from_sqlite` đã hợp
 > nhất ô tick với **mọi** câu lạc bộ em có xếp nguyện vọng, vì em không thi vẫn
-> được xét ở Tầng 2. Đến tầng này hai thứ đã nhập làm một và không tách ra được
+> được xét ở nhóm xét điểm quyết tâm. Đến tầng này hai thứ đã nhập làm một và không tách ra được
 > nữa, nên đếm ở đây là đếm nhầm sang nguyện vọng. Trần 5 vì thế áp **ở lúc
 > nhập**, không phải lúc kiểm toàn vẹn.
 
@@ -545,6 +545,38 @@ Chèn hay xoá cột trong một nhóm thì báo lỗi nêu sheet, cột, nhóm 
 - Em không xếp câu lạc bộ nào của một buổi = **em bận ngày đó**. Hợp lệ.
 - Điểm cho câu lạc bộ em không xếp nguyện vọng thì sổ **không chứa được** (điểm
   luôn nằm cạnh một cột CLB) — điều 8 dưới đây chặn nó từ trước.
+
+## Điểm quyết tâm (tuỳ chọn, mục A13) — dữ liệu MÔ PHỎNG
+
+Chỉ dùng khi được yêu cầu ("có điểm quyết tâm", "dữ liệu mẫu có Wharton"). Luật của phần mềm:
+mỗi em có **hai quỹ cho MỖI buổi** — quỹ 1 chia cho các CLB em **có tick thi**, quỹ 2 chia
+cho các CLB **còn lại** — mỗi quỹ đúng **100** điểm, số nguyên ≥ 0. Quỹ chỉ có một CLB mà để
+trống thì phần mềm tự điền 100. Ô điểm nằm cạnh ô CLB của nguyện vọng đó (nhiều buổi vẫn dùng
+đúng cột này: nhóm xét và buổi suy từ CLB), nên **không cần đổi định dạng sổ**.
+
+```bash
+# Sinh mới, có điểm. Sổ ghi ra có cột "Điểm quyết tâm"; kèm DQT_KIEU_CHIA.json
+python scripts/sinh_du_lieu.py ngau --ra ./bo_moi --hoc-sinh 120 --buoi thu_2,thu_4 \
+    --diem-quyet-tam hop_le --kieu-chia tron
+
+# Áp lên một sổ đã có, giữ nguyên CLB, nguyện vọng, điểm thi
+python scripts/sinh_du_lieu.py ap SO_CU.xlsx --ra ./bo_moi --diem-quyet-tam hop_le --seed 3
+```
+
+| `--diem-quyet-tam` | Ra gì |
+|---|---|
+| `khong` (mặc định) | Như cũ: không cột, không điểm |
+| `hop_le` | Mọi quỹ của mọi em đủ 100, đúng tập CLB, đúng nhóm — chạy xếp ngay |
+| `co_loi` | `hop_le` rồi cố ý làm sai mỗi loại ≥ 3 em (thiếu, thừa, điểm ở ô nguyện vọng trống, một quỹ chung cho cả hai nhóm, toàn 0); ghi `DQT_BANG_LOI.json` |
+| `trong` | Có cột nhưng để trống hết — thử tự điền và học sinh nhập ở kiosk |
+
+`--kieu-chia`: `tron` (mỗi em một kiểu, ghi trong `DQT_KIEU_CHIA.json`) hoặc đúng một kiểu cho cả
+trường — `don_dau` (dồn nguyện vọng đầu, giảm dần), `deu`, `all_in` (100 vào một CLB), `ngau_nhien`.
+Làm tròn bằng phần dư lớn nhất, hoà thì theo mã CLB; cùng `--seed` luôn ra đúng như cũ.
+
+`hop_le` đi qua `soat_diem_quyet_tam` trước khi ghi (sai thì không ghi tệp nào). `co_loi` **cố ý**
+sai nên bỏ qua bước đó; `soat` một sổ có điểm sẽ liệt kê đúng những em sai. Bộ mẫu dựng sẵn:
+`du_lieu_test/sinh_du_lieu_diem_quyet_tam.py` (sáu tệp `SO_NHAP_DQT_*`).
 
 ## Chín điều phải đúng, nếu không thì không ghi
 
@@ -1025,6 +1057,14 @@ tay 8 học sinh, 3 câu lạc bộ, ~15 phút. Kiểm các màn hình *Quản l
 phòng tại kiosk*, *Chấm điểm* — những màn hình mà đường nạp tệp **không** đụng tới.
 Bộ này nhỏ đủ để tự tính kết quả bằng tay rồi đối chiếu với máy.
 
+### 5.3b · `du_lieu_test/SO_NHAP_DQT_*` — sáu sổ có Điểm quyết tâm (A13.6)
+
+Dữ liệu MÔ PHỎNG, seed cố định. Hai cỡ (120 em × 3 buổi, giữ nguyên nguyện vọng và điểm thi của
+`SO_NHAP_MAU_120HS_3BUOI.xlsx`; 800 em × 20 CLB × 4 buổi) × ba biến thể (`HOP_LE`, `CO_LOI`, `TRONG`),
+kèm `DQT_BANG_LOI.json` và `DQT_KIEU_CHIA.json`. Cần bật `rules.wharton` ở workspace. Mô tả đầy đủ:
+`du_lieu_test/README.md`. Sinh lại: `python du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`. Test:
+`tests/test_du_lieu_mau_diem_quyet_tam.py`.
+
 ### 5.4 · `du_lieu_test/bo_sach/` — bộ sạch, MỘT BUỔI
 
 Bộ tồn tại vì đúng một lời hứa: **nạp vào không một cảnh báo nào**, để người chạy
@@ -1170,8 +1210,8 @@ hoc_sinh,so_clb,nguyen_vong,ty_le_cho,cach_chia_chi_tieu,clb_du_thi,t_nap_giay,t
 | `t_nap_giay` · `t_phan_bo_giay` · `t_xuat_giay` | thời gian ba bước |
 | `so_vong` | số vòng lặp thuật toán chạy |
 | `xep_duoc` · `ty_le_xep` · `chua_xep` | kết quả xếp chỗ |
-| `xep_nho_co_diem` | được xếp vào CLB mình **có dự thi** (Tầng 1) |
-| `xep_chi_nho_boc_tham` | được xếp vào CLB mình **không dự thi** — chỉ nhờ bốc thăm (Tầng 2) |
+| `xep_nho_co_diem` | được xếp vào CLB mình **có dự thi** (nhóm xét điểm thi) |
+| `xep_chi_nho_boc_tham` | được xếp vào CLB mình **không dự thi** — chỉ nhờ bốc thăm (nhóm xét điểm quyết tâm) |
 | `db_MB` · `dinh_bo_nho_MB` | dung lượng CSDL và đỉnh bộ nhớ Python |
 | `so_tep_xuat` | số tệp kết quả xuất ra |
 
@@ -1282,9 +1322,9 @@ Ba điều bảng trên cho thấy:
 **Vì sao xếp được 100% mà vẫn không tầm thường.** Mỗi em xếp 6 nguyện vọng nhưng chỉ
 thi 4 câu lạc bộ đầu. Hai nguyện vọng cuối rơi vào nhóm câu lạc bộ còn dư chỗ — đó là
 **đường lui**, và là lý do không em nào trắng tay. Nhưng hai nguyện vọng cuối em
-**không thi**, nên không có điểm; phần mềm vẫn xét, chỉ là ở **Tầng 2**: chọi nhau
+**không thi**, nên không có điểm; phần mềm vẫn xét, chỉ là ở **nhóm xét điểm quyết tâm**: chọi nhau
 bằng số bốc thăm STB chứ không bằng điểm. Nhờ vậy một bộ dữ liệu duy nhất cho thấy
-**cả hai tầng ưu tiên** cùng lúc.
+**cả hai nhóm ưu tiên** cùng lúc.
 
 ### 7.3 · `vi_du_day_du` — `seed = 42`
 

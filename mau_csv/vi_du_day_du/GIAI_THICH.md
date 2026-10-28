@@ -98,8 +98,8 @@ thêm khi giá trị có dấu phẩy; không phải gõ tay.
 
 **3. Em không thi câu lạc bộ nào cũng là một dòng hợp lệ.** `HS003` để trống
 hết. Em ấy vẫn xếp nguyện vọng bình thường ở tệp 3, chỉ là em ấy sẽ đứng ở
-**tầng hai** — tầng của những em không dự thi — tại mọi câu lạc bộ có tổ chức
-thi, và thứ tự trong tầng đó do bốc thăm quyết định.
+**nhóm xét điểm quyết tâm** — nhóm của những em không dự thi — tại mọi câu lạc bộ có tổ chức
+thi, và thứ tự trong nhóm đó do bốc thăm quyết định.
 
 **4. Chỉ 3 trong 9 câu lạc bộ có thi.** `clb_tinhoc`, `clb_robotics`,
 `clb_tienganh` — mỗi buổi một câu lạc bộ. Sáu câu lạc bộ còn lại không ai khai

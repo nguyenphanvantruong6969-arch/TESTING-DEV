@@ -18,7 +18,7 @@ from api_chung import (
     thu_muc_tai_ve,
 )
 from cau_hinh_ws import doc_cau_hinh
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, LoiDuongXuat, loi_cau_hinh
 from i18n_errors import err
 from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
@@ -242,8 +242,8 @@ class XuatKetQuaMixin:
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
             "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
-            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo tầng "
-                          "và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
+            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo cách xét "
+                          "(điểm thi, điểm quyết tâm) và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
             "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu em được "
                         "nguyện vọng 1, suất dự trữ dùng tới đâu.",
             "Dấu vết (kỹ thuật)": "Hạt giống và số bốc thăm để tính lại kết quả. "
@@ -364,17 +364,24 @@ class XuatKetQuaMixin:
         from so_excel import CHU_CANH_BAO
 
         t.tieu_de("ĐIỂM CHUẨN TỪNG {slot_u}",
-                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo tầng và theo suất thường hay "
-                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở tầng đó. Chỉ dành cho nhà "
+                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo cách xét (điểm thi, điểm quyết tâm) và theo suất thường hay "
+                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở mục đó. Chỉ dành cho nhà "
                   "trường, không phát cho {person_l}.")
         if ket_qua_cu:
             t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, điểm chuẩn có thể đã cũ.",
                       CHU_CANH_BAO)
         cot = ["Mã {slot_sl}", "Tên {slot_l}"] + (["{session}"] if du["nhieu_buoi"] else []) \
-            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Tầng 2, suất thường",
-               "Tầng 2, suất dự trữ", "Tầng 1, suất thường", "Tầng 1, suất dự trữ"]
+            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Xét điểm quyết tâm, suất thường",
+               "Xét điểm quyết tâm, suất dự trữ", "Xét điểm thi, suất thường", "Xét điểm thi, suất dự trữ"]
         kq = self.get_diem_chuan()
         rows = kq["data"]["rows"] if kq.get("ok") else []
+        loi_dc = not kq.get("ok")
+        if loi_dc:
+            # Không xuất trang trống im lặng (A13.8): ghi lý do vào trang và báo ra ngoài.
+            ma = ", ".join(str(e.get("code")) for e in kq.get("errors", []) if isinstance(e, dict))
+            t.ghi_chu("KHÔNG ĐỌC ĐƯỢC ĐIỂM CHUẨN khi xuất (mã lỗi: %s). Trang này đang trống do lỗi, "
+                      "không phải vì chưa có dữ liệu. Hãy xuất lại." % (ma or "không rõ"), CHU_CANH_BAO)
+            du.setdefault("canh_bao", []).append(err("xuat_diem_chuan_loi"))
         dong = []
         for r in rows:
             dong.append([r["club_id"], r["ten"]] + ([r["buoi"]] if du["nhieu_buoi"] else [])
@@ -384,7 +391,8 @@ class XuatKetQuaMixin:
                            self._o_diem_chuan(r["tang1"]["thuong"], 1),
                            self._o_diem_chuan(r["tang1"]["du_tru"], 1)])
         dau, _ = t.bang(cot, dong, khoa=True, loc=True,
-                        rong="" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)")
+                        rong="(không đọc được điểm chuẩn — xem dòng cảnh báo phía trên)" if loi_dc
+                        else ("" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)"))
         t.xong(lap_hang=dau)
 
     def _trang_thong_ke(self, t, bao, du):
@@ -681,22 +689,48 @@ class XuatKetQuaMixin:
                 ra.append(["(không có em nào — mọi em đều có ít nhất một chỗ)", ""])
 
         return ra
+    def _chi_tiet_loi_xuat(self, e) -> str:
+        """`detail` AN TOÀN cho lỗi xuất tệp (A13.11): kiểu lỗi (và lý do hệ điều hành nếu là
+        OSError), KHÔNG kèm tên tệp / đường dẫn máy như `str(e)`. Chi tiết đầy đủ (có đường dẫn)
+        vào `loi_ung_dung.txt` cạnh app.db. Chỉ gọi trong khối `except`."""
+        import chan_doan
+
+        try:
+            chan_doan.ghi_ngoai_le_canh_db(self.db_path, "Loi xuat: %s" % type(e).__name__)
+        except Exception:
+            pass
+        if isinstance(e, OSError) and e.strerror:
+            return "%s: %s" % (type(e).__name__, e.strerror)
+        return type(e).__name__
+
     def _duong_xuat(self, output_path: str, ten_mac_dinh: str,
-                    kem_duoi: tuple = ()) -> str:
+                    kem_duoi: tuple = (), thu_muc_du_phong: str = "") -> str:
         """Chỗ đặt một tệp (hoặc thư mục) xuất ra — MỘT luật cho mọi lần xuất.
 
         Rỗng hoặc TƯƠNG ĐỐI -> thư mục Tải xuống (lùi về cạnh app.db nếu
-        không ghi được), và không ghi đè tệp đã có: `x.csv` thành
-        `x (2).csv` như trình duyệt. Đường dẫn TUYỆT ĐỐI là ý muốn rõ ràng
-        của bên gọi -> tôn trọng nguyên văn. Xem `export_csv`.
+        không ghi được). Đường dẫn TUYỆT ĐỐI -> đúng chỗ bên gọi chỉ định.
+        Cả hai đều KHÔNG ghi đè tệp đã có: `x.csv` thành `x (2).csv` như
+        trình duyệt (A13.9: trước đây đường tuyệt đối ghi đè im lặng, nên
+        xuất hai lần ra cùng một chỗ là mất tệp lần trước). Xem `export_csv`.
+
+        `thu_muc_du_phong`: chỗ lùi về khi Tải xuống không ghi được; mặc định là thư mục chứa
+        app.db. Việc xuất KHÔNG thuộc workspace đang mở (export_workspace) truyền chỗ trung tính
+        để tệp không nằm lẫn trong dữ liệu của một workspace khác.
         """
         output_path = (output_path or "").strip() or ten_mac_dinh
         if os.path.isabs(output_path):
-            return output_path
+            # Đường là THƯ MỤC có sẵn: "trùng tên → x (2)" sẽ đẻ ra tệp `x (2)` không đuôi NGOÀI
+            # thư mục đó (A13.11, N1). Từ chối bằng lỗi có tên, như trước A13.9.
+            if os.path.isdir(output_path):
+                # Chỉ TÊN thư mục, không phải cả đường dẫn máy: phản hồi lỗi không mang đường dẫn.
+                raise LoiDuongXuat(err(
+                    "xuat_duong_la_thu_muc",
+                    path=os.path.basename(output_path.rstrip("/\\")) or output_path))
+            return duong_dan_khong_de(output_path, kem_duoi)
         thu_muc = self.thu_muc_xuat or thu_muc_tai_ve()
         if not (thu_muc and os.path.isdir(thu_muc)
                 and os.access(thu_muc, os.W_OK)):
-            thu_muc = os.path.dirname(os.path.abspath(self.db_path))
+            thu_muc = thu_muc_du_phong or os.path.dirname(os.path.abspath(self.db_path))
         # Chi tranh ghi de o duong CHUONG TRINH tu chon.
         # `kem_duoi`: tep di kem cung ten goc (so Excel + bo .csv) — ten goc
         # phai con trong cho moi duoi.
@@ -783,7 +817,7 @@ class XuatKetQuaMixin:
                 "luc_chay": meta[0] if meta else None,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
     # Thứ tự cố định để tệp và màn hình liệt kê giống nhau.
@@ -911,8 +945,10 @@ class XuatKetQuaMixin:
             _ghi_csv(path, [], dau + [[]] + [header] + dong)
             return _ok({"path": path, "n_thay_doi": len(dong),
                         "dem": d["dem"], "ket_qua_cu": ket_qua_cu})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     # -----------------------------------------------------------------
     # DỮ LIỆU ĐẦU VÀO HIỆN TẠI — một Sổ nhập CLB NẠP LẠI ĐƯỢC
@@ -1000,10 +1036,12 @@ class XuatKetQuaMixin:
                 "n_thi_ngoai_nv": n_ngoai,
                 "n_ten_doi": n_ten_doi,
             })
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def export_wharton_can_sua(self, output_path: str = ""):
         """Danh sách hồ sơ điểm quyết tâm cần sửa (A13.5) thành MỘT tệp Excel. KHÔNG đổi điểm nào.
@@ -1060,10 +1098,12 @@ class XuatKetQuaMixin:
             wb.save(path)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_hoc_sinh": len({d[0] for d in dong}), "n_dong": len(dong)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def tao_so_nhap_mau(self, output_path: str = ""):
         """Tạo Sổ nhập CLB để điền, đặt vào thư mục Tải xuống.
@@ -1075,13 +1115,16 @@ class XuatKetQuaMixin:
             path = self._duong_xuat(output_path, "SO_NHAP_CLB.xlsx")
             with self._ket_noi_doc() as cur:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
-            so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True))
+            so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
+                                 luon_co_cot_w=True)       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("so_nhap_mau_loi", detail=str(e)))
+            return _fail(err("so_nhap_mau_loi", detail=self._chi_tiet_loi_xuat(e)))
 
     # -----------------------------------------------------------------
     # HỒ SƠ HỌC SINH — một em hoặc nhiều em được chọn
@@ -1214,10 +1257,12 @@ class XuatKetQuaMixin:
                 "n_dong": len(dong),
                 "ket_qua_cu": bool(tt["ok"] and tt["data"]["ket_qua_cu"]),
             })
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def _khoa_xuat(self, ham, *args):
         """Giữ khoá ghi + bật bộ nhớ báo cáo suốt một lần xuất.
@@ -1271,7 +1316,7 @@ class XuatKetQuaMixin:
             try:
                 trang = self._luu_so_excel(path, du)
             except Exception as e:
-                return _fail(err("error_exporting_excel", detail=str(e)))
+                return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
             ra = {
                 "path": path, "excel_path": path, "trang": trang,
@@ -1282,6 +1327,7 @@ class XuatKetQuaMixin:
                 "csv_path": None, "per_club_dir": None, "n_club_files": 0,
                 "tong_hop_path": None, "thoi_khoa_bieu_path": None,
                 "so_boc_tham_path": None,
+                "canh_bao": du.get("canh_bao", []),
             }
             if kem_csv:
                 # So Excel da ghi xong. CSV hong (vd tep CSV cu dang mo trong
@@ -1292,10 +1338,12 @@ class XuatKetQuaMixin:
                     bo["csv_path"] = bo.pop("path")
                     ra.update(bo)
                 except Exception as e:
-                    ra["loi_csv"] = err("error_exporting_csv", detail=str(e))
+                    ra["loi_csv"] = err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e))
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def export_csv(self, output_path: str = ""):
         """Bộ tệp `.csv` rời (kèm sổ Excel cùng tên) — đường xuất cho phần
@@ -1315,10 +1363,10 @@ class XuatKetQuaMixin:
              các tệp `.csv` đã ghi xong và vẫn dùng được, `excel_path` None.
 
         output_path rỗng hoặc TƯƠNG ĐỐI -> tệp rơi vào **thư mục Tải
-        xuống** của người dùng (lùi về cạnh app.db nếu không ghi được), và
-        không ghi đè tệp cũ. Đường dẫn TUYỆT ĐỐI do bên gọi truyền vào thì
-        tôn trọng nguyên văn, kể cả việc ghi đè. Luôn trả về đường dẫn ĐẦY
-        ĐỦ để giao diện hiện đúng chỗ tệp nằm.
+        xuống** của người dùng (lùi về cạnh app.db nếu không ghi được). Đường
+        dẫn TUYỆT ĐỐI thì đặt đúng chỗ bên gọi chỉ định. Cả hai đều không
+        ghi đè tệp cũ (trùng tên thì `x (2).csv`). Luôn trả về đường dẫn
+        ĐẦY ĐỦ đã dùng để giao diện hiện đúng chỗ tệp nằm.
         """
         try:
             if self._chua_co_ket_qua():
@@ -1337,8 +1385,10 @@ class XuatKetQuaMixin:
                 duong_excel = None
             ra["excel_path"] = duong_excel
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def _ket_qua_cu(self) -> bool:
         tt = self.get_trang_thai_ket_qua()

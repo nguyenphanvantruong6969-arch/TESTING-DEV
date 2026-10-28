@@ -255,8 +255,9 @@ def test_tep_xuat_co_trang_diem_chuan_moi_clb_buoi_mot_dong(api):
     dong = [r for r in noi_dung[dau + 1:] if r and r[0]]
     assert len(dong) == len(bo.cids)
     cot = noi_dung[dau]
-    for ten in ("Tầng 2, suất thường", "Tầng 2, suất dự trữ", "Tầng 1, suất thường",
-                "Tầng 1, suất dự trữ"):
+    for ten in ("Xét điểm quyết tâm, suất thường", "Xét điểm quyết tâm, suất dự trữ",
+                "Xét điểm thi, suất thường",
+                "Xét điểm thi, suất dự trữ"):
         assert ten in cot, cot
 
 

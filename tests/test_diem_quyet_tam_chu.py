@@ -1,4 +1,4 @@
-"""Tên hiển thị của tính năng (A13.4): "Điểm quyết tâm" / "Preference points". Trong mã vẫn là wharton.
+"""Tên hiển thị của tính năng (A13.4): "Điểm quyết tâm" / "Commitment points". Trong mã vẫn là wharton.
 
 Quyết định của Truong (25/10/2026): chữ NGƯỜI DÙNG NHÌN THẤY không còn "Wharton". Tên hàm, tên biến,
 tên bảng, mã lỗi (`wharton_*`), khoá `rules.wharton`, cột CSV `wp_k` và id HTML giữ nguyên.
@@ -46,13 +46,13 @@ def test_cau_ui_dung_ten_moi(khoa):
     if khoa in ("fallback_step3_title", "btn_save_wharton", "wharton_da_khoa_kiosk", "wh_ql_title",
                 "btn_wh_mo_khoa", "btn_wh_xoa_tat_ca", "ws_r_wharton"):
         assert "quyết tâm" in ui["vi"][khoa].lower(), khoa
-        assert "preference points" in ui["en"][khoa].lower(), khoa
+        assert "commitment points" in ui["en"][khoa].lower(), khoa
 
 
 def test_dau_cau_tieng_anh_viet_hoa_dung():
     ui = _ui_strings()
-    assert ui["en"]["wh_ql_title"] == "Preference points"
-    assert ui["en"]["fallback_step3_title"] == "Step 3. Preference points"
+    assert ui["en"]["wh_ql_title"] == "Commitment points"
+    assert ui["en"]["fallback_step3_title"] == "Step 3. Commitment points"
     assert ui["vi"]["wh_ql_title"] == "Điểm quyết tâm"
     assert ui["vi"]["fallback_step3_title"] == "Bước 3. Điểm quyết tâm"
 

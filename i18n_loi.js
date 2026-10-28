@@ -326,6 +326,10 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Hãy nhập mã {slot_sl}.",
     "en": "Enter {slot_la} code."
   },
+  "student_id_required": {
+    "vi": "Hãy nhập mã {person_l}.",
+    "en": "Enter the {person_l} ID."
+  },
   "cannot_delete_club_referenced": {
     "vi": "Không xoá được {slot_sl} {club_id} vì {slot_sl} này đang có trong {n_prefs} nguyện vọng và {n_matches} kết quả. Hãy xử lý các dữ liệu đó trước.",
     "en": "{slot} {club_id} can't be deleted because it's still in {n_prefs} preference(s) and {n_matches} result(s). Deal with that data first."
@@ -476,51 +480,59 @@ window.I18N_ERROR_MESSAGES = {
   },
   "wharton_chua_dung_het": {
     "vi": "Chưa dùng hết điểm quyết tâm: {person_l} {student_id} còn thiếu {thieu} điểm ở quỹ {quy}.",
-    "en": "Preference points not fully used: {person_l} {student_id} still has {thieu} point(s) left in fund {quy}."
+    "en": "Commitment points not fully used: {person_l} {student_id} still has {thieu} point(s) left in fund {quy}."
   },
   "wharton_vuot_ngan_sach": {
     "vi": "{person} {student_id} đặt {tong} điểm quyết tâm ở quỹ {quy}, nhiều hơn {ngan_sach} điểm được phép.",
-    "en": "{person} {student_id} placed {tong} preference points in fund {quy}, more than the {ngan_sach} allowed."
+    "en": "{person} {student_id} placed {tong} commitment points in fund {quy}, more than the {ngan_sach} allowed."
   },
   "wharton_diem_khong_hop_le": {
     "vi": "{person} {student_id} đặt “{gia_tri}” điểm quyết tâm cho {slot_sl} {club_id}. Điểm quyết tâm phải là số nguyên từ 0 trở lên.",
-    "en": "{person} {student_id} placed “{gia_tri}” preference points on {slot_l} {club_id}. Preference points must be a whole number of 0 or more."
+    "en": "{person} {student_id} placed “{gia_tri}” commitment points on {slot_l} {club_id}. Commitment points must be a whole number of 0 or more."
   },
   "wharton_ngoai_tap": {
     "vi": "{person} {student_id} đặt điểm quyết tâm quỹ {quy} cho {slot_sl} {club_id}, nhưng {slot_sl} này không thuộc quỹ {quy} (không có trong nguyện vọng, hoặc sai loại có thi / không thi).",
-    "en": "{person} {student_id} placed fund {quy} preference points on {slot_l} {club_id}, but that {slot_l} isn't in fund {quy} (not in the preferences, or the wrong tested / not-tested group)."
+    "en": "{person} {student_id} placed fund {quy} commitment points on {slot_l} {club_id}, but that {slot_l} isn't in fund {quy} (not in the preferences, or the wrong tested / not-tested group)."
   },
   "wharton_tang_lech": {
     "vi": "{person} {student_id} có {score_l} thi ở {slot_sl} {club_id} nhưng chỉ đặt điểm quyết tâm cho {slot_sl} này ở quỹ không thi. Cần chia lại điểm.",
-    "en": "{person} {student_id} has a test {score_l} for {slot_l} {club_id} but placed preference points for it only in the not-tested fund. The points need to be split again."
+    "en": "{person} {student_id} has a test {score_l} for {slot_l} {club_id} but placed commitment points for it only in the not-tested fund. The points need to be split again."
   },
   "wharton_vang_thi": {
     "vi": "{person} {student_id} vắng thi {slot_sl} {club_id}, nên được xét như không thi với {diem} điểm quyết tâm quỹ 2 ({diem_bo} điểm quỹ 1 không được tính).",
-    "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 preference point(s) ({diem_bo} fund 1 point(s) not counted)."
+    "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 commitment point(s) ({diem_bo} fund 1 point(s) not counted)."
   },
   "csv_wp_khong_hop_le": {
     "vi": "Điểm quyết tâm của {person_l} {student_id} ở {slot_sl} {club_id} là “{gia_tri}”, không phải số nguyên từ 0 trở lên. Ô này chưa được lưu.",
-    "en": "The preference points for {person_l} {student_id} on {slot_l} {club_id} are “{gia_tri}”, not a whole number of 0 or more. This cell wasn't saved."
+    "en": "The commitment points for {person_l} {student_id} on {slot_l} {club_id} are “{gia_tri}”, not a whole number of 0 or more. This cell wasn't saved."
   },
   "csv_wp_khong_co_nguyen_vong": {
     "vi": "{student_id}: có điểm quyết tâm ở cột {cot} nhưng ô nguyện vọng cạnh đó để trống. Điểm này chưa được lưu.",
-    "en": "{student_id}: there are preference points in column {cot} but the preference cell next to it is empty. Those points weren't saved."
+    "en": "{student_id}: there are commitment points in column {cot} but the preference cell next to it is empty. Those points weren't saved."
   },
   "csv_wp_bo_qua": {
     "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
-    "en": "This workspace doesn't use preference points yet: {n} preference points cell(s) in the file were skipped and not saved."
+    "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved."
+  },
+  "xuat_diem_chuan_loi": {
+    "vi": "Không đọc được điểm chuẩn khi xuất: trang \"Điểm chuẩn\" trong tệp đang trống do lỗi. Hãy xuất lại.",
+    "en": "The cut-off scores could not be read while exporting: the \"Cut-off scores\" sheet in the file is empty because of the error. Export again."
+  },
+  "csv_wharton_khoa_giu_nguyen": {
+    "vi": "Học sinh {student_id}: điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi của học sinh này được giữ nguyên, dòng trong tệp bị bỏ qua. Mở khoá ở thẻ Quản lý rồi nạp lại nếu cần đổi.",
+    "en": "Student {student_id}: commitment points are locked and this student already has points, so their rankings and test selection were kept as they are and the file's row was skipped. Unlock them in the Manage tab and import again to change."
   },
   "wharton_chua_bat": {
     "vi": "Không gian làm việc này chưa bật điểm quyết tâm.",
-    "en": "Preference points aren't turned on for this workspace."
+    "en": "Commitment points aren't turned on for this workspace."
   },
   "wharton_ho_so_chua_hop_le": {
     "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy sửa rồi chạy lại.",
-    "en": "{n} {person_l}(s) have a preference points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again."
+    "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again."
   },
   "health_wharton_chua_hop_le": {
     "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",
-    "en": "{n} {person_l}(s) have a preference points profile that isn't valid yet, so the allocation will be blocked until it is fixed."
+    "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation will be blocked until it is fixed."
   },
   "health_wharton_vang_thi": {
     "vi": "{n} {person_l} vắng thi một {slot_sl} đã đặt điểm quỹ 1, nên {slot_sl} đó được xét như không thi (điểm quỹ 1 không được tính).",
@@ -528,23 +540,23 @@ window.I18N_ERROR_MESSAGES = {
   },
   "error_saving_wharton": {
     "vi": "Không lưu được điểm quyết tâm. Hãy thử lại.",
-    "en": "Couldn't save the preference points. Try again."
+    "en": "Couldn't save the commitment points. Try again."
   },
   "wharton_da_khoa": {
     "vi": "Điểm quyết tâm đang khoá vì đã chạy xếp. Mở khoá ở thẻ Quản lý để sửa.",
-    "en": "Preference points are locked because the allocation has run. Unlock them in the Manage tab to edit."
+    "en": "Commitment points are locked because the allocation has run. Unlock them in the Manage tab to edit."
   },
   "wharton_mo_khoa_sai_xac_nhan": {
     "vi": "Cần gõ đúng chữ {can_go} để mở khoá sửa điểm quyết tâm.",
-    "en": "Type {can_go} exactly to unlock editing of the preference points."
+    "en": "Type {can_go} exactly to unlock editing of the commitment points."
   },
   "wharton_xoa_sai_xac_nhan": {
     "vi": "Cần gõ đúng chữ {can_go} để xoá điểm quyết tâm của tất cả {person_pl}.",
-    "en": "Type {can_go} exactly to delete the preference points of all {person_pl}."
+    "en": "Type {can_go} exactly to delete the commitment points of all {person_pl}."
   },
   "wharton_da_xoa": {
     "vi": "Đã xoá điểm quyết tâm của {n} {person_l}.",
-    "en": "Deleted the preference points of {n} {person_l}(s)."
+    "en": "Deleted the commitment points of {n} {person_l}(s)."
   },
   "wharton_da_mo_khoa": {
     "vi": "Đã mở khoá. Lần chạy xếp tiếp theo sẽ khoá lại.",
@@ -552,19 +564,19 @@ window.I18N_ERROR_MESSAGES = {
   },
   "error_wharton_quan_ly": {
     "vi": "Không thực hiện được thao tác với điểm quyết tâm. Hãy thử lại.",
-    "en": "Couldn't complete that action on the preference points. Try again."
+    "en": "Couldn't complete that action on the commitment points. Try again."
   },
   "wharton_tom_tat_chua_hop_le": {
     "vi": "{n} {person_pl} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp.",
-    "en": "{n} {person_pl} have a preference points profile that isn't valid yet, so the allocation hasn't run."
+    "en": "{n} {person_pl} have a commitment points profile that isn't valid yet, so the allocation hasn't run."
   },
   "wharton_phong_sai_xac_nhan": {
     "vi": "Cần gõ đúng chữ {can_go} để phóng điểm quyết tâm của {person_pl} chia thiếu hoặc thừa.",
-    "en": "Type {can_go} exactly to scale the preference points of {person_pl} whose split is short or over."
+    "en": "Type {can_go} exactly to scale the commitment points of {person_pl} whose split is short or over."
   },
   "wharton_da_phong": {
     "vi": "Đã phóng điểm quyết tâm cho {n} {person_pl}. {m} {person_pl} cần sửa tay.",
-    "en": "Scaled the preference points of {n} {person_pl}. {m} {person_pl} need editing by hand."
+    "en": "Scaled the commitment points of {n} {person_pl}. {m} {person_pl} need editing by hand."
   },
   "xuat_chua_co_ket_qua": {
     "vi": "Chưa có kết quả xếp. Chạy xếp trước.",
@@ -751,8 +763,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "Sheet \"{sheet}\" is missing the column \"{cot}\". Don't delete or rename the workbook's header row."
   },
   "so_nhap_cot_lech_nhom": {
-    "vi": "Sheet \"{sheet}\", cột {cot}: không đúng chỗ trong nhóm \"{nhom}\". Mỗi nhóm có các cột giống nhau, theo đúng thứ tự ở hàng 2 của sổ mẫu. Có thể một cột đã bị chèn hay đổi tên. Hãy tải sổ mẫu và điền lại vào đúng cột.",
-    "en": "Sheet \"{sheet}\", column {cot}: it doesn't belong in the group \"{nhom}\". Every group has the same columns, in the order shown in row 2 of the template. A column may have been inserted or renamed. Download the template and fill it in again in the right columns."
+    "vi": "Sheet \"{sheet}\", cột {cot}: không đúng chỗ trong nhóm \"{nhom}\". Mỗi nhóm có các cột giống nhau, theo đúng thứ tự ở hàng 2 của sổ mẫu. Có thể một cột đã bị chèn hay đổi tên. Hãy tải sổ mẫu và điền lại vào đúng cột. Nếu đây là cột phụ (ví dụ \"Ghi chú\") nằm bên phải nhóm cuối: thêm \"Nguyện vọng 2\" (từ hai nhóm trở lên phần mềm tự bỏ qua cột phụ) hoặc bỏ cột phụ.",
+    "en": "Sheet \"{sheet}\", column {cot}: it doesn't belong in the group \"{nhom}\". Every group has the same columns, in the order shown in row 2 of the template. A column may have been inserted or renamed. Download the template and fill it in again in the right columns. If it is an extra column (for example \"Notes\") to the right of the last group: add a second preference group (with two or more groups the extra column is ignored) or remove the extra column."
   },
   "so_nhap_nhom_thieu_cot": {
     "vi": "Sheet \"{sheet}\", nhóm \"{nhom}\" thiếu cột \"{cot}\" mà các nhóm khác có. Mọi nhóm phải có các cột giống nhau. Có thể một cột đã bị xoá. Hãy tải sổ mẫu và điền lại.",
@@ -830,6 +842,14 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): mã tự tạo \"{ma}\" trùng với {slot_sl} ở dòng {dong_truoc}. Điền Mã CLB cho một trong hai dòng.",
     "en": "Sheet \"{sheet}\", row {dong} ({ten}): the generated code \"{ma}\" clashes with the {slot_l} on row {dong_truoc}. Fill in Mã CLB on one of the two rows."
   },
+  "so_nhap_canh_bao_khong_co_clb": {
+    "vi": "Sổ này chưa có {slot_l} nào, nên không thêm hay cập nhật {slot_l} nào. {slot_sl} đang có trong phần mềm được giữ nguyên.",
+    "en": "This workbook has no {slot_l} yet, so none is added or updated. The {slot_l}(s) already in the app are left as they are."
+  },
+  "so_nhap_canh_bao_khong_co_hs": {
+    "vi": "Sổ này chưa có {person_l} nào, nên không thêm hay cập nhật {person_l} nào. Chưa có nguyện vọng thì chưa xếp được.",
+    "en": "This workbook has no {person_l} yet, so none is added or updated. Nothing can be assigned until preferences are in."
+  },
   "so_nhap_canh_bao_xoa_diem": {
     "vi": "{n} {score_l} đã chấm trong phần mềm sẽ bị xoá, vì sổ ghi \"thi\" (chưa có {score_l}) ở các ô đó. Muốn giữ {score_l} thì xuất lại dữ liệu đầu vào thành sổ mới rồi sửa trên sổ đó.",
     "en": "{n} {score_l}(s) already entered in the app will be removed, because the workbook says \"thi\" (no {score_l} yet) in those cells. To keep them, export the current input data to a new workbook and edit that one."
@@ -865,6 +885,30 @@ window.I18N_ERROR_MESSAGES = {
   "ws_cau_hinh_hong": {
     "vi": "Không đọc được cấu hình của không gian làm việc này, nên chưa thể làm việc đó: chạy bằng luật trường học sẽ ra kết quả sai mà không báo. Hãy mở lại không gian làm việc, kiểm tra hoặc đặt lại cấu hình rồi thử lại.",
     "en": "This workspace's settings can't be read, so this can't be done: running with the school rules would give wrong results without any warning. Reopen the workspace, check or reset its settings, then try again."
+  },
+  "xuat_duong_la_thu_muc": {
+    "vi": "Không xuất được vì \"{path}\" là một thư mục có sẵn, không phải tên tệp. Hãy chọn một tên tệp (ví dụ thêm tên tệp vào cuối đường dẫn) hoặc để trống để lưu vào thư mục Tải xuống.",
+    "en": "Couldn't export because \"{path}\" is an existing folder, not a file name. Choose a file name (for example add one to the end of the path) or leave it empty to save to the Downloads folder."
+  },
+  "csdl_dang_ban": {
+    "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
+    "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
+  },
+  "http_bi_tu_choi": {
+    "vi": "Yêu cầu bị từ chối vì thiếu hoặc sai khoá truy cập. Hãy mở lại ứng dụng.",
+    "en": "The request was refused because the access key is missing or wrong. Reopen the app."
+  },
+  "http_khong_co_dich": {
+    "vi": "Không có địa chỉ yêu cầu này. Hãy mở lại ứng dụng.",
+    "en": "There is no such request address. Reopen the app."
+  },
+  "http_khong_co_ham": {
+    "vi": "Không có chức năng «{ten}». Có thể giao diện và phần mềm khác phiên bản nhau.",
+    "en": "There is no function \"{ten}\". The interface and the software may be different versions."
+  },
+  "http_than_qua_lon": {
+    "vi": "Dữ liệu gửi lên quá lớn (tối đa {toi_da_mb} MB). Hãy chia nhỏ tệp rồi thử lại.",
+    "en": "The data sent is too large (limit {toi_da_mb} MB). Split the file and try again."
   },
   "ws_loi_khong_ro": {
     "vi": "Không thực hiện được thao tác với không gian làm việc. Hãy thử lại.",

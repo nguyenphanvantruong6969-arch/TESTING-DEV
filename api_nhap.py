@@ -9,7 +9,7 @@ import csv
 import io
 import re
 import so_nhap
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
@@ -139,21 +139,10 @@ class NhapDuLieuMixin:
     # khác hẳn pythonnet, nên không kéo theo rủi ro đóng gói đã gặp.
     # -----------------------------------------------------------------
 
-    @staticmethod
-    def _o_excel_thanh_chu(gia_tri) -> str:
-        """Đưa một ô Excel về đúng chuỗi mà phần CSV đang chờ.
-
-        Quan trọng nhất là số: Excel lưu chỉ tiêu 20 dưới dạng số thực,
-        đọc thô ra thành "20.0" và int("20.0") ném ValueError — cả dòng
-        CLB sẽ bị bỏ qua dù file hoàn toàn đúng.
-        """
-        if gia_tri is None:
-            return ""
-        if isinstance(gia_tri, bool):
-            return "1" if gia_tri else ""
-        if isinstance(gia_tri, float) and gia_tri.is_integer():
-            return str(int(gia_tri))
-        return str(gia_tri).strip()
+    # MỘT bản duy nhất, ở so_nhap.py (đường nạp Sổ). Hai bản chép tay lệch nhau là xem trước báo
+    # "sẵn sàng" còn nạp thật báo lỗi (A13.12, soát nhập 1.10). Quan trọng nhất là số: Excel lưu chỉ
+    # tiêu 20 dưới dạng số thực, đọc thô ra "20.0" và int("20.0") ném ValueError.
+    _o_excel_thanh_chu = staticmethod(so_nhap.o_thanh_chu)
 
     # Tệp .xlsx là một tệp zip. Tệp nén vài trăm KB có thể bung ra hàng
     # GB (zip bomb) và openpyxl sẽ đọc hết vào bộ nhớ — máy kiosk treo
@@ -271,7 +260,7 @@ class NhapDuLieuMixin:
         try:
             cfg = self._cfg_ws(nghiem=True)
         except CauHinhHong as e:
-            return None, err("ws_cau_hinh_hong", detail=str(e))
+            return None, loi_cau_hinh(e)
         try:
             du_lieu = _b64.b64decode(file_base64 or "", validate=False)
         except Exception as e:
@@ -352,6 +341,12 @@ class NhapDuLieuMixin:
             ngoai = [r[1] or r[0] for r in cur.execute(
                 "SELECT club_id, name FROM clubs ORDER BY name")
                 if r[0] not in ma_trong_so]
+        # Sổ rỗng KHÔNG bị chặn (A13.9): nạp là hợp lệ, chỉ là chẳng thêm gì — nói ra để người vận
+        # hành không tưởng đã nạp xong dữ liệu. Chạy xếp sau đó vẫn chạy được trên cái đang có.
+        if not du_lieu["clubs"]:
+            canh_bao.append(err("so_nhap_canh_bao_khong_co_clb"))
+        if not du_lieu["students"]:
+            canh_bao.append(err("so_nhap_canh_bao_khong_co_hs"))
         if n_xoa:
             canh_bao.append(err("so_nhap_canh_bao_xoa_diem", n=n_xoa))
         if n_bo:
@@ -413,7 +408,10 @@ class NhapDuLieuMixin:
             # bị khoá, lỗi bất ngờ) thì CLB cũng được huỷ. Màn hình nói "chưa
             # nạp gì cả" là đúng sự thật.
             with self._mot_giao_dich():
-                d = buoc(self.import_clubs_csv(csv_text["clubs"]))
+                # Sổ không có CLB nào (cảnh báo ở _canh_bao_so_nhap): hàm nạp CSV từ chối tệp
+                # rỗng (`csv_empty`), nên bỏ qua bước này chứ không coi là lỗi.
+                d = (buoc(self.import_clubs_csv(csv_text["clubs"])) if du_lieu["clubs"]
+                     else {"n_clubs_created": 0, "n_clubs_updated": 0})
                 kq.update(n_clubs_created=d["n_clubs_created"],
                           n_clubs_updated=d["n_clubs_updated"],
                           n_students_created=0, n_students_written=0,
@@ -762,24 +760,9 @@ class NhapDuLieuMixin:
     #   o co gia tri -> GHI DE nhom hien co (nguoi nhap chu dong dua vao)
     #   o trong      -> GIU NGUYEN, khong xoa (file thieu cot khong duoc
     #                   lam mat du lieu da gan truoc do)
-    @staticmethod
-    def _doc_diem(chuoi: str):
-        """Đọc một ô điểm. Trả về float, hoặc None nếu không phải số.
-
-        Chấp nhận cả dấu phẩy thập phân: Excel bản tiếng Việt lưu 8,5
-        chứ không phải 8.5. Chỉ đổi khi có ĐÚNG một dấu phẩy và không có
-        dấu chấm nào — "1,234.5" là cách viết nghìn, không đụng vào.
-        """
-        chuoi = (chuoi or "").strip()
-        if not chuoi:
-            return None
-        if chuoi.count(",") == 1 and "." not in chuoi:
-            chuoi = chuoi.replace(",", ".")
-        try:
-            so = float(chuoi)
-        except (TypeError, ValueError):
-            return None
-        return so if so == so and so not in (float("inf"), float("-inf")) else None
+    # Đọc một ô điểm (nhận dấu phẩy thập phân kiểu Việt, loại inf / nan): cùng MỘT hàm với đường
+    # nạp Sổ, xem so_nhap.doc_diem.
+    _doc_diem = staticmethod(so_nhap.doc_diem)
 
     @staticmethod
     def _soat_dong_trung(rows, is_wide: bool) -> list:
@@ -1263,9 +1246,13 @@ class NhapDuLieuMixin:
                 # Điểm Wharton đang KHOÁ (đã chạy xếp, A13.3): nguyện vọng vẫn nạp, chỉ phần điểm
                 # trong tệp bị bỏ. Đọc trong chính giao dịch ghi này, để không có khe giữa kiểm và ghi.
                 khoa_w = bat_wharton and co_wp and self._wharton_dang_khoa(cur)
+                # Điểm quyết tâm khoá + em ĐÃ có điểm: không đổi nguyện vọng của em đó (A13.8), bỏ qua
+                # cả em (giữ dữ liệu cũ) và cảnh báo từng em. Cũng đọc trong giao dịch ghi này.
+                khoa_nv = bat_wharton and self._wharton_dang_khoa(cur)
 
                 n_created, n_updated, n_skipped = 0, 0, 0
                 sids_da_ghi: list = []
+                n_w_doi = 0
                 # Dem RIENG voi n_skipped. "Bo mot buoi cua mot em" va "bo
                 # tron mot em" la hai chuyen khac han; gop chung la lap lai
                 # dung kieu nham lan da de ra con so "45 em trang tay".
@@ -1322,6 +1309,15 @@ class NhapDuLieuMixin:
                         continue
                     deduped = giu
 
+                    if khoa_nv and self._wharton_giu_em(cur, True, sid):
+                        cu_nv = [r[0] for r in cur.execute(
+                            "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
+                            (sid,))]
+                        if cu_nv != deduped:
+                            row_errors.append(err("csv_wharton_khoa_giu_nguyen", student_id=sid))
+                            n_skipped += 1
+                            continue
+
                     ket = self._tao_hoac_bo_sung_hoc_sinh(
                         cur, sid, name, existing_students, create_missing_students)
                     if ket == "bo_qua":
@@ -1374,7 +1370,15 @@ class NhapDuLieuMixin:
                         "(SELECT club_id FROM preferences WHERE student_id = ?)", (sid, sid))
                     moi_w = self._doc_diem_wharton_cua_em(cur, sid)
                     if moi_w != cu_w:
-                        self._ghi_nhat_ky_wharton(cur, "nap_tep", "luu", sid, cu_w, moi_w)
+                        n_w_doi += 1
+
+                # Nhật ký Wharton (A13.11, N2): MỘT dòng tóm tắt cho cả lần nạp, không một dòng mỗi
+                # em (800 em nạp-xoá-nạp 100 vòng từng đẻ 80.000 dòng). Vẫn chỉ ghi thêm, trong
+                # CÙNG giao dịch; không em nào đổi điểm thì không ghi gì (như trước).
+                if n_w_doi:
+                    self._ghi_nhat_ky_wharton(
+                        cur, "nap_tep", "luu_hang_loat", None, None,
+                        {"so_em_doi": n_w_doi, "so_dong_nap": n_updated})
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
                 if khoa_w and any(wp_tho.values()):
@@ -1400,7 +1404,7 @@ class NhapDuLieuMixin:
                 "warnings": row_errors,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_importing_preferences_csv", detail=str(e))))
 
@@ -1414,6 +1418,7 @@ class NhapDuLieuMixin:
             luat = self._luat_nghiem()
             tran_thi = luat["max_tests"]         # None = không giới hạn
             nhom_cung = nhom_xep_cung(luat_xep_cua(luat))
+            bat_wharton = dung_wharton(luat)     # điểm Wharton (A13): khoá thì giữ ô tick em đã có điểm
             # Điểm theo từng CLB chỉ có nghĩa khi workspace chấm theo CLB và có dùng điểm.
             diem_tung_clb = luat["score_scope"] != "per_person" and luat["priority"] != "tier"
             n_diem_bo_che_do = 0
@@ -1528,6 +1533,15 @@ class NhapDuLieuMixin:
                         continue
                     deduped = giu
 
+                    if bat_wharton and self._wharton_giu_em(cur, True, sid):
+                        cu_tick = {r[0] for r in cur.execute(
+                            "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+                            (sid,))}
+                        if cu_tick != set(deduped):
+                            row_errors.append(err("csv_wharton_khoa_giu_nguyen", student_id=sid))
+                            n_skipped += 1
+                            continue
+
                     ket = self._tao_hoac_bo_sung_hoc_sinh(
                         cur, sid, name, existing_students, create_missing_students)
                     if ket == "bo_qua":
@@ -1614,6 +1628,6 @@ class NhapDuLieuMixin:
                 "warnings": row_errors,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_importing_test_selection_csv", detail=str(e))))

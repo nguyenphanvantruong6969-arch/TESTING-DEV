@@ -219,7 +219,21 @@ function initScoringHandlers() {
         }
         loadScoringOverview();
       } else {
+        /* Khong luu duoc dong nao vi o sai: to do dung cac o do (nhu nhanh luu mot phan). */
+        const oTheoHs = new Map(Array.from(inputs, (i) => [i.dataset.studentId, i]));
+        (res.errors || []).forEach((w) => {
+          const sid = w && w.params && w.params.student_id;
+          const input = sid === undefined || sid === null ? null : oTheoHs.get(String(sid));
+          if (!input) return;
+          input.classList.add("is-invalid");
+          input.setAttribute("aria-invalid", "true");
+          input.title = trErr(w);
+        });
         feedbackErrors(el("scoringFeedback"), res.errors);
+        /* Nhu nhanh luu mot phan: mot thong bao neu HET cac o sai, khong chi o dau tien. */
+        if (res.errors && res.errors.some((w) => w && w.params && w.params.student_id !== undefined)) {
+          showToast(trErrs(res.errors).join("\n"), "warn");
+        }
       }
     });
   });

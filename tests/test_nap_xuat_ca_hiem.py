@@ -104,17 +104,16 @@ def _hai_lan_xuat(api):
         api.submit_club_scores(c, [{"student_id": "HS1", "score": 9},
                                    {"student_id": "HS2", "score": 8}])
     api.run_pipeline(seed=42)
-    # Xuất vào ĐÚNG MỘT chỗ cả hai lần. Khi người dùng không tự chọn
-    # đường dẫn, phần mềm tránh ghi đè bằng hậu tố "(2)" nên mỗi lần xuất
-    # là một thư mục riêng — lúc đó không có tệp cũ nào để lẫn. Việc dọn
-    # tệp cũ chỉ áp dụng khi CÙNG một chỗ bị xuất đè lên, và đó chính là
-    # thứ test này canh.
+    # Ghi vào ĐÚNG MỘT chỗ cả hai lần. Qua `export_csv` thì từ A13.9 mỗi lần xuất ra một
+    # đường mới ("x (2).csv") dù là đường tuyệt đối, nên không còn tệp cũ nào để lẫn. Việc dọn
+    # tệp cũ chỉ còn áp dụng khi CÙNG một chỗ bị ghi đè lên — hàm ghi bộ .csv vẫn phải đúng
+    # ở đó, và đó chính là thứ test này canh.
     dich = os.path.join(os.path.dirname(api.db_path), "ket_qua.csv")
-    thu_muc = api.export_csv(dich)["data"]["per_club_dir"]
+    thu_muc = api._ghi_bo_csv(dich, api._du_lieu_xuat())["per_club_dir"]
     # Trường sửa lại nguyện vọng: không ai chọn clb_b nữa.
     api.import_csv_auto("student_id,name,pref_1\nHS1,An,clb_a\nHS2,Binh,clb_a\n")
     api.run_pipeline(seed=42)
-    api.export_csv(dich)
+    api._ghi_bo_csv(dich, api._du_lieu_xuat())
     return thu_muc
 
 

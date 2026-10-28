@@ -455,7 +455,9 @@ def test_ma_trong_dung_lai_clb_cung_ten_va_bao_clb_ngoai_so(api):
     mềm mà sổ không nhắc tới (vd vừa đổi tên) thì được báo, không bị xoá."""
     assert api.create_or_update_club("tin", "CLB Tin học", 5, 0, "")["ok"]
     assert api.create_or_update_club("cu", "CLB Cũ", 5, 0, "")["ok"]
-    so = b64_sach([{"club_id": "", "name": "clb tin học", "capacity": 7}], [])
+    # Có một em trong sổ: sổ KHÔNG có em nào thì còn một cảnh báo riêng (A13.9, mục 8).
+    so = b64_sach([{"club_id": "", "name": "clb tin học", "capacity": 7}],
+                  [{"student_id": "HS1", "name": "Em HS1", "nv": []}])
     xem = api.xem_truoc_so_nhap(so)["data"]
     assert [w["code"] for w in xem["canh_bao"]] == ["so_nhap_canh_bao_clb_ngoai_so"]
     assert "CLB Cũ" in xem["canh_bao"][0]["params"]["ten"]

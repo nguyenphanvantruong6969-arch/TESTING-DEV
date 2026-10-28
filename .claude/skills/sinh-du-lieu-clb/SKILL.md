@@ -81,13 +81,46 @@ nhóm. Ba cột đầu gộp dọc hai hàng. Kỹ năng không tự viết tiê
 - **Điểm thi** nằm ngay bên phải **CLB** cùng nhóm: có điểm = em đã thi câu lạc bộ đó;
   trống = không thi; chữ `thi` = đã thi, chấm sau trong phần mềm.
 - **Điểm quyết tâm** (tuỳ chọn): khi workspace bật tính năng này, sổ có thêm cột
-  "Điểm quyết tâm" trong mỗi nhóm. Kỹ năng **không bắt buộc** sinh điểm này; để trống thì
-  học sinh tự chia ở kiosk. (Trong mã tính năng này gọi là `wharton`, cột CSV `wp_k`.)
+  "Điểm quyết tâm" trong mỗi nhóm. **Mặc định kỹ năng không sinh điểm này** (`--diem-quyet-tam
+  khong`, đầu ra cũ không đổi một ô); để trống thì học sinh tự chia ở kiosk. Muốn có điểm,
+  xem mục "Điểm quyết tâm" dưới đây. (Trong mã tính năng này gọi là `wharton`, cột CSV `wp_k`.)
 - Sổ cũ chỉ có một hàng tiêu đề (`NV1`, `Điểm 1`…) vẫn được phần mềm đọc và `soat` nhận.
 - Câu lạc bộ **không em nào có điểm** = câu lạc bộ **không tổ chức thi**.
 - Em không xếp câu lạc bộ nào của một buổi = **em bận ngày đó**. Hợp lệ.
 - Điểm cho câu lạc bộ em không xếp nguyện vọng thì sổ **không chứa được** (điểm
   luôn nằm cạnh một cột CLB) — điều 8 dưới đây chặn nó từ trước.
+
+## Điểm quyết tâm (tuỳ chọn, mục A13) — dữ liệu MÔ PHỎNG
+
+Chỉ dùng khi được yêu cầu ("có điểm quyết tâm", "dữ liệu mẫu có Wharton"). Luật của phần mềm:
+mỗi em có **hai quỹ cho MỖI buổi** — quỹ 1 chia cho các CLB em **có tick thi**, quỹ 2 chia
+cho các CLB **còn lại** — mỗi quỹ đúng **100** điểm, số nguyên ≥ 0. Quỹ chỉ có một CLB mà để
+trống thì phần mềm tự điền 100. Ô điểm nằm cạnh ô CLB của nguyện vọng đó (nhiều buổi vẫn dùng
+đúng cột này: tầng và buổi suy từ CLB), nên **không cần đổi định dạng sổ**.
+
+```bash
+# Sinh mới, có điểm. Sổ ghi ra có cột "Điểm quyết tâm"; kèm DQT_KIEU_CHIA.json
+python scripts/sinh_du_lieu.py ngau --ra ./bo_moi --hoc-sinh 120 --buoi thu_2,thu_4 \
+    --diem-quyet-tam hop_le --kieu-chia tron
+
+# Áp lên một sổ đã có, giữ nguyên CLB, nguyện vọng, điểm thi
+python scripts/sinh_du_lieu.py ap SO_CU.xlsx --ra ./bo_moi --diem-quyet-tam hop_le --seed 3
+```
+
+| `--diem-quyet-tam` | Ra gì |
+|---|---|
+| `khong` (mặc định) | Như cũ: không cột, không điểm |
+| `hop_le` | Mọi quỹ của mọi em đủ 100, đúng tập CLB, đúng tầng — chạy xếp ngay |
+| `co_loi` | `hop_le` rồi cố ý làm sai mỗi loại ≥ 3 em (thiếu, thừa, điểm ở ô nguyện vọng trống, một quỹ chung cho cả hai tầng, toàn 0); ghi `DQT_BANG_LOI.json` |
+| `trong` | Có cột nhưng để trống hết — thử tự điền và học sinh nhập ở kiosk |
+
+`--kieu-chia`: `tron` (mỗi em một kiểu, ghi trong `DQT_KIEU_CHIA.json`) hoặc đúng một kiểu cho cả
+trường — `don_dau` (dồn nguyện vọng đầu, giảm dần), `deu`, `all_in` (100 vào một CLB), `ngau_nhien`.
+Làm tròn bằng phần dư lớn nhất, hoà thì theo mã CLB; cùng `--seed` luôn ra đúng như cũ.
+
+`hop_le` đi qua `soat_diem_quyet_tam` trước khi ghi (sai thì không ghi tệp nào). `co_loi` **cố ý**
+sai nên bỏ qua bước đó; `soat` một sổ có điểm sẽ liệt kê đúng những em sai. Bộ mẫu dựng sẵn:
+`du_lieu_test/sinh_du_lieu_diem_quyet_tam.py` (sáu tệp `SO_NHAP_DQT_*`).
 
 ## Chín điều phải đúng, nếu không thì không ghi
 

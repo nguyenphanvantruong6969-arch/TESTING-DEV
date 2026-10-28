@@ -596,6 +596,7 @@
             <button class="btn btn-primary" id="btnSubmitTestSelection" data-i18n="btn_save_test_selection">Lưu CLB dự thi</button>
             <span class="chua-luu" id="chuaLuuThi" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="testSelectionFeedback"></span>
+            <p class="wh-khoa-ghi-chu" id="testSelectionKhoa" role="status" hidden data-i18n="wharton_khoa_nv_ghi_chu">Điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi được giữ nguyên. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần đổi.</p>
           </div>
 
           <div class="fallback-step">
@@ -612,6 +613,7 @@
             <button class="btn btn-primary" id="btnSubmitPreferences" data-i18n="btn_save_preferences">Lưu nguyện vọng</button>
             <span class="chua-luu" id="chuaLuuNv" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="preferencesFeedback"></span>
+            <p class="wh-khoa-ghi-chu" id="preferencesKhoa" role="status" hidden data-i18n="wharton_khoa_nv_ghi_chu">Điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi được giữ nguyên. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần đổi.</p>
           </div>
 
           <!-- Bước 3 · Điểm Wharton (mục A13): chỉ hiện khi workspace bật Wharton; js/04_nhap_tai_cho.js
@@ -882,8 +884,7 @@
         </div>
         <div id="dcChiTiet" hidden>
           <div id="dcBang"></div>
-          <figure class="dc-hinh" id="dcCot"></figure>
-          <figure class="dc-hinh" id="dcCham"></figure>
+          <figure class="dc-hinh" id="dcBieuDo"></figure>
           <p class="hint-text" id="dcKhongXet" hidden></p>
         </div>
       </div>

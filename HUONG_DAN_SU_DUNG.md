@@ -154,6 +154,8 @@ Sheet này có **hai hàng tiêu đề** (từ A13.4): hàng 1 là các ô gộp
 nhóm (CLB, Điểm thi, và Điểm quyết tâm khi bật). Cột đầu gộp dọc hai hàng; dữ liệu bắt đầu từ **hàng 3**. Chèn hay
 xoá cột trong một nhóm thì phần mềm báo lỗi "cột lệch nhóm" và không nạp gì. Sổ cũ chỉ có một hàng tiêu đề vẫn nạp được.
 
+**Cột phụ (ví dụ "Ghi chú").** Từ hai nhóm Nguyện vọng trở lên, cột phụ đặt BÊN PHẢI nhóm cuối được bỏ qua. Giới hạn: sổ chỉ có MỘT nhóm Nguyện vọng thì phần mềm chưa biết nhóm rộng bao nhiêu, nên cột phụ vẫn bị báo "cột lệch nhóm" và không nạp gì; khi đó hãy thêm "Nguyện vọng 2" hoặc bỏ cột phụ.
+
 Bộ ví dụ (3 dòng đầu và dòng cuối; mỗi nhóm có hai cột CLB và Điểm thi):
 
 | Mã HS | Họ tên | Nhóm ưu tiên | NV 1: CLB | NV 1: Điểm thi | NV 2: CLB | NV 2: Điểm thi |
@@ -727,7 +729,7 @@ Bảy quy tắc rà soát. Mỗi cảnh báo nói một điều **vẫn để ph
 
 | Cảnh báo | Nghĩa là gì | Sửa ở đâu |
 |---|---|---|
-| **CLB … chưa chấm điểm ai** | Có em đăng ký thi nhưng chưa ai được chấm. Cả nhóm rơi xuống tầng 2, vòng thi coi như không có tác dụng | Thẻ 05 · Chấm điểm |
+| **CLB … chưa chấm điểm ai** | Có em đăng ký thi nhưng chưa ai được chấm. Cả CLB rơi sang nhóm xét điểm quyết tâm, vòng thi coi như không có tác dụng | Thẻ 05 · Chấm điểm |
 | **CLB … mới chấm x/y** | Em chưa có điểm bị xếp **dưới tất cả** em đã có điểm, kể cả em thấp nhất | Thẻ 05 · Chấm điểm |
 | **n lượt thi bỏ phí** | Em đăng ký thi một CLB nhưng không xếp CLB đó vào nguyện vọng. Điểm cao mấy cũng không vào được | Sửa tệp 3, nạp lại |
 | **n em chưa xếp nguyện vọng nào** | Những em này chắc chắn không được xếp vào đâu | Sửa tệp 3, hoặc thẻ 03 |
@@ -821,12 +823,12 @@ công. Bộ ví dụ chạy xong sau **2 vòng**.
 
 ### CLB xếp hạng đơn thế nào
 
-Hai tầng:
+Hai nhóm:
 
-- **Tầng 1** — em **có thi** CLB đó: xếp theo **điểm**, cao trước.
-- **Tầng 2** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**.
+- **Xét điểm thi** — em **có thi** CLB đó: xếp theo **điểm**, cao trước.
+- **Xét điểm quyết tâm** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**.
 
-Tầng 1 luôn đứng trên tầng 2. Bằng điểm nhau thì **số bốc thăm** phân định.
+Nhóm xét điểm thi luôn đứng trên nhóm xét điểm quyết tâm. Bằng điểm nhau thì **số bốc thăm** phân định.
 
 ### Số bốc thăm (STB)
 
@@ -1010,7 +1012,7 @@ Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm quyế
 thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo còn
 thiếu bao nhiêu ở quỹ nào và không lưu.
 
-- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của bạn khác.
+- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của em khác.
 - Khung chỉ có một CLB thì ô tự điền 100 và khoá. Nếu em chưa bấm **Lưu**, lúc chạy xếp phần mềm vẫn tự điền 100 đó trong bộ nhớ (không ghi vào cơ sở dữ liệu), nên em không bị chặn chỉ vì chưa bấm Lưu; quỹ có từ hai CLB trở lên thì vẫn phải tự chia.
 - Đổi ô tick thi ở Bước 1 **sau khi** đã chia điểm: điểm **không** tự chuyển sang quỹ kia. Khung hiện dòng
   *Cần chia lại điểm* và hồ sơ chưa hợp lệ cho tới khi chia lại.
@@ -1018,6 +1020,8 @@ thiếu bao nhiêu ở quỹ nào và không lưu.
 - Sau khi đã chạy xếp, điểm quyết tâm bị **khoá**: Bước 3 chỉ xem được, kèm dòng nhắc nhờ người quản lý mở khoá ở thẻ Quản lý (xem mục "Quản lý điểm quyết tâm" bên dưới).
 
 ### Quản lý điểm quyết tâm (thẻ Quản lý)
+
+> **Thẻ Quản lý cần người giám sát máy.** Thẻ này không có mật khẩu: bảng điểm quyết tâm của cả khối, điểm chuẩn và nhật ký đều mở được từ máy kiosk. Hãy để máy kiosk dưới sự giám sát của giáo viên hoặc người phụ trách, không để học sinh ngồi một mình ở máy.
 
 Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Thẻ Quản lý chia thành các **tab con**: *CLB*, *Học sinh*, *Điểm quyết tâm*, *Điểm chuẩn* và *Dữ liệu* (phần xoá dữ liệu). Hai tab điểm chỉ hiện khi bật điểm quyết tâm; tắt thì chỉ còn ba tab con. Khối này nằm ở tab con *Điểm quyết tâm*. Phần mềm nhớ tab con bạn vừa mở; chuyển tab bằng chuột hoặc phím mũi tên.
 
@@ -1045,17 +1049,21 @@ Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không
 
 Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem được **điểm chuẩn** của từng CLB. Học sinh ở kiosk **không** thấy.
 
-- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai tầng và hai mức. Mức là suất thường hoặc suất dự trữ,
-  theo đúng diện mà học sinh đã được nhận. **Tầng 2** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
-  **Tầng 1** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
-  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở tầng và mức đó.
+- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai cách xét (điểm thi, điểm quyết tâm) và hai mức. Mức là suất thường hoặc suất dự trữ,
+  theo đúng diện mà học sinh đã được nhận. **Xét điểm quyết tâm** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
+  **Xét điểm thi** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
+  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở nhóm và mức đó.
 - **Tab Kết quả.** Mục **Điểm chuẩn** luôn **đóng** mỗi lần vào thẻ; bấm **Xem điểm chuẩn** mới mở và hiện bảng tổng
-  quan mọi CLB (thanh điểm chuẩn tầng 2, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
-- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai tầng x hai mức và hai biểu đồ:
-  *cột phân bố* điểm quyết tâm của em tầng 2 (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
-  gạch chéo) và *dải chấm* (mỗi em một chấm: đặc là được nhận, rỗng là không được nhận; di chuột hoặc chạm vào chấm để
-  xem mã học sinh và điểm). Vạch đen dọc là mức chuẩn. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
-  thì không tính (số em này được ghi bên dưới).
+  quan mọi CLB. Phần mềm không nhớ trạng thái mở.
+- **Bảng tổng quan.** Mỗi CLB một dòng, có hai cột điểm chuẩn riêng: **Xét điểm thi** (thanh trên thang điểm thi, thường
+  là 10) và **Xét điểm quyết tâm** (thanh trên thang 0 đến 100). Mỗi thanh là điểm thấp nhất đã được nhận. Ô "—": CLB
+  chưa có ai ở cách xét đó. Cột **Đơn và chỗ** có một nhãn mức bằng chữ (**Đủ chỗ**: đơn không nhiều hơn chỗ; **Đông**: đơn nhiều hơn chỗ, đến gấp đôi; **Rất đông**: nhiều hơn gấp đôi), số đơn và số chỗ ghi rõ đơn vị ("62 đơn · 16 chỗ"), và một thanh dùng chung một thang cho cả bảng nên so được giữa các CLB: phần xám đậm là đơn nằm trong số chỗ, phần màu là đơn vượt quá số chỗ, khung rỗng là chỗ còn trống.
+- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai cách xét x hai mức và **một biểu đồ
+  dải chấm**: mỗi em xin vào CLB đó là một chấm đặt theo điểm quyết tâm (đặc xanh là được nhận, rỗng xám là không được
+  nhận; chấm cùng điểm xếp thành cột; di chuột hoặc chạm vào chấm để xem mã học sinh và điểm). Vạch đứng ghi số là điểm
+  chuẩn, vùng nhạt bên phải vạch là vùng được nhận. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
+  thì không tính (số em này được ghi bên dưới). Máy bật chế độ tối thì khối này tự chuyển nền tối; máy bật "giảm chuyển
+  động" thì các chấm không có hiệu ứng vào.
 - Dải vàng "kết quả có thể đã cũ" hiện khi dữ liệu đã đổi sau lần chạy gần nhất.
 - **Tệp xuất.** Sổ Excel kết quả có thêm trang **Điểm chuẩn** (mỗi CLB một dòng). Tắt điểm quyết tâm thì sổ xuất y như cũ.
 

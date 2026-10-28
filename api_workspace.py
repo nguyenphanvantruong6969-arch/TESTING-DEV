@@ -35,6 +35,30 @@ class CauHinhHong(Exception):
     Nơi quyết định kết quả (chạy xếp, trần nhập) phải DỪNG khi gặp nó, không được lặng lẽ
     lùi về luật trường học."""
 
+    ma = "ws_cau_hinh_hong"
+
+
+class CsdlBan(CauHinhHong):
+    """CSDL đang bị tiến trình khác giữ khoá (hết thời gian chờ). KHÔNG phải cấu hình hỏng: thử lại
+    sau vài giây là được, nên báo mã riêng `csdl_dang_ban` — vẫn là CauHinhHong để mọi nơi đang
+    bắt CauHinhHong tiếp tục DỪNG đúng như trước."""
+
+    ma = "csdl_dang_ban"
+
+
+def loi_cau_hinh(e) -> dict:
+    """Mục lỗi dịch được cho một CauHinhHong: `csdl_dang_ban` hay `ws_cau_hinh_hong`."""
+    return err(getattr(e, "ma", "ws_cau_hinh_hong"), detail=str(e))
+
+
+class LoiDuongXuat(Exception):
+    """Đường xuất không dùng được (đang là một thư mục có sẵn): mang sẵn mục lỗi dịch được, để
+    từng hàm xuất trả `_fail(e.loi)` thay vì lỗi chung "xuất hỏng"."""
+
+    def __init__(self, loi):
+        super().__init__(loi.get("code"))
+        self.loi = loi
+
 
 class _LoiWs(Exception):
     """Lỗi nghiệp vụ đã có mã dịch được — chuyển thẳng thành err(code, **params)."""
@@ -55,6 +79,8 @@ def _ws_phuong_thuc(ham):
             return ham(self, *args, **kwargs)
         except _LoiWs as e:
             return _fail(err(e.code, **e.params))
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except ValueError as e:
             # workspace.py / cau_hinh_ws.py nêu lý do bằng tiếng Việt: để ở
             # "chi tiết kỹ thuật" (giao diện gấp sẵn), câu chính thì song ngữ.
@@ -85,6 +111,10 @@ class WorkspaceMixin:
         try:
             return cau_hinh_ws.doc_cau_hinh(self.db_path, nghiem=True)
         except (ValueError, sqlite3.Error) as e:
+            if isinstance(e, sqlite3.OperationalError) and (
+                    "locked" in str(e).lower() or "busy" in str(e).lower()):
+                raise CsdlBan(
+                    "CSDL đang bận (%s). Chờ vài giây rồi thử lại." % e) from e
             raise CauHinhHong(
                 "Không đọc được cấu hình của workspace (%s). Hãy kiểm tra hoặc đặt lại cấu "
                 "hình rồi thử lại." % e) from e
@@ -233,12 +263,14 @@ class WorkspaceMixin:
         if xac_nhan != self._RESET_CONFIRM:
             return _fail(err("reset_confirmation_mismatch", can_go=self._RESET_CONFIRM))
         self._ws_db(slug)
-        # "Đang mở" là cái người dùng ĐÃ CHỌN. Lúc khởi động nhiều workspace, `db_path` chỉ là
-        # chỗ tạm cho đối tượng API sống được (xem main.khoi_dong_workspace) và giao diện đang
-        # hiện màn chọn: workspace tạm đó chưa ai mở nên xoá được như mọi cái khác.
-        if self._ws_da_chon and slug == self._ws_slug_dang_mo():
-            raise _LoiWs("ws_khong_xoa_dang_mo", slug=slug)
         with self._khoa_ghi:
+            # "Đang mở" là cái người dùng ĐÃ CHỌN. Lúc khởi động nhiều workspace, `db_path` chỉ là
+            # chỗ tạm cho đối tượng API sống được (xem main.khoi_dong_workspace) và giao diện đang
+            # hiện màn chọn: workspace tạm đó chưa ai mở nên xoá được như mọi cái khác.
+            # Kiểm TRONG khoá: `open_workspace` đổi `db_path` / `_ws_da_chon` cũng trong khoá, nên
+            # kiểm ngoài khoá thì một lần mở chen vào giữa vẫn để xoá đúng cái vừa mở (A13.12, 4.1).
+            if self._ws_da_chon and slug == self._ws_slug_dang_mo():
+                raise _LoiWs("ws_khong_xoa_dang_mo", slug=slug)
             la_cho_tam = slug == self._ws_slug_dang_mo()     # chưa ai chọn, chỉ là chỗ đứng tạm
             thung = workspace.xoa(self._goc_ws, slug)
             if la_cho_tam:
@@ -246,6 +278,11 @@ class WorkspaceMixin:
                 # kiểm tra dữ liệu...) sẽ đọc một tệp không còn. Chuyển sang workspace còn lại,
                 # cái sửa gần nhất (như main.khoi_dong_workspace).
                 con_lai = workspace.danh_sach(self._goc_ws)
+                if not con_lai:
+                    # Đã xoá hết: dựng lại "Trường học" mặc định như lúc khởi động
+                    # (main.khoi_dong_workspace), để db_path không trỏ vào thùng rác (A13.12, 4.2).
+                    workspace.tao(self._goc_ws, workspace.TEN_TRUONG_HOC, None)
+                    con_lai = workspace.danh_sach(self._goc_ws)
                 if con_lai:
                     self.db_path = max(con_lai, key=lambda w: w["modified"])["path"]
         return _ok({"slug": slug, "thung_rac": thung})
@@ -262,8 +299,15 @@ class WorkspaceMixin:
     def export_workspace(self, slug, output_path=""):
         """Nén workspace thành .zip đặt vào thư mục xuất (Tải xuống), không ghi đè."""
         self._ws_db(slug)
-        dich = self._duong_xuat(output_path, slug + ".zip")
-        workspace.xuat_zip(self._goc_ws, slug, dich)
+        # Tải xuống không ghi được thì lùi về thư mục gốc của chương trình, KHÔNG phải thư mục của
+        # workspace đang mở (có thể là workspace khác, A13.12 soát nhập 4.6).
+        dich = self._duong_xuat(output_path, slug + ".zip", thu_muc_du_phong=self._goc_ws)
+        try:
+            workspace.xuat_zip(self._goc_ws, slug, dich)
+        except OSError as e:
+            # `str(e)` mang tên tệp / đường dẫn máy; chi tiết đầy đủ nằm ở nhật ký (A13.11).
+            self._loi_co_ghi_vet(err("ws_loi_khong_ro"))
+            raise RuntimeError("%s: %s" % (type(e).__name__, e.strerror or "")) from None
         return _ok({"path": dich, "dir": os.path.dirname(dich)})
 
     @_ws_phuong_thuc

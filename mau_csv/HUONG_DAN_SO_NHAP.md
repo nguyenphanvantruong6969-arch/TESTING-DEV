@@ -44,7 +44,8 @@ không được trùng. **Nhóm ưu tiên** chỉ điền cho em thuộc nhóm �
 
 **Bước 3. Nguyện vọng 1, 2, 3…**: tiêu đề của sheet này có **hai hàng**. Hàng 1 là
 các ô gộp "Nguyện vọng 1", "Nguyện vọng 2"…; hàng 2 là tên các cột nằm dưới mỗi
-ô gộp (**CLB**, **Điểm thi**, và **Điểm quyết tâm** nếu trường bật điểm quyết tâm).
+ô gộp (**CLB**, **Điểm thi**, và **Điểm quyết tâm**). Sổ mẫu luôn có cột Điểm quyết tâm, nhưng
+chỉ dùng khi trường bật tính năng này; khi tắt, phần mềm bỏ qua cột và kết quả xếp không đổi.
 Dữ liệu bắt đầu từ **hàng 3**. Ở cột **CLB**, chọn tên CLB trong **danh sách thả
 xuống**, em thích nhất đứng trước. Không cần điền kín.
 

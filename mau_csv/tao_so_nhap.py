@@ -75,13 +75,13 @@ def tao_vi_du(ten_bo: str) -> str:
     goc = os.path.join(THU_MUC, ten_bo)
     clubs, students = _tu_ba_tep(goc, TEN_BA_TEP)
     ra = os.path.join(goc, TEN_VI_DU)
-    so_nhap.ghi_so_nhap(ra, clubs, students)
+    so_nhap.ghi_so_nhap(ra, clubs, students, luon_co_cot_w=True)   # A13.7: có cột Điểm quyết tâm
     return ra
 
 
 def tao_mau_trong() -> str:
     ra = os.path.join(THU_MUC, TEN_MAU)
-    so_nhap.ghi_so_nhap(ra)
+    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True)   # A13.7: mẫu trống có cột Điểm quyết tâm
     return ra
 
 

@@ -24,6 +24,52 @@ chọn hai lần trên cùng dòng, một CLB có Chỉ tiêu bằng 0.
 
 Các sổ sinh bằng `mau_csv/tao_so_nhap.py` từ đúng các tệp dưới đây.
 
+## Bộ có Điểm quyết tâm (A13.6) — sáu tệp `SO_NHAP_DQT_*`
+
+> ⚠️ **Dữ liệu MÔ PHỎNG.** Tên do máy bịa, điểm quyết tâm do máy chia theo seed cố định.
+> Không phải khảo sát thật; không trình bày như khảo sát thật.
+
+Điểm quyết tâm (trong mã: `wharton`, cột CSV `wp_k`): mỗi em chia **100 điểm cho mỗi quỹ ở mỗi
+buổi** — quỹ 1 cho các CLB em có tick thi, quỹ 2 cho các CLB còn lại. Sổ có thêm cột "Điểm quyết
+tâm" trong mỗi nhóm nguyện vọng, nên dùng cho cả nhiều buổi mà **không đổi định dạng sổ**.
+Phải **bật tính năng ở workspace** (`rules.wharton = true`) thì phần mềm mới nạp các ô này; tắt thì
+các ô bị bỏ qua kèm một cảnh báo, và kết quả xếp trùng khít với cùng sổ bỏ cột điểm.
+
+| Tệp | Cỡ | Dùng để |
+|---|---|---|
+| `SO_NHAP_DQT_120HS_HOP_LE.xlsx` | 120 em · 9 CLB · 3 buổi | Bật tính năng → nạp → chạy xếp → xem tab Điểm chuẩn. Nguyện vọng và điểm thi **giữ nguyên** `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm — để so bật / tắt |
+| `SO_NHAP_DQT_120HS_CO_LOI.xlsx` | như trên | Cố ý sai: 5 loại × 3 em. Chạy xếp phải bị **chặn** ở bước Kiểm tra dữ liệu, đúng những em trong `DQT_BANG_LOI.json` |
+| `SO_NHAP_DQT_120HS_TRONG.xlsx` | như trên | Có cột nhưng để trống hết: thử tự điền (quỹ một CLB → 100) và học sinh tự chia ở kiosk |
+| `SO_NHAP_DQT_800HS_HOP_LE.xlsx` | 800 em · 20 CLB · 4 buổi | Cỡ trường thật, xếp ra kết quả ngay |
+| `SO_NHAP_DQT_800HS_CO_LOI.xlsx` | như trên | Như bản nhỏ, 5 loại × 8 em |
+| `SO_NHAP_DQT_800HS_TRONG.xlsx` | như trên | Như bản nhỏ |
+
+Hai tệp đi kèm:
+
+- `DQT_BANG_LOI.json` — với mỗi tệp `CO_LOI`: em nào lỗi loại gì, mã lỗi bước Kiểm tra dữ liệu phải báo
+  (kèm quỹ, buổi) và cảnh báo lúc nạp.
+- `DQT_KIEU_CHIA.json` — kiểu chia điểm của từng em: `don_dau` (dồn nguyện vọng đầu, giảm dần),
+  `deu`, `all_in` (100 vào một CLB), `ngau_nhien`. Mỗi em một kiểu (trộn). Làm tròn để tổng đúng
+  100: phần dư lớn nhất, hoà thì theo mã CLB.
+
+Năm loại lỗi của `CO_LOI` (mỗi em đúng một loại): `thieu` (quỹ dưới 100), `thua` (quỹ trên 100),
+`ngoai_nguyen_vong` (điểm đặt ở ô cạnh nguyện vọng trống — phần mềm bỏ ô đó lúc nạp và quỹ còn thiếu),
+`tang_lech` (chia MỘT quỹ chung cho cả CLB có thi lẫn không thi của một buổi, nên cả hai quỹ đều thiếu),
+`toan_0`. *Vì sổ chỉ có một ô điểm cạnh mỗi nguyện vọng và tầng do ô tick thi quyết định, hai loại giữa
+là cách thể hiện sát nhất của "điểm cho CLB ngoài nguyện vọng" và "đặt sai tầng" trong sổ.*
+
+**Sinh lại** (một lệnh, seed cố định; chạy lại ra đúng nội dung ô cũ):
+
+```bash
+./.venv/bin/python du_lieu_test/sinh_du_lieu_diem_quyet_tam.py            # ghi vào du_lieu_test/
+./.venv/bin/python du_lieu_test/sinh_du_lieu_diem_quyet_tam.py --ra ./ra  # ghi chỗ khác
+```
+
+Script gọi kỹ năng `sinh-du-lieu-clb` (`--diem-quyet-tam`, `--kieu-chia`); ghi sổ chỉ qua
+`so_nhap.ghi_so_nhap`. Test: `tests/test_du_lieu_mau_diem_quyet_tam.py`.
+
+*Phần nhận xét về kết quả chạy thử, học sinh tự viết.*
+
 ## Bốn file gốc (định dạng nội bộ)
 
 `TEST_01–04` là định dạng ba tệp cũ: phần mềm còn đọc được qua các hàm nạp bên

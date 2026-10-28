@@ -1981,7 +1981,11 @@ CREATE TABLE IF NOT EXISTS wharton_lock (
 # song voi mot ban ghi WAL da bi loai bo — xem ke hoach mat du lieu,
 # journal_mode giu nguyen mac dinh DELETE de file .db la BAN SAO DUY
 # NHAT can, tuong thich voi quy trinh sao luu USB copy-file don gian.
-_BUSY_TIMEOUT_MS = 15000
+#
+# A13.11 (N3): 15000 -> 3000 ms. CSDL bị tiến trình khác giữ thì MỌI hàm giờ báo `csdl_dang_ban` sau
+# <= 3 s (trước: 15 s, riêng chạy xếp 17 – 30 s, rồi báo lỗi chung). 3 s vẫn đủ để "chờ" các lần
+# ghi ngắn của kiosk và script đối soát; lần ghi dài hơn thì người vận hành thử lại.
+_BUSY_TIMEOUT_MS = 3000
 
 
 def chuan_hoa_tim_kiem(s) -> str:
@@ -2009,9 +2013,9 @@ def khop_tim(cot, q) -> int:
     return 1 if chuan_hoa_tim_kiem(q) in chuan_hoa_tim_kiem(cot) else 0
 
 
-def _dat_pragma_va_ham(conn) -> None:
+def _dat_pragma_va_ham(conn, cho_khoa_ms=None) -> None:
     """Các PRAGMA bền vững và hàm / collation mọi kết nối của phần mềm cần (xem `connect_db`)."""
-    conn.execute(f"PRAGMA busy_timeout = {_BUSY_TIMEOUT_MS}")
+    conn.execute(f"PRAGMA busy_timeout = {int(cho_khoa_ms or _BUSY_TIMEOUT_MS)}")
     conn.execute("PRAGMA synchronous = FULL")
     # SQLite TẮT kiểm khoá ngoại theo mặc định, và bật theo TỪNG kết nối.
     # Không bật ở đây thì mọi REFERENCES trong lược đồ chỉ là chữ trang trí.
@@ -2028,18 +2032,21 @@ def _dat_pragma_va_ham(conn) -> None:
     conn.create_function("khop_tim", 2, khop_tim, deterministic=True)
 
 
-def connect_db(db_path: str):
+def connect_db(db_path: str, cho_khoa_ms=None):
     """
     Mo mot ket noi sqlite3 toi app.db voi cac pragma do ben vung da
     thong nhat (busy_timeout dai + synchronous=FULL, KHONG WAL). Moi
     noi trong code can ghi/doc app.db nen di qua ham nay thay vi goi
     sqlite3.connect() truc tiep, de dam bao hanh vi nhat quan.
+
+    `cho_khoa_ms`: chờ khoá ngắn hơn mặc định (_BUSY_TIMEOUT_MS) — cho nơi chỉ ĐỌC cấu hình
+    ở đầu thao tác, đừng để người dùng nhìn màn hình đứng 15 s.
     """
     import sqlite3
 
-    conn = sqlite3.connect(db_path, timeout=_BUSY_TIMEOUT_MS / 1000)
+    conn = sqlite3.connect(db_path, timeout=(cho_khoa_ms or _BUSY_TIMEOUT_MS) / 1000)
     try:
-        _dat_pragma_va_ham(conn)
+        _dat_pragma_va_ham(conn, cho_khoa_ms)
     except BaseException:
         # Tệp không phải SQLite (hỏng) thì PRAGMA đầu tiên đã ném. Đóng NGAY: kết nối bỏ quên giữ
         # tệp mở tới khi thu gom rác, mà trên Windows tệp đang mở không dời / xoá / đổi tên được
@@ -2605,6 +2612,27 @@ def load_from_sqlite_kem_dau_van_tay_wharton(db_path: str, rules=None):
         cur = conn.cursor()
         du_lieu = _doc_du_lieu(cur, rules)
         return du_lieu, dau_van_tay_du_lieu(cur, rules), doc_du_lieu_wharton(cur)
+    finally:
+        conn.rollback()
+        conn.close()
+
+
+def load_wharton_kem_doc_them(db_path: str, rules=None, doc_them=None):
+    """Như `load_from_sqlite_kem_dau_van_tay_wharton`, kèm một lần đọc thêm CÙNG giao dịch.
+
+    `doc_them(cur)` chạy trên con trỏ của chính giao dịch đọc đó (con trỏ có `row_factory` là
+    `sqlite3.Row`); kết quả của nó là phần tử thứ tư. Dùng cho màn điểm chuẩn: kết quả xếp, dấu vân
+    tay đã lưu và `run_meta` phải cùng trạng thái với dữ liệu và hồ sơ điểm, không thì một lần
+    chạy chen giữa làm bảng lẫn dữ liệu cũ và mới (A13.8). Hàm kia giữ nguyên chữ ký.
+    """
+    conn = _mo_doc_nhat_quan(db_path)
+    try:
+        cur = conn.cursor()
+        du_lieu = _doc_du_lieu(cur, rules)
+        dau = dau_van_tay_du_lieu(cur, rules)
+        w = doc_du_lieu_wharton(cur)
+        them = doc_them(cur) if doc_them is not None else None
+        return du_lieu, dau, w, them
     finally:
         conn.rollback()
         conn.close()

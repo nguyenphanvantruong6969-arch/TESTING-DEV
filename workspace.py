@@ -68,9 +68,12 @@ _SLUG_TOI_DA = 60
 _TEN_THIET_BI = frozenset(
     {"con", "prn", "aux", "nul"}
     | {"com%d" % i for i in range(1, 10)} | {"lpt%d" % i for i in range(1, 10)})
-# Trần dung lượng GIẢI NÉN của app.db trong zip nhập vào (chống zip bomb). Một app.db
-# thật của trường vài trăm học sinh chỉ cỡ vài MB; 500 MB là rộng rãi.
-TRAN_GIAI_NEN_BYTE = 500 * 1024 * 1024
+# Trần dung lượng GIẢI NÉN của cả zip nhập vào (chống zip bomb). Một app.db thật của trường
+# vài trăm học sinh chỉ cỡ vài MB (hạ từ 500 MB xuống 200 MB sau đợt stress test, A13.9).
+TRAN_GIAI_NEN_BYTE = 200 * 1024 * 1024
+# Số TỆP tối đa trong zip nhập vào (một workspace chỉ có app.db và vài tệp ghi chú): chặn zip
+# chứa hàng triệu mục nhỏ làm treo máy lúc giải nén.
+TRAN_SO_TEP_ZIP = 1000
 _RE_ONG_DAN = re.compile(r"^[A-Za-z]:")
 
 
@@ -428,8 +431,23 @@ def nhap_zip(root: str, zip_path: str) -> str:
             raise ValueError("Không đọc được tệp zip: %s" % e)
         with z:
             muc = []
+            da_thay = set()
+            so_tep = 0
             for info in z.infolist():
-                phan = _kiem_ten_trong_zip(info.filename)     # zip-slip: kiểm MỌI mục
+                # `zipfile` CẮT tên tại byte NUL (`filename`), nên kiểm trên `orig_filename`:
+                # bản đã cắt trông lành, còn bản gốc mới cho thấy tên giả ("app.db\0.txt").
+                phan = _kiem_ten_trong_zip(info.orig_filename)   # zip-slip: kiểm MỌI mục
+                if not info.is_dir():
+                    so_tep += 1
+                    if so_tep > TRAN_SO_TEP_ZIP:
+                        raise ValueError("Zip quá nhiều tệp: quá %d tệp." % TRAN_SO_TEP_ZIP)
+                if phan:
+                    # Hai mục cùng tên (kể cả khác dấu phân cách / hoa-thường — Windows coi là
+                    # một): giải nén cái sau đè cái trước, nên tệp nào "thắng" tuỳ thứ tự.
+                    khoa = "/".join(phan).casefold()
+                    if khoa in da_thay:
+                        raise ValueError("Zip không an toàn: có hai mục trùng tên '%s'." % info.filename)
+                    da_thay.add(khoa)
                 # Liên kết tượng trưng: giải ra sẽ trỏ tới nơi tuỳ ý.
                 if stat.S_ISLNK(info.external_attr >> 16):
                     raise ValueError("Zip không an toàn: liên kết '%s'." % info.filename)

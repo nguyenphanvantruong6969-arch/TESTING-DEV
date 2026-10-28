@@ -581,6 +581,18 @@ class TestKiemHoSo:
         assert ra == [loi("wharton_vuot_ngan_sach", student_id="a", tong=110, quy=2,
                           ngan_sach=100, buoi=BM)]
 
+    def test_bien_ngan_sach_99_100_101(self):
+        """A13.12 (4.5): sát ngưỡng — 99 thiếu 1, 100 hợp lệ, 101 vượt 1 (ở cả hai quỹ)."""
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 50, "Y": 49}})
+        assert ra == [loi("wharton_chua_dung_het", student_id="a", thieu=1, quy=2, buoi=BM)]
+        assert kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 50, "Y": 50}}) == []
+        ra = kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 51, "Y": 50}})
+        assert ra == [loi("wharton_vuot_ngan_sach", student_id="a", tong=101, quy=2,
+                          ngan_sach=100, buoi=BM)]
+        ra = kiem({"a": ["X", "Y"]}, {"a": {"X", "Y"}}, {"a": {"X": 51, "Y": 50}}, {})
+        assert ra == [loi("wharton_vuot_ngan_sach", student_id="a", tong=101, quy=1,
+                          ngan_sach=100, buoi=BM)]
+
     def test_ngan_sach_tuy_chinh(self):
         assert kiem({"a": ["X", "Y"]}, {}, {}, {"a": {"X": 30, "Y": 20}}, ngan_sach=50) == []
 

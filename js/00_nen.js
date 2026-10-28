@@ -285,6 +285,13 @@ function ganChiTietKyThuat(node, errors) {
 
 /* Bao loi tu mot phan hoi API. `khoaMau` (tuy chon) boc cau loi vao mot
    cau mau co {errors}, vd "Khong xuat duoc ket qua. {errors}". */
+/* Danh sach loi co `csdl_dang_ban` khong: app.db dang bi tien trinh khac giu. Day KHONG phai loi
+   cua du lieu hay cua lan chay, nen cac nut khong duoc noi "du lieu chua hop le" hay "that bai"
+   chung chung — noi thang CSDL dang ban de nguoi van hanh thu lai sau vai giay (A13.11, N3). */
+function coLoiCsdlBan(errors) {
+  return Array.isArray(errors) && errors.some((e) => e && e.code === "csdl_dang_ban");
+}
+
 function showErrorToast(errors, khoaMau) {
   const cau = trErrs(errors).join(" ");
   showToast(khoaMau ? t(khoaMau, { errors: cau }) : cau, "error", errors);

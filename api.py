@@ -24,16 +24,18 @@ người dùng đang chọn ngôn ngữ nào.
 import contextlib
 import csv
 import datetime
+import functools
 import os
 import sqlite3
 import statistics
 import threading
+import types
 
 from api_chung import (
     _fail_co_buoc,
     _now,
 )
-from i18n_errors import err
+from i18n_errors import err, la_loi_csdl_ban
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
@@ -69,7 +71,7 @@ from api_bao_cao import BaoCaoMixin
 from api_cham_diem import ChamDiemMixin
 from api_nhap import NhapDuLieuMixin
 from api_quan_ly import QuanLyMixin
-from api_workspace import CauHinhHong, WorkspaceMixin
+from api_workspace import CauHinhHong, CsdlBan, WorkspaceMixin, loi_cau_hinh
 from api_xuat import XuatKetQuaMixin
 
 
@@ -105,6 +107,9 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
         # "database is locked". RLock vì run_pipeline có thể gọi lại chính
         # các hàm ghi khác trong cùng luồng.
         self._khoa_ghi = threading.RLock()
+        # Xếp hàng các lời gọi ĐỌC (get_*, list_*, check_*, xem_truoc_*) — xem `_xep_hang_doc`.
+        # Không dính `_khoa_ghi`: đọc vẫn không phải chờ một lần chạy xếp đang giữ khoá ghi.
+        self._cong_doc = threading.RLock()
         # Giao dịch chung đang mở trong luồng này (xem _mot_giao_dich).
         self._giao_dich = threading.local()
         self._bo_nho_xuat = None
@@ -220,7 +225,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 "n_clubs": len(clubs),
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_checking_integrity", detail=str(e))))
 
@@ -263,10 +268,15 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
         try:
             try:
                 luat, cau_hinh_hong = self._luat_nghiem(), None
+                ma_cau_hinh_hong = None
+            except CsdlBan as e:
+                # CSDL đang bị giữ: các lần đọc sau cũng sẽ chờ rồi hỏng, nên báo ngay (A13.11).
+                return _fail(loi_cau_hinh(e))
             except CauHinhHong as e:
                 # Báo thẳng thay vì lặng lẽ soát theo luật trường học: phần còn lại của báo cáo
                 # dùng luật mặc định, nên cảnh báo này đứng đầu và là mức cao.
                 luat, cau_hinh_hong = self._cfg_ws()["rules"], str(e)
+                ma_cau_hinh_hong = e.ma
             tran_thi = luat["max_tests"]   # trần của workspace; None = không giới hạn
             bat_wharton = dung_wharton(luat)   # điểm Wharton (A13): thêm mục cuối báo cáo
             # Điểm theo NGƯỜI, hay không dùng điểm (priority "tier"): không còn "chấm từng
@@ -285,7 +295,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     warnings.append(entry)
 
                 if cau_hinh_hong:
-                    warn("high", "ws_cau_hinh_hong", detail=cau_hinh_hong)
+                    warn("high", ma_cau_hinh_hong, detail=cau_hinh_hong)
 
                 # --- 1. Chấm điểm thiếu / chưa chấm ---------------------------
                 for row in ([] if not diem_tung_clb else cur.execute("""
@@ -674,6 +684,23 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
 
     _MAX_BACKUPS = 10
 
+    @staticmethod
+    def _xep_hang_doc(ham):
+        """Bọc một hàm ĐỌC để các lời gọi đọc chạy lần lượt, không chồng lên nhau.
+
+        VÌ SAO (A13.11, N4). Mở thẻ Kết quả bắn 13 lời gọi đọc cùng lúc. Chạy lần lượt mỗi lời
+        gọi chỉ 10 – 50 ms, nhưng chạy song song thì mỗi bước `sqlite3` nhả GIL rồi phải giành lại
+        nó từ 12 luồng kia (mỗi lần chờ tới một khoảng chuyển luồng 5 ms): 5.000 em × 100 CLB đo
+        được 3 – 4 giây thay vì ~0,3 giây (cả máy chủ dự phòng lẫn pywebview đều chạy mỗi lời
+        gọi trên một luồng riêng). Xếp hàng đọc loại bỏ cuộc tranh GIL; ghi đã xếp hàng sẵn bằng
+        `_khoa_ghi`. RLock vì một hàm đọc có thể gọi hàm đọc khác trong cùng luồng.
+        """
+        @functools.wraps(ham)
+        def boc(self, *args, **kwargs):
+            with self._cong_doc:
+                return ham(self, *args, **kwargs)
+        return boc
+
     def _loi_co_ghi_vet(self, loi):
         """Ghi vết ngăn xếp của ngoại lệ ĐANG xử lý vào `loi_ung_dung.txt`
         cạnh app.db, rồi trả `[loi, xem_nhat_ky]` để đưa lên giao diện: câu
@@ -960,6 +987,11 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     "step": "backup", "status": "error",
                     "detail": err("db_backup_failed", detail=str(e)),
                 })
+                # TRỪ khi CSDL đang bị tiến trình khác giữ (A13.11, N3): khi đó không sao lưu
+                # được và các bước sau cũng sẽ không đọc / ghi được, nên dừng ngay với
+                # `csdl_dang_ban` (<= 3 s) thay vì chạy tiếp không có lưới an toàn rồi chờ nữa.
+                if la_loi_csdl_ban(e):
+                    return _fail_co_buoc(steps_log, [err("csdl_dang_ban", detail=str(e))])
 
             # ---------------- Bước 2/6 · KIỂM TRA DỮ LIỆU ----------------
             # Sai ở đây thì dừng hẳn, không vẽ số bốc thăm. Vẽ rồi mới
@@ -975,7 +1007,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             try:
                 luat = self._luat_nghiem()
             except CauHinhHong as e:
-                loi_ch = err("ws_cau_hinh_hong", detail=str(e))
+                loi_ch = loi_cau_hinh(e)
                 steps_log.append({"step": "validate", "status": "error", "detail": loi_ch})
                 return _fail_co_buoc(steps_log, [loi_ch])
             # Điểm Wharton (mục A13) bật: dữ liệu, dấu vân tay VÀ hồ sơ Wharton cùng đến từ MỘT
@@ -1509,3 +1541,17 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 except Exception:
                     pass
                 conn.close()
+
+
+# Bọc MỌI hàm đọc công khai (tên bắt đầu bằng get_ / list_ / check_ / xem_truoc_) bằng
+# `_xep_hang_doc`. Làm một lần ở đây thay vì gắn decorator vào hơn 40 hàm rải ở sáu mixin.
+def _xep_hang_cac_ham_doc():
+    for ten in dir(PipelineAPI):
+        if not ten.startswith(("get_", "list_", "check_", "xem_truoc_")):
+            continue
+        ham = next((c.__dict__[ten] for c in PipelineAPI.__mro__ if ten in c.__dict__), None)
+        if isinstance(ham, types.FunctionType):
+            setattr(PipelineAPI, ten, PipelineAPI._xep_hang_doc(ham))
+
+
+_xep_hang_cac_ham_doc()

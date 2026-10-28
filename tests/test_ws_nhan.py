@@ -56,6 +56,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
     "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
     "error_saving_wharton",
+    # A13.8: khoá điểm giữ nguyện vọng / ô tick; điểm chấm sai; điểm chuẩn xuất lỗi; phóng hàng loạt.
+    "csv_wharton_khoa_giu_nguyen", "xuat_diem_chuan_loi",
     # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
     "wharton_da_khoa", "wharton_mo_khoa_sai_xac_nhan", "wharton_xoa_sai_xac_nhan",
     "wharton_da_xoa", "wharton_da_mo_khoa", "error_wharton_quan_ly",
@@ -64,6 +66,16 @@ MA_MOI_SAU_ANH_CHUP = {
     # A13.5: lỗi chặn gọn, phóng điểm hàng loạt, khoá xuất khi chưa có kết quả.
     "wharton_tom_tat_chua_hop_le", "wharton_phong_sai_xac_nhan", "wharton_da_phong",
     "xuat_chua_co_ket_qua",
+    # A13.9 (stress test): CSDL bận không còn bị báo là cấu hình hỏng.
+    "csdl_dang_ban",
+    # A13.11 (N1): đường xuất là thư mục có sẵn.
+    "xuat_duong_la_thu_muc",
+    # Sổ nhập rỗng: ok kèm cảnh báo thay vì lỗi chặn.
+    "so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs",
+    # A13.12 (soát nhập 1.2): lỗi HTTP của máy chủ dự phòng có mã (trước đây là chuỗi trần).
+    "http_bi_tu_choi", "http_khong_co_dich", "http_khong_co_ham", "http_than_qua_lon",
+    # A13.12 (soát nhập 3.1): mã rỗng khi tạo học sinh.
+    "student_id_required",
 }
 
 

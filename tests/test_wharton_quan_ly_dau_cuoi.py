@@ -122,7 +122,7 @@ def test_kich_ban_dau_cuoi(tmp_path):
 
     # 6. nhật ký có đủ chuỗi thao tác theo đúng thứ tự
     assert _nk(api) == (
-        [("nap_tep", "luu")] * 15 + [("quan_ly", "luu")] * 2 + [("he_thong", "khoa")]
+        [("nap_tep", "luu_hang_loat")] + [("quan_ly", "luu")] * 2 + [("he_thong", "khoa")]
         + [("quan_ly", "mo_khoa"), ("quan_ly", "luu"), ("he_thong", "khoa")])
     n_nk = len(_nk(api))
 
@@ -142,7 +142,7 @@ def test_kich_ban_dau_cuoi(tmp_path):
     assert api.reset_data("hoc_sinh", "XOA")["ok"]
     nk = _nk(api)
     assert nk[:n_nk] == (
-        [("nap_tep", "luu")] * 15 + [("quan_ly", "luu")] * 2 + [("he_thong", "khoa")]
+        [("nap_tep", "luu_hang_loat")] + [("quan_ly", "luu")] * 2 + [("he_thong", "khoa")]
         + [("quan_ly", "mo_khoa"), ("quan_ly", "luu"), ("he_thong", "khoa")])
     assert nk[n_nk:] == [("xoa_du_lieu", "xoa_tat_ca"), ("xoa_du_lieu", "mo_khoa")]
     assert api.get_wharton_lock_status()["data"]["is_locked"] is False

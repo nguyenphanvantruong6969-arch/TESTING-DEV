@@ -177,8 +177,9 @@ def test_nap_tep_ghi_nguon_nap_tep(w):
     kq = w.import_preferences_csv("student_id,name,pref_1,wp_1,pref_2,wp_2,pref_3,wp_3\n"
                                   "HS1,An,A,100,B,60,C,40\n")
     assert kq["ok"], kq["errors"]
-    assert _nk(w) == [("nap_tep", "luu", "HS1", {"w1": {}, "w2": {}},
-                       {"w1": {"A": 100}, "w2": {"B": 60, "C": 40}})]
+    # A13.11 (N2): một lần nạp = MỘT dòng tóm tắt, không một dòng mỗi em.
+    assert _nk(w) == [("nap_tep", "luu_hang_loat", None, None,
+                       {"so_em_doi": 1, "so_dong_nap": 1})]
     # nạp lại y nguyên: không đổi gì thì không ghi
     w.import_preferences_csv("student_id,name,pref_1,wp_1,pref_2,wp_2,pref_3,wp_3\n"
                              "HS1,An,A,100,B,60,C,40\n")

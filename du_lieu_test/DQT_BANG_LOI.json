@@ -1,0 +1,1018 @@
+{
+ "SO_NHAP_DQT_120HS_CO_LOI.xlsx": [
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thiếu 10 điểm (tổng 90)",
+   "student_id": "HS063"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "quỹ 1 buổi thu_2 thiếu 9 điểm (tổng 91)",
+   "student_id": "HS008"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "quỹ 1 buổi thu_2 thiếu 11 điểm (tổng 89)",
+   "student_id": "HS064"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thừa 16 điểm (tổng 116)",
+   "student_id": "HS047"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_4",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_4 thừa 25 điểm (tổng 125)",
+   "student_id": "HS029"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_4",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_4 thừa 24 điểm (tổng 124)",
+   "student_id": "HS038"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_4",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "19 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_4 còn thiếu 19",
+   "student_id": "HS077"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "24 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_6 còn thiếu 24",
+   "student_id": "HS004"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "15 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_2 còn thiếu 15",
+   "student_id": "HS053"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_6",
+   "student_id": "HS060"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS026"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_6",
+   "student_id": "HS044"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_4",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS027"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_4",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS019"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_4",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS003"
+  }
+ ],
+ "SO_NHAP_DQT_800HS_CO_LOI.xlsx": [
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_5 thiếu 23 điểm (tổng 77)",
+   "student_id": "HS319"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thiếu 22 điểm (tổng 78)",
+   "student_id": "HS469"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_2 thiếu 24 điểm (tổng 76)",
+   "student_id": "HS352"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_3 thiếu 1 điểm (tổng 99)",
+   "student_id": "HS093"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_5 thiếu 13 điểm (tổng 87)",
+   "student_id": "HS710"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "quỹ 1 buổi thu_2 thiếu 13 điểm (tổng 87)",
+   "student_id": "HS558"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "quỹ 1 buổi thu_5 thiếu 27 điểm (tổng 73)",
+   "student_id": "HS652"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thieu",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_2 thiếu 28 điểm (tổng 72)",
+   "student_id": "HS630"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_3 thừa 14 điểm (tổng 114)",
+   "student_id": "HS148"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "quỹ 1 buổi thu_5 thừa 18 điểm (tổng 118)",
+   "student_id": "HS118"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_2 thừa 2 điểm (tổng 102)",
+   "student_id": "HS766"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_3 thừa 4 điểm (tổng 104)",
+   "student_id": "HS587"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thừa 1 điểm (tổng 101)",
+   "student_id": "HS778"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thừa 23 điểm (tổng 123)",
+   "student_id": "HS212"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_2 thừa 23 điểm (tổng 123)",
+   "student_id": "HS278"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "thua",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_vuot_ngan_sach",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "quỹ 2 buổi thu_6 thừa 5 điểm (tổng 105)",
+   "student_id": "HS678"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "19 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 1 buổi thu_2 còn thiếu 19",
+   "student_id": "HS598"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "10 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_3 còn thiếu 10",
+   "student_id": "HS060"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "19 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_5 còn thiếu 19",
+   "student_id": "HS385"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "17 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_6 còn thiếu 17",
+   "student_id": "HS089"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "10 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_3 còn thiếu 10",
+   "student_id": "HS714"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "1 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_2 còn thiếu 1",
+   "student_id": "HS077"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "20 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 2 buổi thu_3 còn thiếu 20",
+   "student_id": "HS224"
+  },
+  {
+   "canh_bao_nhap": [
+    "csv_wp_khong_co_nguyen_vong"
+   ],
+   "loai": "ngoai_nguyen_vong",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    }
+   ],
+   "mo_ta": "19 điểm đặt ở ô cạnh nguyện vọng trống; quỹ 1 buổi thu_5 còn thiếu 19",
+   "student_id": "HS559"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_5",
+   "student_id": "HS301"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS573"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS525"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS629"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS185"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_2",
+   "student_id": "HS236"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_5",
+   "student_id": "HS463"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "tang_lech",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "một quỹ chung 100 điểm cho cả CLB có thi và không thi của buổi thu_3",
+   "student_id": "HS541"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS597"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS269"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS063"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS445"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS438"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS391"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS689"
+  },
+  {
+   "canh_bao_nhap": [],
+   "loai": "toan_0",
+   "loi_pipeline": [
+    {
+     "buoi": "thu_2",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_3",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    },
+    {
+     "buoi": "thu_5",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 1
+    },
+    {
+     "buoi": "thu_6",
+     "code": "wharton_chua_dung_het",
+     "quy": 2
+    }
+   ],
+   "mo_ta": "mọi ô điểm quyết tâm bằng 0",
+   "student_id": "HS668"
+  }
+ ]
+}

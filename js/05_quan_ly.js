@@ -33,6 +33,9 @@ let adminCoKetQua = false;
    workspace dat tran khac thi js/075_workspace.js ghi de luc khoi dong
    (rules.max_choices / rules.max_tests; max_tests null = khong gioi han = Infinity). */
 let TRAN_NGUYEN_VONG_MOI_BUOI = 10;
+/* Diem quyet tam co bat khong, theo cau hinh da tai (wsApDungCauHinh, js/075). null = chua biet
+   (chua tai xong cau hinh): luc do cu hoi API nhu truoc. false = khong goi API diem quyet tam nao. */
+let WHARTON_BAT = null;
 let TRAN_CLB_THI_MOI_BUOI = 5;
 
 /* Buoi cua mot CLB, tra tu danh sach da nap san — khong goi them API. */
@@ -364,7 +367,9 @@ function loadThoiKhoaBieu(search) {
   const panel = el("tkbPanel");
   if (!panel) return;
   callApiMoiNhat("tkb", "get_thoi_khoa_bieu", search || "").then((res) => {
-    if (!res.ok || res.data.ds_buoi.length < 2 || !res.data.hoc_sinh.length) {
+    /* Tìm không khớp em nào thì chỉ bảng rỗng, KHÔNG ẩn cả panel: ô tìm nằm trong panel, ẩn đi là
+       người dùng không sửa được chuỗi tìm (A13.12, 3.6). Hết em thật (không tìm) mới ẩn. */
+    if (!res.ok || res.data.ds_buoi.length < 2 || (!res.data.hoc_sinh.length && !(search || "").trim())) {
       panel.hidden = true;
       return;
     }
@@ -509,8 +514,13 @@ function loadAdminTab(giuTrang) {
   callApi("get_last_run_info").then((res) => {
     adminCoKetQua = !!(res.ok && res.data);
   });
-  loadAdminWharton(giuTrang);
-  loadAdminDiemChuan();
+  if (WHARTON_BAT === false) {
+    /* Tat tinh nang: khong con dau vet, ke ca loi goi API (A13.8). */
+    anKhoiWharton();
+  } else {
+    loadAdminWharton(giuTrang);
+    loadAdminDiemChuan();
+  }
   return loadAdminStudents();
 }
 
@@ -541,9 +551,17 @@ function loadAdminClubs() {
       armTwoStepConfirm(delBtn, () => t("confirm_delete_generic"), () => {
         callApi("delete_club", c.club_id).then((delRes) => {
           if (delRes.ok) {
-            showToast(t("toast_club_deleted", { club_id: c.club_id }), "success");
+            const d = delRes.data || {};
+            /* Xoá CLB kéo theo điểm đã chấm / ô tick thi: nói rõ số và tệp sao lưu (A13.12, 3.2). */
+            const mat = (d.n_scores_removed || 0) + (d.n_tests_removed || 0);
+            showToast(mat && d.backup_path
+              ? t("toast_club_deleted_removed", {
+                club_id: c.club_id, n_scores: d.n_scores_removed || 0, n_tests: d.n_tests_removed || 0,
+                backup_name: String(d.backup_path).split(/[\\/]/).pop() })
+              : t("toast_club_deleted", { club_id: c.club_id }), "success");
             loadAdminClubs();
             loadReserveGroupOptions();
+            lamMoiSauDoiClb();
           } else {
             showErrorToast(delRes.errors);
           }
@@ -553,6 +571,13 @@ function loadAdminClubs() {
       body.appendChild(tr);
     });
   });
+}
+
+/* Lưu / xoá CLB đổi cả danh sách buổi, bảng tải theo buổi và lịch tuần (A13.12, 3.10). */
+function lamMoiSauDoiClb() {
+  loadBuoiOptions();
+  loadTaiTheoBuoi();
+  loadLichTuan();
 }
 
 function loadReserveGroupOptions() {
@@ -586,6 +611,7 @@ function loadAdminStudents() {
     }
     emptyState.hidden = true;
     pagination.hidden = false;
+    adminStudentPage = res.data.page;   /* máy chủ kẹp trang vượt tổng về trang cuối (A13.12, 1.6 / 3.3) */
 
     res.data.rows.forEach((s) => {
       const tr = document.createElement("tr");
@@ -628,6 +654,17 @@ function demDanhDauAdmin() {
  * lưu cũng là lõi của `submit_wharton`.
  * ------------------------------------------------------------------ */
 
+/* Loi "tinh nang tat" (khac moi loi khac): chi khi do moi an tab (A13.8). */
+function whChuaBat(res) {
+  return !!(res && res.errors && res.errors.some((e) => e && e.code === "wharton_chua_bat"));
+}
+
+function anKhoiWharton() {
+  ["adminWhartonBlock", "adminDiemChuanBlock"].forEach((id) => { if (el(id)) el(id).hidden = true; });
+  whQl.sid = null;
+  dc.rows = null;
+}
+
 const WH_TRANG = 25;
 const WH_NK_TRANG = 10;
 const WH_NGAN_SACH = 100;      // ngân sách mỗi quỹ mỗi buổi (WHARTON_NGAN_SACH ở backend)
@@ -643,15 +680,25 @@ function whNhan(tienTo, gia) {
   return chu === khoa ? gia : chu;
 }
 
-function loadAdminWharton(giuTrang) {
+/* `giuChu`: giữ chữ đang gõ trong màn sửa khi vẽ lại. Mặc định theo `giuTrang` (đổi ngôn ngữ vẽ lại
+   đúng cái đang gõ); sau một thao tác ĐỔI dữ liệu trên máy chủ (lưu, phóng hàng loạt, xoá, mở khoá)
+   phải truyền false, nếu không chữ cũ đè lên dữ liệu vừa đổi và "Lưu" ghi đè kết quả (A13.12, 3.4). */
+function loadAdminWharton(giuTrang, giuChu) {
   if (!giuTrang) whQl.trang = 1;
   /* Chu dang go trong man sua duoc giu lai khi ve lai (vd doi ngon ngu). */
-  const giu = whQl.sid && giuTrang ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
+  const giu = whQl.sid && (giuChu === undefined ? giuTrang : giuChu)
+    ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
   return callApi("list_wharton_canh_bao").then((res) => {
     const khoi = el("adminWhartonBlock");
     if (!res.ok) {
-      khoi.hidden = true;
-      whQl.sid = null;
+      if (whChuaBat(res)) {
+        khoi.hidden = true;
+        whQl.sid = null;
+      } else {
+        /* Loi that (CSDL ban, cau hinh hong...): giu tab, noi ra, khong gia vo "da tat". */
+        khoi.hidden = false;
+        showErrorToast(res.errors);
+      }
       return null;
     }
     khoi.hidden = false;
@@ -667,7 +714,10 @@ function loadAdminWharton(giuTrang) {
 
 function loadWhKhoa() {
   return callApi("get_wharton_lock_status").then((res) => {
-    if (!res.ok) return;
+    if (!res.ok) {
+      if (!whChuaBat(res)) showErrorToast(res.errors);
+      return;
+    }
     whBoNho.khoa = res.data;
     veKhoaWh();
   });
@@ -775,6 +825,7 @@ function loadWhBang() {
     el("whQlTim").value.trim(), el("whLocQuy").value || null, el("whLocBuoi").value || null,
     el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG).then((res) => {
     whBoNho.bang = res.ok ? res.data : null;
+    if (res.ok) whQl.trang = res.data.page;   /* trang vượt tổng được kẹp về trang cuối (A13.12, 3.3) */
     veBangWh();
   });
 }
@@ -925,7 +976,11 @@ function loadWhNhatKy(them) {
   if (!sid) return Promise.resolve(null);
   if (!them) whQl.nkTrang = 1;
   return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
-    if (!res.ok || sid !== whQl.sid) return;
+    if (!res.ok) {
+      if (sid === whQl.sid && !whChuaBat(res)) showErrorToast(res.errors);
+      return;
+    }
+    if (sid !== whQl.sid) return;
     if (!them) whBoNho.nhatKy = [];
     whBoNho.nhatKy = whBoNho.nhatKy.concat(res.data.rows);
     veNhatKyWh();
@@ -938,6 +993,7 @@ function veNhatKyWh() {
   clear(ds);
   const dang = (d) => {
     if (!d || d.so_dong !== undefined) return "";
+    if (d && d.so_em_doi !== undefined) return t("wh_nk_tom_tat", { n_em: d.so_em_doi, n_dong: d.so_dong_nap });
     const phan = ["w1", "w2"].map((k) => Object.entries(d[k] || {})
       .map(([c, v]) => (whQl.ten[c] || c) + ": " + v).join(", ")).filter(Boolean);
     return phan.join(" | ");
@@ -1026,7 +1082,7 @@ function initWhHangLoat() {
         veKetQuaPhong();
         showToast(trErr({ code: "wharton_da_phong",
           params: { n: res.data.n_phong, m: res.data.bo_qua.length } }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       });
   });
   window.addEventListener("langchange", () => {
@@ -1077,7 +1133,7 @@ function initWhartonQuanLy() {
     khiBan(el("btnWhLuu"), () => callApi("admin_save_wharton", sid, w1, w2)).then((res) => {
       if (res.ok) {
         feedback(el("whQlSuaPhanHoi"), t("feedback_wharton_saved"), false);
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         feedbackErrors(el("whQlSuaPhanHoi"), res.errors);
       }
@@ -1090,7 +1146,7 @@ function initWhartonQuanLy() {
     callApi("clear_wharton", sid).then((res) => {
       if (res.ok) {
         showToast(t("toast_wh_xoa_mot", { student_id: sid }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1110,7 +1166,7 @@ function initWhartonQuanLy() {
       if (res.ok) {
         el("whMoKhoaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_mo_khoa", params: {} }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1130,7 +1186,7 @@ function initWhartonQuanLy() {
       if (res.ok) {
         el("whXoaTatCaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_xoa", params: { n: res.data.n_students } }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1161,6 +1217,7 @@ function initAdminHandlers() {
         el("clubFormReserveGroup").value = "";
         loadAdminClubs();
         loadReserveGroupOptions();
+        lamMoiSauDoiClb();
       } else {
         feedbackErrors(el("clubFormFeedback"), res.errors);
       }
@@ -1409,12 +1466,13 @@ function initTabConQl() {
    Chỉ cho quản trị, chỉ khi workspace bật điểm quyết tâm và đã có kết quả. Số liệu do
    `get_diem_chuan` (tổng quan) và `get_diem_chuan_clb` (từng em) trả; ở đây chỉ VẼ.
 
-   Ba biểu đồ, SVG thuần (chạy ngoại tuyến, không thư viện, không tải gì từ mạng):
-     (a) veCotPhanBoQuyetTam   cột phân bố điểm quyết tâm tầng 2 của MỘT CLB;
-     (b) veDaiChamQuyetTam     mỗi em một chấm, cùng thang;
-     (c) veTongQuanDiemChuan   bảng tổng quan mọi CLB, mỗi dòng một thanh.
-   Màu: xanh `--chart-general` cho "được nhận", xám `--chart-khong-nhan` cho "không được
-   nhận"; kênh phụ không dựa vào màu là gạch chéo (cột) và chấm rỗng (dải chấm).
+   Hai hình, SVG thuần (chạy ngoại tuyến, không thư viện, không tải gì từ mạng):
+     (a) veTongQuanDiemChuan   bảng tổng quan mọi CLB: hai cột điểm chuẩn (xét điểm thi, xét điểm
+         quyết tâm) mỗi ô một thanh, và cột "Đơn và chỗ" có nhãn mức bằng chữ, số đơn và chỗ, thanh chung thang;
+     (b) veChiTietDiemChuan    chi tiết MỘT CLB: một biểu đồ dải chấm (beeswarm) có vạch chuẩn.
+   Màu: xanh `--chart-general` cho "được nhận", xám `--chart-khong-nhan` cho "không được nhận";
+   kênh phụ không dựa vào màu là chấm rỗng và độ dài thanh. Hiệu ứng vào chỉ chạy khi người dùng
+   không bật `prefers-reduced-motion`.
    ========================================================================== */
 
 const DC_NS = "http://www.w3.org/2000/svg";
@@ -1460,8 +1518,87 @@ function dcChuGiai(goc, muc) {
   goc.appendChild(ul);
 }
 
-/* (c) Bảng tổng quan. Mỗi dòng: tên, thanh điểm chuẩn tầng 2 (thang 0 đến 100), số đơn / số
-   chỗ, và chấm "nóng" khi số đơn lớn hơn số chỗ. Dòng nào chưa có ai ở tầng 2 thì ghi "—". */
+/* Mức cạnh tranh theo tỉ lệ đơn / chỗ: đến 1 là "thap", đến 2 là "vua", trên 2 là "cao". */
+function dcMucCanhTranh(tiLe) {
+  return tiLe <= 1 ? "thap" : (tiLe <= 2 ? "vua" : "cao");
+}
+
+/* Thang thanh điểm thi: 10 nếu mọi điểm chuẩn không quá 10, rồi 100, rồi bội của 10. */
+function dcThangThi(ds) {
+  let cao = 0;
+  ds.forEach((r) => {
+    const m = r.tang1.thuong || r.tang1.du_tru;
+    if (m && !m.con_cho) cao = Math.max(cao, m.diem_thi);
+  });
+  return cao <= 10 ? 10 : (cao <= 100 ? 100 : Math.ceil(cao / 10) * 10);
+}
+
+/* Một thanh điểm chuẩn trong ô của bảng tổng: nền xám, phần đầy xanh, kèm số bên phải. */
+function dcThanhDiem(o, tang, r, m, thang) {
+  const x = Math.max(0, Math.min(thang, m.con_cho ? 0 : (tang === 1 ? m.diem_thi : m.diem_quyet_tam)));
+  const W = 200, H = 14, rong = (x / thang) * W;
+  const chu = tang === 1 && !m.con_cho ? dcSo(m.diem_thi) : dcChuoiMuc(m, 2);
+  const cach = t(tang === 1 ? "dc_tang1" : "dc_tang2").toLowerCase();
+  const nhan = t("dc_thanh_nhan", { cach, ten: r.ten, x: tang === 1 ? dcChuoiMuc(m, 1) : chu });
+  const svg = dcSvg("svg", { class: "dc-thanh", viewBox: `0 0 ${W} ${H}`, role: "img",
+                             preserveAspectRatio: "none", "data-tang": tang });
+  dcSvg("title", {}, svg).textContent = nhan;
+  dcSvg("rect", { class: "dc-thanh-nen", x: 0, y: 0, width: W, height: H, rx: 4 }, svg);
+  if (rong >= 8) {
+    dcSvg("path", { class: "dc-thanh-do", "data-diem": x,
+                    d: `M0 0H${rong - 4}a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H0z` }, svg);
+  } else if (rong > 0) {
+    dcSvg("rect", { class: "dc-thanh-do", "data-diem": x, x: 0, y: 0, width: rong, height: H }, svg);
+  }
+  o.appendChild(svg);
+  const g = document.createElement("span");
+  g.className = "dc-gtri";
+  g.textContent = chu;
+  o.appendChild(g);
+}
+
+/* Ô "Đơn và chỗ": dòng trên là nhãn mức bằng chữ và "N đơn · M chỗ"; dòng dưới là thanh dùng chung
+   một thang cho mọi dòng (dài nhất = số lớn nhất giữa đơn và chỗ của cả bảng). Thanh gồm: đơn nằm
+   trong số chỗ (xám đậm), đơn vượt quá số chỗ (màu theo mức), chỗ còn trống (khung rỗng). */
+function dcThanhTiLe(o, r, toiDa) {
+  const tiLe = r.suc_chua > 0 ? r.so_don / r.suc_chua : (r.so_don > 0 ? 99 : 0);
+  const muc = dcMucCanhTranh(tiLe);
+  const tenMuc = t("dc_muc_" + muc);
+  const dong = document.createElement("div");
+  dong.className = "dc-don-dong";
+  const chip = document.createElement("span");
+  chip.className = "dc-chip";
+  chip.dataset.muc = muc;
+  chip.textContent = tenMuc;
+  dong.appendChild(chip);
+  const so = document.createElement("span");
+  so.className = "dc-don-so";
+  so.textContent = t("dc_don_chu", { don: r.so_don, cho: r.suc_chua });
+  dong.appendChild(so);
+  o.appendChild(dong);
+
+  const W = 140, H = 8;
+  const px = (n) => (n / toiDa) * W;
+  const trong = Math.min(r.so_don, r.suc_chua);
+  const vuot = Math.max(0, r.so_don - r.suc_chua);
+  const con = Math.max(0, r.suc_chua - r.so_don);
+  const svg = dcSvg("svg", { class: "dc-ti-le", viewBox: `0 0 ${W} ${H}`, role: "img",
+                             "data-muc": muc, "data-ti-le": Math.round(tiLe * 100) / 100,
+                             "data-trong": trong, "data-vuot": vuot, "data-con": con });
+  dcSvg("title", {}, svg).textContent = t("dc_ti_le_nhan", {
+    ten: r.ten, don: r.so_don, cho: r.suc_chua, x: dcSo(tiLe), muc: tenMuc });
+  const rong = (n) => (n > 0 ? Math.max(px(n), 2) : 0);
+  const wTrong = rong(trong), wVuot = rong(vuot), wCon = rong(con);
+  if (wTrong) dcSvg("rect", { class: "dc-ti-le-trong", x: 0, y: 0, width: wTrong, height: H, rx: 2 }, svg);
+  if (wVuot) dcSvg("rect", { class: "dc-ti-le-vuot", x: wTrong, y: 0, width: wVuot, height: H, rx: 2 }, svg);
+  if (wCon) dcSvg("rect", { class: "dc-ti-le-con", x: wTrong + 0.5, y: 0.5, width: Math.max(0, wCon - 1),
+                            height: H - 1, rx: 2 }, svg);
+  o.appendChild(svg);
+}
+
+/* (c) Bảng tổng quan. Mỗi dòng: tên CLB, hai cột điểm chuẩn riêng (xét điểm thi trên thang
+   của kỳ, xét điểm quyết tâm trên thang 0 đến 100), rồi đơn / chỗ kèm thanh tỉ lệ màu theo mức
+   cạnh tranh. Ô chưa có ai ở cách xét đó thì ghi "—". */
 function veTongQuanDiemChuan(goc, ds) {
   clear(goc);
   if (!ds || !ds.length) {
@@ -1472,6 +1609,8 @@ function veTongQuanDiemChuan(goc, ds) {
     return;
   }
   const nhieuBuoi = new Set(ds.map((r) => r.buoi)).size > 1;
+  const thangThi = dcThangThi(ds);
+  const toiDaDon = Math.max(1, ...ds.map((r) => Math.max(r.so_don, r.suc_chua)));
   const cuon = document.createElement("div");
   cuon.className = "scroll-x";
   const bang = document.createElement("table");
@@ -1481,13 +1620,15 @@ function veTongQuanDiemChuan(goc, ds) {
   cap.textContent = t("dc_tong_quan_tieu_de");
   bang.appendChild(cap);
   const dau = bang.createTHead().insertRow();
-  [["dc_cot_ten", ""], ["dc_cot_chuan", ""], ["dc_cot_don", "num"]].forEach(([khoa, lop]) => {
-    const th = document.createElement("th");
-    th.scope = "col";
-    th.className = lop;
-    th.textContent = t(khoa);
-    dau.appendChild(th);
-  });
+  [["dc_cot_ten", "", ""], ["dc_tang1", "", "1"], ["dc_tang2", "", "2"], ["dc_cot_don", "", ""]]
+    .forEach(([khoa, lop, tang]) => {
+      const th = document.createElement("th");
+      th.scope = "col";
+      th.className = lop;
+      if (tang) th.dataset.tang = tang;
+      th.textContent = t(khoa);
+      dau.appendChild(th);
+    });
   const tb = bang.createTBody();
   ds.forEach((r) => {
     const tr = tb.insertRow();
@@ -1497,58 +1638,34 @@ function veTongQuanDiemChuan(goc, ds) {
     tenTxt.className = "dc-ten";
     tenTxt.textContent = dcTenDong(r, nhieuBuoi);
     ten.appendChild(tenTxt);
-    if (r.tang1.thuong || r.tang1.du_tru) {
-      const phu = document.createElement("span");
-      phu.className = "dc-phu";
-      phu.textContent = t("dc_tang1") + ": " + dcChuoiMuc(r.tang1.thuong || r.tang1.du_tru, 1);
-      ten.appendChild(phu);
-    }
 
-    const o = tr.insertCell();
-    const m = r.tang2.thuong || r.tang2.du_tru;
-    if (m) {
-      const x = Math.max(0, Math.min(100, m.diem_quyet_tam));
-      const W = 200, H = 14, rong = (x / 100) * W;
-      const nhan = t("dc_thanh_nhan", { ten: r.ten, x: dcChuoiMuc(m, 2) });
-      const svg = dcSvg("svg", { class: "dc-thanh", viewBox: `0 0 ${W} ${H}`, role: "img",
-                                 preserveAspectRatio: "none" });
-      dcSvg("title", {}, svg).textContent = nhan;
-      dcSvg("rect", { class: "dc-thanh-nen", x: 0, y: 0, width: W, height: H, rx: 4 }, svg);
-      if (rong >= 8) {
-        dcSvg("path", { class: "dc-thanh-do", "data-diem": x,
-                        d: `M0 0H${rong - 4}a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H0z` }, svg);
-      } else if (rong > 0) {
-        dcSvg("rect", { class: "dc-thanh-do", "data-diem": x, x: 0, y: 0, width: rong, height: H }, svg);
+    [[1, r.tang1, thangThi], [2, r.tang2, 100]].forEach(([tang, muc, thang]) => {
+      const o = tr.insertCell();
+      o.dataset.tang = tang;
+      const m = muc.thuong || muc.du_tru;
+      if (m) {
+        dcThanhDiem(o, tang, r, m, thang);
+      } else {
+        o.textContent = "—";
+        o.title = t("dc_khong_ai");
       }
-      o.appendChild(svg);
-      const g = document.createElement("span");
-      g.className = "dc-gtri";
-      g.textContent = dcChuoiMuc(m, 2);
-      o.appendChild(g);
-    } else {
-      o.textContent = "—";
-      o.title = t("dc_khong_ai");
-    }
+    });
 
     const d = tr.insertCell();
-    d.className = "num";
-    d.appendChild(document.createTextNode(r.so_don + " / " + r.suc_chua));
-    if (r.so_don > r.suc_chua) {
-      const nong = document.createElement("span");
-      nong.className = "dc-nong";
-      nong.setAttribute("role", "img");
-      nong.setAttribute("aria-label", t("dc_nong"));
-      nong.title = t("dc_nong");
-      d.appendChild(nong);
-    }
+    d.className = "dc-don";
+    dcThanhTiLe(d, r, toiDaDon);
   });
   cuon.appendChild(bang);
   goc.appendChild(cuon);
   const ghi = document.createElement("p");
   ghi.className = "hint-text";
-  ghi.textContent = t("dc_chu_giai_thanh");
+  ghi.textContent = t("dc_chu_giai_thanh", { thi: thangThi });
   goc.appendChild(ghi);
-  dcChuGiai(goc, [["is-nong", "dc_nong"]]);
+  dcChuGiai(goc, [["is-ti-trong", "dc_bar_trong"], ["is-ti-vuot", "dc_bar_vuot"], ["is-ti-con", "dc_bar_con"]]);
+  const giai = document.createElement("p");
+  giai.className = "hint-text";
+  giai.textContent = t("dc_muc_giai_thich");
+  goc.appendChild(giai);
 }
 
 /* Thang ngang 0 đến 100 dùng chung cho (a) và (b). */
@@ -1605,11 +1722,34 @@ function dcBangAn(goc, tieuDe, cot, dong) {
   goc.appendChild(bang);
 }
 
-/* (a) Cột phân bố: trục ngang 0 đến 100, nhóm 10 điểm, mỗi cột chia hai màu. */
-function veCotPhanBoQuyetTam(goc, d) {
+/* Chi tiết MỘT CLB: MỘT biểu đồ dải chấm kiểu beeswarm. Mỗi em một chấm theo điểm quyết tâm đã
+   đặt (trục ngang 0 đến 100); chấm cùng điểm xếp thành cột lên xuống quanh đường giữa, không
+   chồng nhau. Chấm đặc xanh = được nhận, chấm rỗng xám = không được nhận. Vạch đứng ghi số là
+   điểm chuẩn, vùng nhạt bên phải vạch là vùng được nhận. Chạm hay di chuột vào chấm: hiện mã và
+   điểm. Bảng chữ ẩn cho người đọc màn hình có cùng số liệu. */
+function dcXepBeeswarm(em, px, BK) {
+  const D = 2 * BK + 1.5;
+  const da = [];
+  return em.map((e, i) => {
+    const x = px(e.diem);
+    const gan = da.filter((n) => Math.abs(n.x - x) < D);
+    const ung = [0];
+    gan.forEach((n) => {
+      const dy = Math.sqrt(D * D - (n.x - x) * (n.x - x));
+      ung.push(n.y + dy, n.y - dy);
+    });
+    ung.sort((a, b) => Math.abs(a) - Math.abs(b) || b - a);
+    const y = ung.find((c) => gan.every((n) => Math.hypot(n.x - x, n.y - c) >= D - 1e-6));
+    da.push({ x, y });
+    return { e, i, x, y };
+  });
+}
+
+function veChiTietDiemChuan(goc, d) {
   clear(goc);
+  const tieuDe = t("dc_cham_tieu_de", { ten: d.ten });
   const cap = document.createElement("figcaption");
-  cap.textContent = t("dc_cot_tieu_de", { ten: d.ten });
+  cap.textContent = tieuDe;
   goc.appendChild(cap);
   if (!d.em.length) {
     const p = document.createElement("p");
@@ -1618,138 +1758,51 @@ function veCotPhanBoQuyetTam(goc, d) {
     goc.appendChild(p);
     return;
   }
-  const nhom = [];
-  for (let i = 0; i < 10; i++) nhom.push({ tu: i * 10, den: i * 10 + 9, duoc: 0, khong: 0 });
-  nhom[9].den = 100;
-  d.em.forEach((e) => {
-    const i = Math.min(9, Math.floor(e.diem / 10));
-    nhom[i][e.ket_qua === "duoc" ? "duoc" : "khong"] += 1;
-  });
-  const cao = Math.max(1, ...nhom.map((g) => g.duoc + g.khong));
-  const nac = cao <= 5 ? 1 : Math.ceil(cao / 5);
-  const tran = Math.ceil(cao / nac) * nac;
-
-  const W = 560, H = 270, L = 44, R = 12, yTren = 30, yDuoi = 210;
-  const id = "dcGach" + (++dcUid);
-  const svg = dcSvg("svg", { class: "dc-svg", viewBox: `0 0 ${W} ${H}`, role: "img",
-                             "aria-labelledby": id + "T", "data-bieu-do": "cot" });
-  dcSvg("title", { id: id + "T" }, svg).textContent = t("dc_cot_tieu_de", { ten: d.ten });
-  const defs = dcSvg("defs", {}, svg);
-  const pat = dcSvg("pattern", { id: id, width: 6, height: 6, patternUnits: "userSpaceOnUse",
-                                 patternTransform: "rotate(45)" }, defs);
-  dcSvg("rect", { class: "dc-gach-nen", width: 6, height: 6 }, pat);
-  dcSvg("line", { class: "dc-gach-net", x1: 0, y1: 0, x2: 0, y2: 6 }, pat);
-
-  const y = (n) => yDuoi - (n / tran) * (yDuoi - yTren);
-  for (let n = 0; n <= tran; n += nac) {
-    dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: y(n), y2: y(n) }, svg);
-    dcSvg("text", { x: L - 6, y: y(n) + 4, "text-anchor": "end" }, svg).textContent = String(n);
-  }
-  dcSvg("text", { x: 4, y: 14 }, svg).textContent = t("dc_truc_y");
-  const x = dcThangX(svg, W, L, R, yTren, yDuoi);
-  const bang = (W - L - R) / 10;
-  const DAY = 24, KHE = 2, BAN_KINH = 4;
-  nhom.forEach((g, i) => {
-    const x0 = L + i * bang + (bang - DAY) / 2;
-    const hDuoc = (g.duoc / tran) * (yDuoi - yTren);
-    const hKhong = (g.khong / tran) * (yDuoi - yTren);
-    const grp = dcSvg("g", { "data-tu": g.tu, "data-duoc": g.duoc, "data-khong": g.khong }, svg);
-    let yTop = yDuoi;
-    if (g.duoc) {
-      const co = g.khong > 0;
-      const r = co ? 0 : BAN_KINH;
-      const cao1 = hDuoc;
-      dcSvg("path", { class: "dc-duoc dc-cot-duoc",
-                      d: dcCotTronTren(x0, yDuoi - cao1, DAY, cao1, r) }, grp);
-      yTop = yDuoi - cao1 - KHE;
-    }
-    if (g.khong) {
-      const cao2 = Math.max(0, hKhong - (g.duoc ? KHE : 0));
-      dcSvg("path", { class: "dc-khong dc-cot-khong", fill: `url(#${id})`,
-                      d: dcCotTronTren(x0, yTop - cao2, DAY, cao2, BAN_KINH) }, grp);
-    }
-    const hit = dcSvg("rect", { class: "dc-vung-chi", x: L + i * bang, y: yTren, width: bang,
-                                height: yDuoi - yTren, tabindex: 0, role: "img",
-                                "aria-label": `${g.tu} - ${g.den}: ${t("dc_duoc")} ${g.duoc}, ${t("dc_khong")} ${g.khong}` }, grp);
-    ganTooltip(hit, () => ({
-      tieu_de: t("dc_tooltip_khoang") + " " + g.tu + " - " + g.den,
-      dong: [[t("dc_duoc"), String(g.duoc)], [t("dc_khong"), String(g.khong)]],
-    }));
-  });
-  dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: yDuoi, y2: yDuoi }, svg);
-  dcVachChuan(svg, x, d.chuan, yTren, yDuoi, W);
-  goc.appendChild(svg);
-  dcChuGiaiDuoiKhong(goc, false);
-  dcBangAn(goc, t("dc_cot_tieu_de", { ten: d.ten }),
-           [t("dc_tooltip_khoang"), t("dc_duoc"), t("dc_khong")],
-           nhom.map((g) => [g.tu + " - " + g.den, g.duoc, g.khong]));
-}
-
-/* Đường bao một cột: góc trên bo `r`, đáy vuông (đứng trên đường nền). */
-function dcCotTronTren(x, y, w, h, r) {
-  if (h <= 0) return "M0 0";
-  r = Math.min(r, h, w / 2);
-  if (!r) return `M${x} ${y}h${w}v${h}h${-w}z`;
-  return `M${x} ${y + h}V${y + r}a${r} ${r} 0 0 1 ${r} ${-r}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}V${y + h}z`;
-}
-
-/* (b) Dải chấm: mỗi em một chấm theo điểm quyết tâm đã đặt. Chấm đặc xanh = được nhận,
-   chấm rỗng xám = không được nhận. Chạm hay di chuột vào chấm: hiện mã và điểm. */
-function veDaiChamQuyetTam(goc, d) {
-  clear(goc);
-  const cap = document.createElement("figcaption");
-  cap.textContent = t("dc_cham_tieu_de", { ten: d.ten });
-  goc.appendChild(cap);
-  if (!d.em.length) {
-    const p = document.createElement("p");
-    p.className = "hint-text";
-    p.textContent = t("dc_rong_bieu_do");
-    goc.appendChild(p);
-    return;
-  }
-  const W = 560, L = 20, R = 20, BK = 4.5;
+  const W = 560, L = 20, R = 20;
+  const BK = d.em.length > 120 ? 3 : (d.em.length > 60 ? 4 : 5);
   const em = d.em.slice().sort((a, b) => a.diem - b.diem || (a.student_id < b.student_id ? -1 : 1));
-  const xv = (v) => L + (v / 100) * (W - L - R);
-  /* Xếp chồng: chấm nào chạm chấm trước thì nhích lên một bậc. */
-  const cot = [];
-  const vitri = em.map((e) => {
-    const px = xv(e.diem);
-    let bac = 0;
-    while (cot.some((c) => c.bac === bac && Math.abs(c.px - px) < 2 * BK + 2)) bac += 1;
-    cot.push({ px, bac });
-    return { e, px, bac };
-  });
-  const toiDa = Math.max(...vitri.map((v) => v.bac));
-  const BUOC = Math.max(5, Math.min(11, 200 / (toiDa + 1)));
-  const yTren = 34, yDuoi = yTren + 16 + (toiDa + 1) * BUOC, H = yDuoi + 44;
-  const id = "dcCham" + (++dcUid);
+  const xv = (v) => L + (Math.max(0, Math.min(100, v)) / 100) * (W - L - R);
+  const vitri = dcXepBeeswarm(em, xv, BK);
+  const nua = Math.max(0, ...vitri.map((v) => Math.abs(v.y))) + BK;
+  const yTren = 34, yGiua = yTren + 8 + nua, yDuoi = yGiua + nua + 8, H = yDuoi + 44;
+  const id = "dcCt" + (++dcUid);
   const svg = dcSvg("svg", { class: "dc-svg", viewBox: `0 0 ${W} ${H}`, role: "img",
-                             "aria-labelledby": id + "T", "data-bieu-do": "cham" });
-  dcSvg("title", { id: id + "T" }, svg).textContent = t("dc_cham_tieu_de", { ten: d.ten });
+                             "aria-labelledby": id + "T", "data-bieu-do": "chi-tiet" });
+  dcSvg("title", { id: id + "T" }, svg).textContent = tieuDe;
+  const chuan = d.chuan && (d.chuan.tang2.thuong || d.chuan.tang2.du_tru);
+  if (chuan) {
+    const xc = xv(chuan.diem_quyet_tam);
+    dcSvg("rect", { class: "dc-vung-nhan", x: xc, y: yTren, width: W - R - xc, height: yDuoi - yTren }, svg);
+  }
   for (let v = 0; v <= 100; v += 20) {
     dcSvg("line", { class: "dc-luoi", x1: xv(v), x2: xv(v), y1: yTren, y2: yDuoi }, svg);
   }
   dcSvg("line", { class: "dc-luoi", x1: L, x2: W - R, y1: yDuoi, y2: yDuoi }, svg);
   const x = dcThangX(svg, W, L, R, yTren, yDuoi);
-  vitri.forEach(({ e, px, bac }) => {
-    const py = yDuoi - 10 - bac * BUOC;
-    const nhan = (e.ket_qua === "duoc" ? t("dc_duoc") : t("dc_khong"));
-    dcSvg("circle", { class: e.ket_qua === "duoc" ? "dc-cham dc-cham-duoc" : "dc-cham dc-cham-khong",
-                      cx: px, cy: py, r: BK, "data-student-id": e.student_id,
-                      "data-diem": e.diem, "data-ket-qua": e.ket_qua }, svg);
-    /* Vùng chạm lớn hơn chấm nhiều (24px), tới được bằng bàn phím. */
-    const hit = dcSvg("circle", { class: "dc-vung-chi dc-cham-hit", cx: px, cy: py, r: 12, tabindex: 0,
-                                  role: "img", "data-student-id": e.student_id,
+  /* Vẽ chấm không được nhận trước, chấm được nhận sau để không bị che. */
+  const thuTu = vitri.filter((v) => v.e.ket_qua !== "duoc").concat(vitri.filter((v) => v.e.ket_qua === "duoc"));
+  thuTu.forEach(({ e, i, x: px, y }) => {
+    const duoc = e.ket_qua === "duoc";
+    dcSvg("circle", { class: duoc ? "dc-cham dc-cham-duoc" : "dc-cham dc-cham-khong",
+                      cx: px, cy: yGiua + y, r: BK, "data-student-id": e.student_id,
+                      "data-diem": e.diem, "data-ket-qua": e.ket_qua,
+                      style: `animation-delay:${Math.min(i * 6, 360)}ms` }, svg);
+  });
+  dcVachChuan(svg, x, d.chuan, yTren, yDuoi, W);
+  /* Vùng chạm: lớp trong suốt phía trên cùng, tới được bằng bàn phím. */
+  thuTu.forEach(({ e, x: px, y }) => {
+    const nhan = e.ket_qua === "duoc" ? t("dc_duoc") : t("dc_khong");
+    const hit = dcSvg("circle", { class: "dc-vung-chi dc-cham-hit", cx: px, cy: yGiua + y, r: BK + 2,
+                                  tabindex: 0, role: "img", "data-student-id": e.student_id,
                                   "aria-label": `${e.student_id} ${e.ho_ten}: ${dcSo(e.diem)}, ${nhan}` }, svg);
     ganTooltip(hit, () => ({
       tieu_de: e.student_id + (e.ho_ten ? " · " + e.ho_ten : ""),
       dong: [[t("dc_tooltip_diem"), dcSo(e.diem)], [t("dc_tooltip_kq"), nhan]],
     }));
   });
-  dcVachChuan(svg, x, d.chuan, yTren, yDuoi, W);
   goc.appendChild(svg);
   dcChuGiaiDuoiKhong(goc, true);
-  dcBangAn(goc, t("dc_cham_tieu_de", { ten: d.ten }),
+  dcBangAn(goc, tieuDe,
            [t("th_student_id"), t("dc_tooltip_diem"), t("dc_tooltip_kq")],
            em.map((e) => [e.student_id, dcSo(e.diem), e.ket_qua === "duoc" ? t("dc_duoc") : t("dc_khong")]));
 }
@@ -1798,8 +1851,13 @@ function loadAdminDiemChuan() {
     const khoi = el("adminDiemChuanBlock");
     if (!khoi) return null;
     if (!res.ok) {
-      khoi.hidden = true;
       dc.rows = null;
+      if (whChuaBat(res)) {
+        khoi.hidden = true;
+      } else {
+        khoi.hidden = false;
+        showErrorToast(res.errors);
+      }
       return null;
     }
     khoi.hidden = false;
@@ -1830,16 +1888,17 @@ function loadChiTietDiemChuan() {
     hop.hidden = true;
     return Promise.resolve(null);
   }
-  return callApi("get_diem_chuan_clb", dc.chon).then((res) => {
+  /* callApiMoiNhat: đổi nhanh CLB A sang B mà phản hồi của A về sau thì bỏ phản hồi của A (A13.12, 3.9). */
+  return callApiMoiNhat("dc_chi_tiet", "get_diem_chuan_clb", dc.chon).then((res) => {
     if (!res.ok) {
       hop.hidden = true;
+      if (!whChuaBat(res)) showErrorToast(res.errors);
       return null;
     }
     dc.ct = res.data;
     hop.hidden = false;
     veBangHaiTang(el("dcBang"), res.data);
-    veCotPhanBoQuyetTam(el("dcCot"), res.data);
-    veDaiChamQuyetTam(el("dcCham"), res.data);
+    veChiTietDiemChuan(el("dcBieuDo"), res.data);
     const kx = el("dcKhongXet");
     kx.hidden = !res.data.so_khong_xet;
     kx.textContent = res.data.so_khong_xet ? t("dc_khong_xet", { n: res.data.so_khong_xet }) : "";
