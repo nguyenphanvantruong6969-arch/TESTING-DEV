@@ -826,6 +826,10 @@ class QuanLyMixin:
     # Khoá RIÊNG (`wharton_lock`), không dính `stb_lock`. Lần chạy phân bổ thành công khi Wharton bật
     # tự khoá (xem `_run_pipeline_da_khoa`). Đang khoá thì mọi cửa GHI điểm trả `wharton_da_khoa`;
     # các cửa XOÁ dữ liệu vẫn chạy (và ghi nhật ký). Mở bằng `mo_khoa_wharton`.
+    # A13.8: em ĐÃ có điểm thì nguyện vọng và ô tick "muốn thi" cũng bị giữ nguyên (xem
+    # `_wharton_giu_em`): `submit_preferences` / `submit_test_selection` trả `wharton_da_khoa`
+    # (gửi lại đúng danh sách cũ thì vẫn ok), nạp CSV / Sổ nhập bỏ qua em đó và cảnh báo từng em
+    # (`csv_wharton_khoa_giu_nguyen`). Không còn tỉa điểm im lặng khi khoá.
     # -----------------------------------------------------------------
 
     @staticmethod
@@ -833,6 +837,17 @@ class QuanLyMixin:
         """Có đang khoá không. Gọi TRONG giao dịch ghi của từng cửa: không có khe giữa kiểm và ghi."""
         r = cur.execute("SELECT is_locked FROM wharton_lock WHERE id = 1").fetchone()
         return bool(r and r[0])
+
+    @classmethod
+    def _wharton_giu_em(cls, cur, bat: bool, student_id: str) -> bool:
+        """Em này có bị khoá nguyện vọng và ô tick "muốn thi" không (A13.8): điểm quyết tâm BẬT, đang
+        khoá và em ĐÃ có dòng `wharton_bids`. Đổi nguyện vọng hay ô tick lúc đó làm hồ sơ điểm lệch mà
+        em không sửa lại được (`submit_wharton` bị khoá), nên các cửa ghi từ chối thay vì tỉa im lặng.
+        Gọi TRONG giao dịch ghi, cùng chỗ với việc ghi nguyện vọng / ô tick."""
+        if not bat or not cls._wharton_dang_khoa(cur):
+            return False
+        return bool(cur.execute(
+            "SELECT 1 FROM wharton_bids WHERE student_id = ? LIMIT 1", (student_id,)).fetchone())
 
     def get_wharton_lock_status(self):
         """{is_locked, locked_at, unlocked_at} của khoá điểm Wharton (như `get_stb_lock_status`)."""
@@ -1150,12 +1165,22 @@ class QuanLyMixin:
             # hong. Tick la tap hop -> bo trung, giu thu tu dau tien.
             club_ids = list(dict.fromkeys(club_ids))
             tran_thi = self._tran_thi()   # trần của workspace (None = không giới hạn); đọc trước giao dịch
+            bat_w = dung_wharton(self._luat_nghiem())
             with self._ket_noi_ghi() as cur:
                 exists = cur.execute(
                     "SELECT 1 FROM students WHERE student_id = ?", (student_id,)
                 ).fetchone()
                 if not exists:
                     return _fail(err("student_not_found", student_id=student_id))
+
+                # Điểm quyết tâm đang khoá và em đã có điểm: không đổi ô tick (A13.8). Gửi lại đúng
+                # tập cũ thì vẫn ok.
+                if self._wharton_giu_em(cur, bat_w, student_id):
+                    cu_tick = {r[0] for r in cur.execute(
+                        "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+                        (student_id,))}
+                    if cu_tick != set(club_ids):
+                        return _fail(err("wharton_da_khoa"))
 
                 invalid = self._ma_clb_khong_ton_tai(cur, club_ids)
                 if invalid:
@@ -1205,12 +1230,22 @@ class QuanLyMixin:
                 return _fail(err("duplicate_preference_in_list"))
 
             tran_nv = self._tran_nguyen_vong()   # trần của workspace; đọc trước giao dịch
+            bat_w = dung_wharton(self._luat_nghiem())
             with self._ket_noi_ghi() as cur:
                 exists = cur.execute(
                     "SELECT 1 FROM students WHERE student_id = ?", (student_id,)
                 ).fetchone()
                 if not exists:
                     return _fail(err("student_not_found", student_id=student_id))
+
+                # Điểm quyết tâm đang khoá và em đã có điểm: không đổi nguyện vọng (A13.8), nên
+                # cũng không còn tỉa điểm im lặng. Gửi lại đúng danh sách cũ (cả thứ tự) thì vẫn ok.
+                if self._wharton_giu_em(cur, bat_w, student_id):
+                    cu_nv = [r[0] for r in cur.execute(
+                        "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
+                        (student_id,))]
+                    if cu_nv != ordered_club_ids:
+                        return _fail(err("wharton_da_khoa"))
 
                 invalid = self._ma_clb_khong_ton_tai(cur, ordered_club_ids)
                 # Soat TRUOC tran moi buoi: ma CLB la khong co buoi, bi

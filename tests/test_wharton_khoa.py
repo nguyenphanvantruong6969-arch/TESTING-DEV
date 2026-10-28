@@ -6,8 +6,8 @@ Dữ liệu dưới đây là dữ liệu MÔ PHỎNG dựng trong test.
   * Wharton bật + chạy thành công (kể cả chạy riêng một số buổi) thì khoá, trong cùng giao dịch ghi
     kết quả; chặn hay hỏng (rollback) thì KHÔNG khoá; Wharton tắt thì không có dòng khoá nào;
   * đang khoá thì mọi cửa GHI điểm trả `wharton_da_khoa`, CSDL không đổi, không có dòng nhật ký;
-  * các cửa XOÁ (xoá học sinh, làm lại từ đầu, xoá CLB, tỉa nguyện vọng, xoá dữ liệu) vẫn chạy và
-    ghi nhật ký (quyết định B.4.3);
+  * các cửa XOÁ (xoá học sinh, làm lại từ đầu, xoá CLB, xoá dữ liệu) vẫn chạy và ghi nhật ký
+    (quyết định B.4.3). Riêng ĐỔI nguyện vọng / ô tick của em đã có điểm thì bị chặn khi khoá (A13.8);
   * mở khoá cần gõ đúng "MO", ghi nhật ký, KHÔNG đụng STB; `reset_data` mở luôn khoá.
 """
 
@@ -125,7 +125,8 @@ def test_submit_wharton_bi_chan_khi_khoa(khoa_san):
     assert dong_bids(api) == truoc and _nk(api) == nk_truoc
 
 
-def test_nap_tep_khi_khoa_van_nap_nguyen_vong_chi_bo_phan_wharton(khoa_san):
+def test_nap_tep_khi_khoa_bo_qua_em_co_diem_giu_du_lieu_cu(khoa_san):
+    """A13.8 (thay quyết định B.4.3 cũ): em ĐÃ có điểm thì nguyện vọng cũng được giữ, không tỉa."""
     api, bo = khoa_san
     sid = bo.sids[0]
     truoc, nk_truoc = dong_bids(api), _nk(api)
@@ -133,15 +134,24 @@ def test_nap_tep_khi_khoa_van_nap_nguyen_vong_chi_bo_phan_wharton(khoa_san):
     kq = api.import_preferences_csv(
         "student_id,name,pref_1,wp_1\n%s,Em,%s,7\n" % (sid, cid))
     assert kq["ok"], kq["errors"]
+    assert kq["data"]["n_students_with_preferences_written"] == 0
+    assert ma_loi(kq).count("csv_wharton_khoa_giu_nguyen") == 1
+    assert dong_bids(api) == truoc and _nk(api) == nk_truoc
+
+
+def test_nap_tep_khi_khoa_em_chua_co_diem_nap_nguyen_vong_bo_phan_wharton(khoa_san):
+    api, bo = khoa_san
+    sid = bo.sids[0]
+    with api._ket_noi_ghi() as cur:
+        cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (sid,))
+    truoc, nk_truoc = dong_bids(api), _nk(api)
+    cid = bo.prefs[sid][0]
+    kq = api.import_preferences_csv(
+        "student_id,name,pref_1,wp_1\n%s,Em,%s,7\n" % (sid, cid))
+    assert kq["ok"], kq["errors"]
     assert kq["data"]["n_students_with_preferences_written"] == 1
     assert ma_loi(kq).count("wharton_da_khoa") == 1
-    # nguyện vọng đã đổi (chỉ còn cid), phần tỉa vẫn chạy nên dòng của CLB khác đi theo;
-    # dòng của cid giữ nguyên giá trị cũ (7 KHÔNG được ghi)
-    con = [d for d in dong_bids(api) if d[0] == sid]
-    assert all(d[1] == cid for d in con)
-    assert con == [d for d in truoc if d[0] == sid and d[1] == cid]
-    da_tia = any(d[0] == sid and d[1] != cid for d in truoc)
-    assert _nk(api)[len(nk_truoc):] == ([("nap_tep", "luu", sid)] if da_tia else [])
+    assert dong_bids(api) == truoc and _nk(api) == nk_truoc
 
 
 def test_nap_tep_khi_khoa_khong_co_o_wp_thi_khong_canh_bao_khoa(khoa_san):
@@ -155,15 +165,13 @@ def test_nap_tep_khi_khoa_khong_co_o_wp_thi_khong_canh_bao_khoa(khoa_san):
 
 def test_cua_xoa_van_chay_khi_khoa_va_ghi_nhat_ky(khoa_san):
     api, bo = khoa_san
-    a, b, c = bo.sids[0], bo.sids[1], bo.sids[2]
+    b, c = bo.sids[1], bo.sids[2]
     n0 = len(_nk(api))
-    assert api.submit_preferences(a, [bo.prefs[a][0]])["ok"]                 # tỉa
     assert api.reset_student_entry(b)["ok"]
     with api._ket_noi_ghi() as cur:                                          # chưa có kết quả để xoá
         cur.execute("DELETE FROM match_results WHERE student_id = ?", (c,))
     assert api.delete_student(c)["ok"]
     moi = _nk(api)[n0:]
-    assert ("kiosk", "tia_nguyen_vong", a) in moi
     assert ("kiosk", "xoa_mot_em", b) in moi
     assert ("quan_ly", "xoa_mot_em", c) in moi
     assert [d for d in dong_bids(api) if d[0] in (b, c)] == []

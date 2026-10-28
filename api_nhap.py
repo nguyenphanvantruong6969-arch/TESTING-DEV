@@ -1263,6 +1263,9 @@ class NhapDuLieuMixin:
                 # Điểm Wharton đang KHOÁ (đã chạy xếp, A13.3): nguyện vọng vẫn nạp, chỉ phần điểm
                 # trong tệp bị bỏ. Đọc trong chính giao dịch ghi này, để không có khe giữa kiểm và ghi.
                 khoa_w = bat_wharton and co_wp and self._wharton_dang_khoa(cur)
+                # Điểm quyết tâm khoá + em ĐÃ có điểm: không đổi nguyện vọng của em đó (A13.8), bỏ qua
+                # cả em (giữ dữ liệu cũ) và cảnh báo từng em. Cũng đọc trong giao dịch ghi này.
+                khoa_nv = bat_wharton and self._wharton_dang_khoa(cur)
 
                 n_created, n_updated, n_skipped = 0, 0, 0
                 sids_da_ghi: list = []
@@ -1321,6 +1324,15 @@ class NhapDuLieuMixin:
                         n_skipped += 1
                         continue
                     deduped = giu
+
+                    if khoa_nv and self._wharton_giu_em(cur, True, sid):
+                        cu_nv = [r[0] for r in cur.execute(
+                            "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
+                            (sid,))]
+                        if cu_nv != deduped:
+                            row_errors.append(err("csv_wharton_khoa_giu_nguyen", student_id=sid))
+                            n_skipped += 1
+                            continue
 
                     ket = self._tao_hoac_bo_sung_hoc_sinh(
                         cur, sid, name, existing_students, create_missing_students)
@@ -1414,6 +1426,7 @@ class NhapDuLieuMixin:
             luat = self._luat_nghiem()
             tran_thi = luat["max_tests"]         # None = không giới hạn
             nhom_cung = nhom_xep_cung(luat_xep_cua(luat))
+            bat_wharton = dung_wharton(luat)     # điểm Wharton (A13): khoá thì giữ ô tick em đã có điểm
             # Điểm theo từng CLB chỉ có nghĩa khi workspace chấm theo CLB và có dùng điểm.
             diem_tung_clb = luat["score_scope"] != "per_person" and luat["priority"] != "tier"
             n_diem_bo_che_do = 0
@@ -1527,6 +1540,15 @@ class NhapDuLieuMixin:
                         n_skipped += 1
                         continue
                     deduped = giu
+
+                    if bat_wharton and self._wharton_giu_em(cur, True, sid):
+                        cu_tick = {r[0] for r in cur.execute(
+                            "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+                            (sid,))}
+                        if cu_tick != set(deduped):
+                            row_errors.append(err("csv_wharton_khoa_giu_nguyen", student_id=sid))
+                            n_skipped += 1
+                            continue
 
                     ket = self._tao_hoac_bo_sung_hoc_sinh(
                         cur, sid, name, existing_students, create_missing_students)

@@ -648,12 +648,24 @@ function whartonVeKhung(goc, w, tuyChon) {
   return whartonChuoiTuMap(daLuu);
 }
 
+/* Diem quyet tam dang khoa va em nay DA co diem: server khong cho doi tick thi / nguyen vong
+   (`wharton_da_khoa`). Vo hieu hoa hai nut luu o Buoc 1-2 va hien ghi chu, thay vi de bam roi bi tu choi. */
+function capNhatKhoaNguyenVong(w) {
+  const co = (m) => !!m && Object.keys(m).length > 0;
+  const giu = !!(w && w.bat && w.khoa && (co(w.w1) || co(w.w2)));
+  el("btnSubmitTestSelection").disabled = giu;
+  el("btnSubmitPreferences").disabled = giu;
+  el("testSelectionKhoa").hidden = !giu;
+  el("preferencesKhoa").hidden = !giu;
+}
+
 /* Ve Buoc 3 tu `state` (ket qua get_student_entry_state); `giu` = chu da go can giu lai. */
 function renderWhartonStep(state, giu) {
   const hop = el("fbWhartonStep");
   const body = el("fbWhartonBody");
   const w = state && state.wharton;
   clear(body);
+  capNhatKhoaNguyenVong(w);
   if (!w || !w.bat) {
     whartonState = null;
     daLuuWharton = "";

@@ -269,6 +269,7 @@
       btn_save_wharton: "Lưu điểm quyết tâm",
       feedback_wharton_saved: "Đã lưu điểm quyết tâm.",
       wharton_da_khoa_kiosk: "Điểm quyết tâm đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.",
+      wharton_khoa_nv_ghi_chu: "Điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi được giữ nguyên. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần đổi.",
       /* A13.5: tab con của thẻ Quản lý, xử lý hàng loạt điểm quyết tâm, lỗi chặn gọn, khoá xuất. */
       ql_tab_nhom_aria: "Các mục của thẻ Quản lý",
       ql_tab_clb: "{slot_p}",
@@ -922,6 +923,7 @@
       btn_save_wharton: "Save preference points",
       feedback_wharton_saved: "Saved the preference points.",
       wharton_da_khoa_kiosk: "Preference points are locked because the allocation has run. Ask the manager to unlock them in the Manage tab if they need editing.",
+      wharton_khoa_nv_ghi_chu: "Preference points are locked and this student already has points, so their rankings and test selection are kept as they are. Ask the manager to unlock them in the Manage tab if they need changing.",
       /* A13.5: Manage tab sections, bulk fix of preference points, shorter blocking errors, export lock. */
       ql_tab_nhom_aria: "Sections of the Manage tab",
       ql_tab_clb: "{slot_p}",
