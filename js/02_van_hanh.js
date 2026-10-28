@@ -442,6 +442,8 @@ function initPipelineHandlers() {
             showToast(hopLe, "success");
           }
         });
+      } else if (coLoiCsdlBan(res.errors)) {
+        showErrorToast(res.errors);
       } else {
         showToast(t("toast_data_invalid"), "error");
         showLog(res.errors);
@@ -586,7 +588,7 @@ function executeRun(seed, forceRedraw, chiBuoi) {
       if (!el("historyTable").hidden) loadRunHistory();
     } else {
       const errs = Array.isArray(res.errors) ? res.errors : [String(res.errors)];
-      showToast(t("toast_run_failed"), "error");
+      showToast(coLoiCsdlBan(errs) ? trErrs(errs).join(" ") : t("toast_run_failed"), "error");
       showLog(errs);
     }
   });

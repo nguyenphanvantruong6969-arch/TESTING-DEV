@@ -33,7 +33,7 @@ from rbda_priority_pipeline import (
 
 KHOA_CAU_HINH = "config"
 
-# Đọc cấu hình chỉ chờ khoá ngắn (mặc định của kết nối là 15 s): thao tác nào cũng đọc nó ở đầu,
+# Đọc cấu hình chỉ chờ khoá ngắn (mặc định của kết nối là 3 s từ A13.11): thao tác nào cũng đọc nó ở đầu,
 # nên CSDL đang bị tiến trình khác giữ thì báo "đang bận" sau vài giây chứ không đứng hình.
 CHO_KHOA_DOC_CAU_HINH_MS = 2500
 

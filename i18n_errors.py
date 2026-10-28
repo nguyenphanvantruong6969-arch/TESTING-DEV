@@ -947,8 +947,24 @@ MESSAGES = {
 }
 
 
+_DAU_HIEU_CSDL_BAN = ("database is locked", "database table is locked", "database is busy")
+
+
+def la_loi_csdl_ban(x) -> bool:
+    """`x` (ngoại lệ hay chuỗi) là lỗi SQLite "CSDL đang bị khoá / bận"?"""
+    van_ban = str(x).lower()
+    return any(d in van_ban for d in _DAU_HIEU_CSDL_BAN)
+
+
 def err(code: str, **params) -> dict:
-    """Build one structured, translatable error/info entry."""
+    """Build one structured, translatable error/info entry.
+
+    A13.11 (N3): lỗi có `detail` là "database is locked" thì LUÔN là `csdl_dang_ban`, bất kể hàm
+    nào gọi — hàng trăm khối `except Exception as e` của phần mềm đều đưa `str(e)` vào `detail`,
+    nên đổi ở MỘT chỗ này thì mọi hàm đọc / ghi nói đúng "CSDL đang bận" thay vì lỗi chung.
+    """
+    if code != "csdl_dang_ban" and la_loi_csdl_ban(params.get("detail", "")):
+        return {"code": "csdl_dang_ban", "params": {"detail": params["detail"]}}
     return {"code": code, "params": params}
 
 

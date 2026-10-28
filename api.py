@@ -35,7 +35,7 @@ from api_chung import (
     _fail_co_buoc,
     _now,
 )
-from i18n_errors import err
+from i18n_errors import err, la_loi_csdl_ban
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
@@ -71,7 +71,7 @@ from api_bao_cao import BaoCaoMixin
 from api_cham_diem import ChamDiemMixin
 from api_nhap import NhapDuLieuMixin
 from api_quan_ly import QuanLyMixin
-from api_workspace import CauHinhHong, WorkspaceMixin, loi_cau_hinh
+from api_workspace import CauHinhHong, CsdlBan, WorkspaceMixin, loi_cau_hinh
 from api_xuat import XuatKetQuaMixin
 
 
@@ -269,6 +269,9 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             try:
                 luat, cau_hinh_hong = self._luat_nghiem(), None
                 ma_cau_hinh_hong = None
+            except CsdlBan as e:
+                # CSDL đang bị giữ: các lần đọc sau cũng sẽ chờ rồi hỏng, nên báo ngay (A13.11).
+                return _fail(loi_cau_hinh(e))
             except CauHinhHong as e:
                 # Báo thẳng thay vì lặng lẽ soát theo luật trường học: phần còn lại của báo cáo
                 # dùng luật mặc định, nên cảnh báo này đứng đầu và là mức cao.
@@ -681,9 +684,6 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
 
     _MAX_BACKUPS = 10
 
-    def _loi_co_ghi_vet(self, loi):
-        """Ghi vết ngăn xếp của ngoại lệ ĐANG xử lý vào `loi_ung_dung.txt`
-        cạnh app.db, rồi trả `[loi, xem_nhat_ky]` để đưa lên giao diện: câu
     @staticmethod
     def _xep_hang_doc(ham):
         """Bọc một hàm ĐỌC để các lời gọi đọc chạy lần lượt, không chồng lên nhau.
@@ -701,6 +701,9 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 return ham(self, *args, **kwargs)
         return boc
 
+    def _loi_co_ghi_vet(self, loi):
+        """Ghi vết ngăn xếp của ngoại lệ ĐANG xử lý vào `loi_ung_dung.txt`
+        cạnh app.db, rồi trả `[loi, xem_nhat_ky]` để đưa lên giao diện: câu
         lỗi đã dịch, kèm một dòng nói chi tiết nằm ở tệp nào để gửi cho
         người phụ trách kỹ thuật.
 
@@ -984,6 +987,11 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     "step": "backup", "status": "error",
                     "detail": err("db_backup_failed", detail=str(e)),
                 })
+                # TRỪ khi CSDL đang bị tiến trình khác giữ (A13.11, N3): khi đó không sao lưu
+                # được và các bước sau cũng sẽ không đọc / ghi được, nên dừng ngay với
+                # `csdl_dang_ban` (<= 3 s) thay vì chạy tiếp không có lưới an toàn rồi chờ nữa.
+                if la_loi_csdl_ban(e):
+                    return _fail_co_buoc(steps_log, [err("csdl_dang_ban", detail=str(e))])
 
             # ---------------- Bước 2/6 · KIỂM TRA DỮ LIỆU ----------------
             # Sai ở đây thì dừng hẳn, không vẽ số bốc thăm. Vẽ rồi mới

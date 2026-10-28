@@ -74,7 +74,7 @@ def test_1_csdl_ban_bao_ma_rieng_va_khong_cho_lau(api_ws):
 
 
 def test_1_chay_xep_gap_csdl_ban_cung_bao_csdl_dang_ban(api_ws):
-    # (run_pipeline còn chờ tới 15 s ở bước sao lưu — cố ý giữ, xem báo cáo A13.9.)
+    # (A13.11: bước sao lưu cũng thôi chờ 15 s — CSDL bận thì dừng ngay, xem test_a13_11_stress.)
     with _khoa_csdl(api_ws.db_path):
         res = api_ws.run_pipeline()
     assert "csdl_dang_ban" in _ma(res), _ma(res)

@@ -1981,7 +1981,11 @@ CREATE TABLE IF NOT EXISTS wharton_lock (
 # song voi mot ban ghi WAL da bi loai bo — xem ke hoach mat du lieu,
 # journal_mode giu nguyen mac dinh DELETE de file .db la BAN SAO DUY
 # NHAT can, tuong thich voi quy trinh sao luu USB copy-file don gian.
-_BUSY_TIMEOUT_MS = 15000
+#
+# A13.11 (N3): 15000 -> 3000 ms. CSDL bị tiến trình khác giữ thì MỌI hàm giờ báo `csdl_dang_ban` sau
+# <= 3 s (trước: 15 s, riêng chạy xếp 17 – 30 s, rồi báo lỗi chung). 3 s vẫn đủ để "chờ" các lần
+# ghi ngắn của kiosk và script đối soát; lần ghi dài hơn thì người vận hành thử lại.
+_BUSY_TIMEOUT_MS = 3000
 
 
 def chuan_hoa_tim_kiem(s) -> str:

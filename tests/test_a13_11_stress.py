@@ -135,6 +135,77 @@ def test_n2_so_nhap_cung_chi_mot_dong_va_chi_ghi_them(wh):
     assert sau[:len(truoc)] == truoc                   # chỉ ghi thêm, không sửa / xoá dòng cũ
 
 
+# ------------------------------------------------------------------ N3. CSDL bận ở MỌI hàm
+
+@contextlib.contextmanager
+def _khoa_csdl(db):
+    """Một kết nối khác giữ khoá độc quyền — mô phỏng tiến trình khác đang ghi."""
+    conn = sqlite3.connect(db, isolation_level=None)
+    conn.execute("BEGIN EXCLUSIVE")
+    try:
+        yield
+    finally:
+        conn.execute("ROLLBACK")
+        conn.close()
+
+
+_HAM_BAN = [
+    ("list_students_admin", lambda a: a.list_students_admin()),
+    ("list_clubs_admin", lambda a: a.list_clubs_admin()),
+    ("reset_data", lambda a: a.reset_data("hoc_sinh", "XOA")),
+    ("get_dashboard_status", lambda a: a.get_dashboard_status()),
+    ("check_data_integrity", lambda a: a.check_data_integrity()),
+    ("get_data_health_report", lambda a: a.get_data_health_report()),
+    ("get_run_history", lambda a: a.get_run_history()),
+    ("get_match_results", lambda a: a.get_match_results()),
+    ("get_club_fill_stats", lambda a: a.get_club_fill_stats()),
+    ("get_scoring_overview", lambda a: a.get_scoring_overview()),
+    ("submit_preferences", lambda a: a.submit_preferences("N1", ["a"])),
+    ("create_or_update_club", lambda a: a.create_or_update_club("z", "Z", 3, 0, "")),
+    ("run_pipeline", lambda a: a.run_pipeline(seed=1)),
+]
+
+
+@pytest.mark.parametrize("ten,goi", _HAM_BAN, ids=[x[0] for x in _HAM_BAN])
+def test_n3_moi_ham_gap_csdl_ban_bao_csdl_dang_ban_nhanh(api_co_ket_qua, ten, goi):
+    api = api_co_ket_qua
+    with _khoa_csdl(api.db_path):
+        t0 = time.monotonic()
+        res = goi(api)
+        dt = time.monotonic() - t0
+    assert not res["ok"], ten
+    ma = _ma(res)
+    assert "csdl_dang_ban" in ma, (ten, ma)
+    assert dt < 7, (ten, dt)           # trước: 15 – 30 s
+
+
+def test_n3_tren_csdl_khong_khoa_khong_doi_gi(api_co_ket_qua):
+    api = api_co_ket_qua
+    assert api.list_students_admin()["ok"]
+    assert api.run_pipeline(seed=1)["ok"]
+
+
+def test_n3_chay_xep_gap_csdl_ban_khong_chay_khi_chua_sao_luu_duoc(api_co_ket_qua):
+    """CSDL bận thì không có bản sao lưu để làm lưới an toàn: từ chối chạy, không bỏ sao lưu."""
+    api = api_co_ket_qua
+    thu_muc = os.path.dirname(api.db_path)
+    so_bak = lambda: len([f for f in os.listdir(thu_muc) if ".bak-" in f])    # noqa: E731
+    truoc = so_bak()
+    with _khoa_csdl(api.db_path):
+        res = api.run_pipeline(seed=1)
+    assert "csdl_dang_ban" in _ma(res)
+    assert so_bak() == truoc            # không để lại bản sao lưu dở
+    assert api.run_pipeline(seed=1)["ok"]
+
+
+def test_n3_ma_loi_khoa_trong_detail_duoc_doi_thanh_csdl_dang_ban():
+    from i18n_errors import err
+    e = err("error_reading_student_list", detail="database is locked")
+    assert e["code"] == "csdl_dang_ban"
+    assert err("error_reading_student_list", detail="no such table: x")["code"] == \
+        "error_reading_student_list"
+
+
 # ------------------------------------------------------------------ N4. lời gọi đọc đồng thời
 
 RESOURCE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
