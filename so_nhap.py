@@ -96,6 +96,10 @@ def _cfg(cfg) -> dict:
         # Điểm Wharton (mục A13): thêm cột "Điểm W k" sau "Điểm k". Chỉ có nghĩa khi điểm theo
         # từng CLB (cau_hinh_ws không cho bật cùng per_person); thiếu khoá = tắt.
         "wharton": luat.get("wharton") is True and luat.get("score_scope") != "per_person",
+        # Workspace CÓ THỂ bật tính năng (cùng điều kiện `dung_wharton` / `cau_hinh_ws._chuan_hoa`):
+        # điểm theo từng CLB và priority là score hoặc score+tier. Sổ mẫu chỉ có cột W khi có thể (A13.8).
+        "wharton_bat_duoc": luat.get("score_scope") != "per_person"
+        and luat.get("priority", "score") in ("score", "score+tier"),
     }
 
 
@@ -917,7 +921,11 @@ def tom_tat(du_lieu: dict) -> dict:
 # ---------------------------------------------------------------------------
 # GHI sổ nhập (mẫu trống, mẫu có sẵn CLB, xuất dữ liệu đầu vào, skill)
 # ---------------------------------------------------------------------------
-HUONG_DAN = [
+# Dấu đánh dấu chỗ chèn ghi chú cột Điểm quyết tâm của sổ MẪU (A13.8, thay việc dò chữ "Bước 5."):
+# đứng ngay trước dòng trống ngăn Bước 4 với Bước 5, bị bỏ đi khi trả ra (xem `huong_dan`).
+CHO_CHEN_GHI_CHU_W = "\x00CHO_CHEN_GHI_CHU_W"
+
+_HUONG_DAN_CO_DAU = [
     "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
     "",
     "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
@@ -942,6 +950,7 @@ HUONG_DAN = [
     "Bước 4. Cột Điểm thi nằm ngay bên phải cột CLB cùng nhóm.",
     "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
     "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
+    CHO_CHEN_GHI_CHU_W,
     "",
     "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
     "",
@@ -960,30 +969,32 @@ HUONG_DAN = [
     "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
     "    CLB không thi tuyển.",
 ]
+HUONG_DAN = [d for d in _HUONG_DAN_CO_DAU if d != CHO_CHEN_GHI_CHU_W]
 
 
 def huong_dan(cfg=None, ghi_chu_cot_w: bool = False) -> list:
     """Các dòng sheet "Hướng dẫn". `ghi_chu_cot_w` (sổ MẪU luôn có cột Điểm quyết tâm, A13.7)
-    thêm đoạn nói cột đó chỉ dùng khi bật tính năng; workspace đã bật thì đã có đoạn riêng.
+    thêm đoạn nói cột đó chỉ dùng khi bật tính năng; workspace đã bật thì đã có đoạn riêng, và
+    workspace không thể bật tính năng (điểm theo người, `priority = "tier"`) thì không có cột
+    nên cũng không có đoạn này.
 
-    Bản gốc của hàm: `_huong_dan_goc`.
+    Chỗ chèn đoạn là dòng đánh dấu `CHO_CHEN_GHI_CHU_W` do `_huong_dan_co_dau` đặt sẵn.
     """
-    ra = _huong_dan_goc(cfg)
+    ra = _huong_dan_co_dau(cfg)
     n = _cfg(cfg)
-    if not ghi_chu_cot_w or n["wharton"] or n["per_person"]:
-        return ra
-    slot_l = dang_chu(n["nhan"], "slot", "l", "vi")
-    diem_l = dang_chu(n["nhan"], "score", "l", "vi")
-    ghi_chu = [
-        "        Cột %s (nằm sau cột %s): CHỈ dùng khi phần mềm bật tính năng %s." % (
-            TEN_COT_QUYET_TAM, ten_cot_diem_thi(cfg), TEN_COT_QUYET_TAM),
-        "        Khi bật, mỗi người chia 100 điểm cho mỗi quỹ ở mỗi buổi: quỹ 1 cho các %s có %s," % (
-            slot_l, diem_l),
-        "        quỹ 2 cho các %s còn lại. Khi tắt: phần mềm bỏ qua cột này, kết quả xếp không đổi." % slot_l,
-    ]
-    i = next((k for k, d in enumerate(ra) if d.startswith("Bước 5.")), len(ra))
-    # chèn ngay trước dòng trống đứng trước "Bước 5."
-    return ra[:max(i - 1, 0)] + ghi_chu + ra[max(i - 1, 0):]
+    ghi_chu = []
+    if ghi_chu_cot_w and not n["wharton"] and n["wharton_bat_duoc"]:
+        slot_l = dang_chu(n["nhan"], "slot", "l", "vi")
+        diem_l = dang_chu(n["nhan"], "score", "l", "vi")
+        ghi_chu = [
+            "        Cột %s (nằm sau cột %s): CHỈ dùng khi phần mềm bật tính năng %s." % (
+                TEN_COT_QUYET_TAM, ten_cot_diem_thi(cfg), TEN_COT_QUYET_TAM),
+            "        Khi bật, mỗi người chia 100 điểm cho mỗi quỹ ở mỗi buổi: quỹ 1 cho các %s có %s," % (
+                slot_l, diem_l),
+            "        quỹ 2 cho các %s còn lại. Khi tắt: phần mềm bỏ qua cột này, kết quả xếp không đổi." % slot_l,
+        ]
+    i = ra.index(CHO_CHEN_GHI_CHU_W)
+    return ra[:i] + ghi_chu + ra[i + 1:]
 
 
 def ten_cot_diem_thi(cfg=None) -> str:
@@ -992,11 +1003,12 @@ def ten_cot_diem_thi(cfg=None) -> str:
     return d + (" thi" if d == "Điểm" else "")
 
 
-def _huong_dan_goc(cfg=None) -> list:
-    """Các dòng sheet "Hướng dẫn" khi chưa có ghi chú cột Điểm quyết tâm của sổ mẫu. `cfg=None` (hay mặc định trường học) cho ra đúng
-    `HUONG_DAN` ở trên; workspace khác thì nhãn trong câu đổi theo, và điểm theo người
-    có đoạn riêng. Các tiêu đề cột không đổi nhãn (Tên CLB, Chỉ tiêu, Mã HS, Mã CLB,
-    Buổi) giữ nguyên chữ như trên sheet."""
+def _huong_dan_co_dau(cfg=None) -> list:
+    """Các dòng sheet "Hướng dẫn" KÈM dòng đánh dấu `CHO_CHEN_GHI_CHU_W` (chưa có ghi chú cột
+    Điểm quyết tâm của sổ mẫu). `cfg=None` (hay mặc định trường học) cho ra `HUONG_DAN` ở trên
+    cộng dòng đánh dấu; workspace khác thì nhãn trong câu đổi theo, và điểm theo người có đoạn
+    riêng. Các tiêu đề cột không đổi nhãn (Tên CLB, Chỉ tiêu, Mã HS, Mã CLB, Buổi) giữ nguyên
+    chữ như trên sheet."""
     n = _cfg(cfg)
     nhan = n["nhan"]
     if not cfg or (ten_sheet_clb(cfg) == SHEET_CLB and ten_sheet_hs(cfg) == SHEET_HS
@@ -1004,7 +1016,7 @@ def _huong_dan_goc(cfg=None) -> list:
                    and not n["per_person"] and not n["wharton"]
                    and dang_chu(nhan, "slot", "l", "vi") == "câu lạc bộ"
                    and dang_chu(nhan, "person", "l", "vi") == "học sinh"):
-        return list(HUONG_DAN)
+        return list(_HUONG_DAN_CO_DAU)
 
     def d(*a):
         return dang_chu(nhan, *a)
@@ -1077,6 +1089,7 @@ def _huong_dan_goc(cfg=None) -> list:
                   "  HS001   Nguyễn Văn An   Tin học   9,5      100        Bóng rổ            100",
                   "  → Tin học có thi: 100 điểm quỹ 1 dồn vào đó; Bóng rổ không thi: 100 điểm quỹ 2."]
     ra += [
+        CHO_CHEN_GHI_CHU_W,
         "",
         "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
         "",
@@ -1229,7 +1242,7 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
         cot_dau = cot_dau + [ten_diem]        # MỘT cột điểm chung, ngay sau cột nhóm
     nv1 = len(cot_dau) + 1                    # số thứ tự cột NV1 (tính từ 1)
     # thêm cột "Điểm W k" (điểm Wharton, mục A13); sổ mẫu thì luôn thêm (A13.7)
-    co_w = n_cfg["wharton"] or (luon_co_cot_w and not ca_nhan)
+    co_w = n_cfg["wharton"] or (luon_co_cot_w and n_cfg["wharton_bat_duoc"])
     buoc = 1 if ca_nhan else (3 if co_w else 2)   # khoảng cách giữa hai cột NV liên tiếp
     # HAI hàng tiêu đề (A13.4). Hàng 1: các cột đầu, rồi ô gộp "Nguyện vọng k" trên mỗi nhóm.
     # Hàng 2: tên từng cột trong nhóm ("CLB", "Điểm thi", và "Điểm quyết tâm" khi bật). Cột đầu
