@@ -6,6 +6,7 @@
   N4. Giao diện: thẻ Kết quả / lật trang ở quy mô lớn (xem `test_giao_dien_a13_11_*.py`).
 """
 
+import json
 import os
 
 import pytest
@@ -71,3 +72,58 @@ def test_n1_duong_tep_binh_thuong_van_xuat_duoc(api_co_ket_qua, tmp_path):
     res = api_co_ket_qua.export_ket_qua(str(tmp_path / "ok.xlsx"))
     assert res["ok"], res["errors"]
     assert os.path.basename(res["data"]["path"]) == "ok.xlsx"
+
+
+# ------------------------------------------------------------------ N2. nhật ký Wharton gộp
+
+def _nhat_ky(api):
+    with api._ket_noi_doc() as cur:
+        return [(r["nguon"], r["hanh_dong"], r["student_id"], r["cu_json"],
+                 json.loads(r["moi_json"]) if r["moi_json"] else None)
+                for r in cur.execute("SELECT * FROM wharton_nhat_ky ORDER BY id")]
+
+
+@pytest.fixture
+def wh(api):
+    from _wharton import bat_wharton, dung_clb
+    bat_wharton(api)
+    dung_clb(api, A=50, B=50, C=50)
+    return api
+
+
+def _csv_nap(n, diem_a=100):
+    dong = ["student_id,name,pref_1,wp_1,pref_2,wp_2,pref_3,wp_3"]
+    dong += ["HS%03d,Em %d,A,%d,B,60,C,40" % (i, i, diem_a) for i in range(n)]
+    return "\n".join(dong) + "\n"
+
+
+def test_n2_nap_nhieu_em_chi_ghi_mot_dong_tom_tat(wh):
+    kq = wh.import_preferences_csv(_csv_nap(40))
+    assert kq["ok"], kq["errors"]
+    nk = _nhat_ky(wh)
+    assert len(nk) == 1, len(nk)
+    nguon, hanh_dong, sid, cu, moi = nk[0]
+    assert (nguon, hanh_dong, sid, cu) == ("nap_tep", "luu_hang_loat", None, None)
+    assert moi == {"so_em_doi": 40, "so_dong_nap": 40}
+
+
+def test_n2_nap_lai_y_nguyen_khong_ghi_them(wh):
+    wh.import_preferences_csv(_csv_nap(10))
+    wh.import_preferences_csv(_csv_nap(10))
+    assert len(_nhat_ky(wh)) == 1
+
+
+def test_n2_chi_tinh_em_co_diem_doi(wh):
+    wh.import_preferences_csv(_csv_nap(10))
+    wh.import_preferences_csv(_csv_nap(10, diem_a=90).replace("HS005,Em 5,A,90", "HS005,Em 5,A,100"))
+    nk = _nhat_ky(wh)
+    assert len(nk) == 2
+    assert nk[1][4] == {"so_em_doi": 9, "so_dong_nap": 10}
+
+
+def test_n2_so_nhap_cung_chi_mot_dong_va_chi_ghi_them(wh):
+    wh.import_preferences_csv(_csv_nap(5))
+    truoc = _nhat_ky(wh)
+    assert wh.reset_data("hoc_sinh", "XOA")["ok"]      # dữ liệu mất đi, nhật ký vẫn còn
+    sau = _nhat_ky(wh)
+    assert sau[:len(truoc)] == truoc                   # chỉ ghi thêm, không sửa / xoá dòng cũ

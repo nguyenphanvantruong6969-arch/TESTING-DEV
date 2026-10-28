@@ -1278,6 +1278,7 @@ class NhapDuLieuMixin:
 
                 n_created, n_updated, n_skipped = 0, 0, 0
                 sids_da_ghi: list = []
+                n_w_doi = 0
                 # Dem RIENG voi n_skipped. "Bo mot buoi cua mot em" va "bo
                 # tron mot em" la hai chuyen khac han; gop chung la lap lai
                 # dung kieu nham lan da de ra con so "45 em trang tay".
@@ -1395,7 +1396,15 @@ class NhapDuLieuMixin:
                         "(SELECT club_id FROM preferences WHERE student_id = ?)", (sid, sid))
                     moi_w = self._doc_diem_wharton_cua_em(cur, sid)
                     if moi_w != cu_w:
-                        self._ghi_nhat_ky_wharton(cur, "nap_tep", "luu", sid, cu_w, moi_w)
+                        n_w_doi += 1
+
+                # Nhật ký Wharton (A13.11, N2): MỘT dòng tóm tắt cho cả lần nạp, không một dòng mỗi
+                # em (800 em nạp-xoá-nạp 100 vòng từng đẻ 80.000 dòng). Vẫn chỉ ghi thêm, trong
+                # CÙNG giao dịch; không em nào đổi điểm thì không ghi gì (như trước).
+                if n_w_doi:
+                    self._ghi_nhat_ky_wharton(
+                        cur, "nap_tep", "luu_hang_loat", None, None,
+                        {"so_em_doi": n_w_doi, "so_dong_nap": n_updated})
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
                 if khoa_w and any(wp_tho.values()):

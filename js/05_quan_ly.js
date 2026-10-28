@@ -970,6 +970,7 @@ function veNhatKyWh() {
   clear(ds);
   const dang = (d) => {
     if (!d || d.so_dong !== undefined) return "";
+    if (d && d.so_em_doi !== undefined) return t("wh_nk_tom_tat", { n_em: d.so_em_doi, n_dong: d.so_dong_nap });
     const phan = ["w1", "w2"].map((k) => Object.entries(d[k] || {})
       .map(([c, v]) => (whQl.ten[c] || c) + ": " + v).join(", ")).filter(Boolean);
     return phan.join(" | ");
