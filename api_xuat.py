@@ -18,7 +18,7 @@ from api_chung import (
     thu_muc_tai_ve,
 )
 from cau_hinh_ws import doc_cau_hinh
-from api_workspace import CauHinhHong, loi_cau_hinh
+from api_workspace import CauHinhHong, LoiDuongXuat, loi_cau_hinh
 from i18n_errors import err
 from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
@@ -701,6 +701,10 @@ class XuatKetQuaMixin:
         """
         output_path = (output_path or "").strip() or ten_mac_dinh
         if os.path.isabs(output_path):
+            # Đường là THƯ MỤC có sẵn: "trùng tên → x (2)" sẽ đẻ ra tệp `x (2)` không đuôi NGOÀI
+            # thư mục đó (A13.11, N1). Từ chối bằng lỗi có tên, như trước A13.9.
+            if os.path.isdir(output_path):
+                raise LoiDuongXuat(err("xuat_duong_la_thu_muc", path=output_path))
             return duong_dan_khong_de(output_path, kem_duoi)
         thu_muc = self.thu_muc_xuat or thu_muc_tai_ve()
         if not (thu_muc and os.path.isdir(thu_muc)
@@ -920,6 +924,8 @@ class XuatKetQuaMixin:
             _ghi_csv(path, [], dau + [[]] + [header] + dong)
             return _ok({"path": path, "n_thay_doi": len(dong),
                         "dem": d["dem"], "ket_qua_cu": ket_qua_cu})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 
@@ -1009,6 +1015,8 @@ class XuatKetQuaMixin:
                 "n_thi_ngoai_nv": n_ngoai,
                 "n_ten_doi": n_ten_doi,
             })
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -1069,6 +1077,8 @@ class XuatKetQuaMixin:
             wb.save(path)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_hoc_sinh": len({d[0] for d in dong}), "n_dong": len(dong)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -1088,6 +1098,8 @@ class XuatKetQuaMixin:
                                  luon_co_cot_w=True)       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -1224,6 +1236,8 @@ class XuatKetQuaMixin:
                 "n_dong": len(dong),
                 "ket_qua_cu": bool(tt["ok"] and tt["data"]["ket_qua_cu"]),
             })
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -1305,6 +1319,8 @@ class XuatKetQuaMixin:
                 except Exception as e:
                     ra["loi_csv"] = err("error_exporting_csv", detail=str(e))
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 
@@ -1348,6 +1364,8 @@ class XuatKetQuaMixin:
                 duong_excel = None
             ra["excel_path"] = duong_excel
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 

@@ -68,6 +68,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "xuat_chua_co_ket_qua",
     # A13.9 (stress test): CSDL bận không còn bị báo là cấu hình hỏng.
     "csdl_dang_ban",
+    # A13.11 (N1): đường xuất là thư mục có sẵn.
+    "xuat_duong_la_thu_muc",
     # Sổ nhập rỗng: ok kèm cảnh báo thay vì lỗi chặn.
     "so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs",
 }

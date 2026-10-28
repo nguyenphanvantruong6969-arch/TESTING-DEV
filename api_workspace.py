@@ -51,6 +51,15 @@ def loi_cau_hinh(e) -> dict:
     return err(getattr(e, "ma", "ws_cau_hinh_hong"), detail=str(e))
 
 
+class LoiDuongXuat(Exception):
+    """Đường xuất không dùng được (đang là một thư mục có sẵn): mang sẵn mục lỗi dịch được, để
+    từng hàm xuất trả `_fail(e.loi)` thay vì lỗi chung "xuất hỏng"."""
+
+    def __init__(self, loi):
+        super().__init__(loi.get("code"))
+        self.loi = loi
+
+
 class _LoiWs(Exception):
     """Lỗi nghiệp vụ đã có mã dịch được — chuyển thẳng thành err(code, **params)."""
 
@@ -70,6 +79,8 @@ def _ws_phuong_thuc(ham):
             return ham(self, *args, **kwargs)
         except _LoiWs as e:
             return _fail(err(e.code, **e.params))
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
         except ValueError as e:
             # workspace.py / cau_hinh_ws.py nêu lý do bằng tiếng Việt: để ở
             # "chi tiết kỹ thuật" (giao diện gấp sẵn), câu chính thì song ngữ.

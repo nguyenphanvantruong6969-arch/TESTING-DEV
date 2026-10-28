@@ -882,6 +882,10 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không đọc được cấu hình của không gian làm việc này, nên chưa thể làm việc đó: chạy bằng luật trường học sẽ ra kết quả sai mà không báo. Hãy mở lại không gian làm việc, kiểm tra hoặc đặt lại cấu hình rồi thử lại.",
     "en": "This workspace's settings can't be read, so this can't be done: running with the school rules would give wrong results without any warning. Reopen the workspace, check or reset its settings, then try again."
   },
+  "xuat_duong_la_thu_muc": {
+    "vi": "Không xuất được vì \"{path}\" là một thư mục có sẵn, không phải tên tệp. Hãy chọn một tên tệp (ví dụ thêm tên tệp vào cuối đường dẫn) hoặc để trống để lưu vào thư mục Tải xuống.",
+    "en": "Couldn't export because \"{path}\" is an existing folder, not a file name. Choose a file name (for example add one to the end of the path) or leave it empty to save to the Downloads folder."
+  },
   "csdl_dang_ban": {
     "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
     "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
