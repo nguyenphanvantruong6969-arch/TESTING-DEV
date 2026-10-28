@@ -35,6 +35,21 @@ class CauHinhHong(Exception):
     Nơi quyết định kết quả (chạy xếp, trần nhập) phải DỪNG khi gặp nó, không được lặng lẽ
     lùi về luật trường học."""
 
+    ma = "ws_cau_hinh_hong"
+
+
+class CsdlBan(CauHinhHong):
+    """CSDL đang bị tiến trình khác giữ khoá (hết thời gian chờ). KHÔNG phải cấu hình hỏng: thử lại
+    sau vài giây là được, nên báo mã riêng `csdl_dang_ban` — vẫn là CauHinhHong để mọi nơi đang
+    bắt CauHinhHong tiếp tục DỪNG đúng như trước."""
+
+    ma = "csdl_dang_ban"
+
+
+def loi_cau_hinh(e) -> dict:
+    """Mục lỗi dịch được cho một CauHinhHong: `csdl_dang_ban` hay `ws_cau_hinh_hong`."""
+    return err(getattr(e, "ma", "ws_cau_hinh_hong"), detail=str(e))
+
 
 class _LoiWs(Exception):
     """Lỗi nghiệp vụ đã có mã dịch được — chuyển thẳng thành err(code, **params)."""
@@ -85,6 +100,10 @@ class WorkspaceMixin:
         try:
             return cau_hinh_ws.doc_cau_hinh(self.db_path, nghiem=True)
         except (ValueError, sqlite3.Error) as e:
+            if isinstance(e, sqlite3.OperationalError) and (
+                    "locked" in str(e).lower() or "busy" in str(e).lower()):
+                raise CsdlBan(
+                    "CSDL đang bận (%s). Chờ vài giây rồi thử lại." % e) from e
             raise CauHinhHong(
                 "Không đọc được cấu hình của workspace (%s). Hãy kiểm tra hoặc đặt lại cấu "
                 "hình rồi thử lại." % e) from e

@@ -4,7 +4,7 @@ Một phần của PipelineAPI (xem api.py) — tách riêng cho dễ đọc; m�
 public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được như cũ.
 """
 
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
@@ -65,7 +65,7 @@ class ChamDiemMixin:
                 "n_scored": sum(1 for r in rows if r["score"] is not None),
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_scoring_list", detail=str(e)))
 
@@ -106,7 +106,7 @@ class ChamDiemMixin:
                     n_saved += 1
             return _ok({"n_saved": n_saved, "warnings": skipped})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_saving_scores", detail=str(e)))
 
@@ -219,6 +219,6 @@ class ChamDiemMixin:
                 return _fail(sai_gia_tri)
             return _ok({"club_id": club_id, "n_saved": n_saved, "warnings": skipped})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_saving_scores", detail=str(e)))

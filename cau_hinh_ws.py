@@ -33,6 +33,10 @@ from rbda_priority_pipeline import (
 
 KHOA_CAU_HINH = "config"
 
+# Đọc cấu hình chỉ chờ khoá ngắn (mặc định của kết nối là 15 s): thao tác nào cũng đọc nó ở đầu,
+# nên CSDL đang bị tiến trình khác giữ thì báo "đang bận" sau vài giây chứ không đứng hình.
+CHO_KHOA_DOC_CAU_HINH_MS = 2500
+
 # Năm danh từ (DANH_TU, nguồn duy nhất ở nhan_ws.py): mọi nhãn hiển thị đều đi qua
 # chúng, nên tập này là cố định — gõ sai tên danh từ phải báo lỗi chứ không được
 # lặng lẽ thành một nhãn mồ côi.
@@ -239,7 +243,7 @@ def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
     if not os.path.isfile(db_path):
         return mac_dinh
     try:
-        conn = connect_db(db_path)
+        conn = connect_db(db_path, CHO_KHOA_DOC_CAU_HINH_MS)
         try:
             co_bang = conn.execute(
                 "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'workspace_settings'"

@@ -18,7 +18,7 @@ from api_chung import (
     thu_muc_tai_ve,
 )
 from cau_hinh_ws import doc_cau_hinh
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
@@ -791,7 +791,7 @@ class XuatKetQuaMixin:
                 "luc_chay": meta[0] if meta else None,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
     # Thứ tự cố định để tệp và màn hình liệt kê giống nhau.
@@ -1009,7 +1009,7 @@ class XuatKetQuaMixin:
                 "n_ten_doi": n_ten_doi,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 
@@ -1069,7 +1069,7 @@ class XuatKetQuaMixin:
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_hoc_sinh": len({d[0] for d in dong}), "n_dong": len(dong)})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 
@@ -1088,7 +1088,7 @@ class XuatKetQuaMixin:
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("so_nhap_mau_loi", detail=str(e)))
 
@@ -1224,7 +1224,7 @@ class XuatKetQuaMixin:
                 "ket_qua_cu": bool(tt["ok"] and tt["data"]["ket_qua_cu"]),
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=str(e)))
 

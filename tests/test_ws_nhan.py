@@ -66,6 +66,10 @@ MA_MOI_SAU_ANH_CHUP = {
     # A13.5: lỗi chặn gọn, phóng điểm hàng loạt, khoá xuất khi chưa có kết quả.
     "wharton_tom_tat_chua_hop_le", "wharton_phong_sai_xac_nhan", "wharton_da_phong",
     "xuat_chua_co_ket_qua",
+    # A13.9 (stress test): CSDL bận không còn bị báo là cấu hình hỏng.
+    "csdl_dang_ban",
+    # Sổ nhập rỗng: ok kèm cảnh báo thay vì lỗi chặn.
+    "so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs",
 }
 
 

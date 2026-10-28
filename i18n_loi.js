@@ -879,3 +879,7 @@ window.I18N_ERROR_MESSAGES = {
     "en": "Couldn't complete the workspace operation. Try again."
   }
 };
+  "csdl_dang_ban": {
+    "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
+    "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
+  },

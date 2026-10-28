@@ -69,7 +69,7 @@ from api_bao_cao import BaoCaoMixin
 from api_cham_diem import ChamDiemMixin
 from api_nhap import NhapDuLieuMixin
 from api_quan_ly import QuanLyMixin
-from api_workspace import CauHinhHong, WorkspaceMixin
+from api_workspace import CauHinhHong, WorkspaceMixin, loi_cau_hinh
 from api_xuat import XuatKetQuaMixin
 
 
@@ -220,7 +220,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 "n_clubs": len(clubs),
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_checking_integrity", detail=str(e))))
 
@@ -263,10 +263,12 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
         try:
             try:
                 luat, cau_hinh_hong = self._luat_nghiem(), None
+                ma_cau_hinh_hong = None
             except CauHinhHong as e:
                 # Báo thẳng thay vì lặng lẽ soát theo luật trường học: phần còn lại của báo cáo
                 # dùng luật mặc định, nên cảnh báo này đứng đầu và là mức cao.
                 luat, cau_hinh_hong = self._cfg_ws()["rules"], str(e)
+                ma_cau_hinh_hong = e.ma
             tran_thi = luat["max_tests"]   # trần của workspace; None = không giới hạn
             bat_wharton = dung_wharton(luat)   # điểm Wharton (A13): thêm mục cuối báo cáo
             # Điểm theo NGƯỜI, hay không dùng điểm (priority "tier"): không còn "chấm từng
@@ -285,7 +287,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                     warnings.append(entry)
 
                 if cau_hinh_hong:
-                    warn("high", "ws_cau_hinh_hong", detail=cau_hinh_hong)
+                    warn("high", ma_cau_hinh_hong, detail=cau_hinh_hong)
 
                 # --- 1. Chấm điểm thiếu / chưa chấm ---------------------------
                 for row in ([] if not diem_tung_clb else cur.execute("""
@@ -975,7 +977,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             try:
                 luat = self._luat_nghiem()
             except CauHinhHong as e:
-                loi_ch = err("ws_cau_hinh_hong", detail=str(e))
+                loi_ch = loi_cau_hinh(e)
                 steps_log.append({"step": "validate", "status": "error", "detail": loi_ch})
                 return _fail_co_buoc(steps_log, [loi_ch])
             # Điểm Wharton (mục A13) bật: dữ liệu, dấu vân tay VÀ hồ sơ Wharton cùng đến từ MỘT

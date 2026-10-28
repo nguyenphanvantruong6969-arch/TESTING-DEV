@@ -13,7 +13,7 @@ from api_chung import (
     _now,
 )
 import so_nhap
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
@@ -656,7 +656,7 @@ class QuanLyMixin:
                 "total_pages": max(1, (total + page_size - 1) // page_size),
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
@@ -714,7 +714,7 @@ class QuanLyMixin:
                             c["clubs"], c["tested_scores"], c["applicants"], c["hieu_luc"],
                             c["stb_lottery"], c["match"], c["ten_clb"]) if c["co_ket_qua"] else []})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
 
@@ -765,7 +765,7 @@ class QuanLyMixin:
                         "co_ket_qua": c["co_ket_qua"], "ket_qua_cu": c["ket_qua_cu"],
                         "chuan": chuan, "em": em, "so_khong_xet": so_khong_xet})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
 
@@ -793,7 +793,7 @@ class QuanLyMixin:
                                "loai": "vang_thi", "ma_loi": ["wharton_vang_thi"]})
             return _ok(ra)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
@@ -820,7 +820,7 @@ class QuanLyMixin:
             return _ok({"rows": rows, "page": page, "page_size": page_size, "total": total,
                         "total_pages": max(1, (total + page_size - 1) // page_size)})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
@@ -886,7 +886,7 @@ class QuanLyMixin:
                     self._ghi_nhat_ky_wharton(cur, "quan_ly", "mo_khoa")
             return _ok({"was_locked": dang_khoa})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
@@ -999,7 +999,7 @@ class QuanLyMixin:
             return _ok({"n_phong": n_phong, "bo_qua": bo_qua, "backup_path": backup_path,
                         "backup_name": backup_name})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_wharton_quan_ly", detail=str(e))))
 
@@ -1074,7 +1074,7 @@ class QuanLyMixin:
             return _ok({"n_students": len(ma), "n_rows": n_dong, "backup_path": backup_path,
                         "backup_name": os.path.basename(backup_path)})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_wharton_quan_ly", detail=str(e))))
 
@@ -1108,7 +1108,7 @@ class QuanLyMixin:
             with self._ket_noi_ghi() as cur:
                 return self._luu_wharton_cur(cur, luat, student_id, w1, w2, nguon)
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_saving_wharton", detail=str(e)))
 
@@ -1242,7 +1242,7 @@ class QuanLyMixin:
             return _ok({"student_id": student_id, "n_selected": len(club_ids),
                         "n_scores_removed": n_xoa})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_saving_test_selection", detail=str(e)))
 
@@ -1314,7 +1314,7 @@ class QuanLyMixin:
                                                   student_id, cu_w, moi_w)
             return _ok({"student_id": student_id, "n_ranked": len(ordered_club_ids)})
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_saving_preferences", detail=str(e)))
 

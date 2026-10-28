@@ -932,6 +932,10 @@ MESSAGES = {
 
 
 def err(code: str, **params) -> dict:
+    "csdl_dang_ban": {
+        "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
+        "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again.",
+    },
     """Build one structured, translatable error/info entry."""
     return {"code": code, "params": params}
 

@@ -9,7 +9,7 @@ import csv
 import io
 import re
 import so_nhap
-from api_workspace import CauHinhHong
+from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
@@ -271,7 +271,7 @@ class NhapDuLieuMixin:
         try:
             cfg = self._cfg_ws(nghiem=True)
         except CauHinhHong as e:
-            return None, err("ws_cau_hinh_hong", detail=str(e))
+            return None, loi_cau_hinh(e)
         try:
             du_lieu = _b64.b64decode(file_base64 or "", validate=False)
         except Exception as e:
@@ -1412,7 +1412,7 @@ class NhapDuLieuMixin:
                 "warnings": row_errors,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_importing_preferences_csv", detail=str(e))))
 
@@ -1636,6 +1636,6 @@ class NhapDuLieuMixin:
                 "warnings": row_errors,
             })
         except CauHinhHong as e:
-            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+            return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_importing_test_selection_csv", detail=str(e))))
