@@ -24,10 +24,12 @@ người dùng đang chọn ngôn ngữ nào.
 import contextlib
 import csv
 import datetime
+import functools
 import os
 import sqlite3
 import statistics
 import threading
+import types
 
 from api_chung import (
     _fail_co_buoc,
@@ -105,6 +107,9 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
         # "database is locked". RLock vì run_pipeline có thể gọi lại chính
         # các hàm ghi khác trong cùng luồng.
         self._khoa_ghi = threading.RLock()
+        # Xếp hàng các lời gọi ĐỌC (get_*, list_*, check_*, xem_truoc_*) — xem `_xep_hang_doc`.
+        # Không dính `_khoa_ghi`: đọc vẫn không phải chờ một lần chạy xếp đang giữ khoá ghi.
+        self._cong_doc = threading.RLock()
         # Giao dịch chung đang mở trong luồng này (xem _mot_giao_dich).
         self._giao_dich = threading.local()
         self._bo_nho_xuat = None
@@ -679,6 +684,23 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
     def _loi_co_ghi_vet(self, loi):
         """Ghi vết ngăn xếp của ngoại lệ ĐANG xử lý vào `loi_ung_dung.txt`
         cạnh app.db, rồi trả `[loi, xem_nhat_ky]` để đưa lên giao diện: câu
+    @staticmethod
+    def _xep_hang_doc(ham):
+        """Bọc một hàm ĐỌC để các lời gọi đọc chạy lần lượt, không chồng lên nhau.
+
+        VÌ SAO (A13.11, N4). Mở thẻ Kết quả bắn 13 lời gọi đọc cùng lúc. Chạy lần lượt mỗi lời
+        gọi chỉ 10 – 50 ms, nhưng chạy song song thì mỗi bước `sqlite3` nhả GIL rồi phải giành lại
+        nó từ 12 luồng kia (mỗi lần chờ tới một khoảng chuyển luồng 5 ms): 5.000 em × 100 CLB đo
+        được 3 – 4 giây thay vì ~0,3 giây (cả máy chủ dự phòng lẫn pywebview đều chạy mỗi lời
+        gọi trên một luồng riêng). Xếp hàng đọc loại bỏ cuộc tranh GIL; ghi đã xếp hàng sẵn bằng
+        `_khoa_ghi`. RLock vì một hàm đọc có thể gọi hàm đọc khác trong cùng luồng.
+        """
+        @functools.wraps(ham)
+        def boc(self, *args, **kwargs):
+            with self._cong_doc:
+                return ham(self, *args, **kwargs)
+        return boc
+
         lỗi đã dịch, kèm một dòng nói chi tiết nằm ở tệp nào để gửi cho
         người phụ trách kỹ thuật.
 
@@ -1511,3 +1533,17 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 except Exception:
                     pass
                 conn.close()
+
+
+# Bọc MỌI hàm đọc công khai (tên bắt đầu bằng get_ / list_ / check_ / xem_truoc_) bằng
+# `_xep_hang_doc`. Làm một lần ở đây thay vì gắn decorator vào hơn 40 hàm rải ở sáu mixin.
+def _xep_hang_cac_ham_doc():
+    for ten in dir(PipelineAPI):
+        if not ten.startswith(("get_", "list_", "check_", "xem_truoc_")):
+            continue
+        ham = next((c.__dict__[ten] for c in PipelineAPI.__mro__ if ten in c.__dict__), None)
+        if isinstance(ham, types.FunctionType):
+            setattr(PipelineAPI, ten, PipelineAPI._xep_hang_doc(ham))
+
+
+_xep_hang_cac_ham_doc()

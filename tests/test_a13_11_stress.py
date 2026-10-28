@@ -6,8 +6,14 @@
   N4. Giao diện: thẻ Kết quả / lật trang ở quy mô lớn (xem `test_giao_dien_a13_11_*.py`).
 """
 
+import contextlib
 import json
 import os
+import base64
+import importlib.util
+import sqlite3
+import threading
+import time
 
 import pytest
 
@@ -127,3 +133,100 @@ def test_n2_so_nhap_cung_chi_mot_dong_va_chi_ghi_them(wh):
     assert wh.reset_data("hoc_sinh", "XOA")["ok"]      # dữ liệu mất đi, nhật ký vẫn còn
     sau = _nhat_ky(wh)
     assert sau[:len(truoc)] == truoc                   # chỉ ghi thêm, không sửa / xoá dòng cũ
+
+
+# ------------------------------------------------------------------ N4. lời gọi đọc đồng thời
+
+RESOURCE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_SCRIPT_SDL = os.path.join(RESOURCE_DIR, ".claude", "skills", "sinh-du-lieu-clb", "scripts",
+                           "sinh_du_lieu.py")
+
+# Mười ba lời gọi đọc mà giao diện bắn CÙNG LÚC khi mở thẻ Kết quả (xem js/03_ket_qua.js).
+_DOC_THE_KET_QUA = ["get_thay_doi_ket_qua", "get_match_results", "get_em_chua_co_cho",
+                    "get_phan_bo_nguyen_vong", "get_club_fill_stats", "get_suat_du_tru",
+                    "get_last_run_info", "get_club_fill_stats", "get_phan_bo_nguyen_vong",
+                    "get_suat_du_tru", "get_last_run_info", "get_em_chua_co_cho",
+                    "get_thay_doi_ket_qua"]
+
+
+@pytest.fixture(scope="module")
+def api_lon(tmp_path_factory):
+    spec = importlib.util.spec_from_file_location("sdl_n4", _SCRIPT_SDL)
+    sdl = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sdl)
+    thu_muc = tmp_path_factory.mktemp("n4")
+    clb, hs = sdl.sinh_ngau_nhien(1500, [""], 40, 11)
+    sdl.ghi_bo(str(thu_muc), clb, hs)
+    api = PipelineAPI(str(thu_muc / "app.db"), thu_muc_xuat=str(thu_muc))
+    with open(thu_muc / "SO_NHAP_CLB.xlsx", "rb") as f:
+        assert api.import_so_nhap(base64.b64encode(f.read()).decode())["ok"]
+    assert api.run_pipeline(seed=3)["ok"]
+    return api
+
+
+def test_n4_doc_dong_thoi_khong_cham_hon_doc_lan_luot(api_lon):
+    """Nguyên nhân đo được: nhiều luồng đọc tranh GIL (mỗi bước SQLite nhả rồi giành lại GIL), nên
+    13 lời gọi chạy CÙNG LÚC chậm gấp 5 – 10 lần chạy NỐI TIẾP. Đọc xếp hàng thì không."""
+    api = api_lon
+
+    def goi(ten):
+        assert getattr(api, ten)()["ok"]
+
+    for ten in set(_DOC_THE_KET_QUA):       # làm nóng
+        goi(ten)
+    t0 = time.perf_counter()
+    for ten in _DOC_THE_KET_QUA:
+        goi(ten)
+    noi_tiep = time.perf_counter() - t0
+
+    luong = [threading.Thread(target=goi, args=(ten,)) for ten in _DOC_THE_KET_QUA]
+    t0 = time.perf_counter()
+    for x in luong:
+        x.start()
+    for x in luong:
+        x.join()
+    dong_thoi = time.perf_counter() - t0
+    assert dong_thoi < 2.5 * noi_tiep + 0.15, (dong_thoi, noi_tiep)
+
+
+def test_n4_ham_doc_xep_hang_nhau_va_ham_ghi_khong_bi_chan(api_lon):
+    api = api_lon
+    dang_chay, tung_thay = [0], []
+    khoa = threading.Lock()
+
+    def cham(*a, **k):
+        with khoa:
+            dang_chay[0] += 1
+            tung_thay.append(dang_chay[0])
+        time.sleep(0.05)
+        with khoa:
+            dang_chay[0] -= 1
+        return {"ok": True, "data": None, "errors": []}
+
+    # thay phần THÂN bằng hàm chậm nhưng vẫn đi qua lớp xếp hàng của lớp PipelineAPI
+    goc = PipelineAPI.get_run_history.__wrapped__ if hasattr(
+        PipelineAPI.get_run_history, "__wrapped__") else None
+    assert goc is not None, "hàm đọc công khai phải được bọc (có __wrapped__)"
+    ham_boc = PipelineAPI.get_run_history
+    try:
+        PipelineAPI.get_run_history = PipelineAPI._xep_hang_doc(cham)
+        luong = [threading.Thread(target=api.get_run_history) for _ in range(6)]
+        for x in luong:
+            x.start()
+        for x in luong:
+            x.join()
+    finally:
+        PipelineAPI.get_run_history = ham_boc
+    assert max(tung_thay) == 1            # không bao giờ hai lời gọi đọc chồng lên nhau
+
+
+def test_n4_moi_ham_doc_cong_khai_duoc_boc_con_ham_ghi_thi_khong():
+    doc = [n for n in dir(PipelineAPI)
+           if n.startswith(("get_", "list_", "check_", "xem_truoc_"))
+           and callable(getattr(PipelineAPI, n))]
+    assert len(doc) > 30
+    chua_boc = [n for n in doc if not hasattr(getattr(PipelineAPI, n), "__wrapped__")]
+    assert chua_boc == [], chua_boc
+    for n in ("run_pipeline", "submit_preferences", "import_so_nhap", "reset_data",
+              "export_ket_qua"):
+        assert not hasattr(getattr(PipelineAPI, n), "__wrapped__"), n
