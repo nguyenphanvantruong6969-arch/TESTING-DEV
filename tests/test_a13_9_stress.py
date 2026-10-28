@@ -411,3 +411,58 @@ def test_8_so_day_du_khong_co_canh_bao_rong(api):
     assert not ma & {"so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs"}
 
 
+# ------------------------------------------------------------------ 9. skill sinh-du-lieu-clb
+
+_SCRIPT_SDL = os.path.join(RESOURCE_DIR, ".claude", "skills", "sinh-du-lieu-clb", "scripts",
+                           "sinh_du_lieu.py")
+
+
+@pytest.fixture(scope="module")
+def sdl():
+    spec = importlib.util.spec_from_file_location("sinh_du_lieu_a139", _SCRIPT_SDL)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+# Băm đầu ra của sinh_ngau_nhien TRƯỚC khi sửa (commit 0f13771): ≤ 20 CLB phải giữ từng byte.
+_VANG_SDL = [
+    ((120, ["m"], 3, 42), "4e4078d3c8c8dfcefea534938c17aab9a7b69fb61f363546c6bd0abe51e0b938"),
+    ((200, ["thu_2", "thu_4"], 5, 7), "9fc8c9559ea463609b69862e66174239842619a709e477921680abfffe5b4a69"),
+    ((800, ["thu_2", "thu_4", "thu_6", "thu_7"], 5, 1),
+     "bc538daf600606ac734ac67927872e20f576d800e5f5bb2d2138109929f1af2f"),
+    ((60, ["a"], 20, 3), "8377358db9d6aafb4b27605518fd889f60a0e360221380872cbe8ce6ec336be4"),
+    ((50, ["a", "b"], 10, 11), "aecf76a2791ce2a1fa3f5505c91a08a1410c00148dfc054e31b40862e694416e"),
+    ((30, ["a", "b", "c", "d"], 4, 5), "98a51a86d6d1c8c6314abc82181d441fa386e839dce15ec5a69c853412489f6d"),
+]
+
+
+@pytest.mark.parametrize("tham_so,bam", _VANG_SDL)
+def test_9_tu_20_clb_tro_xuong_giu_nguyen_tung_byte(sdl, tham_so, bam):
+    n, buoi, k, seed = tham_so
+    kq = sdl.sinh_ngau_nhien(n, buoi, k, seed)
+    thuc = hashlib.sha256(json.dumps(kq, sort_keys=True, ensure_ascii=False,
+                                     default=str).encode()).hexdigest()
+    assert thuc == bam
+
+
+@pytest.mark.parametrize("n_hs,buoi,k", [(300, ["thu_2", "thu_4", "thu_6"], 8),    # 24 CLB
+                                        (400, ["thu_2", "thu_4"], 25),             # 50 CLB
+                                        (60, [""], 21)])                           # 21 CLB
+def test_9_tren_20_clb_tu_sinh_ten_khong_bi_chan(sdl, api, tmp_path, n_hs, buoi, k):
+    clb, hs = sdl.sinh_ngau_nhien(n_hs, buoi, k, 7)
+    assert len(clb) == k * len(buoi)
+    assert len({c["club_id"] for c in clb}) == len(clb)         # mã không trùng
+    assert len({c["name"] for c in clb}) == len(clb)            # tên không trùng
+    assert sdl.soat(clb, hs) == []
+    ra = str(tmp_path / "bo")
+    sdl.ghi_bo(ra, clb, hs)
+    with open(os.path.join(ra, "SO_NHAP_CLB.xlsx"), "rb") as f:
+        nap = api.import_so_nhap(base64.b64encode(f.read()).decode())
+    assert nap["ok"], nap["errors"]
+    assert api.run_pipeline(seed=1)["ok"]
+
+
+def test_9_tren_20_clb_van_tat_dinh_theo_seed(sdl):
+    assert sdl.sinh_ngau_nhien(300, ["a", "b", "c"], 8, 5) == sdl.sinh_ngau_nhien(300, ["a", "b", "c"], 8, 5)
+

@@ -431,12 +431,15 @@ def sinh_ngau_nhien(n_hs, ds_buoi, clb_moi_buoi, seed, do_choi=1.15,
     trắng tay.
     """
     rnd = random.Random(seed)
-    if clb_moi_buoi * len(ds_buoi) > len(_CHU_DE):
-        raise SystemExit("Chỉ có %d chủ đề câu lạc bộ sẵn, không đủ cho %d câu lạc bộ"
-                         % (len(_CHU_DE), clb_moi_buoi * len(ds_buoi)))
-
     chu_de = _CHU_DE[:]
-    rnd.shuffle(chu_de)
+    if clb_moi_buoi * len(ds_buoi) <= len(chu_de):
+        rnd.shuffle(chu_de)         # đường cũ: GIỮ NGUYÊN lần gọi rnd để đầu ra ≤ 20 CLB không đổi
+    else:
+        # Quá số chủ đề viết tay: sinh thêm "CLB Chuyên đề 21", "CLB Chuyên đề 22"… (mã
+        # clb_chuyen_de_21…). Đường này không bị ràng buộc byte, nên trộn cả danh sách.
+        for i in range(len(chu_de) + 1, clb_moi_buoi * len(ds_buoi) + 1):
+            chu_de.append(("clb_chuyen_de_%d" % i, "CLB Chuyên đề %d" % i))
+        rnd.shuffle(chu_de)
     nhom_du_tru = ["chinh_sach", "khoi_10"]
 
     clb, k = [], 0
