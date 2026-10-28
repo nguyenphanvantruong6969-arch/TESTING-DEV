@@ -122,3 +122,13 @@ def test_huong_dan_khong_con_tang_1_2():
         assert not CU_VI.search(mat), (ten, CU_VI.search(mat))
     with open(os.path.join(GOC, "api_xuat.py"), encoding="utf-8") as f:
         assert not CU_VI.search(f.read())
+
+
+def test_en_moi_cho_deu_la_commitment_points_khong_con_preference_points():
+    """Giao diện EN (i18n.js) và thông báo lỗi EN (i18n_errors.py, i18n_loi.js): một tên duy nhất."""
+    for ten in ("i18n.js", "i18n_errors.py", "i18n_loi.js"):
+        with open(os.path.join(GOC, ten), encoding="utf-8") as f:
+            mat = f.read()
+        assert not re.search(r"preference points?", mat, re.I), ten
+    with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
+        assert "Commitment points" in f.read()

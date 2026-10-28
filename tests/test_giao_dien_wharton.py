@@ -317,7 +317,7 @@ def test_tieng_anh_chu_buoc_3_doi_theo_ngon_ngu_va_khong_con_chu_co_dau(mo):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     van_ban = page.locator("#fbWhartonStep").inner_text()
-    assert "Step 3" in van_ban and "Preference points" in van_ban
+    assert "Step 3" in van_ban and "Commitment points" in van_ban
     assert _dem(page, 1) == "Used 100 / 100"
     assert not DAU_VIET.search(van_ban), van_ban
     assert not loi, loi

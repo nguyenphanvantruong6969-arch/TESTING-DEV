@@ -391,7 +391,7 @@ def _chu_cot(i: int) -> str:
 
 
 _MAU_NHOM_NV = re.compile(r"^nguyen vong\s*(\d+)$")        # hàng 1 của sổ hai hàng
-_TEN_QUYET_TAM = {"diem quyet tam", "preference points", "diem w"}
+_TEN_QUYET_TAM = {"diem quyet tam", "commitment points", "preference points", "diem w"}
 
 
 def _loai_cot_nhom(o, cfg=None):

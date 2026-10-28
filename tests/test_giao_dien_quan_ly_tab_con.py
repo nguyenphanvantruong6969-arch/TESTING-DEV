@@ -226,5 +226,5 @@ def test_tieng_anh_ten_tab_doi_theo(mo):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     chu = page.eval_on_selector_all(TAB + ":not([hidden])", "ns => ns.map(n => n.textContent.trim())")
-    assert chu[2:] == ["Preference points", "Cut-off points", "Data"]
+    assert chu[2:] == ["Commitment points", "Cut-off points", "Data"]
     assert not loi, loi

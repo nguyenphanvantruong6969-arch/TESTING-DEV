@@ -343,7 +343,7 @@ def test_tieng_anh_chu_cua_khoi_doi_theo_va_khong_con_chu_co_dau(mo):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     page.wait_for_function(
-        "() => document.querySelector('#adminWhartonBlock h2').textContent === 'Preference points'")
+        "() => document.querySelector('#adminWhartonBlock h2').textContent === 'Commitment points'")
     page.wait_for_function(
         "() => document.querySelector('#whQlBody tr[data-student-id=\"HS2\"]').textContent"
         ".includes('Not valid')")

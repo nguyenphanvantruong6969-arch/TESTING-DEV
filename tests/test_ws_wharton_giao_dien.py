@@ -87,7 +87,7 @@ def test_nhan_tieng_anh(mo_trang):
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
     _toi_buoc_luat(page)
-    assert page.locator('label[for="wzWharton"]').inner_text() == "Use preference points"
+    assert page.locator('label[for="wzWharton"]').inner_text() == "Use commitment points"
     assert not loi, loi
 
 
@@ -181,7 +181,7 @@ def test_tieng_anh_khong_lan_chu_co_dau_o_buoc_luat(mo_trang):
     page.locator("#btnWorkspace").click()
     page.wait_for_selector("#wsTieuDe")
     buoc = _chu_cac_buoc_wizard(page, 3)
-    assert "Use preference points" in buoc[2]
+    assert "Use commitment points" in buoc[2]
     for chu in buoc:
         assert not DAU_VIET.search(chu), chu
     assert not loi, loi

@@ -510,41 +510,41 @@ MESSAGES = {
     },
     "wharton_chua_dung_het": {
         "vi": "Chưa dùng hết điểm quyết tâm: {person_l} {student_id} còn thiếu {thieu} điểm ở quỹ {quy}.",
-        "en": "Preference points not fully used: {person_l} {student_id} still has {thieu} point(s) left in fund {quy}.",
+        "en": "Commitment points not fully used: {person_l} {student_id} still has {thieu} point(s) left in fund {quy}.",
     },
     "wharton_vuot_ngan_sach": {
         "vi": "{person} {student_id} đặt {tong} điểm quyết tâm ở quỹ {quy}, nhiều hơn {ngan_sach} điểm được phép.",
-        "en": "{person} {student_id} placed {tong} preference points in fund {quy}, more than the {ngan_sach} allowed.",
+        "en": "{person} {student_id} placed {tong} commitment points in fund {quy}, more than the {ngan_sach} allowed.",
     },
     "wharton_diem_khong_hop_le": {
         "vi": "{person} {student_id} đặt “{gia_tri}” điểm quyết tâm cho {slot_sl} {club_id}. Điểm quyết tâm phải là số nguyên từ 0 trở lên.",
-        "en": "{person} {student_id} placed “{gia_tri}” preference points on {slot_l} {club_id}. Preference points must be a whole number of 0 or more.",
+        "en": "{person} {student_id} placed “{gia_tri}” commitment points on {slot_l} {club_id}. Commitment points must be a whole number of 0 or more.",
     },
     "wharton_ngoai_tap": {
         "vi": "{person} {student_id} đặt điểm quyết tâm quỹ {quy} cho {slot_sl} {club_id}, nhưng {slot_sl} này không thuộc quỹ {quy} (không có trong nguyện vọng, hoặc sai loại có thi / không thi).",
-        "en": "{person} {student_id} placed fund {quy} preference points on {slot_l} {club_id}, but that {slot_l} isn't in fund {quy} (not in the preferences, or the wrong tested / not-tested group).",
+        "en": "{person} {student_id} placed fund {quy} commitment points on {slot_l} {club_id}, but that {slot_l} isn't in fund {quy} (not in the preferences, or the wrong tested / not-tested group).",
     },
     "wharton_tang_lech": {
         "vi": "{person} {student_id} có {score_l} thi ở {slot_sl} {club_id} nhưng chỉ đặt điểm quyết tâm cho {slot_sl} này ở quỹ không thi. Cần chia lại điểm.",
-        "en": "{person} {student_id} has a test {score_l} for {slot_l} {club_id} but placed preference points for it only in the not-tested fund. The points need to be split again.",
+        "en": "{person} {student_id} has a test {score_l} for {slot_l} {club_id} but placed commitment points for it only in the not-tested fund. The points need to be split again.",
     },
     "wharton_vang_thi": {
         "vi": "{person} {student_id} vắng thi {slot_sl} {club_id}, nên được xét như không thi với {diem} điểm quyết tâm quỹ 2 ({diem_bo} điểm quỹ 1 không được tính).",
-        "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 preference point(s) ({diem_bo} fund 1 point(s) not counted).",
+        "en": "{person} {student_id} missed the test for {slot_l} {club_id}, so is ranked as not tested with {diem} fund 2 commitment point(s) ({diem_bo} fund 1 point(s) not counted).",
     },
 
     # --- điểm Wharton, vòng 2 (A13): nhập liệu, kiosk, pipeline, sức khoẻ dữ liệu ---
     "csv_wp_khong_hop_le": {
         "vi": "Điểm quyết tâm của {person_l} {student_id} ở {slot_sl} {club_id} là “{gia_tri}”, không phải số nguyên từ 0 trở lên. Ô này chưa được lưu.",
-        "en": "The preference points for {person_l} {student_id} on {slot_l} {club_id} are “{gia_tri}”, not a whole number of 0 or more. This cell wasn't saved.",
+        "en": "The commitment points for {person_l} {student_id} on {slot_l} {club_id} are “{gia_tri}”, not a whole number of 0 or more. This cell wasn't saved.",
     },
     "csv_wp_khong_co_nguyen_vong": {
         "vi": "{student_id}: có điểm quyết tâm ở cột {cot} nhưng ô nguyện vọng cạnh đó để trống. Điểm này chưa được lưu.",
-        "en": "{student_id}: there are preference points in column {cot} but the preference cell next to it is empty. Those points weren't saved.",
+        "en": "{student_id}: there are commitment points in column {cot} but the preference cell next to it is empty. Those points weren't saved.",
     },
     "csv_wp_bo_qua": {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
-        "en": "This workspace doesn't use preference points yet: {n} preference points cell(s) in the file were skipped and not saved.",
+        "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved.",
     },
     "xuat_diem_chuan_loi": {
         "vi": "Không đọc được điểm chuẩn khi xuất: trang \"Điểm chuẩn\" trong tệp đang trống do lỗi. Hãy xuất lại.",
@@ -552,19 +552,19 @@ MESSAGES = {
     },
     "csv_wharton_khoa_giu_nguyen": {
         "vi": "Học sinh {student_id}: điểm quyết tâm đang khoá và học sinh này đã có điểm, nên nguyện vọng và ô chọn thi của học sinh này được giữ nguyên, dòng trong tệp bị bỏ qua. Mở khoá ở thẻ Quản lý rồi nạp lại nếu cần đổi.",
-        "en": "Student {student_id}: preference points are locked and this student already has points, so their rankings and test selection were kept as they are and the file's row was skipped. Unlock them in the Manage tab and import again to change.",
+        "en": "Student {student_id}: commitment points are locked and this student already has points, so their rankings and test selection were kept as they are and the file's row was skipped. Unlock them in the Manage tab and import again to change.",
     },
     "wharton_chua_bat": {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm.",
-        "en": "Preference points aren't turned on for this workspace.",
+        "en": "Commitment points aren't turned on for this workspace.",
     },
     "wharton_ho_so_chua_hop_le": {
         "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy sửa rồi chạy lại.",
-        "en": "{n} {person_l}(s) have a preference points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again.",
+        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again.",
     },
     "health_wharton_chua_hop_le": {
         "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",
-        "en": "{n} {person_l}(s) have a preference points profile that isn't valid yet, so the allocation will be blocked until it is fixed.",
+        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation will be blocked until it is fixed.",
     },
     "health_wharton_vang_thi": {
         "vi": "{n} {person_l} vắng thi một {slot_sl} đã đặt điểm quỹ 1, nên {slot_sl} đó được xét như không thi (điểm quỹ 1 không được tính).",
@@ -572,23 +572,23 @@ MESSAGES = {
     },
     "error_saving_wharton": {
         "vi": "Không lưu được điểm quyết tâm. Hãy thử lại.",
-        "en": "Couldn't save the preference points. Try again.",
+        "en": "Couldn't save the commitment points. Try again.",
     },
     "wharton_da_khoa": {
         "vi": "Điểm quyết tâm đang khoá vì đã chạy xếp. Mở khoá ở thẻ Quản lý để sửa.",
-        "en": "Preference points are locked because the allocation has run. Unlock them in the Manage tab to edit.",
+        "en": "Commitment points are locked because the allocation has run. Unlock them in the Manage tab to edit.",
     },
     "wharton_mo_khoa_sai_xac_nhan": {
         "vi": "Cần gõ đúng chữ {can_go} để mở khoá sửa điểm quyết tâm.",
-        "en": "Type {can_go} exactly to unlock editing of the preference points.",
+        "en": "Type {can_go} exactly to unlock editing of the commitment points.",
     },
     "wharton_xoa_sai_xac_nhan": {
         "vi": "Cần gõ đúng chữ {can_go} để xoá điểm quyết tâm của tất cả {person_pl}.",
-        "en": "Type {can_go} exactly to delete the preference points of all {person_pl}.",
+        "en": "Type {can_go} exactly to delete the commitment points of all {person_pl}.",
     },
     "wharton_da_xoa": {
         "vi": "Đã xoá điểm quyết tâm của {n} {person_l}.",
-        "en": "Deleted the preference points of {n} {person_l}(s).",
+        "en": "Deleted the commitment points of {n} {person_l}(s).",
     },
     "wharton_da_mo_khoa": {
         "vi": "Đã mở khoá. Lần chạy xếp tiếp theo sẽ khoá lại.",
@@ -596,21 +596,21 @@ MESSAGES = {
     },
     "error_wharton_quan_ly": {
         "vi": "Không thực hiện được thao tác với điểm quyết tâm. Hãy thử lại.",
-        "en": "Couldn't complete that action on the preference points. Try again.",
+        "en": "Couldn't complete that action on the commitment points. Try again.",
     },
 
     # --- điểm quyết tâm, vòng 5 (A13.5): xử lý hàng loạt, lỗi chặn gọn, khoá xuất ---
     "wharton_tom_tat_chua_hop_le": {
         "vi": "{n} {person_pl} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp.",
-        "en": "{n} {person_pl} have a preference points profile that isn't valid yet, so the allocation hasn't run.",
+        "en": "{n} {person_pl} have a commitment points profile that isn't valid yet, so the allocation hasn't run.",
     },
     "wharton_phong_sai_xac_nhan": {
         "vi": "Cần gõ đúng chữ {can_go} để phóng điểm quyết tâm của {person_pl} chia thiếu hoặc thừa.",
-        "en": "Type {can_go} exactly to scale the preference points of {person_pl} whose split is short or over.",
+        "en": "Type {can_go} exactly to scale the commitment points of {person_pl} whose split is short or over.",
     },
     "wharton_da_phong": {
         "vi": "Đã phóng điểm quyết tâm cho {n} {person_pl}. {m} {person_pl} cần sửa tay.",
-        "en": "Scaled the preference points of {n} {person_pl}. {m} {person_pl} need editing by hand.",
+        "en": "Scaled the commitment points of {n} {person_pl}. {m} {person_pl} need editing by hand.",
     },
     "xuat_chua_co_ket_qua": {
         "vi": "Chưa có kết quả xếp. Chạy xếp trước.",
