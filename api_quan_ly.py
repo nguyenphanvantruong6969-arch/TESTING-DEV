@@ -946,7 +946,9 @@ class QuanLyMixin:
         Chỉ làm khi `xac_nhan == "PHONG"`. Sao lưu CSDL trước khi ghi. Mỗi em được phóng đi qua
         `_luu_wharton(..., "quan_ly")`: kiểm khoá, kiểm hồ sơ, ghi nhật ký giá trị cũ và mới. Bỏ qua
         (không đổi, liệt kê trong `bo_qua`): em tổng 0 ở quỹ sai (`ly_do = "tong_0"`) và em còn lỗi
-        khác không phóng được (`"loi_khac"`). Đang khoá thì từ chối (`wharton_da_khoa`).
+        khác không phóng được (`"loi_khac"`), và em vừa tự sửa điểm sau ảnh chụp (`"da_doi"`, giữ điểm mới).
+        Đang khoá thì từ chối (`wharton_da_khoa`) trước khi sao lưu. Cả lượt ghi trong MỘT giao dịch
+        (A13.8): lỗi giữa chừng thì không em nào đổi, lỗi trả kèm `data.backup_path`.
         """
         try:
             luat = self._luat_nghiem()
@@ -963,24 +965,47 @@ class QuanLyMixin:
             bo_qua = [{"student_id": sid, "name": ten.get(sid, sid), "ly_do": ly_do}
                       for sid, ly_do in bo_qua]
             backup_path = self._backup_db() if ke_hoach else None
+            backup_name = os.path.basename(backup_path) if backup_path else None
             n_phong = 0
-            for sid, moi1, moi2 in ke_hoach:
-                kq = self._luu_wharton(sid, moi1, moi2, "quan_ly")
-                if kq["ok"]:
-                    n_phong += 1
-                elif any(e.get("code") == "wharton_da_khoa" for e in kq["errors"]
-                         if isinstance(e, dict)):
-                    return kq
-                else:
-                    bo_qua.append({"student_id": sid, "name": ten.get(sid, sid),
-                                   "ly_do": "loi_khac"})
+            try:
+                # CẢ LƯỢT trong MỘT giao dịch (A13.8): lỗi giữa chừng thì không em nào bị đổi.
+                with self._ket_noi_ghi() as cur:
+                    if self._wharton_dang_khoa(cur):
+                        return self._fail_kem_sao_luu(err("wharton_da_khoa"), backup_path, backup_name)
+                    for sid, moi1, moi2 in ke_hoach:
+                        # Đọc lại điểm HIỆN TẠI: khác ảnh chụp (em vừa tự sửa trên kiosk) thì bỏ
+                        # qua em đó, không ghi đè bằng bản phóng tính từ điểm cũ.
+                        hien = self._doc_diem_wharton_cua_em(cur, sid)
+                        if hien["w1"] != ho_so["w1_luu"].get(sid, {}) \
+                                or hien["w2"] != ho_so["w2_luu"].get(sid, {}):
+                            bo_qua.append({"student_id": sid, "name": ten.get(sid, sid),
+                                           "ly_do": "da_doi"})
+                            continue
+                        kq = self._luu_wharton_cur(cur, luat, sid, moi1, moi2, "quan_ly")
+                        if kq["ok"]:
+                            n_phong += 1
+                        else:
+                            bo_qua.append({"student_id": sid, "name": ten.get(sid, sid),
+                                           "ly_do": "loi_khac"})
+            except Exception as e:
+                return self._fail_kem_sao_luu(
+                    self._loi_co_ghi_vet(err("error_wharton_quan_ly", detail=str(e))),
+                    backup_path, backup_name)
             bo_qua.sort(key=lambda b: b["student_id"])
             return _ok({"n_phong": n_phong, "bo_qua": bo_qua, "backup_path": backup_path,
-                        "backup_name": os.path.basename(backup_path) if backup_path else None})
+                        "backup_name": backup_name})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:
             return _fail(self._loi_co_ghi_vet(err("error_wharton_quan_ly", detail=str(e))))
+
+    @staticmethod
+    def _fail_kem_sao_luu(loi, backup_path, backup_name):
+        """`_fail` mà vẫn trả đường dẫn bản sao lưu đã tạo (lượt phóng hỏng thì người dùng biết
+        bản sao lưu nằm đâu, dù không có gì bị đổi)."""
+        kq = _fail(loi)
+        kq["data"] = {"backup_path": backup_path, "backup_name": backup_name}
+        return kq
 
     @staticmethod
     def _ke_hoach_phong(ho_so: dict):
@@ -1077,43 +1102,49 @@ class QuanLyMixin:
                 return _fail(err("error_saving_wharton",
                                  detail="w1 va w2 phai la dict {club_id: diem}"))
             with self._ket_noi_ghi() as cur:
-                if self._wharton_dang_khoa(cur):
-                    return _fail(err("wharton_da_khoa"))
-                exists = cur.execute(
-                    "SELECT 1 FROM students WHERE student_id = ?", (student_id,)).fetchone()
-                if not exists:
-                    return _fail(err("student_not_found", student_id=student_id))
-                prefs = [r[0] for r in cur.execute(
-                    "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
-                    (student_id,))]
-                tick = {r[0] for r in cur.execute(
-                    "SELECT club_id FROM club_test_selection WHERE student_id = ?",
-                    (student_id,))}
-                clubs = {r[0]: {"buoi": r[1] or BUOI_MAC_DINH} for r in cur.execute(
-                    "SELECT club_id, buoi FROM clubs")}
-                preferences, clb_thi = {student_id: prefs}, {student_id: tick}
-                moi1, moi2 = tu_dien_wharton_mot_clb(
-                    preferences, clb_thi, {student_id: dict(w1)}, {student_id: dict(w2)}, clubs)
-                loi = kiem_ho_so_wharton(
-                    preferences, clb_thi, moi1, moi2, clubs,
-                    tran_nguyen_vong=luat["max_choices"])
-                if loi:
-                    return _fail(loi)
-                cu = self._doc_diem_wharton_cua_em(cur, student_id)
-                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
-                dong = ([(student_id, cid, 1, diem) for cid, diem in w1.items()]
-                        + [(student_id, cid, 2, diem) for cid, diem in w2.items()])
-                cur.executemany(
-                    "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
-                    "VALUES (?, ?, ?, ?)", dong)
-                moi = self._doc_diem_wharton_cua_em(cur, student_id)
-                if moi != cu:
-                    self._ghi_nhat_ky_wharton(cur, nguon, "luu", student_id, cu, moi)
-            return _ok({"student_id": student_id, "n_saved": len(dong)})
+                return self._luu_wharton_cur(cur, luat, student_id, w1, w2, nguon)
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:
             return _fail(err("error_saving_wharton", detail=str(e)))
+
+    def _luu_wharton_cur(self, cur, luat: dict, student_id: str, w1: dict, w2: dict, nguon: str):
+        """Phần ghi của `_luu_wharton` trên một con trỏ có sẵn (đã trong giao dịch ghi): kiểm khoá,
+        kiểm hồ sơ rồi thay toàn bộ dòng của em. Lỗi kiểm thì trả `_fail` MÀ KHÔNG ghi gì, nên gọi
+        lặp nhiều em trong MỘT giao dịch (`phong_wharton_hang_loat`) được."""
+        if self._wharton_dang_khoa(cur):
+            return _fail(err("wharton_da_khoa"))
+        exists = cur.execute(
+            "SELECT 1 FROM students WHERE student_id = ?", (student_id,)).fetchone()
+        if not exists:
+            return _fail(err("student_not_found", student_id=student_id))
+        prefs = [r[0] for r in cur.execute(
+            "SELECT club_id FROM preferences WHERE student_id = ? ORDER BY rank",
+            (student_id,))]
+        tick = {r[0] for r in cur.execute(
+            "SELECT club_id FROM club_test_selection WHERE student_id = ?",
+            (student_id,))}
+        clubs = {r[0]: {"buoi": r[1] or BUOI_MAC_DINH} for r in cur.execute(
+            "SELECT club_id, buoi FROM clubs")}
+        preferences, clb_thi = {student_id: prefs}, {student_id: tick}
+        moi1, moi2 = tu_dien_wharton_mot_clb(
+            preferences, clb_thi, {student_id: dict(w1)}, {student_id: dict(w2)}, clubs)
+        loi = kiem_ho_so_wharton(
+            preferences, clb_thi, moi1, moi2, clubs,
+            tran_nguyen_vong=luat["max_choices"])
+        if loi:
+            return _fail(loi)
+        cu = self._doc_diem_wharton_cua_em(cur, student_id)
+        cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+        dong = ([(student_id, cid, 1, diem) for cid, diem in w1.items()]
+                + [(student_id, cid, 2, diem) for cid, diem in w2.items()])
+        cur.executemany(
+            "INSERT INTO wharton_bids (student_id, club_id, tier, points) "
+            "VALUES (?, ?, ?, ?)", dong)
+        moi = self._doc_diem_wharton_cua_em(cur, student_id)
+        if moi != cu:
+            self._ghi_nhat_ky_wharton(cur, nguon, "luu", student_id, cu, moi)
+        return _ok({"student_id": student_id, "n_saved": len(dong)})
 
     @staticmethod
     def _xoa_diem_khong_con_tick(cur, student_id: str) -> int:
