@@ -1,20 +1,20 @@
 {
  "T1_tai_dan_dap": {
   "do_tre_ms": {
-   "max": 23.5,
-   "p50": 6.8,
-   "p95": 10.7,
-   "p99": 13.4
+   "max": 11.8,
+   "p50": 5.3,
+   "p95": 6.7,
+   "p99": 8.0
   },
   "giay": 10.02,
-  "gui": 5682,
+  "gui": 7316,
   "khong_200": 0,
-  "luong_sau": 3,
-  "luong_truoc": 3,
-  "ok_200": 5682,
-  "rps_thuc": 567.3,
-  "rss_sau_kb": 44912,
-  "rss_truoc_kb": 43052
+  "luong_sau": 6,
+  "luong_truoc": 6,
+  "ok_200": 7316,
+  "rps_thuc": 730.5,
+  "rss_sau_kb": 56764,
+  "rss_truoc_kb": 55244
  },
  "T2_token": {
   "GET /%2e%2e/app.db": 404,
@@ -46,11 +46,11 @@
   "token_dung_them_ky_tu": 403
  },
  "T3_ket_noi_treo": {
-  "do_tre_khi_treo_s": 0.002,
-  "luong_khi_treo": 305,
-  "luong_sau_30s_van_treo": 3,
-  "luong_sau_dong": 3,
-  "luong_truoc": 3,
+  "do_tre_khi_treo_s": 0.003,
+  "luong_khi_treo": 310,
+  "luong_sau_30s_van_treo": 6,
+  "luong_sau_dong": 6,
+  "luong_truoc": 6,
   "phuc_vu_duoc_khi_treo": true,
   "so_ket_noi": 400
  },
@@ -251,132 +251,132 @@
   "app.db_rac": {
    "giay": 0.0,
    "kich_thuoc_zip": 144,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"app.db trong zip kh\\u00f4ng ph\\u1ea3i CSDL h\\u1ee3p l\\u1ec7: file is not a database\"}}]}"
   },
   "khong_co_app.db": {
    "giay": 0.0,
    "kich_thuoc_zip": 111,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng ph\\u1ea3i workspace: thi\\u1ebfu app.db \\u1edf g\\u1ed1c.\"}}]}"
   },
   "nhieu_tep_50k": {
-   "giay": 0.3,
+   "giay": 0.45,
    "kich_thuoc_zip": 5003067,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 51700,
+   "rss_may_chu_kb": 63788,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip qu\\u00e1 nhi\\u1ec1u t\\u1ec7p: qu\\u00e1 1000 t\\u1ec7p.\"}}]}"
   },
   "o_dia_C:": {
    "giay": 0.0,
    "kich_thuoc_zip": 25400,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn tuy\\u1ec7t \\u0111\\u1ed1i 'C:\\\\x\\\\ZIPDRIVE.txt'.\"}}]}"
   },
   "symlink": {
    "giay": 0.0,
    "kich_thuoc_zip": 25372,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: li\\u00ean k\\u1ebft 'link'.\"}}]}"
   },
   "symlink_ten_app.db": {
    "giay": 0.0,
    "kich_thuoc_zip": 111,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: li\\u00ean k\\u1ebft 'app.db'.\"}}]}"
   },
   "ten_NUL": {
    "giay": 0.01,
    "kich_thuoc_zip": 25368,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 54812,
+   "rss_may_chu_kb": 66892,
    "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-3\", \"name\": \"Thu stress\"}, \"errors\": []}"
   },
   "tep_trung_ten": {
    "giay": 0.0,
    "kich_thuoc_zip": 50552,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 54812,
+   "rss_may_chu_kb": 66892,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: c\\u00f3 hai m\\u1ee5c tr\\u00f9ng t\\u00ean 'app.db'.\"}}]}"
   },
   "thu_muc_long_sau": {
-   "giay": 0.03,
+   "giay": 0.02,
    "kich_thuoc_zip": 33376,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 54812,
+   "rss_may_chu_kb": 66892,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_loi_khong_ro\", \"params\": {\"detail\": \"maximum recursion depth exceeded\"}}, {\"code\": \"xem_nhat_ky\", \"params\": {\"file\": \"loi_ung_dung.txt\"}}]}"
   },
   "tieu_de_noi_doi(60MB khai 10 byte)": {
-   "giay": 0.08,
+   "giay": 0.07,
    "kich_thuoc_zip": 86540,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 58204,
+   "rss_may_chu_kb": 70284,
    "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-4\", \"name\": \"Thu stress\"}, \"errors\": []}"
   },
   "tot(đối chứng)": {
    "giay": 0.01,
    "kich_thuoc_zip": 25287,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": true, \"data\": {\"slug\": \"thu-stress-2\", \"name\": \"Thu stress\"}, \"errors\": []}"
   },
   "tuyet_doi_/tmp": {
    "giay": 0.0,
    "kich_thuoc_zip": 25396,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn tuy\\u1ec7t \\u0111\\u1ed1i '/tmp/ZIPABS.txt'.\"}}]}"
   },
   "zip_bomb_700MB(→~700KB)": {
-   "giay": 0.78,
+   "giay": 1.49,
    "kich_thuoc_zip": 738822,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 58204,
+   "rss_may_chu_kb": 70284,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip qu\\u00e1 l\\u1edbn: gi\\u1ea3i n\\u00e9n ra h\\u01a1n 200 MB.\"}}]}"
   },
   "zip_slip_../": {
    "giay": 0.0,
    "kich_thuoc_zip": 25394,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn ch\\u1ee9a '..' ('../ZIPSLIP.txt').\"}}]}"
   },
   "zip_slip_..\\": {
    "giay": 0.0,
    "kich_thuoc_zip": 25402,
-   "luong": 3,
+   "luong": 6,
    "ma_http": 200,
-   "rss_may_chu_kb": 48628,
+   "rss_may_chu_kb": 61028,
    "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"ws_du_lieu_sai\", \"params\": {\"detail\": \"Zip kh\\u00f4ng an to\\u00e0n: \\u0111\\u01b0\\u1eddng d\\u1eabn ch\\u1ee9a '..' ('..\\\\..\\\\ZIPSLIP2.txt').\"}}]}"
   }
  },
  "T6_duong_xuat": {
   "..\\ kiểu Windows": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/..\\\\..\\\\ESC2.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\"
   },
   "..\\..": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC1.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/ESC1.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
   },
   "NUL": {
    "ma": 200,
@@ -384,19 +384,19 @@
   },
   "chỉ dấu chấm": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2)\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2)\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1ed"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/.. (2)\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/.. (2)\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1ed"
   },
   "dấu ~": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC4.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/ESC4.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
   },
   "export_csv(../..)": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_csv\", \"tong_hop_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_csv_tong_hop.csv\", \"n_rows\": 240,"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_export_csv\", \"tong_hop_path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_export_csv_tong_hop.csv\", \"n_rows\": 240,"
   },
   "export_du_lieu_dau_vao(../..)": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_export_du_lieu_dau_vao\", \"dir\": \"/tmp/s8_36xvzp52/tai_ve\", \"n_clubs\": 8, \"n_hoc_sinh\": 120, \"n_prefe"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_export_du_lieu_dau_vao\", \"dir\": \"/tmp/s8_17w05_kz/tai_ve\", \"n_clubs\": 8, \"n_hoc_sinh\": 120, \"n_prefe"
   },
   "export_hoc_sinh_csv(../..)": {
    "ma": 200,
@@ -408,48 +408,46 @@
   },
   "rất dài 5000": {
    "ma": 200,
-   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_exporting_excel\", \"params\": {\"detail\": \"[Errno 36] File name too long: '/tmp/s8_36xvzp52/tai_ve/.~d8bfb263044c4d28a834172f5d6822f2.xlsx' -> '/tmp/s8_36xvzp52/tai_ve/"
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"error_exporting_excel\", \"params\": {\"detail\": \"[Errno 36] File name too long: '/tmp/s8_17w05_kz/tai_ve/.~d77a547249b94eec8a46410dee1869d4.xlsx' -> '/tmp/s8_17w05_kz/tai_ve/"
   },
   "rỗng": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ket_qua_phan_bo.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ket_qua_phan_bo.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\""
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ket_qua_phan_bo.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/ket_qua_phan_bo.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\""
   },
   "tao_so_nhap_mau(../..)": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_tao_so_nhap_mau\", \"dir\": \"/tmp/s8_36xvzp52/tai_ve\", \"n_clubs\": 8, \"n_ten_doi\": 0}, \"errors\": []}"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_tao_so_nhap_mau\", \"dir\": \"/tmp/s8_17w05_kz/tai_ve\", \"n_clubs\": 8, \"n_ten_doi\": 0}, \"errors\": []}"
   },
   "thu_muc_con/../..": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC3.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/ESC3.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 c"
   },
   "thư mục": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai (2)\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai (2)\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1ed7\", \"Th\\"
+   "than": "{\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"xuat_duong_la_thu_muc\", \"params\": {\"path\": \"/tmp/s8_17w05_kz/ngoai\"}}]}"
   },
   "tuyệt đối ghi đè tệp có sẵn": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NHAN (2).xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NHAN (2).xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u0"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/ngoai/NAN_NHAN (2).xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/ngoai/NAN_NHAN (2).xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u0"
   },
   "tuyệt đối ra ngoài": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/ngoai/ABS.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/ngoai/ABS.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\u1"
   },
   "tên đặc biệt": {
    "ma": 200,
-   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/con.xlsx\", \"excel_path\": \"/tmp/s8_36xvzp52/tai_ve/con.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\"
+   "than": "{\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/con.xlsx\", \"excel_path\": \"/tmp/s8_17w05_kz/tai_ve/con.xlsx\", \"trang\": [\"H\\u01b0\\u1edbng d\\u1eabn\", \"Danh s\\u00e1ch h\\u1ecdc sinh\", \"Theo CLB\", \"Ch\\u01b0a c\\u00f3 ch\\"
   }
  },
  "T6_tep_moi": {
   "ngoai_thu_muc_cho_phep": [
    "ngoai",
-   "ngoai (2)",
    "ngoai/ABS.xlsx",
    "ngoai/NAN_NHAN (2).xlsx",
    "ngoai/NAN_NHAN.xlsx"
   ],
   "tat_ca": [
    "ngoai",
-   "ngoai (2)",
    "ngoai/ABS.xlsx",
    "ngoai/NAN_NHAN (2).xlsx",
    "ngoai/NAN_NHAN.xlsx",
@@ -477,7 +475,8 @@
    "tai_ve/ESC5_export_csv_theo_club/clb_vanhoc.csv",
    "tai_ve/ESC5_export_csv_thoi_khoa_bieu.csv",
    "tai_ve/ESC5_export_csv_tong_hop.csv",
-   "tai_ve/ESC5_export_du_lieu_dau_vao"
+   "tai_ve/ESC5_export_du_lieu_dau_vao",
+   "tai_ve/ESC5_tao_so_nhap_mau"
   ],
   "tep_nan_nhan_sau": "TEP_CO_SAN_CUA_NAN_NHAN"
  },
@@ -528,72 +527,17 @@
   "mau_ro_ri": [
    [
     "T6",
-    "..\\..",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "..\\ kiểu Windows",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "thu_muc_con/../..",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "tuyệt đối ra ngoài",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "tuyệt đối ghi đè tệp có sẵn",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
     "rất dài 5000",
-    "/tmp/s8_36xvzp52"
+    "/tmp/s8_17w05_kz"
    ],
    [
     "T6",
     "thư mục",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "dấu ~",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "tên đặc biệt",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "chỉ dấu chấm",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "rỗng",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "export_csv(../..)",
-    "/tmp/s8_36xvzp52"
-   ],
-   [
-    "T6",
-    "export_du_lieu_dau_vao(../..)",
-    "/tmp/s8_36xvzp52"
+    "/tmp/s8_17w05_kz"
    ]
   ],
-  "nhat_ky_loi_sau_byte": 7530,
-  "nhat_ky_loi_truoc_byte": 6726,
+  "nhat_ky_loi_sau_byte": 7720,
+  "nhat_ky_loi_truoc_byte": 6916,
   "so_tep_nhat_ky": 1,
   "so_yeu_cau_loi": 2000
  },
@@ -607,7 +551,7 @@
   [
    "T1",
    "đạt tải / số 200",
-   "567 rps thực, 5682/5682 200, p99 13 ms",
+   "730 rps thực, 7316/7316 200, p99 8 ms",
    "ghi nhận"
   ],
   [
@@ -901,7 +845,7 @@
   [
    "T3",
    "400 kết nối treo (tiêu đề dở)",
-   "luồng 3→305→3 sau 60 s; còn phục vụ: True",
+   "luồng 6→310→6 sau 60 s; còn phục vụ: True",
    "ghi nhận"
   ],
   [
@@ -1099,91 +1043,91 @@
   [
    "T5",
    "zip «tot(đối chứng)» (24 KB)",
-   "nhận; 0.0 s; RSS máy chủ 47 MB",
+   "nhận; 0.0 s; RSS máy chủ 59 MB",
    "ghi nhận (đối chứng)"
   ],
   [
    "T5",
    "zip «zip_slip_../» (24 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «zip_slip_..\\» (24 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «tuyet_doi_/tmp» (24 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «o_dia_C:» (24 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «symlink» (24 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «symlink_ten_app.db» (0 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «khong_co_app.db» (0 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «app.db_rac» (0 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 47 MB",
+   "từ chối; 0.0 s; RSS máy chủ 59 MB",
    "OK"
   ],
   [
    "T5",
    "zip «nhieu_tep_50k» (4885 KB)",
-   "từ chối; 0.3 s; RSS máy chủ 50 MB",
+   "từ chối; 0.5 s; RSS máy chủ 62 MB",
    "OK"
   ],
   [
    "T5",
    "zip «thu_muc_long_sau» (32 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 53 MB",
+   "từ chối; 0.0 s; RSS máy chủ 65 MB",
    "OK"
   ],
   [
    "T5",
    "zip «ten_NUL» (24 KB)",
-   "nhận; 0.0 s; RSS máy chủ 53 MB",
+   "nhận; 0.0 s; RSS máy chủ 65 MB",
    "XEM"
   ],
   [
    "T5",
    "zip «tep_trung_ten» (49 KB)",
-   "từ chối; 0.0 s; RSS máy chủ 53 MB",
+   "từ chối; 0.0 s; RSS máy chủ 65 MB",
    "OK"
   ],
   [
    "T5",
    "zip «zip_bomb_700MB(→~700KB)» (721 KB)",
-   "từ chối; 0.8 s; RSS máy chủ 56 MB",
+   "từ chối; 1.5 s; RSS máy chủ 68 MB",
    "OK"
   ],
   [
    "T5",
    "zip «tieu_de_noi_doi(60MB khai 10 byte)» (84 KB)",
-   "nhận; 0.1 s; RSS máy chủ 56 MB",
+   "nhận; 0.1 s; RSS máy chủ 68 MB",
    "XEM"
   ],
   [
@@ -1201,31 +1145,31 @@
   [
    "T6",
    "xuất «..\\..»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC1.",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC1.",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «..\\ kiểu Windows»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/..\\\\.",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/..\\\\.",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «thu_muc_con/../..»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC3.",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC3.",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «tuyệt đối ra ngoài»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/ABS.xl",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/ngoai/ABS.xl",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «tuyệt đối ghi đè tệp có sẵn»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai/NAN_NH",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/ngoai/NAN_NH",
    "ghi nhận"
   ],
   [
@@ -1243,43 +1187,43 @@
   [
    "T6",
    "xuất «thư mục»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/ngoai (2)\", ",
+   "200 {\"ok\": false, \"data\": null, \"errors\": [{\"code\": \"xuat_duong_",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «dấu ~»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC4.",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC4.",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «tên đặc biệt»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/con.x",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/con.x",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «chỉ dấu chấm»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/.. (2",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/.. (2",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «rỗng»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ket_q",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ket_q",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «export_csv(../..)»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_",
    "ghi nhận"
   ],
   [
    "T6",
    "xuất «export_du_lieu_dau_vao(../..)»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_",
    "ghi nhận"
   ],
   [
@@ -1297,19 +1241,13 @@
   [
    "T6",
    "xuất «tao_so_nhap_mau(../..)»",
-   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_36xvzp52/tai_ve/ESC5_",
+   "200 {\"ok\": true, \"data\": {\"path\": \"/tmp/s8_17w05_kz/tai_ve/ESC5_",
    "ghi nhận"
   ],
   [
    "T6",
    "tệp ghi NGOÀI thư mục cho phép",
    "ngoai",
-   "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
-  ],
-  [
-   "T6",
-   "tệp ghi NGOÀI thư mục cho phép",
-   "ngoai (2)",
    "XEM (đường tuyệt đối do người dùng chọn là thiết kế)"
   ],
   [
@@ -1345,7 +1283,7 @@
   [
    "T7",
    "vết ngăn xếp / đường dẫn máy trong phần LỖI của phản hồi",
-   "[('T6', '..\\\\..', '/tmp/s8_36xvzp52'), ('T6', '..\\\\ kiểu Windows', '/tmp/s8_36xvzp52'), ('T6', 'thu_muc_con/..",
+   "[('T6', 'rất dài 5000', '/tmp/s8_17w05_kz'), ('T6', 'thư mục', '/tmp/s8_17w05_kz')]",
    "LỆCH"
   ],
   [
@@ -1357,7 +1295,7 @@
   [
    "T7",
    "nhật ký lỗi tăng sau 2000 yêu cầu lỗi",
-   "6726 → 7530 byte (0 B/yêu cầu)",
+   "6916 → 7720 byte (0 B/yêu cầu)",
    "XEM"
   ],
   [
@@ -1367,7 +1305,7 @@
    "OK"
   ]
  ],
- "cong": 40751,
+ "cong": 35705,
  "may_do": {
   "chromium": "Google Chrome for Testing 153.0.8010.12",
   "cpu": 4,
@@ -1376,6 +1314,6 @@
   "ram": "15.7 GB",
   "sqlite": "3.45.1"
  },
- "rss_cuoi_kb": 78488,
+ "rss_cuoi_kb": 91340,
  "stderr_may_chu_cuoi": ""
 }

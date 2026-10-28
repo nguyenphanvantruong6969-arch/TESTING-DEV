@@ -704,7 +704,10 @@ class XuatKetQuaMixin:
             # Đường là THƯ MỤC có sẵn: "trùng tên → x (2)" sẽ đẻ ra tệp `x (2)` không đuôi NGOÀI
             # thư mục đó (A13.11, N1). Từ chối bằng lỗi có tên, như trước A13.9.
             if os.path.isdir(output_path):
-                raise LoiDuongXuat(err("xuat_duong_la_thu_muc", path=output_path))
+                # Chỉ TÊN thư mục, không phải cả đường dẫn máy: phản hồi lỗi không mang đường dẫn.
+                raise LoiDuongXuat(err(
+                    "xuat_duong_la_thu_muc",
+                    path=os.path.basename(output_path.rstrip("/\\")) or output_path))
             return duong_dan_khong_de(output_path, kem_duoi)
         thu_muc = self.thu_muc_xuat or thu_muc_tai_ve()
         if not (thu_muc and os.path.isdir(thu_muc)

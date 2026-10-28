@@ -55,7 +55,7 @@ def test_n1_duong_xuat_la_thu_muc_bi_tu_choi(api_co_ket_qua, tmp_path, ham):
     res = ham(api_co_ket_qua, str(thu_muc))
     assert not res["ok"]
     assert _ma(res)[0] == "xuat_duong_la_thu_muc", _ma(res)
-    assert res["errors"][0]["params"]["path"] == str(thu_muc)
+    assert res["errors"][0]["params"]["path"] == "ngoai"      # chỉ tên, không lộ đường dẫn máy
     assert sorted(os.listdir(tmp_path)) == truoc            # không đẻ "ngoai (2)"
     assert os.listdir(thu_muc) == []
 
