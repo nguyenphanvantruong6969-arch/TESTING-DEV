@@ -224,3 +224,82 @@ def test_4_log_khoi_dong_khong_doi_hanh_vi(tmp_path):
     assert _doc_log(tmp_path, chan_doan.TEN_LOG).count("lap lai") == 3
 
 
+# ------------------------------------------------------------------ 6. xuất đường tuyệt đối
+
+@pytest.fixture
+def api_co_ket_qua(api):
+    api.create_or_update_club("a", "A", 1, 0, "")
+    api.create_or_update_club("b", "B", 5, 0, "")
+    for sid, nv in (("N1", ["a", "b"]), ("N2", ["a", "b"])):
+        assert api.create_student_if_missing(sid, sid)["ok"]
+        assert api.submit_preferences(sid, nv)["ok"]
+    assert api.run_pipeline(seed=1)["ok"]
+    return api
+
+
+_CU = "NOI DUNG CU - KHONG DUOC MAT"
+
+
+def _xuat_tep_don(api, ten, ham):
+    """Gọi `ham(api, duong_tuyet_doi)`; trả (res, duong_da_co, noi_dung_cu_truoc)."""
+    thu_muc = os.path.dirname(api.db_path)
+    duong = os.path.join(thu_muc, "ra_ngoai", ten)
+    os.makedirs(os.path.dirname(duong))
+    with open(duong, "w", encoding="utf-8") as f:
+        f.write(_CU)
+    return ham(api, duong), duong
+
+
+@pytest.mark.parametrize("ten,ham,khoa", [
+    ("kq.xlsx", lambda a, d: a.export_ket_qua(d), "path"),
+    ("kq.xlsx", lambda a, d: a.export_ket_qua(d, True), "path"),
+    ("kq.csv", lambda a, d: a.export_csv(d), "path"),
+    ("so.xlsx", lambda a, d: a.tao_so_nhap_mau(d), "path"),
+    ("vao.xlsx", lambda a, d: a.export_du_lieu_dau_vao(d), "path"),
+    ("hs.csv", lambda a, d: a.export_hoc_sinh_csv(["N1", "N2"], d), "path"),
+])
+def test_6_duong_tuyet_doi_khong_ghi_de(api_co_ket_qua, ten, ham, khoa):
+    res, duong = _xuat_tep_don(api_co_ket_qua, ten, ham)
+    assert res["ok"], res["errors"]
+    with open(duong, encoding="utf-8") as f:
+        assert f.read() == _CU                      # tệp có sẵn còn nguyên
+    goc, duoi = os.path.splitext(duong)
+    assert res["data"][khoa] == "%s (2)%s" % (goc, duoi), res["data"][khoa]
+    assert os.path.isfile(res["data"][khoa])
+
+
+def test_6_xuat_lan_hai_len_ba_so_tang(api_co_ket_qua):
+    thu_muc = os.path.join(os.path.dirname(api_co_ket_qua.db_path), "ngoai")
+    os.makedirs(thu_muc)
+    duong = os.path.join(thu_muc, "kq.csv")
+    ra = [api_co_ket_qua.export_csv(duong)["data"]["path"] for _ in range(3)]
+    assert [os.path.basename(p) for p in ra] == ["kq.csv", "kq (2).csv", "kq (3).csv"]
+
+
+def test_6_kem_csv_khong_de_csv_cu_di_kem(api_co_ket_qua):
+    thu_muc = os.path.join(os.path.dirname(api_co_ket_qua.db_path), "ngoai")
+    os.makedirs(thu_muc)
+    with open(os.path.join(thu_muc, "kq.csv"), "w", encoding="utf-8") as f:
+        f.write(_CU)    # chỉ có .csv cũ; xuất Excel kèm CSV phải tránh cả hai đuôi
+    res = api_co_ket_qua.export_ket_qua(os.path.join(thu_muc, "kq.xlsx"), True)
+    assert res["ok"], res["errors"]
+    assert os.path.basename(res["data"]["path"]) == "kq (2).xlsx"
+    with open(os.path.join(thu_muc, "kq.csv"), encoding="utf-8") as f:
+        assert f.read() == _CU
+
+
+def test_6_export_workspace_tuyet_doi_khong_ghi_de(tmp_path):
+    goc = tmp_path / "goc"
+    goc.mkdir()
+    slug = ws.tao(str(goc), "Thử", None)
+    api = PipelineAPI(ws.duong_dan_db(str(goc), slug), thu_muc_xuat=str(tmp_path / "x"),
+                      thu_muc_goc_ws=str(goc), ws_da_chon=True)
+    (tmp_path / "ra").mkdir()
+    dich = tmp_path / "ra" / "ws.zip"
+    dich.write_text(_CU, encoding="utf-8")
+    res = api.export_workspace(slug, str(dich))
+    assert res["ok"], res["errors"]
+    assert dich.read_text(encoding="utf-8") == _CU
+    assert os.path.basename(res["data"]["path"]) == "ws (2).zip"
+
+

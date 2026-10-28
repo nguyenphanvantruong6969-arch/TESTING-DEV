@@ -694,13 +694,14 @@ class XuatKetQuaMixin:
         """Chỗ đặt một tệp (hoặc thư mục) xuất ra — MỘT luật cho mọi lần xuất.
 
         Rỗng hoặc TƯƠNG ĐỐI -> thư mục Tải xuống (lùi về cạnh app.db nếu
-        không ghi được), và không ghi đè tệp đã có: `x.csv` thành
-        `x (2).csv` như trình duyệt. Đường dẫn TUYỆT ĐỐI là ý muốn rõ ràng
-        của bên gọi -> tôn trọng nguyên văn. Xem `export_csv`.
+        không ghi được). Đường dẫn TUYỆT ĐỐI -> đúng chỗ bên gọi chỉ định.
+        Cả hai đều KHÔNG ghi đè tệp đã có: `x.csv` thành `x (2).csv` như
+        trình duyệt (A13.9: trước đây đường tuyệt đối ghi đè im lặng, nên
+        xuất hai lần ra cùng một chỗ là mất tệp lần trước). Xem `export_csv`.
         """
         output_path = (output_path or "").strip() or ten_mac_dinh
         if os.path.isabs(output_path):
-            return output_path
+            return duong_dan_khong_de(output_path, kem_duoi)
         thu_muc = self.thu_muc_xuat or thu_muc_tai_ve()
         if not (thu_muc and os.path.isdir(thu_muc)
                 and os.access(thu_muc, os.W_OK)):
@@ -1325,10 +1326,10 @@ class XuatKetQuaMixin:
              các tệp `.csv` đã ghi xong và vẫn dùng được, `excel_path` None.
 
         output_path rỗng hoặc TƯƠNG ĐỐI -> tệp rơi vào **thư mục Tải
-        xuống** của người dùng (lùi về cạnh app.db nếu không ghi được), và
-        không ghi đè tệp cũ. Đường dẫn TUYỆT ĐỐI do bên gọi truyền vào thì
-        tôn trọng nguyên văn, kể cả việc ghi đè. Luôn trả về đường dẫn ĐẦY
-        ĐỦ để giao diện hiện đúng chỗ tệp nằm.
+        xuống** của người dùng (lùi về cạnh app.db nếu không ghi được). Đường
+        dẫn TUYỆT ĐỐI thì đặt đúng chỗ bên gọi chỉ định. Cả hai đều không
+        ghi đè tệp cũ (trùng tên thì `x (2).csv`). Luôn trả về đường dẫn
+        ĐẦY ĐỦ đã dùng để giao diện hiện đúng chỗ tệp nằm.
         """
         try:
             if self._chua_co_ket_qua():
