@@ -385,7 +385,7 @@ Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–2
 | 2 | 2.2 docstring + tài liệu | `2a2b2ea` | Không thêm PIN. |
 | 3 | 2.3 trang "Điểm chuẩn" khi xuất lỗi | `1127db5`, `953cb71` | Mã mới `xuat_diem_chuan_loi`, `canh_bao` trong kết quả xuất. |
 | 4 | 3.1 chỉ ẩn tab khi `wharton_chua_bat` | `7bec6a0` | |
-| 5 | 1.1 `submit_club_scores` điểm sai | CHƯA SỬA | Phải đổi 4 test cũ khẳng định `ok=True`; đã gửi câu hỏi lên phiên điều phối, chờ chọn A / B / C. |
+| 5 | 1.1 `submit_club_scores` điểm sai | xem `git log` mục "A13.8 (lỗi 1.1)" | Truong chọn B: chỉ `ok=false` khi không lưu được dòng nào vì ô sai; 4 test cũ sửa có duyệt. |
 | 6 | 3.3 tắt tính năng không gọi API | `7bec6a0` | Cờ `WHARTON_BAT` từ cấu hình đã tải. |
 | 7 | 3.4 khoảng cách `#dcKhongXet` | `7bec6a0` | |
 | 8 | 2.4 phóng hàng loạt | `a710a31` | Một giao dịch, `da_doi`, rollback giữ `backup_path`. |

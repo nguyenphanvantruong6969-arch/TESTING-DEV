@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2026-10-28 — A13.8 Sửa 11/12 lỗi từ đợt soát A13 (lỗi 1.1 chờ quyết định)
+## 2026-10-28 — A13.8 Sửa 12 lỗi từ đợt soát A13
 
 Theo danh sách Truong đã chốt (báo cáo `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`, mục "Vòng sửa A13.8"). Mô phỏng. Tắt Điểm quyết tâm: kết quả, dấu vân tay, run_history trùng khít `e08af78` (`kiem_nhanh.py`: 15 ca, 3 bộ × 5 seed).
 - **2.1 + 3.2:** khoá đang bật và em đã có điểm thì `submit_preferences` / `submit_test_selection` trả `wharton_da_khoa` (gửi lại đúng danh sách cũ vẫn ok); nạp CSV / Sổ nhập bỏ qua em đó, cảnh báo `csv_wharton_khoa_giu_nguyen`; kiosk vô hiệu hai nút lưu kèm ghi chú. Tệp: `api_quan_ly.py`, `api_nhap.py`, `js/04_nhap_tai_cho.js`, `index.html`, `i18n.js`, `i18n_errors.py`. Test: `test_a13_8_khoa_nguyen_vong.py`, `test_giao_dien_a13_8_khoa.py`. **Hai test cũ sửa** (`tests/test_wharton_khoa.py`: nạp tệp khi khoá, cửa xoá khi khoá) vì mã hoá hành vi tỉa mà quyết định này đổi.
@@ -10,8 +10,8 @@ Theo danh sách Truong đã chốt (báo cáo `docs/ke_hoach/BAO_CAO_SOAT_MA_A13
 - **2.4:** `phong_wharton_hang_loat` một giao dịch, đọc lại điểm hiện tại (`ly_do = "da_doi"`), rollback toàn bộ kèm `backup_path`; `_luu_wharton` tách `_luu_wharton_cur`. Test: `test_a13_8_phong_mot_giao_dich.py`.
 - **2.5:** `_ngu_canh_diem_chuan` đọc trong một giao dịch (`load_wharton_kem_doc_them`, hàm mới ở `rbda_priority_pipeline.py`; hàm cũ giữ nguyên). Test: `test_a13_8_diem_chuan_mot_giao_dich.py`.
 - **2.6, 2.7, 2.8:** `so_nhap.py` — cột W của sổ mẫu chỉ khi workspace bật được (`wharton_bat_duoc`); hằng `CHO_CHEN_GHI_CHU_W` thay việc dò "Bước 5."; test so `lam_tron_100` với `phong_theo_ti_le`. Test: `test_a13_8_so_mau.py`.
-- **Chưa làm: 1.1 `submit_club_scores`** — phải sửa 4 test cũ; đã hỏi phiên điều phối (A: cả lượt thất bại, B: chỉ khi không lưu được dòng nào, C: giữ ok kèm cờ), đề xuất A.
-- **Kiểm:** toàn bộ test có Chromium, `-rs`: 2.850 qua, 3 bỏ qua (numpy ×2, POSIX ×1; không ca giao diện nào bị bỏ qua). `ruff check .` sạch.
+- **1.1 `submit_club_scores` (Truong chọn B, 28/10/2026):** lượt không lưu và không xoá được dòng nào vì ô điểm sai (`nan`, `inf`, `"1e999"`, `-1`, chữ) trả `ok=false`, `errors` liệt kê từng (student_id, giá trị) bằng `score_not_a_number` / `score_negative`; lượt lẫn ô đúng và sai vẫn lưu phần đúng, `ok=true` + `warnings` như cũ. `js/06_cham_diem.js` tô đỏ các ô sai cả khi thất bại. **Test cũ sửa có duyệt** (`tests/test_diem_bat_thuong.py`, đúng các ca một-ô-sai): `test_man_hinh_cham_diem_tu_choi_diem_am`, `test_hai_duong_nhap_cung_mot_luat_voi_diem_am`, `test_gia_tri_khong_doc_duoc_thi_khong_ghi_de_diem_cu`, `test_diem_am_viet_bang_dau_phay_van_bi_chan`; ca mới thêm ở cuối tệp. Hai test cũ ở `tests/test_wharton_khoa.py` (lỗi 2.1) cũng được Truong đồng ý giữ nguyên bản sửa.
+- **Kiểm (trước lỗi 1.1):** toàn bộ test có Chromium, `-rs`: 2.850 qua, 3 bỏ qua (numpy ×2, POSIX ×1; không ca giao diện nào bị bỏ qua). `ruff check .` sạch.
 
 ## 2026-10-28 — Z-SOAT Skill `soat-ma`: soát mã trước khi push
 

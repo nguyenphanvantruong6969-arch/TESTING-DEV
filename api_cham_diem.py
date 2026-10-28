@@ -167,7 +167,7 @@ class ChamDiemMixin:
                     ).fetchall()
                 }
 
-                n_saved, skipped = 0, []
+                n_saved, n_xoa, skipped = 0, 0, []
                 for entry in scores:
                     if not isinstance(entry, dict):
                         skipped.append(err("score_not_applicant", student_id=str(entry)))
@@ -183,6 +183,7 @@ class ChamDiemMixin:
                             "DELETE FROM club_scores WHERE student_id = ? AND club_id = ?",
                             (sid, club_id),
                         )
+                        n_xoa += 1
                         continue
                     # Dùng CHUNG bộ đọc số với đường nạp tệp, thay vì float()
                     # thẳng. `_doc_diem` nhận cả dấu phẩy thập phân kiểu Việt
@@ -209,6 +210,13 @@ class ChamDiemMixin:
                     )
                     n_saved += 1
 
+            # Lượt chỉ có ô điểm sai (không lưu, không xoá được dòng nào) mà trả ok là để người
+            # chấm tưởng đã lưu (A13.8): trả lỗi, liệt kê từng em / giá trị. Lượt lẫn ô đúng và
+            # sai vẫn lưu phần đúng, ok kèm warnings như cũ.
+            sai_gia_tri = [w for w in skipped
+                           if w["code"] in ("score_not_a_number", "score_negative")]
+            if sai_gia_tri and not n_saved and not n_xoa:
+                return _fail(sai_gia_tri)
             return _ok({"club_id": club_id, "n_saved": n_saved, "warnings": skipped})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))

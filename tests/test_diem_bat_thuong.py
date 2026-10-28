@@ -55,9 +55,10 @@ def _diem_da_luu(api, sid, club="clb_a"):
 def test_man_hinh_cham_diem_tu_choi_diem_am(api):
     _clb_co_diem(api, {"HS01": 9.0, "HS02": 8.0})
     res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": -9}])
-    assert res["ok"] is True                       # không làm hỏng cả lượt lưu
-    assert [w["code"] for w in res["data"]["warnings"]] == ["score_negative"]
-    assert res["data"]["n_saved"] == 0
+    # A13.8: lượt CHỈ có ô sai (không lưu được dòng nào) thì trả lỗi, không báo ok.
+    assert res["ok"] is False
+    assert [(e["code"], e["params"]["student_id"]) for e in res["errors"]] == [
+        ("score_negative", "HS01")]
     # Điểm cũ phải CÒN NGUYÊN, không bị ghi đè bằng số âm.
     assert _diem_da_luu(api, "HS01") == 9.0
 
@@ -74,7 +75,7 @@ def test_hai_duong_nhap_cung_mot_luat_voi_diem_am(api, tmp_path):
     qua_tep = api2.import_test_selection_csv(
         "student_id,name,test_club_1,score_1\nHS01,Em,clb_a,-9\n")
 
-    assert "score_negative" in [w["code"] for w in qua_man_hinh["data"]["warnings"]]
+    assert [e["code"] for e in qua_man_hinh["errors"]] == ["score_negative"]
     assert "csv_score_negative" in [w["code"] for w in qua_tep["data"]["warnings"]]
     assert _diem_da_luu(api2, "HS01") is None
 
@@ -222,9 +223,9 @@ def test_gia_tri_khong_doc_duoc_thi_khong_ghi_de_diem_cu(api, go):
     assert _diem_da_luu(api, "HS01") == 7.5
 
     res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": go}])
-    assert res["data"]["n_saved"] == 0, go
     if go != "":
-        assert [w["code"] for w in res["data"]["warnings"]] == ["score_not_a_number"]
+        assert res["ok"] is False, go          # A13.8: không lưu được dòng nào thì trả lỗi
+        assert [e["code"] for e in res["errors"]] == ["score_not_a_number"]
     # Điểm cũ phải còn nguyên (ô rỗng là lệnh XOÁ, nên bỏ qua ca đó).
     if go != "":
         assert _diem_da_luu(api, "HS01") == 7.5
@@ -236,7 +237,8 @@ def test_diem_am_viet_bang_dau_phay_van_bi_chan(api):
     _mot_thi_sinh(api)
     api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": "7,5"}])
     res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": "-8,5"}])
-    assert [w["code"] for w in res["data"]["warnings"]] == ["score_negative"]
+    assert res["ok"] is False
+    assert [e["code"] for e in res["errors"]] == ["score_negative"]
     assert _diem_da_luu(api, "HS01") == 7.5
 
 
@@ -251,3 +253,32 @@ def test_hai_cua_cho_cung_ket_qua_voi_dau_phay(api, tmp_path):
         "student_id,name,test_club_1,score_1\nHS01,Em,clb_a,\"8,5\"\n")
 
     assert _diem_da_luu(api, "HS01") == _diem_da_luu(api2, "HS01") == 8.5
+
+
+# ------------------------------------------------------------------ A13.8 (lỗi 1.1)
+
+@pytest.mark.parametrize("go", [float("nan"), "nan", float("inf"), "1e999", -1, "-1", "abc"])
+def test_a13_8_diem_sai_trong_luot_khong_luu_duoc_gi_thi_tra_loi(api, go):
+    _mot_thi_sinh(api)
+    res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": go}])
+    assert res["ok"] is False
+    assert res["errors"][0]["params"]["student_id"] == "HS01"
+    assert _diem_da_luu(api, "HS01") is None
+
+
+def test_a13_8_luot_lan_o_dung_o_sai_van_luu_phan_dung_ok_kem_warnings(api):
+    _mot_thi_sinh(api)
+    api.create_student_if_missing("HS02", "Em HS02")
+    api.submit_test_selection("HS02", ["clb_a"])
+    res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": 8},
+                                           {"student_id": "HS02", "score": "nan"}])
+    assert res["ok"] is True and res["data"]["n_saved"] == 1
+    assert [w["code"] for w in res["data"]["warnings"]] == ["score_not_a_number"]
+    assert _diem_da_luu(api, "HS01") == 8 and _diem_da_luu(api, "HS02") is None
+
+
+def test_a13_8_o_trong_xoa_diem_cung_la_luot_co_viec_nen_van_ok(api):
+    _mot_thi_sinh(api)
+    api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": 7}])
+    res = api.submit_club_scores("clb_a", [{"student_id": "HS01", "score": ""}])
+    assert res["ok"] is True and _diem_da_luu(api, "HS01") is None
