@@ -26,6 +26,7 @@ biết sai ở đâu.
 """
 
 import os
+import re
 import sys
 import traceback
 from datetime import datetime
@@ -37,19 +38,70 @@ TEN_LOG = "loi_khoi_dong.txt"
 TEN_LOG_UNG_DUNG = "loi_ung_dung.txt"
 _LUONG_ZONE = ":Zone.Identifier"
 
+# Nhật ký lỗi khi chạy có TRẦN: một lỗi lặp trong vòng lặp (hay một kiosk chạy nhiều tháng) làm
+# tệp phình vô hạn. Vượt trần thì giữ PHẦN CUỐI (lỗi mới nhất là thứ cần đọc), cắt ở ranh giới mục.
+TRAN_LOG_UNG_DUNG_BYTE = 1_000_000
+_GIU_LAI_SAU_KHI_CAT = 0.75          # cắt xuống còn ngần này trần, để khỏi cắt ở MỌI lần ghi
+_DAU_MOC = re.compile(r"^\[\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\] ", re.M)
+
 
 def duong_log(base_dir: str, ten: str = TEN_LOG) -> str:
     return os.path.join(base_dir, ten)
 
 
+def _bo_moc(van_ban: str) -> str:
+    """Bỏ mốc giờ đầu mỗi mục — để so hai mục xem có cùng nội dung không."""
+    return _DAU_MOC.sub("", van_ban)
+
+
+def _trung_muc_cuoi(duong: str, muc_moi: str) -> bool:
+    """Mục sắp ghi có TRÙNG HẾT (trừ giờ) mục cuối đang nằm trong tệp không."""
+    try:
+        with open(duong, "rb") as f:
+            f.seek(0, os.SEEK_END)
+            f.seek(max(0, f.tell() - 4 * len(muc_moi.encode("utf-8")) - 4096))
+            duoi = f.read().decode("utf-8", "replace")
+    except OSError:
+        return False
+    return _bo_moc(duoi).endswith(_bo_moc(muc_moi))
+
+
+def _cat_dau_neu_qua_tran(duong: str, tran: int) -> None:
+    """Tệp quá `tran` byte thì giữ phần cuối, bắt đầu từ một mốc mục nguyên vẹn."""
+    if os.path.getsize(duong) <= tran:
+        return
+    giu = int(tran * _GIU_LAI_SAU_KHI_CAT)
+    with open(duong, "rb") as f:
+        f.seek(-giu, os.SEEK_END)
+        phan = f.read().decode("utf-8", "ignore")
+    m = _DAU_MOC.search(phan)
+    if m:
+        phan = phan[m.start():]
+    moc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    phan = "[%s] (phần đầu nhật ký đã bị cắt vì vượt trần %d byte)\n%s" % (moc, tran, phan)
+    tam = duong + ".tmp"
+    with open(tam, "w", encoding="utf-8") as f:
+        f.write(phan)
+    os.replace(tam, duong)
+
+
 def ghi(base_dir: str, *dong, ten: str = TEN_LOG) -> None:
     """Ghi thêm vào cuối tệp log. Không bao giờ được ném lỗi ra ngoài —
-    hỏng phần ghi log mà làm chết app thì tệ hơn cả lỗi đang chẩn đoán."""
+    hỏng phần ghi log mà làm chết app thì tệ hơn cả lỗi đang chẩn đoán.
+
+    Riêng log LỖI KHI CHẠY (`TEN_LOG_UNG_DUNG`): bỏ lần ghi giống hệt lần ghi ngay trước
+    (chỉ khác giờ) và giữ tệp dưới `TRAN_LOG_UNG_DUNG_BYTE`."""
     try:
-        with open(duong_log(base_dir, ten), "a", encoding="utf-8") as f:
-            moc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            for d in dong:
-                f.write("[%s] %s\n" % (moc, d))
+        duong = duong_log(base_dir, ten)
+        moc = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        muc = "".join("[%s] %s\n" % (moc, d) for d in dong)
+        la_log_ung_dung = ten == TEN_LOG_UNG_DUNG
+        if la_log_ung_dung and _trung_muc_cuoi(duong, muc):
+            return
+        with open(duong, "a", encoding="utf-8") as f:
+            f.write(muc)
+        if la_log_ung_dung:
+            _cat_dau_neu_qua_tran(duong, TRAN_LOG_UNG_DUNG_BYTE)
     except Exception:
         pass
 

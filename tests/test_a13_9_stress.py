@@ -173,3 +173,54 @@ def test_5_loi_ngoai_du_kien_chi_tra_ten_kieu(hosted, api):
         assert "abc123" in f.read()   # chi tiết thật vẫn có ở nhật ký
 
 
+# ------------------------------------------------------------------ 4. nhật ký lỗi có trần
+
+def _doc_log(thu_muc, ten=chan_doan.TEN_LOG_UNG_DUNG):
+    with open(os.path.join(thu_muc, ten), encoding="utf-8") as f:
+        return f.read()
+
+
+def test_4_tran_mac_dinh_khoang_1_mb():
+    assert 900_000 <= chan_doan.TRAN_LOG_UNG_DUNG_BYTE <= 1_200_000
+
+
+def test_4_log_vuot_tran_giu_phan_cuoi(tmp_path, monkeypatch):
+    monkeypatch.setattr(chan_doan, "TRAN_LOG_UNG_DUNG_BYTE", 20_000)
+    for i in range(400):
+        chan_doan.ghi(str(tmp_path), "Loi so %04d: " % i + "x" * 80, ten=chan_doan.TEN_LOG_UNG_DUNG)
+    noi_dung = _doc_log(tmp_path)
+    assert len(noi_dung.encode("utf-8")) <= 20_000
+    assert "Loi so 0399" in noi_dung            # phần cuối còn
+    assert "Loi so 0000" not in noi_dung        # phần đầu bị cắt
+    # cắt ở ranh giới mục: không để nửa dòng
+    dong_dau = noi_dung.split("\n", 1)[0]
+    assert dong_dau.startswith("[") and "Loi so" in dong_dau or "cắt" in dong_dau
+
+
+def test_4_bo_muc_trung_lien_tiep(tmp_path):
+    for _ in range(50):
+        chan_doan.ghi(str(tmp_path), "Loi: cung mot loi", ten=chan_doan.TEN_LOG_UNG_DUNG)
+    assert _doc_log(tmp_path).count("cung mot loi") == 1
+    # khác thì ghi; trùng nhưng KHÔNG liên tiếp thì vẫn ghi
+    chan_doan.ghi(str(tmp_path), "Loi: loi khac", ten=chan_doan.TEN_LOG_UNG_DUNG)
+    chan_doan.ghi(str(tmp_path), "Loi: cung mot loi", ten=chan_doan.TEN_LOG_UNG_DUNG)
+    nd = _doc_log(tmp_path)
+    assert nd.count("cung mot loi") == 2 and nd.count("loi khac") == 1
+
+
+def test_4_ngoai_le_giong_het_chi_ghi_mot_lan(tmp_path):
+    db = str(tmp_path / "app.db")
+    for _ in range(5):
+        try:
+            raise ValueError("nhu nhau")
+        except ValueError:
+            chan_doan.ghi_ngoai_le_canh_db(db, "Loi: thu")
+    assert _doc_log(tmp_path).count("ValueError: nhu nhau") == 1
+
+
+def test_4_log_khoi_dong_khong_doi_hanh_vi(tmp_path):
+    for _ in range(3):
+        chan_doan.ghi(str(tmp_path), "lap lai")
+    assert _doc_log(tmp_path, chan_doan.TEN_LOG).count("lap lai") == 3
+
+
