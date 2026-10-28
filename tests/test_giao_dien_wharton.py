@@ -177,7 +177,8 @@ def test_luu_thieu_40_bao_loi_va_khong_ghi_gi_roi_luu_dung_100_thi_co_dong(mo):
     page.locator("#btnSubmitWharton").click()
     page.wait_for_function(
         "() => document.getElementById('whartonFeedback').textContent.includes('Đã lưu')")
-    assert dong_bids(api) == [("HS1", "A", 1, 100), ("HS1", "B", 2, 60), ("HS1", "C", 2, 40)]
+    # A13.12 (2.2, Truong chọn cách A): ô tự điền 100 của khung một CLB KHÔNG ghi vào CSDL.
+    assert dong_bids(api) == [("HS1", "B", 2, 60), ("HS1", "C", 2, 40)]
     assert page.locator("#chuaLuuWharton").is_hidden()
     assert not loi, loi
 
@@ -200,8 +201,8 @@ def test_o_chua_luu_hien_dau_chua_luu_va_het_sau_khi_luu(mo):
     page, api, loi = mo()
     _chon(page, "HS1")
     _cho_buoc_3(page)
-    # khung một CLB tự điền 100 mà chưa lưu: vẫn là "chưa lưu" (CSDL chưa có dòng nào)
-    assert page.locator("#chuaLuuWharton").is_visible()
+    # khung một CLB tự điền 100: KHÔNG tính là "chưa lưu" (A13.12, 1.8 / 2.4: máy chủ tự điền, không ghi)
+    assert page.locator("#chuaLuuWharton").is_hidden()
     _o(page, "B").fill("60")
     _o(page, "C").fill("40")
     page.locator("#btnSubmitWharton").click()
@@ -221,13 +222,13 @@ def test_bo_clb_o_buoc_2_xoa_dong_va_buoc_3_ve_lai_thieu_40(mo):
     _o(page, "C").fill("40")
     page.locator("#btnSubmitWharton").click()
     page.wait_for_function("() => document.getElementById('chuaLuuWharton').hidden")
-    assert len(dong_bids(api)) == 3
+    assert len(dong_bids(api)) == 2           # A13.12: không có dòng 100 tự điền của A
 
     page.locator("#rankingList li").nth(2).locator("button").click()       # bỏ C khỏi nguyện vọng
     page.locator("#btnSubmitPreferences").click()
     page.wait_for_function(
         "() => document.getElementById('preferencesFeedback').textContent.includes('Đã lưu')")
-    assert dong_bids(api) == [("HS1", "A", 1, 100), ("HS1", "B", 2, 60)]   # dòng C bị xoá
+    assert dong_bids(api) == [("HS1", "B", 2, 60)]                          # dòng C bị xoá
     page.wait_for_function("() => document.querySelectorAll('#fbWhartonBody input.wh-diem').length === 2")
     assert _o(page, "C").count() == 0 and _o(page, "B").input_value() == "60"
     assert _dem(page, 2) == "Đã dùng 60 / 100"                              # thiếu 40
@@ -298,12 +299,11 @@ def test_nhieu_buoi_moi_buoi_hai_khung_theo_thu_tu_ngay(tmp_path, api, mo):
     assert buoi == ["thu_3:1", "thu_3:2", "thu_5:1", "thu_5:2"]      # thứ 3 trước thứ 5
     for cid in "ABCD":                                  # mỗi khung chỉ một CLB: tự điền 100, khoá
         assert _o(page, cid).is_disabled() and _o(page, cid).input_value() == "100"
-    assert page.locator("#chuaLuuWharton").is_visible()  # tự điền mà chưa lưu vẫn là "chưa lưu"
+    assert page.locator("#chuaLuuWharton").is_hidden()   # A13.12: tự điền không phải "chưa lưu"
     page.locator("#btnSubmitWharton").click()
     page.wait_for_function(
         "() => document.getElementById('whartonFeedback').textContent.includes('Đã lưu')")
-    assert dong_bids(api) == [("HS1", "A", 1, 100), ("HS1", "B", 2, 100),
-                              ("HS1", "C", 1, 100), ("HS1", "D", 2, 100)]
+    assert dong_bids(api) == []                          # A13.12: ô tự điền không đi vào CSDL
     assert not loi, loi
 
 
