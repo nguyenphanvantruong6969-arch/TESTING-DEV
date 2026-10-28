@@ -16,7 +16,7 @@ def _khoa_db(api, khoa=True):
                     (1 if khoa else 0,))
 
 
-def test_khoa_va_em_co_diem_thi_hai_nut_luu_bi_vo_hieu_va_co_ghi_chu(mo):
+def test_khoa_va_em_co_diem_thi_hai_nut_luu_bi_vo_hieu_va_co_ghi_chu(mo):  # noqa: F811
     page, api, loi = mo()
     chen_bids(api, [("HS1", "A", 1, 100), ("HS1", "B", 2, 50), ("HS1", "C", 2, 50)])
     _khoa_db(api)
@@ -30,7 +30,7 @@ def test_khoa_va_em_co_diem_thi_hai_nut_luu_bi_vo_hieu_va_co_ghi_chu(mo):
     assert not loi, loi
 
 
-def test_khoa_nhung_em_chua_co_diem_thi_nut_luu_binh_thuong(mo):
+def test_khoa_nhung_em_chua_co_diem_thi_nut_luu_binh_thuong(mo):  # noqa: F811
     page, api, loi = mo()
     _khoa_db(api)
     _chon(page, "HS1")
@@ -41,7 +41,7 @@ def test_khoa_nhung_em_chua_co_diem_thi_nut_luu_binh_thuong(mo):
     assert not loi, loi
 
 
-def test_chua_khoa_em_co_diem_thi_nut_luu_binh_thuong(mo):
+def test_chua_khoa_em_co_diem_thi_nut_luu_binh_thuong(mo):  # noqa: F811
     page, api, loi = mo()
     chen_bids(api, [("HS1", "A", 1, 100), ("HS1", "B", 2, 50), ("HS1", "C", 2, 50)])
     _chon(page, "HS1")
@@ -52,7 +52,7 @@ def test_chua_khoa_em_co_diem_thi_nut_luu_binh_thuong(mo):
     assert not loi, loi
 
 
-def test_chuyen_tu_em_bi_khoa_sang_em_khac_nut_bat_lai(mo):
+def test_chuyen_tu_em_bi_khoa_sang_em_khac_nut_bat_lai(mo):  # noqa: F811
     page, api, loi = mo()
     chen_bids(api, [("HS1", "A", 1, 100), ("HS1", "B", 2, 50), ("HS1", "C", 2, 50)])
     _khoa_db(api)
@@ -66,7 +66,7 @@ def test_chuyen_tu_em_bi_khoa_sang_em_khac_nut_bat_lai(mo):
     assert not loi, loi
 
 
-def test_wharton_tat_hai_nut_luu_luon_bat(mo):
+def test_wharton_tat_hai_nut_luu_luon_bat(mo):  # noqa: F811
     page, api, loi = mo(bat=False)
     _chon(page, "HS1")
     assert page.locator("#btnSubmitTestSelection").is_enabled()

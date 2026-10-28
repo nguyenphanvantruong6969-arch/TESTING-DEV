@@ -85,7 +85,7 @@ def test_chua_bat_thi_van_an_tab(trinh):
     assert not loi, loi
 
 
-def test_loi_nhat_ky_hien_thong_bao(mo):
+def test_loi_nhat_ky_hien_thong_bao(mo):  # noqa: F811
     page, api, loi = mo()
     _chan(page, "get_wharton_nhat_ky", "error_wharton_quan_ly")
     _mo_man_sua(page, "HS2")
