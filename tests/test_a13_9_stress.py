@@ -465,4 +465,3 @@ def test_9_tren_20_clb_tu_sinh_ten_khong_bi_chan(sdl, api, tmp_path, n_hs, buoi,
 
 def test_9_tren_20_clb_van_tat_dinh_theo_seed(sdl):
     assert sdl.sinh_ngau_nhien(300, ["a", "b", "c"], 8, 5) == sdl.sinh_ngau_nhien(300, ["a", "b", "c"], 8, 5)
-
