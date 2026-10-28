@@ -443,8 +443,15 @@ def _tieu_de_hai_hang(h1, h2, loi, ten_sheet, cfg=None):
         if k in da_gap:
             continue
         da_gap.add(k)
-        cuoi = (dau[vi_tri + 1][0] - 1 if vi_tri + 1 < len(dau)
-                else max(j for j in range(i, n) if h2[j] or j == i))
+        if vi_tri + 1 < len(dau):
+            cuoi = dau[vi_tri + 1][0] - 1
+        else:
+            cuoi = max(j for j in range(i, n) if h2[j] or j == i)
+            if vi_tri >= 1:
+                # Nhóm cuối rộng bằng nhóm liền trước: cột phụ ("Ghi chú"…) bên phải không thuộc
+                # nhóm nào, bị bỏ qua thay vì làm cả sổ bị từ chối. Cột lạ NẰM TRONG chiều rộng
+                # đó vẫn là lỗi (sai chữ cột điểm).
+                cuoi = min(cuoi, i + (dau[vi_tri][0] - dau[vi_tri - 1][0]) - 1)
         nhom = {"k": k, "ten": str(h1[i]).strip(), "cot": {}}
         for j in range(i, cuoi + 1):
             loai = _loai_cot_nhom(h2[j], cfg)
@@ -1269,7 +1276,9 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
         w = x.get("diem_w")
         if w in (None, ""):
             return None
-        if isinstance(w, str) and w.strip().isdigit():
+        # Chỉ chữ số 0-9: `str.isdigit()` còn đúng với "²", "①", "٣"…, mà `int()` ném ValueError
+        # (hay đọc "٣" thành 3 và làm mất ô gốc). Ô như vậy giữ nguyên chuỗi để người nhập thấy.
+        if isinstance(w, str) and re.fullmatch(r"[0-9]+", w.strip()):
             return int(w.strip())
         return w
 
