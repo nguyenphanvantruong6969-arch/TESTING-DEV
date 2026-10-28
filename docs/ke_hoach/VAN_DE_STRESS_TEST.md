@@ -28,7 +28,7 @@
 | # | Hiện nay (A13.11) | Đã sửa ở commit |
 |---|---|---|
 | N1 | **Hết** — lỗi `xuat_duong_la_thu_muc`, không đẻ tệp `ngoai (2)` | 902cb6b, 02c3089 |
-| N2 | **Hết** — một dòng tóm tắt mỗi lần nạp; `app.db` 16,7 → 1,66 MB sau 100 vòng; còn 2 test cũ đỏ chờ Truong quyết | 442725f |
+| N2 | **Hết** — một dòng tóm tắt mỗi lần nạp; `app.db` 16,7 → 1,66 MB sau 100 vòng; 2 test cũ sửa có duyệt | 442725f |
 | N3 | **Hết** — mọi hàm báo `csdl_dang_ban` sau ≤ 3 s (trước 15 – 17,6 s); giao diện nói rõ "CSDL đang bận" | 49c7319 |
 | N4 | **Hết** — nguyên nhân là 13 lời gọi đọc cùng lúc tranh GIL, không phải vẽ DOM; lần đầu mở Kết quả 13,6 → 1,06 s, trang chậm nhất 6,5 → 0,34 s; 800 × 20 không chậm đi | 2fb9680 |
 

@@ -293,7 +293,12 @@ class WorkspaceMixin:
         """Nén workspace thành .zip đặt vào thư mục xuất (Tải xuống), không ghi đè."""
         self._ws_db(slug)
         dich = self._duong_xuat(output_path, slug + ".zip")
-        workspace.xuat_zip(self._goc_ws, slug, dich)
+        try:
+            workspace.xuat_zip(self._goc_ws, slug, dich)
+        except OSError as e:
+            # `str(e)` mang tên tệp / đường dẫn máy; chi tiết đầy đủ nằm ở nhật ký (A13.11).
+            self._loi_co_ghi_vet(err("ws_loi_khong_ro"))
+            raise RuntimeError("%s: %s" % (type(e).__name__, e.strerror or "")) from None
         return _ok({"path": dich, "dir": os.path.dirname(dich)})
 
     @_ws_phuong_thuc

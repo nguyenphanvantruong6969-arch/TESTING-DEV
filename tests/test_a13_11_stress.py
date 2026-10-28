@@ -301,3 +301,47 @@ def test_n4_moi_ham_doc_cong_khai_duoc_boc_con_ham_ghi_thi_khong():
     for n in ("run_pipeline", "submit_preferences", "import_so_nhap", "reset_data",
               "export_ket_qua"):
         assert not hasattr(getattr(PipelineAPI, n), "__wrapped__"), n
+
+
+# ------------------------------------------------------------------ N1b. lỗi xuất không lộ đường dẫn máy
+
+DAU_DUONG = "thu_muc_khong_co_zzz"
+
+
+@pytest.mark.parametrize("ham", [
+    lambda a, d: a.export_ket_qua(d),
+    lambda a, d: a.export_ket_qua(d, True),
+    lambda a, d: a.export_csv(d),
+    lambda a, d: a.tao_so_nhap_mau(d),
+    lambda a, d: a.export_du_lieu_dau_vao(d),
+    lambda a, d: a.export_hoc_sinh_csv(["N1", "N2"], d),
+    lambda a, d: a.export_thay_doi_ket_qua(d),
+], ids=["ket_qua", "ket_qua_kem_csv", "csv", "so_mau", "du_lieu_vao", "hoc_sinh", "thay_doi"])
+def test_n1b_loi_xuat_khong_lo_duong_dan_may(api_co_ket_qua, tmp_path, ham):
+    duong = str(tmp_path / DAU_DUONG / "x.xlsx")            # thư mục cha không tồn tại
+    res = ham(api_co_ket_qua, duong)
+    assert not res["ok"]
+    van_ban = json.dumps(res, ensure_ascii=False)
+    assert DAU_DUONG not in van_ban and str(tmp_path) not in van_ban, van_ban
+    assert "FileNotFoundError" in van_ban or "No such file" in van_ban    # vẫn nói được kiểu lỗi
+
+
+def test_n1b_export_workspace_khong_lo_duong_dan_may(tmp_path):
+    goc = tmp_path / "goc"
+    goc.mkdir()
+    slug = ws.tao(str(goc), "Thử", None)
+    api = PipelineAPI(ws.duong_dan_db(str(goc), slug), thu_muc_xuat=str(tmp_path / "x"),
+                      thu_muc_goc_ws=str(goc), ws_da_chon=True)
+    (tmp_path / DAU_DUONG).write_text("tệp, không phải thư mục", encoding="utf-8")
+    res = api.export_workspace(slug, str(tmp_path / DAU_DUONG / "ws.zip"))   # cha là TỆP
+    assert not res["ok"]
+    assert DAU_DUONG not in json.dumps(res, ensure_ascii=False)
+
+
+def test_n1b_chi_tiet_that_nam_o_nhat_ky(api_co_ket_qua, tmp_path):
+    import chan_doan
+    duong = str(tmp_path / DAU_DUONG / "x.xlsx")
+    api_co_ket_qua.export_ket_qua(duong)
+    log = os.path.join(os.path.dirname(api_co_ket_qua.db_path), chan_doan.TEN_LOG_UNG_DUNG)
+    with open(log, encoding="utf-8") as f:
+        assert DAU_DUONG in f.read()

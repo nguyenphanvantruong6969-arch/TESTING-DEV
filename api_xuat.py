@@ -689,6 +689,20 @@ class XuatKetQuaMixin:
                 ra.append(["(không có em nào — mọi em đều có ít nhất một chỗ)", ""])
 
         return ra
+    def _chi_tiet_loi_xuat(self, e) -> str:
+        """`detail` AN TOÀN cho lỗi xuất tệp (A13.11): kiểu lỗi (và lý do hệ điều hành nếu là
+        OSError), KHÔNG kèm tên tệp / đường dẫn máy như `str(e)`. Chi tiết đầy đủ (có đường dẫn)
+        vào `loi_ung_dung.txt` cạnh app.db. Chỉ gọi trong khối `except`."""
+        import chan_doan
+
+        try:
+            chan_doan.ghi_ngoai_le_canh_db(self.db_path, "Loi xuat: %s" % type(e).__name__)
+        except Exception:
+            pass
+        if isinstance(e, OSError) and e.strerror:
+            return "%s: %s" % (type(e).__name__, e.strerror)
+        return type(e).__name__
+
     def _duong_xuat(self, output_path: str, ten_mac_dinh: str,
                     kem_duoi: tuple = ()) -> str:
         """Chỗ đặt một tệp (hoặc thư mục) xuất ra — MỘT luật cho mọi lần xuất.
@@ -930,7 +944,7 @@ class XuatKetQuaMixin:
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     # -----------------------------------------------------------------
     # DỮ LIỆU ĐẦU VÀO HIỆN TẠI — một Sổ nhập CLB NẠP LẠI ĐƯỢC
@@ -1023,7 +1037,7 @@ class XuatKetQuaMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def export_wharton_can_sua(self, output_path: str = ""):
         """Danh sách hồ sơ điểm quyết tâm cần sửa (A13.5) thành MỘT tệp Excel. KHÔNG đổi điểm nào.
@@ -1085,7 +1099,7 @@ class XuatKetQuaMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def tao_so_nhap_mau(self, output_path: str = ""):
         """Tạo Sổ nhập CLB để điền, đặt vào thư mục Tải xuống.
@@ -1106,7 +1120,7 @@ class XuatKetQuaMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("so_nhap_mau_loi", detail=str(e)))
+            return _fail(err("so_nhap_mau_loi", detail=self._chi_tiet_loi_xuat(e)))
 
     # -----------------------------------------------------------------
     # HỒ SƠ HỌC SINH — một em hoặc nhiều em được chọn
@@ -1244,7 +1258,7 @@ class XuatKetQuaMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def _khoa_xuat(self, ham, *args):
         """Giữ khoá ghi + bật bộ nhớ báo cáo suốt một lần xuất.
@@ -1298,7 +1312,7 @@ class XuatKetQuaMixin:
             try:
                 trang = self._luu_so_excel(path, du)
             except Exception as e:
-                return _fail(err("error_exporting_excel", detail=str(e)))
+                return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
             ra = {
                 "path": path, "excel_path": path, "trang": trang,
@@ -1320,12 +1334,12 @@ class XuatKetQuaMixin:
                     bo["csv_path"] = bo.pop("path")
                     ra.update(bo)
                 except Exception as e:
-                    ra["loi_csv"] = err("error_exporting_csv", detail=str(e))
+                    ra["loi_csv"] = err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e))
             return _ok(ra)
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def export_csv(self, output_path: str = ""):
         """Bộ tệp `.csv` rời (kèm sổ Excel cùng tên) — đường xuất cho phần
@@ -1370,7 +1384,7 @@ class XuatKetQuaMixin:
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
-            return _fail(err("error_exporting_csv", detail=str(e)))
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
     def _ket_qua_cu(self) -> bool:
         tt = self.get_trang_thai_ket_qua()
