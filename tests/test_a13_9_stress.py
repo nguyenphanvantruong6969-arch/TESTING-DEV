@@ -303,3 +303,74 @@ def test_6_export_workspace_tuyet_doi_khong_ghi_de(tmp_path):
     assert os.path.basename(res["data"]["path"]) == "ws (2).zip"
 
 
+# ------------------------------------------------------------------ 7. nhập zip workspace
+
+@pytest.fixture
+def goc_ws(tmp_path):
+    g = tmp_path / "goc7"
+    g.mkdir()
+    return str(g)
+
+
+def _db_that(goc_ws):
+    slug = ws.tao(goc_ws, "Nguồn")
+    with open(ws.duong_dan_db(goc_ws, slug), "rb") as f:
+        return f.read()
+
+
+def _zip(duong, muc):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")     # zipfile cảnh báo "Duplicate name"
+        with zipfile.ZipFile(duong, "w", zipfile.ZIP_DEFLATED) as z:
+            for ten, du_lieu in muc:
+                z.writestr(ten, du_lieu)
+    return str(duong)
+
+
+def _khong_con_rac(goc_ws, truoc):
+    return set(os.listdir(os.path.join(goc_ws, "workspaces"))) == truoc
+
+
+def test_7_tran_la_1000_tep_va_200_mb():
+    assert ws.TRAN_SO_TEP_ZIP == 1000
+    assert ws.TRAN_GIAI_NEN_BYTE == 200 * 1024 * 1024
+
+
+def test_7_qua_1000_tep_bi_tu_choi_va_1000_van_nhan(goc_ws, tmp_path):
+    db = _db_that(goc_ws)
+    truoc = set(os.listdir(os.path.join(goc_ws, "workspaces")))
+    nhieu = [("app.db", db)] + [("t%04d.txt" % i, b"x") for i in range(1000)]   # 1.001 tệp
+    with pytest.raises(ValueError, match="1000|1\\.000"):
+        ws.nhap_zip(goc_ws, _zip(tmp_path / "nhieu.zip", nhieu))
+    assert _khong_con_rac(goc_ws, truoc)
+    vua = nhieu[:1000]                                                          # đúng 1.000
+    assert ws.nhap_zip(goc_ws, _zip(tmp_path / "vua.zip", vua))
+
+
+def test_7_ten_trung_bi_tu_choi(goc_ws, tmp_path):
+    db = _db_that(goc_ws)
+    truoc = set(os.listdir(os.path.join(goc_ws, "workspaces")))
+    with pytest.raises(ValueError, match="trùng"):
+        ws.nhap_zip(goc_ws, _zip(tmp_path / "a.zip", [("app.db", db), ("ghi.txt", b"1"),
+                                                      ("ghi.txt", b"2")]))
+    # trùng sau khi chuẩn hoá dấu phân cách và hoa/thường (Windows coi là cùng một tệp)
+    with pytest.raises(ValueError, match="trùng"):
+        ws.nhap_zip(goc_ws, _zip(tmp_path / "b.zip", [("app.db", db), ("T/Ghi.txt", b"1"),
+                                                      ("t\\ghi.TXT", b"2")]))
+    with pytest.raises(ValueError, match="trùng"):
+        ws.nhap_zip(goc_ws, _zip(tmp_path / "c.zip", [("app.db", db), ("App.DB", b"2")]))
+    assert _khong_con_rac(goc_ws, truoc)
+
+
+def test_7_ten_co_nul_bi_tu_choi(goc_ws, tmp_path):
+    db = _db_that(goc_ws)
+    truoc = set(os.listdir(os.path.join(goc_ws, "workspaces")))
+    zp = _zip(tmp_path / "nul.zip", [("app.db", db), ("ghi#chu.txt", b"1")])
+    du = open(zp, "rb").read()
+    assert du.count(b"ghi#chu.txt") == 2                  # tiêu đề cục bộ + thư mục trung tâm
+    open(zp, "wb").write(du.replace(b"ghi#chu.txt", b"ghi\x00chu.txt"))
+    with pytest.raises(ValueError, match="NUL"):
+        ws.nhap_zip(goc_ws, zp)
+    assert _khong_con_rac(goc_ws, truoc)
+
+
