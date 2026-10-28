@@ -1019,6 +1019,8 @@ thiếu bao nhiêu ở quỹ nào và không lưu.
 
 ### Quản lý điểm quyết tâm (thẻ Quản lý)
 
+> **Thẻ Quản lý cần người giám sát máy.** Thẻ này không có mật khẩu: bảng điểm quyết tâm của cả khối, điểm chuẩn và nhật ký đều mở được từ máy kiosk. Hãy để máy kiosk dưới sự giám sát của giáo viên hoặc người phụ trách, không để học sinh ngồi một mình ở máy.
+
 Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Thẻ Quản lý chia thành các **tab con**: *CLB*, *Học sinh*, *Điểm quyết tâm*, *Điểm chuẩn* và *Dữ liệu* (phần xoá dữ liệu). Hai tab điểm chỉ hiện khi bật điểm quyết tâm; tắt thì chỉ còn ba tab con. Khối này nằm ở tab con *Điểm quyết tâm*. Phần mềm nhớ tab con bạn vừa mở; chuyển tab bằng chuột hoặc phím mũi tên.
 
 **Xem bảng điểm.** Mỗi dòng là một học sinh: điểm đã chia cho từng CLB, tách theo quỹ (Quỹ 1: CLB đã thi, Quỹ 2: CLB không thi) và theo buổi, kèm **Tổng** của từng quỹ (phải đúng 100). Ô được phần mềm tự điền 100 vì quỹ chỉ có một CLB thì ghi *tự điền*; ô chưa đặt hiện dấu —. Dùng ô tìm (gõ không dấu cũng được), các ô lọc Quỹ / Buổi / CLB và ô **Chỉ hồ sơ có vấn đề**; có phân trang. Dòng có vấn đề được tô viền đỏ và ghi *Chưa hợp lệ*, *Vắng thi* hoặc *Cần chia lại*.

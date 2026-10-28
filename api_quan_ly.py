@@ -605,7 +605,7 @@ class QuanLyMixin:
     def list_wharton_admin(self, search: str = "", quy=None, buoi=None, club_id=None,
                            chi_loi: bool = False, page: int = 1, page_size: int = 100):
         """Bảng điểm Wharton cho thẻ Quản lý: mỗi dòng một em (tìm và phân trang như
-        `list_students_admin`).
+        `list_students_admin`). KHÔNG có xác thực: thẻ Quản lý là một thẻ ngang hàng, ai ngồi ở máy cũng gọi được (kể cả qua máy chủ dự phòng); an toàn dựa vào người giám sát máy (xem HUONG_DAN_SU_DUNG.md).
 
         Mỗi dòng: `diem` [{club_id, ten_clb, buoi, quy, diem, tu_dien}] sắp theo buổi rồi theo thứ
         tự nguyện vọng (`diem` là None khi chưa đặt; `tu_dien` là ô 100 tự điền trong bộ nhớ, không
@@ -693,12 +693,11 @@ class QuanLyMixin:
         return None, ctx
 
     def get_diem_chuan(self):
-        """Điểm chuẩn từng CLB sau lần chạy gần nhất (A13.4), CHỈ cho quản trị.
+        """Điểm chuẩn từng CLB sau lần chạy gần nhất (A13.4). Dành cho quản lý, nhưng KHÔNG có xác thực: thẻ Quản lý là một thẻ ngang hàng, ai ngồi ở máy cũng gọi được (kể cả qua máy chủ dự phòng); an toàn dựa vào người giám sát máy (xem HUONG_DAN_SU_DUNG.md).
 
         Chỉ có khi workspace bật điểm quyết tâm (không thì `wharton_chua_bat`). Chưa có kết quả
         thì trả `co_ket_qua` False và `rows` rỗng. `ket_qua_cu` True khi dữ liệu đã đổi sau lần
-        chạy (dấu vân tay khác), như các màn kết quả khác. Không có đường nào cho kiosk gọi hàm
-        này. Cách tính: xem `tinh_diem_chuan`.
+        chạy (dấu vân tay khác), như các màn kết quả khác. Cách tính: xem `tinh_diem_chuan`.
         """
         try:
             loi, c = self._ngu_canh_diem_chuan()
@@ -723,7 +722,7 @@ class QuanLyMixin:
         không được: chưa có chỗ nào ở buổi đó, hoặc đang ở CLB xếp SAU CLB này). Em đã vào một CLB
         xếp TRƯỚC thì chưa từng xin CLB này nên không tính, chỉ đếm vào `so_khong_xet`. Em tầng 1
         (có điểm thi ở CLB này) không nằm trên thang này. Kèm `chuan`: đúng dòng của
-        `get_diem_chuan`. Chỉ cho quản trị, giống `get_diem_chuan`.
+        `get_diem_chuan`. Cùng mức truy cập với `get_diem_chuan` (không xác thực, xem ở đó).
         """
         try:
             loi, c = self._ngu_canh_diem_chuan()
@@ -795,7 +794,8 @@ class QuanLyMixin:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
 
     def get_wharton_nhat_ky(self, student_id=None, page: int = 1, page_size: int = 50):
-        """Nhật ký điểm Wharton, dòng MỚI NHẤT trước, có phân trang; `student_id` lọc theo một em."""
+        """Nhật ký điểm Wharton, dòng MỚI NHẤT trước, có phân trang; `student_id` lọc theo một em.
+        KHÔNG có xác thực: thẻ Quản lý là một thẻ ngang hàng, ai ngồi ở máy cũng gọi được (kể cả qua máy chủ dự phòng); an toàn dựa vào người giám sát máy (xem HUONG_DAN_SU_DUNG.md)."""
         try:
             if not dung_wharton(self._luat_nghiem()):
                 return _fail(err("wharton_chua_bat"))
