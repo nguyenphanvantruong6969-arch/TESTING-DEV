@@ -1010,7 +1010,7 @@ Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm quyế
 thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo còn
 thiếu bao nhiêu ở quỹ nào và không lưu.
 
-- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của bạn khác.
+- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của em khác.
 - Khung chỉ có một CLB thì ô tự điền 100 và khoá. Nếu em chưa bấm **Lưu**, lúc chạy xếp phần mềm vẫn tự điền 100 đó trong bộ nhớ (không ghi vào cơ sở dữ liệu), nên em không bị chặn chỉ vì chưa bấm Lưu; quỹ có từ hai CLB trở lên thì vẫn phải tự chia.
 - Đổi ô tick thi ở Bước 1 **sau khi** đã chia điểm: điểm **không** tự chuyển sang quỹ kia. Khung hiện dòng
   *Cần chia lại điểm* và hồ sơ chưa hợp lệ cho tới khi chia lại.

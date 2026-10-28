@@ -65,8 +65,11 @@ thư mục nào.
 | `BAO_CAO_BAT_THUONG.md` | Mọi điều bất thường, kèm mã học sinh |
 
 Sổ được soát bằng `soat()` của skill `sinh-du-lieu-clb` (9 điều bắt buộc của
-phần mềm) rồi ghi bằng `so_nhap.py` của chính phần mềm, nên bố cục (hai hàng tiêu đề)
-giống hệt sổ mẫu trong kho.
+phần mềm) rồi ghi bằng `so_nhap.py` của chính phần mềm, nên có cùng bố cục hai hàng
+tiêu đề với sổ mẫu trong kho (`mau_csv/SO_NHAP_CLB.xlsx`). Khác một điểm: sổ mẫu có thêm
+cột "Điểm quyết tâm" bên phải mỗi cột "Điểm thi"; sổ do kỹ năng này ghi không có cột đó
+(biểu mẫu không hỏi). Nạp sổ không có cột ấy vẫn được; muốn nhập điểm quyết tâm thì thêm
+sau trong phần mềm.
 
 ## Đọc báo cáo và nói với người dùng
 
