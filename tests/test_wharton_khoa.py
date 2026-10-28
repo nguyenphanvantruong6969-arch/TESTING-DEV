@@ -95,6 +95,48 @@ def test_chay_hong_giua_chung_rollback_thi_khong_khoa(da_chay, monkeypatch):
     assert _khoa(api) == [] and _nk(api) == nk0
 
 
+BON_BANG_ROLLBACK = ("match_results", "run_history", "wharton_lock", "stb_lock")
+
+
+def _chup_bon_bang(api):
+    with api._ket_noi_doc() as cur:
+        return {b: [tuple(r) for r in cur.execute("SELECT * FROM %s ORDER BY 1, 2" % b)]
+                for b in BON_BANG_ROLLBACK}
+
+
+def test_loi_o_buoc_nhat_ky_khoa_rollback_ca_giao_dich(da_chay, monkeypatch):
+    """A13.12 (4.5): lỗi NGAY SAU khi dòng khoá được chèn (tại `_ghi_nhat_ky_wharton(..., "khoa")`):
+    dòng khoá, kết quả, run_history và số STB vừa vẽ đều phải bị huỷ cùng giao dịch.
+
+    Test liền trên làm hỏng ở `luat_xep_de_ghi`, TRƯỚC dòng khoá nên không chứng minh gì về
+    rollback (thay `rollback()` bằng `commit()` nó vẫn xanh). Ở đây lỗi ném khi mọi bảng đã có dữ
+    liệu chưa commit, nên một `commit()` nhầm sẽ để lại dòng ở cả bốn bảng.
+    """
+    api, _bo = da_chay
+    goc = api_mod.PipelineAPI._ghi_nhat_ky_wharton.__func__
+    dong_khoa_luc_loi = []
+
+    def hong_khi_khoa(cls, cur, nguon, hanh_dong, *a, **k):
+        if hanh_dong == "khoa":
+            dong_khoa_luc_loi.append(
+                cur.execute("SELECT COUNT(*) FROM wharton_lock").fetchone()[0])
+            raise RuntimeError("hong khi ghi nhat ky khoa")
+        return goc(cls, cur, nguon, hanh_dong, *a, **k)
+
+    monkeypatch.setattr(api_mod.PipelineAPI, "_ghi_nhat_ky_wharton", classmethod(hong_khi_khoa))
+    truoc, nk0 = _chup_bon_bang(api), _nk(api)
+    assert [b for b, v in truoc.items() if v == []] == ["match_results", "run_history", "wharton_lock"]
+    assert truoc["stb_lock"][0][1] == 0     # dòng mặc định, chưa khoá STB
+    assert api.run_pipeline(seed=3)["ok"] is False
+    assert dong_khoa_luc_loi == [1], "lỗi phải ném SAU khi dòng khoá đã chèn (nếu không test vô nghĩa)"
+    assert _chup_bon_bang(api) == truoc
+    assert _nk(api) == nk0
+    # Gỡ lỗi giả: lần chạy sau vẫn thành công và khoá bình thường, không để lại trạng thái nửa vời.
+    monkeypatch.undo()
+    assert api.run_pipeline(seed=3)["ok"]
+    assert _khoa(api)[0][0] == 1
+
+
 def test_wharton_tat_chay_xong_khong_co_dong_khoa_va_khong_nhat_ky(tmp_path):
     bo = sinh_bo(79, n_hs=12, n_clb=4)
     api = api_mod.PipelineAPI(str(tmp_path / "t.db"))
