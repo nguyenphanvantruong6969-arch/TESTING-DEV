@@ -2,7 +2,7 @@
 
 > Soát CHỈ BÁO CÁO, không sửa mã. Dữ liệu là MÔ PHỎNG. Không subagent, không `/code-review`.
 > Phạm vi: `git diff e08af78..54a5cf4` (A13 vòng 1–5, trên `main`) + hàm cũ mà mã A13 gọi vào hoặc sửa.
-> Vòng 6+7 (A13.6, A13.7) chưa đẩy: sẽ soát BỔ SUNG khi phiên điều phối báo, rồi mới push.
+> Vòng 6+7 (A13.6 `2df59ce`, A13.7 `088573d`) đã đẩy ngày 27/10: báo cáo đã rebase lên `088573d` và soát BỔ SUNG phần `54a5cf4..088573d` vào Tầng 1–2.
 > Cách ghi: `| # | Mức | Tệp:dòng | Hàm | Vấn đề | Đường xảy ra | Đề xuất sửa | Chắc chắn? |`.
 
 ## Bước 0 — Chuẩn bị
@@ -70,6 +70,24 @@ STB: A=1, B=2, C=3. X có điểm thi: A=8, B=8, C không thi. Y không ai thi. 
 
 `chặn`: 0 · `nên sửa`: 0 · `nhỏ`: 2 (1.1, 1.2 — cả hai đã hạ xuống "không có đường thật" sau Tầng 2).
 
+
+### Soát bổ sung vòng 6+7 (`54a5cf4..088573d`) — phần lõi
+
+Phạm vi mở rộng thành `e08af78..088573d`. Vòng 6+7 **không đổi một dòng nào** của `rbda_priority_pipeline.py`. Bản chạy lại trùng khít trên mã `088573d`: **15/15 ca (3 bộ × 5 seed) trùng khít `e08af78`** (1.350 dòng `match_results` và `stb_number`).
+
+### Bốn khía cạnh — Tầng 1
+
+- **Bảo mật:** không có SQL, tệp hay chuỗi người dùng trong mã lõi; không có bí mật trong diff (grep `password|secret|token|eval|exec|os.system|pickle`: chỉ `subprocess` dạng danh sách đối số, không `shell`, trong test).
+- **Hiệu năng:** `uu_tien_wharton` là `sorted` một lần mỗi CLB, O(n log n); `diem_wharton_hieu_luc` duyệt (em × nguyện vọng). Với bộ 800 em × 20 CLB × 4 buổi, `run_pipeline` mất 0,16 giây.
+- **Đúng đắn:** đã thử biên ở bảng trên; không có lệch một.
+- **Bảo trì:** hằng `WHARTON_*` có chú thích quyết định; tên `wharton` trong mã so với "điểm quyết tâm" ở chữ người dùng là chủ ý (đã ghi chú trong mã).
+
+### Điểm tốt (Tầng 1)
+
+Nhánh bật/tắt tách bạch bằng `if diem_wharton is not None` nên đường cũ không đổi một phép so sánh. Khoá ưu tiên là một hàm thuần có chữ ký không nhận nguyện vọng, dễ chứng minh bất biến 2. `verify_stability` tự đúng vì đọc `base_rank` của chính lần giải. Hàm phụ trả bản sao, không sửa đầu vào.
+
+### Kết luận tầng: **Đạt**
+
 ---
 
 ## Tầng 2 — Backend
@@ -107,4 +125,40 @@ Phạm vi đã đọc: diff `api.py`, `api_quan_ly.py` (≈ 800 dòng), `api_nha
 
 ### Tóm tắt Tầng 2
 
-`chặn`: 0 · `nên sửa`: 3 (2.1, 2.2, 2.3) · `nhỏ`: 2 (2.4, 2.5). Hai mục cần Truong quyết: **2.1** và **2.2**.
+`chặn`: 0 · `nên sửa`: 3 (2.1, 2.2, 2.3) · `nhỏ`: 5 (2.4, 2.5, 2.6, 2.7, 2.8). Hai mục cần Truong quyết: **2.1** và **2.2**.
+
+### Soát bổ sung vòng 6+7 (`54a5cf4..088573d`) — phần backend và dữ liệu mẫu
+
+Tệp đổi đúng phạm vi A13.6/A13.7: `api_xuat.py` (1 dòng), `so_nhap.py`, `mau_csv/tao_so_nhap.py`, `tests/test_ws_so_nhap.py` (đúng 2 kỳ vọng, đã duyệt), sổ mẫu, 6 sổ `SO_NHAP_DQT_*`, hai JSON, hai script sinh, test mới, tài liệu và skill.
+
+| Mục kiểm | Kết luận | Bằng chứng |
+|---|---|---|
+| `ghi_so_nhap(luon_co_cot_w=False)` mặc định giữ hành vi cũ | **ĐẠT** | So `54a5cf4` và `088573d` trên 4 cấu hình × (có dữ liệu / sổ trống): từng ô, ô gộp, kiểm dữ liệu, sheet Hướng dẫn **giống hệt**. |
+| Chỉ `tao_so_nhap_mau` và `mau_csv/tao_so_nhap.py` truyền True | **ĐẠT** | `grep luon_co_cot_w`: đúng ba chỗ gọi (`api_xuat.py:1079`, `tao_so_nhap.py:78`, `:84`). Script của skill gọi `ghi_so_nhap` không truyền cờ. |
+| 4 sổ cũ trong `du_lieu_test/` không đổi byte | **ĐẠT** | `git diff 54a5cf4 088573d` không có tệp nào trong số đó (`SO_NHAP_CO_LOI_CO_Y`, `SO_NHAP_MAU_120HS_3BUOI`, `SO_NHAP_TEST`, `TEST_04_CO_LOI_CO_Y`). |
+| 6 sổ `SO_NHAP_DQT_*` mở được, sinh lại cùng nội dung | **ĐẠT** | Chạy `sinh_du_lieu_diem_quyet_tam.py --ra <tạm>`: nội dung 6 tệp (mọi ô mọi sheet) **bằng** tệp đã commit (byte khác do dấu thời gian của openpyxl, chấp nhận). Nạp cả 6 vào CSDL trống (bật và tắt): xem trước và nạp đều `ok`. `HOP_LE` (120 và 800 em): 0 cảnh báo, `run_pipeline` thành công. `TRONG`: 0 dòng `wharton_bids`. |
+| Bảng lỗi `DQT_BANG_LOI.json` khớp thực tế | **ĐẠT** | Với `CO_LOI` (15 và 40 em lỗi): mọi `loi_pipeline` và `canh_bao_nhap` ghi trong bảng đều xuất hiện đúng em, đúng quỹ, đúng buổi; **0 em ngoài bảng bị báo**, 0 thiếu. |
+| Tắt tính năng: ô có số chỉ cảnh báo | **ĐẠT** | Cả 6 sổ khi tắt: `ok`, đúng một cảnh báo `csv_wp_bo_qua`, không chặn, `wharton_bids` rỗng. |
+| Trùng khít 3 bộ × 5 seed so với `e08af78` | **ĐẠT** | Xem phần Tầng 1. |
+| Test | **ĐẠT** | `ruff check .` sạch trên `088573d`; 95 ca của `test_du_lieu_mau_diem_quyet_tam`, `test_so_mau_co_cot_quyet_tam`, `test_ws_so_nhap`, `test_dong_goi_skill` đều qua. |
+
+Phát hiện bổ sung từ vòng 6+7:
+
+| # | Mức | Tệp:dòng | Hàm | Vấn đề | Đường xảy ra | Đề xuất sửa | Chắc chắn? |
+|---|---|---|---|---|---|---|---|
+| 2.6 | nhỏ | `so_nhap.py:1232` | `ghi_so_nhap` / `huong_dan` | Sổ MẪU luôn có cột "Điểm quyết tâm" kể cả workspace không thể bật tính năng (ví dụ `priority = "tier"`), và đoạn hướng dẫn nói "chỉ dùng khi phần mềm bật tính năng". Người dùng workspace đó thấy một cột không bao giờ có tác dụng. Điểm theo người đã được loại đúng (`not ca_nhan`). | `tao_so_nhap_mau` trên workspace `priority = "tier"` → sổ có cột; nạp lại → `csv_wp_bo_qua`. Không gây sai kết quả. | Thêm điều kiện "workspace có thể bật" (cùng điều kiện của `cau_hinh_ws._chuan_hoa`) cho `luon_co_cot_w`. | suy luận (đọc mã) |
+| 2.7 | nhỏ | `.claude/skills/sinh-du-lieu-clb/scripts/sinh_du_lieu.py` (`lam_tron_100`); `api_quan_ly.py` (`phong_theo_ti_le`) | cả hai | Hai bản của cùng một thuật toán làm tròn phần dư lớn nhất. Chủ ý (skill đóng gói riêng, không nhập mã thuật toán), nhưng test chỉ canh ngân sách bằng nhau, không canh hai hàm cho cùng kết quả. | Một bên đổi luật hoà, bên kia không đổi theo → sổ mẫu sinh ra lệch với nút "Phóng". | Thêm một test so hai hàm trên cùng đầu vào ngẫu nhiên. | suy luận |
+| 2.8 | nhỏ | `so_nhap.py:965–1000` | `huong_dan`, `_huong_dan_goc` | Dòng đầu docstring của `_huong_dan_goc` dài hơn 100 ký tự (trộn tóm tắt và mô tả); `huong_dan` chèn ghi chú bằng cách tìm dòng "Bước 5." rồi lùi một dòng, dễ vỡ nếu ai đổi chữ hướng dẫn. | Đổi "Bước 5." thành tên khác → ghi chú rơi xuống cuối hướng dẫn, không báo lỗi. | Dùng một hằng đánh dấu vị trí chèn; có test canh vị trí. | suy luận |
+
+### Bốn khía cạnh — Tầng 2
+
+- **Bảo mật:** SQL luôn tham số hoá (`?`), chỉ hai chỗ ghép chuỗi nhận hằng nội bộ. Đường dẫn xuất: tương đối bị rút về tên tệp (`os.path.basename`), thử `../../../../tmp/…` cho kết quả nằm trong thư mục xuất; đường tuyệt đối được tôn trọng nguyên văn theo thiết kế sẵn có (qua `browser_host` thì mọi trang gọi được, xem 2.2). Không có bí mật trong diff. Phát hiện 2.2 (không có xác thực) là điểm bảo mật chính.
+- **Hiệu năng (bộ 800 em × 20 CLB × 4 buổi, 5.664 dòng điểm):** nạp sổ 0,42 giây; báo cáo sức khoẻ 0,04; bảng điểm Quản lý 0,04 (cả 500 dòng); danh sách cảnh báo 0,03; chạy phân bổ 0,16; điểm chuẩn 0,04 và chi tiết một CLB 0,08; xuất sổ kết quả 0,32; xuất "cần sửa" 0,04. Không có truy vấn trong vòng lặp theo em ở đường đọc (`_ho_so_wharton_tat_ca` đọc một lần). Đường ghi `phong_wharton_hang_loat` mở một giao dịch mỗi em (N giao dịch, chấp nhận vì cần nhật ký từng em).
+- **Đúng đắn:** rollback thật, khoá đặt trong cùng giao dịch, kiểm khoá trong giao dịch ghi, biên rỗng/None/tràn đã thử ở trên; điều kiện tranh chấp: xem 2.4, 2.5.
+- **Bảo trì:** lõi `_luu_wharton` dùng chung cho kiosk và quản lý (một bản luật). `api_quan_ly.py` tăng thêm ≈ 800 dòng, nên cân nhắc tách `api_wharton.py` về sau (không gấp).
+
+### Điểm tốt (Tầng 2)
+
+Kiểm hồ sơ đứng trước khoá STB và có test chứng minh; nhật ký chỉ ghi thêm trong cùng giao dịch với thao tác; khoá điểm tách khỏi khoá STB; mã lỗi một nguồn và `i18n_loi.js` khớp bản sinh lại; cấu hình hỏng không làm sập màn kiosk; sổ dữ liệu mẫu có bảng lỗi khớp thực tế từng em.
+
+### Kết luận tầng: **Cần bàn** (không có lỗi `chặn`; 2.1 và 2.2 cần Truong quyết, 2.3 nên sửa trước khi giao)
