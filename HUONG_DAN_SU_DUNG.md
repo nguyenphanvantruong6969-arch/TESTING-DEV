@@ -1052,12 +1052,17 @@ Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem đư
   **Xét điểm thi** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
   "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở nhóm và mức đó.
 - **Tab Kết quả.** Mục **Điểm chuẩn** luôn **đóng** mỗi lần vào thẻ; bấm **Xem điểm chuẩn** mới mở và hiện bảng tổng
-  quan mọi CLB (thanh điểm chuẩn xét điểm quyết tâm, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
-- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai cách xét x hai mức và hai biểu đồ:
-  *cột phân bố* điểm quyết tâm của em thuộc nhóm xét điểm quyết tâm (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
-  gạch chéo) và *dải chấm* (mỗi em một chấm: đặc là được nhận, rỗng là không được nhận; di chuột hoặc chạm vào chấm để
-  xem mã học sinh và điểm). Vạch đen dọc là mức chuẩn. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
-  thì không tính (số em này được ghi bên dưới).
+  quan mọi CLB. Phần mềm không nhớ trạng thái mở.
+- **Bảng tổng quan.** Mỗi CLB một dòng, có hai cột điểm chuẩn riêng: **Xét điểm thi** (thanh trên thang điểm thi, thường
+  là 10) và **Xét điểm quyết tâm** (thanh trên thang 0 đến 100). Mỗi thanh là điểm thấp nhất đã được nhận. Ô "—": CLB
+  chưa có ai ở cách xét đó. Cột **Đơn / chỗ** có số đơn trên số chỗ và một thanh nhỏ: vạch đứng là mốc đơn bằng chỗ;
+  thanh xanh là đơn không nhiều hơn chỗ, vàng là nhiều hơn đến gấp đôi, đỏ là nhiều hơn gấp đôi.
+- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai cách xét x hai mức và **một biểu đồ
+  dải chấm**: mỗi em xin vào CLB đó là một chấm đặt theo điểm quyết tâm (đặc xanh là được nhận, rỗng xám là không được
+  nhận; chấm cùng điểm xếp thành cột; di chuột hoặc chạm vào chấm để xem mã học sinh và điểm). Vạch đứng ghi số là điểm
+  chuẩn, vùng nhạt bên phải vạch là vùng được nhận. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
+  thì không tính (số em này được ghi bên dưới). Máy bật chế độ tối thì khối này tự chuyển nền tối; máy bật "giảm chuyển
+  động" thì các chấm không có hiệu ứng vào.
 - Dải vàng "kết quả có thể đã cũ" hiện khi dữ liệu đã đổi sau lần chạy gần nhất.
 - **Tệp xuất.** Sổ Excel kết quả có thêm trang **Điểm chuẩn** (mỗi CLB một dòng). Tắt điểm quyết tâm thì sổ xuất y như cũ.
 
