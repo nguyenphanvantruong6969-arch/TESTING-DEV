@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-10-28 — A13.8 Sửa 11/12 lỗi từ đợt soát A13 (lỗi 1.1 chờ quyết định)
+
+Theo danh sách Truong đã chốt (báo cáo `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`, mục "Vòng sửa A13.8"). Mô phỏng. Tắt Điểm quyết tâm: kết quả, dấu vân tay, run_history trùng khít `e08af78` (`kiem_nhanh.py`: 15 ca, 3 bộ × 5 seed).
+- **2.1 + 3.2:** khoá đang bật và em đã có điểm thì `submit_preferences` / `submit_test_selection` trả `wharton_da_khoa` (gửi lại đúng danh sách cũ vẫn ok); nạp CSV / Sổ nhập bỏ qua em đó, cảnh báo `csv_wharton_khoa_giu_nguyen`; kiosk vô hiệu hai nút lưu kèm ghi chú. Tệp: `api_quan_ly.py`, `api_nhap.py`, `js/04_nhap_tai_cho.js`, `index.html`, `i18n.js`, `i18n_errors.py`. Test: `test_a13_8_khoa_nguyen_vong.py`, `test_giao_dien_a13_8_khoa.py`. **Hai test cũ sửa** (`tests/test_wharton_khoa.py`: nạp tệp khi khoá, cửa xoá khi khoá) vì mã hoá hành vi tỉa mà quyết định này đổi.
+- **2.2:** docstring bốn API đúng thực tế; `HUONG_DAN_SU_DUNG.md` ghi "thẻ Quản lý cần người giám sát máy". Không PIN.
+- **2.3:** `_trang_diem_chuan` ghi lý do lên trang và `export_ket_qua` trả `canh_bao` (`xuat_diem_chuan_loi`). Test: `test_a13_8_xuat_diem_chuan.py`.
+- **3.1, 3.3, 3.4:** `js/05_quan_ly.js` chỉ ẩn tab khi `wharton_chua_bat`, lỗi khác hiện thông báo; tắt tính năng không gọi `list_wharton_canh_bao` / `get_diem_chuan` (cờ `WHARTON_BAT` đặt ở `js/075_workspace.js`); `style.css` `#dcKhongXet`. Test: `test_giao_dien_a13_8_quan_ly.py`.
+- **2.4:** `phong_wharton_hang_loat` một giao dịch, đọc lại điểm hiện tại (`ly_do = "da_doi"`), rollback toàn bộ kèm `backup_path`; `_luu_wharton` tách `_luu_wharton_cur`. Test: `test_a13_8_phong_mot_giao_dich.py`.
+- **2.5:** `_ngu_canh_diem_chuan` đọc trong một giao dịch (`load_wharton_kem_doc_them`, hàm mới ở `rbda_priority_pipeline.py`; hàm cũ giữ nguyên). Test: `test_a13_8_diem_chuan_mot_giao_dich.py`.
+- **2.6, 2.7, 2.8:** `so_nhap.py` — cột W của sổ mẫu chỉ khi workspace bật được (`wharton_bat_duoc`); hằng `CHO_CHEN_GHI_CHU_W` thay việc dò "Bước 5."; test so `lam_tron_100` với `phong_theo_ti_le`. Test: `test_a13_8_so_mau.py`.
+- **Chưa làm: 1.1 `submit_club_scores`** — phải sửa 4 test cũ; đã hỏi phiên điều phối (A: cả lượt thất bại, B: chỉ khi không lưu được dòng nào, C: giữ ok kèm cờ), đề xuất A.
+- **Kiểm:** toàn bộ test có Chromium, `-rs`: 2.850 qua, 3 bỏ qua (numpy ×2, POSIX ×1; không ca giao diện nào bị bỏ qua). `ruff check .` sạch.
+
 ## 2026-10-28 — Z-SOAT Skill `soat-ma`: soát mã trước khi push
 
 Theo yêu cầu của Truong (28/10/2026, "làm bước cuối" của đợt soát A13). Mã mục `Z-SOAT` do Claude đề xuất, chưa có trong sổ đăng ký 33 mục (quy ước khác thì đổi tên). Đây là lần duy nhất đợt soát được thêm mã; KHÔNG sửa lỗi nào trong `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md` (sẽ làm ở A13.8, dùng chính skill này).

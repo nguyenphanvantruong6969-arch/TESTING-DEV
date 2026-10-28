@@ -375,3 +375,21 @@ Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–2
 - Chạy `kiem_nhanh.py` trên chính kho (so với `main` = `origin/main`, và so với `e08af78`): **7/7 mục ĐẠT**, gồm trùng khít 15 ca (3 bộ × 5 seed).
 - Hai điều chỉnh khi chạy thử trên kho thật, đã ghi vào mã và SKILL.md: (1) chữ trong phần tử có `data-i18n` ở `index.html` chỉ là chữ dự phòng (bị thay bằng khoá `i18n.js` lúc chạy; các chữ này có "em" từ trước A13) nên mục `chu_cam` không soát lần hai ở đó; (2) mã `loi_giao_dien_ngoai_du_kien` ở `js/00_nen.js` (từ trước A13) không có trong `i18n_errors.py` nhưng trùng một khoá UI của `i18n.js` và chỉ dùng để mang `params.detail`, nên mục `ma_loi_js` chấp nhận mã trùng khoá UI.
 - Đăng ký kiểu sẵn có: skill nằm trong `.claude/skills/` như `sinh-du-lieu-clb`, `tao-workspace-tu-raw` (có `tests/test_skill_*.py` riêng); KHÔNG đưa vào `mau_forms_thi_clb/dong_goi_skill.py` (danh sách đó chỉ đóng .zip phát cho người dùng cuối; có test canh).
+
+
+## Vòng sửa A13.8 — 12 lỗi, cột "Đã sửa ở commit" (28/10/2026)
+
+| # | Lỗi | Đã sửa ở commit | Ghi chú |
+|---|---|---|---|
+| 1 | 2.1 + 3.2 khoá điểm chặn đổi nguyện vọng / ô tick | `04740a5` | `wharton_da_khoa` ở kiosk và Quản lý; nạp CSV / Sổ nhập bỏ qua em đó, cảnh báo `csv_wharton_khoa_giu_nguyen`; giao diện vô hiệu hai nút lưu. Hai test cũ trong `test_wharton_khoa.py` mã hoá hành vi tỉa khi khoá nên được sửa theo quyết định. |
+| 2 | 2.2 docstring + tài liệu | `2a2b2ea` | Không thêm PIN. |
+| 3 | 2.3 trang "Điểm chuẩn" khi xuất lỗi | `1127db5`, `953cb71` | Mã mới `xuat_diem_chuan_loi`, `canh_bao` trong kết quả xuất. |
+| 4 | 3.1 chỉ ẩn tab khi `wharton_chua_bat` | `7bec6a0` | |
+| 5 | 1.1 `submit_club_scores` điểm sai | CHƯA SỬA | Phải đổi 4 test cũ khẳng định `ok=True`; đã gửi câu hỏi lên phiên điều phối, chờ chọn A / B / C. |
+| 6 | 3.3 tắt tính năng không gọi API | `7bec6a0` | Cờ `WHARTON_BAT` từ cấu hình đã tải. |
+| 7 | 3.4 khoảng cách `#dcKhongXet` | `7bec6a0` | |
+| 8 | 2.4 phóng hàng loạt | `a710a31` | Một giao dịch, `da_doi`, rollback giữ `backup_path`. |
+| 9 | 2.5 ngữ cảnh điểm chuẩn | `d4dc297` | Hàm mới `load_wharton_kem_doc_them`. |
+| 10 | 2.6 cột W chỉ khi bật được | `90c3d5e` | |
+| 11 | 2.7 test hai bản làm tròn | `90c3d5e` | |
+| 12 | 2.8 dấu chèn trong `huong_dan` | `90c3d5e` | Hằng `CHO_CHEN_GHI_CHU_W`. |
