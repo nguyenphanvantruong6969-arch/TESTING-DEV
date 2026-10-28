@@ -9,17 +9,18 @@
 - Ngăn xếp: Python 3.11 + SQLite (`app.db`), giao diện HTML/JS chạy trong pywebview (WebView2), có chế độ dự phòng mở bằng trình duyệt (`browser_host.py`). Đóng gói bằng PyInstaller qua GitHub Actions (workflow *Build Windows executable (rbda-kiosk)*; build tay: `build_windows.bat`).
 - **Mục tiêu hiện tại của chủ dự án:** tổng quát hoá chương trình để bán cho các ngành khác ngoài CLB trường học (12 ngành đã đánh giá), và thêm khả năng xử lý thay đổi theo thời gian (em đến muộn, rút lui). Mô hình kinh doanh để sau.
 
-## Bản đồ mã (định vị theo TÊN HÀM; số dòng đã đối chiếu với kho ngày 08/10/2026 — bảng đầy đủ ở `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`)
+## Bản đồ mã (định vị theo TÊN HÀM, KHÔNG ghi số dòng: số dòng trôi sau mỗi đợt sửa; muốn số dòng chạy `grep -n "^def <tên>" <tệp>`. Bảng đối chiếu 08/10/2026 và bảng cập nhật 28/10/2026 ở `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`)
 | Tệp | Vai trò | Hàm then chốt |
 |---|---|---|
-| `rbda_priority_pipeline.py` (~2.187 dòng) | Thuật toán, schema, I/O SQLite | `compute_club_priority` L123–191 · `club_choice_function` L236–292 · `run_rbda` L315–452 · `verify_stability` L456–524 · `run_rbda_nhieu_buoi` L877–985 · `generate_stb_lottery`, `chen_stb_cho_hoc_sinh_moi` L1086–1182 · `_BANG_RANG_BUOC` L1250, `DEFAULT_SCHEMA` L1290 · `di_tru_schema` L1568–1666 · `default_reserve_eligible_fn` L1709–1720 |
-| `api.py` (~1.364 dòng) | `PipelineAPI`: pipeline 5 bước | `_run_pipeline_da_khoa` L784–1364 (rollback khi có cặp phá vỡ: L1107–1119) · `get_data_health_report` L236 |
-| `api_nhap.py`, `api_xuat.py`, `api_quan_ly.py`, `api_bao_cao.py`, `api_cham_diem.py`, `api_chung.py` | Nhập/xuất CSV-Excel, quản lý, báo cáo, chấm điểm mù, tiện ích | số dòng trong sổ đã trôi (api_nhap +~230, api_xuat +~250): xem `docs/ke_hoach/DOI_CHIEU_KHO_MA.md` |
+| `rbda_priority_pipeline.py` (~2.950 dòng) | Thuật toán, schema, I/O SQLite | `compute_club_priority` · `club_choice_function` · `run_rbda` · `verify_stability` · `run_rbda_nhieu_buoi` · `generate_stb_lottery`, `chen_stb_cho_hoc_sinh_moi` · `_BANG_RANG_BUOC`, `DEFAULT_SCHEMA` · `di_tru_schema` · `default_reserve_eligible_fn` |
+| Điểm quyết tâm (trong mã gọi là `wharton`; giao diện: "Xét điểm quyết tâm") | Tầng 2: mỗi em chia 100 điểm mỗi quỹ mỗi buổi; khoá sau lần chạy đầu | `rbda_priority_pipeline.py`: `khoa_uu_tien_wharton`, `uu_tien_wharton`, `kiem_ho_so_wharton`, `tu_dien_wharton_mot_clb`, `diem_wharton_hieu_luc`, `dung_wharton`, `doc_du_lieu_wharton`, `load_wharton_kem_doc_them` · `api_quan_ly.py`: `submit_wharton`, `admin_save_wharton`, `phong_wharton_hang_loat`, `clear_wharton`, `mo_khoa_wharton`, `list_wharton_admin`, `get_diem_chuan`, `get_diem_chuan_clb`, `tinh_diem_chuan`, `_luu_wharton_cur`, `_ghi_nhat_ky_wharton` · `api_xuat.py`: `export_wharton_can_sua` · JS: `renderWhartonStep`, `whartonVeKhung` (`js/04_nhap_tai_cho.js`), `loadAdminWharton`, `loadAdminDiemChuan` (`js/05_quan_ly.js`) |
+| `api.py` (~1.560 dòng) | `PipelineAPI`: pipeline 5 bước | `_run_pipeline_da_khoa` (rollback ở khối bắt lỗi cuối hàm; dòng khoá điểm và dòng nhật ký hành động "khoa" nằm TRONG cùng giao dịch với kết quả) · `get_data_health_report` · `_backup_db` |
+| `api_nhap.py`, `api_xuat.py`, `api_quan_ly.py`, `api_bao_cao.py`, `api_cham_diem.py`, `api_chung.py` | Nhập/xuất CSV-Excel, quản lý, báo cáo, chấm điểm mù, tiện ích | `import_csv_auto`, `import_preferences_csv` (api_nhap) · `_duong_xuat` (api_xuat) · `submit_preferences`, `delete_student`, `reset_data` (api_quan_ly) |
 | `so_nhap.py`, `so_excel.py` | Sổ nhập CLB: MỘT tệp Excel thay ba tệp nạp; nguồn duy nhất của định dạng (skill trong `.claude/skills/` cũng dùng) | `import_so_nhap`, `xem_truoc_so_nhap` (api_nhap.py) |
 | `i18n_errors.py` → `tao_i18n_js.py` → `i18n_loi.js` | Thông báo lỗi song ngữ, **một nguồn** | `err`, `phan_hoi_ok`, `phan_hoi_loi` |
 | `browser_host.py`, `recovery.py`, `chan_doan.py`, `main.py` | Máy chủ dự phòng 127.0.0.1, phục hồi, log, điểm vào | |
 | `index.html`, `js/00…08_*.js`, `i18n.js`, `style.css` | Giao diện; gọi backend qua `window.pywebview.api.*`, trả `{ok, data, errors}` | |
-| `tests/` | 89 tệp `test_*.py`, 1.515 ca (`pytest --collect-only`, 10/10/2026) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
+| `tests/` | 163 tệp `test_*.py`, SO_CA ca (`pytest --collect-only`, 28/10/2026) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
 | `du_lieu_test/`, `mau_csv/`, `docs/`, `BAN_GIAO.md` | Bộ dữ liệu mô phỏng, script đo, mẫu nhập, tài liệu cơ chế, nhật ký 25 lỗi đã sửa | |
 
 ## Lệnh

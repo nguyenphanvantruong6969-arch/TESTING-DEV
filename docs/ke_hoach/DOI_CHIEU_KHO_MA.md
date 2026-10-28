@@ -8,6 +8,37 @@
 
 ---
 
+## Cập nhật 28/10/2026 (A13.12): định vị theo TÊN HÀM
+
+Mọi số dòng ở các bảng phía dưới là của ngày 08/10/2026 (nhánh `main` @ `52981bb`) và **đã trôi**: đợt A13 (Điểm quyết tâm, trong mã gọi là `wharton`) thêm hơn 1.000 dòng vào mã sản phẩm, và các đợt A13.8 đến A13.11 thêm nữa. Phiên sau đọc theo số dòng cũ sẽ mở nhầm chỗ, nên `CLAUDE.md` nay **định vị theo tên hàm, không ghi số dòng**. Muốn số dòng: `grep -n "^def <tên>" <tệp>` (hàm của `PipelineAPI` thụt lề: `grep -n "    def <tên>" <tệp>`).
+
+- **Cỡ tệp (`wc -l`, 28/10/2026):** `rbda_priority_pipeline.py` 2.187 → **2.950**; `api.py` 1.364 → **1.557**; `api_nhap.py` **1.659**; `api_xuat.py` **1.580**; `api_quan_ly.py` **1.513**; `so_nhap.py` **1.491**; `js/05_quan_ly.js` **1.955**.
+- **Bộ test (28/10/2026):** **TEP_TEST tệp** `tests/test_*.py`, **SO_CA ca** (`pytest --collect-only -q`). Hai con số 91 tệp / 1.287 ca ở bước 3 bên dưới là của ngày 08/10/2026.
+- **Cách đo:** `grep -n` trên kho tại đỉnh A13.12; cột "Dòng 28/10" chỉ để định hướng, sẽ lại trôi.
+
+| Hàm / nhóm | Tệp | Dòng 28/10 | Ghi chú so với bảng 08/10 |
+|---|---|---|---|
+| `compute_club_priority` | `rbda_priority_pipeline.py` | 123 | không đổi vị trí; **không nhận thứ hạng nguyện vọng** (bất biến 2) |
+| `club_choice_function` | `rbda_priority_pipeline.py` | 736 | từng ghi L236 |
+| `run_rbda` | `rbda_priority_pipeline.py` | 815 | từng ghi L315 |
+| `verify_stability` | `rbda_priority_pipeline.py` | 975 | từng ghi L456 |
+| `run_rbda_nhieu_buoi` | `rbda_priority_pipeline.py` | 1400 | từng ghi L877 |
+| `generate_stb_lottery`, `chen_stb_cho_hoc_sinh_moi` | `rbda_priority_pipeline.py` | 1626, 1652 | từng ghi L1086, L1112 |
+| `_BANG_RANG_BUOC`, `DEFAULT_SCHEMA` | `rbda_priority_pipeline.py` | 1790, 1830 | từng ghi L1250, L1290; thêm các bảng điểm quyết tâm (`wharton_bids`, `wharton_lock`, `wharton_nhat_ky`) |
+| `di_tru_schema` | `rbda_priority_pipeline.py` | 2183 | từng ghi L1568 |
+| `default_reserve_eligible_fn`, `hop_ung_vien` | `rbda_priority_pipeline.py` | 2336, 2350 | từng ghi L1709, L1723 |
+| **Điểm quyết tâm — lõi:** `khoa_uu_tien_wharton`, `uu_tien_wharton`, `kiem_ho_so_wharton`, `tu_dien_wharton_mot_clb`, `diem_wharton_hieu_luc`, `dung_wharton` | `rbda_priority_pipeline.py` | 287, 317, 369, 471, 519, 596 | **mới (A13)**; `uu_tien_wharton` thay `compute_club_priority` chỉ khi workspace bật điểm quyết tâm, tắt thì kết quả trùng khít `e08af78` |
+| **Điểm quyết tâm — đọc dữ liệu:** `doc_du_lieu_wharton`, `load_from_sqlite_kem_dau_van_tay_wharton`, `load_wharton_kem_doc_them` | `rbda_priority_pipeline.py` | 2527, 2602, 2620 | **mới**; `load_wharton_kem_doc_them` đọc trong một giao dịch (A13.8) |
+| `_run_pipeline_da_khoa` | `api.py` | 898 | từng ghi L784–1364; nay dài hơn, thêm dòng khoá điểm và nhật ký `khoa` **trong cùng giao dịch** với kết quả |
+| `get_data_health_report` | `api.py` | 261 | từng ghi L236 |
+| **Điểm quyết tâm — API:** `submit_wharton`, `admin_save_wharton`, `phong_wharton_hang_loat`, `clear_wharton`, `mo_khoa_wharton`, `list_wharton_admin`, `get_diem_chuan`, `get_diem_chuan_clb`, `tinh_diem_chuan`, `_luu_wharton_cur`, `_ghi_nhat_ky_wharton` | `api_quan_ly.py` | 945, 960, 967, 1067, 892, 624, 719, 741, 57, 1136, 526 | **mới (A13.3 đến A13.8)**; `wharton_nhat_ky` chỉ INSERT (kiểm bởi `kiem_nhanh.py`, mục `khong_sua_nhat_ky`) |
+| `export_wharton_can_sua`, `_trang_diem_chuan`, `_duong_xuat` | `api_xuat.py` | 1046, 361, 706 | **mới** (hai hàm đầu); `_duong_xuat` có thêm `thu_muc_du_phong` (A13.12) |
+| `import_so_nhap`, `xem_truoc_so_nhap`, `import_csv_auto`, `import_preferences_csv` | `api_nhap.py` | 382, 359, 512, 1124 | từng ghi L364, L347, L483, L1041 |
+| Giao diện: `renderWhartonStep`, `whartonVeKhung` | `js/04_nhap_tai_cho.js` | (tên hàm) | Bước 3 của "Nhập tại chỗ"; `whartonVeKhung` dùng chung với thẻ Quản lý |
+| Giao diện: `loadAdminWharton`, `loadAdminDiemChuan` | `js/05_quan_ly.js` | (tên hàm) | khối Điểm quyết tâm và Điểm chuẩn ở thẻ Quản lý |
+
+---
+
 ## Kết quả đo giai đoạn 0
 
 ### Bước 3: bộ test và lint
