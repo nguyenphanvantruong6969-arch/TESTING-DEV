@@ -162,7 +162,7 @@ class _ChuHienThi(HTMLParser):
 def kiem_ruff(goc):
     lenh = [sys.executable, "-m", "ruff", "check", "."]
     try:
-        r = subprocess.run(lenh, cwd=goc, capture_output=True, text=True, encoding="utf-8")
+        r = subprocess.run(lenh, cwd=goc, capture_output=True, text=True, encoding="utf-8", errors="replace")
     except OSError as e:
         return False, ["không chạy được ruff: %s" % e]
     ra = (r.stdout + r.stderr).strip()
@@ -281,7 +281,7 @@ def _chay_bo(goc, seeds, so_bo):
         ra = os.path.join(tam, "ra.json")
         r = subprocess.run([sys.executable, "-I", "-c", _CHAY_BO, goc, ra,
                             ",".join(str(s) for s in seeds), str(so_bo)],
-                           capture_output=True, text=True, encoding="utf-8")
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
         if r.returncode != 0 or not os.path.isfile(ra):
             raise RuntimeError("chạy bộ dữ liệu ở %s lỗi: %s" % (
                 goc, (r.stderr.strip().splitlines() or ["?"])[-1]))
@@ -426,6 +426,10 @@ def chay(goc, co_so="main", chi=None, bo_qua=(), seeds=SEED_MAC_DINH, so_bo=BO_D
 
 
 def main(argv=None):
+    # Cửa sổ lệnh / ống dẫn Windows mặc định cp1252: in tiếng Việt sẽ ném UnicodeEncodeError.
+    for _luong in (sys.stdout, sys.stderr):
+        if hasattr(_luong, "reconfigure"):
+            _luong.reconfigure(encoding="utf-8", errors="replace")
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--goc", default=GOC_MAC_DINH, help="thư mục gốc của kho (mặc định: kho chứa tệp này)")
     p.add_argument("--co-so", default="main", help="nhánh/commit so trùng khít (mặc định: main)")

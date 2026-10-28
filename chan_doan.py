@@ -63,6 +63,9 @@ def _trung_muc_cuoi(duong: str, muc_moi: str) -> bool:
             duoi = f.read().decode("utf-8", "replace")
     except OSError:
         return False
+    # Windows ghi tệp chế độ văn bản bằng \r\n còn `muc_moi` dựng bằng \n: chuẩn hoá trước khi so,
+    # không thì mục trùng không bao giờ bị bỏ (A13.12).
+    duoi = duoi.replace("\r\n", "\n")
     return _bo_moc(duoi).endswith(_bo_moc(muc_moi))
 
 

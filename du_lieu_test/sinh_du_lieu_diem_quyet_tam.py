@@ -62,6 +62,10 @@ def _ap_va_ghi(thu_muc, co, bt, clb, hs):
 
 
 def main(argv=None):
+    # Cửa sổ lệnh / ống dẫn Windows mặc định cp1252: in tiếng Việt sẽ ném UnicodeEncodeError.
+    for _luong in (sys.stdout, sys.stderr):
+        if hasattr(_luong, "reconfigure"):
+            _luong.reconfigure(encoding="utf-8", errors="replace")
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--ra", default=_DAY, help="thư mục ghi (mặc định: du_lieu_test/)")
     ns = p.parse_args(argv)
