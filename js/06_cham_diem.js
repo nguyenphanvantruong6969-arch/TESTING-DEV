@@ -230,6 +230,10 @@ function initScoringHandlers() {
           input.title = trErr(w);
         });
         feedbackErrors(el("scoringFeedback"), res.errors);
+        /* Nhu nhanh luu mot phan: mot thong bao neu HET cac o sai, khong chi o dau tien. */
+        if (res.errors && res.errors.some((w) => w && w.params && w.params.student_id !== undefined)) {
+          showToast(trErrs(res.errors).join("\n"), "warn");
+        }
       }
     });
   });
