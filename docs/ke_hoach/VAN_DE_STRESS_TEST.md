@@ -23,6 +23,15 @@
 
 **Phát hiện mới trên A13.9** (chi tiết ở báo cáo, mục 10): N1 nhỏ (xuất vào đường là thư mục → tệp `ngoai (2)` cạnh thư mục), N2 nhỏ (`wharton_nhat_ky` thêm 801 dòng mỗi vòng nạp → xoá → nạp; `app.db` 1,4 → 16,7 MB sau 100 vòng), N3 nhỏ (còn chờ 15 s ở `list_students_admin` / `reset_data` khi CSDL bị khoá), N4 nên xem (5.000 × 100: lần đầu mở thẻ Kết quả ≈ 13,6 s, ba lần lật trang đầu 8 – 20 s; lặp lại 3 / 3 lần).
 
+**Cập nhật A13.11** (sửa N1 – N4; đo lại s3 / s5 / s6 / s8 sau sửa, số trước / sau ở `CHANGELOG.md`):
+
+| # | Hiện nay (A13.11) | Đã sửa ở commit |
+|---|---|---|
+| N1 | **Hết** — lỗi `xuat_duong_la_thu_muc`, không đẻ tệp `ngoai (2)` | 902cb6b, 02c3089 |
+| N2 | **Hết** — một dòng tóm tắt mỗi lần nạp; `app.db` 16,7 → 1,66 MB sau 100 vòng; còn 2 test cũ đỏ chờ Truong quyết | 442725f |
+| N3 | **Hết** — mọi hàm báo `csdl_dang_ban` sau ≤ 3 s (trước 15 – 17,6 s); giao diện nói rõ "CSDL đang bận" | 49c7319 |
+| N4 | **Hết** — nguyên nhân là 13 lời gọi đọc cùng lúc tranh GIL, không phải vẽ DOM; lần đầu mở Kết quả 13,6 → 1,06 s, trang chậm nhất 6,5 → 0,34 s; 800 × 20 không chậm đi | 2fb9680 |
+
 ---
 
 ## 1. CSDL bị khoá: thông báo sai nguyên nhân, chờ lâu — **nên sửa** (nhóm 3)
