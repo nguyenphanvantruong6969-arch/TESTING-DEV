@@ -289,3 +289,67 @@ Không có mã chết hay import thừa; chỉ một khối trùng lặp và có
 ### Tóm tắt Tầng 4
 
 `chặn`: 0 · `nên sửa`: 2 (4.1, 4.5) · `nhỏ`: 4 (4.2, 4.3, 4.4, 4.6).
+
+
+---
+
+## Danh sách sửa đầy đủ (gom sau Tầng 4, cho vòng sửa) — KHÔNG sửa mã trong vòng soát
+
+Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–28/10/2026). **Đề xuất** = em đề xuất làm, chờ Truong đồng ý hoặc đổi. Theo `CLAUDE.md`: test thất bại trước, sửa tối thiểu, chạy toàn bộ test, cập nhật CHANGELOG và `TIEN_DO.md`. Mã mục cho vòng sửa: do Truong đặt (em đề xuất `A13.8`).
+
+### Nhóm 1 — Khoá điểm (2.1 + 3.2), ĐÃ QUYẾT
+
+| # | Việc | Tệp chính | Trạng thái |
+|---|---|---|---|
+| S1 | Khi điểm đang khoá, em đã có điểm quyết tâm KHÔNG đổi được nguyện vọng: `submit_preferences`, nạp CSV nguyện vọng, Sổ nhập và sửa ở Quản lý trả `wharton_da_khoa` (không tỉa im lặng). | `api_quan_ly.py` (`submit_preferences`, tỉa ở dòng ~1233), `api_nhap.py` (~1373) | Đã quyết (2.1 = B) |
+| S2 | Cũng không đổi được ô tick "muốn thi": `submit_test_selection` và nạp chọn thi trả `wharton_da_khoa` với em đã có điểm. | `api_quan_ly.py`, `api_nhap.py` | Đã quyết (3.2 = A) |
+| S3 | Giao diện: vô hiệu hoá nút "Lưu CLB dự thi" và "Lưu nguyện vọng" khi khoá, kèm ghi chú khoá (đã có chữ `wharton_da_khoa_kiosk`). | `js/04_nhap_tai_cho.js`, `index.html` | Đã quyết (3.2 = A) |
+| S4 | Test mới theo `CLAUDE.md`: khoá + đổi nguyện vọng / tick (API và giao diện) → bị từ chối, `wharton_bids` không đổi; Wharton tắt thì hành vi cũ y nguyên. | `tests/` | Đi kèm |
+
+### Nhóm 2 — Quản trị và xuất
+
+| # | Việc | Nguồn | Trạng thái |
+|---|---|---|---|
+| S5 | Sửa docstring của `get_diem_chuan`, `get_diem_chuan_clb`, `list_wharton_admin`, `get_wharton_nhat_ky` cho đúng thực tế (không có xác thực); ghi vào `HUONG_DAN_SU_DUNG.md`: "thẻ Quản lý cần người giám sát máy". Không thêm PIN. | 2.2 | Đã quyết (A) |
+| S6 | `_trang_diem_chuan`: khi `get_diem_chuan` lỗi thì ghi cảnh báo vào trang (hoặc cho cả lần xuất thất bại), không xuất trang trống `ok`. | 2.3 (`api_xuat.py:377`) | Đã quyết (đưa vào danh sách sửa) |
+
+### Nhóm 3 — Giao diện
+
+| # | Việc | Nguồn | Trạng thái |
+|---|---|---|---|
+| S7 | Chỉ ẩn tab / khối Wharton khi mã lỗi = `wharton_chua_bat`; lỗi khác hiện thông báo (và giữ tab). Gồm `loadAdminWharton`, `loadAdminDiemChuan`, `loadChiTietDiemChuan`, `loadWhNhatKy`, `loadWhKhoa`. | 3.1 (`js/05_quan_ly.js:652, 668, 928, 1800, 1834`) | Đã quyết (Có) |
+| S8 | Khi tắt tính năng, không gọi `list_wharton_canh_bao` / `get_diem_chuan` mỗi lần mở Quản lý (dùng cờ bật/tắt có sẵn trong cấu hình đã tải). | 3.3 | Đã quyết (sửa cùng đợt) |
+| S9 | Thêm khoảng cách giữa chú giải biểu đồ chấm và dòng "N học sinh không tính…" (`margin-top`). | 3.4 (`style.css:2900`, `#dcKhongXet`) | Đã quyết (sửa cùng đợt) |
+
+### Nhóm 4 — Ngoài A13, theo yêu cầu của Truong
+
+| # | Việc | Nguồn | Trạng thái |
+|---|---|---|---|
+| S10 | `submit_club_scores` hiện bỏ im lặng điểm `nan`, `inf`, `-1`, `"1e999"` mà vẫn trả `ok=True`: phải trả lỗi cho điểm không hợp lệ, không lưu dòng nào. Test thất bại trước. | 1.1 (ngoài phạm vi A13) | Đã quyết (SỬA đợt này) |
+
+### Nhóm 5 — Tài liệu và test (vòng soát Tầng 4)
+
+| # | Việc | Nguồn | Trạng thái |
+|---|---|---|---|
+| S11 | `CLAUDE.md` và `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`: sửa bản đồ mã (số dòng, 138 tệp / 2.764 ca), thêm hàng Wharton; kiến nghị đổi sang định vị theo TÊN HÀM. | 4.1 | Đề xuất |
+| S12 | Thêm test rollback thật: làm `_ghi_nhat_ky_wharton` ném lỗi tại `hanh_dong == "khoa"` rồi khẳng định `match_results`, `run_history`, `wharton_lock`, `stb_lock` y nguyên; thêm ca biên tổng 99 và 101 vào `test_wharton.py`. | 4.5 | Đề xuất |
+| S13 | Kỹ năng `xu-li-raw-forms`: sửa câu "bố cục giống hệt sổ mẫu" (sổ mẫu nay có cột Điểm quyết tâm); `HUONG_DAN_SU_DUNG.md`: "điểm của bạn khác" → "điểm của em khác". | 4.2 | Đề xuất |
+| S14 | Xoá hai khoá i18n chết `dc_cot_buoi`, `dc_tooltip_so` (VI và EN). | 4.3 | Đề xuất |
+| S15 | `tao_i18n_js.py` / `i18n_loi.js` sinh lại sau mọi lần đổi `i18n_errors.py` (nếu S1–S2 thêm mã lỗi mới). | quy ước sẵn | Đi kèm |
+
+### Nhóm 6 — Mục nhỏ còn CẦN TRUONG QUYẾT (mỗi mục 2–3 lựa chọn)
+
+| # | Mục | Lựa chọn | Em đề xuất |
+|---|---|---|---|
+| Q1 | 2.4 phóng hàng loạt không nguyên tử, ghi đè điểm em vừa sửa; 2.5 `_ngu_canh_diem_chuan` đọc ở hai kết nối | (A) sửa gọn: `_luu_wharton` đọc lại điểm hiện tại và bỏ qua em nếu khác ảnh chụp; đọc điểm chuẩn trong MỘT giao dịch; (B) chấp nhận, ghi rõ vào docstring; (C) A cho 2.5, B cho 2.4 | **A** (chi phí thấp, tránh mất điểm em vừa nhập) |
+| Q2 | 2.6 sổ mẫu luôn có cột Điểm quyết tâm kể cả workspace không bật được (ví dụ `priority = "tier"`) | (A) thêm điều kiện "workspace có thể bật" cho `luon_co_cot_w`; (B) giữ (mẫu thống nhất mọi nơi) | **B** (tránh đổi sổ mẫu vừa chốt ở A13.7; ghi chú trong hướng dẫn đã nói rõ) |
+| Q3 | 2.7 hai bản làm tròn phần dư lớn nhất (`lam_tron_100` trong kỹ năng, `phong_theo_ti_le` trong app) | (A) thêm test so hai hàm trên đầu vào ngẫu nhiên; (B) bỏ bản chép, kỹ năng nhập từ app (mất đóng gói riêng) | **A** |
+| Q4 | 2.8 chỗ chèn ghi chú trong `huong_dan` dựa vào chữ "Bước 5." | (A) dùng hằng đánh dấu + test; (B) giữ | **A** |
+| Q5 | 4.6 14 `wait_for_timeout` cố định trong test giao diện | (A) đổi dần sang `wait_for_selector` / `wait_for_function`; (B) giữ (10/10 lần xanh) | **B** nếu CI không chập chờn, làm A khi thấy đỏ |
+| Q6 | 4.4 tên nội bộ `wharton` trong ba tài liệu | (A) giữ, đã có ghi chú; (B) chuyển câu bảo trì xuống cuối tài liệu | **A** |
+| Q7 | Chuỗi cũ khi đổi ngôn ngữ lúc đang mở một học sinh (`fallback_phu_buoi`, `btn_remove_ranked`) không vẽ lại — có từ trước A13 | (A) sửa trong vòng này; (B) ghi thành mục riêng ngoài sổ | **B** |
+| Q8 | "Bước cuối — kỹ năng `soat-ma`" (thêm `SKILL.md`, `scripts/kiem_nhanh.py`, `tests/test_skill_soat_ma.py`, dòng vào `CLAUDE.md`, CHANGELOG mã `Z-SOAT`) | (A) làm ngay sau Tầng 4; (B) làm sau vòng sửa A13.8, để chốt luôn các quy tắc mới (rollback, khoá) vào danh sách kiểm; (C) bỏ | **B** |
+
+### Thứ tự gợi ý cho vòng sửa
+
+1. S1–S4 (khoá điểm; đổi hành vi, test trước). 2. S7–S8 rồi S9 (giao diện, cùng tệp `js/05_quan_ly.js`). 3. S6, S5 (xuất, docstring). 4. S10 (ngoài A13, kèm test). 5. S12 (test), S11, S13–S14 (tài liệu / i18n). 6. Các mục Q đã được Truong chọn. Sau cùng: `python tao_i18n_js.py`, `ruff check .`, toàn bộ test, trùng khít 3 bộ × 5 seed so với `e08af78`.
