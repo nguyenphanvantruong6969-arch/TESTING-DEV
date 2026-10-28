@@ -10,10 +10,10 @@
 
 ## Cập nhật 28/10/2026 (A13.12): định vị theo TÊN HÀM
 
-Mọi số dòng ở các bảng phía dưới là của ngày 08/10/2026 (nhánh `main` @ `52981bb`) và **đã trôi**: đợt A13 (Điểm quyết tâm, trong mã gọi là `wharton`) thêm hơn 1.000 dòng vào mã sản phẩm, và các đợt A13.8 đến A13.11 thêm nữa. Phiên sau đọc theo số dòng cũ sẽ mở nhầm chỗ, nên `CLAUDE.md` nay **định vị theo tên hàm, không ghi số dòng**. Muốn số dòng: `grep -n "^def <tên>" <tệp>` (hàm của `PipelineAPI` thụt lề: `grep -n "    def <tên>" <tệp>`).
+Mọi số dòng ở các bảng phía dưới là của ngày 08/10/2026 (nhánh `main` @ `52981bb`) và **đã trôi**: đợt A13 (Điểm quyết tâm, trong mã gọi là `wharton`) và các đợt sửa A13.8 đến A13.12 đã thêm 763 dòng vào `rbda_priority_pipeline.py` (2.187 → 2.950) và 193 dòng vào `api.py` (1.364 → 1.557), cùng hàng trăm dòng vào `api_nhap.py`, `api_xuat.py`, `api_quan_ly.py`. Phiên sau đọc theo số dòng cũ sẽ mở nhầm chỗ, nên `CLAUDE.md` nay **định vị theo tên hàm, không ghi số dòng**. Muốn số dòng: `grep -n "^def <tên>" <tệp>` (hàm của `PipelineAPI` thụt lề: `grep -n "    def <tên>" <tệp>`).
 
 - **Cỡ tệp (`wc -l`, 28/10/2026):** `rbda_priority_pipeline.py` 2.187 → **2.950**; `api.py` 1.364 → **1.557**; `api_nhap.py` **1.659**; `api_xuat.py` **1.580**; `api_quan_ly.py` **1.513**; `so_nhap.py` **1.491**; `js/05_quan_ly.js` **1.955**.
-- **Bộ test (28/10/2026):** **TEP_TEST tệp** `tests/test_*.py`, **SO_CA ca** (`pytest --collect-only -q`). Hai con số 91 tệp / 1.287 ca ở bước 3 bên dưới là của ngày 08/10/2026.
+- **Bộ test (28/10/2026):** **163 tệp** `tests/test_*.py`, **3.054 ca** (`pytest --collect-only -q`). Hai con số 91 tệp / 1.287 ca ở bước 3 bên dưới là của ngày 08/10/2026.
 - **Cách đo:** `grep -n` trên kho tại đỉnh A13.12; cột "Dòng 28/10" chỉ để định hướng, sẽ lại trôi.
 
 | Hàm / nhóm | Tệp | Dòng 28/10 | Ghi chú so với bảng 08/10 |
