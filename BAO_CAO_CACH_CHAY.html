@@ -635,7 +635,7 @@ from ...\_internal\pythonnet\runtime\Python.Runtime.dll</pre>
         <tr><td class="num">1</td><td><strong>Ghép cặp trì hoãn</strong></td><td><code>run_rbda</code></td><td class="num">275</td><td>Ai vào CLB nào?</td></tr>
         <tr><td class="num">2</td><td><strong>Dự trữ mềm, xét hai lượt</strong></td><td><code>club_choice_function</code></td><td class="num">204</td><td>CLB chọn ai trong số đang nộp?</td></tr>
         <tr><td class="num">3</td><td><strong>Bốc thăm dùng chung</strong></td><td><code>generate_stb_lottery</code></td><td class="num">1037</td><td>Hai em ngang nhau thì ai trước?</td></tr>
-        <tr><td class="num">4</td><td><strong>Ưu tiên hai tầng</strong></td><td><code>compute_club_priority</code></td><td class="num">116</td><td>CLB xếp hạng các em thế nào?</td></tr>
+        <tr><td class="num">4</td><td><strong>Ưu tiên hai nhóm</strong></td><td><code>compute_club_priority</code></td><td class="num">116</td><td>CLB xếp hạng các em thế nào?</td></tr>
         <tr><td class="num">5</td><td><strong>Kiểm chứng ổn định</strong></td><td><code>verify_stability</code></td><td class="num">410</td><td>Kết quả có ai phá được không?</td></tr>
       </tbody>
     </table>
@@ -827,7 +827,7 @@ general_held = general_candidates[:general_capacity]   <span class="cm"># LƯỢ
 
   <div class="measure">
     <h4>Ví dụ đời thường</h4>
-    <p>Ở tầng không thi tuyển, nhiều em <strong>ngang nhau hoàn toàn</strong> — không có điểm nào để phân biệt. Phải có cách phá hoà, và cách đó phải <strong>chạy lại ra đúng kết quả cũ</strong> để trường còn giải thích được với phụ huynh.</p>
+    <p>Ở nhóm xét điểm quyết tâm (không thi tuyển), nhiều em <strong>ngang nhau hoàn toàn</strong> — không có điểm nào để phân biệt. Phải có cách phá hoà, và cách đó phải <strong>chạy lại ra đúng kết quả cũ</strong> để trường còn giải thích được với phụ huynh.</p>
     <p>Cách làm: mỗi em rút <strong>một</strong> lá thăm, và lá đó <strong>dùng cho mọi CLB</strong>. Đó là nghĩa của chữ "single" trong Single Tie-Breaking — trái với việc mỗi CLB bốc một bộ thăm riêng. Số nhỏ = ưu tiên cao.</p>
 
     <h4>Mã làm gì — và một dòng cứu cả tính tái lập</h4>
@@ -857,7 +857,7 @@ return {sid: idx for idx, sid in enumerate(shuffled)}</pre>
 
   <div class="tablewrap">
     <table>
-      <thead><tr><th>Thí nghiệm: 20 em cũ + 10 em mới tranh 10 suất, đều Tầng 2</th><th class="num">Em mới giành được</th></tr></thead>
+      <thead><tr><th>Thí nghiệm: 20 em cũ + 10 em mới tranh 10 suất, đều thuộc nhóm xét điểm quyết tâm</th><th class="num">Em mới giành được</th></tr></thead>
       <tbody>
         <tr><td>Cách cũ (<code>MAX(stb)+1</code>), mọi hạt giống</td><td class="num bad">0</td></tr>
         <tr><td>Công bằng thì kỳ vọng</td><td class="num">≈ 3,3</td></tr>
@@ -876,20 +876,20 @@ return {sid: idx for idx, sid in enumerate(shuffled)}</pre>
   </div>
 
   <!-- ---------- LỚP 4 ---------- -->
-  <h3>Lớp 4 — Ưu tiên hai tầng: em đã thi đứng trọn trước em không thi</h3>
+  <h3>Lớp 4 — Ưu tiên hai nhóm: em đã thi đứng trọn trước em không thi</h3>
 
   <div class="measure">
     <h4>Vì sao lớp này tồn tại</h4>
     <p>Đây là lớp <strong>sinh ra từ hoàn cảnh trường</strong>, không có trong sách. Có CLB tổ chức thi tuyển, có CLB không. Một bài toán ghép cặp chuẩn không có chỗ cho tình huống hai loại CLB cùng tồn tại trong một đợt phân bổ.</p>
-    <p>Cách giải: mỗi CLB xếp các em thành <strong>hai tầng</strong>, và Tầng 1 luôn đứng <strong>trọn vẹn</strong> trước Tầng 2 — không xen kẽ.</p>
+    <p>Cách giải: mỗi CLB xếp các em thành <strong>hai nhóm</strong>, và nhóm xét điểm thi luôn đứng <strong>trọn vẹn</strong> trước nhóm xét điểm quyết tâm — không xen kẽ.</p>
   </div>
 
   <div class="tablewrap">
     <table>
-      <thead><tr><th>Tầng</th><th>Gồm ai</th><th>Xếp theo gì</th></tr></thead>
+      <thead><tr><th>Nhóm</th><th>Gồm ai</th><th>Xếp theo gì</th></tr></thead>
       <tbody>
-        <tr><td><strong>Tầng 1</strong></td><td>Em <strong>đã được chấm điểm</strong> cho CLB đó</td><td>Điểm giảm dần; <strong>hoà điểm mới tới</strong> số bốc thăm</td></tr>
-        <tr><td><strong>Tầng 2</strong></td><td>Em có đăng ký nhưng <strong>không thi</strong> CLB đó</td><td><strong>Thuần</strong> số bốc thăm</td></tr>
+        <tr><td><strong>Xét điểm thi</strong></td><td>Em <strong>đã được chấm điểm</strong> cho CLB đó</td><td>Điểm giảm dần; <strong>hoà điểm mới tới</strong> số bốc thăm</td></tr>
+        <tr><td><strong>Xét điểm quyết tâm</strong></td><td>Em có đăng ký nhưng <strong>không thi</strong> CLB đó</td><td><strong>Thuần</strong> số bốc thăm</td></tr>
       </tbody>
     </table>
   </div>
@@ -1112,7 +1112,7 @@ if sid in accepted:
           <td><code>stb_tuan</code></td>
           <td>Dùng thẳng một bộ số cho mọi buổi</td>
           <td>chỉ để đối chứng</td>
-          <td>Em số xấu đứng cuối Tầng 2 ở <em>mọi</em> buổi — may rủi <strong>cộng dồn</strong></td>
+          <td>Em số xấu đứng cuối nhóm xét điểm quyết tâm ở <em>mọi</em> buổi — may rủi <strong>cộng dồn</strong></td>
         </tr>
         <tr>
           <td><code>stb_co_bu</code></td>
@@ -1186,8 +1186,8 @@ if sid in accepted:
         <rect x="200" y="154" width="170" height="80" rx="6" class="d-fill-paper d-stroke"/>
         <text x="212" y="176" class="d-tb">club_scores</text>
         <text x="212" y="196" class="d-ts">điểm chấm mù</text>
-        <text x="212" y="213" class="d-ts">CÓ ở đây = Tầng 1</text>
-        <text x="212" y="229" class="d-ts">VẮNG = Tầng 2</text>
+        <text x="212" y="213" class="d-ts">CÓ ở đây = xét điểm thi</text>
+        <text x="212" y="229" class="d-ts">VẮNG = xét điểm quyết tâm</text>
 
         <rect x="380" y="154" width="180" height="80" rx="6" class="d-fill-paper d-stroke"/>
         <text x="392" y="176" class="d-tb">preferences</text>
@@ -1280,7 +1280,7 @@ if sid in accepted:
     <h3>Tám cảnh báo sức khoẻ dữ liệu — loại lỗi nguy hiểm nhất</h3>
     <p>Có một nhóm tình huống mà dữ liệu <strong>vẫn hợp lệ</strong>, phần mềm <strong>vẫn chạy</strong>, kết quả <strong>vẫn trông bình thường</strong> — trong khi ai được vào CLB đã bị đổi bởi một thiếu sót không ai nhìn thấy. Ví dụ nguy hiểm nhất:</p>
     <blockquote style="border-left:3px solid var(--rust); padding-left:16px; margin:0 0 17px; color:var(--ink-soft);">
-      Giáo viên mới chấm 1/3 danh sách → em được 4,0 điểm chiếm chắc một suất, còn 2 em chưa chấm bị đẩy xuống Tầng 2 và chỉ được xét bằng số bốc thăm. <strong>Kết quả trông hoàn toàn bình thường.</strong> <span class="cite">README.md:77–79</span>
+      Giáo viên mới chấm 1/3 danh sách → em được 4,0 điểm chiếm chắc một suất, còn 2 em chưa chấm bị đẩy sang nhóm xét điểm quyết tâm và chỉ được xét bằng số bốc thăm. <strong>Kết quả trông hoàn toàn bình thường.</strong> <span class="cite">README.md:77–79</span>
     </blockquote>
     <p>Hàm <code>get_data_health_report</code> <span class="cite">api.py:325</span> rà soát 8 tình huống như vậy và hiện chúng <strong>ngay phía trên nút "Chạy pipeline"</strong>, chia ba mức. Đây là <strong>cảnh báo, không phải lỗi</strong> — không chặn chạy, chỉ bắt buộc hiện ra để người vận hành tự quyết định.</p>
   </div>
@@ -1289,7 +1289,7 @@ if sid in accepted:
     <table>
       <thead><tr><th class="num">#</th><th>Tình huống</th><th>Hậu quả âm thầm</th><th>Mức</th></tr></thead>
       <tbody>
-        <tr><td class="num">1</td><td>Club có người đăng ký thi nhưng <strong>chưa chấm ai</strong></td><td>Cả club rơi xuống Tầng 2, vòng thi vô nghĩa</td><td class="bad">Nghiêm trọng</td></tr>
+        <tr><td class="num">1</td><td>Club có người đăng ký thi nhưng <strong>chưa chấm ai</strong></td><td>Cả club rơi sang nhóm xét điểm quyết tâm, vòng thi vô nghĩa</td><td class="bad">Nghiêm trọng</td></tr>
         <tr><td class="num">2</td><td><strong>Chấm dở dang</strong> (mới chấm một phần)</td><td>Em chưa chấm bị xếp dưới cả em thấp điểm nhất</td><td class="bad">Nghiêm trọng</td></tr>
         <tr><td class="num">3</td><td><strong>Thi nhưng không xếp nguyện vọng</strong> club đó</td><td>Điểm bị bỏ phí, không bao giờ được xếp vào đó</td><td class="bad">Nghiêm trọng</td></tr>
         <tr><td class="num">4</td><td>Nhãn dự trữ của học sinh <strong>không club nào dùng</strong> (gõ sai)</td><td>Học sinh mất quyền ưu tiên ở mọi nơi</td><td class="bad">Nghiêm trọng</td></tr>
@@ -1497,7 +1497,7 @@ if sid in accepted:
   </div>
 
   <div class="measure">
-    <p><strong>Đọc ra:</strong> rung điểm thi ±0,5 xáo <strong>gấp hơn ba lần</strong> so với đổi toàn bộ bộ thăm (15,14 % so với 4,36 %). Nghĩa là <strong>điểm mới là thứ quyết định chính, bốc thăm chỉ đứng sau</strong> — đúng như thiết kế Lớp 4 (Tầng 1 luôn đứng trọn trước Tầng 2). Và ở <em>mọi</em> mức rung, số cặp phá vỡ vẫn là 0: kết quả có thể đổi, nhưng không bao giờ trở thành sai.</p>
+    <p><strong>Đọc ra:</strong> rung điểm thi ±0,5 xáo <strong>gấp hơn ba lần</strong> so với đổi toàn bộ bộ thăm (15,14 % so với 4,36 %). Nghĩa là <strong>điểm mới là thứ quyết định chính, bốc thăm chỉ đứng sau</strong> — đúng như thiết kế Lớp 4 (nhóm xét điểm thi luôn đứng trọn trước nhóm xét điểm quyết tâm). Và ở <em>mọi</em> mức rung, số cặp phá vỡ vẫn là 0: kết quả có thể đổi, nhưng không bao giờ trở thành sai.</p>
     <p>Nguồn: <code>du_lieu_test/so_lieu_ben_vung.json</code>, khoá <code>bo_sach → diem_0_5 / doi_seed</code>.</p>
 
     <h3>Bộ test tự động</h3>
@@ -1548,7 +1548,7 @@ python3 du_lieu_test/do_boc_tham.py           <span class="cm"># TN7 — chọn 
     <table>
       <thead><tr><th class="num">#</th><th>Câu hỏi</th><th>Trả lời</th><th>Mở ở đâu</th></tr></thead>
       <tbody>
-        <tr><td class="num">1</td><td>Thuật toán gốc là gì?</td><td>Deferred Acceptance do học sinh đề xuất, cộng ba lớp riêng: dự trữ mềm, bốc thăm dùng chung, ưu tiên hai tầng.</td><td><span class="cite">pipeline:275</span></td></tr>
+        <tr><td class="num">1</td><td>Thuật toán gốc là gì?</td><td>Deferred Acceptance do học sinh đề xuất, cộng ba lớp riêng: dự trữ mềm, bốc thăm dùng chung, ưu tiên hai nhóm.</td><td><span class="cite">pipeline:275</span></td></tr>
         <tr><td class="num">2</td><td>Vì sao không dùng Gale–Shapley thuần?</td><td>Vì có CLB thi và CLB không thi cùng tồn tại trong một đợt, và có CLB cần để dành suất. Mô hình thuần không có chỗ cho hai tình huống đó.</td><td><span class="cite">pipeline:116</span></td></tr>
         <tr><td class="num">3</td><td>"Trì hoãn" nghĩa là gì?</td><td>CLB <em>giữ tạm</em> chứ chưa chốt. Mỗi vòng, em đang được giữ lại bị xét lại cùng người mới đến.</td><td><span class="cite">pipeline:352</span></td></tr>
         <tr><td class="num">4</td><td>Bốc thăm có công bằng không?</td><td>Có. Một số duy nhất mỗi em, dùng chung mọi CLB, sinh từ hoán vị ngẫu nhiên đều. Không phụ thuộc thứ tự nhập liệu.</td><td><span class="cite">pipeline:1037</span></td></tr>
@@ -1656,7 +1656,7 @@ python3 du_lieu_test/do_boc_tham.py           <span class="cm"># TN7 — chọn 
       benchTitle: "Giữ tạm KHÔNG phải đã chốt"
     },
     {
-      t: "<b>Vòng 3.</b> Dũng nộp vào Bóng rổ. Nhưng Dũng <i>không thi</i> Bóng rổ nên em thuộc <b>Tầng 2</b> — đứng sau trọn vẹn An và Chi (Tầng 1, đã có điểm). Hai chỗ đã đầy bởi Tầng 1, Dũng bị từ chối. Dũng hết nguyện vọng.",
+      t: "<b>Vòng 3.</b> Dũng nộp vào Bóng rổ. Nhưng Dũng <i>không thi</i> Bóng rổ nên em thuộc <b>nhóm xét điểm quyết tâm</b> — đứng sau trọn vẹn An và Chi (nhóm xét điểm thi, đã có điểm). Hai chỗ đã đầy bởi nhóm xét điểm thi, Dũng bị từ chối. Dũng hết nguyện vọng.",
       br: [["An","giữ tạm · 9,0"],["Chi","giữ tạm · 8,5"]],
       cv: [["Bình","giữ tạm · 9,5"]],
       bench: [["Dũng","hết nguyện vọng — không có suất", true]],

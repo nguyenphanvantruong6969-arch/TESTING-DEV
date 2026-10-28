@@ -103,7 +103,7 @@ một thiếu sót người vận hành không nhìn thấy. Đã kiểm chứng
 nghiệm: cả 6 tình huống dưới đây trước đây đều **im lặng hoàn toàn**.
 
 Ví dụ nguy hiểm nhất: giáo viên mới chấm 1/3 danh sách → em được 4.0 điểm
-chiếm chắc một suất, còn 2 em chưa chấm bị đẩy xuống Tầng 2 và chỉ được
+chiếm chắc một suất, còn 2 em chưa chấm bị đẩy sang nhóm xét điểm quyết tâm và chỉ được
 xét bằng số bốc thăm. Kết quả trông hoàn toàn bình thường.
 
 `get_data_health_report()` rà soát và hiện các cảnh báo này **ngay phía
@@ -112,7 +112,7 @@ Thông tin), sắp xếp nghiêm trọng lên trước:
 
 | # | Tình huống | Hậu quả âm thầm | Mức |
 |---|---|---|---|
-| 1 | Club có người đăng ký thi nhưng **chưa chấm ai** | Cả club rơi xuống Tầng 2, vòng thi vô nghĩa | Nghiêm trọng |
+| 1 | Club có người đăng ký thi nhưng **chưa chấm ai** | Cả club rơi sang nhóm xét điểm quyết tâm, vòng thi vô nghĩa | Nghiêm trọng |
 | 2 | **Chấm dở dang** (mới chấm một phần) | Em chưa chấm bị xếp dưới cả em thấp điểm nhất | Nghiêm trọng |
 | 3 | **Thi nhưng không xếp nguyện vọng** club đó | Điểm bị bỏ phí, không bao giờ được xếp vào đó | Nghiêm trọng |
 | 4 | Nhãn dự trữ của học sinh **không club nào dùng** (gõ sai) | Học sinh mất quyền ưu tiên ở mọi nơi | Nghiêm trọng |
@@ -120,7 +120,7 @@ Thông tin), sắp xếp nghiêm trọng lên trước:
 | 6 | Học sinh **chưa xếp nguyện vọng nào** | Chắc chắn không được xếp vào đâu | Cần lưu ý |
 | 7 | Club dành suất cho nhãn **chưa ai mang** | Suất dự trữ không dùng đến | Cần lưu ý |
 | 8 | **Tổng chỗ ít hơn số học sinh** | Ít nhất N em chắc chắn không có chỗ | Thông tin |
-| 9 | Học sinh **thi quá 5 CLB trong một buổi** (thường do CLB vừa đổi buổi ở màn Quản lý) | Em đó được xét Tầng 1 ở nhiều chỗ hơn em khác | Nghiêm trọng |
+| 9 | Học sinh **thi quá 5 CLB trong một buổi** (thường do CLB vừa đổi buổi ở màn Quản lý) | Em đó được xét điểm thi ở nhiều chỗ hơn em khác | Nghiêm trọng |
 
 Đây là **cảnh báo, không phải lỗi** — không chặn chạy pipeline, chỉ bắt
 buộc hiện ra để người vận hành tự quyết định.

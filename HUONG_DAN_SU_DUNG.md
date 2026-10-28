@@ -727,7 +727,7 @@ Bảy quy tắc rà soát. Mỗi cảnh báo nói một điều **vẫn để ph
 
 | Cảnh báo | Nghĩa là gì | Sửa ở đâu |
 |---|---|---|
-| **CLB … chưa chấm điểm ai** | Có em đăng ký thi nhưng chưa ai được chấm. Cả nhóm rơi xuống tầng 2, vòng thi coi như không có tác dụng | Thẻ 05 · Chấm điểm |
+| **CLB … chưa chấm điểm ai** | Có em đăng ký thi nhưng chưa ai được chấm. Cả CLB rơi sang nhóm xét điểm quyết tâm, vòng thi coi như không có tác dụng | Thẻ 05 · Chấm điểm |
 | **CLB … mới chấm x/y** | Em chưa có điểm bị xếp **dưới tất cả** em đã có điểm, kể cả em thấp nhất | Thẻ 05 · Chấm điểm |
 | **n lượt thi bỏ phí** | Em đăng ký thi một CLB nhưng không xếp CLB đó vào nguyện vọng. Điểm cao mấy cũng không vào được | Sửa tệp 3, nạp lại |
 | **n em chưa xếp nguyện vọng nào** | Những em này chắc chắn không được xếp vào đâu | Sửa tệp 3, hoặc thẻ 03 |
@@ -821,12 +821,12 @@ công. Bộ ví dụ chạy xong sau **2 vòng**.
 
 ### CLB xếp hạng đơn thế nào
 
-Hai tầng:
+Hai nhóm:
 
-- **Tầng 1** — em **có thi** CLB đó: xếp theo **điểm**, cao trước.
-- **Tầng 2** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**.
+- **Xét điểm thi** — em **có thi** CLB đó: xếp theo **điểm**, cao trước.
+- **Xét điểm quyết tâm** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**.
 
-Tầng 1 luôn đứng trên tầng 2. Bằng điểm nhau thì **số bốc thăm** phân định.
+Nhóm xét điểm thi luôn đứng trên nhóm xét điểm quyết tâm. Bằng điểm nhau thì **số bốc thăm** phân định.
 
 ### Số bốc thăm (STB)
 
@@ -1047,14 +1047,14 @@ Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không
 
 Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem được **điểm chuẩn** của từng CLB. Học sinh ở kiosk **không** thấy.
 
-- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai tầng và hai mức. Mức là suất thường hoặc suất dự trữ,
-  theo đúng diện mà học sinh đã được nhận. **Tầng 2** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
-  **Tầng 1** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
-  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở tầng và mức đó.
+- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai cách xét (điểm thi, điểm quyết tâm) và hai mức. Mức là suất thường hoặc suất dự trữ,
+  theo đúng diện mà học sinh đã được nhận. **Xét điểm quyết tâm** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
+  **Xét điểm thi** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
+  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở nhóm và mức đó.
 - **Tab Kết quả.** Mục **Điểm chuẩn** luôn **đóng** mỗi lần vào thẻ; bấm **Xem điểm chuẩn** mới mở và hiện bảng tổng
-  quan mọi CLB (thanh điểm chuẩn tầng 2, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
-- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai tầng x hai mức và hai biểu đồ:
-  *cột phân bố* điểm quyết tâm của em tầng 2 (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
+  quan mọi CLB (thanh điểm chuẩn xét điểm quyết tâm, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
+- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai cách xét x hai mức và hai biểu đồ:
+  *cột phân bố* điểm quyết tâm của em thuộc nhóm xét điểm quyết tâm (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
   gạch chéo) và *dải chấm* (mỗi em một chấm: đặc là được nhận, rỗng là không được nhận; di chuột hoặc chạm vào chấm để
   xem mã học sinh và điểm). Vạch đen dọc là mức chuẩn. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
   thì không tính (số em này được ghi bên dưới).

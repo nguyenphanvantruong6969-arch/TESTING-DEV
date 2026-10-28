@@ -242,8 +242,8 @@ class XuatKetQuaMixin:
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
             "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
-            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo tầng "
-                          "và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
+            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo cách xét "
+                          "(điểm thi, điểm quyết tâm) và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
             "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu em được "
                         "nguyện vọng 1, suất dự trữ dùng tới đâu.",
             "Dấu vết (kỹ thuật)": "Hạt giống và số bốc thăm để tính lại kết quả. "
@@ -364,15 +364,15 @@ class XuatKetQuaMixin:
         from so_excel import CHU_CANH_BAO
 
         t.tieu_de("ĐIỂM CHUẨN TỪNG {slot_u}",
-                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo tầng và theo suất thường hay "
-                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở tầng đó. Chỉ dành cho nhà "
+                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo cách xét (điểm thi, điểm quyết tâm) và theo suất thường hay "
+                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở mục đó. Chỉ dành cho nhà "
                   "trường, không phát cho {person_l}.")
         if ket_qua_cu:
             t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, điểm chuẩn có thể đã cũ.",
                       CHU_CANH_BAO)
         cot = ["Mã {slot_sl}", "Tên {slot_l}"] + (["{session}"] if du["nhieu_buoi"] else []) \
-            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Tầng 2, suất thường",
-               "Tầng 2, suất dự trữ", "Tầng 1, suất thường", "Tầng 1, suất dự trữ"]
+            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Xét điểm quyết tâm, suất thường",
+               "Xét điểm quyết tâm, suất dự trữ", "Xét điểm thi, suất thường", "Xét điểm thi, suất dự trữ"]
         kq = self.get_diem_chuan()
         rows = kq["data"]["rows"] if kq.get("ok") else []
         loi_dc = not kq.get("ok")
