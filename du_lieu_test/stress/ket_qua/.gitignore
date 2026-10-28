@@ -1,0 +1,4 @@
+# Chỉ giữ tệp kết quả JSON nhỏ; không bao giờ commit CSDL, Sổ nhập sinh ra hay tệp sao lưu.
+*
+!.gitignore
+!*.json
