@@ -129,7 +129,7 @@ def main():
                                "dong_moi_trang": so_dong, "nhan_trang_dau": nhan}
         # Tìm / lọc
         o_tim = page.locator("#adminStudentSearch")
-        for ten, chuoi in (("tim_ma", "HS0100"), ("tim_ten", "Nguyễn"), ("tim_khong_co", "zzzzzz")):
+        for ten, chuoi in (("tim_ma", "HS100"), ("tim_ten", "Nguyễn"), ("tim_khong_co", "zzzzzz")):
             o_tim.fill("")
             page.evaluate(RAF2)
             xs = []
@@ -141,7 +141,8 @@ def main():
                 o_tim.fill(chuoi)
                 try:
                     page.wait_for_function(
-                        "(cu) => document.getElementById('adminPaginationLabel').textContent !== cu", arg=cu,
+                        "(cu) => document.getElementById('adminPaginationLabel').textContent !== cu || "
+                        "!document.getElementById('adminStudentEmptyState').hidden", arg=cu,
                         timeout=20000)
                 except Exception:
                     pass
