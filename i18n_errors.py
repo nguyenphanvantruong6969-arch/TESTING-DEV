@@ -812,8 +812,8 @@ MESSAGES = {
         "en": "Sheet \"{sheet}\" is missing the column \"{cot}\". Don't delete or rename the workbook's header row.",
     },
     "so_nhap_cot_lech_nhom": {
-        "vi": "Sheet \"{sheet}\", cột {cot}: không đúng chỗ trong nhóm \"{nhom}\". Mỗi nhóm có các cột giống nhau, theo đúng thứ tự ở hàng 2 của sổ mẫu. Có thể một cột đã bị chèn hay đổi tên. Hãy tải sổ mẫu và điền lại vào đúng cột.",
-        "en": "Sheet \"{sheet}\", column {cot}: it doesn't belong in the group \"{nhom}\". Every group has the same columns, in the order shown in row 2 of the template. A column may have been inserted or renamed. Download the template and fill it in again in the right columns.",
+        "vi": "Sheet \"{sheet}\", cột {cot}: không đúng chỗ trong nhóm \"{nhom}\". Mỗi nhóm có các cột giống nhau, theo đúng thứ tự ở hàng 2 của sổ mẫu. Có thể một cột đã bị chèn hay đổi tên. Hãy tải sổ mẫu và điền lại vào đúng cột. Nếu đây là cột phụ (ví dụ \"Ghi chú\") nằm bên phải nhóm cuối: thêm \"Nguyện vọng 2\" (từ hai nhóm trở lên phần mềm tự bỏ qua cột phụ) hoặc bỏ cột phụ.",
+        "en": "Sheet \"{sheet}\", column {cot}: it doesn't belong in the group \"{nhom}\". Every group has the same columns, in the order shown in row 2 of the template. A column may have been inserted or renamed. Download the template and fill it in again in the right columns. If it is an extra column (for example \"Notes\") to the right of the last group: add a second preference group (with two or more groups the extra column is ignored) or remove the extra column.",
     },
     "so_nhap_nhom_thieu_cot": {
         "vi": "Sheet \"{sheet}\", nhóm \"{nhom}\" thiếu cột \"{cot}\" mà các nhóm khác có. Mọi nhóm phải có các cột giống nhau. Có thể một cột đã bị xoá. Hãy tải sổ mẫu và điền lại.",

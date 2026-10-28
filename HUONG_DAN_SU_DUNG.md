@@ -154,6 +154,8 @@ Sheet này có **hai hàng tiêu đề** (từ A13.4): hàng 1 là các ô gộp
 nhóm (CLB, Điểm thi, và Điểm quyết tâm khi bật). Cột đầu gộp dọc hai hàng; dữ liệu bắt đầu từ **hàng 3**. Chèn hay
 xoá cột trong một nhóm thì phần mềm báo lỗi "cột lệch nhóm" và không nạp gì. Sổ cũ chỉ có một hàng tiêu đề vẫn nạp được.
 
+**Cột phụ (ví dụ "Ghi chú").** Từ hai nhóm Nguyện vọng trở lên, cột phụ đặt BÊN PHẢI nhóm cuối được bỏ qua. Giới hạn: sổ chỉ có MỘT nhóm Nguyện vọng thì phần mềm chưa biết nhóm rộng bao nhiêu, nên cột phụ vẫn bị báo "cột lệch nhóm" và không nạp gì; khi đó hãy thêm "Nguyện vọng 2" hoặc bỏ cột phụ.
+
 Bộ ví dụ (3 dòng đầu và dòng cuối; mỗi nhóm có hai cột CLB và Điểm thi):
 
 | Mã HS | Họ tên | Nhóm ưu tiên | NV 1: CLB | NV 1: Điểm thi | NV 2: CLB | NV 2: Điểm thi |

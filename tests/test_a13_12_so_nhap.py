@@ -70,3 +70,17 @@ def test_chu_so_ascii_van_thanh_so_nguyen():
                         [_hs("HS1", [_nv("A", True, 7.5, diem_w=" 100 ")])], cfg=CFG_W)
     ws = openpyxl.load_workbook(io.BytesIO(b.getvalue()))[HS]
     assert 100 in [ws.cell(row=3, column=c).value for c in range(1, ws.max_column + 1)]
+
+
+def test_mot_nhom_nguyen_vong_cot_phu_van_bao_lech_va_noi_cach_sua():
+    """Truong giữ giới hạn (28/10): sổ chỉ 1 nhóm + cột phụ vẫn báo lệch; câu lỗi phải nói cách sửa."""
+    from i18n_errors import format_message
+    sv = [_hs("HS1", [_nv("A", True, 7.5)])]
+
+    def them(ws):
+        ws.cell(row=2, column=ws.max_column + 1, value="Ghi chú")
+    kq = _doc(_sua(_bytes(sv, so_nv=1), them))
+    lech = [e for e in kq["loi"] if e["code"] == "so_nhap_cot_lech_nhom"]
+    assert lech and kq["students"] == []
+    for ngon, y in (("vi", "bỏ cột phụ"), ("en", "remove the extra column")):
+        assert y in format_message("so_nhap_cot_lech_nhom", lech[0]["params"], ngon)
