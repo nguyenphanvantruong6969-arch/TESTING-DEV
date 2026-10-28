@@ -518,7 +518,8 @@ def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHE
     dong_iter = _cac_dong(ws)
     dau = next(dong_iter, None)
     if dau is None:
-        loi.append(err("so_nhap_khong_co_clb", sheet=ten_sheet))
+        # Sheet trống hẳn: sổ không có CLB nào. Không phải lỗi (A13.9) — api_nhap báo cảnh báo
+        # `so_nhap_canh_bao_khong_co_clb` thay vì chặn nạp.
         return []
     _, tieu_de = dau
     cot = _khop_cot(tieu_de, _ten_cot_clb(cfg))
@@ -626,8 +627,6 @@ def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHE
             "dong": so_dong,
         })
 
-    if not any(not c.get("hong") for c in clubs) and not loi:
-        loi.append(err("so_nhap_khong_co_clb", sheet=ten_sheet))
     return clubs
 
 

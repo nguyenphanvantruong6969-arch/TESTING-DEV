@@ -374,3 +374,40 @@ def test_7_ten_co_nul_bi_tu_choi(goc_ws, tmp_path):
     assert _khong_con_rac(goc_ws, truoc)
 
 
+# ------------------------------------------------------------------ 8. sổ nhập rỗng
+
+def _b64_so(clubs, students):
+    b = io.BytesIO()
+    so_nhap.ghi_so_nhap(b, clubs, students)
+    return base64.b64encode(b.getvalue()).decode()
+
+
+_CLB = [{"club_id": "a", "name": "A", "capacity": 2, "reserved_seats": 0}]
+_HS = [{"student_id": "S1", "name": "Em Một", "nv": []}]
+
+
+@pytest.mark.parametrize("clubs,hs,canh_bao_mong_doi", [
+    ([], [], {"so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs"}),
+    (_CLB, [], {"so_nhap_canh_bao_khong_co_hs"}),
+    ([], _HS, {"so_nhap_canh_bao_khong_co_clb"}),
+], ids=["0hs_0clb", "0hs", "0clb"])
+def test_8_so_rong_ok_kem_canh_bao_va_chay_xep_khong_sap(api, clubs, hs, canh_bao_mong_doi):
+    x = _b64_so(clubs, hs)
+    xem = api.xem_truoc_so_nhap(x)
+    assert xem["ok"], xem["errors"]
+    assert {e["code"] for e in xem["data"]["canh_bao"]} >= canh_bao_mong_doi
+    nap = api.import_so_nhap(x)
+    assert nap["ok"], nap["errors"]
+    assert {e["code"] for e in nap["data"]["warnings"]} >= canh_bao_mong_doi
+    chay = api.run_pipeline(seed=1)
+    assert chay["ok"], chay["errors"]
+
+
+def test_8_so_day_du_khong_co_canh_bao_rong(api):
+    x = _b64_so(_CLB, [{"student_id": "S1", "name": "Em", "nv": [{"club_id": "a"}]}])
+    nap = api.import_so_nhap(x)
+    assert nap["ok"], nap["errors"]
+    ma = {e["code"] for e in nap["data"]["warnings"]}
+    assert not ma & {"so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs"}
+
+

@@ -352,6 +352,12 @@ class NhapDuLieuMixin:
             ngoai = [r[1] or r[0] for r in cur.execute(
                 "SELECT club_id, name FROM clubs ORDER BY name")
                 if r[0] not in ma_trong_so]
+        # Sổ rỗng KHÔNG bị chặn (A13.9): nạp là hợp lệ, chỉ là chẳng thêm gì — nói ra để người vận
+        # hành không tưởng đã nạp xong dữ liệu. Chạy xếp sau đó vẫn chạy được trên cái đang có.
+        if not du_lieu["clubs"]:
+            canh_bao.append(err("so_nhap_canh_bao_khong_co_clb"))
+        if not du_lieu["students"]:
+            canh_bao.append(err("so_nhap_canh_bao_khong_co_hs"))
         if n_xoa:
             canh_bao.append(err("so_nhap_canh_bao_xoa_diem", n=n_xoa))
         if n_bo:
@@ -413,7 +419,10 @@ class NhapDuLieuMixin:
             # bị khoá, lỗi bất ngờ) thì CLB cũng được huỷ. Màn hình nói "chưa
             # nạp gì cả" là đúng sự thật.
             with self._mot_giao_dich():
-                d = buoc(self.import_clubs_csv(csv_text["clubs"]))
+                # Sổ không có CLB nào (cảnh báo ở _canh_bao_so_nhap): hàm nạp CSV từ chối tệp
+                # rỗng (`csv_empty`), nên bỏ qua bước này chứ không coi là lỗi.
+                d = (buoc(self.import_clubs_csv(csv_text["clubs"])) if du_lieu["clubs"]
+                     else {"n_clubs_created": 0, "n_clubs_updated": 0})
                 kq.update(n_clubs_created=d["n_clubs_created"],
                           n_clubs_updated=d["n_clubs_updated"],
                           n_students_created=0, n_students_written=0,

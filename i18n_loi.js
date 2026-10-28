@@ -838,6 +838,14 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): mã tự tạo \"{ma}\" trùng với {slot_sl} ở dòng {dong_truoc}. Điền Mã CLB cho một trong hai dòng.",
     "en": "Sheet \"{sheet}\", row {dong} ({ten}): the generated code \"{ma}\" clashes with the {slot_l} on row {dong_truoc}. Fill in Mã CLB on one of the two rows."
   },
+  "so_nhap_canh_bao_khong_co_clb": {
+    "vi": "Sổ này chưa có {slot_l} nào, nên không thêm hay cập nhật {slot_l} nào. {slot_sl} đang có trong phần mềm được giữ nguyên.",
+    "en": "This workbook has no {slot_l} yet, so none is added or updated. The {slot_l}(s) already in the app are left as they are."
+  },
+  "so_nhap_canh_bao_khong_co_hs": {
+    "vi": "Sổ này chưa có {person_l} nào, nên không thêm hay cập nhật {person_l} nào. Chưa có nguyện vọng thì chưa xếp được.",
+    "en": "This workbook has no {person_l} yet, so none is added or updated. Nothing can be assigned until preferences are in."
+  },
   "so_nhap_canh_bao_xoa_diem": {
     "vi": "{n} {score_l} đã chấm trong phần mềm sẽ bị xoá, vì sổ ghi \"thi\" (chưa có {score_l}) ở các ô đó. Muốn giữ {score_l} thì xuất lại dữ liệu đầu vào thành sổ mới rồi sửa trên sổ đó.",
     "en": "{n} {score_l}(s) already entered in the app will be removed, because the workbook says \"thi\" (no {score_l} yet) in those cells. To keep them, export the current input data to a new workbook and edit that one."
@@ -874,12 +882,12 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không đọc được cấu hình của không gian làm việc này, nên chưa thể làm việc đó: chạy bằng luật trường học sẽ ra kết quả sai mà không báo. Hãy mở lại không gian làm việc, kiểm tra hoặc đặt lại cấu hình rồi thử lại.",
     "en": "This workspace's settings can't be read, so this can't be done: running with the school rules would give wrong results without any warning. Reopen the workspace, check or reset its settings, then try again."
   },
+  "csdl_dang_ban": {
+    "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
+    "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
+  },
   "ws_loi_khong_ro": {
     "vi": "Không thực hiện được thao tác với không gian làm việc. Hãy thử lại.",
     "en": "Couldn't complete the workspace operation. Try again."
   }
 };
-  "csdl_dang_ban": {
-    "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
-    "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
-  },
