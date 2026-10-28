@@ -409,6 +409,7 @@
       btn_delete: "Xoá",
       confirm_delete_generic: "Bấm lần nữa để xoá",
       toast_club_deleted: "Đã xoá {slot_sl} {club_id}.",
+      toast_club_deleted_removed: "Đã xoá {slot_sl} {club_id}, kèm {n_scores} điểm đã chấm và {n_tests} ô tick thi. Bản sao lưu: {backup_name}.",
 
       danger_zone_title: "Vùng nguy hiểm: xoá dữ liệu để làm lại",
       danger_zone_desc: "Nạp tệp chỉ thêm {person_l} mới, không xoá {person_l} cũ. Muốn làm lại với bộ dữ liệu khác, hãy xoá ở đây trước, nếu không {person_l} cũ vẫn chiếm chỗ.",
@@ -673,6 +674,7 @@
       ws_r_canh_bao_nhom: "Lưu ý: ưu tiên \"Nhóm trước, rồi đến điểm\" nhưng chưa chọn \"Thứ hạng nhóm nghiêm ngặt\", nên thứ tự các nhóm sẽ không được dùng.",
       ws_v_ten: "Hãy nhập tên.",
       ws_v_vi: "Ô tiếng Việt của \"{muc}\" không được để trống.",
+      ws_v_cong_thuc: "Nhãn của \"{muc}\" không được bắt đầu bằng = + - hoặc @ (Excel sẽ hiểu là công thức).",
       ws_v_max_choices: "Số lựa chọn tối đa phải là số nguyên từ 1 đến 20.",
       ws_v_max_tests: "Số mục dự thi tối đa phải là số nguyên từ 0 đến 20, hoặc tích \"Không giới hạn\".",
       ws_v_tiers: "Danh sách nhóm có hai dòng trùng nhau.",
@@ -1068,6 +1070,7 @@
       btn_delete: "Delete",
       confirm_delete_generic: "Click again to delete",
       toast_club_deleted: "Deleted {slot_l} {club_id}.",
+      toast_club_deleted_removed: "Deleted {slot_l} {club_id}, with {n_scores} saved score(s) and {n_tests} test tick(s). Backup: {backup_name}.",
 
       danger_zone_title: "Danger zone: delete data to start over",
       danger_zone_desc: "Importing a file only adds {person_pl}. It doesn't remove existing ones. To start over with a different set, delete here first, or the old {person_pl} will keep taking seats.",
@@ -1332,6 +1335,7 @@
       ws_r_canh_bao_nhom: "Note: priority is \"Group first, then score\", but \"Strict group ranking\" is not selected, so the group order won't be used.",
       ws_v_ten: "Enter a name.",
       ws_v_vi: "The Vietnamese box for \"{muc}\" can't be empty.",
+      ws_v_cong_thuc: "The label for \"{muc}\" can't start with = + - or @ (Excel would read it as a formula).",
       ws_v_max_choices: "Most choices must be a whole number from 1 to 20.",
       ws_v_max_tests: "Most tested places must be a whole number from 0 to 20, or tick \"No limit\".",
       ws_v_tiers: "The group list has two identical lines.",

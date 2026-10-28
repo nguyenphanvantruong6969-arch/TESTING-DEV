@@ -438,6 +438,13 @@ function wsLoiBuoc(w, buoc) {
   if (buoc === 2) {
     WS_DANH_TU.forEach((dt) => {
       if (!w.labels[dt].vi.trim()) loi.push(t("ws_v_vi", { muc: t("ws_dt_" + dt) }));
+      /* Cùng luật với cau_hinh_ws.py: nhãn thành tiêu đề cột Excel, mở đầu bằng = + - @ bị hiểu là
+         công thức. Báo ngay ở bước này, đúng mục sai, thay vì lỗi chung ở bước cuối (A13.12, 4.10). */
+      ["vi", "en"].forEach((ngon) => {
+        if (/^[=+\-@]/.test(w.labels[dt][ngon].trim())) {
+          loi.push(t("ws_v_cong_thuc", { muc: t("ws_dt_" + dt) }));
+        }
+      });
     });
   }
   if (buoc === 3) {
@@ -691,12 +698,17 @@ function wsTaoWorkspace() {
     }
   }
   const cfg = wsCfgTuWizard(wsWizard);
+  const moRoiTaiLai = (slug) => callApi("open_workspace", slug).then((mo) => {
+    if (!mo.ok) { showErrorToast(mo.errors); return; }
+    wsTaiLaiTrang();
+  });
+  /* Đã tạo mà mở lỗi: bấm "Tạo" lại chỉ thử MỞ lại cái đó, không đẻ thêm "name-2" (A13.12, 4.8). */
+  if (wsWizard.daTaoSlug) return moRoiTaiLai(wsWizard.daTaoSlug);
   return callApi("create_workspace", cfg.name, cfg).then((res) => {
     if (!res.ok) { showErrorToast(res.errors); return; }
+    if (wsWizard) wsWizard.daTaoSlug = res.data.slug;
     showToast(t("ws_da_tao", { ten: cfg.name }), "success");
-    return callApi("open_workspace", res.data.slug).then((mo) => {
-      if (!mo.ok) { showErrorToast(mo.errors); return; }
-      wsTaiLaiTrang();
-    });
+    wsLamMoiDanhSach();
+    return moRoiTaiLai(res.data.slug);
   });
 }

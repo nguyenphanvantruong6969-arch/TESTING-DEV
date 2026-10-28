@@ -367,7 +367,9 @@ function loadThoiKhoaBieu(search) {
   const panel = el("tkbPanel");
   if (!panel) return;
   callApiMoiNhat("tkb", "get_thoi_khoa_bieu", search || "").then((res) => {
-    if (!res.ok || res.data.ds_buoi.length < 2 || !res.data.hoc_sinh.length) {
+    /* Tìm không khớp em nào thì chỉ bảng rỗng, KHÔNG ẩn cả panel: ô tìm nằm trong panel, ẩn đi là
+       người dùng không sửa được chuỗi tìm (A13.12, 3.6). Hết em thật (không tìm) mới ẩn. */
+    if (!res.ok || res.data.ds_buoi.length < 2 || (!res.data.hoc_sinh.length && !(search || "").trim())) {
       panel.hidden = true;
       return;
     }
@@ -549,9 +551,17 @@ function loadAdminClubs() {
       armTwoStepConfirm(delBtn, () => t("confirm_delete_generic"), () => {
         callApi("delete_club", c.club_id).then((delRes) => {
           if (delRes.ok) {
-            showToast(t("toast_club_deleted", { club_id: c.club_id }), "success");
+            const d = delRes.data || {};
+            /* Xoá CLB kéo theo điểm đã chấm / ô tick thi: nói rõ số và tệp sao lưu (A13.12, 3.2). */
+            const mat = (d.n_scores_removed || 0) + (d.n_tests_removed || 0);
+            showToast(mat && d.backup_path
+              ? t("toast_club_deleted_removed", {
+                club_id: c.club_id, n_scores: d.n_scores_removed || 0, n_tests: d.n_tests_removed || 0,
+                backup_name: String(d.backup_path).split(/[\\/]/).pop() })
+              : t("toast_club_deleted", { club_id: c.club_id }), "success");
             loadAdminClubs();
             loadReserveGroupOptions();
+            lamMoiSauDoiClb();
           } else {
             showErrorToast(delRes.errors);
           }
@@ -561,6 +571,13 @@ function loadAdminClubs() {
       body.appendChild(tr);
     });
   });
+}
+
+/* Lưu / xoá CLB đổi cả danh sách buổi, bảng tải theo buổi và lịch tuần (A13.12, 3.10). */
+function lamMoiSauDoiClb() {
+  loadBuoiOptions();
+  loadTaiTheoBuoi();
+  loadLichTuan();
 }
 
 function loadReserveGroupOptions() {
@@ -594,6 +611,7 @@ function loadAdminStudents() {
     }
     emptyState.hidden = true;
     pagination.hidden = false;
+    adminStudentPage = res.data.page;   /* máy chủ kẹp trang vượt tổng về trang cuối (A13.12, 1.6 / 3.3) */
 
     res.data.rows.forEach((s) => {
       const tr = document.createElement("tr");
@@ -662,10 +680,14 @@ function whNhan(tienTo, gia) {
   return chu === khoa ? gia : chu;
 }
 
-function loadAdminWharton(giuTrang) {
+/* `giuChu`: giữ chữ đang gõ trong màn sửa khi vẽ lại. Mặc định theo `giuTrang` (đổi ngôn ngữ vẽ lại
+   đúng cái đang gõ); sau một thao tác ĐỔI dữ liệu trên máy chủ (lưu, phóng hàng loạt, xoá, mở khoá)
+   phải truyền false, nếu không chữ cũ đè lên dữ liệu vừa đổi và "Lưu" ghi đè kết quả (A13.12, 3.4). */
+function loadAdminWharton(giuTrang, giuChu) {
   if (!giuTrang) whQl.trang = 1;
   /* Chu dang go trong man sua duoc giu lai khi ve lai (vd doi ngon ngu). */
-  const giu = whQl.sid && giuTrang ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
+  const giu = whQl.sid && (giuChu === undefined ? giuTrang : giuChu)
+    ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
   return callApi("list_wharton_canh_bao").then((res) => {
     const khoi = el("adminWhartonBlock");
     if (!res.ok) {
@@ -803,6 +825,7 @@ function loadWhBang() {
     el("whQlTim").value.trim(), el("whLocQuy").value || null, el("whLocBuoi").value || null,
     el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG).then((res) => {
     whBoNho.bang = res.ok ? res.data : null;
+    if (res.ok) whQl.trang = res.data.page;   /* trang vượt tổng được kẹp về trang cuối (A13.12, 3.3) */
     veBangWh();
   });
 }
@@ -1059,7 +1082,7 @@ function initWhHangLoat() {
         veKetQuaPhong();
         showToast(trErr({ code: "wharton_da_phong",
           params: { n: res.data.n_phong, m: res.data.bo_qua.length } }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       });
   });
   window.addEventListener("langchange", () => {
@@ -1110,7 +1133,7 @@ function initWhartonQuanLy() {
     khiBan(el("btnWhLuu"), () => callApi("admin_save_wharton", sid, w1, w2)).then((res) => {
       if (res.ok) {
         feedback(el("whQlSuaPhanHoi"), t("feedback_wharton_saved"), false);
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         feedbackErrors(el("whQlSuaPhanHoi"), res.errors);
       }
@@ -1123,7 +1146,7 @@ function initWhartonQuanLy() {
     callApi("clear_wharton", sid).then((res) => {
       if (res.ok) {
         showToast(t("toast_wh_xoa_mot", { student_id: sid }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1143,7 +1166,7 @@ function initWhartonQuanLy() {
       if (res.ok) {
         el("whMoKhoaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_mo_khoa", params: {} }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1163,7 +1186,7 @@ function initWhartonQuanLy() {
       if (res.ok) {
         el("whXoaTatCaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_xoa", params: { n: res.data.n_students } }), "success");
-        loadAdminWharton(true);
+        loadAdminWharton(true, false);
       } else {
         showErrorToast(res.errors);
       }
@@ -1194,6 +1217,7 @@ function initAdminHandlers() {
         el("clubFormReserveGroup").value = "";
         loadAdminClubs();
         loadReserveGroupOptions();
+        lamMoiSauDoiClb();
       } else {
         feedbackErrors(el("clubFormFeedback"), res.errors);
       }
@@ -1864,7 +1888,8 @@ function loadChiTietDiemChuan() {
     hop.hidden = true;
     return Promise.resolve(null);
   }
-  return callApi("get_diem_chuan_clb", dc.chon).then((res) => {
+  /* callApiMoiNhat: đổi nhanh CLB A sang B mà phản hồi của A về sau thì bỏ phản hồi của A (A13.12, 3.9). */
+  return callApiMoiNhat("dc_chi_tiet", "get_diem_chuan_clb", dc.chon).then((res) => {
     if (!res.ok) {
       hop.hidden = true;
       if (!whChuaBat(res)) showErrorToast(res.errors);
