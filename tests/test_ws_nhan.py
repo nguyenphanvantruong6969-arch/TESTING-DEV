@@ -72,6 +72,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "xuat_duong_la_thu_muc",
     # Sổ nhập rỗng: ok kèm cảnh báo thay vì lỗi chặn.
     "so_nhap_canh_bao_khong_co_clb", "so_nhap_canh_bao_khong_co_hs",
+    # A13.12 (soát nhập 1.2): lỗi HTTP của máy chủ dự phòng có mã (trước đây là chuỗi trần).
+    "http_bi_tu_choi", "http_khong_co_dich", "http_khong_co_ham", "http_than_qua_lon",
 }
 
 

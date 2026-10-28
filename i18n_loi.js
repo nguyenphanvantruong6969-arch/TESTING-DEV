@@ -890,6 +890,22 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Cơ sở dữ liệu đang bận vì có thao tác khác đang ghi. Chờ vài giây rồi thử lại.",
     "en": "The database is busy because another operation is writing to it. Wait a few seconds and try again."
   },
+  "http_bi_tu_choi": {
+    "vi": "Yêu cầu bị từ chối vì thiếu hoặc sai khoá truy cập. Hãy mở lại ứng dụng.",
+    "en": "The request was refused because the access key is missing or wrong. Reopen the app."
+  },
+  "http_khong_co_dich": {
+    "vi": "Không có địa chỉ yêu cầu này. Hãy mở lại ứng dụng.",
+    "en": "There is no such request address. Reopen the app."
+  },
+  "http_khong_co_ham": {
+    "vi": "Không có chức năng «{ten}». Có thể giao diện và phần mềm khác phiên bản nhau.",
+    "en": "There is no function \"{ten}\". The interface and the software may be different versions."
+  },
+  "http_than_qua_lon": {
+    "vi": "Dữ liệu gửi lên quá lớn (tối đa {toi_da_mb} MB). Hãy chia nhỏ tệp rồi thử lại.",
+    "en": "The data sent is too large (limit {toi_da_mb} MB). Split the file and try again."
+  },
   "ws_loi_khong_ro": {
     "vi": "Không thực hiện được thao tác với không gian làm việc. Hãy thử lại.",
     "en": "Couldn't complete the workspace operation. Try again."
