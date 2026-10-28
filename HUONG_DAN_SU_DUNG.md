@@ -23,6 +23,7 @@
 11. [Sự cố hay gặp](#11-sự-cố-hay-gặp)
 12. [Thuật toán làm gì](#12-thuật-toán-làm-gì)
 13. [Giới hạn đã biết](#13-giới-hạn-đã-biết)
+14. [Điểm quyết tâm (tuỳ chọn)](#14-điểm-quyết-tâm-tuỳ-chọn)
 
 ---
 
@@ -145,13 +146,17 @@ nhãn `chinh_sach`. Hai chỗ còn lại cạnh tranh bình thường.
 | Mã HS | Mã học sinh. Bắt buộc, không được trùng |
 | Họ tên | Họ tên |
 | Nhóm ưu tiên | Nhãn diện ưu tiên của em này. Bỏ trống nếu không thuộc diện nào |
-| NV1 | Nguyện vọng **mong muốn nhất** — chọn tên CLB trong danh sách thả xuống |
-| NV2, NV3, … | Nguyện vọng tiếp theo |
-| Điểm 1, Điểm 2, … | Điểm thi của CLB **ngay bên trái**. Trống = không thi. Chữ `thi` = đã thi, chấm sau |
+| Nguyện vọng 1 (ô gộp, hàng 1) | Nguyện vọng **mong muốn nhất**. Dưới ô gộp có cột **CLB**: chọn tên CLB trong danh sách thả xuống |
+| Nguyện vọng 2, 3, … | Nguyện vọng tiếp theo, cùng cấu trúc |
+| Điểm thi (hàng 2, cùng nhóm) | Điểm thi của CLB **ngay bên trái**. Trống = không thi. Chữ `thi` = đã thi, chấm sau |
 
-Bộ ví dụ (3 dòng đầu và dòng cuối):
+Sheet này có **hai hàng tiêu đề** (từ A13.4): hàng 1 là các ô gộp "Nguyện vọng k", hàng 2 là tên cột trong từng
+nhóm (CLB, Điểm thi, và Điểm quyết tâm khi bật). Cột đầu gộp dọc hai hàng; dữ liệu bắt đầu từ **hàng 3**. Chèn hay
+xoá cột trong một nhóm thì phần mềm báo lỗi "cột lệch nhóm" và không nạp gì. Sổ cũ chỉ có một hàng tiêu đề vẫn nạp được.
 
-| Mã HS | Họ tên | Nhóm ưu tiên | NV1 | Điểm 1 | NV2 | Điểm 2 |
+Bộ ví dụ (3 dòng đầu và dòng cuối; mỗi nhóm có hai cột CLB và Điểm thi):
+
+| Mã HS | Họ tên | Nhóm ưu tiên | NV 1: CLB | NV 1: Điểm thi | NV 2: CLB | NV 2: Điểm thi |
 |---|---|---|---|---|---|---|
 | HS01 | Nguyễn Văn An | | CLB Bóng rổ | 9 | CLB Tin học | 7,5 |
 | HS02 | Trần Thị Bình | | CLB Bóng rổ | 8,5 | CLB Mỹ thuật | 8 |
@@ -199,11 +204,11 @@ như `thu_3_tiet_9` và `thu_3_tiet_10` — phần mềm giữ nguyên tên bu�
 
 ### Nguyện vọng: vẫn một danh sách
 
-Trang `2. Học sinh` **không đổi** khi trường có nhiều buổi: NV1, NV2, … là một
+Trang `2. Học sinh` **không đổi** khi trường có nhiều buổi: các nhóm Nguyện vọng 1, 2, … là một
 danh sách chung. Phần mềm tự chia theo buổi của từng CLB, giữ đúng thứ tự em
 đã xếp trong mỗi buổi.
 
-| Mã HS | NV1 | NV2 | NV3 |
+| Mã HS | Nguyện vọng 1 | Nguyện vọng 2 | Nguyện vọng 3 |
 |---|---|---|---|
 | HS001 | CLB Bóng đá *(Thứ 3)* | CLB Cờ vua *(Thứ 3)* | CLB Tin học *(Thứ 5)* |
 
@@ -460,6 +465,10 @@ nào để chúng nói khác nhau.
 
 > Tệp kết quả là **dữ liệu học sinh**. Cân nhắc trước khi gửi qua email hay chép
 > lên máy dùng chung.
+
+> **Vì sao mục "Kết quả sắp xếp" bị khoá?** Mục này chỉ dùng được khi đã có kết quả xếp. Chưa chạy xếp, hoặc lần chạy bị chặn, thì ô bị khoá và có dòng vàng "Chưa có kết quả xếp. Chạy xếp trước." Chạy xếp thành công rồi quay lại thẻ Kết quả là ô mở lại. Các mục khác (dữ liệu đầu vào, hồ sơ học sinh) vẫn xuất được.
+
+**Thông báo nổi** ở góc dưới bên phải: thông báo thành công tự đóng sau 6 đến 10 giây (đưa chuột vào thì dừng đếm); lỗi và cảnh báo ở lại cho tới khi bạn bấm ×.
 
 #### Xuất thêm: dữ liệu đầu vào, thay đổi, hồ sơ học sinh
 
@@ -957,6 +966,112 @@ Bỏ trống nguyện vọng là tự bỏ cơ hội của chính mình.
 
 Số liệu đầy đủ: `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md` mục 3c.
 Ba câu hỏi hay gặp nhất về bốc thăm, kèm số đo: **`docs/GIAI_DAP_BOC_THAM.md`**.
+
+## 14. Điểm quyết tâm (tuỳ chọn)
+
+> Dành cho người bảo trì: trong mã và trong tên cột tệp, tính năng này vẫn gọi là `wharton` (ví dụ `rules.wharton`, cột `wp_k`).
+
+Mặc định **TẮT**: không bật thì phần mềm chạy y hệt như trước, kể cả kết quả và dấu vân tay dữ liệu.
+Khi bật, mỗi học sinh tự chia điểm để nói mình muốn CLB nào hơn. Điểm này được xét **trước** số bốc thăm
+và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hưởng thứ tự ưu tiên của CLB.
+
+### Hai quỹ điểm
+
+- Mỗi buổi, mỗi học sinh có **hai quỹ, mỗi quỹ đúng 100 điểm** (số nguyên từ 0 trở lên; ô trống tính là 0).
+- **Quỹ 1** chia cho các CLB em có thi. Chỉ dùng để phá hoà khi hai em **bằng điểm thi**.
+- **Quỹ 2** chia cho các CLB em không thi. Điểm cao hơn thì đứng trước; bằng điểm mới đến số bốc thăm.
+- Quỹ nào chỉ có một CLB thì điền 100.
+
+### Bật ở đâu
+
+Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã bật sẵn).
+Ô này chỉ dùng được khi cách xếp ưu tiên có điểm (Theo điểm, hoặc Nhóm trước rồi đến điểm) **và** điểm tính
+riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một điểm duy nhất" thì ô tự khoá và bỏ chọn.
+
+### Cột trong Sổ nhập và tệp CSV (chỉ khi đã bật)
+
+| Tệp | Cột điểm quyết tâm |
+|---|---|
+| Sổ nhập | mỗi nhóm "Nguyện vọng k" có ba cột ở hàng 2: `CLB` · `Điểm thi` · `Điểm quyết tâm` (cột cuối ngay sau `Điểm thi`) |
+| CSV nguyện vọng, dạng rộng | `wp_k` đi cặp `pref_k` |
+| CSV nguyện vọng, cột theo buổi | `<buoi>_wp_k` đi cặp `<buoi>_pref_k` |
+| CSV nguyện vọng, dạng dài | thêm cột `wp` cạnh `club_id` |
+
+- Tệp **không có** các cột này thì nạp như cũ. Chưa bật mà tệp có các cột này thì chúng bị bỏ qua và phần mềm
+  báo số ô đã bỏ.
+- Nạp lại tệp cho một học sinh là **thay** mọi điểm quyết tâm cũ của em đó; em không có trong tệp thì giữ nguyên.
+- Ô không phải số nguyên từ 0 trở lên (ví dụ `12,5`, `-3`, `abc`) bị báo và không lưu; các ô khác vẫn lưu.
+- Nạp **không bị chặn** vì tổng chưa đủ 100: phần mềm chỉ cảnh báo. Việc chặn nằm ở bước chạy (xem dưới).
+- Xuất "dữ liệu đầu vào" ra Sổ nhập rồi nạp lại thì điểm quyết tâm giống hệt.
+
+### Học sinh chia điểm ở kiosk
+
+Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm quyết tâm**. Mỗi buổi có hai khung (CLB đã thi, CLB không
+thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo còn
+thiếu bao nhiêu ở quỹ nào và không lưu.
+
+- Học sinh chỉ thấy điểm của chính mình: không có điểm chuẩn, độ đông hay điểm của bạn khác.
+- Khung chỉ có một CLB thì ô tự điền 100 và khoá. Nếu em chưa bấm **Lưu**, lúc chạy xếp phần mềm vẫn tự điền 100 đó trong bộ nhớ (không ghi vào cơ sở dữ liệu), nên em không bị chặn chỉ vì chưa bấm Lưu; quỹ có từ hai CLB trở lên thì vẫn phải tự chia.
+- Đổi ô tick thi ở Bước 1 **sau khi** đã chia điểm: điểm **không** tự chuyển sang quỹ kia. Khung hiện dòng
+  *Cần chia lại điểm* và hồ sơ chưa hợp lệ cho tới khi chia lại.
+- Bỏ một CLB khỏi nguyện vọng ở Bước 2 thì điểm đã đặt ở CLB đó bị xoá.
+- Sau khi đã chạy xếp, điểm quyết tâm bị **khoá**: Bước 3 chỉ xem được, kèm dòng nhắc nhờ người quản lý mở khoá ở thẻ Quản lý (xem mục "Quản lý điểm quyết tâm" bên dưới).
+
+### Quản lý điểm quyết tâm (thẻ Quản lý)
+
+Khối **Điểm quyết tâm** chỉ hiện ở thẻ **Quản lý** khi không gian làm việc bật điểm quyết tâm; tắt thì thẻ Quản lý giống hệt như cũ. Thẻ Quản lý chia thành các **tab con**: *CLB*, *Học sinh*, *Điểm quyết tâm*, *Điểm chuẩn* và *Dữ liệu* (phần xoá dữ liệu). Hai tab điểm chỉ hiện khi bật điểm quyết tâm; tắt thì chỉ còn ba tab con. Khối này nằm ở tab con *Điểm quyết tâm*. Phần mềm nhớ tab con bạn vừa mở; chuyển tab bằng chuột hoặc phím mũi tên.
+
+**Xem bảng điểm.** Mỗi dòng là một học sinh: điểm đã chia cho từng CLB, tách theo quỹ (Quỹ 1: CLB đã thi, Quỹ 2: CLB không thi) và theo buổi, kèm **Tổng** của từng quỹ (phải đúng 100). Ô được phần mềm tự điền 100 vì quỹ chỉ có một CLB thì ghi *tự điền*; ô chưa đặt hiện dấu —. Dùng ô tìm (gõ không dấu cũng được), các ô lọc Quỹ / Buổi / CLB và ô **Chỉ hồ sơ có vấn đề**; có phân trang. Dòng có vấn đề được tô viền đỏ và ghi *Chưa hợp lệ*, *Vắng thi* hoặc *Cần chia lại*.
+
+**Đọc cảnh báo.** Phía trên bảng là danh sách **Hồ sơ cần xử lý**, chia hai nhóm: *Chưa chia đủ* (mọi lỗi sẽ chặn lần chạy xếp, như tổng khác 100) và *Vắng thi* (chỉ là cảnh báo, không chặn). Số liệu trùng với mục Cảnh báo dữ liệu ở thẻ Vận hành. Bấm vào một tên thì mở màn sửa của học sinh đó.
+
+**Sửa điểm một học sinh.** Màn sửa có hai khung giống Bước 3 ở kiosk. Sửa xong bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo thiếu bao nhiêu ở quỹ nào và không lưu gì. Luật kiểm là đúng luật của kiosk.
+
+**Xoá điểm.**
+- Một học sinh: bấm **Xoá điểm của học sinh này** hai lần liên tiếp.
+- Tất cả: bấm **Xoá điểm quyết tâm của tất cả học sinh**, gõ đúng chữ `XOA` rồi bấm xác nhận. Phần mềm tự sao lưu cơ sở dữ liệu trước khi xoá.
+
+**Xử lý hàng loạt hồ sơ chia thiếu hoặc thừa.** Dưới danh sách *Hồ sơ cần xử lý* có hai nút:
+- **Tải danh sách cần sửa:** tạo một tệp Excel liệt kê từng lỗi (mã, họ tên, buổi, quỹ, tổng hiện tại, thiếu hay thừa bao nhiêu, và câu lỗi). Nút này **không đổi điểm nào**.
+- **Phóng cho đủ 100 theo tỉ lệ:** với mỗi học sinh chia thiếu hoặc thừa ở một quỹ, phần mềm **đổi điểm thay học sinh**: giữ tỉ lệ các điểm em đã đặt trong đúng quỹ đó và phóng cho tổng đúng 100 (làm tròn theo phần dư lớn nhất; hai CLB bằng phần dư thì CLB có mã nhỏ hơn được điểm lẻ; thứ hạng nguyện vọng không được dùng). Đây là thay đổi điểm của học sinh, nên cần gõ đúng chữ `PHONG` để xác nhận, phần mềm tự sao lưu trước, và mỗi thay đổi được ghi vào **Nhật ký thay đổi** (nguồn "thẻ Quản lý"). Học sinh chưa đặt điểm nào ở quỹ đó, hoặc còn lỗi khác (điểm ngoài nguyện vọng, cần chia lại, nguyện vọng chưa xếp xong) thì **không bị đổi** và được liệt kê lại để sửa tay. Đang khoá thì không phóng được.
+
+**Khi chạy sắp xếp bị chặn vì hồ sơ điểm.** Thẻ Vận hành chỉ hiện một dòng tóm tắt, vài học sinh đầu (mỗi em một dòng gộp mọi lỗi của em) và nút **Mở danh sách cần xử lý**. Bấm nút để sang tab con *Điểm quyết tâm* với bộ lọc "chỉ hồ sơ có vấn đề" đã bật. Phần mềm vẫn kiểm đủ mọi học sinh, chỉ cách hiện gọn hơn.
+
+**Vì sao bị khoá, và mở khoá.** Mỗi lần chạy xếp thành công khi bật điểm quyết tâm, điểm tự **khoá** để kết quả không đổi âm thầm sau đó. Khoá này riêng, không liên quan tới khoá số bốc thăm. Đang khoá thì không ghi được điểm ở đâu cả (thẻ Quản lý, Bước 3 ở kiosk, nạp cột điểm từ tệp; nạp tệp vẫn lưu nguyện vọng và cảnh báo rằng phần điểm bị bỏ). Việc xoá học sinh, xoá CLB, làm lại từ đầu hay xoá dữ liệu vẫn làm được. Muốn sửa: bấm **Mở khoá sửa điểm quyết tâm**, gõ đúng chữ `MO` rồi xác nhận. Kết quả đã xếp không tự đổi; lần chạy xếp tiếp theo sẽ khoá lại. Xoá dữ liệu (**Vùng nguy hiểm**) cũng mở khoá.
+
+**Xem nhật ký.** Khi mở màn sửa của một học sinh, cuối màn là **Nhật ký thay đổi** của em đó (10 dòng mới nhất, bấm **Xem thêm** để xem tiếp): lúc nào, từ đâu (thẻ Quản lý, nhập tại chỗ, nạp tệp, xoá dữ liệu, hệ thống), tên tài khoản máy, và điểm trước và sau. Nhật ký chỉ ghi thêm, không bao giờ bị xoá hay sửa, kể cả khi xoá dữ liệu.
+
+### Đọc điểm chuẩn và biểu đồ
+
+Khi đã bật điểm quyết tâm và đã chạy xếp, quản trị xem được **điểm chuẩn** của từng CLB. Học sinh ở kiosk **không** thấy.
+
+- **Tính thế nào.** Tính riêng cho từng CLB (và từng buổi), tách hai tầng và hai mức. Mức là suất thường hoặc suất dự trữ,
+  theo đúng diện mà học sinh đã được nhận. **Tầng 2** (CLB không thi): điểm quyết tâm thấp nhất trong số em đã được nhận.
+  **Tầng 1** (CLB có thi): điểm thi thấp nhất trong số em đã được nhận, kèm điểm quỹ 1 của chính em đó, ví dụ
+  "8,25 điểm thi · 40 điểm quyết tâm". CLB còn chỗ thì ghi **0 (còn N chỗ)**. Ô "—": chưa có em nào ở tầng và mức đó.
+- **Tab Kết quả.** Mục **Điểm chuẩn** luôn **đóng** mỗi lần vào thẻ; bấm **Xem điểm chuẩn** mới mở và hiện bảng tổng
+  quan mọi CLB (thanh điểm chuẩn tầng 2, số đơn trên số chỗ, chấm đỏ khi đơn nhiều hơn chỗ). Phần mềm không nhớ trạng thái mở.
+- **Tab Quản lý.** Khối **Điểm chuẩn** có bảng tổng quan, hộp chọn một CLB, bảng hai tầng x hai mức và hai biểu đồ:
+  *cột phân bố* điểm quyết tâm của em tầng 2 (mỗi cột chia hai phần: được nhận là màu xanh, không được nhận là màu xám có
+  gạch chéo) và *dải chấm* (mỗi em một chấm: đặc là được nhận, rỗng là không được nhận; di chuột hoặc chạm vào chấm để
+  xem mã học sinh và điểm). Vạch đen dọc là mức chuẩn. Chỉ tính em đã thật sự xin vào CLB đó; em đã vào CLB xếp trước
+  thì không tính (số em này được ghi bên dưới).
+- Dải vàng "kết quả có thể đã cũ" hiện khi dữ liệu đã đổi sau lần chạy gần nhất.
+- **Tệp xuất.** Sổ Excel kết quả có thêm trang **Điểm chuẩn** (mỗi CLB một dòng). Tắt điểm quyết tâm thì sổ xuất y như cũ.
+
+### Khi nào lần chạy bị chặn
+
+Ở bước **Kiểm tra dữ liệu**, trước khi bốc thăm: nếu hồ sơ của **bất kỳ** học sinh nào chưa hợp lệ (tổng khác 100,
+điểm không phải số nguyên từ 0 trở lên, điểm đặt ở CLB không thuộc quỹ đó, nguyện vọng chưa xếp xong…), phần mềm
+**không bốc thăm, không ghi gì**, và trả đủ danh sách: học sinh nào, quỹ nào, thiếu hay thừa bao nhiêu. Sửa xong thì
+chạy lại. Mục **Cảnh báo dữ liệu** báo trước hai điều khi đã bật: số học sinh có hồ sơ chưa hợp lệ (mức cao, vì sẽ
+chặn chạy) và số học sinh vắng thi (mức vừa).
+
+### Cảnh báo vắng thi
+
+Một học sinh tick thi CLB X và đặt điểm quỹ 1 cho X, nhưng đến lúc xếp không có điểm thi ở X. Khi đó X được xét như
+CLB **không thi** của em: điểm quỹ 1 đã đặt cho X **không được tính**; nếu em có đặt điểm quỹ 2 cho X thì dùng điểm
+đó, không có thì tính 0. Lần chạy vẫn tiếp tục; cảnh báo nằm trong chi tiết của bước Kiểm tra dữ liệu.
 
 ---
 

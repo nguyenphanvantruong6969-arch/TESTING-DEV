@@ -249,14 +249,340 @@ def uu_tien_theo_nhom(
     return ra
 
 
-# Bốn khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
-# thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ.
+# ----- BƯỚC A2 — ĐIỂM WHARTON (A13) -----
+#
+# Mỗi học sinh có HAI quỹ điểm ảo cho mỗi buổi, mỗi quỹ 100 điểm, chia cho các CLB trong
+# danh sách nguyện vọng của em:
+#
+#   * quỹ 1 chia cho các CLB em có thi (T1). Quỹ này CHỈ để phá hoà: điểm thi đã quyết định
+#     trước, nên 100 điểm Wharton không bao giờ mua được chỗ đứng trước một người điểm thi
+#     cao hơn. Điểm Wharton chỉ có nghĩa khi hai người BẰNG điểm thi.
+#   * quỹ 2 chia cho các CLB em không thi (T2). Tầng 2 vốn không có tiêu chí nào ngoài số bốc
+#     thăm, nên quỹ này là tiêu chí chính của tầng 2.
+#
+# Điểm Wharton được xét TRƯỚC số bốc thăm: bằng điểm Wharton thì mới đến STB. Số bốc thăm,
+# bộ số đã khoá và cách chèn em đến muộn giữ nguyên (bất biến 3).
+#
+# KHÔNG có thứ hạng nguyện vọng trong khoá — kể cả ở vị trí phụ. Điểm Wharton là điểm em tự
+# chia cho từng CLB (khoá theo CLB), không phải vị trí của CLB trong danh sách; hoán vị danh
+# sách nguyện vọng mà giữ nguyên điểm thì thứ tự ưu tiên của mọi CLB không đổi. Đây là ràng
+# buộc chống nội sinh giống `compute_club_priority`.
+#
+# Gale–Shapley vẫn chạy MỘT lần cho cả hai tầng: chỉ đổi NGUỒN thứ tự nền `base_rank` của
+# `run_rbda`; dự trữ mềm và `verify_stability` dùng lại nguyên.
+
+# Ngân sách của MỖI quỹ, MỖI BUỔI (quyết định của chủ dự án 24/10/2026). Trường chỉ có một
+# buổi thì mỗi quỹ có đúng 100 điểm.
+WHARTON_NGAN_SACH = 100
+
+# Quỹ nào chỉ có đúng một CLB mà em chưa đặt điểm thì tự điền cả ngân sách vào CLB đó.
+# Chờ quyết của chủ dự án (mặc định bật).
+WHARTON_TU_DIEN_MOT_CLB = True
+
+# Em tick thi mà vắng (lúc khoá không có điểm thi): CLB đó chuyển sang tầng 2, lấy điểm quỹ 2
+# của CLB đó nếu có, không thì 0, kèm cảnh báo. Chờ quyết của chủ dự án.
+WHARTON_VANG_THI = "tier2_zero_points"
+
+
+def khoa_uu_tien_wharton(
+    student_id: str,
+    diem_thi: Optional[float],
+    w1: int,
+    w2: int,
+    stb: int,
+) -> tuple:
+    """Khoá sắp xếp của MỘT học sinh ở MỘT CLB; khoá nhỏ hơn thì ưu tiên cao hơn.
+
+        tầng 1 (có điểm thi): (0, -diem_thi, (), -w1, stb, student_id)
+        tầng 2 (không điểm):  (1, -w2, stb, student_id)
+
+    `diem_thi is None` là tầng 2. Tầng 1 luôn đứng trước tầng 2: phần tử đầu khác nhau nên
+    hai tuple dài khác nhau không bao giờ bị so tới phần tử sau. Mã học sinh là khoá phá hoà
+    cuối, cùng lý do với `compute_club_priority`.
+
+    Phần tử `()` ở tầng 1 là CHỖ DÀNH cho tiêu chí phụ (mục A1); mã hiện chưa có tiêu chí
+    phụ nào.
+
+    Điểm thi giữ dạng `float`, không đổi sang `Decimal`: điểm đọc thẳng từ cột REAL của CSDL
+    chứ không qua tính toán, nên không có sai số làm tròn, và so `float` cho ra cùng thứ tự
+    với `Decimal(str(x))`.
+
+    Hàm KHÔNG nhận thứ hạng nguyện vọng dưới bất kỳ hình thức nào (chống nội sinh).
+    """
+    if diem_thi is not None:
+        return (0, -diem_thi, (), -w1, stb, student_id)
+    return (1, -w2, stb, student_id)
+
+
+def uu_tien_wharton(
+    club_id: str,
+    applicants_for_club: list[str],
+    tested_scores_for_club: dict[str, float],
+    stb_lottery: dict[str, int],
+    diem_wharton_clb: dict[str, int],
+    tier_rank: Optional[dict[str, int]] = None,
+) -> list[str]:
+    """Thứ tự ưu tiên của MỘT CLB khi có điểm Wharton; thay `compute_club_priority` (hay
+    `uu_tien_theo_nhom` khi có `tier_rank`) làm nguồn `base_rank` của `run_rbda`.
+
+    `diem_wharton_clb` là điểm HIỆU LỰC của CLB này: {student_id: điểm}, lấy từ quỹ 1 nếu em ở
+    tầng 1 (có điểm thi ở CLB này) và từ quỹ 2 nếu em ở tầng 2 — do `diem_wharton_hieu_luc`
+    tính. Em không có trong dict thì điểm là 0. Hàm dùng chung một điểm cho cả hai vị trí của
+    khoá (`w1` ở tầng 1, `w2` ở tầng 2) vì mỗi em chỉ ở đúng một tầng.
+
+    Tầng của em được xác định bằng `sid in tested_scores_for_club`, không bằng giá trị điểm,
+    nên điểm thi `0.0` vẫn là tầng 1. Khi có `tier_rank`, hạng nhóm đứng đầu khoá (nhóm tốt
+    hơn đứng trước mọi nhóm kém hơn, em không có nhóm đứng cuối), đúng như `uu_tien_theo_nhom`.
+
+    Cố ý là hàm BỌC, giống `uu_tien_theo_nhom`: không thêm tham số cho `compute_club_priority`
+    (có test canh chữ ký — chống nội sinh). Hàm này cũng KHÔNG nhận thứ hạng nguyện vọng; điểm
+    Wharton là điểm em chia cho từng CLB, không phải vị trí CLB trong danh sách.
+
+    Raises:
+        ValueError: nếu có applicant thiếu STB, cùng thông điệp với `compute_club_priority`.
+    """
+    # Chép nguyên khối kiểm của compute_club_priority (không gọi nó, không sửa nó): `is None`
+    # cũng là thiếu, vì cột stb_number cho phép NULL.
+    missing_stb = [
+        sid for sid in applicants_for_club if stb_lottery.get(sid) is None
+    ]
+    if missing_stb:
+        raise ValueError(
+            f"[{club_id}] Có {len(missing_stb)} học sinh thiếu số bốc "
+            f"thăm STB: {missing_stb[:5]}{'...' if len(missing_stb) > 5 else ''}"
+        )
+
+    cuoi = (max(tier_rank.values(), default=-1) + 1) if tier_rank is not None else 0
+
+    def khoa(sid: str) -> tuple:
+        diem = diem_wharton_clb.get(sid, 0)
+        k = khoa_uu_tien_wharton(
+            sid,
+            tested_scores_for_club[sid] if sid in tested_scores_for_club else None,
+            diem, diem, stb_lottery[sid],
+        )
+        return k if tier_rank is None else (tier_rank.get(sid, cuoi),) + k
+
+    return sorted(applicants_for_club, key=khoa)
+
+
+def kiem_ho_so_wharton(
+    preferences: dict[str, list[str]],
+    clb_thi: dict[str, set],
+    w1: dict[str, dict[str, int]],
+    w2: dict[str, dict[str, int]],
+    clubs: dict[str, dict],
+    ngan_sach: int = WHARTON_NGAN_SACH,
+    tran_nguyen_vong: int = TRAN_NGUYEN_VONG_MOI_BUOI,
+) -> list[dict]:
+    """Kiểm hồ sơ Wharton của MỌI học sinh theo từng buổi; trả về TẤT CẢ lỗi, rỗng = hợp lệ.
+
+    Đầu vào: `preferences` {sid: [cid…]}, `clb_thi` {sid: set(cid)} (ô tick "muốn thi"),
+    `w1` / `w2` {sid: {cid: điểm}} (quỹ 1 / quỹ 2 do học sinh đặt).
+
+    Luật (mỗi buổi tách riêng, mỗi quỹ có `ngan_sach` điểm MỖI BUỔI — quyết định 24/10/2026):
+      V1  em có 1..`tran_nguyen_vong` nguyện vọng mỗi buổi, không trùng (`wharton_nguyen_vong_chua_xep`);
+      V2  T1 khác rỗng: khoá của w1 ⊆ T1, mỗi giá trị là `int` ≥ 0 (chặn `bool`, `float`, số
+          âm), tổng ĐÚNG `ngan_sach` (`wharton_ngoai_tap`, `wharton_diem_khong_hop_le`,
+          `wharton_chua_dung_het`, `wharton_vuot_ngan_sach`);
+      V3  như V2, áp cho w2 và T2;
+      V4  T1 rỗng thì w1 của buổi đó phải rỗng; T2 rỗng thì w2 của buổi đó phải rỗng (tự đúng:
+          tập rỗng thì mọi khoá đều "ngoài tập");
+      V5  một CLB được nhận tới `ngan_sach` điểm (không có trần thấp hơn).
+
+    T1 ở đây là T1 lúc NỘP (theo ô tick `clb_thi`), KHÁC với T1 lúc KHOÁ (theo điểm thi thật):
+    việc xử lý em vắng thi hay CLB đổi tầng là của `diem_wharton_hieu_luc`, không phải hàm này.
+    Một CLB đặt điểm quỹ 1 mà không tick thi thì là lỗi "ngoài tập".
+
+    Mỗi ô điểm có tối đa một lỗi: khoá ngoài tập chỉ báo `wharton_ngoai_tap`, không báo thêm giá
+    trị xấu. Tổng của một quỹ chỉ cộng các giá trị hợp lệ của khoá TRONG tập, nên bỏ một CLB
+    khỏi nguyện vọng (điểm cũ thành "ngoài tập") kéo theo `wharton_chua_dung_het`.
+
+    Thứ tự lỗi cố định (không phụ thuộc thứ tự dict): học sinh theo mã; với mỗi em, lỗi V1 trước
+    (theo thứ tự buổi), rồi từng buổi (theo `sap_buoi`), trong buổi là quỹ 1 rồi quỹ 2; trong
+    quỹ là ngoài tập, giá trị xấu (đều theo mã CLB), rồi tổng. Mọi lỗi có `params["buoi"]`;
+    trường một buổi thì buổi là `BUOI_MAC_DINH`. CLB lạ (không có trong `clubs`) rơi vào buổi
+    mặc định, như `gom_theo_buoi`.
+
+    `preferences` chỉ dùng để biết TẬP CLB của em trong từng buổi và đếm độ dài / trùng; hàm
+    KHÔNG dùng thứ hạng nguyện vọng làm khoá của bất cứ thứ gì (chống nội sinh).
+    """
+    from i18n_errors import err
+
+    def buoi_cua(cid: str) -> str:
+        return clubs.get(cid, {}).get("buoi") or BUOI_MAC_DINH
+
+    def la_diem_hop_le(v) -> bool:
+        return isinstance(v, int) and not isinstance(v, bool) and v >= 0
+
+    problems: list[dict] = []
+    for sid in sorted(set(preferences) | set(w1) | set(w2)):
+        prefs = list(preferences.get(sid) or [])
+        thi = clb_thi.get(sid) or set()
+        quy_w = {1: w1.get(sid) or {}, 2: w2.get(sid) or {}}
+        prefs_buoi = gom_theo_buoi(prefs, clubs)
+        ds_buoi = sap_buoi(
+            set(prefs_buoi) | {buoi_cua(c) for w in quy_w.values() for c in w})
+
+        # V1: độ dài và trùng, đếm theo TỪNG buổi.
+        if not prefs:
+            problems.append(err(
+                "wharton_nguyen_vong_chua_xep", student_id=sid,
+                tran=tran_nguyen_vong, n=0, n_trung=0, buoi=BUOI_MAC_DINH))
+        for buoi in ds_buoi:
+            ds = prefs_buoi.get(buoi, [])
+            n_trung = len(ds) - len(set(ds))
+            if len(ds) > tran_nguyen_vong or n_trung:
+                problems.append(err(
+                    "wharton_nguyen_vong_chua_xep", student_id=sid,
+                    tran=tran_nguyen_vong, n=len(ds), n_trung=n_trung, buoi=buoi))
+
+        # V2-V4: hai quỹ của từng buổi.
+        for buoi in ds_buoi:
+            ds = prefs_buoi.get(buoi, [])
+            tap_theo_quy = {1: {c for c in ds if c in thi},
+                            2: {c for c in ds if c not in thi}}
+            for quy in (1, 2):
+                tap = tap_theo_quy[quy]
+                w = {c: v for c, v in quy_w[quy].items() if buoi_cua(c) == buoi}
+                for cid in sorted(w, key=str):
+                    if cid not in tap:
+                        problems.append(err(
+                            "wharton_ngoai_tap", student_id=sid, quy=quy,
+                            club_id=cid, buoi=buoi))
+                for cid in sorted((c for c in w if c in tap), key=str):
+                    if not la_diem_hop_le(w[cid]):
+                        problems.append(err(
+                            "wharton_diem_khong_hop_le", student_id=sid,
+                            club_id=cid, gia_tri=repr(w[cid]), buoi=buoi))
+                if tap:
+                    tong = sum(v for c, v in w.items() if c in tap and la_diem_hop_le(v))
+                    if tong < ngan_sach:
+                        problems.append(err(
+                            "wharton_chua_dung_het", student_id=sid,
+                            thieu=ngan_sach - tong, quy=quy, buoi=buoi))
+                    elif tong > ngan_sach:
+                        problems.append(err(
+                            "wharton_vuot_ngan_sach", student_id=sid, tong=tong,
+                            quy=quy, ngan_sach=ngan_sach, buoi=buoi))
+    return problems
+
+
+def tu_dien_wharton_mot_clb(
+    preferences: dict[str, list[str]],
+    clb_thi: dict[str, set],
+    w1: dict[str, dict[str, int]],
+    w2: dict[str, dict[str, int]],
+    clubs: dict[str, dict],
+    bat: bool = WHARTON_TU_DIEN_MOT_CLB,
+    ngan_sach: int = WHARTON_NGAN_SACH,
+) -> tuple[dict, dict]:
+    """Quỹ nào của một buổi chỉ có đúng MỘT CLB mà em chưa đặt điểm thì điền cả `ngan_sach`.
+
+    Trả về `(w1_moi, w2_moi)`, là BẢN SAO — không sửa dict đầu vào. `bat=False` trả bản sao y
+    hệt đầu vào. Làm riêng từng buổi (mỗi quỹ mỗi buổi có ngân sách riêng).
+
+    "Chưa đặt điểm" nghĩa là quỹ đó của buổi đó không có khoá nào — kể cả khoá có giá trị 0,
+    và kể cả khoá sai chỗ: em đã đụng tới quỹ thì để `kiem_ho_so_wharton` báo lỗi, không điền
+    đè lên ý em. Tập có từ hai CLB trở lên thì em phải tự chia, không điền.
+
+    Tập T1 / T2 ở đây là theo ô tick lúc NỘP, cùng cách chia với `kiem_ho_so_wharton`, và là
+    bước ĐẦU của thứ tự: tự điền → kiểm hồ sơ → khoá STB → điểm hiệu lực → chạy thuật toán.
+    Chỉ dùng TẬP CLB của em trong từng buổi, không dùng thứ hạng nguyện vọng.
+    """
+    ra1 = {sid: dict(w or {}) for sid, w in w1.items()}
+    ra2 = {sid: dict(w or {}) for sid, w in w2.items()}
+    if not bat:
+        return ra1, ra2
+
+    def buoi_cua(cid: str) -> str:
+        return clubs.get(cid, {}).get("buoi") or BUOI_MAC_DINH
+
+    for sid in sorted(preferences):
+        thi = clb_thi.get(sid) or set()
+        for buoi, ds in gom_theo_buoi(list(preferences.get(sid) or []), clubs).items():
+            for ra, tap in ((ra1, {c for c in ds if c in thi}),
+                            (ra2, {c for c in ds if c not in thi})):
+                if len(tap) != 1:
+                    continue
+                if any(buoi_cua(c) == buoi for c in ra.get(sid, {})):
+                    continue
+                (cid,) = tap
+                ra.setdefault(sid, {})[cid] = ngan_sach
+    return ra1, ra2
+
+
+# Chính sách vắng thi mà `diem_wharton_hieu_luc` hiểu; chính sách khác thì từ chối thay vì đoán.
+_CHINH_SACH_VANG_THI = ("tier2_zero_points",)
+
+
+def diem_wharton_hieu_luc(
+    preferences: dict[str, list[str]],
+    w1: dict[str, dict[str, int]],
+    w2: dict[str, dict[str, int]],
+    tested_scores: dict[str, dict[str, float]],
+    chinh_sach: str = WHARTON_VANG_THI,
+) -> tuple[dict[str, dict[str, int]], list[dict]]:
+    """Điểm Wharton HIỆU LỰC lúc KHOÁ: {club_id: {student_id: điểm}} cho `run_rbda`, kèm thông báo.
+
+    Dùng SAU `kiem_ho_so_wharton` (và sau khi đã có điểm thi). Tầng thật của em ở một CLB lấy
+    theo ĐIỂM THI (`sid in tested_scores[cid]`), không theo ô tick lúc nộp:
+
+      * Có điểm thi: điểm hiệu lực là `w1[sid][cid]` (0 nếu em không đặt). Nếu CLB đó chỉ có
+        trong w2 mà không có trong w1 (em tưởng là CLB không thi) thì điểm là 0 và báo LỖI
+        `wharton_tang_lech` — hồ sơ cần chia lại.
+      * Không có điểm thi: điểm hiệu lực là `w2[sid][cid]` (0 nếu em không đặt). Nếu em đã đặt
+        điểm quỹ 1 cho CLB này (tick thi mà vắng) thì báo CẢNH BÁO `wharton_vang_thi` kèm số
+        điểm quỹ 1 bị bỏ; hồ sơ không bị chặn. Đây là chính sách `"tier2_zero_points"`.
+
+    Trả về `(hieu_luc, thong_bao)`; `thong_bao` gộp cả lỗi lẫn cảnh báo, phân biệt bằng mã. Mỗi
+    cặp (em, CLB trong nguyện vọng) đều có một mục trong `hieu_luc`. Khoá nào thiếu thì là 0.
+    Hai quỹ không bao giờ trộn: điểm quỹ 1 chỉ được đọc ở tầng 1, quỹ 2 chỉ ở tầng 2.
+
+    Duyệt theo thứ tự đã sắp (mã em, rồi mã CLB) nên danh sách thông báo tất định và không phụ
+    thuộc thứ tự nguyện vọng.
+
+    `preferences` chỉ dùng để biết TẬP CLB của từng em; hàm KHÔNG dùng thứ hạng nguyện vọng.
+
+    Raises:
+        ValueError: nếu `chinh_sach` không phải một chính sách được hỗ trợ.
+    """
+    if chinh_sach not in _CHINH_SACH_VANG_THI:
+        raise ValueError(
+            "chinh_sach phai la mot trong %r, nhan duoc %r"
+            % (list(_CHINH_SACH_VANG_THI), chinh_sach))
+    from i18n_errors import err
+
+    hieu_luc: dict[str, dict[str, int]] = {}
+    thong_bao: list[dict] = []
+    for sid in sorted(preferences):
+        w1_sid = w1.get(sid) or {}
+        w2_sid = w2.get(sid) or {}
+        for cid in sorted(set(preferences.get(sid) or []), key=str):
+            if sid in tested_scores.get(cid, {}):
+                diem = w1_sid.get(cid, 0)
+                if cid not in w1_sid and cid in w2_sid:
+                    thong_bao.append(err(
+                        "wharton_tang_lech", student_id=sid, club_id=cid))
+            else:
+                diem = w2_sid.get(cid, 0)
+                if cid in w1_sid:
+                    thong_bao.append(err(
+                        "wharton_vang_thi", student_id=sid, club_id=cid,
+                        diem=diem, diem_bo=w1_sid[cid]))
+            hieu_luc.setdefault(cid, {})[sid] = diem
+    return hieu_luc, thong_bao
+
+
+# Năm khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
+# thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ. `wharton` (mục A13)
+# mặc định TẮT; xem `dung_wharton` và `_luat_de_ghi_hoac_bam`.
 LUAT_XEP_MAC_DINH = {"priority": "score", "tier_mode": "reserve",
-                     "score_scope": "per_slot", "tiers": []}
+                     "score_scope": "per_slot", "tiers": [], "wharton": False}
 
 
 def luat_xep_cua(rules) -> dict:
-    """Bốn khoá luật xếp của `rules` (thiếu khoá thì lấy mặc định trường học)."""
+    """Năm khoá luật xếp của `rules` (thiếu khoá thì lấy mặc định trường học)."""
     rules = rules or {}
     return {k: (list(rules.get(k) or []) if k == "tiers" else rules.get(k, v))
             for k, v in LUAT_XEP_MAC_DINH.items()}
@@ -265,6 +591,39 @@ def luat_xep_cua(rules) -> dict:
 def nhom_xep_cung(luat: dict) -> bool:
     """Nhóm xếp CỨNG (hạng nhóm đứng trước điểm, bỏ suất dự trữ)? `luat` từ `luat_xep_cua`."""
     return luat["tier_mode"] == "strict" or luat["priority"] == "tier"
+
+
+def dung_wharton(rules) -> bool:
+    """Workspace có dùng điểm Wharton (mục A13) không? `rules` thô hoặc đã chuẩn hoá.
+
+    Chỉ bật được khi priority là "score" hoặc "score+tier" VÀ score_scope là "per_slot" (điểm
+    Wharton cần biết em có thi CLB nào). `cau_hinh_ws` đã từ chối tổ hợp khác lúc lưu; ở đây
+    ném `ValueError` thêm một lần cho cấu hình hỏng lọt qua (sửa tay trong CSDL): chạy theo
+    kiểu khác mà không báo là loại lỗi im lặng dự án này không chấp nhận.
+    """
+    luat = luat_xep_cua(rules)
+    bat = luat["wharton"]
+    if not isinstance(bat, bool):
+        raise ValueError("rules.wharton phai la true hoac false, nhan %r" % (bat,))
+    if bat and (luat["priority"] not in ("score", "score+tier")
+                or luat["score_scope"] != "per_slot"):
+        raise ValueError(
+            "rules.wharton chi dung duoc khi priority la score hoac score+tier va "
+            "score_scope la per_slot (priority=%r, score_scope=%r)"
+            % (luat["priority"], luat["score_scope"]))
+    return bat
+
+
+def _luat_de_ghi_hoac_bam(luat: dict) -> dict:
+    """Bản của luật hiệu lực để GHI (`run_history.luat_xep`) hoặc BĂM (dấu vân tay).
+
+    Khoá `wharton` chỉ có mặt khi nó BẬT. Tắt thì bỏ đi: workspace tuỳ biến đã có từ trước
+    (nhóm xếp cứng, điểm theo người…) phải giữ nguyên từng byte chuỗi đã ghi và dấu vân tay,
+    nếu không mọi kết quả cũ của chúng tự báo "đã cũ" chỉ vì có thêm một khoá luôn bằng False.
+    """
+    if luat.get("wharton") is False:
+        return {k: v for k, v in luat.items() if k != "wharton"}
+    return luat
 
 
 def luat_xep_hieu_luc(rules) -> dict:
@@ -301,7 +660,7 @@ def luat_xep_de_ghi(rules):
     luat = luat_xep_hieu_luc(rules)
     if luat == LUAT_XEP_MAC_DINH:
         return None
-    return json.dumps(luat, sort_keys=True, ensure_ascii=False)
+    return json.dumps(_luat_de_ghi_hoac_bam(luat), sort_keys=True, ensure_ascii=False)
 
 
 def tham_so_luat(rules, students: dict[str, dict]) -> dict:
@@ -464,6 +823,7 @@ def run_rbda(
     max_rounds: int = 1000,
     tier_rank: Optional[dict[str, int]] = None,
     bo_qua_du_tru: bool = False,
+    diem_wharton: Optional[dict[str, dict[str, int]]] = None,
 ) -> MatchResult:
     """
     Chạy thuật toán RB-DA đầy đủ (student-proposing deferred
@@ -488,6 +848,10 @@ def run_rbda(
         bo_qua_du_tru: True thì BỎ lượt xếp suất dự trữ mềm — mọi suất là suất thường, xếp
             hoàn toàn theo thứ hạng ưu tiên nền. Dùng cùng `tier_rank` (nhóm đã cho ưu tiên
             rồi, giữ thêm suất dự trữ là ưu tiên hai lần). Mặc định False = như cũ.
+        diem_wharton: {club_id: {student_id: điểm}} — điểm Wharton HIỆU LỰC (mục A13, xem
+            `diem_wharton_hieu_luc`); có nó thì thứ tự nền xếp bằng `uu_tien_wharton` (điểm
+            Wharton xét trước STB; vẫn tôn trọng `tier_rank` nếu có). Khoá theo CLB nên truyền
+            nguyên cho mọi buổi được. Mặc định None = như cũ, kết quả trùng khít.
 
     Returns:
         MatchResult
@@ -508,8 +872,13 @@ def run_rbda(
             tested_scores_for_club=tested_scores.get(club_id, {}),
             stb_lottery=stb_lottery,
         )
-        base_order = (compute_club_priority(**chung) if tier_rank is None
-                      else uu_tien_theo_nhom(tier_rank=tier_rank, **chung))
+        if diem_wharton is not None:
+            base_order = uu_tien_wharton(
+                diem_wharton_clb=diem_wharton.get(club_id, {}),
+                tier_rank=tier_rank, **chung)
+        else:
+            base_order = (compute_club_priority(**chung) if tier_rank is None
+                          else uu_tien_theo_nhom(tier_rank=tier_rank, **chung))
         base_rank[club_id] = {sid: i for i, sid in enumerate(base_order)}
 
     unassigned = [
@@ -1042,6 +1411,7 @@ def run_rbda_nhieu_buoi(
     chi_buoi: Optional[list[str]] = None,
     tier_rank: Optional[dict[str, int]] = None,
     bo_qua_du_tru: bool = False,
+    diem_wharton: Optional[dict[str, dict[str, int]]] = None,
 ) -> KetQuaTuan:
     """Xếp CLB cho cả tuần: cắt theo buổi, gọi run_rbda từng buổi, ghép lại.
 
@@ -1084,8 +1454,10 @@ def run_rbda_nhieu_buoi(
     đầu vào. Chế độ đó chỉ còn dùng cho phép đo TN7, và TN7 không dùng
     `chi_buoi`.
 
-    `tier_rank`, `bo_qua_du_tru`: chuyển nguyên cho `run_rbda` ở MỌI buổi (xem ở đó). Cả hai
-    mặc định như cũ, nên lời gọi cũ cho ra đúng kết quả cũ.
+    `tier_rank`, `bo_qua_du_tru`, `diem_wharton`: chuyển nguyên cho `run_rbda` ở MỌI buổi (xem
+    ở đó). Cả ba mặc định như cũ, nên lời gọi cũ cho ra đúng kết quả cũ. `diem_wharton` khoá
+    theo CLB nên không cần cắt theo buổi: mỗi buổi chỉ đọc điểm của các CLB thuộc buổi đó, và
+    điểm hiệu lực đã tính riêng cho từng buổi (mỗi quỹ 100 điểm mỗi buổi).
     """
     if che_do_boc_tham not in CHE_DO_BOC_THAM:
         raise ValueError(
@@ -1133,6 +1505,7 @@ def run_rbda_nhieu_buoi(
             students, clubs_b, scores_b, app_b, prefs_b, stb_b,
             is_reserve_eligible_fn, max_rounds=max_rounds,
             tier_rank=tier_rank, bo_qua_du_tru=bo_qua_du_tru,
+            diem_wharton=diem_wharton,
         )
 
         ket.per_buoi[buoi] = kq
@@ -1558,6 +1931,46 @@ CREATE TABLE IF NOT EXISTS workspace_settings (
     key TEXT PRIMARY KEY,
     value TEXT
 );
+
+-- Điểm Wharton (mục A13, chỉ dùng khi rules.wharton bật): mỗi học sinh chia hai quỹ, mỗi
+-- quỹ 100 điểm MỖI BUỔI, cho các CLB trong danh sách nguyện vọng. Bảng MỚI hoàn toàn, không
+-- cột nào thêm vào bảng cũ, nên CREATE TABLE IF NOT EXISTS đã đủ cho cả CSDL cũ (như
+-- workspace_settings) và KHÔNG nằm trong _BANG_RANG_BUOC.
+--
+-- `tier` là quỹ lúc NỘP: 1 = lúc ghi em đang tick thi CLB này, 2 = không. Lưu lại chứ không
+-- suy ra từ ô tick hiện tại, vì đổi ô tick SAU khi đã chia điểm phải làm hồ sơ chưa hợp lệ
+-- (kiem_ho_so_wharton báo "ngoài tập") để em chia lại — phần mềm không được lặng lẽ chuyển
+-- điểm từ quỹ này sang quỹ kia. Ô điểm trống = không có dòng (tính là 0).
+CREATE TABLE IF NOT EXISTS wharton_bids (
+    student_id TEXT NOT NULL REFERENCES students (student_id),
+    club_id TEXT NOT NULL REFERENCES clubs (club_id),
+    tier INTEGER NOT NULL CHECK (tier IN (1, 2)),
+    points INTEGER NOT NULL CHECK (points >= 0),
+    PRIMARY KEY (student_id, club_id)
+);
+
+-- Nhật ký điểm Wharton (A13.3): CHỈ GHI THÊM, không bao giờ xoá hay sửa (như run_history).
+-- KHÔNG có khoá ngoại: đây là dấu vết, phải còn sau khi học sinh / CLB bị xoá. Bảng MỚI hoàn
+-- toàn như wharton_bids: CREATE TABLE IF NOT EXISTS đã đủ cho CSDL cũ, không vào _BANG_RANG_BUOC.
+CREATE TABLE IF NOT EXISTS wharton_nhat_ky (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    luc TEXT NOT NULL,
+    nguon TEXT NOT NULL CHECK (nguon IN ('quan_ly', 'kiosk', 'nap_tep', 'xoa_du_lieu', 'he_thong')),
+    nguoi TEXT NOT NULL DEFAULT '',
+    hanh_dong TEXT NOT NULL,        -- 'luu' | 'xoa_mot_em' | 'xoa_tat_ca' | 'tia_nguyen_vong' | 'khoa' | 'mo_khoa' ...
+    student_id TEXT,                -- NULL cho thao tác cả bảng (khoá, mở khoá, xoá tất cả)
+    cu_json TEXT,                   -- {"w1": {...}, "w2": {...}} trước thao tác, hoặc NULL
+    moi_json TEXT                   -- sau thao tác, hoặc NULL
+);
+
+-- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
+-- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
+CREATE TABLE IF NOT EXISTS wharton_lock (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    is_locked INTEGER NOT NULL DEFAULT 0,
+    locked_at TEXT,
+    unlocked_at TEXT
+);
 """
 
 # busy_timeout dai hon mac dinh (5s) — nhieu tien trinh cung mo app.db
@@ -1974,7 +2387,8 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
 
     `rules` (luật của workspace; mặc định None) chỉ làm đổi dấu vân tay khi luật xếp KHÁC
     mặc định trường học: đổi nhóm xếp, chế độ nhóm, cách ưu tiên hay phạm vi điểm làm kết
-    quả cũ đi dù không dòng dữ liệu nào đổi. Điểm theo người thì thêm cả cột điểm đó.
+    quả cũ đi dù không dòng dữ liệu nào đổi. Điểm theo người thì thêm cả cột điểm đó; luật
+    bật điểm Wharton thì thêm cả bảng `wharton_bids`.
     Luật mặc định thì dấu vân tay GIỮ NGUYÊN từng byte so với trước.
 
     Đặt CẠNH `load_from_sqlite` có chủ ý: dấu vân tay của một lần chạy phải
@@ -2002,6 +2416,11 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
     if diem_theo_nguoi(rules):
         cac_phan.append(("diem_ca_nhan", "SELECT student_id, diem_ca_nhan FROM students "
                                          "ORDER BY student_id"))
+    # Điểm Wharton chỉ vào dấu vân tay khi BẬT: tắt thì bảng wharton_bids không quyết định
+    # kết quả nào, sửa nó không được làm kết quả báo "đã cũ".
+    if dung_wharton(rules):
+        cac_phan.append(("wharton", "SELECT student_id, club_id, tier, points FROM wharton_bids "
+                                    "ORDER BY student_id, club_id"))
     for ten, sql in cac_phan:
         h.update(("\x1e" + ten).encode("utf-8"))
         for row in cur.execute(sql):
@@ -2009,7 +2428,8 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
     if luat != LUAT_XEP_MAC_DINH:
         import json
 
-        h.update(("\x1eluat" + json.dumps(luat, sort_keys=True, ensure_ascii=True)).encode("utf-8"))
+        h.update(("\x1eluat" + json.dumps(_luat_de_ghi_hoac_bam(luat), sort_keys=True,
+                                          ensure_ascii=True)).encode("utf-8"))
     return h.hexdigest()
 
 
@@ -2097,6 +2517,27 @@ def _doc_du_lieu(cur, rules=None):
     return students, clubs, tested_scores, applicants, preferences, stb_lottery
 
 
+def doc_du_lieu_wharton(cur) -> dict:
+    """Hồ sơ điểm Wharton đã lưu, đúng dạng `kiem_ho_so_wharton` / `diem_wharton_hieu_luc` nhận.
+
+    Trả `{"clb_thi": {sid: set(cid)}, "w1": {sid: {cid: điểm}}, "w2": {...}}`: `w1` / `w2` tách
+    theo cột `tier` (quỹ lúc NỘP); `clb_thi` là ô tick HIỆN TẠI. Dòng có `tier` lệch với ô tick
+    hiện tại vẫn được trả nguyên — để `kiem_ho_so_wharton` báo lệch, không lặng lẽ sửa.
+    Đặt cạnh `_doc_du_lieu`; `ORDER BY` cố định để kết quả tất định.
+    """
+    clb_thi: dict = {}
+    for sid, cid in cur.execute(
+            "SELECT student_id, club_id FROM club_test_selection "
+            "ORDER BY student_id, club_id"):
+        clb_thi.setdefault(sid, set()).add(cid)
+    w: dict = {1: {}, 2: {}}
+    for sid, cid, tier, diem in cur.execute(
+            "SELECT student_id, club_id, tier, points FROM wharton_bids "
+            "ORDER BY student_id, club_id"):
+        w[tier].setdefault(sid, {})[cid] = diem
+    return {"clb_thi": clb_thi, "w1": w[1], "w2": w[2]}
+
+
 def _mo_doc_nhat_quan(db_path: str):
     """Kết nối + giao dịch ĐỌC tường minh: mọi SELECT sau đó thấy CÙNG một
     trạng thái CSDL.
@@ -2146,6 +2587,24 @@ def load_from_sqlite_kem_dau_van_tay(db_path: str, rules=None):
         cur = conn.cursor()
         du_lieu = _doc_du_lieu(cur, rules)
         return du_lieu, dau_van_tay_du_lieu(cur, rules)
+    finally:
+        conn.rollback()
+        conn.close()
+
+
+def load_from_sqlite_kem_dau_van_tay_wharton(db_path: str, rules=None):
+    """Như `load_from_sqlite_kem_dau_van_tay`, kèm hồ sơ điểm Wharton.
+
+    Trả `(du_lieu, dau_van_tay, wharton)`: dữ liệu, dấu vân tay VÀ hồ sơ Wharton đều lấy trong
+    CÙNG một giao dịch đọc. Lần chạy khi `rules.wharton` bật dùng hàm này thay vì đọc Wharton
+    một lần riêng: đọc lần hai thì một lần lưu từ kiosk chen giữa làm dấu vân tay và điểm
+    Wharton đến từ hai trạng thái khác nhau. Hàm cũ giữ nguyên chữ ký và giá trị trả về.
+    """
+    conn = _mo_doc_nhat_quan(db_path)
+    try:
+        cur = conn.cursor()
+        du_lieu = _doc_du_lieu(cur, rules)
+        return du_lieu, dau_van_tay_du_lieu(cur, rules), doc_du_lieu_wharton(cur)
     finally:
         conn.rollback()
         conn.close()
@@ -2333,6 +2792,7 @@ def seed_sample_data(
     cur = conn.cursor()
     # Con trước, cha sau — khoá ngoại chặn xoá students/clubs khi còn dòng
     # trỏ tới chúng. Cùng thứ tự với `PipelineAPI._RESET_BANG`.
+    cur.execute("DELETE FROM wharton_bids")
     cur.execute("DELETE FROM match_results")
     cur.execute("DELETE FROM club_scores")
     cur.execute("DELETE FROM preferences")

@@ -23,7 +23,9 @@ from i18n_errors import err
 from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
-from rbda_priority_pipeline import BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi
+from rbda_priority_pipeline import (
+    BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton,
+)
 import so_nhap
 
 
@@ -91,6 +93,17 @@ class XuatKetQuaMixin:
     # -----------------------------------------------------------------
     TRANG_SO_EXCEL = ("Hướng dẫn", "Danh sách {person_l}", "Theo {slot_sl}",
                       "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)")
+    # Chỉ có khi workspace bật điểm quyết tâm (A13.4); đứng sau "Chưa có chỗ". Tắt thì sổ có đúng
+    # sáu trang như trước.
+    TRANG_DIEM_CHUAN = "Điểm chuẩn"
+
+    def _khoa_trang_so_excel(self) -> tuple:
+        """Các trang của sổ kết quả, theo thứ tự: sáu trang cũ, thêm "Điểm chuẩn" khi bật."""
+        if not dung_wharton(self._cfg_ws(nghiem=True)["rules"]):
+            return self.TRANG_SO_EXCEL
+        cu = self.TRANG_SO_EXCEL
+        i = cu.index("Chưa có chỗ") + 1
+        return cu[:i] + (self.TRANG_DIEM_CHUAN,) + cu[i:]
 
     def _nhan_xuat(self) -> dict:
         """Nhãn tiếng Việt của workspace đang mở, cho chữ trong tệp xuất.
@@ -134,11 +147,12 @@ class XuatKetQuaMixin:
         # Khoá trong `TRANG_SO_EXCEL` là tên MẪU (có chỗ giữ danh từ); tên thật điền
         # nhãn của workspace. `du["ten_trang"]` đưa tên thật cho các trang liên kết nhau.
         da_dung: set = set()
+        du["khoa_trang"] = self._khoa_trang_so_excel()
         du["ten_trang"] = {
             khoa: self._ten_trang_hop_le(dien_nhan(khoa, nhan), da_dung)
-            for khoa in self.TRANG_SO_EXCEL}
+            for khoa in du["khoa_trang"]}
         trang = {khoa: Trang(wb.create_sheet(du["ten_trang"][khoa]), nhan)
-                 for khoa in self.TRANG_SO_EXCEL}
+                 for khoa in du["khoa_trang"]}
 
         bao = self._bang_bao_cao(so=True)
         xuat_luc = _now()
@@ -151,12 +165,14 @@ class XuatKetQuaMixin:
         self._trang_danh_sach(trang["Danh sách {person_l}"], du, co_ket_qua)
         self._trang_theo_clb(trang["Theo {slot_sl}"], du)
         self._trang_chua_co_cho(trang["Chưa có chỗ"], bao, co_ket_qua)
+        if self.TRANG_DIEM_CHUAN in trang:
+            self._trang_diem_chuan(trang[self.TRANG_DIEM_CHUAN], du, co_ket_qua, ket_qua_cu)
         self._trang_thong_ke(trang["Thống kê"], bao, du)
         self._trang_dau_vet(trang["Dấu vết (kỹ thuật)"], du, xuat_luc)
 
         wb.active = 0
         wb.save(path)
-        return [du["ten_trang"][khoa] for khoa in self.TRANG_SO_EXCEL]
+        return [du["ten_trang"][khoa] for khoa in du["khoa_trang"]]
 
     def _luu_so_excel(self, path: str, du: dict) -> list:
         """Ghi sổ vào tệp TẠM cạnh `path`, xong mới đổi tên đè lên `path`.
@@ -226,12 +242,14 @@ class XuatKetQuaMixin:
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
             "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
+            "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo tầng "
+                          "và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
             "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu em được "
                         "nguyện vọng 1, suất dự trữ dùng tới đâu.",
             "Dấu vết (kỹ thuật)": "Hạt giống và số bốc thăm để tính lại kết quả. "
                                   "Không cần đọc trang này để dùng kết quả.",
         }
-        for ten in self.TRANG_SO_EXCEL[1:]:
+        for ten in du["khoa_trang"][1:]:
             t.lien_ket(du["ten_trang"][ten], mo_ta[ten])
 
         t.muc("LƯU Ý")
@@ -322,6 +340,52 @@ class XuatKetQuaMixin:
         for h in range(dau + 1, cuoi + 1):
             t.ws.cell(row=h, column=len(cot)).alignment = Alignment(wrap_text=True)
         t.xong(lap_hang=dau, rong_co_dinh={len(cot): 70})
+
+    @staticmethod
+    def _so_chuan(x) -> str:
+        """Số trong ô điểm chuẩn: bỏ phần thập phân thừa, dấu phẩy như người Việt viết."""
+        if isinstance(x, float) and not x.is_integer():
+            return ("%g" % x).replace(".", ",")
+        return str(int(x))
+
+    def _o_diem_chuan(self, muc, tang) -> str:
+        if muc is None:
+            return "—"
+        if muc.get("con_cho"):
+            return "0 (còn %d chỗ)" % muc["con_cho"]
+        if tang == 1:
+            return "%s điểm thi · %s điểm quyết tâm" % (
+                self._so_chuan(muc["diem_thi"]), self._so_chuan(muc["diem_quyet_tam"]))
+        return self._so_chuan(muc["diem_quyet_tam"])
+
+    def _trang_diem_chuan(self, t, du, co_ket_qua, ket_qua_cu):
+        """Điểm chuẩn từng {slot_l} (A13.4): mỗi {slot_l} (và {session_l}) một dòng, hai tầng x
+        hai mức. Dùng `get_diem_chuan`, cùng nguồn với màn hình quản trị."""
+        from so_excel import CHU_CANH_BAO
+
+        t.tieu_de("ĐIỂM CHUẨN TỪNG {slot_u}",
+                  "Điểm quyết tâm thấp nhất đã được nhận, tách theo tầng và theo suất thường hay "
+                  "suất dự trữ. Ô \"—\": không có {person_l} nào ở tầng đó. Chỉ dành cho nhà "
+                  "trường, không phát cho {person_l}.")
+        if ket_qua_cu:
+            t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, điểm chuẩn có thể đã cũ.",
+                      CHU_CANH_BAO)
+        cot = ["Mã {slot_sl}", "Tên {slot_l}"] + (["{session}"] if du["nhieu_buoi"] else []) \
+            + ["Chỗ", "Số đơn", "Đã nhận", "Còn chỗ", "Tầng 2, suất thường",
+               "Tầng 2, suất dự trữ", "Tầng 1, suất thường", "Tầng 1, suất dự trữ"]
+        kq = self.get_diem_chuan()
+        rows = kq["data"]["rows"] if kq.get("ok") else []
+        dong = []
+        for r in rows:
+            dong.append([r["club_id"], r["ten"]] + ([r["buoi"]] if du["nhieu_buoi"] else [])
+                        + [r["suc_chua"], r["so_don"], r["so_nhan"], r["con_cho"],
+                           self._o_diem_chuan(r["tang2"]["thuong"], 2),
+                           self._o_diem_chuan(r["tang2"]["du_tru"], 2),
+                           self._o_diem_chuan(r["tang1"]["thuong"], 1),
+                           self._o_diem_chuan(r["tang1"]["du_tru"], 1)])
+        dau, _ = t.bang(cot, dong, khoa=True, loc=True,
+                        rong="" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)")
+        t.xong(lap_hang=dau)
 
     def _trang_thong_ke(self, t, bao, du):
         t.tieu_de("THỐNG KÊ",
@@ -884,6 +948,15 @@ class XuatKetQuaMixin:
                 "SELECT student_id, club_id FROM preferences ORDER BY student_id, rank"):
             if sid in hs:
                 hs[sid]["nv"].append({"club_id": cid, "thi": False, "diem": ""})
+        # Workspace bật điểm Wharton: điểm đã chia của mỗi nguyện vọng đi vào cột "Điểm W k".
+        # Tắt thì không đọc bảng wharton_bids và sổ y hệt trước vòng 2.
+        if dung_wharton(self._cfg_ws(nghiem=True)["rules"]):
+            for sid, cid, diem_w in cur.execute(
+                    "SELECT student_id, club_id, points FROM wharton_bids "
+                    "ORDER BY student_id, club_id"):
+                o = next((x for x in hs.get(sid, {"nv": []})["nv"] if x["club_id"] == cid), None)
+                if o is not None:
+                    o["diem_w"] = diem_w
         n_ngoai = 0
         for sid, cid, diem in cur.execute("""
                 SELECT t.student_id, t.club_id, sc.score
@@ -927,6 +1000,66 @@ class XuatKetQuaMixin:
                 "n_thi_ngoai_nv": n_ngoai,
                 "n_ten_doi": n_ten_doi,
             })
+        except CauHinhHong as e:
+            return _fail(err("ws_cau_hinh_hong", detail=str(e)))
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=str(e)))
+
+    def export_wharton_can_sua(self, output_path: str = ""):
+        """Danh sách hồ sơ điểm quyết tâm cần sửa (A13.5) thành MỘT tệp Excel. KHÔNG đổi điểm nào.
+
+        Mỗi lỗi một dòng: mã, họ tên, buổi, quỹ, tổng hiện tại, thiếu hoặc thừa bao nhiêu, và câu lỗi
+        đã dịch. Cùng nguồn với `list_wharton_canh_bao` (`_ho_so_wharton_tat_ca`). Chỗ đặt tệp theo
+        luật của `_duong_xuat`.
+        """
+        try:
+            luat = self._luat_nghiem()
+            if not dung_wharton(luat):
+                return _fail(err("wharton_chua_bat"))
+            from openpyxl import Workbook
+
+            from i18n_errors import format_message
+            from rbda_priority_pipeline import WHARTON_NGAN_SACH
+            from so_excel import Trang
+
+            path = self._duong_xuat(output_path, "diem_quyet_tam_can_sua.xlsx")
+            nhan = self._nhan_xuat()
+            with self._ket_noi_doc() as cur:
+                ho_so = self._ho_so_wharton_tat_ca(cur, luat)
+                ten = {r[0]: r[1] for r in cur.execute("SELECT student_id, name FROM students")}
+            dong = []
+            for sid in sorted(ho_so["loi"]):
+                tong = self._dong_wharton_cua_em(sid, ho_so)["tong"]
+                for e in ho_so["loi"][sid]:
+                    p = e["params"]
+                    buoi, quy = p.get("buoi"), p.get("quy")
+                    hien_tai = (tong.get(buoi, {}).get(str(quy))
+                                if buoi is not None and quy is not None else None)
+                    thieu = p.get("thieu") if e["code"] == "wharton_chua_dung_het" else None
+                    thua = (hien_tai - WHARTON_NGAN_SACH
+                            if e["code"] == "wharton_vuot_ngan_sach" and hien_tai is not None
+                            else None)
+                    dong.append([sid, ten.get(sid, sid),
+                                 "" if buoi in (None, BUOI_MAC_DINH) else buoi,
+                                 quy if quy is not None else "",
+                                 hien_tai if hien_tai is not None else "",
+                                 thieu if thieu is not None else "",
+                                 thua if thua is not None else "",
+                                 format_message(e["code"], p, "vi", nhan)])
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Cần sửa"
+            t = Trang(ws, nhan)
+            t.tieu_de("ĐIỂM QUYẾT TÂM CẦN SỬA",
+                      "Hồ sơ chưa hợp lệ khiến lần chạy xếp bị chặn. Tệp này chỉ để xem, phần mềm "
+                      "không đổi điểm nào khi tạo nó.")
+            dau, _ = t.bang(["Mã {person_l}", "Họ tên", "{session}", "Quỹ", "Tổng hiện tại",
+                             "Thiếu", "Thừa", "Lỗi"], dong, khoa=True, loc=True,
+                            rong="Không có hồ sơ nào cần sửa.")
+            t.xong(lap_hang=dau)
+            wb.save(path)
+            return _ok({"path": path, "dir": os.path.dirname(path),
+                        "n_hoc_sinh": len({d[0] for d in dong}), "n_dong": len(dong)})
         except CauHinhHong as e:
             return _fail(err("ws_cau_hinh_hong", detail=str(e)))
         except Exception as e:
@@ -1118,9 +1251,18 @@ class XuatKetQuaMixin:
         """
         return self._khoa_xuat(self._export_ket_qua_da_khoa, output_path, kem_csv)
 
+    def _chua_co_ket_qua(self) -> bool:
+        """Chưa có kết quả xếp nào (cùng phép đo với `get_trang_thai_ket_qua`: bảng match_results
+        rỗng). Hai đường xuất kết quả từ chối TRƯỚC khi tạo tệp, để không có tệp rỗng mà vẫn
+        báo "Đã xuất" (A13.5)."""
+        with self._ket_noi_doc() as cur:
+            return cur.execute("SELECT COUNT(*) FROM match_results").fetchone()[0] == 0
+
     def _export_ket_qua_da_khoa(self, output_path: str, kem_csv: bool):
         path = None
         try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
             # Kem CSV thi ten goc phai con trong cho CA HAI duoi, khong thi tep
             # .csv di kem ghi de mot tep cu trung ten.
             path = self._duong_xuat(output_path, "ket_qua_phan_bo.xlsx",
@@ -1179,6 +1321,8 @@ class XuatKetQuaMixin:
         ĐỦ để giao diện hiện đúng chỗ tệp nằm.
         """
         try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
             # So Excel cung ten goc di kem -> ten goc phai trong cho ca .xlsx,
             # khong thi ghi de so ma nut tren giao dien vua de o Tai xuong.
             output_path = self._duong_xuat(output_path, "ket_qua_phan_bo.csv",

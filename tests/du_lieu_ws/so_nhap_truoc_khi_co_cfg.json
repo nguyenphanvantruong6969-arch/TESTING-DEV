@@ -134,125 +134,125 @@
     "cao_hang_1": 30.0,
     "dieu_kien": [
      [
-      "A2:A1500",
+      "A3:A1500",
       [
-       "AND(A2<>\"\",COUNTIF($A$2:$A$1500,A2)>1)"
+       "AND(A3<>\"\",COUNTIF($A$3:$A$1500,A3)>1)"
       ],
       "expression"
      ],
      [
-      "AB2:AB1500",
+      "AB3:AB1500",
       [
-       "AND(AB2<>\"\",(($D2=AB2)+($F2=AB2)+($H2=AB2)+($J2=AB2)+($L2=AB2)+($N2=AB2)+($P2=AB2)+($R2=AB2)+($T2=AB2)+($V2=AB2)+($X2=AB2)+($Z2=AB2)+($AB2=AB2)+($AD2=AB2)+($AF2=AB2))>1)"
+       "AND(AB3<>\"\",(($D3=AB3)+($F3=AB3)+($H3=AB3)+($J3=AB3)+($L3=AB3)+($N3=AB3)+($P3=AB3)+($R3=AB3)+($T3=AB3)+($V3=AB3)+($X3=AB3)+($Z3=AB3)+($AB3=AB3)+($AD3=AB3)+($AF3=AB3))>1)"
       ],
       "expression"
      ],
      [
-      "AD2:AD1500",
+      "AD3:AD1500",
       [
-       "AND(AD2<>\"\",(($D2=AD2)+($F2=AD2)+($H2=AD2)+($J2=AD2)+($L2=AD2)+($N2=AD2)+($P2=AD2)+($R2=AD2)+($T2=AD2)+($V2=AD2)+($X2=AD2)+($Z2=AD2)+($AB2=AD2)+($AD2=AD2)+($AF2=AD2))>1)"
+       "AND(AD3<>\"\",(($D3=AD3)+($F3=AD3)+($H3=AD3)+($J3=AD3)+($L3=AD3)+($N3=AD3)+($P3=AD3)+($R3=AD3)+($T3=AD3)+($V3=AD3)+($X3=AD3)+($Z3=AD3)+($AB3=AD3)+($AD3=AD3)+($AF3=AD3))>1)"
       ],
       "expression"
      ],
      [
-      "AF2:AF1500",
+      "AF3:AF1500",
       [
-       "AND(AF2<>\"\",(($D2=AF2)+($F2=AF2)+($H2=AF2)+($J2=AF2)+($L2=AF2)+($N2=AF2)+($P2=AF2)+($R2=AF2)+($T2=AF2)+($V2=AF2)+($X2=AF2)+($Z2=AF2)+($AB2=AF2)+($AD2=AF2)+($AF2=AF2))>1)"
+       "AND(AF3<>\"\",(($D3=AF3)+($F3=AF3)+($H3=AF3)+($J3=AF3)+($L3=AF3)+($N3=AF3)+($P3=AF3)+($R3=AF3)+($T3=AF3)+($V3=AF3)+($X3=AF3)+($Z3=AF3)+($AB3=AF3)+($AD3=AF3)+($AF3=AF3))>1)"
       ],
       "expression"
      ],
      [
-      "D2:D1500",
+      "D3:D1500",
       [
-       "AND(D2<>\"\",(($D2=D2)+($F2=D2)+($H2=D2)+($J2=D2)+($L2=D2)+($N2=D2)+($P2=D2)+($R2=D2)+($T2=D2)+($V2=D2)+($X2=D2)+($Z2=D2)+($AB2=D2)+($AD2=D2)+($AF2=D2))>1)"
+       "AND(D3<>\"\",(($D3=D3)+($F3=D3)+($H3=D3)+($J3=D3)+($L3=D3)+($N3=D3)+($P3=D3)+($R3=D3)+($T3=D3)+($V3=D3)+($X3=D3)+($Z3=D3)+($AB3=D3)+($AD3=D3)+($AF3=D3))>1)"
       ],
       "expression"
      ],
      [
-      "F2:F1500",
+      "F3:F1500",
       [
-       "AND(F2<>\"\",(($D2=F2)+($F2=F2)+($H2=F2)+($J2=F2)+($L2=F2)+($N2=F2)+($P2=F2)+($R2=F2)+($T2=F2)+($V2=F2)+($X2=F2)+($Z2=F2)+($AB2=F2)+($AD2=F2)+($AF2=F2))>1)"
+       "AND(F3<>\"\",(($D3=F3)+($F3=F3)+($H3=F3)+($J3=F3)+($L3=F3)+($N3=F3)+($P3=F3)+($R3=F3)+($T3=F3)+($V3=F3)+($X3=F3)+($Z3=F3)+($AB3=F3)+($AD3=F3)+($AF3=F3))>1)"
       ],
       "expression"
      ],
      [
-      "H2:H1500",
+      "H3:H1500",
       [
-       "AND(H2<>\"\",(($D2=H2)+($F2=H2)+($H2=H2)+($J2=H2)+($L2=H2)+($N2=H2)+($P2=H2)+($R2=H2)+($T2=H2)+($V2=H2)+($X2=H2)+($Z2=H2)+($AB2=H2)+($AD2=H2)+($AF2=H2))>1)"
+       "AND(H3<>\"\",(($D3=H3)+($F3=H3)+($H3=H3)+($J3=H3)+($L3=H3)+($N3=H3)+($P3=H3)+($R3=H3)+($T3=H3)+($V3=H3)+($X3=H3)+($Z3=H3)+($AB3=H3)+($AD3=H3)+($AF3=H3))>1)"
       ],
       "expression"
      ],
      [
-      "J2:J1500",
+      "J3:J1500",
       [
-       "AND(J2<>\"\",(($D2=J2)+($F2=J2)+($H2=J2)+($J2=J2)+($L2=J2)+($N2=J2)+($P2=J2)+($R2=J2)+($T2=J2)+($V2=J2)+($X2=J2)+($Z2=J2)+($AB2=J2)+($AD2=J2)+($AF2=J2))>1)"
+       "AND(J3<>\"\",(($D3=J3)+($F3=J3)+($H3=J3)+($J3=J3)+($L3=J3)+($N3=J3)+($P3=J3)+($R3=J3)+($T3=J3)+($V3=J3)+($X3=J3)+($Z3=J3)+($AB3=J3)+($AD3=J3)+($AF3=J3))>1)"
       ],
       "expression"
      ],
      [
-      "L2:L1500",
+      "L3:L1500",
       [
-       "AND(L2<>\"\",(($D2=L2)+($F2=L2)+($H2=L2)+($J2=L2)+($L2=L2)+($N2=L2)+($P2=L2)+($R2=L2)+($T2=L2)+($V2=L2)+($X2=L2)+($Z2=L2)+($AB2=L2)+($AD2=L2)+($AF2=L2))>1)"
+       "AND(L3<>\"\",(($D3=L3)+($F3=L3)+($H3=L3)+($J3=L3)+($L3=L3)+($N3=L3)+($P3=L3)+($R3=L3)+($T3=L3)+($V3=L3)+($X3=L3)+($Z3=L3)+($AB3=L3)+($AD3=L3)+($AF3=L3))>1)"
       ],
       "expression"
      ],
      [
-      "N2:N1500",
+      "N3:N1500",
       [
-       "AND(N2<>\"\",(($D2=N2)+($F2=N2)+($H2=N2)+($J2=N2)+($L2=N2)+($N2=N2)+($P2=N2)+($R2=N2)+($T2=N2)+($V2=N2)+($X2=N2)+($Z2=N2)+($AB2=N2)+($AD2=N2)+($AF2=N2))>1)"
+       "AND(N3<>\"\",(($D3=N3)+($F3=N3)+($H3=N3)+($J3=N3)+($L3=N3)+($N3=N3)+($P3=N3)+($R3=N3)+($T3=N3)+($V3=N3)+($X3=N3)+($Z3=N3)+($AB3=N3)+($AD3=N3)+($AF3=N3))>1)"
       ],
       "expression"
      ],
      [
-      "P2:P1500",
+      "P3:P1500",
       [
-       "AND(P2<>\"\",(($D2=P2)+($F2=P2)+($H2=P2)+($J2=P2)+($L2=P2)+($N2=P2)+($P2=P2)+($R2=P2)+($T2=P2)+($V2=P2)+($X2=P2)+($Z2=P2)+($AB2=P2)+($AD2=P2)+($AF2=P2))>1)"
+       "AND(P3<>\"\",(($D3=P3)+($F3=P3)+($H3=P3)+($J3=P3)+($L3=P3)+($N3=P3)+($P3=P3)+($R3=P3)+($T3=P3)+($V3=P3)+($X3=P3)+($Z3=P3)+($AB3=P3)+($AD3=P3)+($AF3=P3))>1)"
       ],
       "expression"
      ],
      [
-      "R2:R1500",
+      "R3:R1500",
       [
-       "AND(R2<>\"\",(($D2=R2)+($F2=R2)+($H2=R2)+($J2=R2)+($L2=R2)+($N2=R2)+($P2=R2)+($R2=R2)+($T2=R2)+($V2=R2)+($X2=R2)+($Z2=R2)+($AB2=R2)+($AD2=R2)+($AF2=R2))>1)"
+       "AND(R3<>\"\",(($D3=R3)+($F3=R3)+($H3=R3)+($J3=R3)+($L3=R3)+($N3=R3)+($P3=R3)+($R3=R3)+($T3=R3)+($V3=R3)+($X3=R3)+($Z3=R3)+($AB3=R3)+($AD3=R3)+($AF3=R3))>1)"
       ],
       "expression"
      ],
      [
-      "T2:T1500",
+      "T3:T1500",
       [
-       "AND(T2<>\"\",(($D2=T2)+($F2=T2)+($H2=T2)+($J2=T2)+($L2=T2)+($N2=T2)+($P2=T2)+($R2=T2)+($T2=T2)+($V2=T2)+($X2=T2)+($Z2=T2)+($AB2=T2)+($AD2=T2)+($AF2=T2))>1)"
+       "AND(T3<>\"\",(($D3=T3)+($F3=T3)+($H3=T3)+($J3=T3)+($L3=T3)+($N3=T3)+($P3=T3)+($R3=T3)+($T3=T3)+($V3=T3)+($X3=T3)+($Z3=T3)+($AB3=T3)+($AD3=T3)+($AF3=T3))>1)"
       ],
       "expression"
      ],
      [
-      "V2:V1500",
+      "V3:V1500",
       [
-       "AND(V2<>\"\",(($D2=V2)+($F2=V2)+($H2=V2)+($J2=V2)+($L2=V2)+($N2=V2)+($P2=V2)+($R2=V2)+($T2=V2)+($V2=V2)+($X2=V2)+($Z2=V2)+($AB2=V2)+($AD2=V2)+($AF2=V2))>1)"
+       "AND(V3<>\"\",(($D3=V3)+($F3=V3)+($H3=V3)+($J3=V3)+($L3=V3)+($N3=V3)+($P3=V3)+($R3=V3)+($T3=V3)+($V3=V3)+($X3=V3)+($Z3=V3)+($AB3=V3)+($AD3=V3)+($AF3=V3))>1)"
       ],
       "expression"
      ],
      [
-      "X2:X1500",
+      "X3:X1500",
       [
-       "AND(X2<>\"\",(($D2=X2)+($F2=X2)+($H2=X2)+($J2=X2)+($L2=X2)+($N2=X2)+($P2=X2)+($R2=X2)+($T2=X2)+($V2=X2)+($X2=X2)+($Z2=X2)+($AB2=X2)+($AD2=X2)+($AF2=X2))>1)"
+       "AND(X3<>\"\",(($D3=X3)+($F3=X3)+($H3=X3)+($J3=X3)+($L3=X3)+($N3=X3)+($P3=X3)+($R3=X3)+($T3=X3)+($V3=X3)+($X3=X3)+($Z3=X3)+($AB3=X3)+($AD3=X3)+($AF3=X3))>1)"
       ],
       "expression"
      ],
      [
-      "Z2:Z1500",
+      "Z3:Z1500",
       [
-       "AND(Z2<>\"\",(($D2=Z2)+($F2=Z2)+($H2=Z2)+($J2=Z2)+($L2=Z2)+($N2=Z2)+($P2=Z2)+($R2=Z2)+($T2=Z2)+($V2=Z2)+($X2=Z2)+($Z2=Z2)+($AB2=Z2)+($AD2=Z2)+($AF2=Z2))>1)"
+       "AND(Z3<>\"\",(($D3=Z3)+($F3=Z3)+($H3=Z3)+($J3=Z3)+($L3=Z3)+($N3=Z3)+($P3=Z3)+($R3=Z3)+($T3=Z3)+($V3=Z3)+($X3=Z3)+($Z3=Z3)+($AB3=Z3)+($AD3=Z3)+($AF3=Z3))>1)"
       ],
       "expression"
      ]
     ],
-    "dinh_dang_ma_hs": "@",
-    "khoa": "D2",
+    "dinh_dang_ma_hs": "General",
+    "khoa": "D3",
     "kiem": [
      [
       "custom",
-      "AA2:AA1500",
-      "OR(ISNUMBER(AA2),LOWER(AA2)=\"thi\")",
+      "AA3:AA1500",
+      "OR(ISNUMBER(AA3),LOWER(AA3)=\"thi\")",
       null,
       null,
       true,
@@ -263,8 +263,8 @@
      ],
      [
       "custom",
-      "AC2:AC1500",
-      "OR(ISNUMBER(AC2),LOWER(AC2)=\"thi\")",
+      "AC3:AC1500",
+      "OR(ISNUMBER(AC3),LOWER(AC3)=\"thi\")",
       null,
       null,
       true,
@@ -275,8 +275,8 @@
      ],
      [
       "custom",
-      "AE2:AE1500",
-      "OR(ISNUMBER(AE2),LOWER(AE2)=\"thi\")",
+      "AE3:AE1500",
+      "OR(ISNUMBER(AE3),LOWER(AE3)=\"thi\")",
       null,
       null,
       true,
@@ -287,8 +287,8 @@
      ],
      [
       "custom",
-      "AG2:AG1500",
-      "OR(ISNUMBER(AG2),LOWER(AG2)=\"thi\")",
+      "AG3:AG1500",
+      "OR(ISNUMBER(AG3),LOWER(AG3)=\"thi\")",
       null,
       null,
       true,
@@ -299,8 +299,8 @@
      ],
      [
       "custom",
-      "E2:E1500",
-      "OR(ISNUMBER(E2),LOWER(E2)=\"thi\")",
+      "E3:E1500",
+      "OR(ISNUMBER(E3),LOWER(E3)=\"thi\")",
       null,
       null,
       true,
@@ -311,8 +311,8 @@
      ],
      [
       "custom",
-      "G2:G1500",
-      "OR(ISNUMBER(G2),LOWER(G2)=\"thi\")",
+      "G3:G1500",
+      "OR(ISNUMBER(G3),LOWER(G3)=\"thi\")",
       null,
       null,
       true,
@@ -323,8 +323,8 @@
      ],
      [
       "custom",
-      "I2:I1500",
-      "OR(ISNUMBER(I2),LOWER(I2)=\"thi\")",
+      "I3:I1500",
+      "OR(ISNUMBER(I3),LOWER(I3)=\"thi\")",
       null,
       null,
       true,
@@ -335,8 +335,8 @@
      ],
      [
       "custom",
-      "K2:K1500",
-      "OR(ISNUMBER(K2),LOWER(K2)=\"thi\")",
+      "K3:K1500",
+      "OR(ISNUMBER(K3),LOWER(K3)=\"thi\")",
       null,
       null,
       true,
@@ -347,8 +347,8 @@
      ],
      [
       "custom",
-      "M2:M1500",
-      "OR(ISNUMBER(M2),LOWER(M2)=\"thi\")",
+      "M3:M1500",
+      "OR(ISNUMBER(M3),LOWER(M3)=\"thi\")",
       null,
       null,
       true,
@@ -359,8 +359,8 @@
      ],
      [
       "custom",
-      "O2:O1500",
-      "OR(ISNUMBER(O2),LOWER(O2)=\"thi\")",
+      "O3:O1500",
+      "OR(ISNUMBER(O3),LOWER(O3)=\"thi\")",
       null,
       null,
       true,
@@ -371,8 +371,8 @@
      ],
      [
       "custom",
-      "Q2:Q1500",
-      "OR(ISNUMBER(Q2),LOWER(Q2)=\"thi\")",
+      "Q3:Q1500",
+      "OR(ISNUMBER(Q3),LOWER(Q3)=\"thi\")",
       null,
       null,
       true,
@@ -383,8 +383,8 @@
      ],
      [
       "custom",
-      "S2:S1500",
-      "OR(ISNUMBER(S2),LOWER(S2)=\"thi\")",
+      "S3:S1500",
+      "OR(ISNUMBER(S3),LOWER(S3)=\"thi\")",
       null,
       null,
       true,
@@ -395,8 +395,8 @@
      ],
      [
       "custom",
-      "U2:U1500",
-      "OR(ISNUMBER(U2),LOWER(U2)=\"thi\")",
+      "U3:U1500",
+      "OR(ISNUMBER(U3),LOWER(U3)=\"thi\")",
       null,
       null,
       true,
@@ -407,8 +407,8 @@
      ],
      [
       "custom",
-      "W2:W1500",
-      "OR(ISNUMBER(W2),LOWER(W2)=\"thi\")",
+      "W3:W1500",
+      "OR(ISNUMBER(W3),LOWER(W3)=\"thi\")",
       null,
       null,
       true,
@@ -419,8 +419,8 @@
      ],
      [
       "custom",
-      "Y2:Y1500",
-      "OR(ISNUMBER(Y2),LOWER(Y2)=\"thi\")",
+      "Y3:Y1500",
+      "OR(ISNUMBER(Y3),LOWER(Y3)=\"thi\")",
       null,
       null,
       true,
@@ -431,7 +431,7 @@
      ],
      [
       "list",
-      "D2:D1500 F2:F1500 H2:H1500 J2:J1500 L2:L1500 N2:N1500 P2:P1500 R2:R1500 T2:T1500 V2:V1500 X2:X1500 Z2:Z1500 AB2:AB1500 AD2:AD1500 AF2:AF1500",
+      "D3:D1500 F3:F1500 H3:H1500 J3:J1500 L3:L1500 N3:N1500 P3:P1500 R3:R1500 T3:T1500 V3:V1500 X3:X1500 Z3:Z1500 AB3:AB1500 AD3:AD1500 AF3:AF1500",
       "'1. CLB'!$A$2:$A$60",
       null,
       null,
@@ -449,9 +449,9 @@
       "00FFFFFF"
      ],
      "AA1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AB1": [
       "001F3A5F",
@@ -459,9 +459,9 @@
       "00FFFFFF"
      ],
      "AC1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AD1": [
       "001F3A5F",
@@ -469,9 +469,9 @@
       "00FFFFFF"
      ],
      "AE1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AF1": [
       "001F3A5F",
@@ -479,9 +479,9 @@
       "00FFFFFF"
      ],
      "AG1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "B1": [
       "001F3A5F",
@@ -499,9 +499,9 @@
       "00FFFFFF"
      ],
      "E1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "F1": [
       "001F3A5F",
@@ -509,9 +509,9 @@
       "00FFFFFF"
      ],
      "G1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "H1": [
       "001F3A5F",
@@ -519,9 +519,9 @@
       "00FFFFFF"
      ],
      "I1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "J1": [
       "001F3A5F",
@@ -529,9 +529,9 @@
       "00FFFFFF"
      ],
      "K1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "L1": [
       "001F3A5F",
@@ -539,9 +539,9 @@
       "00FFFFFF"
      ],
      "M1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "N1": [
       "001F3A5F",
@@ -549,9 +549,9 @@
       "00FFFFFF"
      ],
      "O1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "P1": [
       "001F3A5F",
@@ -559,9 +559,9 @@
       "00FFFFFF"
      ],
      "Q1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "R1": [
       "001F3A5F",
@@ -569,9 +569,9 @@
       "00FFFFFF"
      ],
      "S1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "T1": [
       "001F3A5F",
@@ -579,9 +579,9 @@
       "00FFFFFF"
      ],
      "U1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "V1": [
       "001F3A5F",
@@ -589,9 +589,9 @@
       "00FFFFFF"
      ],
      "W1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "X1": [
       "001F3A5F",
@@ -599,9 +599,9 @@
       "00FFFFFF"
      ],
      "Y1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "Z1": [
       "001F3A5F",
@@ -614,58 +614,73 @@
      33
     ],
     "nen": {
-     "A2": "00FFF8DC",
-     "B2": "00FFF8DC",
-     "C2": "00FFF8DC",
-     "D2": "00FFF8DC",
-     "E2": "00EAF4EA",
-     "F2": "00FFF8DC",
-     "G2": "00EAF4EA"
+     "A2": "00000000",
+     "B2": "00000000",
+     "C2": "00000000",
+     "D2": "0035577F",
+     "E2": "0035577F",
+     "F2": "0035577F",
+     "G2": "0035577F"
     },
     "o": {
      "A1": "Mã HS",
-     "A2": "H1",
-     "A3": "H2",
-     "AA1": "Điểm 12",
-     "AB1": "NV13",
-     "AC1": "Điểm 13",
-     "AD1": "NV14",
-     "AE1": "Điểm 14",
-     "AF1": "NV15",
-     "AG1": "Điểm 15",
+     "A3": "H1",
+     "A4": "H2",
+     "AA2": "Điểm thi",
+     "AB1": "Nguyện vọng 13",
+     "AB2": "CLB",
+     "AC2": "Điểm thi",
+     "AD1": "Nguyện vọng 14",
+     "AD2": "CLB",
+     "AE2": "Điểm thi",
+     "AF1": "Nguyện vọng 15",
+     "AF2": "CLB",
+     "AG2": "Điểm thi",
      "B1": "Họ tên",
-     "B2": "An",
-     "B3": "Bình",
+     "B3": "An",
+     "B4": "Bình",
      "C1": "Nhóm ưu tiên",
-     "C2": "cs",
-     "D1": "NV1",
-     "D2": "Cờ vua",
-     "D3": "Bóng đá",
-     "E1": "Điểm 1",
-     "E2": 9.5,
-     "E3": "thi",
-     "F1": "NV2",
-     "F2": "Bóng đá",
-     "G1": "Điểm 2",
-     "H1": "NV3",
-     "I1": "Điểm 3",
-     "J1": "NV4",
-     "K1": "Điểm 4",
-     "L1": "NV5",
-     "M1": "Điểm 5",
-     "N1": "NV6",
-     "O1": "Điểm 6",
-     "P1": "NV7",
-     "Q1": "Điểm 7",
-     "R1": "NV8",
-     "S1": "Điểm 8",
-     "T1": "NV9",
-     "U1": "Điểm 9",
-     "V1": "NV10",
-     "W1": "Điểm 10",
-     "X1": "NV11",
-     "Y1": "Điểm 11",
-     "Z1": "NV12"
+     "C3": "cs",
+     "D1": "Nguyện vọng 1",
+     "D2": "CLB",
+     "D3": "Cờ vua",
+     "D4": "Bóng đá",
+     "E2": "Điểm thi",
+     "E3": 9.5,
+     "E4": "thi",
+     "F1": "Nguyện vọng 2",
+     "F2": "CLB",
+     "F3": "Bóng đá",
+     "G2": "Điểm thi",
+     "H1": "Nguyện vọng 3",
+     "H2": "CLB",
+     "I2": "Điểm thi",
+     "J1": "Nguyện vọng 4",
+     "J2": "CLB",
+     "K2": "Điểm thi",
+     "L1": "Nguyện vọng 5",
+     "L2": "CLB",
+     "M2": "Điểm thi",
+     "N1": "Nguyện vọng 6",
+     "N2": "CLB",
+     "O2": "Điểm thi",
+     "P1": "Nguyện vọng 7",
+     "P2": "CLB",
+     "Q2": "Điểm thi",
+     "R1": "Nguyện vọng 8",
+     "R2": "CLB",
+     "S2": "Điểm thi",
+     "T1": "Nguyện vọng 9",
+     "T2": "CLB",
+     "U2": "Điểm thi",
+     "V1": "Nguyện vọng 10",
+     "V2": "CLB",
+     "W2": "Điểm thi",
+     "X1": "Nguyện vọng 11",
+     "X2": "CLB",
+     "Y2": "Điểm thi",
+     "Z1": "Nguyện vọng 12",
+     "Z2": "CLB"
     },
     "rong_cot": {
      "A": 11.0,
@@ -717,7 +732,7 @@
      ]
     },
     "max": [
-     35,
+     41,
      1
     ],
     "nen": {
@@ -733,26 +748,32 @@
      "A1": "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
      "A10": "        Mã HS là bắt buộc và không được trùng.",
      "A11": "        Nhóm ưu tiên: chỉ điền với học sinh thuộc nhóm đó.",
-     "A13": "Bước 3. NV1, NV2, NV3…: chọn tên CLB trong danh sách thả xuống,",
-     "A14": "        theo thứ tự em thích nhất trước. Không cần điền kín.",
-     "A15": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
-     "A16": "        theo buổi của từng CLB.",
-     "A18": "Bước 4. Điểm 1, Điểm 2…: điểm thi của CLB ngay bên trái.",
-     "A19": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
-     "A20": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
-     "A22": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
-     "A24": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
-     "A25": "        → xem lại phần tóm tắt → bấm Nhập.",
-     "A27": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
-     "A28": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
-     "A29": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A13": "Bước 3. Tiêu đề của sheet này có HAI hàng. Hàng 1 là các ô gộp \"Nguyện vọng 1\",",
+     "A14": "        \"Nguyện vọng 2\"…; hàng 2 là tên các cột nằm dưới mỗi ô gộp: CLB, Điểm thi.",
+     "A15": "        Dữ liệu bắt đầu từ hàng 3.",
+     "A16": "        Cột CLB: chọn tên CLB trong danh sách thả xuống, theo thứ tự em thích nhất",
+     "A17": "        trước. Không cần điền kín.",
+     "A18": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+     "A19": "        theo buổi của từng CLB.",
+     "A20": "        Đừng chèn hay xoá cột trong một nhóm: phần mềm sẽ báo lỗi vì cột lệch nhóm.",
+     "A22": "Bước 4. Cột Điểm thi nằm ngay bên phải cột CLB cùng nhóm.",
+     "A23": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
+     "A24": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
+     "A26": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
+     "A28": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
+     "A29": "        → xem lại phần tóm tắt → bấm Nhập.",
      "A3": "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
-     "A31": "Ví dụ một dòng học sinh:",
-     "A32": "  Mã HS   Họ tên          NV1          Điểm 1   NV2           Điểm 2",
-     "A33": "  HS001   Nguyễn Văn An   CLB Tin học  9,5      CLB Bóng rổ",
-     "A34": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
-     "A35": "    CLB không thi tuyển.",
+     "A31": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
+     "A32": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
+     "A33": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A34": "Phần mềm vẫn đọc được sổ cũ chỉ có MỘT hàng tiêu đề (NV1, Điểm 1…).",
+     "A36": "Ví dụ một dòng học sinh:",
+     "A37": "                                  Nguyện vọng 1           Nguyện vọng 2",
+     "A38": "  Mã HS   Họ tên          CLB          Điểm thi   CLB           Điểm thi",
+     "A39": "  HS001   Nguyễn Văn An   CLB Tin học  9,5        CLB Bóng rổ",
      "A4": "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
+     "A40": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
+     "A41": "    CLB không thi tuyển.",
      "A5": "        (trường chỉ có một buổi thì để trống cả cột).",
      "A6": "        Suất ưu tiên / Nhóm ưu tiên: chỉ điền nếu CLB giữ chỗ cho một nhóm",
      "A7": "        học sinh (ví dụ nhóm chinh_sach). Mã CLB để trống, phần mềm tự tạo.",
@@ -889,125 +910,125 @@
     "cao_hang_1": 30.0,
     "dieu_kien": [
      [
-      "A2:A1500",
+      "A3:A1500",
       [
-       "AND(A2<>\"\",COUNTIF($A$2:$A$1500,A2)>1)"
+       "AND(A3<>\"\",COUNTIF($A$3:$A$1500,A3)>1)"
       ],
       "expression"
      ],
      [
-      "AB2:AB1500",
+      "AB3:AB1500",
       [
-       "AND(AB2<>\"\",(($D2=AB2)+($F2=AB2)+($H2=AB2)+($J2=AB2)+($L2=AB2)+($N2=AB2)+($P2=AB2)+($R2=AB2)+($T2=AB2)+($V2=AB2)+($X2=AB2)+($Z2=AB2)+($AB2=AB2)+($AD2=AB2)+($AF2=AB2))>1)"
+       "AND(AB3<>\"\",(($D3=AB3)+($F3=AB3)+($H3=AB3)+($J3=AB3)+($L3=AB3)+($N3=AB3)+($P3=AB3)+($R3=AB3)+($T3=AB3)+($V3=AB3)+($X3=AB3)+($Z3=AB3)+($AB3=AB3)+($AD3=AB3)+($AF3=AB3))>1)"
       ],
       "expression"
      ],
      [
-      "AD2:AD1500",
+      "AD3:AD1500",
       [
-       "AND(AD2<>\"\",(($D2=AD2)+($F2=AD2)+($H2=AD2)+($J2=AD2)+($L2=AD2)+($N2=AD2)+($P2=AD2)+($R2=AD2)+($T2=AD2)+($V2=AD2)+($X2=AD2)+($Z2=AD2)+($AB2=AD2)+($AD2=AD2)+($AF2=AD2))>1)"
+       "AND(AD3<>\"\",(($D3=AD3)+($F3=AD3)+($H3=AD3)+($J3=AD3)+($L3=AD3)+($N3=AD3)+($P3=AD3)+($R3=AD3)+($T3=AD3)+($V3=AD3)+($X3=AD3)+($Z3=AD3)+($AB3=AD3)+($AD3=AD3)+($AF3=AD3))>1)"
       ],
       "expression"
      ],
      [
-      "AF2:AF1500",
+      "AF3:AF1500",
       [
-       "AND(AF2<>\"\",(($D2=AF2)+($F2=AF2)+($H2=AF2)+($J2=AF2)+($L2=AF2)+($N2=AF2)+($P2=AF2)+($R2=AF2)+($T2=AF2)+($V2=AF2)+($X2=AF2)+($Z2=AF2)+($AB2=AF2)+($AD2=AF2)+($AF2=AF2))>1)"
+       "AND(AF3<>\"\",(($D3=AF3)+($F3=AF3)+($H3=AF3)+($J3=AF3)+($L3=AF3)+($N3=AF3)+($P3=AF3)+($R3=AF3)+($T3=AF3)+($V3=AF3)+($X3=AF3)+($Z3=AF3)+($AB3=AF3)+($AD3=AF3)+($AF3=AF3))>1)"
       ],
       "expression"
      ],
      [
-      "D2:D1500",
+      "D3:D1500",
       [
-       "AND(D2<>\"\",(($D2=D2)+($F2=D2)+($H2=D2)+($J2=D2)+($L2=D2)+($N2=D2)+($P2=D2)+($R2=D2)+($T2=D2)+($V2=D2)+($X2=D2)+($Z2=D2)+($AB2=D2)+($AD2=D2)+($AF2=D2))>1)"
+       "AND(D3<>\"\",(($D3=D3)+($F3=D3)+($H3=D3)+($J3=D3)+($L3=D3)+($N3=D3)+($P3=D3)+($R3=D3)+($T3=D3)+($V3=D3)+($X3=D3)+($Z3=D3)+($AB3=D3)+($AD3=D3)+($AF3=D3))>1)"
       ],
       "expression"
      ],
      [
-      "F2:F1500",
+      "F3:F1500",
       [
-       "AND(F2<>\"\",(($D2=F2)+($F2=F2)+($H2=F2)+($J2=F2)+($L2=F2)+($N2=F2)+($P2=F2)+($R2=F2)+($T2=F2)+($V2=F2)+($X2=F2)+($Z2=F2)+($AB2=F2)+($AD2=F2)+($AF2=F2))>1)"
+       "AND(F3<>\"\",(($D3=F3)+($F3=F3)+($H3=F3)+($J3=F3)+($L3=F3)+($N3=F3)+($P3=F3)+($R3=F3)+($T3=F3)+($V3=F3)+($X3=F3)+($Z3=F3)+($AB3=F3)+($AD3=F3)+($AF3=F3))>1)"
       ],
       "expression"
      ],
      [
-      "H2:H1500",
+      "H3:H1500",
       [
-       "AND(H2<>\"\",(($D2=H2)+($F2=H2)+($H2=H2)+($J2=H2)+($L2=H2)+($N2=H2)+($P2=H2)+($R2=H2)+($T2=H2)+($V2=H2)+($X2=H2)+($Z2=H2)+($AB2=H2)+($AD2=H2)+($AF2=H2))>1)"
+       "AND(H3<>\"\",(($D3=H3)+($F3=H3)+($H3=H3)+($J3=H3)+($L3=H3)+($N3=H3)+($P3=H3)+($R3=H3)+($T3=H3)+($V3=H3)+($X3=H3)+($Z3=H3)+($AB3=H3)+($AD3=H3)+($AF3=H3))>1)"
       ],
       "expression"
      ],
      [
-      "J2:J1500",
+      "J3:J1500",
       [
-       "AND(J2<>\"\",(($D2=J2)+($F2=J2)+($H2=J2)+($J2=J2)+($L2=J2)+($N2=J2)+($P2=J2)+($R2=J2)+($T2=J2)+($V2=J2)+($X2=J2)+($Z2=J2)+($AB2=J2)+($AD2=J2)+($AF2=J2))>1)"
+       "AND(J3<>\"\",(($D3=J3)+($F3=J3)+($H3=J3)+($J3=J3)+($L3=J3)+($N3=J3)+($P3=J3)+($R3=J3)+($T3=J3)+($V3=J3)+($X3=J3)+($Z3=J3)+($AB3=J3)+($AD3=J3)+($AF3=J3))>1)"
       ],
       "expression"
      ],
      [
-      "L2:L1500",
+      "L3:L1500",
       [
-       "AND(L2<>\"\",(($D2=L2)+($F2=L2)+($H2=L2)+($J2=L2)+($L2=L2)+($N2=L2)+($P2=L2)+($R2=L2)+($T2=L2)+($V2=L2)+($X2=L2)+($Z2=L2)+($AB2=L2)+($AD2=L2)+($AF2=L2))>1)"
+       "AND(L3<>\"\",(($D3=L3)+($F3=L3)+($H3=L3)+($J3=L3)+($L3=L3)+($N3=L3)+($P3=L3)+($R3=L3)+($T3=L3)+($V3=L3)+($X3=L3)+($Z3=L3)+($AB3=L3)+($AD3=L3)+($AF3=L3))>1)"
       ],
       "expression"
      ],
      [
-      "N2:N1500",
+      "N3:N1500",
       [
-       "AND(N2<>\"\",(($D2=N2)+($F2=N2)+($H2=N2)+($J2=N2)+($L2=N2)+($N2=N2)+($P2=N2)+($R2=N2)+($T2=N2)+($V2=N2)+($X2=N2)+($Z2=N2)+($AB2=N2)+($AD2=N2)+($AF2=N2))>1)"
+       "AND(N3<>\"\",(($D3=N3)+($F3=N3)+($H3=N3)+($J3=N3)+($L3=N3)+($N3=N3)+($P3=N3)+($R3=N3)+($T3=N3)+($V3=N3)+($X3=N3)+($Z3=N3)+($AB3=N3)+($AD3=N3)+($AF3=N3))>1)"
       ],
       "expression"
      ],
      [
-      "P2:P1500",
+      "P3:P1500",
       [
-       "AND(P2<>\"\",(($D2=P2)+($F2=P2)+($H2=P2)+($J2=P2)+($L2=P2)+($N2=P2)+($P2=P2)+($R2=P2)+($T2=P2)+($V2=P2)+($X2=P2)+($Z2=P2)+($AB2=P2)+($AD2=P2)+($AF2=P2))>1)"
+       "AND(P3<>\"\",(($D3=P3)+($F3=P3)+($H3=P3)+($J3=P3)+($L3=P3)+($N3=P3)+($P3=P3)+($R3=P3)+($T3=P3)+($V3=P3)+($X3=P3)+($Z3=P3)+($AB3=P3)+($AD3=P3)+($AF3=P3))>1)"
       ],
       "expression"
      ],
      [
-      "R2:R1500",
+      "R3:R1500",
       [
-       "AND(R2<>\"\",(($D2=R2)+($F2=R2)+($H2=R2)+($J2=R2)+($L2=R2)+($N2=R2)+($P2=R2)+($R2=R2)+($T2=R2)+($V2=R2)+($X2=R2)+($Z2=R2)+($AB2=R2)+($AD2=R2)+($AF2=R2))>1)"
+       "AND(R3<>\"\",(($D3=R3)+($F3=R3)+($H3=R3)+($J3=R3)+($L3=R3)+($N3=R3)+($P3=R3)+($R3=R3)+($T3=R3)+($V3=R3)+($X3=R3)+($Z3=R3)+($AB3=R3)+($AD3=R3)+($AF3=R3))>1)"
       ],
       "expression"
      ],
      [
-      "T2:T1500",
+      "T3:T1500",
       [
-       "AND(T2<>\"\",(($D2=T2)+($F2=T2)+($H2=T2)+($J2=T2)+($L2=T2)+($N2=T2)+($P2=T2)+($R2=T2)+($T2=T2)+($V2=T2)+($X2=T2)+($Z2=T2)+($AB2=T2)+($AD2=T2)+($AF2=T2))>1)"
+       "AND(T3<>\"\",(($D3=T3)+($F3=T3)+($H3=T3)+($J3=T3)+($L3=T3)+($N3=T3)+($P3=T3)+($R3=T3)+($T3=T3)+($V3=T3)+($X3=T3)+($Z3=T3)+($AB3=T3)+($AD3=T3)+($AF3=T3))>1)"
       ],
       "expression"
      ],
      [
-      "V2:V1500",
+      "V3:V1500",
       [
-       "AND(V2<>\"\",(($D2=V2)+($F2=V2)+($H2=V2)+($J2=V2)+($L2=V2)+($N2=V2)+($P2=V2)+($R2=V2)+($T2=V2)+($V2=V2)+($X2=V2)+($Z2=V2)+($AB2=V2)+($AD2=V2)+($AF2=V2))>1)"
+       "AND(V3<>\"\",(($D3=V3)+($F3=V3)+($H3=V3)+($J3=V3)+($L3=V3)+($N3=V3)+($P3=V3)+($R3=V3)+($T3=V3)+($V3=V3)+($X3=V3)+($Z3=V3)+($AB3=V3)+($AD3=V3)+($AF3=V3))>1)"
       ],
       "expression"
      ],
      [
-      "X2:X1500",
+      "X3:X1500",
       [
-       "AND(X2<>\"\",(($D2=X2)+($F2=X2)+($H2=X2)+($J2=X2)+($L2=X2)+($N2=X2)+($P2=X2)+($R2=X2)+($T2=X2)+($V2=X2)+($X2=X2)+($Z2=X2)+($AB2=X2)+($AD2=X2)+($AF2=X2))>1)"
+       "AND(X3<>\"\",(($D3=X3)+($F3=X3)+($H3=X3)+($J3=X3)+($L3=X3)+($N3=X3)+($P3=X3)+($R3=X3)+($T3=X3)+($V3=X3)+($X3=X3)+($Z3=X3)+($AB3=X3)+($AD3=X3)+($AF3=X3))>1)"
       ],
       "expression"
      ],
      [
-      "Z2:Z1500",
+      "Z3:Z1500",
       [
-       "AND(Z2<>\"\",(($D2=Z2)+($F2=Z2)+($H2=Z2)+($J2=Z2)+($L2=Z2)+($N2=Z2)+($P2=Z2)+($R2=Z2)+($T2=Z2)+($V2=Z2)+($X2=Z2)+($Z2=Z2)+($AB2=Z2)+($AD2=Z2)+($AF2=Z2))>1)"
+       "AND(Z3<>\"\",(($D3=Z3)+($F3=Z3)+($H3=Z3)+($J3=Z3)+($L3=Z3)+($N3=Z3)+($P3=Z3)+($R3=Z3)+($T3=Z3)+($V3=Z3)+($X3=Z3)+($Z3=Z3)+($AB3=Z3)+($AD3=Z3)+($AF3=Z3))>1)"
       ],
       "expression"
      ]
     ],
-    "dinh_dang_ma_hs": "@",
-    "khoa": "D2",
+    "dinh_dang_ma_hs": "General",
+    "khoa": "D3",
     "kiem": [
      [
       "custom",
-      "AA2:AA1500",
-      "OR(ISNUMBER(AA2),LOWER(AA2)=\"thi\")",
+      "AA3:AA1500",
+      "OR(ISNUMBER(AA3),LOWER(AA3)=\"thi\")",
       null,
       null,
       true,
@@ -1018,8 +1039,8 @@
      ],
      [
       "custom",
-      "AC2:AC1500",
-      "OR(ISNUMBER(AC2),LOWER(AC2)=\"thi\")",
+      "AC3:AC1500",
+      "OR(ISNUMBER(AC3),LOWER(AC3)=\"thi\")",
       null,
       null,
       true,
@@ -1030,8 +1051,8 @@
      ],
      [
       "custom",
-      "AE2:AE1500",
-      "OR(ISNUMBER(AE2),LOWER(AE2)=\"thi\")",
+      "AE3:AE1500",
+      "OR(ISNUMBER(AE3),LOWER(AE3)=\"thi\")",
       null,
       null,
       true,
@@ -1042,8 +1063,8 @@
      ],
      [
       "custom",
-      "AG2:AG1500",
-      "OR(ISNUMBER(AG2),LOWER(AG2)=\"thi\")",
+      "AG3:AG1500",
+      "OR(ISNUMBER(AG3),LOWER(AG3)=\"thi\")",
       null,
       null,
       true,
@@ -1054,8 +1075,8 @@
      ],
      [
       "custom",
-      "E2:E1500",
-      "OR(ISNUMBER(E2),LOWER(E2)=\"thi\")",
+      "E3:E1500",
+      "OR(ISNUMBER(E3),LOWER(E3)=\"thi\")",
       null,
       null,
       true,
@@ -1066,8 +1087,8 @@
      ],
      [
       "custom",
-      "G2:G1500",
-      "OR(ISNUMBER(G2),LOWER(G2)=\"thi\")",
+      "G3:G1500",
+      "OR(ISNUMBER(G3),LOWER(G3)=\"thi\")",
       null,
       null,
       true,
@@ -1078,8 +1099,8 @@
      ],
      [
       "custom",
-      "I2:I1500",
-      "OR(ISNUMBER(I2),LOWER(I2)=\"thi\")",
+      "I3:I1500",
+      "OR(ISNUMBER(I3),LOWER(I3)=\"thi\")",
       null,
       null,
       true,
@@ -1090,8 +1111,8 @@
      ],
      [
       "custom",
-      "K2:K1500",
-      "OR(ISNUMBER(K2),LOWER(K2)=\"thi\")",
+      "K3:K1500",
+      "OR(ISNUMBER(K3),LOWER(K3)=\"thi\")",
       null,
       null,
       true,
@@ -1102,8 +1123,8 @@
      ],
      [
       "custom",
-      "M2:M1500",
-      "OR(ISNUMBER(M2),LOWER(M2)=\"thi\")",
+      "M3:M1500",
+      "OR(ISNUMBER(M3),LOWER(M3)=\"thi\")",
       null,
       null,
       true,
@@ -1114,8 +1135,8 @@
      ],
      [
       "custom",
-      "O2:O1500",
-      "OR(ISNUMBER(O2),LOWER(O2)=\"thi\")",
+      "O3:O1500",
+      "OR(ISNUMBER(O3),LOWER(O3)=\"thi\")",
       null,
       null,
       true,
@@ -1126,8 +1147,8 @@
      ],
      [
       "custom",
-      "Q2:Q1500",
-      "OR(ISNUMBER(Q2),LOWER(Q2)=\"thi\")",
+      "Q3:Q1500",
+      "OR(ISNUMBER(Q3),LOWER(Q3)=\"thi\")",
       null,
       null,
       true,
@@ -1138,8 +1159,8 @@
      ],
      [
       "custom",
-      "S2:S1500",
-      "OR(ISNUMBER(S2),LOWER(S2)=\"thi\")",
+      "S3:S1500",
+      "OR(ISNUMBER(S3),LOWER(S3)=\"thi\")",
       null,
       null,
       true,
@@ -1150,8 +1171,8 @@
      ],
      [
       "custom",
-      "U2:U1500",
-      "OR(ISNUMBER(U2),LOWER(U2)=\"thi\")",
+      "U3:U1500",
+      "OR(ISNUMBER(U3),LOWER(U3)=\"thi\")",
       null,
       null,
       true,
@@ -1162,8 +1183,8 @@
      ],
      [
       "custom",
-      "W2:W1500",
-      "OR(ISNUMBER(W2),LOWER(W2)=\"thi\")",
+      "W3:W1500",
+      "OR(ISNUMBER(W3),LOWER(W3)=\"thi\")",
       null,
       null,
       true,
@@ -1174,8 +1195,8 @@
      ],
      [
       "custom",
-      "Y2:Y1500",
-      "OR(ISNUMBER(Y2),LOWER(Y2)=\"thi\")",
+      "Y3:Y1500",
+      "OR(ISNUMBER(Y3),LOWER(Y3)=\"thi\")",
       null,
       null,
       true,
@@ -1186,7 +1207,7 @@
      ],
      [
       "list",
-      "D2:D1500 F2:F1500 H2:H1500 J2:J1500 L2:L1500 N2:N1500 P2:P1500 R2:R1500 T2:T1500 V2:V1500 X2:X1500 Z2:Z1500 AB2:AB1500 AD2:AD1500 AF2:AF1500",
+      "D3:D1500 F3:F1500 H3:H1500 J3:J1500 L3:L1500 N3:N1500 P3:P1500 R3:R1500 T3:T1500 V3:V1500 X3:X1500 Z3:Z1500 AB3:AB1500 AD3:AD1500 AF3:AF1500",
       "'1. CLB'!$A$2:$A$60",
       null,
       null,
@@ -1204,9 +1225,9 @@
       "00FFFFFF"
      ],
      "AA1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AB1": [
       "001F3A5F",
@@ -1214,9 +1235,9 @@
       "00FFFFFF"
      ],
      "AC1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AD1": [
       "001F3A5F",
@@ -1224,9 +1245,9 @@
       "00FFFFFF"
      ],
      "AE1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "AF1": [
       "001F3A5F",
@@ -1234,9 +1255,9 @@
       "00FFFFFF"
      ],
      "AG1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "B1": [
       "001F3A5F",
@@ -1254,9 +1275,9 @@
       "00FFFFFF"
      ],
      "E1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "F1": [
       "001F3A5F",
@@ -1264,9 +1285,9 @@
       "00FFFFFF"
      ],
      "G1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "H1": [
       "001F3A5F",
@@ -1274,9 +1295,9 @@
       "00FFFFFF"
      ],
      "I1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "J1": [
       "001F3A5F",
@@ -1284,9 +1305,9 @@
       "00FFFFFF"
      ],
      "K1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "L1": [
       "001F3A5F",
@@ -1294,9 +1315,9 @@
       "00FFFFFF"
      ],
      "M1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "N1": [
       "001F3A5F",
@@ -1304,9 +1325,9 @@
       "00FFFFFF"
      ],
      "O1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "P1": [
       "001F3A5F",
@@ -1314,9 +1335,9 @@
       "00FFFFFF"
      ],
      "Q1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "R1": [
       "001F3A5F",
@@ -1324,9 +1345,9 @@
       "00FFFFFF"
      ],
      "S1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "T1": [
       "001F3A5F",
@@ -1334,9 +1355,9 @@
       "00FFFFFF"
      ],
      "U1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "V1": [
       "001F3A5F",
@@ -1344,9 +1365,9 @@
       "00FFFFFF"
      ],
      "W1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "X1": [
       "001F3A5F",
@@ -1354,9 +1375,9 @@
       "00FFFFFF"
      ],
      "Y1": [
-      "001F3A5F",
-      true,
-      "00FFFFFF"
+      "00000000",
+      false,
+      "Values must be of type <class 'str'>"
      ],
      "Z1": [
       "001F3A5F",
@@ -1369,48 +1390,63 @@
      33
     ],
     "nen": {
-     "A2": "00FFF8DC",
-     "B2": "00FFF8DC",
-     "C2": "00FFF8DC",
-     "D2": "00FFF8DC",
-     "E2": "00EAF4EA",
-     "F2": "00FFF8DC",
-     "G2": "00EAF4EA"
+     "A2": "00000000",
+     "B2": "00000000",
+     "C2": "00000000",
+     "D2": "0035577F",
+     "E2": "0035577F",
+     "F2": "0035577F",
+     "G2": "0035577F"
     },
     "o": {
      "A1": "Mã HS",
-     "AA1": "Điểm 12",
-     "AB1": "NV13",
-     "AC1": "Điểm 13",
-     "AD1": "NV14",
-     "AE1": "Điểm 14",
-     "AF1": "NV15",
-     "AG1": "Điểm 15",
+     "AA2": "Điểm thi",
+     "AB1": "Nguyện vọng 13",
+     "AB2": "CLB",
+     "AC2": "Điểm thi",
+     "AD1": "Nguyện vọng 14",
+     "AD2": "CLB",
+     "AE2": "Điểm thi",
+     "AF1": "Nguyện vọng 15",
+     "AF2": "CLB",
+     "AG2": "Điểm thi",
      "B1": "Họ tên",
      "C1": "Nhóm ưu tiên",
-     "D1": "NV1",
-     "E1": "Điểm 1",
-     "F1": "NV2",
-     "G1": "Điểm 2",
-     "H1": "NV3",
-     "I1": "Điểm 3",
-     "J1": "NV4",
-     "K1": "Điểm 4",
-     "L1": "NV5",
-     "M1": "Điểm 5",
-     "N1": "NV6",
-     "O1": "Điểm 6",
-     "P1": "NV7",
-     "Q1": "Điểm 7",
-     "R1": "NV8",
-     "S1": "Điểm 8",
-     "T1": "NV9",
-     "U1": "Điểm 9",
-     "V1": "NV10",
-     "W1": "Điểm 10",
-     "X1": "NV11",
-     "Y1": "Điểm 11",
-     "Z1": "NV12"
+     "D1": "Nguyện vọng 1",
+     "D2": "CLB",
+     "E2": "Điểm thi",
+     "F1": "Nguyện vọng 2",
+     "F2": "CLB",
+     "G2": "Điểm thi",
+     "H1": "Nguyện vọng 3",
+     "H2": "CLB",
+     "I2": "Điểm thi",
+     "J1": "Nguyện vọng 4",
+     "J2": "CLB",
+     "K2": "Điểm thi",
+     "L1": "Nguyện vọng 5",
+     "L2": "CLB",
+     "M2": "Điểm thi",
+     "N1": "Nguyện vọng 6",
+     "N2": "CLB",
+     "O2": "Điểm thi",
+     "P1": "Nguyện vọng 7",
+     "P2": "CLB",
+     "Q2": "Điểm thi",
+     "R1": "Nguyện vọng 8",
+     "R2": "CLB",
+     "S2": "Điểm thi",
+     "T1": "Nguyện vọng 9",
+     "T2": "CLB",
+     "U2": "Điểm thi",
+     "V1": "Nguyện vọng 10",
+     "V2": "CLB",
+     "W2": "Điểm thi",
+     "X1": "Nguyện vọng 11",
+     "X2": "CLB",
+     "Y2": "Điểm thi",
+     "Z1": "Nguyện vọng 12",
+     "Z2": "CLB"
     },
     "rong_cot": {
      "A": 11.0,
@@ -1462,7 +1498,7 @@
      ]
     },
     "max": [
-     35,
+     41,
      1
     ],
     "nen": {
@@ -1478,26 +1514,32 @@
      "A1": "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
      "A10": "        Mã HS là bắt buộc và không được trùng.",
      "A11": "        Nhóm ưu tiên: chỉ điền với học sinh thuộc nhóm đó.",
-     "A13": "Bước 3. NV1, NV2, NV3…: chọn tên CLB trong danh sách thả xuống,",
-     "A14": "        theo thứ tự em thích nhất trước. Không cần điền kín.",
-     "A15": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
-     "A16": "        theo buổi của từng CLB.",
-     "A18": "Bước 4. Điểm 1, Điểm 2…: điểm thi của CLB ngay bên trái.",
-     "A19": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
-     "A20": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
-     "A22": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
-     "A24": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
-     "A25": "        → xem lại phần tóm tắt → bấm Nhập.",
-     "A27": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
-     "A28": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
-     "A29": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A13": "Bước 3. Tiêu đề của sheet này có HAI hàng. Hàng 1 là các ô gộp \"Nguyện vọng 1\",",
+     "A14": "        \"Nguyện vọng 2\"…; hàng 2 là tên các cột nằm dưới mỗi ô gộp: CLB, Điểm thi.",
+     "A15": "        Dữ liệu bắt đầu từ hàng 3.",
+     "A16": "        Cột CLB: chọn tên CLB trong danh sách thả xuống, theo thứ tự em thích nhất",
+     "A17": "        trước. Không cần điền kín.",
+     "A18": "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+     "A19": "        theo buổi của từng CLB.",
+     "A20": "        Đừng chèn hay xoá cột trong một nhóm: phần mềm sẽ báo lỗi vì cột lệch nhóm.",
+     "A22": "Bước 4. Cột Điểm thi nằm ngay bên phải cột CLB cùng nhóm.",
+     "A23": "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
+     "A24": "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
+     "A26": "Bước 5. Lưu tệp (giữ định dạng .xlsx).",
+     "A28": "Bước 6. Mở phần mềm → màn hình Vận hành → kéo tệp này vào ô nạp",
+     "A29": "        → xem lại phần tóm tắt → bấm Nhập.",
      "A3": "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
-     "A31": "Ví dụ một dòng học sinh:",
-     "A32": "  Mã HS   Họ tên          NV1          Điểm 1   NV2           Điểm 2",
-     "A33": "  HS001   Nguyễn Văn An   CLB Tin học  9,5      CLB Bóng rổ",
-     "A34": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
-     "A35": "    CLB không thi tuyển.",
+     "A31": "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
+     "A32": "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
+     "A33": "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+     "A34": "Phần mềm vẫn đọc được sổ cũ chỉ có MỘT hàng tiêu đề (NV1, Điểm 1…).",
+     "A36": "Ví dụ một dòng học sinh:",
+     "A37": "                                  Nguyện vọng 1           Nguyện vọng 2",
+     "A38": "  Mã HS   Họ tên          CLB          Điểm thi   CLB           Điểm thi",
+     "A39": "  HS001   Nguyễn Văn An   CLB Tin học  9,5        CLB Bóng rổ",
      "A4": "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
+     "A40": "  → An thích Tin học nhất và đã thi được 9,5; nguyện vọng 2 là Bóng rổ,",
+     "A41": "    CLB không thi tuyển.",
      "A5": "        (trường chỉ có một buổi thì để trống cả cột).",
      "A6": "        Suất ưu tiên / Nhóm ưu tiên: chỉ điền nếu CLB giữ chỗ cho một nhóm",
      "A7": "        học sinh (ví dụ nhóm chinh_sach). Mã CLB để trống, phần mềm tự tạo.",

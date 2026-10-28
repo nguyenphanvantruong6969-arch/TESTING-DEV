@@ -308,11 +308,13 @@ def test_ten_doc_khong_thanh_cong_thuc(api):
     assert ten in gia_tri and "=1+1" in gia_tri
 
 
-def test_chua_chay_thi_van_xuat_duoc(api):
+def test_chua_chay_thi_xuat_ket_qua_bi_tu_choi(api):
+    """A13.5: trước đây vẫn xuất được một sổ rỗng; nay từ chối, không tạo tệp. Sổ có đủ các trang
+    khi đã có kết quả được test_xuat_khoa_chua_co_ket_qua.py kiểm."""
     api.create_or_update_club("clb_a", "CLB A", 5, 0, "")
     kq = api.export_ket_qua("")
-    assert kq["ok"], kq
-    assert openpyxl.load_workbook(kq["data"]["path"]).sheetnames == CAC_TRANG
+    assert not kq["ok"]
+    assert kq["errors"][0]["code"] == "xuat_chua_co_ket_qua"
 
 
 # ------------------------------------------------------------------ #
@@ -342,6 +344,9 @@ def test_qua_nhieu_clb_khong_vuot_gioi_han_ngat_trang_cua_excel(api):
     phải "sửa chữa" khi mở. CLB thứ 1.028 trở đi in nối tiếp, không ngắt."""
     for i in range(1030):
         api.create_or_update_club("c%04d" % i, "CLB %d" % i, 5, 0, "")
+    # A13.5: xuất kết quả cần có kết quả; một em xếp vào CLB đầu là đủ
+    api.import_preferences_csv("student_id,name,pref_1\nHS001,An,c0000\n")
+    assert api.run_pipeline(seed=42)["ok"]
     ws = openpyxl.load_workbook(api.export_ket_qua("")["data"]["path"])["Theo CLB"]
     assert len(ws.row_breaks.brk) <= 1026
 

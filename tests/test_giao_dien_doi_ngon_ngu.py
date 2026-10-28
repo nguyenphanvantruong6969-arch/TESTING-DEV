@@ -151,6 +151,7 @@ def test_nut_dang_cho_xac_nhan_duoc_nha_ra(trang):
     xoá thật. Test kiểm tra cả hai."""
     page, loi, api = trang
     page.locator('[data-tab="admin"]').click()
+    page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     page.wait_for_selector("#btnResetAll")
     nut = page.locator("#btnResetAll")
     nhan_goc_vi = nut.inner_text()

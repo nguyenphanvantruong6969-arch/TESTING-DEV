@@ -207,6 +207,7 @@ def test_chon_tat_ca_chi_chon_cac_em_dang_hien(trang):
 def test_the_04_danh_dau_roi_xuat(trang):
     page, api, loi = trang
     page.locator('[data-tab="admin"]').click()
+    page.locator('#qlTabs [data-ql-tab="hs"]').click()
     page.wait_for_selector(".admin-row-checkbox")
     page.locator('.admin-row-checkbox[data-student-id="HS03"]').check()
     page.click("#btnAdminXuatHs")

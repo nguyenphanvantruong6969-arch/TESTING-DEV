@@ -61,12 +61,12 @@ thư mục nào.
 
 | Tệp | Nội dung |
 |---|---|
-| `SO_NHAP_CLB.xlsx` | Sheet `1. CLB`: CLB, buổi, chỉ tiêu (trống nếu chưa có `--clb`). Sheet `2. Học sinh`: mỗi em một dòng, NV1, NV2… theo hạng em chọn (buổi này nối buổi kia), điểm thang 10 ngay cạnh CLB em đã thi |
+| `SO_NHAP_CLB.xlsx` | Sheet `1. CLB`: CLB, buổi, chỉ tiêu (trống nếu chưa có `--clb`). Sheet `2. Học sinh`: hai hàng tiêu đề ("Nguyện vọng 1", "Nguyện vọng 2"… ở hàng 1; "CLB", "Điểm thi" ở hàng 2), mỗi em một dòng từ hàng 3, nguyện vọng theo hạng em chọn (buổi này nối buổi kia), điểm thang 10 ngay bên phải CLB em đã thi. Biểu mẫu không hỏi điểm quyết tâm nên sổ không có cột đó |
 | `BAO_CAO_BAT_THUONG.md` | Mọi điều bất thường, kèm mã học sinh |
 
 Sổ được soát bằng `soat()` của skill `sinh-du-lieu-clb` (9 điều bắt buộc của
-phần mềm) rồi ghi bằng `so_nhap.py` của chính phần mềm, nên bố cục giống hệt sổ
-mẫu trong kho.
+phần mềm) rồi ghi bằng `so_nhap.py` của chính phần mềm, nên bố cục (hai hàng tiêu đề)
+giống hệt sổ mẫu trong kho.
 
 ## Đọc báo cáo và nói với người dùng
 

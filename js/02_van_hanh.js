@@ -259,7 +259,7 @@ function renderSteps(steps) {
     if (s.status === "running") detail.textContent = t("step_running");
     else if (s.status === "done") detail.textContent = s.detail ? trErr(s.detail) : t("step_done_default");
     else if (s.status === "error")
-      detail.textContent = Array.isArray(s.detail) ? trErrs(s.detail).join(" ") : (s.detail ? trErr(s.detail) : t("generic_error"));
+      detail.textContent = Array.isArray(s.detail) ? chuLoiBuocGon(s.detail) : (s.detail ? trErr(s.detail) : t("generic_error"));
   });
 }
 
@@ -329,6 +329,54 @@ function datKhoa(ten, bat) {
   capNhatKhoaVanHanh();
 }
 
+/* Lỗi chặn vì hồ sơ điểm quyết tâm có thể lên tới hàng trăm dòng (mỗi em mỗi quỹ một lỗi). Màn hình
+   chỉ hiện tóm tắt, vài em đầu (mỗi em MỘT dòng gộp mọi lỗi của em) và nút sang danh sách đầy đủ ở
+   tab Quản lý. Backend vẫn trả đủ mọi lỗi; chỉ cách HIỆN đổi (bất biến 6). */
+const MA_LOI_HO_SO_WHARTON = [
+  "wharton_chua_dung_het", "wharton_vuot_ngan_sach", "wharton_diem_khong_hop_le",
+  "wharton_ngoai_tap", "wharton_tang_lech", "wharton_nguyen_vong_chua_xep",
+];
+const LOG_SO_EM_TOI_DA = 5;
+
+/* Tách `errors` thành {khac: lỗi thường, em: [[sid, [lỗi]]] theo mã tăng dần, gop: có gộp không}. */
+function tachLoiWharton(errors) {
+  const em = new Map();
+  const khac = [];
+  errors.forEach((e) => {
+    if (e && typeof e === "object" && e.code === "wharton_ho_so_chua_hop_le") return;
+    if (e && typeof e === "object" && MA_LOI_HO_SO_WHARTON.includes(e.code) && e.params
+        && e.params.student_id !== undefined) {
+      if (!em.has(e.params.student_id)) em.set(e.params.student_id, []);
+      em.get(e.params.student_id).push(e);
+    } else khac.push(e);
+  });
+  const ds = Array.from(em.entries()).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  return { khac, em: ds };
+}
+
+function chuMotLoiWharton(e) {
+  const p = e.params || {};
+  let cau;
+  if (e.code === "wharton_chua_dung_het") cau = t("wh_loi_p_thieu", { quy: p.quy, x: p.thieu });
+  else if (e.code === "wharton_vuot_ngan_sach") cau = t("wh_loi_p_thua", { quy: p.quy, x: p.tong - p.ngan_sach });
+  else if (e.code === "wharton_ngoai_tap") cau = t("wh_loi_p_ngoai_tap", { quy: p.quy });
+  else if (e.code === "wharton_tang_lech") cau = t("wh_loi_p_tang_lech");
+  else if (e.code === "wharton_diem_khong_hop_le") cau = t("wh_loi_p_khong_hop_le");
+  else if (e.code === "wharton_nguyen_vong_chua_xep") cau = t("wh_loi_p_nguyen_vong");
+  else cau = t("wh_loi_p_khac");
+  if (p.buoi && p.buoi !== BUOI_MAC_DINH) cau += " (" + nhanBuoi(p.buoi) + ")";
+  return cau;
+}
+
+/* Chữ lỗi của MỘT bước trong danh sách bước: lỗi hồ sơ điểm quyết tâm chỉ còn câu tóm tắt (chi tiết
+   từng em nằm ở khung "Các lỗi cần xử lý" và ở tab Quản lý), lỗi khác giữ nguyên. */
+function chuLoiBuocGon(errors) {
+  const { khac, em } = tachLoiWharton(errors);
+  const cau = khac.map((e) => trErr(e));
+  if (em.length) cau.push(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }));
+  return cau.join(" ");
+}
+
 function showLog(errors) {
   lastRenderedTopErrors = errors;
   const panel = el("logPanel");
@@ -340,15 +388,39 @@ function showLog(errors) {
   }
   panel.hidden = false;
   clear(box);
-  (Array.isArray(errors) ? errors : [errors]).forEach((e) => {
+  const ds = Array.isArray(errors) ? errors : [errors];
+  const { khac, em } = tachLoiWharton(ds);
+  const them = (cau, lop, loi) => {
     const dong = document.createElement("div");
-    dong.className = "log-dong";
-    const cau = document.createElement("div");
-    cau.textContent = trErr(e);
-    dong.appendChild(cau);
-    ganChiTietKyThuat(dong, [e]);
+    dong.className = "log-dong" + (lop ? " " + lop : "");
+    const c = document.createElement("div");
+    c.textContent = cau;
+    dong.appendChild(c);
+    if (loi) ganChiTietKyThuat(dong, [loi]);
     box.appendChild(dong);
+  };
+  khac.forEach((e) => them(trErr(e), "", e));
+  if (!em.length) return;
+  them(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }), "log-tom-tat");
+  em.slice(0, LOG_SO_EM_TOI_DA).forEach(([sid, loi]) => {
+    const chiTiet = Array.from(new Set(loi.map(chuMotLoiWharton))).join(", ");
+    them(t("wh_loi_dong_em", { student_id: sid, chi_tiet: chiTiet }), "log-em");
   });
+  const hang = document.createElement("div");
+  hang.className = "log-hang-cuoi";
+  if (em.length > LOG_SO_EM_TOI_DA) {
+    const con = document.createElement("span");
+    con.className = "log-them";
+    con.textContent = t("wh_loi_khac", { m: em.length - LOG_SO_EM_TOI_DA });
+    hang.appendChild(con);
+  }
+  const nut = document.createElement("button");
+  nut.type = "button";
+  nut.className = "btn btn-secondary log-mo-ds";
+  nut.textContent = t("wh_loi_mo_ds");
+  nut.addEventListener("click", moDanhSachCanXuLy);
+  hang.appendChild(nut);
+  box.appendChild(hang);
 }
 
 function initPipelineHandlers() {

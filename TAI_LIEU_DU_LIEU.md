@@ -525,19 +525,26 @@ Một tệp Excel, hai sheet dữ liệu và một sheet `Hướng dẫn`.
 
 ### Sheet `2. Học sinh` — mỗi học sinh một dòng
 
-| Mã HS | Họ tên | Nhóm ưu tiên | NV1 | Điểm 1 | NV2 | Điểm 2 | … |
+Sheet này có **hai hàng tiêu đề** (từ A13.4) và dữ liệu bắt đầu từ **hàng 3**. Hàng 1 là ô gộp "Nguyện vọng 1",
+"Nguyện vọng 2"… trên mỗi nhóm cột; hàng 2 là tên cột trong nhóm (**CLB**, **Điểm thi**, và **Điểm quyết tâm** khi
+workspace bật tính năng này; trong mã gọi là `wharton`, cột CSV `wp_k`). Ba cột đầu gộp dọc hai hàng. Nạp đọc được
+**ba dạng**, nhận dạng bằng hàng 1: sổ một hàng cũ (`NV1`, `Điểm 1`), sổ một hàng có `Điểm W 1` của vòng 2, và sổ hai hàng.
+Chèn hay xoá cột trong một nhóm thì báo lỗi nêu sheet, cột, nhóm và không nạp gì. CSV không đổi.
+
+| Mã HS | Họ tên | Nhóm ưu tiên | Nguyện vọng 1 | | Nguyện vọng 2 | | … |
 |---|---|---|---|---|---|---|---|
+| | | | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** | |
 | HS001 | Nguyễn Văn An | | CLB Tin học | 9,5 | CLB Bóng rổ | | |
 
-- **NV1, NV2, …**: tên câu lạc bộ theo thứ tự ưu tiên. **Một danh sách chung
+- **Cột CLB của mỗi nhóm**: tên câu lạc bộ theo thứ tự ưu tiên. **Một danh sách chung
   cho mọi buổi** — phần mềm tự chia theo buổi của từng câu lạc bộ. Kỹ năng ghi
   lần lượt nguyện vọng buổi 1, rồi buổi 2, …
-- **Điểm k** nằm ngay cạnh **NV k**: có điểm = em đã thi câu lạc bộ đó; trống =
+- **Điểm thi** nằm ngay bên phải **CLB** cùng nhóm: có điểm = em đã thi câu lạc bộ đó; trống =
   không thi; chữ `thi` = đã thi, chấm sau trong phần mềm.
 - Câu lạc bộ **không em nào có điểm** = câu lạc bộ **không tổ chức thi**.
 - Em không xếp câu lạc bộ nào của một buổi = **em bận ngày đó**. Hợp lệ.
 - Điểm cho câu lạc bộ em không xếp nguyện vọng thì sổ **không chứa được** (điểm
-  luôn nằm cạnh một NV) — điều 8 dưới đây chặn nó từ trước.
+  luôn nằm cạnh một cột CLB) — điều 8 dưới đây chặn nó từ trước.
 
 ## Chín điều phải đúng, nếu không thì không ghi
 
