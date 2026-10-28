@@ -331,10 +331,10 @@ Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–2
 
 | # | Việc | Nguồn | Trạng thái |
 |---|---|---|---|
-| S11 | `CLAUDE.md` và `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`: sửa bản đồ mã (số dòng, 138 tệp / 2.764 ca), thêm hàng Wharton; kiến nghị đổi sang định vị theo TÊN HÀM. | 4.1 | Đề xuất |
-| S12 | Thêm test rollback thật: làm `_ghi_nhat_ky_wharton` ném lỗi tại `hanh_dong == "khoa"` rồi khẳng định `match_results`, `run_history`, `wharton_lock`, `stb_lock` y nguyên; thêm ca biên tổng 99 và 101 vào `test_wharton.py`. | 4.5 | Đề xuất |
-| S13 | Kỹ năng `xu-li-raw-forms`: sửa câu "bố cục giống hệt sổ mẫu" (sổ mẫu nay có cột Điểm quyết tâm); `HUONG_DAN_SU_DUNG.md`: "điểm của bạn khác" → "điểm của em khác". | 4.2 | Đề xuất |
-| S14 | Xoá hai khoá i18n chết `dc_cot_buoi`, `dc_tooltip_so` (VI và EN). | 4.3 | Đề xuất |
+| S11 | `CLAUDE.md` và `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`: sửa bản đồ mã (số dòng, 138 tệp / 2.764 ca), thêm hàng Wharton; kiến nghị đổi sang định vị theo TÊN HÀM. | 4.1 | **Đã quyết (28/10): làm trong A13.8** |
+| S12 | Thêm test rollback thật: làm `_ghi_nhat_ky_wharton` ném lỗi tại `hanh_dong == "khoa"` rồi khẳng định `match_results`, `run_history`, `wharton_lock`, `stb_lock` y nguyên; thêm ca biên tổng 99 và 101 vào `test_wharton.py`. | 4.5 | **Đã quyết (28/10): làm trong A13.8** |
+| S13 | Kỹ năng `xu-li-raw-forms`: sửa câu "bố cục giống hệt sổ mẫu" (sổ mẫu nay có cột Điểm quyết tâm); `HUONG_DAN_SU_DUNG.md`: "điểm của bạn khác" → "điểm của em khác". | 4.2 | **Đã quyết (28/10): làm trong A13.8** |
+| S14 | Xoá hai khoá i18n chết `dc_cot_buoi`, `dc_tooltip_so` (VI và EN). | 4.3 | **Đã quyết (28/10): làm trong A13.8** |
 | S15 | `tao_i18n_js.py` / `i18n_loi.js` sinh lại sau mọi lần đổi `i18n_errors.py` (nếu S1–S2 thêm mã lỗi mới). | quy ước sẵn | Đi kèm |
 
 ### Nhóm 6 — Mục nhỏ còn CẦN TRUONG QUYẾT (mỗi mục 2–3 lựa chọn)
@@ -345,11 +345,33 @@ Quy ước: **Đã quyết** = Truong chọn trong phiên điều phối (27–2
 | Q2 | 2.6 sổ mẫu luôn có cột Điểm quyết tâm kể cả workspace không bật được (ví dụ `priority = "tier"`) | (A) thêm điều kiện "workspace có thể bật" cho `luon_co_cot_w`; (B) giữ (mẫu thống nhất mọi nơi) | **B** (tránh đổi sổ mẫu vừa chốt ở A13.7; ghi chú trong hướng dẫn đã nói rõ) |
 | Q3 | 2.7 hai bản làm tròn phần dư lớn nhất (`lam_tron_100` trong kỹ năng, `phong_theo_ti_le` trong app) | (A) thêm test so hai hàm trên đầu vào ngẫu nhiên; (B) bỏ bản chép, kỹ năng nhập từ app (mất đóng gói riêng) | **A** |
 | Q4 | 2.8 chỗ chèn ghi chú trong `huong_dan` dựa vào chữ "Bước 5." | (A) dùng hằng đánh dấu + test; (B) giữ | **A** |
-| Q5 | 4.6 14 `wait_for_timeout` cố định trong test giao diện | (A) đổi dần sang `wait_for_selector` / `wait_for_function`; (B) giữ (10/10 lần xanh) | **B** nếu CI không chập chờn, làm A khi thấy đỏ |
-| Q6 | 4.4 tên nội bộ `wharton` trong ba tài liệu | (A) giữ, đã có ghi chú; (B) chuyển câu bảo trì xuống cuối tài liệu | **A** |
-| Q7 | Chuỗi cũ khi đổi ngôn ngữ lúc đang mở một học sinh (`fallback_phu_buoi`, `btn_remove_ranked`) không vẽ lại — có từ trước A13 | (A) sửa trong vòng này; (B) ghi thành mục riêng ngoài sổ | **B** |
+| Q5 | 4.6 14 `wait_for_timeout` cố định trong test giao diện | (A) đổi dần sang `wait_for_selector` / `wait_for_function`; (B) giữ (10/10 lần xanh) | **Đã quyết (28/10): KHÔNG làm** (giữ như hiện tại, đề xuất B) |
+| Q6 | 4.4 tên nội bộ `wharton` trong ba tài liệu | (A) giữ, đã có ghi chú; (B) chuyển câu bảo trì xuống cuối tài liệu | **Đã quyết (28/10): KHÔNG làm** (giữ, đề xuất A) |
+| Q7 | Chuỗi cũ khi đổi ngôn ngữ lúc đang mở một học sinh (`fallback_phu_buoi`, `btn_remove_ranked`) không vẽ lại — có từ trước A13 | (A) sửa trong vòng này; (B) ghi thành mục riêng ngoài sổ | **Đã quyết (28/10): SỬA trong A13.8** (hai chuỗi cũ `fallback_phu_buoi`, `btn_remove_ranked` vẽ lại khi đổi ngôn ngữ; có test thất bại trước) |
 | Q8 | "Bước cuối — kỹ năng `soat-ma`" (thêm `SKILL.md`, `scripts/kiem_nhanh.py`, `tests/test_skill_soat_ma.py`, dòng vào `CLAUDE.md`, CHANGELOG mã `Z-SOAT`) | (A) làm ngay sau Tầng 4; (B) làm sau vòng sửa A13.8, để chốt luôn các quy tắc mới (rollback, khoá) vào danh sách kiểm; (C) bỏ | **B** |
 
 ### Thứ tự gợi ý cho vòng sửa
 
 1. S1–S4 (khoá điểm; đổi hành vi, test trước). 2. S7–S8 rồi S9 (giao diện, cùng tệp `js/05_quan_ly.js`). 3. S6, S5 (xuất, docstring). 4. S10 (ngoài A13, kèm test). 5. S12 (test), S11, S13–S14 (tài liệu / i18n). 6. Các mục Q đã được Truong chọn. Sau cùng: `python tao_i18n_js.py`, `ruff check .`, toàn bộ test, trùng khít 3 bộ × 5 seed so với `e08af78`.
+
+
+### Quyết định của Truong cho vòng sửa A13.8 (28/10/2026, qua phiên điều phối) — cột quyết định
+
+| Việc | Quyết định |
+|---|---|
+| 4.1 CLAUDE.md bản đồ mã + DOI_CHIEU_KHO_MA.md (S11) | LÀM trong A13.8 (bước soát này chỉ thêm đúng MỘT dòng quy tắc cho `soat-ma`, không đụng bản đồ mã) |
+| 4.5 test rollback thật + biên 99/101 (S12) | LÀM |
+| 4.2 skill `xu-li-raw-forms` + "bạn khác" (S13) | LÀM |
+| 4.3 hai khoá i18n chết (S14) | LÀM |
+| 4.4 tên nội bộ `wharton` trong tài liệu | KHÔNG làm |
+| 4.6 `wait_for_timeout` cố định | KHÔNG làm |
+| Hai lỗi ngoài phạm vi về đổi ngôn ngữ (`fallback_phu_buoi`, `btn_remove_ranked`) | SỬA trong A13.8 |
+| Q1–Q4 (2.4/2.5, 2.6, 2.7, 2.8) | chưa có quyết định; làm theo đề xuất nếu Truong không đổi |
+
+## Bước cuối — skill `soat-ma` (28/10/2026, Truong nói "tiếp")
+
+Đã dựng `.claude/skills/soat-ma/` (`SKILL.md`, `scripts/kiem_nhanh.py`) và `tests/test_skill_soat_ma.py` (45 ca: mỗi mục tự kiểm một ca ĐẠT và các ca KHÔNG ĐẠT dựng trong thư mục tạm, cộng khung skill). Thêm đúng một dòng vào `CLAUDE.md` mục "Quy tắc làm việc" (quy tắc 8: "Trước khi push: chạy skill `soat-ma`"). Không sửa lỗi nào trong báo cáo này.
+
+- Chạy `kiem_nhanh.py` trên chính kho (so với `main` = `origin/main`, và so với `e08af78`): **7/7 mục ĐẠT**, gồm trùng khít 15 ca (3 bộ × 5 seed).
+- Hai điều chỉnh khi chạy thử trên kho thật, đã ghi vào mã và SKILL.md: (1) chữ trong phần tử có `data-i18n` ở `index.html` chỉ là chữ dự phòng (bị thay bằng khoá `i18n.js` lúc chạy; các chữ này có "em" từ trước A13) nên mục `chu_cam` không soát lần hai ở đó; (2) mã `loi_giao_dien_ngoai_du_kien` ở `js/00_nen.js` (từ trước A13) không có trong `i18n_errors.py` nhưng trùng một khoá UI của `i18n.js` và chỉ dùng để mang `params.detail`, nên mục `ma_loi_js` chấp nhận mã trùng khoá UI.
+- Đăng ký kiểu sẵn có: skill nằm trong `.claude/skills/` như `sinh-du-lieu-clb`, `tao-workspace-tu-raw` (có `tests/test_skill_*.py` riêng); KHÔNG đưa vào `mau_forms_thi_clb/dong_goi_skill.py` (danh sách đó chỉ đóng .zip phát cho người dùng cuối; có test canh).

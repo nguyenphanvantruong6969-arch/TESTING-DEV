@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-10-28 — Z-SOAT Skill `soat-ma`: soát mã trước khi push
+
+Theo yêu cầu của Truong (28/10/2026, "làm bước cuối" của đợt soát A13). Mã mục `Z-SOAT` do Claude đề xuất, chưa có trong sổ đăng ký 33 mục (quy ước khác thì đổi tên). Đây là lần duy nhất đợt soát được thêm mã; KHÔNG sửa lỗi nào trong `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md` (sẽ làm ở A13.8, dùng chính skill này).
+
+- **Tệp mới:** `.claude/skills/soat-ma/SKILL.md` (luật không subagent / chỉ báo cáo, phạm vi diff so với `main`, cách ghi phát hiện, checklist bốn tầng viết tổng quát kèm bài học rút từ đợt soát A13, lệnh, mẫu báo cáo); `.claude/skills/soat-ma/scripts/kiem_nhanh.py` (một lệnh, bảy mục in ĐẠT / KHÔNG ĐẠT: `ruff`, `chu_cam`, `ma_loi_js`, `i18n_loi_khop`, `i18n_khoa`, `trung_khit` so với `main` 3 bộ × 5 seed, `khong_sua_nhat_ky`; chỉ thư viện chuẩn, `ruff` là công cụ ngoài đã có ở requirements-dev; mục không chạy được tính KHÔNG ĐẠT kèm lý do, không bỏ qua im lặng); `tests/test_skill_soat_ma.py`.
+- **Tệp sửa:** `CLAUDE.md` — đúng MỘT dòng mới ở "Quy tắc làm việc" (quy tắc 8: "Trước khi push: chạy skill `soat-ma`"); bản đồ mã KHÔNG đụng (để A13.8).
+- **Không đổi** mã sản phẩm, schema, hợp đồng cột CSV, hay kết quả xếp (bất biến 1–8 giữ nguyên). Skill KHÔNG vào `mau_forms_thi_clb/dong_goi_skill.py` (danh sách đó chỉ đóng .zip cho người dùng cuối); đăng ký theo kiểu của `sinh-du-lieu-clb` và `tao-workspace-tu-raw`: nằm trong `.claude/skills/`, có test riêng.
+- **Test mới (45 ca):** `tests/test_skill_soat_ma.py` — mỗi mục một ca ĐẠT và các ca KHÔNG ĐẠT dựng trong thư mục tạm (xưng hô cấm ở VI / EN / lỗi / HTML, "Wharton" lộ ra chữ, mã lỗi lạ ở `.js` và `.html`, `i18n_loi.js` lệch và thiếu, khoá thiếu một ngôn ngữ hay rỗng, `DELETE` / `UPDATE` / `DROP` một dòng và nhiều dòng trên bảng dấu vết, tên bảng nằm trong danh sách `_RESET_BANG`-kiểu, hai bản mã khác thứ tự ưu tiên cho kết quả lệch, nhánh so sánh không có); khung `SKILL.md`, dòng trong `CLAUDE.md`, skill không nằm trong gói zip; và MỘT ca chạy script thật trên kho thật (năm mục nhanh phải ĐẠT: ai thêm xưng hô cấm, mã lỗi lạ, khoá i18n lệch hay xoá nhật ký thì test đỏ).
+- **Chạy trên kho thật:** `kiem_nhanh.py` 7/7 ĐẠT (so với `main` và so với `e08af78`; trùng khít 15 ca). Hai điều chỉnh ghi trong mã và SKILL.md: chữ trong phần tử có `data-i18n` ở `index.html` là chữ dự phòng (có "em" từ trước A13) nên không soát lần hai; mã `loi_giao_dien_ngoai_du_kien` (từ trước A13) trùng một khoá UI nên được chấp nhận.
+- **Kiểm toàn bộ (28/10/2026, Chromium thật, `-rs`):** 2.806 qua, 3 bỏ qua (thiếu `numpy` ×2; cần người dùng thường trên POSIX ×1; không ca giao diện nào bị bỏ qua) — 2.761 của A13.7 cộng 45 ca mới. `ruff check .` sạch.
+
 ## 2026-10-27 — A13.7 Sổ nhập mẫu luôn có cột Điểm quyết tâm
 
 Theo quyết định của Truong (27/10/2026): sổ MẪU luôn có cột "Điểm quyết tâm" kèm ghi chú "chỉ dùng khi bật tính năng". Không đổi mặc định `rules.wharton` (vẫn tắt), thuật toán, schema, hợp đồng CSV. Các đường ghi sổ khác (xuất dữ liệu đầu vào, ba skill, `du_lieu_test/`) giữ hành vi cũ.

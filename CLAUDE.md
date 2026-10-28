@@ -45,6 +45,7 @@
 5. Hàm lựa chọn mới phải qua test **thay thế được** và **luật tổng cầu**; không qua thì ghi rõ "không bảo đảm ổn định" và dùng chế độ đo lường (mục A12).
 6. Sau mỗi mục: cập nhật `CHANGELOG.md` (mã mục, tệp, test mới) và đánh dấu tiến độ trong `docs/ke_hoach/TIEN_DO.md`.
 7. Dừng và hỏi khi: một bất biến xung đột với mục; số dòng/hiện trạng trong sổ lệch hẳn so với kho; cần thêm thư viện; cần đổi hợp đồng cột CSV hay schema ngoài phạm vi mục.
+8. Trước khi push: chạy skill `soat-ma` (`.claude/skills/soat-ma/`): một lệnh `kiem_nhanh.py` cho phần máy làm được, rồi soát theo bốn tầng trong `SKILL.md`. Không subagent; chỉ báo cáo trừ khi được giao sửa.
 
 ## Liêm chính học thuật (đây là đề tài của học sinh)
 - **Mọi số liệu kiểm chứng là dữ liệu MÔ PHỎNG.** Không bao giờ viết như thể là khảo sát thật.
