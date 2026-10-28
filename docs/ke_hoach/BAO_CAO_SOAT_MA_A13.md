@@ -216,3 +216,76 @@ Thoát HTML nhất quán, có chú thích vì sao `esc()` thoát cả dấu nhá
 ### Tóm tắt Tầng 3
 
 `chặn`: 0 · `nên sửa`: 2 (3.1, 3.2) · `nhỏ`: 2 (3.3, 3.4).
+
+
+---
+
+## Tầng 4 — Mã viết sai / vệ sinh
+
+Cách làm: quét tự động trên toàn bộ diff `e08af78..8ad399d` (script ngoài kho), rồi kiểm tay từng chỗ nghi. Gây hỏng tạm 11 chỗ then chốt và hoàn tác từng chỗ bằng ghi đè lại đúng nội dung gốc (`git status` sạch sau mỗi lượt và ở cuối). Chạy 10 lần liền nhóm test giao diện A13.
+
+### Kết quả theo mục yêu cầu
+
+| Mục | Kết luận | Bằng chứng |
+|---|---|---|
+| 1a. Mã chết | **ĐẠT** | `ruff check .` sạch. Mọi hàm Python và JS A13 thêm mới đều có nơi gọi (script `t4e.py`); mọi API công khai mới của `PipelineAPI` đều được `js/` gọi bằng tên chuỗi. Không có import thừa kể cả ở `.claude/`, `mau_csv/`, `du_lieu_test/` (`ruff --select F401,F841`). |
+| 1b. Trùng lặp ≥ 10 dòng | **ĐẠT (một chỗ chủ ý)** | Cửa sổ 8 dòng chuẩn hoá: duy nhất `rbda_priority_pipeline.py:169–176 ↔ 346–353` — khối kiểm "thiếu STB" chép từ `compute_club_priority` vào `uu_tien_wharton`, có chú thích lý do (không sửa hàm cũ). Hai bản làm tròn phần dư lớn nhất khác dáng nên máy không bắt, xem 2.7. |
+| 2a. Xưng hô cấm | **ĐẠT** | Quét mọi chuỗi hiển thị: i18n VI/EN của 146 khoá mới, 27 mã lỗi mới, chữ hiển thị thật qua Chromium ở cả tiếng Việt và tiếng Anh (mọi thẻ, ba tab con Quản lý), tiêu đề và hướng dẫn trong 8 sổ Excel mẫu: 0 lần "bạn / các em / you / your". Hai chỗ chữ "bạn" nghĩa là bạn học trong tài liệu (xem 4.2). |
+| 2b. "Wharton" lọt ra chữ người dùng thấy | **ĐẠT** | 0 lần trong chữ hiển thị trên giao diện (cả hai ngôn ngữ), thông báo lỗi đã dịch, 8 sổ Excel. Chỉ có ở tài liệu dành cho người bảo trì (ghi rõ "trong mã gọi là `wharton`"). |
+| 2c. Khoá i18n thiếu VI/EN | **ĐẠT** | 637 khoá VI = 637 khoá EN, không khoá nào thiếu một bên. Chạy thật tiếng Anh: không còn `{tham_so}` chưa điền, không còn dấu tiếng Việt ở phần chữ giao diện của A13 (hai chuỗi cũ còn sót, xem ngoài phạm vi). |
+| 2d. Khoá i18n không ai dùng | **ĐẠT MỘT PHẦN — 4.3** | 146 khoá mới: 2 khoá không ai gọi (`dc_cot_buoi`, `dc_tooltip_so`); 14 khoá `wh_nk_*` và `wh_hl_ly_do_*` được dùng bằng tiền tố động (`whNhan("wh_nk_", …)`), đã đối chiếu đủ mọi giá trị `nguon` / `hanh_dong` backend có thể ghi. |
+| 2e. Mã lỗi không qua `i18n_errors.py` | **ĐẠT** | 27 mã lỗi mới đều ở `MESSAGES` có VI và EN, đều được phát ra ở đâu đó, đều có ít nhất một test nhắc tới. Câu đã dịch không lộ token nội bộ (`__mac_dinh__`). |
+| 2f. Chuỗi cứng trong JS | **ĐẠT** | Quét dòng JS thêm mới: chuỗi có dấu tiếng Việt trong literal = 0 (6 dòng khớp đều là chú thích). |
+| 3. Tài liệu lệch mã | **CẦN SỬA — 4.1, 4.2, 4.4** | CHANGELOG, sổ đăng ký (A13.1–A13.7), `TIEN_DO.md` khớp mã và số liệu (2.761 qua + 3 bỏ qua = 2.764 ca; em chạy mốc 2.699 trước vòng 6+7; cộng 62 ca mới của vòng 6+7 ra 2.761, khớp CHANGELOG). Lệch: `CLAUDE.md` (bản đồ mã, số test), kỹ năng `xu-li-raw-forms`, hai chỗ chữ. |
+| 4a. Test yếu (gây hỏng tạm) | **ĐẠT MỘT PHẦN — 4.5** | 11 chỗ gây hỏng, cả 11 bị test bắt, nhưng hai chỗ chỉ bị bắt bởi tệp test KHÁC ngoài tệp "đúng chủ đề", và một test mang tên "rollback" không chứng minh rollback (4.5). |
+| 4b. `sleep` cứng | **CHẤP NHẬN (ghi chú 4.6)** | 14 `wait_for_timeout` 100–600 ms trong 7 tệp test giao diện A13 và 1 `time.sleep(0.5)` có chủ đích trong `test_wharton_doc.py:144` (giữ giao dịch đọc để thử ghi chen). |
+| 4c. Chập chờn (10 lần liền) | **ĐẠT** | 9 tệp test giao diện A13 (85 ca) chạy 10 lần liền: **10/10 lần `85 passed`**, mỗi lượt 124–127 giây, 0 ca bỏ qua, 0 ca đỏ. |
+| 4d. Test bỏ qua im lặng | **ĐẠT** | Mốc 3 ca bỏ qua, đều ngoài A13 (numpy ×2, người dùng thường POSIX ×1). CI đã có chốt "không test giao diện nào bị bỏ qua" (`tests.yml`, lấy mẫu `test_giao_dien_upload.py`); đủ làm đại diện vì cùng một Chromium. |
+
+### Bảng gây hỏng tạm (11 chỗ)
+
+| # | Gây hỏng | Test bắt? |
+|---|---|---|
+| M1 | Đảo dấu điểm tầng 2: `(1, -w2, …)` → `(1, w2, …)` | Bắt (`test_wharton.py`) |
+| M2 | Bỏ kiểm khoá trong `_luu_wharton` | Bắt (`test_wharton_khoa.py`) |
+| M3 | Thay `rollback()` bằng `commit()` ở nhánh lỗi giữa chừng của `_run_pipeline_da_khoa` | **Chạy nhóm A13 (`test_wharton_pipeline`, `_khoa`, `_nhat_ky`): XANH, không bắt.** Chỉ bị bắt khi thêm các test chung về rollback (`test_data_durability.py` …). Xem 4.5 |
+| M4 | Bỏ `if any(…): continue` trong `tu_dien_wharton_mot_clb` (tự điền đè quỹ em đã đặt) | Bắt |
+| M5 | Đảo luật hoà của `phong_theo_ti_le` | Bắt (`test_wharton_hang_loat.py`) |
+| M6 | `_chua_co_ket_qua` luôn trả False (tắt khoá xuất) | Bắt |
+| M7 | Chạy xong không khoá điểm | Bắt |
+| M8 | Tổng 101 điểm được chấp nhận (`> ngan_sach` → `> ngan_sach + 1`) | Bắt, nhưng chỉ khi chạy cả nhóm `tests/test_wharton*.py`; riêng `test_wharton.py` không bắt |
+| M9 | Điểm hiệu lực tầng 1 lấy nhầm quỹ 2 | Bắt |
+| M10 | Điểm chuẩn tầng 2 lấy `max` thay `min` | Bắt (`test_diem_chuan.py`) |
+| M11 | `_luu_wharton` ghi nhầm `tier` (quỹ 1 ↔ 2) | Bắt, nhưng chỉ khi chạy cả nhóm `tests/test_wharton*.py` và test giao diện; `test_wharton_luu_tru.py` + `test_wharton_kiosk.py` riêng không bắt |
+
+### Phát hiện Tầng 4
+
+| # | Mức | Tệp:dòng | Hàm | Vấn đề | Đường xảy ra | Đề xuất sửa | Chắc chắn? |
+|---|---|---|---|---|---|---|---|
+| 4.1 | nên sửa | `CLAUDE.md` (bảng "Bản đồ mã", dòng "tests/") | tài liệu | Bản đồ mã đã trôi: A13 làm `rbda_priority_pipeline.py` từ ~2.187 lên **2.922** dòng, `api.py` ~1.364 lên **1.511**; MỌI số dòng hàm sau `compute_club_priority` sai: `club_choice_function` ghi L236–292, thực tế **L736**; `run_rbda` L315–452 → **L815**; `verify_stability` L456–524 → **L975**; `run_rbda_nhieu_buoi` L877–985 → **L1400**; `generate_stb_lottery` / `chen_stb_cho_hoc_sinh_moi` L1086–1182 → **L1626 / L1652**; `_BANG_RANG_BUOC` L1250 → **L1790**; `DEFAULT_SCHEMA` L1290 → **L1830**; `di_tru_schema` L1568–1666 → **L2176**; `default_reserve_eligible_fn` L1709–1720 → **L2329**; `_run_pipeline_da_khoa` L784–1364 → **L871**; `get_data_health_report` L236 → **L256**. Dòng "tests/" ghi 89 tệp, 1.515 ca; thực tế **138 tệp, 2.764 ca** (`pytest --collect-only`). Bản đồ không có hàm Wharton nào. Phiên sau tin số cũ sẽ đọc nhầm chỗ. | Mở `CLAUDE.md`, đối chiếu `grep -n "^def club_choice_function" rbda_priority_pipeline.py` → 736. | Cập nhật bảng (có thể thay số dòng bằng tên hàm, đúng quy ước "định vị theo TÊN HÀM"), thêm hàng cho nhóm Wharton, sửa số test; cùng việc cho `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`. | đã tái hiện (so số dòng) |
+| 4.2 | nhỏ | `.claude/skills/xu-li-raw-forms/SKILL.md` ("bố cục giống hệt sổ mẫu trong kho"); `HUONG_DAN_SU_DUNG.md` (câu "điểm của bạn khác") | tài liệu | (a) Sau A13.7, sổ mẫu trong kho có ba cột mỗi nhóm (CLB, Điểm thi, Điểm quyết tâm) còn sổ do kỹ năng này ghi chỉ hai cột (ghi bằng `ghi_so_nhap` mặc định), nên "giống hệt" không còn đúng. (b) "bạn khác" = bạn học, nhưng bị quy tắc xưng hô quét máy bắt. | (a) `openpyxl` đọc hàng 2 của `mau_csv/SO_NHAP_CLB.xlsx` và của sổ ghi mặc định: `['CLB','Điểm thi','Điểm quyết tâm',…]` so với `['CLB','Điểm thi','CLB',…]`. | (a) Sửa câu thành "cùng bố cục hai hàng tiêu đề; sổ mẫu có thêm cột Điểm quyết tâm". (b) Đổi "của bạn khác" thành "của em khác". | đã tái hiện (a); (b) đọc chữ |
+| 4.3 | nhỏ | `i18n.js:632, 655, 1285, 1308` | bảng chữ | Hai khoá `dc_cot_buoi` và `dc_tooltip_so` (VI và EN) không ai gọi (grep `js/`, `index.html`, `*.py`, test). | Đã grep mọi nơi, kể cả tiền tố động `dc_`. | Xoá bốn dòng (hoặc dùng). | đã tái hiện (grep) |
+| 4.4 | nhỏ | `du_lieu_test/README.md`, `TAI_LIEU_DU_LIEU.md`, `HUONG_DAN_SU_DUNG.md` | tài liệu | Ba tài liệu nói "trong mã gọi là `wharton`" / "dữ liệu mẫu có Wharton" — chủ ý cho người bảo trì và đúng quy ước, nhưng người đọc tài liệu hướng dẫn sử dụng thấy tên nội bộ. Không lọt ra giao diện hay Excel. | Đọc ba tệp. | Giữ (đã có ghi chú rõ); nếu muốn sạch, chuyển câu bảo trì xuống phần cuối. | đã đọc |
+| 4.5 | nên sửa | `tests/test_wharton_khoa.py:87` (`test_chay_hong_giua_chung_rollback_thi_khong_khoa`) | test | Test mang tên "rollback" không chứng minh rollback: nó làm `luat_xep_de_ghi` ném lỗi, nhưng dòng khoá điểm nằm SAU dòng đó nên chưa bao giờ được ghi; thay `rollback()` bằng `commit()` (M3) test vẫn xanh. Rollback thật của A13 (dòng khoá + nhật ký `khoa` nằm trong cùng giao dịch với kết quả) chỉ được test chung (`test_data_durability.py`) bảo vệ gián tiếp. Cùng nhóm: M8 (tổng 101) và M11 (ghi nhầm `tier`) chỉ bị bắt bởi tệp test không phải "tệp chủ đề". | Gây hỏng M3 rồi chạy `test_wharton_pipeline.py test_wharton_khoa.py test_wharton_nhat_ky.py`: `72 passed`. Ngược lại, chèn lỗi giả ngay tại `_ghi_nhat_ky_wharton(… "khoa")` (phần Tầng 2) làm cả 8 bảng nguyên vẹn khi `rollback()` đúng. | Thêm test: `monkeypatch` làm `_ghi_nhat_ky_wharton` ném lỗi khi `hanh_dong == "khoa"`, rồi khẳng định `match_results`, `run_history`, `wharton_lock`, `stb_lock` y nguyên; thêm ca biên tổng 101 / 99 vào `test_wharton.py`. | đã tái hiện (`t4m.py`) |
+| 4.6 | nhỏ | `tests/test_giao_dien_wharton_quan_ly.py:135, 237, 260, 319, 391, 403` và 8 chỗ khác | test giao diện | 14 `wait_for_timeout(100–600 ms)` đợi cố định thay vì đợi điều kiện. Chưa thấy chập chờn (xem 4c) nhưng sẽ dễ vỡ trên máy chậm (CI). | Máy CI chậm gấp vài lần → ô chưa vẽ xong khi kiểm. | Đổi sang `wait_for_selector` / `wait_for_function` theo điều kiện. | suy luận |
+
+### Ghi chú ngoài phạm vi (một dòng)
+
+- Khi đang mở một học sinh rồi đổi ngôn ngữ, hai chuỗi cũ ở Bước 2 (`fallback_phu_buoi` "Đã xếp hạng ở 3/3 buổi" và liên kết `btn_remove_ranked` "xoá") không vẽ lại sang tiếng Anh. Khoá có sẵn từ trước A13 và đều có bản EN; Bước 3 của A13 vẽ lại đúng.
+
+### Bốn khía cạnh — Tầng 4
+
+- **Bảo mật:** không bí mật, không `eval`/`exec`/`os.system`; `subprocess` trong test dùng danh sách đối số, không `shell`.
+- **Hiệu năng:** không có mã chết gây tốn; test giao diện A13 mất 125 giây mỗi lượt cho 85 ca.
+- **Đúng đắn:** xem 4.5 (test không chứng minh điều nó nói).
+- **Bảo trì:** hai bản thuật toán làm tròn (2.7), tài liệu lệch mã (4.1, 4.2), hai khoá chết (4.3), `api_quan_ly.py` +800 dòng và `js/05_quan_ly.js` +1.136 dòng (nên tách, không gấp).
+
+### Điểm tốt (Tầng 4)
+
+Không có mã chết hay import thừa; chỉ một khối trùng lặp và có lý do ghi rõ. Chữ hiển thị sạch ở cả hai ngôn ngữ (không xưng hô cấm, không tên nội bộ, không tham số chưa điền). Mọi mã lỗi đi một nguồn và đều có test. Mười một lần gây hỏng cố ý đều bị bắt bởi ít nhất một test. CHANGELOG, sổ đăng ký và `TIEN_DO.md` khớp số liệu đo thật.
+
+### Kết luận tầng: **Cần sửa** (không có lỗi `chặn`; 4.1 và 4.5 nên sửa; còn lại nhỏ)
+
+### Tóm tắt Tầng 4
+
+`chặn`: 0 · `nên sửa`: 2 (4.1, 4.5) · `nhỏ`: 4 (4.2, 4.3, 4.4, 4.6).
