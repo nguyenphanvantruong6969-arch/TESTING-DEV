@@ -3,7 +3,7 @@
   * bảng tổng: hai cột điểm chuẩn riêng, mỗi ô có thanh; không còn dòng chữ nhỏ dưới tên CLB;
   * "Đơn / chỗ": thanh tỉ lệ nhỏ kèm số, màu theo mức cạnh tranh, không còn chấm đỏ;
   * chi tiết một CLB: ĐÚNG MỘT biểu đồ SVG, vạch chuẩn ghi số, được / không được nhận phân biệt;
-  * `prefers-reduced-motion` tắt hiệu ứng; `prefers-color-scheme: dark` đổi màu khối;
+  * `prefers-reduced-motion` tắt hiệu ứng; hệ điều hành ở chế độ tối KHÔNG làm khối đổi nền (A13.13, tông kem như app);
   * nhãn mới có mặt ở cả VI và EN.
 """
 
@@ -186,24 +186,43 @@ def test_reduced_motion_tat_hieu_ung_con_binh_thuong_thi_co(mo):
     assert not loi, loi
 
 
-def test_che_do_toi_doi_mau_khoi_va_giu_chu_doc_duoc(mo):
+def test_che_do_toi_cua_he_dieu_hanh_khong_doi_nen_khoi_diem_chuan(mo):
+    """A13.13: khối Điểm chuẩn luôn tông kem như app, kể cả khi trình duyệt báo chế độ tối."""
     page, loi = mo()
 
-    def sang(c):
-        r, g, b = [int(x) for x in re.findall(r"\d+", c)[:3]]
+    def rgb(c):
+        return [int(x) for x in re.findall(r"\d+", c)[:3]]
+
+    def do_sang(c):
+        def k(v):
+            v /= 255
+            return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        r, g, b = [k(x) for x in rgb(c)]
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    def tuong_phan(a, b):
+        x, y = sorted([do_sang(a), do_sang(b)], reverse=True)
+        return (x + 0.05) / (y + 0.05)
     lay = """() => { const s = getComputedStyle(document.querySelector('#adminDiemChuanBlock'));
         return [s.backgroundColor, s.color]; }"""
-    page.emulate_media(color_scheme="light")
-    nen_sang, _ = page.evaluate(lay)
-    assert sang(nen_sang) > 200, nen_sang
+    ket = []
+    for che_do in ("light", "dark"):
+        page.emulate_media(color_scheme=che_do)
+        ket.append(page.evaluate(lay))
+    assert ket[0] == ket[1], ket
     page.emulate_media(color_scheme="dark")
-    nen_toi, chu_toi = page.evaluate(lay)
-    assert sang(nen_toi) < 90 and sang(chu_toi) > 160, (nen_toi, chu_toi)
-    # chấm "được nhận" và vạch chuẩn vẫn tương phản với nền tối
-    mau = page.evaluate("""() => [getComputedStyle(document.querySelector('svg[data-bieu-do=chi-tiet] circle.dc-cham-duoc')).fill,
-        getComputedStyle(document.querySelector('svg[data-bieu-do=chi-tiet] line.dc-chuan-vach')).stroke]""")
-    assert all(sang(m) > 110 for m in mau), mau
+    # tên CLB dùng phông thường, nhãn mức và thanh đọc được trên nền sáng
+    phong = page.evaluate("() => getComputedStyle(document.querySelector('#dcQlTongQuan .dc-ten')).fontFamily")
+    assert "Plex Mono" not in phong, phong
+    for sel in ("#dcQlTongQuan .dc-ten", "#dcQlTongQuan .dc-don-so", "#dcQlTongQuan th"):
+        chu = page.evaluate("s => getComputedStyle(document.querySelector(s)).color", sel)
+        assert tuong_phan(chu, "rgb(255, 255, 255)") >= 4.5, (sel, chu)
+    chip = page.evaluate("""() => { const e = document.querySelector('#dcQlTongQuan .dc-chip'); const s = getComputedStyle(e);
+        return [s.color, s.backgroundColor]; }""")
+    assert tuong_phan(*chip) >= 4.5, chip
+    for sel in ("circle.dc-cham-duoc", "line.dc-chuan-vach"):
+        m = page.evaluate("s => { const e = document.querySelector('svg[data-bieu-do=chi-tiet] ' + s); const c = getComputedStyle(e); return c.fill !== 'none' && s.startsWith('circle') ? c.fill : c.stroke; }", sel)
+        assert tuong_phan(m, "rgb(255, 255, 255)") >= 3, (sel, m)
     assert not loi, loi
 
 

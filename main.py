@@ -79,9 +79,10 @@ def khoi_dong_workspace() -> tuple:
     if len(sys.argv) > 1:
         return resolve_db_path(), None, True
     workspace.di_chuyen_db_cu(BASE_DIR)
+    workspace.bat_dqt_mac_dinh_truong_hoc(BASE_DIR)
     ds = workspace.danh_sach(BASE_DIR)
     if not ds:
-        slug = workspace.tao(BASE_DIR, workspace.TEN_TRUONG_HOC, None)
+        slug = workspace.tao_truong_hoc_mac_dinh(BASE_DIR)
         return workspace.duong_dan_db(BASE_DIR, slug), BASE_DIR, True
     loi_dau = None
     for w in sorted(ds, key=lambda w: w["modified"], reverse=True):

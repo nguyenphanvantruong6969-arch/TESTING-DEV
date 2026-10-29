@@ -281,7 +281,7 @@ class WorkspaceMixin:
                 if not con_lai:
                     # Đã xoá hết: dựng lại "Trường học" mặc định như lúc khởi động
                     # (main.khoi_dong_workspace), để db_path không trỏ vào thùng rác (A13.12, 4.2).
-                    workspace.tao(self._goc_ws, workspace.TEN_TRUONG_HOC, None)
+                    workspace.tao_truong_hoc_mac_dinh(self._goc_ws)
                     con_lai = workspace.danh_sach(self._goc_ws)
                 if con_lai:
                     self.db_path = max(con_lai, key=lambda w: w["modified"])["path"]

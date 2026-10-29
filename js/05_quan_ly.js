@@ -1634,9 +1634,15 @@ function veTongQuanDiemChuan(goc, ds) {
     const tr = tb.insertRow();
     tr.dataset.clubId = r.club_id;
     const ten = tr.insertCell();
+    if (nhieuBuoi && r.buoi) {
+      const buoi = document.createElement("span");
+      buoi.className = "dc-buoi";
+      buoi.textContent = "[" + r.buoi + "]";
+      ten.appendChild(buoi);
+    }
     const tenTxt = document.createElement("span");
     tenTxt.className = "dc-ten";
-    tenTxt.textContent = dcTenDong(r, nhieuBuoi);
+    tenTxt.textContent = r.ten;
     ten.appendChild(tenTxt);
 
     [[1, r.tang1, thangThi], [2, r.tang2, 100]].forEach(([tang, muc, thang]) => {

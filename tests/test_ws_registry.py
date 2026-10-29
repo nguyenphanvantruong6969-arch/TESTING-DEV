@@ -582,7 +582,10 @@ def test_main_khong_co_gi_thi_dung_truong_hoc_mac_dinh(main_mod, tmp_path):
     goc = Path(main_mod.BASE_DIR)
     db = main_mod.khoi_dong_workspace()[0]
     assert db == str(goc / "workspaces" / "truong-hoc" / "app.db")
-    assert ch.doc_cau_hinh(db) == {**ch.MAC_DINH_TRUONG_HOC, "name": "Trường học"}
+    # A13.13: workspace Trường học mặc định dựng lúc mở app lần đầu có Điểm quyết tâm BẬT
+    mong = {**ch.MAC_DINH_TRUONG_HOC, "name": "Trường học"}
+    mong["rules"] = {**mong["rules"], "wharton": True}
+    assert ch.doc_cau_hinh(db) == mong
     assert not (goc / "app.db").exists()  # không còn app.db rải cạnh chương trình
     assert main_mod.khoi_dong_workspace()[0] == db      # lần sau mở lại đúng nó
     assert [w["slug"] for w in ws.danh_sach(str(goc))] == ["truong-hoc"]

@@ -63,7 +63,9 @@ MAC_DINH_TRUONG_HOC = {
         "tier_mode": "reserve",
         "score_scope": "per_slot",
         "tiers": [],
-        # Điểm Wharton (mục A13): mặc định TẮT, xem `_chuan_hoa` về điều kiện bật.
+        # Điểm Wharton (mục A13): mặc định CHUNG là TẮT (nền của mọi ngành); riêng workspace Trường học
+        # mặc định dựng lúc mở app lần đầu thì BẬT (A13.13, xem workspace.CAU_HINH_TRUONG_HOC_MAC_DINH).
+        # `_chuan_hoa` nói điều kiện bật.
         "wharton": False,
     },
 }

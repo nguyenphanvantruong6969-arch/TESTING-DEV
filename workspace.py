@@ -56,6 +56,14 @@ TEN_TRUONG_HOC = "Trường học"
 # slug của một mẫu người dùng lưu (slug workspace chỉ có a-z, 0-9 và '-').
 SLUG_MAU_TRUONG_HOC = "_truong-hoc"
 
+# Dấu "đã xét bật Điểm quyết tâm mặc định" của workspace Trường học mặc định (A13.13): một hàng
+# trong `workspace_settings`. Có dấu thì không xét lại nữa, nên người dùng tắt Điểm quyết tâm sau đó
+# (qua `update_workspace_config`) không bị bật lại ở lần mở app sau.
+KHOA_DQT_MAC_DINH = "wharton_mac_dinh_truong_hoc"
+# Cấu hình của workspace Trường học mặc định dựng lúc mở app lần đầu: Điểm quyết tâm BẬT (A13.13).
+# Mặc định chung `MAC_DINH_TRUONG_HOC` vẫn TẮT, vì nó cũng là nền của mọi workspace ngành khác.
+CAU_HINH_TRUONG_HOC_MAC_DINH = {"rules": {"wharton": True}}
+
 TEN_FILE_GHI_CHU = "DA_CHUYEN_SANG_WORKSPACES.txt"
 # Thư mục dựng dở của di_chuyen_db_cu. Chỉ đổi tên thành `workspaces` khi đã
 # xong hết — xem vì sao ở đó.
@@ -227,6 +235,69 @@ def tao(root: str, name: str, cfg: dict | None = None) -> str:
         shutil.rmtree(thu_muc, ignore_errors=True)
         raise
     return slug
+
+
+def _dat_dau_dqt(db: str) -> None:
+    conn = connect_db(db)
+    try:
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS workspace_settings (key TEXT PRIMARY KEY, value TEXT)")
+        conn.execute("INSERT OR REPLACE INTO workspace_settings (key, value) VALUES (?, '1')",
+                     (KHOA_DQT_MAC_DINH,))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def tao_truong_hoc_mac_dinh(root: str) -> str:
+    """Dựng workspace "Trường học" mặc định (lúc mở app lần đầu): Điểm quyết tâm BẬT. Trả về slug."""
+    slug = tao(root, TEN_TRUONG_HOC, CAU_HINH_TRUONG_HOC_MAC_DINH)
+    _dat_dau_dqt(duong_dan_db(root, slug))
+    return slug
+
+
+def bat_dqt_mac_dinh_truong_hoc(root: str) -> bool:
+    """Bật Điểm quyết tâm cho workspace "Trường học" CŨ còn nguyên cấu hình mặc định (A13.13).
+
+    Chỉ đổi khi đủ cả bốn điều kiện: có `workspaces/truong-hoc`; chưa có dấu `KHOA_DQT_MAC_DINH`;
+    cấu hình đúng bằng mặc định trường học cũ (chỉ khác `name` là "Trường học", Điểm quyết tâm
+    tắt); và `run_history` rỗng. Đã chạy xếp, đã đổi bất kỳ luật / nhãn nào, hay đã có dấu thì
+    KHÔNG đổi. Mọi lần xét xong đều đặt dấu, nên người dùng tắt lại về sau không bị bật lại.
+    Sao lưu app.db (`.bak-<giờ>`) ngay trước khi đổi. Chạy lặp an toàn: lần hai là không làm gì.
+    Cấu hình đọc không được (hỏng, khoá lạ, CSDL bận) thì bỏ qua, không đặt dấu, không ghi đè.
+    Trả True nếu vừa bật.
+    """
+    db = duong_dan_db(root, SLUG_TRUONG_HOC)
+    if not os.path.isfile(db):
+        return False
+    try:
+        conn = connect_db(db, 2500)
+        try:
+            def co_bang(ten):
+                return conn.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (ten,)).fetchone()
+            if co_bang("workspace_settings") and conn.execute(
+                    "SELECT 1 FROM workspace_settings WHERE key = ?", (KHOA_DQT_MAC_DINH,)).fetchone():
+                return False
+            da_chay = bool(co_bang("run_history")
+                           and conn.execute("SELECT 1 FROM run_history LIMIT 1").fetchone())
+        finally:
+            conn.close()
+        cfg = doc_cau_hinh(db, nghiem=True)
+    except (sqlite3.Error, ValueError):
+        return False
+    cu = chuan_hoa({"name": TEN_TRUONG_HOC})
+    if da_chay or cfg != cu:
+        _dat_dau_dqt(db)
+        return False
+    try:
+        _chep_db(db, "%s.bak-%s" % (db, _dau_thoi_gian()))
+        cfg["rules"]["wharton"] = True
+        ghi_cau_hinh(db, cfg)
+        _dat_dau_dqt(db)
+    except (sqlite3.Error, OSError):
+        return False        # lần mở sau thử lại; không để một lỗi ghi chặn việc mở app
+    return True
 
 
 def doi_ten(root: str, slug: str, new_name: str) -> None:

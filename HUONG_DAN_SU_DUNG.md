@@ -973,7 +973,7 @@ Ba câu hỏi hay gặp nhất về bốc thăm, kèm số đo: **`docs/GIAI_DAP
 
 > Dành cho người bảo trì: trong mã và trong tên cột tệp, tính năng này vẫn gọi là `wharton` (ví dụ `rules.wharton`, cột `wp_k`).
 
-Mặc định **TẮT**: không bật thì phần mềm chạy y hệt như trước, kể cả kết quả và dấu vân tay dữ liệu.
+Không gian làm việc **Trường học** mặc định (dựng lúc mở phần mềm lần đầu) **đã BẬT** tính năng này. Một không gian Trường học cũ còn nguyên cấu hình mặc định và chưa từng chạy xếp cũng được tự bật khi mở phần mềm (có sao lưu `app.db.bak-…` ngay trước đó); đã chạy xếp, đã đổi luật, hoặc đã tắt thì giữ nguyên. Không gian ngành khác (công ty, sự kiện…) và không gian dựng bằng trình hướng dẫn vẫn **TẮT** cho tới khi bật. Khi tắt, phần mềm chạy y hệt như trước, kể cả kết quả và dấu vân tay dữ liệu.
 Khi bật, mỗi học sinh tự chia điểm để nói mình muốn CLB nào hơn. Điểm này được xét **trước** số bốc thăm
 và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hưởng thứ tự ưu tiên của CLB.
 

@@ -232,6 +232,50 @@ def test_ket_qua_muc_dong_san_mo_duoc_vao_lai_thi_dong(mo):
     assert not loi, loi
 
 
+def test_ket_qua_khoi_diem_chuan_tong_kem_ke_ca_khi_he_dieu_hanh_toi(mo):
+    """A13.13: không còn khối tối ở tab Kết quả; nút Ẩn / Xem điểm chuẩn đọc được (≥ 4,5:1)."""
+    page, api, loi, _ = mo(tab="results")
+    page.emulate_media(color_scheme="dark")
+    page.wait_for_selector("#dcKqPanel:not([hidden])")
+    page.locator("#btnDcKqMo").click()
+    page.wait_for_selector("#dcKqBody:not([hidden]) #dcKqTongQuan tbody tr")
+
+    def kenh(c):
+        return [int(x) for x in re.findall(r"\d+", c)[:3]]
+
+    def do_sang(c):
+        def k(v):
+            v /= 255
+            return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        r, g, b = [k(x) for x in kenh(c)]
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    def tuong_phan(a, b):
+        x, y = sorted([do_sang(a), do_sang(b)], reverse=True)
+        return (x + 0.05) / (y + 0.05)
+    mau = """s => { const c = getComputedStyle(document.querySelector(s)); return [c.color, c.backgroundColor]; }"""
+    nen, chu = page.evaluate(mau, "#dcKqPanel")[1], page.evaluate(mau, "#dcKqPanel")[0]
+    assert sum(kenh(nen)) / 3 > 235, nen      # nền kem / trắng, không phải nền tối
+    assert tuong_phan(chu, nen) >= 4.5, (chu, nen)
+    chu_nut, nen_nut = page.evaluate(mau, "#btnDcKqMo")
+    assert tuong_phan(chu_nut, nen_nut) >= 4.5, (chu_nut, nen_nut)
+    assert "Plex Mono" not in page.evaluate("() => getComputedStyle(document.querySelector('#dcKqTongQuan .dc-ten')).fontFamily")
+    chu_chip, nen_chip = page.evaluate(mau, "#dcKqTongQuan .dc-chip")
+    assert tuong_phan(chu_chip, nen_chip) >= 4.5, (chu_chip, nen_chip)
+    # chế độ EN: nút và nhãn vẫn đọc được
+    page.evaluate("window.I18N.setLang('en')")
+    page.wait_for_function("() => document.getElementById('btnDcKqMo').textContent === 'Hide cut-off points'")
+    chu_nut, nen_nut = page.evaluate(mau, "#btnDcKqMo")
+    assert tuong_phan(chu_nut, nen_nut) >= 4.5, (chu_nut, nen_nut)
+    # không còn khối / ô / nút nào ở tab Kết quả có nền tối (chấm màu, thanh số liệu thì được) (độ sáng trung bình < 90)
+    toi = page.evaluate("""() => [...document.querySelectorAll('#view-results :is(section, div, table, thead, tbody, tr, td, th, button, p, ul, li, h2)')].filter(e => {
+        const c = getComputedStyle(e).backgroundColor.match(/\\d+(\\.\\d+)?/g);
+        return c && c.length >= 3 && (c.length < 4 || +c[3] > 0.5) && (+c[0] + +c[1] + +c[2]) / 3 < 90;
+      }).map(e => e.tagName + '#' + e.id + '.' + e.className)""")
+    assert not toi, toi
+    assert not loi, loi
+
+
 # ------------------------------------------------------------------ tắt tính năng, kiosk
 
 def test_tat_tinh_nang_hai_phan_khong_hien(mo):

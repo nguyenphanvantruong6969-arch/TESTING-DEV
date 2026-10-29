@@ -37,7 +37,7 @@ các ô bị bỏ qua kèm một cảnh báo, và kết quả xếp trùng khít
 
 | Tệp | Cỡ | Dùng để |
 |---|---|---|
-| `SO_NHAP_DQT_120HS_HOP_LE.xlsx` | 120 em · 9 CLB · 3 buổi | Bật tính năng → nạp → chạy xếp → xem tab Điểm chuẩn. Nguyện vọng và điểm thi **giữ nguyên** `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm — để so bật / tắt |
+| `SO_NHAP_DQT_120HS_HOP_LE.xlsx` | 120 em · 9 CLB · 3 buổi | Không gian Trường học mặc định đã bật Điểm quyết tâm sẵn (không gian khác thì bật trước) → nạp → chạy xếp → xem tab Điểm chuẩn. Nguyện vọng và điểm thi **giữ nguyên** `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm — để so bật / tắt |
 | `SO_NHAP_DQT_120HS_CO_LOI.xlsx` | như trên | Cố ý sai: 5 loại × 3 em. Chạy xếp phải bị **chặn** ở bước Kiểm tra dữ liệu, đúng những em trong `DQT_BANG_LOI.json` |
 | `SO_NHAP_DQT_120HS_TRONG.xlsx` | như trên | Có cột nhưng để trống hết: thử tự điền (quỹ một CLB → 100) và học sinh tự chia ở kiosk |
 | `SO_NHAP_DQT_800HS_HOP_LE.xlsx` | 800 em · 20 CLB · 4 buổi | Cỡ trường thật, xếp ra kết quả ngay |

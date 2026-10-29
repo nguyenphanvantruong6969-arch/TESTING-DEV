@@ -2901,7 +2901,9 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .dc-mau.is-cham-khong { border-radius: 50%; border: 2px solid var(--chart-khong-nhan); background: var(--paper-raised); }
 .dc-mau.is-vach { width: 3px; height: 16px; border-radius: 0; background: var(--ink); }
 .dc-tq { width: 100%; }
-.dc-tq .dc-ten { font-weight: 600; }
+.dc-tq .dc-ten { font-weight: 600; font-family: var(--font-body); font-size: 13px; color: var(--ink); }
+.dc-tq .dc-buoi { font-family: var(--font-body); font-size: 12px; color: var(--slate); margin-right: 6px; }
+.dc-tq td:first-child { font-family: var(--font-body); }
 .dc-thanh { width: 100px; height: 14px; vertical-align: middle; }
 .dc-thanh .dc-thanh-nen { fill: var(--paper-hover); }
 .dc-thanh .dc-thanh-do { fill: var(--chart-general); }
@@ -2916,10 +2918,10 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .dc-tq td.dc-don { text-align: left; min-width: 190px; }
 .dc-don-dong { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; white-space: nowrap; }
 .dc-don-so { font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: 13px; }
-.dc-chip { display: inline-block; min-width: 4.8em; padding: 1px 8px; border-radius: 10px; font-size: 11.5px; font-weight: 600; text-align: center; color: #fff; }
-.dc-chip[data-muc="thap"] { background: var(--chart-general); }
-.dc-chip[data-muc="vua"] { background: var(--gold-text); }
-.dc-chip[data-muc="cao"] { background: var(--rust-text); }
+.dc-chip { display: inline-block; min-width: 4.8em; padding: 1px 8px; border-radius: 10px; font-size: 11.5px; font-weight: 600; text-align: center; }
+.dc-chip[data-muc="thap"] { background: var(--moss-soft); color: var(--chart-general); }
+.dc-chip[data-muc="vua"] { background: var(--gold-soft); color: var(--gold-text); }
+.dc-chip[data-muc="cao"] { background: var(--rust-soft); color: var(--rust-text); }
 .dc-ti-le { display: block; width: 140px; height: 8px; overflow: visible; }
 .dc-ti-le .dc-ti-le-trong { fill: var(--ink-soft); }
 .dc-ti-le .dc-ti-le-con { fill: none; stroke: var(--slate); stroke-width: 1; }
@@ -2931,34 +2933,10 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 @media (prefers-reduced-motion: no-preference) {
   .dc-svg .dc-cham { animation: dc-hien 0.35s var(--ease-out) both; }
 }
-/* Chế độ tối: chỉ khối Điểm chuẩn tự đổi sang nền tối (ứng dụng chưa có giao diện tối chung).
-   Bảng màu tối nằm ở các biến `--dcd-*`, rồi gán lại các biến chung NGAY trên khối nên mọi hình con
-   (bảng, thanh, chấm, chữ) theo cùng. Gán qua `var()` để test độ tương phản của `:root` (đọc mã
-   màu thẳng trong tệp) không nhầm màu tối với màu sáng. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) #adminDiemChuanBlock, :root:not([data-theme="light"]) #dcKqPanel {
-    --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-    --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-    --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-    --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-    --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-    --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-    --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-    --rust-text: var(--dcd-do-chu);
-    background: var(--dcd-nen); color: var(--ink);
-  }
-}
-:root[data-theme="dark"] #adminDiemChuanBlock, :root[data-theme="dark"] #dcKqPanel {
-  --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-  --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-  --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-  --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-  --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-  --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-  --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-  --rust-text: var(--dcd-do-chu);
-  background: var(--dcd-nen); color: var(--ink);
-}
+/* Khối Điểm chuẩn dùng đúng tông kem của ứng dụng ở cả Quản lý và Kết quả. Ứng dụng chưa có giao
+   diện tối, nên KHÔNG đổi màu theo `prefers-color-scheme` hay `data-theme` (A13.13): trước đây khối
+   này tự chuyển nền gần đen khi hệ điều hành ở chế độ tối, lệch với phần còn lại và làm nút "Ẩn
+   điểm chuẩn" khó đọc. */
 .dc-chon .text-input { background: var(--paper-raised); color: var(--ink); border-color: var(--hairline); }
 .dc-an-chu { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .dc-bang-hai-tang { margin-top: 14px; max-width: 640px; }
