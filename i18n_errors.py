@@ -965,6 +965,19 @@ MESSAGES = {
         "vi": "Không thực hiện được thao tác với không gian làm việc. Hãy thử lại.",
         "en": "Couldn't complete the workspace operation. Try again.",
     },
+    # A13.14: nút Cài đặt (đổi luật xếp của không gian làm việc đang mở).
+    "cai_dat_can_xac_nhan": {
+        "vi": "Đã có {n_lan_chay} lần chạy xếp. Đổi luật xong, lần chạy sau sẽ cho kết quả khác. Cần xác nhận để lưu.",
+        "en": "The placement has already been run {n_lan_chay} time(s). After changing the rules, the next run will give different results. Confirmation is needed to save.",
+    },
+    "cai_dat_nguyen_vong_vuot_tran": {
+        "vi": "Chưa đổi được: {n_em} người đang có nhiều hơn {tran} lựa chọn xếp hạng trong một đợt (cao nhất {cao_nhat}). Hãy chọn số tối đa từ {cao_nhat} trở lên, hoặc bớt lựa chọn của họ trước.",
+        "en": "Not changed: {n_em} people have more than {tran} ranked choices in one round (highest {cao_nhat}). Choose a maximum of {cao_nhat} or more, or reduce their choices first.",
+    },
+    "cai_dat_thi_vuot_tran": {
+        "vi": "Chưa đổi được: {n_em} người đang đăng ký thi nhiều hơn {tran} mục trong một đợt (cao nhất {cao_nhat}). Hãy chọn số tối đa từ {cao_nhat} trở lên, hoặc bớt mục thi của họ trước.",
+        "en": "Not changed: {n_em} people are registered for more than {tran} tests in one round (highest {cao_nhat}). Choose a maximum of {cao_nhat} or more, or reduce their tests first.",
+    },
 }
 
 

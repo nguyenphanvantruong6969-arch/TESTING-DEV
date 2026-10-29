@@ -1085,3 +1085,13 @@ CLB **không thi** của em: điểm quỹ 1 đã đặt cho X **không được
 
 *Tài liệu này hướng dẫn vận hành phần mềm. Mọi nhận xét, diễn giải và kết luận về
 kết quả phân bổ do người sử dụng tự viết.*
+
+## 15. Cài đặt (bánh răng ở thanh trái)
+
+Bấm biểu tượng **bánh răng** cạnh nút EN ở thanh trái (từ thẻ nào cũng được). Phím **Esc** hoặc nút **Đóng** để thoát. Hộp có bốn nhóm:
+
+1. **Điểm quyết tâm:** bật / tắt cho không gian làm việc đang mở. Ô tự khoá khi cách xếp ưu tiên là "chỉ theo nhóm" hoặc điểm không tính riêng cho từng chỗ (khi đó tính năng không dùng được).
+2. **Luật xếp:** cách xếp ưu tiên, cách dùng nhóm ưu tiên (suất dự trữ mềm hay thứ hạng nhóm nghiêm ngặt), số lựa chọn tối đa, số mục dự thi tối đa, phạm vi của điểm, thứ tự các nhóm. Luật sai thì báo lỗi và không lưu. Số tối đa thấp hơn dữ liệu đang có (có người đã chọn nhiều hơn) bị từ chối, phần mềm không tự cắt bớt lựa chọn của ai.
+   - **Đã chạy xếp rồi vẫn đổi được**, nhưng phần mềm hỏi lại: lần chạy sau sẽ cho kết quả khác. Đồng ý thì phần mềm **sao lưu** `app.db.bak-…` rồi mới lưu. Lịch sử các lần chạy giữ nguyên; khoá thứ tự bốc thăm và khoá điểm quyết tâm **không** tự mở.
+3. **Giao diện:** ngôn ngữ (Tiếng Việt / English; nút EN ở thanh trái vẫn dùng được), hiệu ứng chuyển động bật / tắt, cỡ chữ ba mức (Vừa, Lớn, Rất lớn). Ba lựa chọn này nhớ theo máy.
+4. **Dữ liệu và sao lưu:** xem và mở thư mục lưu tệp xuất, mở thư mục sao lưu, xuất / nhập không gian làm việc `.zip` (chỉ khi mở bằng không gian làm việc), và **đặt lại dữ liệu** (có hộp xác nhận; tự sao lưu trước, lịch sử chạy xếp được giữ).

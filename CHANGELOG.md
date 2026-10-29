@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-10-29 — A13.14 Nút Cài đặt (bánh răng ở thanh trái)
+
+Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Mặc định không đổi gì: tắt Điểm quyết tâm vẫn trùng khít `e08af78` (không đụng lõi thuật toán, schema, cột CSV).
+
+- **Backend (`api_workspace.py`):** `get_cai_dat` (luật hiện có, số lần chạy, khoá STB / khoá điểm quyết tâm, thư mục xuất, thư mục sao lưu; chạy được cả khi không có workspace) và `save_cai_dat(rules, xac_nhan)`. Chỉ nhận đúng các khoá luật `cau_hinh_ws.py` đã có (`priority`, `tier_mode`, `max_choices`, `max_tests`, `score_scope`, `wharton`, `tiers`); kiểm bằng `cau_hinh_ws.chuan_hoa`, lỗi thành `{ok, data, errors}` (`ws_du_lieu_sai` kèm `detail`; cấu hình đang lưu hỏng thì `ws_cau_hinh_hong`, không ghi đè). Đã có lần chạy xếp mà luật đổi thật: không `xac_nhan is True` thì trả `cai_dat_can_xac_nhan` (chưa ghi gì); có thì `_backup_db()` rồi mới ghi. `run_history`, khoá STB, khoá điểm không bị đụng. Lưu đúng giá trị đang có thì không ghi, không sao lưu. Trần thấp hơn dữ liệu đang có (người có nhiều nguyện vọng / mục thi hơn trần mới) bị từ chối bằng `cai_dat_nguyen_vong_vuot_tran` / `cai_dat_thi_vuot_tran`, không cắt bớt lựa chọn của ai. Ba mã lỗi mới ở `i18n_errors.py` (VI + EN), `i18n_loi.js` sinh lại.
+- **Giao diện:** bánh răng `#btnCaiDat` (có `aria-label`) cạnh nút EN, mở từ mọi thẻ; Esc / nút Đóng / bấm nền mờ để đóng, Tab không rời hộp, trả tiêu điểm về bánh răng. Khung dùng lại `.ws-overlay` / `.ws-hop` (tông kem). Bốn nhóm: Điểm quyết tâm; luật xếp (ô Điểm quyết tâm tự khoá khi tổ hợp không dùng được, như trình hướng dẫn); giao diện (ngôn ngữ VI/EN, hiệu ứng, cỡ chữ Vừa / Lớn / Rất lớn bằng lớp `co-chu-*` trên `<html>`, `zoom` 1 / 1,12 / 1,25, nhớ trong localStorage có try/catch); dữ liệu (thư mục xuất, mở thư mục xuất / sao lưu, xuất / nhập `.zip` dùng lại `wsXuat` / `wsNhapZip`, đặt lại dữ liệu dùng lại `reset_data` có hộp xác nhận, xong thì tải lại trang). Tệp mới `js/076_cai_dat.js`.
+- **Nút "Hiệu ứng" chuyển từ thanh trái vào hộp** (cùng `id="btnMotionToggle"`, cùng mã `07_ngon_ngu.js`); nút EN vẫn ở thanh trái. `tests/test_giao_dien_hieu_ung.py` sửa: mở hộp (bánh răng) rồi đóng bằng Esc trước khi rê chuột, vì hộp che nút; kỳ vọng hành vi không đổi.
+- **Không làm:** "số quỹ và tổng điểm quyết tâm" (không phải khoá nào của `cau_hinh_ws.py`: 100 điểm / 2 quỹ là hằng của thuật toán, đưa vào là đổi lõi). "Thư mục xuất" chỉ xem và mở, chưa đổi được (chưa có API lưu bền; cần thì mở mục riêng).
+- **Hộp xác nhận đổi luật sau khi chạy xếp:** "lần chạy sau sẽ cho kết quả khác", sao lưu trước khi ghi. Không tìm thấy luật nào mâu thuẫn với khoá STB / khoá điểm: hai khoá độc lập với luật; tắt Điểm quyết tâm thì khoá và dữ liệu điểm còn nguyên (bật lại thì dùng lại).
+- **Ảnh:** `docs/ke_hoach/anh/a13_14_cai_dat_vi.png`, `a13_14_cai_dat_en.png` (đang hiện hộp xác nhận sau khi đã chạy xếp; hệ điều hành chế độ tối).
+- **Test mới:** `tests/test_cai_dat_backend.py` (21 ca), `tests/test_giao_dien_a13_14_cai_dat.py` (14 ca Chromium: mở / đóng từ mọi thẻ, Esc, tiêu điểm, đổi luật có / không xác nhận, sao lưu, lỗi, Điểm quyết tâm, EN, cỡ chữ, xuất zip, đặt lại, tương phản). Tài liệu: `HUONG_DAN_SU_DUNG.md` mục 15; `CLAUDE.md` 167 tệp / 3.105 ca.
+
 ## 2026-10-29 — A13.13 Điểm chuẩn tông kem + workspace Trường học mặc định bật Điểm quyết tâm
 
 Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`; lõi thuật toán không đổi; `MAC_DINH_TRUONG_HOC` vẫn `wharton: False` (nền của workspace ngành khác).

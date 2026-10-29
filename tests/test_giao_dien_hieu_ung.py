@@ -5,7 +5,7 @@ Ba điều phải đúng:
 
   1. Mặc định hiệu ứng BẬT: rê chuột lên một `.panel` thì khung nhấc lên
      (có `transform`) và có bóng.
-  2. Bấm nút "Hiệu ứng" thì tắt: rê chuột lên khung không còn nhấc, không
+  2. Bấm nút "Hiệu ứng" (từ A13.14 nằm trong hộp Cài đặt, mở bằng bánh răng ở thanh trái) thì tắt: rê chuột lên khung không còn nhấc, không
      còn chuyển tiếp nào chạy — lựa chọn còn nguyên sau khi tải lại trang.
   3. Nhãn nút là chữ ĐỘNG (bật/tắt), nên đổi ngôn ngữ phải dịch lại nó.
 
@@ -37,10 +37,20 @@ def trang(api):
     loi = []
     page.on("pageerror", lambda e: loi.append(str(e)))
     page.goto(url)
-    page.wait_for_selector("#btnMotionToggle")
+    page.wait_for_selector("#btnCaiDat")
     yield page, loi
     br.close()
     pw.stop()
+
+
+def _mo_cai_dat(page):
+    page.click("#btnCaiDat")
+    page.wait_for_selector("#btnMotionToggle", state="visible")
+
+
+def _dong_cai_dat(page):
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#caiDatOverlay", state="hidden")
 
 
 def _khung_khi_re_chuot(page):
@@ -55,9 +65,11 @@ def _khung_khi_re_chuot(page):
 
 def test_mac_dinh_bat_hieu_ung(trang):
     page, loi = trang
+    _mo_cai_dat(page)
     nut = page.locator("#btnMotionToggle")
     assert nut.get_attribute("aria-pressed") == "true"
     assert nut.inner_text() == "Hiệu ứng: bật"
+    _dong_cai_dat(page)
     s = _khung_khi_re_chuot(page)
     assert s["transform"] != "none"
     assert s["shadow"] != "none"
@@ -66,18 +78,21 @@ def test_mac_dinh_bat_hieu_ung(trang):
 
 def test_tat_hieu_ung_va_nho_sau_khi_tai_lai(trang):
     page, loi = trang
+    _mo_cai_dat(page)
     page.click("#btnMotionToggle")
     nut = page.locator("#btnMotionToggle")
     assert nut.get_attribute("aria-pressed") == "false"
     assert nut.inner_text() == "Hiệu ứng: tắt"
+    _dong_cai_dat(page)
     s = _khung_khi_re_chuot(page)
     assert s["transform"] == "none"
     assert s["shadow"] == "none"
     assert s["transition"] == "0s"
 
     page.reload()
-    page.wait_for_selector("#btnMotionToggle")
+    page.wait_for_selector("#btnCaiDat")
     assert page.locator("html.tat-hieu-ung").count() == 1
+    _mo_cai_dat(page)
     assert page.locator("#btnMotionToggle").get_attribute("aria-pressed") == "false"
 
     page.click("#btnMotionToggle")
@@ -87,10 +102,11 @@ def test_tat_hieu_ung_va_nho_sau_khi_tai_lai(trang):
 
 def test_nhan_nut_doi_theo_ngon_ngu(trang):
     page, loi = trang
-    page.click("#btnLangToggle")
+    page.click("#btnLangToggle")            # nút EN vẫn ở thanh trái
+    _mo_cai_dat(page)
     assert page.locator("#btnMotionToggle").inner_text() == "Animations: on"
     page.click("#btnMotionToggle")
     assert page.locator("#btnMotionToggle").inner_text() == "Animations: off"
-    page.click("#btnLangToggle")
+    page.click("#cdNgonVi")                 # đổi lại tiếng Việt ngay trong hộp Cài đặt
     assert page.locator("#btnMotionToggle").inner_text() == "Hiệu ứng: tắt"
     assert loi == []

@@ -23,6 +23,7 @@ function init() {
   initAdminHandlers();
   initScoringHandlers();
   initWorkspace();   // nút đổi workspace ở thanh bên + màn chọn (js/075_workspace.js)
+  initCaiDat();      // bánh răng Cài đặt ở thanh trái (js/076_cai_dat.js)
   loadPipelineTab(); // tab mặc định đang mở khi khởi động
 }
 

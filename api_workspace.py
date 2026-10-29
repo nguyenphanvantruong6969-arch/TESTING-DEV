@@ -22,6 +22,7 @@ import tempfile
 
 import cau_hinh_ws
 import workspace
+from api_chung import thu_muc_tai_ve
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
@@ -348,3 +349,101 @@ class WorkspaceMixin:
             da_luu = cau_hinh_ws.doc_cau_hinh(db, nghiem=True)
             moi = cau_hinh_ws.ghi_cau_hinh(db, cau_hinh_ws.tron_len(da_luu, cfg))
         return _ok({"slug": slug, "config": moi})
+
+    # ---------------------------------------------------------------- cài đặt (A13.14)
+
+    # Các khoá luật mà hộp Cài đặt được đổi: đúng các khoá `cau_hinh_ws.py` đã có.
+    _KHOA_LUAT_CAI_DAT = ("priority", "tier_mode", "max_choices", "max_tests", "score_scope",
+                          "wharton", "tiers")
+
+    def _cai_dat_so_lieu(self):
+        """(số lần chạy, STB đang khoá, điểm quyết tâm đang khoá) — đọc một lượt."""
+        with self._ket_noi_doc() as cur:
+            n_chay = cur.execute("SELECT COUNT(*) FROM run_history").fetchone()[0]
+            r = cur.execute("SELECT is_locked FROM stb_lock WHERE id = 1").fetchone()
+            khoa_stb = bool(r and r[0])
+            try:
+                r = cur.execute("SELECT is_locked FROM wharton_lock WHERE id = 1").fetchone()
+                khoa_wh = bool(r and r[0])
+            except sqlite3.OperationalError:
+                khoa_wh = False
+        return n_chay, khoa_stb, khoa_wh
+
+    def get_cai_dat(self):
+        """Luật xếp của không gian làm việc đang mở + trạng thái cho hộp Cài đặt.
+
+        Dùng được cả khi chạy với đường dẫn CSDL riêng (`che_do_ws` False: không xuất / nhập zip)."""
+        try:
+            cfg = self._cfg_ws(nghiem=True)
+            n_chay, khoa_stb, khoa_wh = self._cai_dat_so_lieu()
+            ws_thu_muc_xuat = self.thu_muc_xuat or thu_muc_tai_ve()
+            return _ok({
+                "rules": {k: cfg["rules"][k] for k in self._KHOA_LUAT_CAI_DAT},
+                "name": cfg["name"],
+                "che_do_ws": bool(self._goc_ws),
+                "slug": (self._ws_slug_dang_mo() or "") if self._goc_ws else "",
+                "so_lan_chay": n_chay,
+                "khoa_stb": khoa_stb,
+                "khoa_diem_quyet_tam": khoa_wh,
+                "thu_muc_xuat": ws_thu_muc_xuat,
+                "thu_muc_sao_luu": os.path.dirname(os.path.abspath(self.db_path)),
+                "toi_da": {"max_choices": cau_hinh_ws._MAX_CHOICES_TOI_DA,
+                           "max_tests": cau_hinh_ws._MAX_TESTS_TOI_DA},
+            })
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(self._loi_co_ghi_vet(err("ws_loi_khong_ro", detail=str(e))))
+
+    def _cai_dat_tran_so_voi_du_lieu(self, rules):
+        """Trần mới thấp hơn dữ liệu đang có thì từ chối (không tự cắt bớt nguyện vọng của ai)."""
+        with self._ket_noi_doc() as cur:
+            for khoa, bang, ma in (("max_choices", "preferences", "cai_dat_nguyen_vong_vuot_tran"),
+                                   ("max_tests", "club_test_selection", "cai_dat_thi_vuot_tran")):
+                tran = rules[khoa]
+                if tran is None:
+                    continue
+                dong = cur.execute(
+                    "SELECT COUNT(*) AS c FROM %s p JOIN clubs cl ON cl.club_id = p.club_id "
+                    "GROUP BY p.student_id, COALESCE(cl.buoi, '')" % bang).fetchall()
+                so = [r[0] for r in dong]
+                n_em = len([c for c in so if c > tran])
+                if n_em:
+                    return err(ma, n_em=n_em, tran=tran, cao_nhat=max(so))
+        return None
+
+    def save_cai_dat(self, rules, xac_nhan=False):
+        """Đổi luật xếp của không gian làm việc đang mở (hộp Cài đặt, A13.14).
+
+        `rules`: từ điển một phần các khoá luật (xem `_KHOA_LUAT_CAI_DAT`); khoá không nhắc tới giữ nguyên.
+        Kiểm bằng chính `cau_hinh_ws.chuan_hoa`. Đã có lần chạy xếp mà luật đổi thật thì cần
+        `xac_nhan=True` (nếu không: `cai_dat_can_xac_nhan`, chưa ghi gì) và được SAO LƯU trước khi ghi
+        (chưa chạy xếp lần nào thì chưa có kết quả nào để giữ, không sao lưu cho khỏi đẩy bản cũ ra).
+        `run_history`, khoá STB và khoá điểm quyết tâm giữ nguyên, kể cả khi tắt Điểm quyết tâm."""
+        try:
+            if not isinstance(rules, dict) or not set(rules) <= set(self._KHOA_LUAT_CAI_DAT):
+                raise ValueError("Luật không đổi được ở Cài đặt: %s." % ", ".join(
+                    sorted(map(str, set(rules) - set(self._KHOA_LUAT_CAI_DAT)))
+                    if isinstance(rules, dict) else ["(không phải từ điển)"]))
+            with self._khoa_ghi:
+                da_luu = self._cfg_ws(nghiem=True)
+                cfg = cau_hinh_ws.tron_len(da_luu, {"rules": rules})
+                moi = cau_hinh_ws.chuan_hoa(cfg)
+                if moi["rules"] == da_luu["rules"]:
+                    n_chay, _, _ = self._cai_dat_so_lieu()
+                    return _ok({"da_doi": False, "config": da_luu, "sao_luu": "", "so_lan_chay": n_chay})
+                loi = self._cai_dat_tran_so_voi_du_lieu(moi["rules"])
+                if loi:
+                    return _fail(loi)
+                n_chay, _, _ = self._cai_dat_so_lieu()
+                if n_chay and xac_nhan is not True:
+                    return _fail(err("cai_dat_can_xac_nhan", n_lan_chay=n_chay))
+                sao_luu = os.path.basename(self._backup_db()) if n_chay else ""
+                moi = cau_hinh_ws.ghi_cau_hinh(self.db_path, cfg)
+            return _ok({"da_doi": True, "config": moi, "sao_luu": sao_luu, "so_lan_chay": n_chay})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except ValueError as e:
+            return _fail(err("ws_du_lieu_sai", detail=str(e)))
+        except Exception as e:
+            return _fail(self._loi_co_ghi_vet(err("ws_loi_khong_ro", detail=str(e))))

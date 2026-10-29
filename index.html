@@ -22,6 +22,10 @@
         <div class="brand-sub" data-i18n="brand_sub">Reserve-Based DA</div>
       </div>
       <button type="button" class="lang-toggle" id="btnLangToggle" data-i18n="lang_toggle_label">EN</button>
+      <button type="button" class="cai-dat-nut" id="btnCaiDat" aria-haspopup="dialog" aria-controls="caiDatOverlay"
+              data-i18n-aria-label="aria_cai_dat" aria-label="Mở cài đặt">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M10.3 3h3.4l.5 2.4 1.9.8 2.1-1.3 2.4 2.4-1.3 2.1.8 1.9 2.4.5v3.4l-2.4.5-.8 1.9 1.3 2.1-2.4 2.4-2.1-1.3-1.9.8-.5 2.4h-3.4l-.5-2.4-1.9-.8-2.1 1.3-2.4-2.4 1.3-2.1-.8-1.9L3 13.7v-3.4l2.4-.5.8-1.9-1.3-2.1 2.4-2.4 2.1 1.3 1.9-.8z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+      </button>
     </div>
 
     <button type="button" class="ws-switcher" id="btnWorkspace" hidden aria-haspopup="dialog"
@@ -49,7 +53,6 @@
     </div>
 
     <div class="sidebar-footer">
-      <button type="button" class="motion-toggle" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hiệu ứng: bật</button>
       <div id="dbStatusLine" class="db-status" data-i18n="db_status_loading">Đang tải…</div>
       <div id="lastRunLine" class="db-status db-status-sub"></div>
       <div id="cheDoHienThi" class="db-status db-status-sub"></div>
@@ -975,6 +978,82 @@
   <div class="ws-hop" id="wsHop"></div>
 </div>
 
+<!-- ===================== CÀI ĐẶT (js/076_cai_dat.js) ===================== -->
+<div class="ws-overlay cd-overlay" id="caiDatOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="caiDatTieuDe">
+  <div class="ws-hop cd-hop" id="caiDatHop">
+    <div class="cd-dau">
+      <h2 id="caiDatTieuDe" class="ws-tieu-de" tabindex="-1" data-i18n="cd_title">Cài đặt</h2>
+      <button type="button" class="btn btn-secondary" id="caiDatDong" data-i18n="cd_dong">Đóng</button>
+    </div>
+
+    <form id="cdForm" class="cd-nhom" novalidate></form>
+
+    <section class="cd-nhom" aria-labelledby="cdTenGiaoDien">
+      <h3 id="cdTenGiaoDien" class="cd-ten-nhom" data-i18n="cd_nhom_giao_dien">Giao diện</h3>
+      <div class="cd-hang">
+        <span class="cd-nhan" id="cdNhanNgonNgu" data-i18n="cd_ngon_ngu">Ngôn ngữ</span>
+        <div class="cd-nhom-nut" role="group" aria-labelledby="cdNhanNgonNgu">
+          <button type="button" class="btn btn-secondary" id="cdNgonVi" data-cd-ngon="vi" aria-pressed="false" lang="vi" data-i18n="cd_vi">Tiếng Việt</button>
+          <button type="button" class="btn btn-secondary" id="cdNgonEn" data-cd-ngon="en" aria-pressed="false" lang="en" data-i18n="cd_en">English</button>
+        </div>
+      </div>
+      <div class="cd-hang">
+        <span class="cd-nhan" data-i18n="cd_hieu_ung">Hiệu ứng chuyển động</span>
+        <button type="button" class="btn btn-secondary" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hiệu ứng: bật</button>
+      </div>
+      <div class="cd-hang">
+        <span class="cd-nhan" id="cdNhanCoChu" data-i18n="cd_co_chu">Cỡ chữ</span>
+        <div class="cd-nhom-nut" role="group" aria-labelledby="cdNhanCoChu">
+          <button type="button" class="btn btn-secondary" data-cd-co="vua" aria-pressed="true" data-i18n="cd_co_vua">Vừa</button>
+          <button type="button" class="btn btn-secondary" data-cd-co="lon" aria-pressed="false" data-i18n="cd_co_lon">Lớn</button>
+          <button type="button" class="btn btn-secondary" data-cd-co="rat_lon" aria-pressed="false" data-i18n="cd_co_rat_lon">Rất lớn</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="cd-nhom" aria-labelledby="cdTenDuLieu">
+      <h3 id="cdTenDuLieu" class="cd-ten-nhom" data-i18n="cd_nhom_du_lieu">Dữ liệu và sao lưu</h3>
+      <div class="cd-hang">
+        <div class="cd-cot">
+          <span class="cd-nhan" data-i18n="cd_thu_muc_xuat">Thư mục lưu tệp xuất</span>
+          <code class="cd-duong" id="cdThuMucXuat"></code>
+        </div>
+        <button type="button" class="btn btn-secondary" id="cdMoXuat" data-i18n="cd_mo_thu_muc">Mở thư mục</button>
+      </div>
+      <div class="cd-hang">
+        <div class="cd-cot">
+          <span class="cd-nhan" data-i18n="cd_thu_muc_sao_luu">Thư mục sao lưu (cạnh tệp dữ liệu)</span>
+          <code class="cd-duong" id="cdThuMucSaoLuu"></code>
+        </div>
+        <button type="button" class="btn btn-secondary" id="cdMoSaoLuu" data-i18n="cd_mo_thu_muc">Mở thư mục</button>
+      </div>
+      <p class="hint-text" data-i18n="cd_sao_luu_ghi_chu">Mỗi lần xoá dữ liệu hay đổi luật sau khi đã chạy xếp, phần mềm tự sao lưu; chỉ giữ 10 bản gần nhất.</p>
+      <div class="cd-hang">
+        <div class="cd-nhom-nut">
+          <button type="button" class="btn btn-secondary" id="cdXuatZip" data-i18n="cd_xuat_zip">Xuất không gian làm việc (.zip)</button>
+          <button type="button" class="btn btn-secondary" id="cdNhapZip" data-i18n="cd_nhap_zip">Nhập không gian làm việc (.zip)</button>
+          <input type="file" id="cdTepZip" accept=".zip" hidden>
+        </div>
+      </div>
+      <p class="hint-text" id="cdChiWs" data-i18n="cd_chi_ws" hidden>Hai nút này chỉ dùng được khi mở bằng không gian làm việc.</p>
+
+      <h4 class="cd-ten-con" data-i18n="cd_dat_lai_tieu_de">Đặt lại dữ liệu</h4>
+      <p class="hint-text" data-i18n="cd_dat_lai_mo_ta">Xoá dữ liệu để làm lại từ đầu. Phần mềm sao lưu trước khi xoá; lịch sử các lần chạy xếp được giữ lại.</p>
+      <div class="cd-nhom-nut">
+        <button type="button" class="btn btn-danger" id="cdResetHs" data-cd-reset="hoc_sinh" data-i18n="btn_reset_students">Xoá toàn bộ học sinh (giữ CLB)</button>
+        <button type="button" class="btn btn-danger" id="cdResetTatCa" data-cd-reset="tat_ca" data-i18n="btn_reset_all">Xoá toàn bộ dữ liệu (cả CLB)</button>
+      </div>
+      <div class="cd-xac-nhan" id="cdResetXn" role="alertdialog" aria-labelledby="cdResetXnChu" hidden>
+        <p id="cdResetXnChu" class="cd-xac-nhan-chu" data-i18n="cd_dat_lai_xn">Xoá thật? Không thể hoàn tác, trừ khi chép lại từ bản sao lưu.</p>
+        <div class="cd-nhom-nut">
+          <button type="button" class="btn btn-danger" id="cdResetDongY" data-i18n="cd_dat_lai_dong_y">Đồng ý xoá</button>
+          <button type="button" class="btn btn-secondary" id="cdResetHuy" data-i18n="cd_dat_lai_huy">Không xoá</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
 <script src="i18n_loi.js"></script>
 <script src="i18n.js"></script>
 <script src="chung.js"></script>
@@ -987,6 +1066,7 @@
 <script src="js/06_cham_diem.js"></script>
 <script src="js/07_ngon_ngu.js"></script>
 <script src="js/075_workspace.js"></script>
+<script src="js/076_cai_dat.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>
