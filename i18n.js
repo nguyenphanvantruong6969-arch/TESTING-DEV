@@ -1380,7 +1380,7 @@
       cd_dang_khoa: "Results already exist. The draw order is locked{dqt}; changing the rules does not unlock them.",
       cd_dang_khoa_dqt: " and the commitment points are locked",
       cd_xn_tieu_de: "Change the rules after a placement run?",
-      cd_xn_noi_dung: "The placement has already been run {n} time(s). After you change the rules, the next run will give different results. The app backs up the data before saving; the run history is kept as it is.",
+      cd_xn_noi_dung: "The placement has already been run {n} time(s). Once the rules are changed, the next run will give different results. The app backs up the data before saving; the run history is kept as it is.",
       cd_xn_dong_y: "Yes, save the rules",
       cd_nhom_giao_dien: "Appearance",
       cd_ngon_ngu: "Language",
