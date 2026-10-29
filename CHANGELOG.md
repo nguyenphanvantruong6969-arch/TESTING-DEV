@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 2026-10-29 — A13.13 Điểm chuẩn tông kem + workspace Trường học mặc định bật Điểm quyết tâm
+
+Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`; lõi thuật toán không đổi; `MAC_DINH_TRUONG_HOC` vẫn `wharton: False` (nền của workspace ngành khác).
+
+**Việc 1 — Điểm chuẩn tông kem (`style.css`, `js/05_quan_ly.js`)**
+- Khối tối ở tab Kết quả đến từ `prefers-color-scheme: dark` / `data-theme=dark` (bảng `--dcd-*`) của A13.10. Ứng dụng chưa có giao diện tối nên bỏ hẳn hai khối đó: Kết quả và Quản lý → Điểm chuẩn dùng đúng biến `:root` (`--paper`, `--ink`, `--slate`, `--hairline`, `--chart-general`). Nút "Ẩn / Xem điểm chuẩn" là `btn-secondary` bình thường.
+- Tên CLB đổi sang `--font-body`; `[thu_2]` thành nhãn phụ `--slate` (`span.dc-buoi`). Nhãn mức: Rất đông `--rust-soft`/`--rust-text`, Đông `--gold-soft`/`--gold-text`, Đủ chỗ `--moss-soft`/`--chart-general` (đều ≥ 4,5:1). Thanh "Đơn và chỗ" (xám đậm + đỏ) đọc được trên nền sáng (10,3:1 và 5,1:1).
+- Ảnh sau (OS ở chế độ tối, nơi lỗi xảy ra): `docs/ke_hoach/anh/a13_13_sau_ket_qua_vi.png`, `a13_13_sau_ket_qua_en.png`, `a13_13_sau_quan_ly_en.png` (sổ `SO_NHAP_DQT_120HS_HOP_LE.xlsx`, Chromium qua `browser_host`).
+- Test: `test_giao_dien_a13_10_diem_chuan.py::test_che_do_toi_cua_he_dieu_hanh_khong_doi_nen_khoi_diem_chuan` thay test "chế độ tối đổi màu khối" (kỳ vọng cũ đã đổi theo yêu cầu Truong, "kem như app"); mới `test_giao_dien_diem_chuan.py::test_ket_qua_khoi_diem_chuan_tong_kem_ke_ca_khi_he_dieu_hanh_toi` (VI + EN, tương phản chữ / nút / nhãn ≥ 4,5:1, không còn khối nền tối ở tab Kết quả).
+
+**Việc 2 — Trường học mặc định bật Điểm quyết tâm (`workspace.py`, `main.py`, `api_workspace.py`)**
+- `tao_truong_hoc_mac_dinh`: dựng "Trường học" với `rules.wharton = True` (lúc mở app lần đầu, và khi xoá hết rồi dựng lại).
+- `bat_dqt_mac_dinh_truong_hoc` (gọi ở `main.khoi_dong_workspace`): workspace `truong-hoc` CŨ, cấu hình đúng bằng mặc định cũ, `run_history` rỗng, chưa có dấu `wharton_mac_dinh_truong_hoc` → sao lưu `app.db.bak-<giờ>` rồi bật. Đã chạy xếp / đã đổi luật hay nhãn → giữ nguyên. Mọi lần xét xong đều đặt dấu trong `workspace_settings`, nên người dùng tắt lại sau đó (`update_workspace_config`) không bị bật lại; chạy lặp an toàn. Cấu hình hỏng thì bỏ qua, không ghi đè.
+- Phân biệt "tự tắt" với "mặc định cũ": giao diện hiện chỉ cho chọn Điểm quyết tâm ở trình hướng dẫn tạo workspace mới (không có đường sửa workspace đang có), nên Trường học cũ mang `wharton = False` + cấu hình mặc định + chưa chạy là mặc định cũ; từ nay dấu phân biệt được. Còn lại một khoảng mù nhỏ: ai đã tắt qua API trước bản này mà chưa chạy xếp, và chưa đổi luật nào khác.
+- Test mới `tests/test_ws_dqt_mac_dinh.py` (10 ca): workspace mới bật; mở lại không đổi; ngành khác và mặc định chung vẫn tắt; workspace cũ chưa chạy được bật có sao lưu; hai lần như một; đã chạy giữ nguyên; đã đổi luật giữ nguyên; tắt lại không bị bật lại; cấu hình hỏng; xoá hết dựng lại. Test cũ sửa: `test_ws_registry.py::test_main_khong_co_gi_thi_dung_truong_hoc_mac_dinh` (kỳ vọng `wharton` True cho workspace mặc định). Không test cũ nào phải "tắt tường minh": mọi test khác dùng `PipelineAPI(db)` không workspace nên vẫn mặc định tắt.
+- Lời: `HUONG_DAN_SU_DUNG.md` mục 14, `du_lieu_test/README.md`, chú thích `cau_hinh_ws.py`.
+- Trình hướng dẫn tạo workspace mới (mẫu Trường học dựng sẵn) KHÔNG đổi, vẫn tắt sẵn; cần thì nói để đổi.
+
 ## 2026-10-28 — A13.12 Sửa Tầng 4 của đợt soát A13 và toàn bộ mục chặn / nên sửa của đợt soát hệ thống nhập
 
 Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`. Mỗi mục có test đỏ trước, xanh sau (mục chỉ thêm test: ghi rõ). Bảng xử lý từng mục (commit hoặc "không sửa – lý do"): `docs/ke_hoach/BAO_CAO_SOAT_NHAP.md` (cột cuối mỗi bảng) và mục "Vòng sửa A13.12" cuối `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`.
