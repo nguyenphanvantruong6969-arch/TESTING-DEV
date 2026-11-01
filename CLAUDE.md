@@ -47,6 +47,7 @@
 6. Sau mỗi mục: cập nhật `CHANGELOG.md` (mã mục, tệp, test mới) và đánh dấu tiến độ trong `docs/ke_hoach/TIEN_DO.md`.
 7. Dừng và hỏi khi: một bất biến xung đột với mục; số dòng/hiện trạng trong sổ lệch hẳn so với kho; cần thêm thư viện; cần đổi hợp đồng cột CSV hay schema ngoài phạm vi mục.
 8. Trước khi push: chạy skill `soat-ma` (`.claude/skills/soat-ma/`): một lệnh `kiem_nhanh.py` cho phần máy làm được, rồi soát theo bốn tầng trong `SKILL.md`. Không subagent; chỉ báo cáo trừ khi được giao sửa.
+9. Cuối mỗi phiên có thay đổi: cập nhật `docs/ke_hoach/TRANG_THAI_PHIEN.md` (ghi đè mục "Hiện tại", thêm một dòng vào "Nhật ký phiên") để phiên khác vào việc ngay mà không cần nén ngữ cảnh. Hook Stop trong `.claude/settings.json` nhắc nếu quên.
 
 ## Liêm chính học thuật (đây là đề tài của học sinh)
 - **Mọi số liệu kiểm chứng là dữ liệu MÔ PHỎNG.** Không bao giờ viết như thể là khảo sát thật.
@@ -73,6 +74,7 @@
 Thứ tự làm chung khi chuẩn bị nhiều ngành: `Z6 → Z3 → Z7 → Z4 → Z5 → Z2 → Z1 → B1 → B2 → A1 → A2 → A3 → A4 → A5 → A6 → A7 → A8 → A9 → A10 → A11 → A12 → B3 → C1 → C2 → C3 → E1 → E2 → E3 → G1 → G2 → G3 → G4 → G5`
 
 ## Tài liệu cần đọc (theo thứ tự)
+0. `docs/ke_hoach/TRANG_THAI_PHIEN.md` — **đọc đầu tiên**: việc đang dở, việc tiếp theo, quyết định cần nhớ (bàn giao giữa các phiên).
 1. `docs/ke_hoach/BOI_CANH_DU_AN.md` — toàn bộ bối cảnh: lịch sử phân tích, phát hiện, số đo, lý thuyết, câu hỏi mở.
 2. `docs/ke_hoach/SO_DANG_KY_33_MUC.md` — 33 mục sửa: hiện trạng, thay đổi, rủi ro, kiểm nhận, áp dụng cho ngành nào.
 3. `docs/ke_hoach/ke_hoach_thay_doi.json` — cùng dữ liệu, dạng máy đọc; `nganh[].ke_hoach` là thứ tự làm đã tính phụ thuộc — **làm theo, không tự sắp lại**.
