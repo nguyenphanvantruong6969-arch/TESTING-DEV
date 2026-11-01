@@ -3,56 +3,48 @@
 > Read CLAUDE.md first, then this file. English, cap 150 lines. Rewrite "Current state"; only append to "Session log".
 
 ## Feature / goal
-A13.13: school workspace default `rules.wharton = True` (commitment points on by default).
-Truong approved breaking invariant 1 for this item (recorded in CHANGELOG + TIEN_DO). Invariants 2-8 hold.
-Out of scope: "template header by vocabulary" (Direction A/B).
+A13.13: the school workspace default `rules.wharton = True` (commitment points / "Wharton" ON by default). Truong approved breaking invariant 1 for this item (recorded in CHANGELOG + TIEN_DO under A13.13). Invariants 2-8 hold. Out of scope: "template header by vocabulary" (Direction A/B).
 
-## Plan (Opus plan, ticked)
-- [x] 1. Failing tests first (tests/test_wharton_mac_dinh_bat.py)
-- [x] 2. Minimal fix: cau_hinh_ws (default True; auto-off in `_chuan_hoa` and `tron_len` when combo not allowed and `wharton` not explicit)
-- [x] 3. Fix affected old tests (default -> new default, or explicit `wharton: false` via `tests/_wharton.py::tat_wharton`; no delete/skip)
-- [x] 4. Scripts in du_lieu_test/ + soat-ma `kiem_nhanh.py` pass `wharton: false` explicitly
-- [x] 5. Error text `wharton_ho_so_chua_hop_le` now names both fixes; docs wording
-- [x] 6. ruff clean; soat-ma 7/7; CHANGELOG + TIEN_DO; commits pushed (no PR)
-- [x] 7. Parent's acceptance suite: tests/test_a13_13_kiem_nhan.py (45) + tests/test_giao_dien_a13_13_kiem_nhan.py (2): all pass, no code change needed
+## Plan (all ticked)
+- [x] Failing tests first (tests/test_wharton_mac_dinh_bat.py, 16 cases)
+- [x] cau_hinh_ws: default True; auto-off in `_chuan_hoa` and `tron_len` when priority=tier / score_scope=per_person and `wharton` not explicit (explicit true + bad combo still raises)
+- [x] Fix old tests (group A) and independent acceptance suite from parent (tests/test_a13_13_kiem_nhan.py 45 + tests/test_giao_dien_a13_13_kiem_nhan.py 2: all pass, no code change needed)
+- [x] Scripts in du_lieu_test/ + soat-ma kiem_nhanh.py pass `wharton: false` explicitly
+- [x] Error text `wharton_ho_so_chua_hop_le` names both fixes (VI uses "khong gian lam viec", no English word)
+- [x] Group B (shipped samples / skills), direction (c); demo-branch merge; docs; CHANGELOG/TIEN_DO; ruff; soat-ma
 
-## Current state
-- Work complete and pushed (last commit 94d3e53). Truong APPROVED (01/11/2026) the HS024 data change in vi_du_day_du, the new hash in tests/test_ket_qua_khong_doi.py and the 4 adjusted tests; recorded in CHANGELOG.
-- Parent session is watching CI (runs 41309555295, 41309617327) and will report if red. No PR from this branch's sessions; parent opens it when CI is green.
-- ruff clean, soat-ma 7/7 at last check.
+## Current state (rewritten)
+- (a) LAST CODE COMMIT: 94d3e53 (Truong's approval recorded in CHANGELOG); handoff commits after it. Branch is pushed to origin/claude/wharton-mac-dinh-bat. MERGED INTO IT (merge commits): origin/claude/sleepy-sagan-ly5fx0 (doc-test fixes, CLAUDE_CHI_TIET map) and origin/claude/demo-wharton-va-duong-dan (demo DB with Wharton on). 79c8946's `_nap_nhieu_buoi` change was redone by hand, not cherry-picked.
+- (d) CI: GitHub runs 41309555295 and 41309617327 are running; result UNKNOWN. Parent session (session_01YVAyu1fhG9nmCdTfR1eikv) reads CI and will report. Local status: ruff clean, soat-ma 7/7, targeted runs green after fixes (last: 27 passed on the 2 re-fixed files; before that 1414 passed). The whole suite was never run locally (rule 2; CI does).
+- No PR yet: the PR into the default branch is opened by the PARENT session when CI is green.
 
-## Round 3 (after full CI: 241 red in 40 files) — classification
-- Group A fixed (local `api` fixture -> `tat_wharton`; 27 files incl. 9 giao_dien; no assert loosened, none skipped): all pass.
-- Group B (shipped sample/example/skill outputs under DEFAULT config; NOT masked; waiting for Truong): 50 red.
-  test_vi_du_huong_dan(8), test_vi_du_day_du(6), test_csv_mau(2), test_bo_sach(10), test_skill_sinh_du_lieu(6),
-  test_skill_tao_workspace(3), test_skill_xu_li_raw(1), test_mau_forms_thi_clb(1), test_kich_ban_nhap_tay(8: the doc'd
-  scenario in du_lieu_test/NHAP_TAY.md), test_so_nhap(2: vi_du sổ must load with 0 warnings), test_diem_bat_thuong(1:
-  published sets must be silent), test_rang_buoc_csdl::test_csdl_demo_that_duoc_nang_len (shipped demo DB, health n_high=1).
-- Real bug found in own change: VI text of `wharton_ho_so_chua_hop_le` contained "workspace" -> fixed.
-- Merged claude/sleepy-sagan-ly5fx0 (doc tests); CLAUDE_CHI_TIET `tests/` row updated to 167 files / 3.127 cases.
+## Decisions (Truong, via parent)
+- (b) Default ON for the school workspace; exception to invariant 1 approved. `rbda_priority_pipeline.LUAT_XEP_MAC_DINH["wharton"]` stays False (bare pipeline calls keep old numbers; default ON lives only in cau_hinh_ws). Old stored configs without the `wharton` key read as ON (no migration).
+- Group B = direction (c): example sets in user docs get SIMULATED valid commitment points via fixed-seed script `du_lieu_test/them_diem_quyet_tam_vao_mau.py` (vi_du_huong_dan, mau_csv/vi_du_day_du, vi_du_ca_tuan, 08_nguyen_vong_nhieu_buoi); CSV column contract unchanged (`wp_k` / `<buoi>_wp_k`); `mau_csv/tao_so_nhap.py` reads `wp` cols.
+- `bo_sach` (thesis data): data untouched; every place that runs it sets Wharton OFF explicitly. No published number changed.
+- Skill sinh-du-lieu-clb: default `--diem-quyet-tam hop_le`, flag `--khong-diem-quyet-tam`. Skill tao-workspace-tu-raw (REAL data, never invent points): writes `wharton: false` + one-line notice when the spec doesn't set it. Skill xu-li-raw-forms and mau_forms_thi_clb converter ONLY remind to turn the feature off (a sổ cannot hold config; output file list is test-locked).
+- du_lieu_test/NHAP_TAY.md: new Step 3 "commitment points" (table from `random.Random(112026105)`); expected result table unchanged.
+- vi_du_day_du: HS024's `thu_2` pref `clb_bongro` removed (tao_bo_mau.py) so exactly one em stays trang tay; hash in tests/test_ket_qua_khong_doi.py updated; 3 more tests adjusted (csv_wp_bo_qua warning when feature OFF; clear all W cells before setting one). Truong APPROVED 01/11/2026.
+- Google Form (tao-google-form-clb): NOT changed now.
 
-## Round 4 (Truong chose direction (c) for group B)
-- Merged claude/demo-wharton-va-duong-dan. DQT added to vi_du_huong_dan, mau_csv/vi_du_day_du, vi_du_ca_tuan, 08 via `du_lieu_test/them_diem_quyet_tam_vao_mau.py` (fixed seeds 11202610x; SIMULATED data). `mau_csv/tao_so_nhap.py` now reads `wp` cols.
-- vi_du_day_du: HS024 dropped `thu_2` pref `clb_bongro` in tao_bo_mau.py (otherwise 2 em trang tay with DQT, test needs exactly 1).
-- bo_sach untouched; Wharton OFF explicit everywhere it runs. sinh-du-lieu-clb default = hop_le + `--khong-diem-quyet-tam`.
-- tao-workspace-tu-raw writes `wharton:false` + message; xu-li-raw-forms / chuyen_forms only report (a sổ cannot hold config).
-- NHAP_TAY.md: new step 3 (DQT table, seed 112026105).
-- TODO later (not done on purpose): add DQT collection to the Google Form (tao-google-form-clb).
+## (c) Helper rule
+- `tests/_wharton.py::tat_wharton(api_or_db)` writes `rules.wharton=false`. Use it per file via a LOCAL fixture `api(api)` override (or at the build point). NEVER autouse/global: tests about the new default must see the real default. Group B tests keep their asserts (data changed instead).
 
-## Decisions and gotchas
-- `rbda_priority_pipeline.LUAT_XEP_MAC_DINH["wharton"]` stays False: bare pipeline calls (rules=None, run_full_pipeline) keep old numbers; default ON lives only in cau_hinh_ws.
-- Old stored config lacking the `wharton` key reads as ON (no migration, per Truong's original request).
-- Data is blocked only when a fund has >=2 clubs and no points (single-club fund auto-fills 100, "cach A").
-- soat-ma `kiem_trung_khit` would silently compare two "blocked" runs; fixed by writing wharton false in both.
+## (e) Traps hit
+- A grep-chosen test list misses many files that run the pipeline on data without points: first "0 red" report was wrong (241 red in CI). Classify red files: A internal fixture (mask with tat_wharton) vs B shipped sample/skill output (do NOT mask; ask parent).
+- soat-ma `chu_cam` does not catch English words inside Vietnamese text ("workspace"); test_giao_dien_tieng_viet_sach did. Also no "you" in EN text.
+- soat-ma `kiem_nhanh.py` trung_khit must turn Wharton off in BOTH trees, else it silently compares two "blocked" runs.
+- With Wharton on, only funds with >=2 clubs and no points block a run (single-club fund auto-fills 100). A student with 2 untested clubs per session (<=75 pts) loses to students with 1 club (100 pts).
+- Env: pip install pytest ruff openpyxl "playwright>=1.40,<2" into system python; chromium via RBDA_TEST_CHROMIUM=/opt/pw-browsers/chromium-1243/chrome-linux64/chrome; never `playwright install`.
 
 ## Next steps
-1. Only act on parent/Truong feedback (CI red files). Classify: A = internal fixture -> local `api` fixture + `tat_wharton`; B = shipped sample/skill output -> ask parent, never mask.
-2. Later (not now): Google Form (tao-google-form-clb) should collect commitment points.
+1. (f) Wait for CI (runs above) -> fix red files if any (only on parent/Truong feedback; don't loosen asserts) -> parent opens the PR.
+2. (g) Later: Google Form should collect commitment points.
 
-## Files touched
-- cau_hinh_ws.py, i18n_errors.py, i18n_loi.js, api_nhap.py/rbda_priority_pipeline.py (comments), docs: HUONG_DAN_SU_DUNG.md, TAI_LIEU_DU_LIEU.md, CHANGELOG.md, TIEN_DO.md, CLAUDE_CHI_TIET.md (tests row: 168 files / 3.138 cases), mau_csv/* (GIAI_THICH, wp cols, tao_so_nhap.py, tao_bo_mau.py HS024), du_lieu_test/* (them_diem_quyet_tam_vao_mau.py NEW, NHAP_TAY.md, vi_du_huong_dan/*, scripts with explicit wharton false).
-- Skills: sinh-du-lieu-clb (default hop_le + --khong-diem-quyet-tam), tao-workspace-tu-raw (wharton:false + note), xu-li-raw-forms (note), soat-ma kiem_nhanh.py; mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py (note).
-- ~60 test files: local `api` fixture override with `tat_wharton` (group A), group-B tests keep asserts (data changed), new tests test_wharton_mac_dinh_bat.py, test_a13_13_kiem_nhan.py, test_giao_dien_a13_13_kiem_nhan.py.
+## Files touched (summary)
+- cau_hinh_ws.py, i18n_errors.py/i18n_loi.js, comments in api_nhap.py + rbda_priority_pipeline.py; docs (HUONG_DAN_SU_DUNG, TAI_LIEU_DU_LIEU, CHANGELOG, TIEN_DO, CLAUDE_CHI_TIET tests row 168 files/3.138 cases, mau_csv + vi_du docs).
+- Data/scripts: mau_csv/*, du_lieu_test/* (new them_diem_quyet_tam_vao_mau.py, NHAP_TAY.md, explicit wharton false in scripts); skills sinh-du-lieu-clb, tao-workspace-tu-raw, xu-li-raw-forms, soat-ma; mau_forms_thi_clb converter.
+- ~60 test files (local `api` fixture + tat_wharton) + new tests: test_wharton_mac_dinh_bat.py, test_a13_13_kiem_nhan.py, test_giao_dien_a13_13_kiem_nhan.py.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -62,3 +54,4 @@ Out of scope: "template header by vocabulary" (Direction A/B).
 | 2026-11-01 | Sonnet | Round 3 (group A after CI) + round 4 (group B, direction c, demo-branch merge, skills, NHAP_TAY) | handoff at ~400k tokens; final test run + ruff + soat-ma + report to parent pending |
 | 2026-11-01 | Sonnet | Final handoff after round 4: 4 red tests fixed, ruff/soat-ma green, report sent to parent | context >400k; open a new session to continue |
 | 2026-11-01 | Sonnet | Recorded Truong's approval in CHANGELOG; final handoff | context >400k; open a new session to continue |
+| 2026-11-01 | Sonnet | Full handoff rewrite requested by parent (rule 9, context ~538k) | stop; new session continues from this file |
