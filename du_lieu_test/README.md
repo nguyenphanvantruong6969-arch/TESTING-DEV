@@ -150,7 +150,13 @@ Nạp `TEST_01` trước, rồi nạp `TEST_04`. Phần mềm **phải** hiện 
 
 ## Bộ demo — `app_DEMO_da_cham_diem.db`
 
-Dựng sẵn tới ngay trước bước cuối: dữ liệu đã nạp, điểm đã có đủ, **0 cảnh báo**.
+Dựng sẵn tới ngay trước bước cuối: dữ liệu đã nạp, điểm đã có đủ, **Wharton BẬT** (mặc định của phần mềm)
+và dữ liệu có **điểm quyết tâm** (`SO_NHAP_DQT_120HS_HOP_LE.xlsx`, 120 em / 10 CLB — **DỮ LIỆU MÔ PHỎNG**,
+nguyện vọng và điểm thi giống `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm). Có 3 cảnh báo
+mức thường (`health_oversubscribed_buoi`: bộ cố ý cạnh tranh cao), không cảnh báo nghiêm trọng.
+
+**Bản cũ** (bộ ba `TEST_01..03`, Wharton tắt, 0 cảnh báo) dựng bằng `tao_db_demo.py --tat-wharton`;
+dùng bản này khi cần tái lập số liệu đã công bố (poster, `SO_LIEU_DA_KIEM_CHUNG.md`).
 
 **Cách dùng, hôm demo:**
 
@@ -166,7 +172,8 @@ Dựng sẵn tới ngay trước bước cuối: dữ liệu đã nạp, điểm
 
 ```bash
 ./.venv/bin/python du_lieu_test/tao_du_lieu_test.py   # 4 tệp Excel
-./.venv/bin/python du_lieu_test/tao_db_demo.py        # CSDL demo
+./.venv/bin/python du_lieu_test/tao_db_demo.py        # CSDL demo (Wharton BẬT, có điểm quyết tâm mô phỏng)
+./.venv/bin/python du_lieu_test/tao_db_demo.py --tat-wharton   # CSDL demo bản cũ (số liệu đã công bố)
 ./.venv/bin/python du_lieu_test/bo_sach/tao_bo_sach.py  # bộ sạch (seed 9090)
 ```
 

@@ -2,9 +2,13 @@
 
     python poster/chup_giao_dien.py
 
-Dùng CSDL demo `du_lieu_test/app_DEMO_da_cham_diem.db` (DỮ LIỆU MÔ PHỎNG,
-120 học sinh, 10 CLB, đã chấm điểm), chép sang thư mục tạm rồi chạy sắp xếp
-với seed 42 — tệp gốc không bị đụng. Ảnh ra ở poster/hinh/.
+Dựng CSDL demo BẢN CŨ (`tao_db_demo.py --tat-wharton`: DỮ LIỆU MÔ PHỎNG,
+120 học sinh, 10 CLB, bộ ba TEST, Wharton tắt, đã chấm điểm) vào thư mục tạm
+rồi chạy sắp xếp với seed 42 — tệp .db trong kho không bị đụng. Ảnh ra ở
+poster/hinh/.
+
+VÌ SAO BẢN CŨ: ảnh nằm trên poster cạnh các con số đã công bố (đo trên bộ ba
+TEST, Wharton tắt). Chụp bản có điểm quyết tâm thì ảnh và số liệu lệch nhau.
 """
 
 import glob
@@ -36,7 +40,9 @@ def main():
     tam = tempfile.mkdtemp()
     os.environ["RBDA_THU_MUC_TAI_VE"] = tam
     db = os.path.join(tam, "app.db")
-    shutil.copy(os.path.join(GOC, "du_lieu_test", "app_DEMO_da_cham_diem.db"), db)
+    sys.path.insert(0, os.path.join(GOC, "du_lieu_test"))
+    import tao_db_demo
+    tao_db_demo.main(["--tat-wharton", "--ra", db])
     api = PipelineAPI(db)
     r = api.run_pipeline(seed=42)
     assert r["ok"], r
