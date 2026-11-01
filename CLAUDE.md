@@ -38,7 +38,7 @@ Bảng tệp → vai trò → hàm then chốt: xem `docs/ke_hoach/CLAUDE_CHI_TI
 8. Trước khi push: chạy skill `soat-ma` (`.claude/skills/soat-ma/`): một lệnh `kiem_nhanh.py` cho phần máy làm được, rồi soát theo bốn tầng trong `SKILL.md`. Không subagent; chỉ báo cáo trừ khi được giao sửa.
 9. **Bàn giao theo nhánh**: mỗi nhánh (tính năng) có một tệp `docs/phien/<nhánh>.md` (mẫu: `docs/phien/_TEMPLATE.md`, tiếng Anh, tối đa 150 dòng). Khi ngữ cảnh vượt ~400k token, SAU KHI xong lượt hiện tại, phiên ghi lại trạng thái vào tệp đó rồi dừng để mở phiên mới; hook Stop `.claude/hooks/handoff_khi_day_ngu_canh.py` nhắc việc này.
 10. **NO SUBAGENT**: không tự gọi subagent / Agent tool (mỗi subagent khởi động nguội, tốn token). Tự dùng Read/Grep/Bash trực tiếp. Chỉ dùng khi Truong nói rõ.
-11. **Vai trò mô hình** (mỗi vai một phiên riêng, cầu nối là tệp bàn giao): Opus lập kế hoạch (ghi vào mục Plan), Sonnet viết mã và đánh dấu Plan, Haiku chỉ đọc / tìm / tóm tắt, không sửa tệp.
+11. **Vai trò mô hình** (mỗi vai một phiên riêng, cầu nối là tệp bàn giao): Opus lập kế hoạch (ghi vào mục Plan), Sonnet viết mã và đánh dấu Plan, Haiku chỉ đọc / tìm / tóm tắt, không sửa tệp. Phiên Opus đầu tiên của nhánh mới tạo `docs/phien/<nhánh>.md` từ `_TEMPLATE.md` và điền Goal + Plan.
 
 ## Liêm chính học thuật (đây là đề tài của học sinh)
 - **Mọi số liệu kiểm chứng là dữ liệu MÔ PHỎNG.** Không bao giờ viết như thể là khảo sát thật.

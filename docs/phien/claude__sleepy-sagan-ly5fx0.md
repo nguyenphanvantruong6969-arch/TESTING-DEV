@@ -30,3 +30,4 @@ Workflow tooling for Claude sessions on this repo (no algorithm change): session
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-01 | Sonnet | Built handoff scheme, NO SUBAGENT rule, related-tests-only rule, CLAUDE.md trim | Opus advised via advisor tool |
+| 2026-11-01 | Sonnet | Rule 11: Opus session creates the branch file from the template | Answer "yes" from Truong |
