@@ -21,6 +21,12 @@
 
 **Test** (`tests/test_wharton_mac_dinh_bat.py`, 16 ca mới; helper `tests/_wharton.py::tat_wharton`, KHÔNG autouse). Test cũ sửa, không xoá, không skip: (a) đổi sang mặc định mới + giữ khẳng định cũ dưới dạng ca `wharton: false` tường minh: `test_wharton_luat`, `test_ws_cau_hinh`, `test_ws_api`, `test_ws_sua_loi_2`, `test_ws_so_nhap`, `test_ws_nhan`, `test_so_mau_co_cot_quyet_tam`, `test_wharton_so_nhap`; (b) truyền `wharton: false` ở fixture / đầu test (hành vi cũ làm nền): `test_nhieu_buoi`, `test_wharton_pipeline`, `test_thay_doi_ket_qua`, `test_ws_luat`, `test_ws_sua_loi_3`, `test_diem_chuan`, `test_wharton_{quan_ly,hang_loat,kiosk,khoa,nhap,suc_khoe,dau_cuoi}`, `test_so_nhap_hai_hang`.
 
+## 2026-11-01 — Công cụ phiên (ngoài sổ): sửa test tài liệu sau khi rút gọn CLAUDE.md
+
+- `tests/test_a13_12_tai_lieu.py::_doan_ban_do` đọc "Bản đồ mã" ở `docs/ke_hoach/CLAUDE_CHI_TIET.md` (bảng đã chuyển nguyên văn khỏi `CLAUDE.md` ở `5fd624b`). Trước đó hai ca `test_ban_do_ma_co_nhom_ham_diem_quyet_tam`, `test_ban_do_ma_so_tep_test_la_so_that` đỏ trên `cee2940`. Không đổi mã sản phẩm. `kiem_nhanh.py --co-so cee2940`: 7/7 ĐẠT.
+- `TAI_LIEU_DU_LIEU.md` mục 4 nay tả `.claude/settings.json` và hook bàn giao (thêm ở `5fd624b`); `tests/test_tai_lieu_du_lieu.py`: `VANG_MAT_CO_Y` thành tập rỗng. Trước đó `test_nhung_tep_tai_lieu_noi_khong_co_thi_van_khong_co` đỏ trên nhánh này và mọi nhánh tách từ nó.
+- Lưu ý khi gộp nhánh `claude/wharton-mac-dinh-bat`: nhánh đó thêm tệp test, nên phải cập nhật số tệp ở dòng `tests/` của bản đồ mã trong `CLAUDE_CHI_TIET.md`.
+
 ## 2026-10-28 — A13.12 Sửa Tầng 4 của đợt soát A13 và toàn bộ mục chặn / nên sửa của đợt soát hệ thống nhập
 
 Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`. Mỗi mục có test đỏ trước, xanh sau (mục chỉ thêm test: ghi rõ). Bảng xử lý từng mục (commit hoặc "không sửa – lý do"): `docs/ke_hoach/BAO_CAO_SOAT_NHAP.md` (cột cuối mỗi bảng) và mục "Vòng sửa A13.12" cuối `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`.

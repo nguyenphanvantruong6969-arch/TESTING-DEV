@@ -49,7 +49,8 @@ def test_huong_dan_khong_con_ban_khac():
 # ------------------------------------------------------------------ 4.1: bản đồ mã định vị theo TÊN HÀM
 
 def _doan_ban_do():
-    van = _doc(os.path.join(GOC, "CLAUDE.md"))
+    # Bản đồ mã đã chuyển nguyên văn từ CLAUDE.md sang CLAUDE_CHI_TIET.md (CLAUDE.md chỉ còn trỏ tới).
+    van = _doc(os.path.join(GOC, "docs", "ke_hoach", "CLAUDE_CHI_TIET.md"))
     dau = van.index("## Bản đồ mã")
     return van[dau:van.index("\n## ", dau + 5)]
 
