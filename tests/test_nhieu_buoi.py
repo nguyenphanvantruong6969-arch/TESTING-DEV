@@ -95,6 +95,15 @@ sys.path.insert(0, os.path.join(GOC, "du_lieu_test"))
 
 import rbda_priority_pipeline as loi  # noqa: E402
 from api import PipelineAPI  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
+
+
+def _api_tat(*args, **kw):
+    """`PipelineAPI` với `rules.wharton = false` TƯỜNG MINH (A13.13: mặc định đã BẬT; các test
+    ở đây lấy hành vi cũ — dữ liệu không có điểm quyết tâm — làm nền)."""
+    api = PipelineAPI(*args, **kw)
+    tat_wharton(api)
+    return api
 
 BO_MAU = os.path.join(GOC, "du_lieu_test", "bo_nhieu_buoi")
 TEP_MAU = [
@@ -118,7 +127,7 @@ def _nap_bo_mau(api):
 @pytest.fixture
 def api_nhieu_buoi(tmp_path):
     """API đã nạp sẵn bộ dữ liệu mẫu 5 buổi."""
-    api = PipelineAPI(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
+    api = _api_tat(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
     _nap_bo_mau(api)
     return api
 
@@ -236,9 +245,8 @@ class TestTrungKhit:
         )[ten_bo]
         db = nap_bo(thu_muc, duong)
 
-        from api import PipelineAPI
 
-        api = PipelineAPI(db, thu_muc_xuat=thu_muc)
+        api = _api_tat(db, thu_muc_xuat=thu_muc)
         assert api.run_pipeline(seed=42)["ok"]
 
         students, clubs, scores, app, prefs, stb = loi.load_from_sqlite(db)
@@ -517,7 +525,7 @@ class TestDiTru:
 
     def test_csdl_cu_dung_duoc_ngay_sau_khi_di_tru(self, db_luoc_do_cu):
         """Không chỉ mở được mà phải CHẠY được — di trú xong là dùng tiếp."""
-        api = PipelineAPI(db_luoc_do_cu)
+        api = _api_tat(db_luoc_do_cu)
         assert api.get_match_results()["ok"]
         assert api.get_thoi_khoa_bieu()["ok"]
         assert api.list_clubs_admin()["ok"]
@@ -531,7 +539,7 @@ class TestDiTru:
 class TestNhapDuLieu:
 
     def test_nhap_clb_co_cot_buoi(self, tmp_path):
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         kq = api.import_clubs_csv(
             "club_id,name,capacity,buoi\nclb_a,CLB A,5,thu_3\nclb_b,CLB B,5,thu_5\n")
         assert kq["ok"] and kq["data"]["n_clubs_co_buoi"] == 2
@@ -540,7 +548,7 @@ class TestNhapDuLieu:
 
     def test_khong_khai_buoi_thi_KHONG_coi_la_nhieu_buoi(self, tmp_path):
         """Trường chưa dùng buổi thì giao diện phải trông y hệt bản cũ."""
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         api.import_clubs_csv("club_id,name,capacity\nclb_a,CLB A,5\nclb_b,CLB B,5\n")
         assert api.get_danh_sach_buoi()["data"]["nhieu_buoi"] is False
 
@@ -548,14 +556,14 @@ class TestNhapDuLieu:
         """Tình huống nguy hiểm nhất của bước nhập này: những CLB bỏ trống
         buổi bị gom hết vào một buổi, tức là bị coi là TRÙNG GIỜ với nhau,
         mà không có gì trên màn hình nói ra."""
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         kq = api.import_clubs_csv(
             "club_id,name,capacity,buoi\nclb_a,CLB A,5,thu_3\nclb_b,CLB B,5,\n")
         ma = [w["code"] for w in kq["data"]["warnings"]]
         assert "clb_thieu_buoi" in ma
 
     def test_nhap_nguyen_vong_theo_tung_buoi(self, tmp_path):
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         api.import_clubs_csv(
             "club_id,name,capacity,buoi\n"
             "clb_a,CLB A,5,thu_3\nclb_c,CLB C,5,thu_3\nclb_b,CLB B,5,thu_5\n")
@@ -570,7 +578,7 @@ class TestNhapDuLieu:
     def test_nguyen_vong_lech_buoi_bi_bao_va_bi_bo(self, tmp_path):
         """Ghi câu lạc bộ Thứ 5 vào cột Thứ 3 là lỗi gõ tay dễ xảy ra nhất.
         Im lặng nhận vào thì kết quả sai mà không ai biết vì sao."""
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         api.import_clubs_csv(
             "club_id,name,capacity,buoi\nclb_a,CLB A,5,thu_3\nclb_b,CLB B,5,thu_5\n")
         kq = api.import_preferences_csv(
@@ -583,20 +591,20 @@ class TestNhapDuLieu:
         assert pr.get("HS1", []) == []
 
     def test_tu_nhan_dien_duoc_bo_cot_theo_buoi(self, tmp_path):
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         d = api.detect_csv_kind("student_id,thu_3_pref_1,thu_5_pref_1\nHS1,a,b\n")["data"]
         assert d["kind"] == "preferences" and d["confident"] is True
 
     def test_bo_cot_cu_van_nhan_dien_dung(self, tmp_path):
         """`pref_1` không được lẫn sang nhánh theo buổi."""
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         d = api.detect_csv_kind("student_id,pref_1,pref_2\nHS1,a,b\n")["data"]
         assert (d["kind"], d["format"]) == ("preferences", "wide")
 
     def test_chuan_hoa_buoi_gom_cac_cach_viet_ve_mot(self, tmp_path):
         """"Thứ 3" và "thu 3" và "thu_3" phải ra cùng một buổi — không thì
         hai câu lạc bộ cùng giờ bị coi là hai buổi và học sinh trúng cả hai."""
-        api = PipelineAPI(str(tmp_path / "app.db"))
+        api = _api_tat(str(tmp_path / "app.db"))
         assert api.chuan_hoa_buoi("  Thu 3 ") == api.chuan_hoa_buoi("thu_3")
         assert api.chuan_hoa_buoi("") == ""
 
@@ -826,9 +834,8 @@ class TestSoBocThamTheoBuoi:
 
     def test_mot_buoi_thi_khong_xuat_tep_do(self, tmp_path):
         """Một buổi thì bảng này không nói thêm điều gì so với bộ số đã khoá."""
-        from api import PipelineAPI
 
-        api = PipelineAPI(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
+        api = _api_tat(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
         for ten in ("VIDU_01_danh_sach_CLB.csv", "VIDU_02_chon_CLB_muon_thi.csv",
                     "VIDU_03_xep_hang_nguyen_vong.csv"):
             duong = os.path.join(GOC, "du_lieu_test", "vi_du_huong_dan", ten)

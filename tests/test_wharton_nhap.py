@@ -12,6 +12,7 @@ Dữ liệu dưới đây là dữ liệu MÔ PHỎNG dựng trong test.
 import pytest
 
 from _wharton import (bat_wharton, canh_bao, chen_bids, dong_bids, dung_clb, dung_hs, ma_loi)
+from _wharton import tat_wharton  # noqa: E402
 
 
 @pytest.fixture
@@ -107,6 +108,7 @@ def test_wp_k_ma_pref_k_trong_thi_canh_bao_khong_co_nguyen_vong(w):
 # ------------------------------------------------------------------ Wharton tắt
 
 def test_wharton_tat_cot_wp_bi_bo_qua_kem_canh_bao_va_nguyen_vong_y_nhu_khong_co_cot(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     dung_clb(api, A=5, B=5)
     dung_hs(api, "HS1", "HS2")
     kq = _nap(api, "student_id,name,pref_1,wp_1,pref_2,wp_2\nHS1,An,A,100,B,50\nHS2,Bo,B,,A,7\n")
@@ -133,6 +135,7 @@ def test_wharton_tat_khong_co_o_wp_nao_co_chu_thi_khong_canh_bao(api):
 
 
 def test_wharton_tat_dang_dai_va_theo_buoi_cung_bi_bo_qua(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     dung_clb(api, A=(5, "thu_3"))
     kq = _nap(api, "student_id,name,club_id,rank,wp\nHS1,An,A,1,100\n")
     assert dong_bids(api) == [] and canh_bao(kq, "csv_wp_bo_qua")[0]["params"]["n"] == 1

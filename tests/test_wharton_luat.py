@@ -22,9 +22,11 @@ def _luat(**rest):
 
 # ------------------------------------------------------------------ cau_hinh_ws
 
-def test_mac_dinh_tat():
-    assert ch.MAC_DINH_TRUONG_HOC["rules"]["wharton"] is False
-    assert _luat()["wharton"] is False
+def test_mac_dinh_bat_va_tat_ro_rang_van_duoc():
+    # A13.13: mặc định BẬT (Truong duyệt, ngoại lệ bất biến 1); tắt phải ghi RÕ.
+    assert ch.MAC_DINH_TRUONG_HOC["rules"]["wharton"] is True
+    assert _luat()["wharton"] is True
+    assert _luat(wharton=False)["wharton"] is False
 
 
 @pytest.mark.parametrize("rest", [
@@ -63,6 +65,7 @@ def test_tat_thi_tron_che_do_nao_cung_duoc():
 
 def test_tron_len_giu_duoc_gia_tri():
     da_luu = copy.deepcopy(ch.MAC_DINH_TRUONG_HOC)
+    da_luu["rules"]["wharton"] = False                            # A13.13: mặc định đã BẬT
     moi = ch.tron_len(da_luu, {"rules": {"wharton": True}})
     assert moi["rules"]["wharton"] is True and moi["rules"]["max_choices"] == 10
     assert da_luu["rules"]["wharton"] is False                    # không sửa đầu vào
@@ -80,7 +83,10 @@ def test_luat_de_ghi_mac_dinh_van_la_none():
     assert rp.luat_xep_de_ghi(None) is None
     assert rp.luat_xep_de_ghi({}) is None
     assert rp.luat_xep_de_ghi({"wharton": False}) is None
-    assert rp.luat_xep_de_ghi(ch.MAC_DINH_TRUONG_HOC["rules"]) is None
+    # A13.13: luật mặc định của workspace trường học nay có wharton=True nên KHÔNG còn là None;
+    # luật mặc định cũ (tắt RÕ RÀNG) vẫn là None.
+    assert rp.luat_xep_de_ghi({**ch.MAC_DINH_TRUONG_HOC["rules"], "wharton": False}) is None
+    assert json.loads(rp.luat_xep_de_ghi(ch.MAC_DINH_TRUONG_HOC["rules"]))["wharton"] is True
 
 
 def test_luat_de_ghi_bat_thi_co_khoa_wharton_true():

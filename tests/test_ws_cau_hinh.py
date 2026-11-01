@@ -108,7 +108,7 @@ def test_ghi_roi_doc_giong_nhau(db):
     cfg["labels"]["person"] = {"vi": "Nhân viên", "en": "Employee"}
     cfg["rules"].update(max_choices=3, max_tests=None, priority="score+tier",
                         tier_mode="strict", score_scope="per_person",
-                        tiers=["Cấp cao", "Cấp thấp"])
+                        tiers=["Cấp cao", "Cấp thấp"], wharton=False)   # A13.13: tổ hợp này không bật được
     ghi = ch.ghi_cau_hinh(db, cfg)
     assert ghi == cfg
     doc = ch.doc_cau_hinh(db)
@@ -200,6 +200,8 @@ def test_gia_tri_null_trong_hang_cho_mac_dinh(db):
 def _sua(**luat):
     cfg = copy.deepcopy(ch.MAC_DINH_TRUONG_HOC)
     cfg["rules"].update(luat)
+    # A13.13: mặc định bật Wharton; bỏ khoá ra để "không ghi rõ" thì tổ hợp tier / per_person tự tắt.
+    del cfg["rules"]["wharton"]
     return cfg
 
 

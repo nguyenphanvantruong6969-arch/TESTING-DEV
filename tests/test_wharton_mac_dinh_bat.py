@@ -6,8 +6,9 @@ Truong đã duyệt ngoại lệ bất biến 1 cho mục này. Tổ hợp luậ
 """
 
 import copy
-import json
 import sqlite3
+import json
+
 
 import pytest
 
@@ -97,3 +98,57 @@ def test_workspace_di_tru_tu_app_db_cu_co_wharton_bat(tmp_path):
 def test_mau_dung_san_truong_hoc_bat_wharton(tmp_path):
     mau = ws.danh_sach_mau(str(tmp_path))[0]
     assert mau["builtin"] and mau["config"]["rules"]["wharton"] is True
+
+
+# ------------------------------------------------------------------ ảnh hưởng tới workspace / dữ liệu cũ
+
+def test_cau_hinh_luu_truoc_a13_thieu_khoa_wharton_doc_thanh_bat(tmp_path):
+    """Khoá `wharton` thiếu trong cấu hình đã lưu => BẬT (không di trú; xem CHANGELOG A13.13)."""
+    db = str(tmp_path / "app.db")
+    init_db(db)
+    cu = copy.deepcopy(ch.MAC_DINH_TRUONG_HOC)
+    del cu["rules"]["wharton"]
+    conn = sqlite3.connect(db)
+    conn.execute("CREATE TABLE IF NOT EXISTS workspace_settings (key TEXT PRIMARY KEY, value TEXT)")
+    conn.execute("INSERT OR REPLACE INTO workspace_settings VALUES (?, ?)",
+                 (ch.KHOA_CAU_HINH, json.dumps(cu)))
+    conn.commit()
+    conn.close()
+    assert ch.doc_cau_hinh(db)["rules"]["wharton"] is True
+
+
+def _dung_du_lieu_khong_diem_quyet_tam(api):
+    assert api.create_or_update_club("A", "CLB A", 1, 0, "")["ok"]
+    assert api.create_or_update_club("B", "CLB B", 5, 0, "")["ok"]
+    assert api.create_or_update_club("C", "CLB C", 5, 0, "")["ok"]
+    # Quỹ 2 có hai CLB (B, C) nên KHÔNG tự điền 100 được (cách A chỉ tự điền quỹ một CLB).
+    for sid in ("HS1", "HS2"):
+        assert api.create_student_if_missing(sid, sid)["ok"]
+        assert api.submit_test_selection(sid, ["A"])["ok"]
+        assert api.submit_preferences(sid, ["A", "B", "C"])["ok"]
+    assert api.submit_club_scores("A", [{"student_id": "HS1", "score": 5},
+                                        {"student_id": "HS2", "score": 9}])["ok"]
+
+
+def test_mac_dinh_du_lieu_chua_co_diem_quyet_tam_bi_chan_va_thong_bao_chi_cach_go(tmp_path):
+    from api import PipelineAPI
+    from i18n_errors import format_message
+    api = PipelineAPI(str(tmp_path / "app.db"))
+    _dung_du_lieu_khong_diem_quyet_tam(api)
+    kq = api.run_pipeline(seed=1)
+    assert not kq["ok"]
+    codes = [e["code"] for e in kq["errors"]]
+    assert "wharton_ho_so_chua_hop_le" in codes
+    loi = next(e for e in kq["errors"] if e["code"] == "wharton_ho_so_chua_hop_le")
+    for ngon in ("vi", "en"):
+        chu = format_message(loi["code"], loi["params"], ngon).lower()
+        # chỉ cách khắc phục: điền điểm, hoặc tắt trong cấu hình workspace
+        assert ("điền" in chu and "tắt" in chu) if ngon == "vi" else ("fill in" in chu and "turn off" in chu)
+
+
+def test_tat_ro_rang_thi_cung_du_lieu_chay_duoc(tmp_path):
+    from api import PipelineAPI
+    api = PipelineAPI(str(tmp_path / "app.db"))
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})
+    _dung_du_lieu_khong_diem_quyet_tam(api)
+    assert api.run_pipeline(seed=1)["ok"]

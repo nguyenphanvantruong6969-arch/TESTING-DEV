@@ -9,6 +9,7 @@ Dữ liệu dưới đây là dữ liệu MÔ PHỎNG dựng trong test.
 import pytest
 
 from _wharton import bat_wharton, chen_bids, dung_clb, dung_hs
+from _wharton import tat_wharton  # noqa: E402
 
 
 def _ma(api):
@@ -34,6 +35,7 @@ def w(api):
 
 
 def test_tat_wharton_khong_co_muc_nao_ke_ca_khi_bang_co_dong_sai(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     dung_clb(api, A=5)
     dung_hs(api, "HS1")
     assert api.submit_preferences("HS1", ["A"])["ok"]

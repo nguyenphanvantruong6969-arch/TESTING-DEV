@@ -110,7 +110,12 @@ HS_MAU = [_hs("H1", "An", [{"club_id": "a", "thi": True, "diem": "9,5"},
           _hs("H2", "Bình", [{"club_id": "b", "thi": True, "diem": ""}])]
 
 
-@pytest.mark.parametrize("cfg", [None, {}, ch.MAC_DINH_TRUONG_HOC,
+# A13.13: mặc định trường học nay BẬT Wharton (sổ có thêm cột Điểm quyết tâm); "như trước" là
+# bản mặc định TẮT RÕ RÀNG.
+MAC_DINH_TAT_W = ch.tron_len(ch.MAC_DINH_TRUONG_HOC, {"rules": {"wharton": False}})
+
+
+@pytest.mark.parametrize("cfg", [None, {}, MAC_DINH_TAT_W,
                                  {"rules": {"max_choices": 10, "max_tests": 5}}],
                          ids=["None", "rong", "mac_dinh_truong_hoc", "luat_mac_dinh"])
 def test_mac_dinh_truong_hoc_cho_ra_dung_so_nhu_truoc(cfg):
@@ -120,7 +125,7 @@ def test_mac_dinh_truong_hoc_cho_ra_dung_so_nhu_truoc(cfg):
 
 
 def test_mau_nv_khong_doi_voi_mac_dinh():
-    wb = _wb(_bytes(cfg=ch.MAC_DINH_TRUONG_HOC))
+    wb = _wb(_bytes(cfg=MAC_DINH_TAT_W))
     # Hai hàng tiêu đề (A13.4): hàng 1 là ô gộp "Nguyện vọng k", hàng 2 là tên cột trong nhóm.
     tieu_de = [c.value for c in wb["2. Học sinh"][1]]
     hang_2 = [c.value for c in wb["2. Học sinh"][2]]

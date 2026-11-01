@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026-11-01 — A13.13 Điểm quyết tâm (Wharton) BẬT mặc định cho workspace trường học
+
+**NGOẠI LỆ BẤT BIẾN 1 (đã duyệt).** Bất biến 1 ("cấu hình mặc định cho kết quả trùng khít với trước khi sửa") bị phá có chủ đích, theo quyết định rõ ràng của Truong. Các bất biến 2–8 vẫn giữ. Tắt RÕ RÀNG (`wharton: false`) thì kết quả, dấu vân tay và `run_history.luat_xep` trùng khít bản trước (đã chạy lại `do_anh_huong_seed.py` và `bao_cao_phan_bo.py`, so với bản gốc: đầu ra giống hệt).
+
+- **Mã:** `cau_hinh_ws.py` — `MAC_DINH_TRUONG_HOC["rules"]["wharton"] = True`. Tổ hợp không bật được (`priority = "tier"` hoặc `score_scope = "per_person"`) mà người dùng KHÔNG ghi rõ `wharton` thì tự tắt (`_chuan_hoa`, và `tron_len` khi cập nhật); ghi rõ `wharton: true` với tổ hợp sai vẫn báo lỗi như cũ.
+- **Giữ nguyên có chủ ý:** `rbda_priority_pipeline.LUAT_XEP_MAC_DINH["wharton"] = False`. Đây là mặc định ở tầng thuật toán thuần (gọi `run_full_pipeline`, `luat_xep_de_ghi`… không kèm cấu hình workspace) nên số liệu cũ vẫn tái lập; mặc định BẬT chỉ nằm ở cấu hình workspace.
+- **Thông báo:** `wharton_ho_so_chua_hop_le` (`i18n_errors.py` → `tao_i18n_js.py`) nay chỉ cách khắc phục: điền đủ điểm quyết tâm, hoặc tắt "Dùng điểm quyết tâm" trong cấu hình workspace.
+- **Tài liệu:** `HUONG_DAN_SU_DUNG.md` (mục "Bật ở đâu"), `mau_csv/HUONG_DAN_SO_NHAP.md`, hai chú thích trong `api_nhap.py`, `rbda_priority_pipeline.py`.
+- **Công cụ:** `.claude/skills/soat-ma/scripts/kiem_nhanh.py` (kiểm `trung_khit`) tắt Wharton rõ ràng cho cả hai bản so sánh; không thì kiểm này lặng lẽ so hai kết quả "bị chặn" với nhau. 15 script trong `du_lieu_test/` (và `stress/_chung.py`, `stress/s8_bao_mat.py`, `bo_thu_workspace/tao_bo_workspace.py`) truyền `wharton: false` tường minh để tái lập số liệu cũ (quy tắc 4).
+
+**Ảnh hưởng tới workspace cũ**
+- Workspace đã lưu từ phiên bản có khoá `wharton` (A13.2 trở đi) ghi rõ `wharton: false` nên KHÔNG đổi.
+- Cấu hình lưu TRƯỚC khi có khoá `wharton`, CSDL chưa có hàng `workspace_settings` (kể cả `app.db` cũ được di trú), và mẫu dựng sẵn "Trường học" nay ĐỌC THÀNH BẬT. Không viết di trú (đúng yêu cầu gốc).
+- Hệ quả: dữ liệu mà một quỹ có từ hai CLB trở lên và chưa có điểm quyết tâm bị chặn khi chạy (`wharton_ho_so_chua_hop_le` + `wharton_chua_dung_het`); quỹ chỉ có một CLB được tự điền 100 trong bộ nhớ (quyết định "cách A"). Muốn chạy như cũ: tắt "Dùng điểm quyết tâm" trong cấu hình workspace. Không nới luật kiểm Wharton.
+- `run_history.luat_xep` và dấu vân tay của workspace mặc định đổi (có khoá `wharton: true`): kết quả đã chạy trước đó của workspace đọc thành bật sẽ báo "đã cũ".
+- Sổ mẫu `mau_csv/SO_NHAP_CLB.xlsx` và hai sổ `vi_du_*` nạp với mặc định mới: các sổ `vi_du_*` chưa điền cột Điểm quyết tâm nên bị chặn khi chạy; tắt rõ ràng thì nạp và chạy trùng khít bộ ba CSV (seed 1, 7, 42).
+
+**Test** (`tests/test_wharton_mac_dinh_bat.py`, 16 ca mới; helper `tests/_wharton.py::tat_wharton`, KHÔNG autouse). Test cũ sửa, không xoá, không skip: (a) đổi sang mặc định mới + giữ khẳng định cũ dưới dạng ca `wharton: false` tường minh: `test_wharton_luat`, `test_ws_cau_hinh`, `test_ws_api`, `test_ws_sua_loi_2`, `test_ws_so_nhap`, `test_ws_nhan`, `test_so_mau_co_cot_quyet_tam`, `test_wharton_so_nhap`; (b) truyền `wharton: false` ở fixture / đầu test (hành vi cũ làm nền): `test_nhieu_buoi`, `test_wharton_pipeline`, `test_thay_doi_ket_qua`, `test_ws_luat`, `test_ws_sua_loi_3`, `test_diem_chuan`, `test_wharton_{quan_ly,hang_loat,kiosk,khoa,nhap,suc_khoe,dau_cuoi}`, `test_so_nhap_hai_hang`.
+
 ## 2026-10-28 — A13.12 Sửa Tầng 4 của đợt soát A13 và toàn bộ mục chặn / nên sửa của đợt soát hệ thống nhập
 
 Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`. Mỗi mục có test đỏ trước, xanh sau (mục chỉ thêm test: ghi rõ). Bảng xử lý từng mục (commit hoặc "không sửa – lý do"): `docs/ke_hoach/BAO_CAO_SOAT_NHAP.md` (cột cuối mỗi bảng) và mục "Vòng sửa A13.12" cuối `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`.

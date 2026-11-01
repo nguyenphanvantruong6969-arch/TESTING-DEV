@@ -18,6 +18,7 @@ import pytest
 
 import api_quan_ly
 from _wharton import bat_wharton, chen_bids, dong_bids, dung_clb, dung_hs
+from _wharton import tat_wharton  # noqa: E402
 from api_quan_ly import phong_theo_ti_le
 
 
@@ -175,6 +176,7 @@ def test_dang_khoa_bao_da_khoa_va_khong_doi_gi(w):
 
 
 def test_tat_tinh_nang_bao_chua_bat(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     kq = api.phong_wharton_hang_loat("PHONG")
     assert not kq["ok"] and kq["errors"][0]["code"] == "wharton_chua_bat"
 
@@ -230,6 +232,7 @@ def test_xuat_danh_sach_can_sua_dung_cac_em_va_khong_doi_csdl(w, tmp_path):
 
 
 def test_xuat_danh_sach_tat_tinh_nang_bao_chua_bat(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     kq = api.export_wharton_can_sua()
     assert not kq["ok"] and kq["errors"][0]["code"] == "wharton_chua_bat"
 

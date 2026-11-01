@@ -17,6 +17,7 @@ import time
 import pytest
 
 from _wharton import bat_wharton, chen_bids, dung_clb, dung_hs
+from _wharton import tat_wharton  # noqa: E402
 
 
 @pytest.fixture
@@ -206,6 +207,7 @@ def test_nhat_ky_moi_nhat_truoc_va_phan_trang(w):
 # ------------------------------------------------------------------ Wharton tắt
 
 def test_wharton_tat_ba_ham_bao_chua_bat(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     for kq in (api.list_wharton_admin(), api.list_wharton_canh_bao(), api.get_wharton_nhat_ky()):
         assert kq["ok"] is False and [e["code"] for e in kq["errors"]] == ["wharton_chua_bat"]
 

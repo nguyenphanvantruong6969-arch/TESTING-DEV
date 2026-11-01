@@ -46,6 +46,7 @@ def do(ham, lan=5):
 
 def dung_du_lieu(duong_db):
     api = PipelineAPI(duong_db)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     for text in sinh_csv(N_HS, N_CLB, N_NV, 1.08):
         api.import_csv_auto(text)
     api.run_pipeline(seed=42)
@@ -81,6 +82,7 @@ def main():
     conn.commit()
     conn.close()
     api2 = PipelineAPI(duong_db2)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api2.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     sau = dict((ten, do(f)) for ten, f in cac_phep_do(api2))
 
     print("\n%-32s %12s %12s %10s" % ("Truy vấn", "hiện nay", "có chỉ mục", "nhanh hơn"))

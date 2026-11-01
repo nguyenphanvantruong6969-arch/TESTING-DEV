@@ -19,6 +19,7 @@ import rbda_priority_pipeline as rp
 import workspace as ws
 from api import PipelineAPI
 from _ket_qua_bo_test import BO, chay_bo
+from _wharton import tat_wharton
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ANH_CHUP = os.path.join(GOC, "tests", "du_lieu_ws", "ket_qua_truoc_luat.json")
@@ -76,12 +77,13 @@ def test_mac_dinh_truong_hoc_ra_dung_ket_qua_truoc_khi_co_luat(tmp_path):
     truoc = json.load(open(ANH_CHUP, encoding="utf-8"))
     for ten_bo in BO:
         api = PipelineAPI(str(tmp_path / (ten_bo + ".db")))
+        tat_wharton(api)     # A13.13: mặc định đã BẬT; luật cũ = tắt RÕ RÀNG
         assert chay_bo(api, ten_bo) == truoc[ten_bo], ten_bo
 
 
 def test_mac_dinh_trong_workspace_cung_ra_dung_ket_qua(goc, tmp_path):
     truoc = json.load(open(ANH_CHUP, encoding="utf-8"))
-    api = _api(goc, tmp_path, {})
+    api = _api(goc, tmp_path, {"rules": {"wharton": False}})   # A13.13: tắt RÕ RÀNG
     assert chay_bo(api, "sach") == truoc["sach"]
 
 

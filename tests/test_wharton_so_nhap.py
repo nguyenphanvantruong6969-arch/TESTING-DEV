@@ -22,6 +22,7 @@ import cau_hinh_ws as ch  # noqa: E402
 import so_nhap  # noqa: E402
 from _so_nhap_dump import chup  # noqa: E402
 from _wharton import (bat_wharton, canh_bao, chen_bids, dong_bids, dung_clb, dung_hs)  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
 from api import PipelineAPI  # noqa: E402
 
 CFG_W = {"rules": {"wharton": True, "max_choices": 10, "max_tests": 5, "score_scope": "per_slot"}}
@@ -95,7 +96,9 @@ SV_CO_W = [_hs("HS1", [_nv("A", True, 7.5, diem_w=100), _nv("B", diem_w=60), _nv
 def test_tat_wharton_so_nhap_giong_het_khong_cfg_ke_ca_khi_nv_mang_diem_w():
     goc = chup(_bytes(students=SV_THUONG))
     assert chup(_bytes(students=SV_THUONG, cfg=CFG_TAT)) == goc
-    assert chup(_bytes(students=SV_THUONG, cfg=ch.MAC_DINH_TRUONG_HOC)) == goc
+    # A13.13: mặc định trường học đã BẬT nên không còn giống `goc`; bản mặc định TẮT RÕ RÀNG thì có.
+    assert chup(_bytes(students=SV_THUONG, cfg=ch.tron_len(ch.MAC_DINH_TRUONG_HOC,
+                                                            CFG_TAT))) == goc
     # nv có diem_w mà workspace tắt: cột W KHÔNG xuất hiện, sổ vẫn như cũ
     co_w_nhung_tat = [_hs("HS1", [_nv("A", True, 7.5, diem_w=100), _nv("B", diem_w=60),
                                   _nv("C", diem_w=40)]),
@@ -286,6 +289,7 @@ def test_xuat_roi_nap_lai_vao_workspace_moi_wharton_bids_giong_het(api, tmp_path
 
 
 def test_xuat_khi_tat_wharton_khong_co_cot_w(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     _dung_du_lieu(api)                                         # bảng có dòng nhưng workspace tắt
     with open(api.export_du_lieu_dau_vao()["data"]["path"], "rb") as f:
         du = f.read()
@@ -319,6 +323,7 @@ def test_nap_so_o_w_mo_coi_thanh_canh_bao_khong_co_nguyen_vong(api):
 
 
 def test_nap_so_khi_workspace_tat_bo_qua_kem_canh_bao_va_xem_truoc_noi_truoc(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     du = _bytes(students=SV_CO_W, cfg=CFG_W)
     pv = api.xem_truoc_so_nhap(_b64(du))
     assert pv["ok"]

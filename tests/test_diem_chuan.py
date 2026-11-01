@@ -15,6 +15,7 @@ import openpyxl
 import pytest
 
 from _wharton import bat_wharton
+from _wharton import tat_wharton  # noqa: E402
 from api_quan_ly import tinh_diem_chuan
 from test_wharton import sinh_bo
 from test_wharton_pipeline import _nap_bo_vao_api
@@ -217,6 +218,7 @@ def test_api_tra_du_lieu_va_ket_qua_cu_khi_dau_van_tay_khac(api):
 
 
 def test_api_tat_tinh_nang_tra_wharton_chua_bat(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     kq = api.get_diem_chuan()
     assert not kq["ok"] and kq["errors"][0]["code"] == "wharton_chua_bat"
 
@@ -262,6 +264,7 @@ def test_tep_xuat_co_trang_diem_chuan_moi_clb_buoi_mot_dong(api):
 
 
 def test_tep_xuat_tat_tinh_nang_giong_het_truoc(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     # Tắt tính năng: không có trang Điểm chuẩn, các trang còn lại đúng như trước vòng 4.
     api.create_or_update_club("A", "CLB A", 2, 0, "")
     for sid in ("S1", "S2", "S3"):
@@ -342,6 +345,7 @@ def test_api_chi_tiet_em_chi_tinh_em_da_xin_vao_clb_do(api):
 
 
 def test_api_chi_tiet_clb_khong_co_tat_tinh_nang_va_ma_sai(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     assert api.get_diem_chuan_clb("A")["errors"][0]["code"] == "wharton_chua_bat"
     _chay_that(api, 2)
     kq = api.get_diem_chuan_clb("khong_co_clb_nay")

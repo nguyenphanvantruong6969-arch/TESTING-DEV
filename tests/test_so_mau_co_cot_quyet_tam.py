@@ -21,6 +21,7 @@ openpyxl = pytest.importorskip("openpyxl")
 import cau_hinh_ws as ch  # noqa: E402
 import so_nhap  # noqa: E402
 from _so_nhap_dump import chup  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
 from api import PipelineAPI  # noqa: E402
 from rbda_priority_pipeline import dung_wharton  # noqa: E402
 
@@ -56,8 +57,19 @@ def _doc_huong_dan(nguon):
 
 # ------------------------------------------------------------------ 1. nút tải sổ mẫu
 
-def test_workspace_mac_dinh_so_mau_co_cot_trong_moi_nhom_va_co_ghi_chu(tmp_path):
+def test_workspace_mac_dinh_bat_so_mau_co_cot_trong_moi_nhom(tmp_path):
+    # A13.13: mặc định BẬT; sổ mẫu vẫn có cột trong mỗi nhóm, hướng dẫn dùng đoạn của workspace bật.
     api = PipelineAPI(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
+    assert dung_wharton(api._luat_nghiem()) is True
+    kq = api.tao_so_nhap_mau(str(tmp_path / "mau.xlsx"))
+    assert kq["ok"], kq["errors"]
+    assert _nhom_co_cot_w(_hang_2(kq["data"]["path"]))
+    assert TEN_COT_W in _doc_huong_dan(kq["data"]["path"])
+
+
+def test_workspace_tat_ro_rang_so_mau_co_cot_trong_moi_nhom_va_co_ghi_chu(tmp_path):
+    api = PipelineAPI(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
+    tat_wharton(api)
     assert dung_wharton(api._luat_nghiem()) is False
     kq = api.tao_so_nhap_mau(str(tmp_path / "mau.xlsx"))
     assert kq["ok"], kq["errors"]
@@ -88,6 +100,7 @@ def test_so_mau_csv_co_cot_quyet_tam(duong):
 
 @pytest.mark.parametrize("duong", CAC_SO_MAU[1:])
 def test_tat_tinh_nang_nap_so_khong_loi_khong_wharton_bids(api, duong):
+    tat_wharton(api)          # A13.13: mặc định đã BẬT
     kq = api.import_so_nhap(_b64(duong))
     assert kq["ok"], kq["errors"]
     assert kq["data"]["warnings"] == []
@@ -96,6 +109,7 @@ def test_tat_tinh_nang_nap_so_khong_loi_khong_wharton_bids(api, duong):
 
 
 def test_so_mau_trong_nap_duoc_khi_tat_tinh_nang(api):
+    tat_wharton(api)
     kq = api.import_so_nhap(_b64(CAC_SO_MAU[0]))
     assert kq["ok"] or [e["code"] for e in kq["errors"]] == ["so_nhap_khong_co_clb"]
 
@@ -104,10 +118,12 @@ def test_so_mau_trong_nap_duoc_khi_tat_tinh_nang(api):
 @pytest.mark.parametrize("bo", ("vi_du_day_du", "vi_du_ca_tuan"))
 def test_tat_tinh_nang_ket_qua_trung_khit_voi_bo_ba_csv(api_factory, bo, seed):
     api_csv = api_factory()
+    tat_wharton(api_csv)      # A13.13: mặc định đã BẬT; so khớp bộ ba CSV cũ cần tắt RÕ RÀNG
     for ten in TEP_CSV:
         with io.open(os.path.join(MAU, bo, ten), encoding="utf-8-sig") as f:
             assert api_csv.import_csv_auto(f.read())["ok"]
     api_so = api_factory()
+    tat_wharton(api_so)
     assert api_so.import_so_nhap(_b64(os.path.join(MAU, bo, "SO_NHAP_CLB_vi_du.xlsx")))["ok"]
     assert api_csv.run_pipeline(seed=seed)["ok"] and api_so.run_pipeline(seed=seed)["ok"]
 
@@ -118,6 +134,7 @@ def test_tat_tinh_nang_ket_qua_trung_khit_voi_bo_ba_csv(api_factory, bo, seed):
 
 
 def test_tat_tinh_nang_so_co_so_o_cot_quyet_tam_chi_canh_bao_khong_chan(api, tmp_path):
+    tat_wharton(api)
     wb = openpyxl.load_workbook(SO_VI_DU[0])
     ws = wb["2. Học sinh"]
     cot_w = next(c.column for c in ws[2] if c.value == TEN_COT_W)
@@ -171,7 +188,10 @@ def test_ghi_so_nhap_mac_dinh_khong_co_cot_va_giong_het_khi_truyen_false():
     goc = chup(_ghi())
     assert chup(_ghi(luon_co_cot_w=False)) == goc
     assert TEN_COT_W not in _hang_2(io.BytesIO(_ghi()))
-    assert chup(_ghi(cfg=ch.MAC_DINH_TRUONG_HOC)) == goc
+    # A13.13: mặc định trường học nay BẬT nên sổ có cột; bản mặc định tắt RÕ RÀNG thì giống hệt.
+    tat = ch.tron_len(ch.MAC_DINH_TRUONG_HOC, {"rules": {"wharton": False}})
+    assert chup(_ghi(cfg=tat)) == goc
+    assert TEN_COT_W in _hang_2(io.BytesIO(_ghi(cfg=ch.MAC_DINH_TRUONG_HOC)))
     assert TEN_COT_W not in _doc_huong_dan(io.BytesIO(_ghi()))
 
 
@@ -189,7 +209,17 @@ def test_luon_co_cot_w_khong_doi_phan_con_lai_cua_dong_du_lieu():
             for s in b["students"]]
 
 
-def test_xuat_du_lieu_dau_vao_workspace_mac_dinh_khong_co_cot(api, tmp_path):
+def test_xuat_du_lieu_dau_vao_workspace_mac_dinh_bat_co_cot(api, tmp_path):
+    # A13.13: mặc định BẬT nên sổ xuất có cột Điểm quyết tâm.
+    assert api.create_student_if_missing("HS1", "Em 1")["ok"]
+    assert api.create_or_update_club("A", "CLB A", 5, 0, "", "")["ok"]
+    kq = api.export_du_lieu_dau_vao(str(tmp_path / "xuat.xlsx"))
+    assert kq["ok"], kq["errors"]
+    assert _nhom_co_cot_w(_hang_2(kq["data"]["path"]))
+
+
+def test_xuat_du_lieu_dau_vao_workspace_tat_ro_rang_khong_co_cot(api, tmp_path):
+    tat_wharton(api)
     assert api.create_student_if_missing("HS1", "Em 1")["ok"]
     assert api.create_or_update_club("A", "CLB A", 5, 0, "", "")["ok"]
     kq = api.export_du_lieu_dau_vao(str(tmp_path / "xuat.xlsx"))

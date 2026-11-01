@@ -134,6 +134,7 @@ def test_dau_cuoi_nap_so_sua_diem_cham_thi_chay_xuat_nap_lai_va_tat_wharton(tmp_
         co_w = [c.value for c in openpyxl.load_workbook(io.BytesIO(f.read()))["2. Học sinh"][1]]
     assert not any(str(c).startswith("Điểm W") for c in co_w if c)
     api3 = PipelineAPI(str(tmp_path / "khong_wharton.db"))
+    bat_wharton(api3, bat=False)       # A13.13: mặc định đã BẬT; đây là workspace chưa từng có điểm W
     with open(xuat_tat["data"]["path"], "rb") as f:
         kq = api3.import_so_nhap(_b64(f.read()))
     assert kq["ok"], kq["errors"]

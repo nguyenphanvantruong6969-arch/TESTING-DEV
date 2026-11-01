@@ -35,6 +35,7 @@ N_SEED = 50
 tm = tempfile.mkdtemp()
 try:
     db = os.path.join(tm,"app.db"); api = PipelineAPI(db)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     for rel in F: api.import_csv_auto(open(os.path.join(GOC,rel),encoding="utf-8-sig").read())
     students, clubs, diem, ung_vien_goc, nv_goc, _ = loi.load_from_sqlite(db)
     fn = loi.default_reserve_eligible_fn(students, clubs)

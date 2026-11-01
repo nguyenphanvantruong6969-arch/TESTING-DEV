@@ -94,6 +94,8 @@ def tao_api(thu_muc, dqt=False, cfg=None):
     if dqt or cfg:
         c = copy.deepcopy(cfg) if cfg else copy.deepcopy(CFG_DQT_RULES)
         cau_hinh_ws.ghi_cau_hinh(db, c)
+    else:   # A13.13: mặc định đã BẬT Wharton; các kịch bản không-DQT lấy luật cũ (tắt RÕ RÀNG)
+        cau_hinh_ws.ghi_cau_hinh(db, {"rules": {"wharton": False}})
     return api
 
 

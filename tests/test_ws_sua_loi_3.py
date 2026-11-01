@@ -267,7 +267,7 @@ def test_dau_van_tay_khong_doi_khi_chi_sua_nhom_vo_tac_dung(tmp_path):
 
 
 def test_run_full_pipeline_khong_tu_choi_vi_nhom_vo_tac_dung(goc, tmp_path):
-    slug = ws.tao(goc, "Rảnh", {"rules": {"tiers": ["A"]}})
+    slug = ws.tao(goc, "Rảnh", {"rules": {"tiers": ["A"], "wharton": False}})  # A13.13: mặc định đã BẬT
     db = ws.duong_dan_db(goc, slug)
     rp.seed_sample_data(db, n_students=20)
     rp.run_full_pipeline(db, seed=1, output_csv_path=str(tmp_path / "x.csv"))

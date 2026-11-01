@@ -20,7 +20,7 @@ import pytest
 
 import api as api_mod
 import rbda_priority_pipeline as rp
-from _wharton import bat_wharton, dung_clb, dung_hs
+from _wharton import bat_wharton, dung_clb, dung_hs, tat_wharton
 from test_wharton import sinh_bo
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -78,6 +78,7 @@ def test_tat_wharton_trung_khit_ban_chup_truoc_vong_2(khoa):
     with tempfile.TemporaryDirectory() as tmp:
         db = nap_bo(tmp, files)
         api = api_mod.PipelineAPI(db)
+        tat_wharton(api)          # A13.13: mặc định đã BẬT; bản chụp cũ = tắt RÕ RÀNG
         kq = api.run_pipeline(seed=int(seed))
         assert kq["ok"], kq["errors"]
         with api._ket_noi_doc() as cur:
@@ -147,8 +148,7 @@ def test_bat_wharton_that_su_doi_ket_qua_so_voi_tat(tmp_path):
         for bat in (True, False):
             db = str(tmp_path / ("%d_%s.db" % (seed, bat)))
             api = api_mod.PipelineAPI(db)
-            if bat:
-                bat_wharton(api)
+            bat_wharton(api, bat=bat)          # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
             _nap_bo_vao_api_neu_bat(api, bo, bat)
             assert api.run_pipeline(seed=seed)["ok"]
             ket[bat] = _ket_qua(api)

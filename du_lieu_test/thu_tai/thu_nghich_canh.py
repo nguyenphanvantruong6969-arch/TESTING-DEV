@@ -215,6 +215,7 @@ def main() -> None:
         t0 = time.time()
         try:
             api = PipelineAPI(os.path.join(d, "app.db"))
+            __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
             mo_ta = ham(api)
             if ten != "Nạp theo 5 đợt":       # kịch bản đó tự chạy pipeline rồi
                 kq = api.run_pipeline(seed=42)

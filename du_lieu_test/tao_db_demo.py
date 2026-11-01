@@ -45,6 +45,7 @@ def main():
     if os.path.exists(DICH):
         os.remove(DICH)
     api = PipelineAPI(DICH)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
 
     for ten in TEP:
         r = api.import_csv_auto(doc_xlsx(api, ten))

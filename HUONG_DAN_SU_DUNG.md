@@ -986,7 +986,9 @@ và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hư�
 
 ### Bật ở đâu
 
-Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã bật sẵn).
+Không gian làm việc **Trường học** (kể cả khi tạo mới hoặc mở lại dữ liệu cũ chưa có cấu hình) **bật sẵn** điểm quyết tâm.
+Muốn tắt: Màn **Không gian làm việc** → tạo mới → bước luật → bỏ chọn ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã tắt).
+Khi bật mà học sinh chưa chia đủ điểm thì phần mềm **không chạy xếp** và báo rõ ai còn thiếu: hãy điền đủ điểm, hoặc tắt tính năng nếu không dùng.
 Ô này chỉ dùng được khi cách xếp ưu tiên có điểm (Theo điểm, hoặc Nhóm trước rồi đến điểm) **và** điểm tính
 riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một điểm duy nhất" thì ô tự khoá và bỏ chọn.
 

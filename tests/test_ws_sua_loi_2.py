@@ -181,17 +181,32 @@ def _chay(goc, tmp_path, cfg, seed):
 
 
 def test_run_history_luat_mac_dinh_la_null(goc, tmp_path):
-    api = _chay(goc, tmp_path, {}, 1)
+    # A13.13: mặc định workspace đã BẬT Wharton nên luật hiệu lực KHÁC mặc định thuật toán; luật
+    # cũ (tắt RÕ RÀNG) vẫn ghi NULL.
+    api = _chay(goc, tmp_path, _cau_hinh(wharton=False), 1)
     dong = api.get_run_history()["data"][0]
     assert "luat_xep" in dong and dong["luat_xep"] is None
+
+
+def test_run_history_luat_mac_dinh_moi_ghi_wharton_true(goc, tmp_path):
+    api = _chay(goc, tmp_path, {}, 5)
+    luat = json.loads(api.get_run_history()["data"][0]["luat_xep"])
+    assert luat == {"priority": "score", "tier_mode": "reserve", "score_scope": "per_slot",
+                    "tiers": [], "wharton": True}
 
 
 def test_run_history_ghi_luat_khac_mac_dinh(goc, tmp_path):
     api = _chay(goc, tmp_path, _cau_hinh(tier_mode="strict", tiers=["Cấp 1", "Cấp 2"]), 2)
     dong = api.get_run_history()["data"][0]
     luat = json.loads(dong["luat_xep"])
+    # A13.13: workspace mặc định có wharton=True nên bản ghi có thêm khoá đó.
     assert luat == {"priority": "score", "tier_mode": "strict",
-                    "score_scope": "per_slot", "tiers": ["Cấp 1", "Cấp 2"]}
+                    "score_scope": "per_slot", "tiers": ["Cấp 1", "Cấp 2"], "wharton": True}
+    cu = _chay(goc, tmp_path, _cau_hinh(tier_mode="strict", tiers=["Cấp 1", "Cấp 2"],
+                                        wharton=False), 6)
+    assert json.loads(cu.get_run_history()["data"][0]["luat_xep"]) == {
+        "priority": "score", "tier_mode": "strict", "score_scope": "per_slot",
+        "tiers": ["Cấp 1", "Cấp 2"]}
 
 
 def test_di_tru_them_cot_luat_xep_vao_run_history_cu(tmp_path):
@@ -226,7 +241,7 @@ def test_run_full_pipeline_tu_choi_khi_luat_khac_mac_dinh(goc, tmp_path):
 
 
 def test_run_full_pipeline_van_chay_voi_luat_mac_dinh(goc, tmp_path):
-    slug = ws.tao(goc, "Mặc định")
+    slug = ws.tao(goc, "Mặc định", {"rules": {"wharton": False}})   # A13.13: mặc định đã BẬT
     db = ws.duong_dan_db(goc, slug)
     rp.seed_sample_data(db, n_students=20)
     rp.run_full_pipeline(db, seed=1, output_csv_path=str(tmp_path / "x.csv"))
