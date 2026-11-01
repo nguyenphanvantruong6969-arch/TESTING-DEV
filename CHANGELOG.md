@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-01 — Công cụ phiên (ngoài sổ): sửa test tài liệu sau khi rút gọn CLAUDE.md
+
+- `tests/test_a13_12_tai_lieu.py::_doan_ban_do` đọc "Bản đồ mã" ở `docs/ke_hoach/CLAUDE_CHI_TIET.md` (bảng đã chuyển nguyên văn khỏi `CLAUDE.md` ở `5fd624b`). Trước đó hai ca `test_ban_do_ma_co_nhom_ham_diem_quyet_tam`, `test_ban_do_ma_so_tep_test_la_so_that` đỏ trên `cee2940`. Không đổi mã sản phẩm. `kiem_nhanh.py --co-so cee2940`: 7/7 ĐẠT.
+- Lưu ý khi gộp nhánh `claude/wharton-mac-dinh-bat`: nhánh đó thêm tệp test, nên phải cập nhật số tệp ở dòng `tests/` của bản đồ mã trong `CLAUDE_CHI_TIET.md`.
+
 ## 2026-10-28 — A13.12 Sửa Tầng 4 của đợt soát A13 và toàn bộ mục chặn / nên sửa của đợt soát hệ thống nhập
 
 Theo yêu cầu của Truong qua phiên điều phối. Mô phỏng. Tắt Điểm quyết tâm: kết quả trùng khít `e08af78`. Mỗi mục có test đỏ trước, xanh sau (mục chỉ thêm test: ghi rõ). Bảng xử lý từng mục (commit hoặc "không sửa – lý do"): `docs/ke_hoach/BAO_CAO_SOAT_NHAP.md` (cột cuối mỗi bảng) và mục "Vòng sửa A13.12" cuối `docs/ke_hoach/BAO_CAO_SOAT_MA_A13.md`.
