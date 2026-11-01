@@ -103,7 +103,8 @@ def test_tat_tinh_nang_nap_so_khong_loi_khong_wharton_bids(api, duong):
     tat_wharton(api)          # A13.13: mặc định đã BẬT
     kq = api.import_so_nhap(_b64(duong))
     assert kq["ok"], kq["errors"]
-    assert kq["data"]["warnings"] == []
+    # A13.13: sổ ví dụ nay CÓ điểm quyết tâm mô phỏng; workspace tắt thì bỏ qua và nói rõ (không lỗi).
+    assert [w["code"] for w in kq["data"]["warnings"]] == ["csv_wp_bo_qua"]
     with api._ket_noi_doc() as cur:
         assert cur.execute("SELECT COUNT(*) FROM wharton_bids").fetchone()[0] == 0
 
@@ -158,6 +159,9 @@ def test_bat_tinh_nang_so_dien_vao_cot_duoc_doc_vao_wharton_bids(tmp_path):
     cot_w = next(c.column for c in ws[2] if c.value == TEN_COT_W)
     sid = ws.cell(row=3, column=1).value
     ten_clb = ws.cell(row=3, column=cot_w - 2).value
+    for c in [c.column for c in ws[2] if c.value == TEN_COT_W]:   # A13.13: sổ ví dụ đã có điểm;
+        for r in range(3, ws.max_row + 1):                        # xoá hết, chỉ đặt một ô
+            ws.cell(row=r, column=c).value = None
     ws.cell(row=3, column=cot_w).value = 100
     p = tmp_path / "bat.xlsx"
     wb.save(p)
