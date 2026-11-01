@@ -17,11 +17,10 @@ Out of scope: "template header by vocabulary" (Direction A/B).
 - [x] 7. Parent's acceptance suite: tests/test_a13_13_kiem_nhan.py (45) + tests/test_giao_dien_a13_13_kiem_nhan.py (2): all pass, no code change needed
 
 ## Current state
-- Pushed up to group-A fixes (14737b7) + merge of claude/demo-wharton-va-duong-dan; ROUND 4 (group B, direction (c)) is DONE IN THE WORKING TREE and committed in the last commit of this session (see git log).
-- Last targeted run (all files touching changed data/skills + group-B files + bo_sach + demo DB + kiem_nhan + wizard UI) was still running at handoff: log /tmp/rB2.log may be gone in a new session. RE-RUN it first (command below).
-- Final targeted run: 4 red fixed (3 tests of vi_du sổ expected an EMPTY DQT sổ -> adjusted; vi_du_day_du result hash updated because HS024 data changed). ruff clean, soat-ma 7/7, TIEN_DO updated. Still to do: report to parent session (session_01YVAyu1fhG9nmCdTfR1eikv) with: commit, group-B table by file, CI run number. No PR (parent opens it when CI is green). Do NOT run the whole suite (rule 2); CI does.
-- Re-run command: F=$(grep -ln "vi_du_huong_dan\|vi_du_day_du\|vi_du_ca_tuan\|08_nguyen_vong_nhieu_buoi\|tao_so_nhap\|NHAP_TAY\|VIDU_\|SO_NHAP_CLB_vi_du\|sinh_du_lieu\|chuyen_forms\|xu_li_raw\|tao_workspace\|them_diem" tests/*.py); RBDA_TEST_CHROMIUM=/opt/pw-browsers/chromium-1243/chrome-linux64/chrome python -m pytest -q -p no:cacheprovider $F tests/test_bo_sach.py tests/test_db_demo_wharton.py tests/test_rang_buoc_csdl.py tests/test_wharton_mac_dinh_bat.py tests/test_ws_wharton_giao_dien.py tests/test_giao_dien_a13_13_kiem_nhan.py
-- Env note: pytest in the container needs `pip install pytest ruff openpyxl "playwright>=1.40,<2"` into the system python (not the uv tool one); do not `playwright install`.
+- ALL planned work is done and pushed (last code commit a19731c). Rounds 1-4 complete: default ON, group-A test fixes, group B direction (c), demo-branch merge, skills, NHAP_TAY.
+- Last targeted run after the final fixes: 27 passed on the two re-fixed files; before that 1414 passed / 4 red (now fixed). ruff clean, soat-ma 7/7. Reported to parent session (session_01YVAyu1fhG9nmCdTfR1eikv) with the group-B table; CI run number NOT known (parent reads CI).
+- Open question sent to parent/Truong: vi_du_day_du data was changed (HS024 lost thu_2 pref clb_bongro) so exactly one em stays trang tay; hash in tests/test_ket_qua_khong_doi.py updated. If Truong rejects the data change, find another way (e.g. change the test) - do not loosen asserts silently.
+- Do NOT open a PR; parent opens it when CI is green.
 
 ## Round 3 (after full CI: 241 red in 40 files) — classification
 - Group A fixed (local `api` fixture -> `tat_wharton`; 27 files incl. 9 giao_dien; no assert loosened, none skipped): all pass.
@@ -48,10 +47,9 @@ Out of scope: "template header by vocabulary" (Direction A/B).
 - soat-ma `kiem_trung_khit` would silently compare two "blocked" runs; fixed by writing wharton false in both.
 
 ## Next steps
-1. Re-run the command above; fix any red (dont loosen asserts, no skip).
-2. `ruff check .`; run soat-ma (7/7 expected); add a TIEN_DO.md A13.13 sentence for round 4 (group B done, direction (c)).
-3. Commit + push (git push -u origin claude/wharton-mac-dinh-bat), then send_message to parent: commit, group-B table by file, CI run number (check with GitHub MCP actions_list if available).
-4. Later (not now): Google Form (tao-google-form-clb) should collect DQT.
+1. Wait for parent/Truong feedback (CI result, decision on the HS024 data change). Fix only what they ask.
+2. If CI shows red files not run locally, classify A (internal fixture -> local `api` fixture + `tat_wharton`) vs B (shipped sample/skill output -> do not mask; ask parent).
+3. Later (not now): Google Form (tao-google-form-clb) should collect commitment points.
 
 ## Files touched
 - cau_hinh_ws.py, i18n_errors.py, i18n_loi.js, api_nhap.py/rbda_priority_pipeline.py (comments), docs: HUONG_DAN_SU_DUNG.md, TAI_LIEU_DU_LIEU.md, CHANGELOG.md, TIEN_DO.md, CLAUDE_CHI_TIET.md (tests row: 168 files / 3.138 cases), mau_csv/* (GIAI_THICH, wp cols, tao_so_nhap.py, tao_bo_mau.py HS024), du_lieu_test/* (them_diem_quyet_tam_vao_mau.py NEW, NHAP_TAY.md, vi_du_huong_dan/*, scripts with explicit wharton false).
@@ -64,3 +62,4 @@ Out of scope: "template header by vocabulary" (Direction A/B).
 | 2026-11-01 | Sonnet | Branch + handoff created | |
 | 2026-11-01 | Sonnet | Implemented A13.13, fixed tests/scripts, parent acceptance suite | see Current state |
 | 2026-11-01 | Sonnet | Round 3 (group A after CI) + round 4 (group B, direction c, demo-branch merge, skills, NHAP_TAY) | handoff at ~400k tokens; final test run + ruff + soat-ma + report to parent pending |
+| 2026-11-01 | Sonnet | Final handoff after round 4: 4 red tests fixed, ruff/soat-ma green, report sent to parent | context >400k; open a new session to continue |
