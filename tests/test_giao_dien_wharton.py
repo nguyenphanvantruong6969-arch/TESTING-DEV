@@ -33,8 +33,7 @@ DAU_VIET = re.compile(
 
 
 def _dung_du_lieu(api, bat=True):
-    if bat:
-        bat_wharton(api)
+    bat_wharton(api, bat=bat)     # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
     dung_clb(api, A=5, B=5, C=5, D=5)
     dung_hs(api, "HS1", "HS2", tick={"HS1": ["A"], "HS2": ["A"]})
     assert api.create_student_if_missing("HS1", "Ngô Văn An")["ok"]

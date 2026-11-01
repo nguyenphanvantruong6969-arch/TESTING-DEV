@@ -26,8 +26,7 @@ TAB = '#qlTabs [role="tab"]'
 
 
 def _dung_du_lieu(api, bat):
-    if bat:
-        bat_wharton(api)
+    bat_wharton(api, bat=bat)     # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
     dung_clb(api, A=(5, "thu_3"), B=(5, "thu_3"), C=(5, "thu_3"))
     dung_hs(api, "HS1", "HS2", tick={"HS1": ["A"]})
     assert api.submit_preferences("HS1", ["A", "B", "C"])["ok"]

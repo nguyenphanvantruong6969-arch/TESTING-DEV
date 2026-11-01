@@ -24,8 +24,7 @@ DONG_VANG = "Chưa có kết quả xếp. Chạy xếp trước."
 
 
 def _du_lieu(api, bi_chan=False):
-    if bi_chan:
-        bat_wharton(api)
+    bat_wharton(api, bat=bi_chan)     # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
     dung_clb(api, A=5, B=5)
     dung_hs(api, "HS1", "HS2")
     for sid in ("HS1", "HS2"):

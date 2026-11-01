@@ -18,6 +18,7 @@ import time
 import pytest
 
 import workspace as ws
+from _wharton import tat_wharton
 from api import PipelineAPI
 
 
@@ -27,6 +28,7 @@ def _ma(res):
 
 @pytest.fixture
 def api_co_ket_qua(api):
+    tat_wharton(api)         # A13.13: mặc định đã BẬT; nền này không có điểm quyết tâm
     api.create_or_update_club("a", "A", 1, 0, "")
     api.create_or_update_club("b", "B", 5, 0, "")
     for sid in ("N1", "N2"):
@@ -229,6 +231,7 @@ def api_lon(tmp_path_factory):
     clb, hs = sdl.sinh_ngau_nhien(1500, [""], 40, 11)
     sdl.ghi_bo(str(thu_muc), clb, hs)
     api = PipelineAPI(str(thu_muc / "app.db"), thu_muc_xuat=str(thu_muc))
+    tat_wharton(api)         # A13.13: mặc định đã BẬT; sổ sinh ngẫu nhiên không có điểm quyết tâm
     with open(thu_muc / "SO_NHAP_CLB.xlsx", "rb") as f:
         assert api.import_so_nhap(base64.b64encode(f.read()).decode())["ok"]
     assert api.run_pipeline(seed=3)["ok"]

@@ -37,8 +37,7 @@ DAU_VIET = re.compile(
 
 def _dung_du_lieu(api, bat=True):
     """HS1 hợp lệ; HS2 quỹ 2 mới 90 điểm; HS3 tick thi A mà vắng thi (hồ sơ hợp lệ)."""
-    if bat:
-        bat_wharton(api)
+    bat_wharton(api, bat=bat)     # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
     dung_clb(api, A=(5, "thu_3"), B=(5, "thu_3"), C=(5, "thu_3"), D=(5, "thu_5"))
     for sid, ten in (("HS1", "Nguyễn Văn Bình"), ("HS2", "Trần Thị Lan"), ("HS3", "Lê Hoàng Nam")):
         assert api.create_student_if_missing(sid, ten)["ok"]

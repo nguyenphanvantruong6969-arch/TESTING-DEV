@@ -29,8 +29,7 @@ DAU_VIET = re.compile(
 
 def _dung_du_lieu(api, bat=True, chay=True):
     """Tám em xin CLB A (4 chỗ, không thi) rồi B (10 chỗ); điểm quyết tâm cho A: 95, 85, …, 25."""
-    if bat:
-        bat_wharton(api)
+    bat_wharton(api, bat=bat)     # A13.13: mặc định đã BẬT nên tắt phải RÕ RÀNG
     dung_clb(api, A=4, B=10, C=3)
     bids = []
     for i in range(8):
