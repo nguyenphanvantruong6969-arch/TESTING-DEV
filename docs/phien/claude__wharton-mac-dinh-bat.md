@@ -55,3 +55,4 @@ A13.13: the school workspace default `rules.wharton = True` (commitment points /
 | 2026-11-01 | Sonnet | Final handoff after round 4: 4 red tests fixed, ruff/soat-ma green, report sent to parent | context >400k; open a new session to continue |
 | 2026-11-01 | Sonnet | Recorded Truong's approval in CHANGELOG; final handoff | context >400k; open a new session to continue |
 | 2026-11-01 | Sonnet | Full handoff rewrite requested by parent (rule 9, context ~538k) | stop; new session continues from this file |
+| 2026-11-01 | Sonnet | Handoff re-confirmed (hook fired again); nothing new done | open a new session from this file |
