@@ -29,7 +29,7 @@ bằng tay** rồi đối chiếu với máy.
 |---|---|
 | `VIDU_01_danh_sach_CLB` | 4 CLB, tổng **10 suất** cho 10 em; Bóng rổ có 1 suất dự trữ |
 | `VIDU_02_chon_CLB_muon_thi` | 10 em, mỗi em thi 1–2 CLB, **điểm có sẵn** |
-| `VIDU_03_xep_hang_nguyen_vong` | 10 em, mỗi em 1–2 nguyện vọng |
+| `VIDU_03_xep_hang_nguyen_vong` | 10 em, mỗi em 1–2 nguyện vọng, kèm cột `wp_1`, `wp_2` = **điểm quyết tâm MÔ PHỎNG** (workspace trường học bật sẵn; sinh bằng `du_lieu_test/them_diem_quyet_tam_vao_mau.py`, seed cố định). Kết quả bên dưới không đổi vì mọi em đã thi mọi CLB mình ghi |
 
 Mỗi tệp có cả `.xlsx` và `.csv`.
 

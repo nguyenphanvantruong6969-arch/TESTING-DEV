@@ -734,7 +734,12 @@ def _tom_tat(clubs, students):
     return nhu_cau, nv1, nguoi_buoi
 
 
-def viet_bao_cao(duong, spec, cfg, clubs, students, phieu_bo, canh_bao, nguon_spec):
+GHI_CHU_TAT_DQT = ("Dữ liệu không có điểm quyết tâm nên đã tắt tính năng này "
+                   "(workspace ghi rõ wharton: false).")
+
+
+def viet_bao_cao(duong, spec, cfg, clubs, students, phieu_bo, canh_bao, nguon_spec,
+                 tat_diem_quyet_tam=False):
     from i18n_errors import format_message
     nhan = cfg["labels"]
     L = {k: v["vi"] for k, v in nhan.items()}
@@ -756,6 +761,9 @@ def viet_bao_cao(duong, spec, cfg, clubs, students, phieu_bo, canh_bao, nguon_sp
                  if r["max_tests"] is not None else "không giới hạn số chỗ có điểm",
                  r["priority"], r["tier_mode"], r["score_scope"],
                  (" · tiers: " + ", ".join(r["tiers"])) if r["tiers"] else ""))
+    if tat_diem_quyet_tam:
+        d.append("> **Điểm quyết tâm: TẮT.** " + GHI_CHU_TAT_DQT + " Muốn dùng, thêm điểm vào raw rồi "
+                 "bật lại trong cấu hình workspace.\n")
     d.append("## Số liệu\n")
     tong_cho = sum(c["capacity"] for c in clubs)
     d.append("- %d %s, %d %s, %d %s; tổng chỉ tiêu %d."
@@ -814,8 +822,16 @@ def dung(duong_spec, thu_muc_ra, chap_nhan=()):
     ten_ws = _gon(spec.get("ten_workspace"))
     if not ten_ws:
         raise LoiDung([_loi("spec_ten", "Thiếu ten_workspace.")])
+    # A13.13: workspace mặc định BẬT điểm quyết tâm, mà raw của khách KHÔNG có điểm đó và kỹ năng
+    # này KHÔNG được bịa. Spec không ghi rõ `rules.wharton` thì ghi `wharton: false` và báo người
+    # dùng; spec tự ghi `wharton: true` thì giữ (chạy thử sẽ nói rõ nếu thiếu điểm).
+    cau_hinh_spec = dict(spec.get("cau_hinh") or {})
+    luat_spec = cau_hinh_spec.get("rules")
+    tat_diem_quyet_tam = not (isinstance(luat_spec, dict) and "wharton" in luat_spec)
+    if tat_diem_quyet_tam:
+        cau_hinh_spec["rules"] = dict(luat_spec if isinstance(luat_spec, dict) else {}, wharton=False)
     try:
-        cfg = chuan_hoa(dict(spec.get("cau_hinh") or {}, name=ten_ws))
+        cfg = chuan_hoa(dict(cau_hinh_spec, name=ten_ws))
     except ValueError as e:
         raise LoiDung([_loi("cau_hinh_sai", str(e))])
 
@@ -887,13 +903,14 @@ def dung(duong_spec, thu_muc_ra, chap_nhan=()):
         bao_cao_tam = os.path.join(tam, "BAO_CAO_SOAT.md")
         viet_bao_cao(bao_cao_tam, spec, cfg, clubs, students, phieu_bo,
                      [w for w in canh_bao if w["code"] in chap_nhan or w["code"] in CANH_BAO_LUON_CHO_QUA],
-                     duong_spec)
+                     duong_spec, tat_diem_quyet_tam)
         shutil.copy2(zip_tam, dich["zip"])
         shutil.copy2(so_tam, dich["so"])
         shutil.copy2(bao_cao_tam, dich["bao_cao"])
         return {"slug": slug, "tep": dich, "so_nguoi": len(students), "so_cho": len(clubs),
                 "so_buoi": len({c["buoi"] for c in clubs}),
-                "canh_bao_da_chap_nhan": sorted({w["code"] for w in canh_bao})}
+                "canh_bao_da_chap_nhan": sorted({w["code"] for w in canh_bao}),
+                "ghi_chu": [GHI_CHU_TAT_DQT] if tat_diem_quyet_tam else []}
     finally:
         shutil.rmtree(tam, ignore_errors=True)
 
@@ -935,6 +952,8 @@ def main(argv=None):
                                                                  kq["so_cho"], kq["so_buoi"]))
         for t in kq["tep"].values():
             print("   → %s" % t)
+        for g in kq.get("ghi_chu") or []:
+            print("   ℹ %s" % g)
     return 0
 
 

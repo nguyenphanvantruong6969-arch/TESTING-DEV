@@ -294,6 +294,12 @@ def ghi_bang_diem(de, hoc_sinh, canh_bao, duong):
     wb.save(duong)
 
 
+# A13.13: workspace trường học BẬT điểm quyết tâm mặc định, mà biểu mẫu KHÔNG thu điểm đó (và
+# không được bịa): sổ ra không có điểm quyết tâm, nên phải tắt tính năng trước khi nạp.
+GHI_CHU_DIEM_QUYET_TAM = ("Dữ liệu không có điểm quyết tâm nên cần TẮT \"Dùng điểm quyết tâm\" trong "
+                          "cấu hình không gian làm việc trước khi nạp sổ này.")
+
+
 def chuyen(duong_xlsx, thu_muc_ra, de=None):
     de = de or bm.doc_de_thi()
     tieu_de, cac_dong = doc_tep_xuat(duong_xlsx)
@@ -305,7 +311,8 @@ def chuyen(duong_xlsx, thu_muc_ra, de=None):
     ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"))
     return {"n_hoc_sinh": len(hoc_sinh),
             "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
-            "canh_bao": canh_bao}
+            "canh_bao": canh_bao,
+            "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
 
 
 def main(argv=None):
@@ -326,6 +333,8 @@ def main(argv=None):
               % len(kq["canh_bao"]))
         for dong, sid, nd in kq["canh_bao"]:
             print("  dòng %s %s: %s" % (dong, sid, nd))
+    for g in kq["ghi_chu"]:
+        print("\nℹ %s" % g)
     print("\nKéo %s vào ô nạp ở màn hình Vận hành của phần mềm." % TEN_SO)
     return 0
 

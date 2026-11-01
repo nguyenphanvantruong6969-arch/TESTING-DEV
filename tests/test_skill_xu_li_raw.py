@@ -22,6 +22,7 @@ SCRIPT = os.path.join(GOC, ".claude", "skills", "xu-li-raw-forms", "scripts", "x
 sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
 
 from api import PipelineAPI  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -157,7 +158,10 @@ def test_nap_sach_vao_phan_mem_that(bo, xr):
     assert xr.main(["--raw", str(thu / "RAW_PHIEU.xlsx"), "--dap-an", str(thu / "DAP_AN.xlsx"),
                     "--clb", str(thu / "01.xlsx"), "--ra", str(ra)]) == 0
     assert sorted(os.listdir(str(ra))) == ["BAO_CAO_BAT_THUONG.md", "SO_NHAP_CLB.xlsx"]
+    # A13.13: raw không có điểm quyết tâm; báo cáo nói phải tắt tính năng, rồi người dùng làm đúng vậy.
+    assert "TẮT" in (ra / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
     api = PipelineAPI(str(thu / "app.db"), thu_muc_xuat=str(thu))
+    tat_wharton(api)
     with open(str(ra / "SO_NHAP_CLB.xlsx"), "rb") as f:
         kq = api.import_so_nhap(base64.b64encode(f.read()).decode())
     assert kq["ok"] and not (kq["data"].get("warnings") or []), kq

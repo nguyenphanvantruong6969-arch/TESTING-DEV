@@ -81,6 +81,31 @@ def _dung(tw, spec, ra, chap_nhan=()):
     return tw.dung(spec, ra, set(chap_nhan))
 
 
+# ---------------------------------------------------------------- điểm quyết tâm (A13.13)
+
+def test_raw_khong_co_diem_quyet_tam_thi_workspace_ghi_wharton_false_va_bao_nguoi_dung(tw, tmp_path):
+    _nguoi_rong(tmp_path)
+    kq = _dung(tw, _spec(tmp_path), str(tmp_path / "ra"))
+    db = _mo_zip(kq["tep"]["zip"], tmp_path)
+    assert cau_hinh_ws.doc_cau_hinh(db, nghiem=True)["rules"]["wharton"] is False
+    assert kq["ghi_chu"] == [tw.GHI_CHU_TAT_DQT]
+    assert "đã tắt tính năng này" in kq["ghi_chu"][0]
+    with open(kq["tep"]["bao_cao"], encoding="utf-8") as f:
+        assert tw.GHI_CHU_TAT_DQT in f.read()
+
+
+def test_spec_tu_ghi_wharton_true_thi_giu_nguyen_khong_tu_tat(tw, tmp_path):
+    _nguoi_rong(tmp_path)
+    p = _spec(tmp_path)
+    with open(p, encoding="utf-8") as f:
+        spec = json.load(f)
+    spec.setdefault("cau_hinh", {}).setdefault("rules", {})["wharton"] = True
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(spec, f, ensure_ascii=False)
+    with pytest.raises(tw.LoiDung):         # raw không có điểm mà spec đòi bật: chạy thử phải nói rõ
+        _dung(tw, p, str(tmp_path / "ra"))
+
+
 # ---------------------------------------------------------------- dựng được, cả bốn dạng
 
 def test_cot_xep_hang_dung_zip_nap_va_chay_duoc(tw, tmp_path):

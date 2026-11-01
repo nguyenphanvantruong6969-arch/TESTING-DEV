@@ -90,9 +90,11 @@ def _nhap_va_dem_canh_bao(api, thu_muc):
 def test_bo_ngau_nhien_nhap_sach(sdl, api, tmp_path, n_hs, ds_buoi, seed):
     """Phép kiểm thật: nhập vào phần mềm và đếm cảnh báo."""
     clb, hs = sdl.sinh_ngau_nhien(n_hs, ds_buoi, 3, seed)
-    assert sdl.soat(clb, hs) == []
+    # A13.13: mặc định của kỹ năng là sinh KÈM điểm quyết tâm MÔ PHỎNG hợp lệ (như CLI)
+    sdl.ap_diem_quyet_tam(clb, hs, seed, "hop_le", "tron", 3)
+    assert sdl.soat(clb, hs) == [] and sdl.soat_diem_quyet_tam(clb, hs) == []
     ra = str(tmp_path / "bo")
-    sdl.ghi_bo(ra, clb, hs)
+    sdl.ghi_bo(ra, clb, hs, sdl.CFG_DQT)
 
     n_nhap, n_suc_khoe = _nhap_va_dem_canh_bao(api, ra)
     assert n_nhap == 0, "sinh ra du lieu lam phan mem canh bao khi nhap"
@@ -108,8 +110,9 @@ def test_bo_ngau_nhien_nhap_sach(sdl, api, tmp_path, n_hs, ds_buoi, seed):
 def test_truong_mot_buoi_cung_nhap_sach(sdl, api, tmp_path):
     """Trường một buổi: cột Buổi của sổ để trống hết."""
     clb, hs = sdl.sinh_ngau_nhien(40, [""], 3, seed=5)
+    sdl.ap_diem_quyet_tam(clb, hs, 5, "hop_le", "tron", 3)       # A13.13: mặc định kèm điểm
     ra = str(tmp_path / "bo1")
-    assert sdl.ghi_bo(ra, clb, hs) == [os.path.join(ra, "SO_NHAP_CLB.xlsx")]
+    assert sdl.ghi_bo(ra, clb, hs, sdl.CFG_DQT) == [os.path.join(ra, "SO_NHAP_CLB.xlsx")]
     assert os.listdir(ra) == ["SO_NHAP_CLB.xlsx"], "chi duoc ghi MOT tep"
 
     clb_doc, hs_doc = sdl.doc_bo(ra)

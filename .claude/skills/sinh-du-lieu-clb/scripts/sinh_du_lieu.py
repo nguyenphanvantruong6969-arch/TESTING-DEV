@@ -13,8 +13,10 @@ Ba chế độ:
 `ap`   — áp Điểm quyết tâm (mục A13; trong mã là `wharton`) lên một sổ đã có.
 
 `ngau`, `tao` và `ap` nhận thêm `--diem-quyet-tam {khong,hop_le,co_loi,trong}` và
-`--kieu-chia {tron,don_dau,deu,all_in,ngau_nhien}`. Mặc định `khong` = hành vi cũ, đầu ra
-không đổi một ô nào.
+`--kieu-chia {tron,don_dau,deu,all_in,ngau_nhien}`. Từ A13.13 mặc định là `hop_le` (workspace
+trường học BẬT điểm quyết tâm nên bộ sinh ra phải chạy xếp được ngay): sổ ra có kèm điểm quyết
+tâm MÔ PHỎNG hợp lệ. Muốn đầu ra như trước (không cột, không điểm) thì thêm
+`--khong-diem-quyet-tam` (hoặc `--diem-quyet-tam khong`).
 
 Đầu ra là MỘT tệp: `SO_NHAP_CLB.xlsx` — Sổ nhập CLB, đúng tệp phần mềm nhận
 (xem `so_nhap.py` ở gốc kho mã). `soat` đọc được cả sổ lẫn bộ ba CSV cũ.
@@ -745,9 +747,12 @@ def _in_ket_qua(clb, hs, loi, canh_bao):
     return 0
 
 
-def _them_tuy_chon_dqt(parser, mac_dinh="khong"):
+def _them_tuy_chon_dqt(parser, mac_dinh="hop_le"):
     parser.add_argument("--diem-quyet-tam", choices=CHE_DO_DQT, default=mac_dinh,
-                        help="sinh Điểm quyết tâm (mục A13); khong = như cũ")
+                        help="sinh Điểm quyết tâm MÔ PHỎNG (mục A13); mặc định hop_le (A13.13); "
+                             "khong = không cột, không điểm")
+    parser.add_argument("--khong-diem-quyet-tam", action="store_true",
+                        help="tắt điểm quyết tâm: giống --diem-quyet-tam khong (đầu ra như trước A13.13)")
     parser.add_argument("--kieu-chia", choices=("tron",) + KIEU_CHIA, default="tron",
                         help="kiểu chia điểm; tron = mỗi em một kiểu")
 
@@ -796,6 +801,8 @@ def main(argv=None):
     c.add_argument("thu_muc", help="tệp SO_NHAP_CLB.xlsx, hoặc thư mục chứa nó / bộ ba CSV")
 
     ns = p.parse_args(argv)
+    if getattr(ns, "khong_diem_quyet_tam", False):
+        ns.diem_quyet_tam = "khong"
 
     if ns.lenh == "ap":
         if ns.diem_quyet_tam == "khong":
@@ -827,8 +834,11 @@ def main(argv=None):
         clb, hs = sinh_ngau_nhien(ns.hoc_sinh, ds_buoi, ns.clb_moi_buoi,
                                   ns.seed, ns.do_choi)
 
-    kieu, bang = ap_diem_quyet_tam(clb, hs, ns.seed if ns.lenh == "ngau" else 42,
-                                   ns.diem_quyet_tam, ns.kieu_chia)
+    if ns.lenh == "tao" and ns.diem_quyet_tam == "hop_le" and any(h.get("diem_quyet_tam") for h in hs):
+        kieu, bang = {}, []          # bản khai báo đã tự ghi điểm: giữ nguyên, không sinh đè
+    else:
+        kieu, bang = ap_diem_quyet_tam(clb, hs, ns.seed if ns.lenh == "ngau" else 42,
+                                       ns.diem_quyet_tam, ns.kieu_chia)
     loi = soat(clb, hs)
     if ns.diem_quyet_tam == "hop_le":
         loi += soat_diem_quyet_tam(clb, hs)       # co_loi: lỗi là CỐ Ý, bảng lỗi ghi lại

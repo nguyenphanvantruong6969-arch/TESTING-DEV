@@ -59,7 +59,7 @@ HS = [
     ("HS021", "Đinh Bá Long",     "",            {"thu_2": [], "thu_4": ["clb_robotics", "clb_nauan"], "thu_6": ["clb_lamvuon", "clb_covua"]}, {"clb_robotics": "5,0"}),
     ("HS022", "Võ Kim Ngân",      "",            {"thu_2": ["clb_bongro", "clb_tinhoc"], "thu_4": ["clb_nauan"], "thu_6": ["clb_covua"]}, {"clb_tinhoc": "8,5"}),
     ("HS023", "Hà Đức Thắng",     "khoi_10",     {"thu_2": ["clb_tinhoc", "clb_vanhoc"], "thu_4": ["clb_mythuat", "clb_robotics"], "thu_6": ["clb_lamvuon"]}, {"clb_tinhoc": "6,0", "clb_robotics": "7,0"}),
-    ("HS024", "Nguyễn Thảo Vy",   "",            {"thu_2": ["clb_bongro", "clb_vanhoc"], "thu_4": ["clb_nauan", "clb_mythuat"], "thu_6": ["clb_tienganh", "clb_covua"]}, {"clb_tienganh": "6,5"}),
+    ("HS024", "Nguyễn Thảo Vy",   "",            {"thu_2": ["clb_vanhoc"], "thu_4": ["clb_nauan", "clb_mythuat"], "thu_6": ["clb_tienganh", "clb_covua"]}, {"clb_tienganh": "6,5"}),
 ]
 
 # ---------------- SOAT TRUOC KHI GHI ----------------

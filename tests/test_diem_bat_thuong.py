@@ -186,6 +186,8 @@ def test_bo_du_lieu_that_khong_sinh_canh_bao_nao(api):
     for bo in ("vi_du_huong_dan", "bo_sach"):
         tm = os.path.join(goc, "du_lieu_test", bo)
         a = PipelineAPI(os.path.join(os.path.dirname(api.db_path), bo + ".db"))
+        if bo == "bo_sach":      # A13.13: dữ liệu của báo cáo đề tài, giữ nguyên => Wharton TẮT rõ ràng
+            tat_wharton(a)
         for t in sorted(os.listdir(tm)):
             if not t.endswith(".xlsx"):
                 continue

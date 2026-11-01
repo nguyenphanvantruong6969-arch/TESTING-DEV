@@ -382,15 +382,28 @@ def test_ngan_sach_cua_skill_bang_ngan_sach_cua_thuat_toan():
     assert sk.NGAN_SACH_DQT == rp.WHARTON_NGAN_SACH
 
 
-def test_skill_mac_dinh_khong_sinh_diem_dau_ra_cu_khong_doi(tmp_path):
+def test_skill_tat_ro_rang_khong_sinh_diem_dau_ra_cu_khong_doi(tmp_path):
+    # A13.13: mặc định ĐÃ ĐỔI sang sinh kèm điểm; đầu ra cũ chỉ còn khi tắt RÕ RÀNG.
     a, b = tmp_path / "a", tmp_path / "b"
     chung = ["ngau", "--hoc-sinh", "40", "--buoi", "thu_2,thu_4", "--seed", "5"]
-    assert _chay_skill(*chung, "--ra", str(a)).returncode == 0
+    assert _chay_skill(*chung, "--khong-diem-quyet-tam", "--ra", str(a)).returncode == 0
     assert _chay_skill(*chung, "--diem-quyet-tam", "khong", "--ra", str(b)).returncode == 0
     assert chup(str(a / "SO_NHAP_CLB.xlsx")) == chup(str(b / "SO_NHAP_CLB.xlsx"))
     assert not (a / "DQT_KIEU_CHIA.json").exists()
     cot = [c.value for c in openpyxl.load_workbook(a / "SO_NHAP_CLB.xlsx")["2. Học sinh"][2]]
     assert "Điểm quyết tâm" not in cot
+
+
+def test_skill_mac_dinh_sinh_kem_diem_quyet_tam_hop_le(tmp_path):
+    a, b = tmp_path / "a", tmp_path / "b"
+    chung = ["ngau", "--hoc-sinh", "40", "--buoi", "thu_2,thu_4", "--seed", "5"]
+    assert _chay_skill(*chung, "--ra", str(a)).returncode == 0
+    assert _chay_skill(*chung, "--diem-quyet-tam", "hop_le", "--ra", str(b)).returncode == 0
+    assert chup(str(a / "SO_NHAP_CLB.xlsx")) == chup(str(b / "SO_NHAP_CLB.xlsx"))
+    assert (a / "DQT_KIEU_CHIA.json").exists()
+    cot = [c.value for c in openpyxl.load_workbook(a / "SO_NHAP_CLB.xlsx")["2. Học sinh"][2]]
+    assert "Điểm quyết tâm" in cot
+    assert _chay_skill("soat", str(a / "SO_NHAP_CLB.xlsx")).returncode == 0
 
 
 @pytest.mark.parametrize("kieu", ("don_dau", "deu", "all_in", "ngau_nhien"))

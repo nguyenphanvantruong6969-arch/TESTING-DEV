@@ -1,11 +1,11 @@
-﻿student_id,name,reserve_group,pref_1,pref_2
-HS01,Nguyễn Văn An,,clb_bongro,clb_tinhoc
-HS02,Trần Thị Bình,,clb_bongro,clb_mythuat
-HS03,Lê Minh Cường,,clb_bongro,clb_nauan
-HS04,Phạm Thu Dung,chinh_sach,clb_bongro,clb_mythuat
-HS05,Hoàng Văn Đức,,clb_bongro,clb_tinhoc
-HS06,Vũ Ngọc Giang,,clb_tinhoc,clb_nauan
-HS07,Đỗ Thị Hạnh,,clb_mythuat,clb_nauan
-HS08,Bùi Quang Khánh,,clb_mythuat,clb_nauan
-HS09,Ngô Phương Linh,,clb_nauan,clb_tinhoc
-HS10,Dương Bá Minh,,clb_bongro,
+﻿student_id,name,reserve_group,pref_1,pref_2,wp_1,wp_2
+HS01,Nguyễn Văn An,,clb_bongro,clb_tinhoc,90,10
+HS02,Trần Thị Bình,,clb_bongro,clb_mythuat,82,18
+HS03,Lê Minh Cường,,clb_bongro,clb_nauan,30,70
+HS04,Phạm Thu Dung,chinh_sach,clb_bongro,clb_mythuat,37,63
+HS05,Hoàng Văn Đức,,clb_bongro,clb_tinhoc,34,66
+HS06,Vũ Ngọc Giang,,clb_tinhoc,clb_nauan,60,40
+HS07,Đỗ Thị Hạnh,,clb_mythuat,clb_nauan,75,25
+HS08,Bùi Quang Khánh,,clb_mythuat,clb_nauan,73,27
+HS09,Ngô Phương Linh,,clb_nauan,clb_tinhoc,50,50
+HS10,Dương Bá Minh,,clb_bongro,,100,

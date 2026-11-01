@@ -25,6 +25,7 @@ import chuyen_forms_sang_phan_mem as cv  # noqa: E402
 import tao_mau_forms as tm  # noqa: E402
 
 from api import PipelineAPI  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
 
 import so_nhap  # noqa: E402
 
@@ -107,7 +108,10 @@ def test_tep_xuat_mau_nap_sach_vao_phan_mem(tmp_path, de):
     assert kq["canh_bao"] == []
     assert kq["n_hoc_sinh"] == 60 and kq["n_bai_thi"] > 0
 
+    # A13.13: biểu mẫu không thu điểm quyết tâm; kết quả nói phải tắt tính năng, rồi người dùng làm đúng vậy.
+    assert any("TẮT" in g for g in kq["ghi_chu"])
     api = PipelineAPI(str(tmp_path / "app.db"), thu_muc_xuat=str(tmp_path))
+    tat_wharton(api)
     with open(str(ra / "SO_NHAP_CLB.xlsx"), "rb") as f:
         r = api.import_so_nhap(base64.b64encode(f.read()).decode())
     assert r["ok"] and not (r["data"].get("warnings") or []), r
