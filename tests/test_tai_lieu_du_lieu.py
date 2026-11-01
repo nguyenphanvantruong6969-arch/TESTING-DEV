@@ -25,7 +25,9 @@ SKILL_MD = os.path.join(GOC, ".claude", "skills", "sinh-du-lieu-clb", "SKILL.md"
 
 # Những đường dẫn tài liệu nhắc tới ĐỂ NÓI LÀ KHÔNG CÓ. Chúng phải vắng mặt,
 # và `test_nhung_tep_tai_lieu_noi_khong_co_thi_van_khong_co` canh điều đó.
-VANG_MAT_CO_Y = {".claude/settings.json"}
+# Tệp tài liệu khẳng định KHÔNG có. Trống từ 01/11/2026: `.claude/settings.json` và hook bàn giao
+# đã được thêm (nhánh claude/sleepy-sagan-ly5fx0) và mục 4 của tài liệu đã tả chúng.
+VANG_MAT_CO_Y: set = set()
 
 
 @pytest.fixture(scope="module")

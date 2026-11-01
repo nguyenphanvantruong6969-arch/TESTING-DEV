@@ -451,7 +451,7 @@ tìm chỗ sai.
             └── sinh_du_lieu.py     21 734 B · 496 dòng
 ```
 
-Không có `.claude/settings.json`, không có hook, không có kỹ năng nào khác.
+`.claude/settings.json` chỉ đăng ký một hook Stop cho phiên làm việc của Claude (`.claude/hooks/handoff_khi_day_ngu_canh.py`: nhắc ghi tệp bàn giao `docs/phien/` khi ngữ cảnh gần đầy); nó không đụng tới phần mềm hay dữ liệu. Các kỹ năng khác trong `.claude/skills/` (soát mã, Google Forms, xử lí raw, dựng workspace) nằm ngoài phạm vi mục này.
 
 ### 4.1 · Toàn văn `SKILL.md`
 
