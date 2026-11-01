@@ -24,6 +24,8 @@ import os
 
 import pytest
 
+from _wharton import tat_wharton
+
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 BO_MAU = {
@@ -71,6 +73,14 @@ def chay_bo(api, ten_bo: str) -> str:
     kq = api.run_pipeline(seed=42)
     assert kq["ok"], kq.get("errors")
     return bam_ket_qua(api)
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: bản chụp kết quả này canh THUẬT TOÁN trên các bộ không có điểm quyết tâm; mặc định
+    Wharton đã BẬT nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 @pytest.mark.parametrize("ten_bo", sorted(BO_MAU))

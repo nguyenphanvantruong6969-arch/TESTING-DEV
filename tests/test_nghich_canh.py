@@ -20,6 +20,15 @@ import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import rbda_priority_pipeline as loi  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 TRAN_VONG = 1000
 

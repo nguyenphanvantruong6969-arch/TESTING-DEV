@@ -22,6 +22,15 @@ import pytest
 
 import rbda_priority_pipeline as loi
 from api import PipelineAPI
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BANG = ["students", "clubs", "club_test_selection", "club_scores",
@@ -82,6 +91,9 @@ def _ha_cap(db):
 
 
 def _nap_nhieu_buoi(api):
+    # A13.13: dữ liệu CSV cũ không có điểm quyết tâm; mặc định Wharton BẬT sẽ chặn
+    # chạy. Test này canh ràng buộc CSDL, không canh Wharton => tắt RÕ RÀNG.
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})
     for i, ten in enumerate(
             ["danh_sach_CLB", "chon_CLB_muon_thi", "xep_hang_nguyen_vong"], start=1):
         with io.open(os.path.join(GOC, "du_lieu_test", "bo_nhieu_buoi",

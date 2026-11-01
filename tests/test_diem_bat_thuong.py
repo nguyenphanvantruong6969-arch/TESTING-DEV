@@ -22,6 +22,15 @@ import sqlite3
 import pytest
 
 from api import PipelineAPI
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 def _clb_co_diem(api, diem_theo_em, club="clb_a", suc_chua=5):

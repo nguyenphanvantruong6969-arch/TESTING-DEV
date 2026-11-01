@@ -21,6 +21,16 @@ Out of scope: "template header by vocabulary" (Direction A/B).
 - test_a13_11_stress.py 33 errors were caused by the new default (run_pipeline blocked in fixtures), fixed with tat_wharton.
 - F2 (scripts vs base cee2940, git worktree): do_anh_huong_seed.py --so-seed 5 output identical; bao_cao_phan_bo.py HTML identical.
 
+## Round 3 (after full CI: 241 red in 40 files) — classification
+- Group A fixed (local `api` fixture -> `tat_wharton`; 27 files incl. 9 giao_dien; no assert loosened, none skipped): all pass.
+- Group B (shipped sample/example/skill outputs under DEFAULT config; NOT masked; waiting for Truong): 50 red.
+  test_vi_du_huong_dan(8), test_vi_du_day_du(6), test_csv_mau(2), test_bo_sach(10), test_skill_sinh_du_lieu(6),
+  test_skill_tao_workspace(3), test_skill_xu_li_raw(1), test_mau_forms_thi_clb(1), test_kich_ban_nhap_tay(8: the doc'd
+  scenario in du_lieu_test/NHAP_TAY.md), test_so_nhap(2: vi_du sổ must load with 0 warnings), test_diem_bat_thuong(1:
+  published sets must be silent), test_rang_buoc_csdl::test_csdl_demo_that_duoc_nang_len (shipped demo DB, health n_high=1).
+- Real bug found in own change: VI text of `wharton_ho_so_chua_hop_le` contained "workspace" -> fixed.
+- Merged claude/sleepy-sagan-ly5fx0 (doc tests); CLAUDE_CHI_TIET `tests/` row updated to 167 files / 3.127 cases.
+
 ## Decisions and gotchas
 - `rbda_priority_pipeline.LUAT_XEP_MAC_DINH["wharton"]` stays False: bare pipeline calls (rules=None, run_full_pipeline) keep old numbers; default ON lives only in cau_hinh_ws.
 - Old stored config lacking the `wharton` key reads as ON (no migration, per Truong's original request).
