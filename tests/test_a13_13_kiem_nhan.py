@@ -431,6 +431,7 @@ NGOAI_LE_F1 = {
     "stress/s8_bao_mat.py": "tạo workspace bằng ws.tao(..., {'rules': {'wharton': False}}) trong chuỗi mẫu",
     "bo_thu_workspace/tao_bo_workspace.py": "đặt wharton False trong CAU_HINH rồi ws.tao",
     "stress/_chung.py": "tao_api ghi cấu hình (tắt khi không DQT, bật khi dqt)",
+    "tao_db_demo.py": "mặc định BẬT (demo có điểm quyết tâm); chỉ cờ --tat-wharton mới ghi wharton False",
 }
 
 

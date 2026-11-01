@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
+
+- **`du_lieu_test/tao_db_demo.py`:** mặc định dựng CSDL demo với Wharton BẬT (không ghi `wharton: false`), nạp `SO_NHAP_DQT_120HS_HOP_LE.xlsx` qua `import_so_nhap` (chọn bản 120HS vì giữ nguyên nguyện vọng và điểm thi của `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm MÔ PHỎNG; nhỏ, demo nhanh). Vẫn dừng trước khi chạy phân bổ. Cờ mới `--tat-wharton` dựng y như trước (TEST_01..03, `wharton: false`); cờ `--ra` chọn tệp đầu ra (mặc định giữ chỗ cũ). Đã so với bản dựng ở `cee2940`: 14/15 bảng trùng khít từng dòng, chỉ `workspace_settings` khác (có khoá `wharton=false`) — đúng dự kiến.
+- **`du_lieu_test/app_DEMO_da_cham_diem.db`:** commit bản dựng mới (Wharton bật; 3 cảnh báo mức thường `health_oversubscribed_buoi`, 0 nghiêm trọng).
+- **Tài liệu đổi lệnh sang `--tat-wharton` (để số cũ tái lập):** `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md`, `poster/chup_giao_dien.py` (ảnh poster đứng cạnh số đã công bố nên dựng bản cũ vào thư mục tạm). Lời hướng dẫn cập nhật: `du_lieu_test/README.md`, `TAI_LIEU_DU_LIEU.md`, `poster/DU_LIEU_POSTER.md`, `BAN_GIAO.md`. Không sửa con số nào.
+- **`du_lieu_test/do_do_dai_nguyen_vong.py`:** bỏ đường dẫn cứng `/home/user/truong/rbda-kiosk`, tính từ `__file__`; ghi bước chuẩn bị dữ liệu vào docstring (`bo_sach/` có sẵn trong kho, sinh lại bằng `bo_sach/tao_bo_sach.py`). Đầu ra trùng khít bản `cee2940` (đã vá tạm đường dẫn trong worktree).
+- **Test:** mới `tests/test_db_demo_wharton.py` (6 ca: bật/tắt, chạy trên bản sao, `luat_xep.wharton`, trùng khít `match_results` seed 42, không còn `/home/user/truong`); `tests/test_a13_13_kiem_nhan.py` thêm `tao_db_demo.py` vào `NGOAI_LE_F1`; `tests/test_rang_buoc_csdl.py` tắt Wharton tường minh trong `_nap_nhieu_buoi` (3 test này đỏ sẵn từ nhánh cha vì dữ liệu CSV không có điểm quyết tâm).
+
 ## 2026-11-01 — A13.13 Điểm quyết tâm (Wharton) BẬT mặc định cho workspace trường học
 
 **NGOẠI LỆ BẤT BIẾN 1 (đã duyệt).** Bất biến 1 ("cấu hình mặc định cho kết quả trùng khít với trước khi sửa") bị phá có chủ đích, theo quyết định rõ ràng của Truong. Các bất biến 2–8 vẫn giữ. Tắt RÕ RÀNG (`wharton: false`) thì kết quả, dấu vân tay và `run_history.luat_xep` trùng khít bản trước (đã chạy lại `do_anh_huong_seed.py` và `bao_cao_phan_bo.py`, so với bản gốc: đầu ra giống hệt).

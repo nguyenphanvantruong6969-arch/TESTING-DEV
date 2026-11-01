@@ -1036,7 +1036,7 @@ nên ba tệp không thể lệch nhau. Bộ sinh này **tất định, không d
 | `TEST_02_chon_CLB_muon_thi.xlsx` | 14 111 B | 120 em, mỗi em thi 2–5 CLB, **kèm sẵn 396 ô điểm** | nạp thứ hai |
 | `TEST_03_xep_hang_nguyen_vong.xlsx` | 11 355 B | cùng 120 em, mỗi em 2–5 nguyện vọng | nạp thứ ba |
 | `TEST_04_CO_LOI_CO_Y.xlsx` | 7 168 B | 10 dòng, **cố ý sai 6 chỗ** | kiểm phần mềm **có** cảnh báo không — [Phần 6](#phần-6--test_04_co_loi_co_yxlsx--sáu-lỗi-cài-sẵn) |
-| `app_DEMO_da_cham_diem.db` | 147 456 B | CSDL dựng sẵn tới ngay trước bước cuối: đã nạp, đã chấm điểm, **0 cảnh báo** | demo |
+| `app_DEMO_da_cham_diem.db` | 278 528 B | CSDL dựng sẵn tới ngay trước bước cuối: nạp `SO_NHAP_DQT_120HS_HOP_LE.xlsx` (nguyện vọng + điểm thi như bộ TEST, **thêm điểm quyết tâm MÔ PHỎNG**), Wharton BẬT, đã chấm điểm, 3 cảnh báo mức thường (`health_oversubscribed_buoi`, bộ cố ý cạnh tranh cao), 0 nghiêm trọng. Bản cũ (bộ ba TEST, Wharton tắt) dựng bằng `tao_db_demo.py --tat-wharton` | demo |
 
 Mỗi tệp `.xlsx` có sheet **"Ghi chú"** giải thích nội dung ngay trong tệp.
 
@@ -1564,7 +1564,8 @@ cũng ra đúng bộ đó. Đây là lý do có thể tin các bảng ở [Phầ
 ```bash
 # ── Bộ cạnh tranh cao + CSDL demo ──────────────────────────────────
 ./.venv/bin/python du_lieu_test/tao_du_lieu_test.py     # TEST_01..04.xlsx   SEED = 2026
-./.venv/bin/python du_lieu_test/tao_db_demo.py          # app_DEMO_da_cham_diem.db
+./.venv/bin/python du_lieu_test/tao_db_demo.py          # app_DEMO_da_cham_diem.db (Wharton BẬT, có điểm quyết tâm mô phỏng)
+./.venv/bin/python du_lieu_test/tao_db_demo.py --tat-wharton   # bản cũ: bộ ba TEST, Wharton tắt (tái lập số liệu đã công bố)
 
 # ── Năm bộ CSV chạy thử ────────────────────────────────────────────
 ./.venv/bin/python du_lieu_test/bo_sach/tao_bo_sach.py               # SEED = 9090

@@ -228,7 +228,7 @@ lúc cần `hidden` thì phải thêm luật `[hidden] { display: none; }` (xem 
   - `bo_nhieu_buoi/` (160 em, 13 CLB, 5 buổi), `bo_sau_buoi/` (180 em, 17 CLB) và
     `bo_can_bang/` (200 em, 24 CLB) — dữ liệu nhiều buổi; mỗi thư mục có script sinh lại
   - `thu_tai/` — đo phần mềm ở quy mô lớn (xem README của nó)
-  - `app_DEMO_da_cham_diem.db` — CSDL demo đã nạp và chấm xong (lược đồ CŨ,
+  - `app_DEMO_da_cham_diem.db` — CSDL demo đã nạp và chấm xong (từ A13.13: Wharton BẬT + điểm quyết tâm mô phỏng; `tao_db_demo.py --tat-wharton` dựng bản cũ; lược đồ CŨ,
     tự được nâng cấp khi mở bằng bản hiện tại — có test canh)
   - `NHAP_TAY.md` — kịch bản gõ tay 8 em / 3 CLB cho các màn hình mà đường nạp
     tệp không chạm tới
@@ -1623,8 +1623,8 @@ Hai hệ quả đã xử lý:
   khác là rào cản thật).
 - Bộ 120 học sinh cần **356 ô điểm** và phần mềm **không có đường nhập điểm từ tệp**
   — gõ tay hết mất ~18 phút, dài hơn thời gian demo. Đã dựng sẵn
-  `du_lieu_test/app_DEMO_da_cham_diem.db` (nạp xong, chấm xong, 0 cảnh báo, cố ý
-  chưa chạy phân bổ). Đây là **lỗ hổng tiện dụng còn lại đã biết**, không sửa vì
+  `du_lieu_test/app_DEMO_da_cham_diem.db` (nạp xong, chấm xong, cố ý
+  chưa chạy phân bổ; ghi chú tại thời điểm viết: "0 cảnh báo" là của bản cũ `--tat-wharton`). Đây là **lỗ hổng tiện dụng còn lại đã biết**, không sửa vì
   đang đóng băng tính năng.
 
 **Chưa kiểm chứng trên máy thật:** các bước SAU khi nạp dữ liệu (chấm điểm, chạy
