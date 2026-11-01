@@ -21,3 +21,4 @@
 | Ngày | Việc đã làm | Tệp chính | Ghi chú |
 |---|---|---|---|
 | 2026-11-01 | Dựng cơ chế bàn giao: tệp này, quy tắc 9 trong `CLAUDE.md`, hook Stop | `.claude/settings.json`, `.claude/hooks/nhac_cap_nhat_trang_thai.py`, `CLAUDE.md` | Hook chỉ nhắc khi cây làm việc có thay đổi |
+| 2026-11-01 | Giảm token: chỉ chạy test liên quan, không chạy toàn bộ bộ test | `CLAUDE.md` (quy tắc 2, mục Lệnh), `.claude/skills/soat-ma/SKILL.md` | CI vẫn chạy toàn bộ; Truong yêu cầu thì mới chạy toàn bộ cục bộ |

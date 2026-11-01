@@ -57,7 +57,7 @@ python .claude/skills/soat-ma/scripts/kiem_nhanh.py --co-so origin/main --chi ru
 Ngoài bảy mục trên, chạy thêm:
 
 ```bash
-python -m pytest -q                                  # toàn bộ test (kèm giao diện nếu có Chromium)
+python -m pytest -q tests/test_<tệp liên quan>.py    # CHỈ test liên quan tới mục vừa làm; toàn bộ test chỉ khi Truong yêu cầu (CI đã chạy)
 RBDA_TEST_CHROMIUM=$(ls /opt/pw-browsers/chromium-*/chrome-linux64/chrome | head -1) python -m pytest -q -rs
 ```
 

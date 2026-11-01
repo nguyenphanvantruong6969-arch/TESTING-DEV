@@ -24,7 +24,7 @@
 | `du_lieu_test/`, `mau_csv/`, `docs/`, `BAN_GIAO.md` | Bộ dữ liệu mô phỏng, script đo, mẫu nhập, tài liệu cơ chế, nhật ký 25 lỗi đã sửa | |
 
 ## Lệnh
-- Chạy test: `python -m pytest -q` trong venv của dự án (tài liệu ghi `./.venv/bin/python -m pytest -q`; trên Windows: `.venv\Scripts\python -m pytest -q`). Toàn bộ ~22 phút trên máy 4 nhân kèm test giao diện Chromium (BAN_GIAO.md ghi ~3,5 phút; chưa giải thích được, xem `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`). Lint: `ruff check .`; CI đòi phủ ≥ 85 %.
+- Chạy test (mặc định chỉ test liên quan, xem quy tắc 2): `python -m pytest -q <tệp hoặc -k ...>` trong venv của dự án (tài liệu ghi `./.venv/bin/python -m pytest -q`; trên Windows: `.venv\Scripts\python -m pytest -q`). Toàn bộ ~22 phút trên máy 4 nhân kèm test giao diện Chromium (BAN_GIAO.md ghi ~3,5 phút; chưa giải thích được, xem `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`). Lint: `ruff check .`; CI đòi phủ ≥ 85 %.
 - Sinh lại thông báo lỗi JS sau khi sửa `i18n_errors.py`: `python tao_i18n_js.py`.
 - Kiểm verify nhanh (tham khảo): `pip install numpy` (chỉ cho kịch bản tham khảo, KHÔNG thêm vào requirements) rồi `python docs/ke_hoach/tham_khao/kiem_verify_nhanh.py <thư mục chứa rbda_priority_pipeline.py>`. Test `tests/test_tham_khao_verify_nhanh.py` (không cần numpy) canh `verify_stability_nhanh`, `exp_resume.resume_da` / `kiem_tien_de`, `_chung.nap_rb` (thư mục: nạp thẳng tệp .py, cùng bản, bản khác, tiến trình mới, mô-đun anh em lạ; tệp không phải PyInstaller); `_chung.gen` chỉ được kiểm khi có numpy; đường nạp `.exe` được kiểm bằng một tệp PyInstaller tối thiểu dựng trong test (không có bản build thật trong kho).
 
@@ -40,7 +40,7 @@
 
 ## Quy tắc làm việc
 1. Mỗi thay đổi gắn với **một mã mục** trong sổ đăng ký (Z1…G5). Không làm việc ngoài sổ khi chưa hỏi.
-2. **Test trước**: viết test thất bại theo trường `kiem_nhan`, rồi sửa tối thiểu, rồi chạy toàn bộ test.
+2. **Test trước**: viết test thất bại theo trường `kiem_nhan`, rồi sửa tối thiểu, rồi chạy **chỉ các test liên quan** tới mục đang làm (`python -m pytest -q tests/test_<tên>.py` hoặc `-k <từ khoá>`). KHÔNG chạy toàn bộ bộ test (~22 phút) trừ khi Truong yêu cầu rõ; CI trên GitHub sẽ chạy toàn bộ.
 3. Tham số mới phải có **mặc định = hành vi cũ**; cấu hình mặc định phải cho kết quả **trùng khít** (so từng dòng `match_results`, 3 bộ dữ liệu × 20 seed).
 4. Không xoá các chế độ đối chứng (`stb_tuan`, `stb_co_bu`, A1/A3 trong TN7): script đo trong `du_lieu_test/` cần chúng để tái lập số liệu.
 5. Hàm lựa chọn mới phải qua test **thay thế được** và **luật tổng cầu**; không qua thì ghi rõ "không bảo đảm ổn định" và dùng chế độ đo lường (mục A12).
