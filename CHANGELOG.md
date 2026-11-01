@@ -17,6 +17,8 @@
 - `run_history.luat_xep` và dấu vân tay của workspace mặc định đổi (có khoá `wharton: true`): kết quả đã chạy trước đó của workspace đọc thành bật sẽ báo "đã cũ".
 - Sổ mẫu `mau_csv/SO_NHAP_CLB.xlsx` và hai sổ `vi_du_*` nạp với mặc định mới: các sổ `vi_du_*` chưa điền cột Điểm quyết tâm nên bị chặn khi chạy; tắt rõ ràng thì nạp và chạy trùng khít bộ ba CSV (seed 1, 7, 42).
 
+**Kiểm nhận độc lập (phiên cha thiết kế):** `tests/test_a13_13_kiem_nhan.py` (45 ca, nhóm A–F) và `tests/test_giao_dien_a13_13_kiem_nhan.py` (2 ca, nhóm G): đều qua, không phải sửa mã. So hai script đo với bản gốc `cee2940` bằng `git worktree`: `do_anh_huong_seed.py --so-seed 5` và `bao_cao_phan_bo.py` cho đầu ra giống hệt.
+
 **Test** (`tests/test_wharton_mac_dinh_bat.py`, 16 ca mới; helper `tests/_wharton.py::tat_wharton`, KHÔNG autouse). Test cũ sửa, không xoá, không skip: (a) đổi sang mặc định mới + giữ khẳng định cũ dưới dạng ca `wharton: false` tường minh: `test_wharton_luat`, `test_ws_cau_hinh`, `test_ws_api`, `test_ws_sua_loi_2`, `test_ws_so_nhap`, `test_ws_nhan`, `test_so_mau_co_cot_quyet_tam`, `test_wharton_so_nhap`; (b) truyền `wharton: false` ở fixture / đầu test (hành vi cũ làm nền): `test_nhieu_buoi`, `test_wharton_pipeline`, `test_thay_doi_ket_qua`, `test_ws_luat`, `test_ws_sua_loi_3`, `test_diem_chuan`, `test_wharton_{quan_ly,hang_loat,kiosk,khoa,nhap,suc_khoe,dau_cuoi}`, `test_so_nhap_hai_hang`.
 
 ## 2026-10-28 — A13.12 Sửa Tầng 4 của đợt soát A13 và toàn bộ mục chặn / nên sửa của đợt soát hệ thống nhập
