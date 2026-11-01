@@ -63,8 +63,10 @@ MAC_DINH_TRUONG_HOC = {
         "tier_mode": "reserve",
         "score_scope": "per_slot",
         "tiers": [],
-        # Điểm Wharton (mục A13): mặc định TẮT, xem `_chuan_hoa` về điều kiện bật.
-        "wharton": False,
+        # Điểm Wharton (mục A13): mặc định BẬT (A13.13, Truong duyệt — ngoại lệ bất biến 1).
+        # Xem `_chuan_hoa` về điều kiện bật; tổ hợp không cho phép mà không ghi rõ
+        # `wharton` thì tự tắt.
+        "wharton": True,
     },
 }
 
@@ -103,6 +105,12 @@ def _nhan_thieu_en_lay_vi(goc: dict, da_tron: dict) -> None:
 def _la_so_nguyen(v) -> bool:
     # bool là lớp con của int: True không được lọt qua như "1".
     return isinstance(v, int) and not isinstance(v, bool)
+
+
+def _ghi_ro_wharton(cfg) -> bool:
+    """`cfg` (thô) có ghi khoá `rules.wharton` không?"""
+    return isinstance(cfg, dict) and isinstance(cfg.get("rules"), dict) \
+        and "wharton" in cfg["rules"]
 
 
 def _chuan_hoa(cfg) -> dict:
@@ -180,8 +188,13 @@ def _chuan_hoa(cfg) -> dict:
     bat_wharton = luat["wharton"]
     if not isinstance(bat_wharton, bool):
         raise ValueError("wharton phải là true hoặc false, nhận %r." % (bat_wharton,))
-    if bat_wharton and (luat["priority"] not in ("score", "score+tier")
-                        or luat["score_scope"] != "per_slot"):
+    cho_phep_wharton = (luat["priority"] in ("score", "score+tier")
+                        and luat["score_scope"] == "per_slot")
+    if bat_wharton and not cho_phep_wharton and not _ghi_ro_wharton(cfg):
+        # Mặc định bật (A13.13): cấu hình đổi priority / score_scope mà không nhắc tới
+        # `wharton` thì thừa hưởng True rồi bị từ chối — nên tự tắt. Chỉ ghi RÕ true mới lỗi.
+        bat_wharton = luat["wharton"] = False
+    if bat_wharton and not cho_phep_wharton:
         raise ValueError(
             "wharton chỉ dùng được khi priority là score hoặc score+tier và score_scope là "
             "per_slot (điểm Wharton cần biết em có thi CLB nào).")
@@ -214,6 +227,16 @@ def tron_len(da_luu: dict, moi: dict) -> dict:
             kq[khoa].update(copy.deepcopy(gia_tri))
         else:
             kq[khoa] = copy.deepcopy(gia_tri)
+    # Đổi priority / score_scope sang tổ hợp không dùng được Wharton mà không nhắc tới
+    # `wharton` (A13.13): tắt nó, vì giá trị đã lưu (True) không còn hợp. Ghi rõ thì giữ nguyên
+    # để `ghi_cau_hinh` báo lỗi.
+    luat_moi = moi.get("rules")
+    luat = kq.get("rules")
+    if isinstance(luat_moi, dict) and isinstance(luat, dict) and "wharton" not in luat_moi \
+            and luat.get("wharton") is True \
+            and (luat.get("priority") not in ("score", "score+tier")
+                 or luat.get("score_scope") != "per_slot"):
+        luat["wharton"] = False
     return kq
 
 

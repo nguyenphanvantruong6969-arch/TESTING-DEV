@@ -15,6 +15,7 @@ import pytest
 
 import rbda_priority_pipeline as rp
 from _wharton import bat_wharton, chen_bids, dong_bids, dung_clb, dung_hs
+from _wharton import tat_wharton  # noqa: E402
 
 
 @pytest.fixture
@@ -36,6 +37,7 @@ def _loi(kq):
 # ------------------------------------------------------------------ get_student_entry_state
 
 def test_tat_wharton_trang_thai_giong_het_truoc(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     dung_clb(api, A=5)
     dung_hs(api, "HS1", tick={"HS1": ["A"]})
     assert api.submit_preferences("HS1", ["A"])["ok"]
@@ -185,6 +187,7 @@ def test_em_chua_xep_nguyen_vong_thi_bao_chua_xep_xong(api):
 # ------------------------------------------------------------------ lỗi khác và hợp đồng
 
 def test_wharton_tat_thi_bao_chua_bat_va_khong_ghi_gi(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     dung_clb(api, A=5)
     dung_hs(api, "HS1")
     assert api.submit_preferences("HS1", ["A"])["ok"]

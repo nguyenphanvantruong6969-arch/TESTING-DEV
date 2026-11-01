@@ -134,7 +134,7 @@ thay (sửa `stats` trong `tao_poster.py`).
 | Việc em làm | Quay video demo ngắn (≤ 2 phút) **không lộ tên, không lộ trường**; đăng ẩn danh; tạo QR; báo AI để chèn ảnh QR vào ô |
 | Câu hỏi gợi ý | Người xem được làm gì tại gian — xem video, thử bấm trên máy? |
 | Độ dài | 1 câu, ≤ 20 từ |
-| Gợi ý thêm | Mang máy chạy sẵn `du_lieu_test/app_DEMO_da_cham_diem.db` — đã nạp và chấm điểm, **cố ý dừng trước bước chạy** để người xem tự bấm (`du_lieu_test/tao_db_demo.py`) |
+| Gợi ý thêm | Mang máy chạy sẵn `du_lieu_test/app_DEMO_da_cham_diem.db` — đã nạp và chấm điểm, **cố ý dừng trước bước chạy** để người xem tự bấm (`du_lieu_test/tao_db_demo.py`). Bản này bật điểm quyết tâm (dữ liệu **mô phỏng**) nên kết quả chạy KHÁC các số trên poster; muốn máy demo ra đúng số trên poster, dựng bằng `tao_db_demo.py --tat-wharton` |
 
 ---
 

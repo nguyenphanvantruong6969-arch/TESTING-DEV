@@ -71,11 +71,11 @@ def _cho_ten(page, ten):
         "n => document.querySelector('#wsTenHienTai').textContent === n", arg=ten, timeout=10000)
 
 
-def test_buoc_luat_co_o_wharton_tat_san_va_nhan_dung(mo_trang):
+def test_buoc_luat_co_o_wharton_bat_san_va_nhan_dung(mo_trang):
     page, _, loi = mo_trang()
     _toi_buoc_luat(page)
     assert page.locator("#wzWharton").count() == 1
-    assert not page.locator("#wzWharton").is_checked()
+    assert page.locator("#wzWharton").is_checked()        # A13.13: mặc định (mẫu Trường học) BẬT
     assert page.locator("#wzWharton").is_enabled()
     assert page.locator('label[for="wzWharton"]').inner_text() == "Dùng điểm quyết tâm"
     assert "100" in page.locator("#wzWharton").locator("xpath=../..").inner_text()
@@ -127,9 +127,22 @@ def test_bat_roi_tao_thi_rules_wharton_duoc_luu_va_xem_lai_co_hang_rvwharton(mo_
     assert not loi, loi
 
 
-def test_mac_dinh_tao_ra_wharton_tat_va_xem_lai_ghi_tat(mo_trang):
+def test_mac_dinh_tao_ra_wharton_bat_va_xem_lai_ghi_bat(mo_trang):
+    # A13.13: mặc định BẬT.
     page, api, loi = mo_trang()
     _toi_buoc_luat(page, "Đợt thường")
+    page.locator("#wzTiep").click()
+    assert page.locator("#rvWharton").inner_text() == "Bật"
+    page.locator("#wzTao").click()
+    _cho_ten(page, "Đợt thường")
+    assert api.get_workspace_config()["data"]["config"]["rules"]["wharton"] is True
+    assert not loi, loi
+
+
+def test_bo_chon_o_wharton_thi_tao_ra_wharton_tat_va_xem_lai_ghi_tat(mo_trang):
+    page, api, loi = mo_trang()
+    _toi_buoc_luat(page, "Đợt thường")
+    page.locator("#wzWharton").uncheck()
     page.locator("#wzTiep").click()
     assert page.locator("#rvWharton").inner_text() == "Tắt"
     page.locator("#wzTao").click()

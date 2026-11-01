@@ -163,7 +163,7 @@ def test_slug_khong_ton_tai_hoac_xau(api, slug):
 def test_create_workspace(api, goc):
     cfg = copy.deepcopy(ch.MAC_DINH_TRUONG_HOC)
     cfg["rules"].update(max_choices=4, max_tests=None, priority="tier", tier_mode="strict",
-                        tiers=["Cao", "Thấp"])
+                        tiers=["Cao", "Thấp"], wharton=False)   # A13.13: priority tier không bật được
     res = api.create_workspace("Sự kiện 2026", cfg)
     assert res["ok"] and res["data"] == {"slug": "su-kien-2026"}
     doc = ch.doc_cau_hinh(ws.duong_dan_db(goc, "su-kien-2026"))

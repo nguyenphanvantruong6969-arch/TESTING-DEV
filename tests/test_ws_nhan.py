@@ -15,6 +15,7 @@ import subprocess
 import pytest
 
 import nhan_ws
+from _wharton import tat_wharton
 from i18n_errors import MESSAGES, format_all, format_message
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -398,7 +399,8 @@ def _api_cong_ty(tmp_path, nhan=CONG_TY):
 
     goc = str(tmp_path / "goc")
     os.makedirs(goc)
-    cfg = {"industry": "company", "labels": nhan}
+    cfg = {"industry": "company", "labels": nhan,
+           "rules": {"wharton": False}}   # A13.13: mặc định đã BẬT; test này không có điểm quyết tâm
     slug = workspace.tao(goc, "Công ty ABC", cfg)
     api = PipelineAPI(workspace.duong_dan_db(goc, slug), thu_muc_xuat=str(tmp_path / "xuat"),
                       thu_muc_goc_ws=goc)
@@ -493,6 +495,9 @@ def test_trang_en_trong_xuat_ra_tieng_viet_nhu_truoc(tmp_path):
 
 def test_mac_dinh_truong_hoc_ten_trang_excel_khong_doi(api, tmp_path):
     openpyxl = pytest.importorskip("openpyxl")
+    # A13.13: mặc định đã BẬT Wharton nên tệp xuất có thêm trang "Điểm chuẩn"; tên trang cũ
+    # được giữ nguyên khi tắt RÕ RÀNG, và mặc định mới chỉ thêm đúng trang đó.
+    tat_wharton(api)
     api.create_or_update_club("a", "A", 2, 0, "")
     api.import_preferences_csv("student_id,name,pref_1\nHS1,An,a\n")
     assert api.run_pipeline(seed=1)["ok"]
@@ -502,3 +507,16 @@ def test_mac_dinh_truong_hoc_ten_trang_excel_khong_doi(api, tmp_path):
     assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB",
                              "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
     assert wb["Danh sách học sinh"]["A1"].value == "DANH SÁCH HỌC SINH VÀ CÂU LẠC BỘ"
+
+
+def test_mac_dinh_moi_them_dung_trang_diem_chuan(api, tmp_path):
+    """A13.13: mặc định BẬT Wharton chỉ thêm trang "Điểm chuẩn" so với mặc định cũ."""
+    openpyxl = pytest.importorskip("openpyxl")
+    api.create_or_update_club("a", "A", 2, 0, "")
+    api.import_preferences_csv("student_id,name,pref_1\nHS1,An,a\n")
+    assert api.run_pipeline(seed=1)["ok"]
+    ra = str(tmp_path / "kq.csv")
+    assert api.export_csv(ra)["ok"]
+    wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
+    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Chưa có chỗ",
+                             "Điểm chuẩn", "Thống kê", "Dấu vết (kỹ thuật)"]

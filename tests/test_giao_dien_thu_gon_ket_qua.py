@@ -43,6 +43,15 @@ GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BO_MAU = os.path.join(GOC, "du_lieu_test", "bo_nhieu_buoi")
 
 from _trinh_duyet import CHROMIUM  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 NAM_MUC = ["fillPanel", "clbPanel", "duTruPanel", "doPhuPanel", "nvPanel",
            "chuaCoChoPanel", "tkbPanel", "thamPanel", "dsXepPanel"]

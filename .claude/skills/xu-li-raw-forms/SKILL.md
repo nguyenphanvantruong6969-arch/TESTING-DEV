@@ -61,7 +61,7 @@ thư mục nào.
 
 | Tệp | Nội dung |
 |---|---|
-| `SO_NHAP_CLB.xlsx` | Sheet `1. CLB`: CLB, buổi, chỉ tiêu (trống nếu chưa có `--clb`). Sheet `2. Học sinh`: hai hàng tiêu đề ("Nguyện vọng 1", "Nguyện vọng 2"… ở hàng 1; "CLB", "Điểm thi" ở hàng 2), mỗi em một dòng từ hàng 3, nguyện vọng theo hạng em chọn (buổi này nối buổi kia), điểm thang 10 ngay bên phải CLB em đã thi. Biểu mẫu không hỏi điểm quyết tâm nên sổ không có cột đó |
+| `SO_NHAP_CLB.xlsx` | Sheet `1. CLB`: CLB, buổi, chỉ tiêu (trống nếu chưa có `--clb`). Sheet `2. Học sinh`: hai hàng tiêu đề ("Nguyện vọng 1", "Nguyện vọng 2"… ở hàng 1; "CLB", "Điểm thi" ở hàng 2), mỗi em một dòng từ hàng 3, nguyện vọng theo hạng em chọn (buổi này nối buổi kia), điểm thang 10 ngay bên phải CLB em đã thi. Biểu mẫu không hỏi điểm quyết tâm nên sổ không có cột đó (và kỹ năng KHÔNG được bịa điểm) |
 | `BAO_CAO_BAT_THUONG.md` | Mọi điều bất thường, kèm mã học sinh |
 
 Sổ được soát bằng `soat()` của skill `sinh-du-lieu-clb` (9 điều bắt buộc của
@@ -70,6 +70,18 @@ tiêu đề với sổ mẫu trong kho (`mau_csv/SO_NHAP_CLB.xlsx`). Khác một
 cột "Điểm quyết tâm" bên phải mỗi cột "Điểm thi"; sổ do kỹ năng này ghi không có cột đó
 (biểu mẫu không hỏi). Nạp sổ không có cột ấy vẫn được; muốn nhập điểm quyết tâm thì thêm
 sau trong phần mềm.
+
+## Điểm quyết tâm (A13.13): luôn nói với người dùng
+
+Workspace trường học BẬT điểm quyết tâm theo mặc định, mà raw của Forms không có điểm đó. Sổ ra không
+có điểm quyết tâm, nên nạp vào workspace mặc định sẽ bị cảnh báo và chạy xếp bị chặn. Báo người dùng
+đúng một câu (script in ra ở cuối lệnh và ghi ở đầu `BAO_CAO_BAT_THUONG.md`):
+
+> Dữ liệu không có điểm quyết tâm nên cần TẮT "Dùng điểm quyết tâm" trong cấu hình không gian làm việc
+> trước khi nạp sổ này.
+
+Sổ không chứa được cấu hình, nên kỹ năng không ghi `wharton: false` vào sổ; chỉ báo. Nếu sau này biểu
+mẫu có thêm phần thu điểm quyết tâm thì sổ có điểm và tính năng giữ bật.
 
 ## Đọc báo cáo và nói với người dùng
 

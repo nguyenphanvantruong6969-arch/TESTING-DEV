@@ -7,7 +7,7 @@ Bộ Excel trong thư mục này kiểm tra **đường nạp tệp**. Kịch b�
 **đường gõ tay** — tức là các màn hình mà giáo viên và học sinh thật sự bấm vào:
 tab *Quản lý club*, tab *Nhập dự phòng tại kiosk*, tab *Chấm điểm*.
 
-Nhỏ đủ để gõ trong khoảng 15 phút, và — điểm quan trọng nhất — **nhỏ đủ để bạn
+Nhỏ đủ để gõ trong khoảng 20 phút, và — điểm quan trọng nhất — **nhỏ đủ để bạn
 tự tính ra kết quả bằng tay rồi đối chiếu**.
 
 ---
@@ -41,14 +41,35 @@ mới*, rồi tick CLB ở Bước 1 và xếp nguyện vọng ở Bước 2.
 | `HS07` | Bùi Thị Lan | Nấu ăn | 1. Nấu ăn |
 | `HS08` | Hoàng Văn Minh | Cờ vua | 1. Cờ vua |
 
-## Bước 3 — Gán diện dự trữ cho HS05
+## Bước 3 — Chia điểm quyết tâm (Bước 3 của thẻ *Nhập dự phòng tại kiosk*)
+
+Workspace trường học **bật sẵn** điểm quyết tâm, nên mỗi em phải chia điểm trước khi chạy: ở mỗi
+buổi, **quỹ 1 = 100 điểm chia cho các CLB em đã tick thi** (quỹ 2 chia cho CLB không thi; kịch bản
+này mọi em đều tick thi hết các CLB mình ghi nên chỉ có quỹ 1). Em chỉ có một CLB thì điền 100.
+Gõ **đúng như bảng** (số MÔ PHỎNG do máy sinh bằng `random.Random(112026105)`, không phải số thật):
+
+| Mã | Nhiếp ảnh | Cờ vua | Nấu ăn |
+|---|---|---|---|
+| HS01 | 57 | 43 | |
+| HS02 | 47 | | 53 |
+| HS03 | 20 | 80 | |
+| HS04 | 100 | | |
+| HS05 | 60 | | 40 |
+| HS06 | | 59 | 41 |
+| HS07 | | | 100 |
+| HS08 | | 100 | |
+
+> Không muốn dùng điểm quyết tâm? Tắt "Dùng điểm quyết tâm" trong cấu hình không gian làm việc, bỏ
+> qua bước này; kết quả bên dưới **vẫn y nguyên** (xem phần cuối).
+
+## Bước 4 — Gán diện dự trữ cho HS05
 
 Vẫn ở tab **Quản lý club**, phần *Gán diện dự trữ cho học sinh*: tìm `HS05`,
 tick vào em đó, gõ nhãn `chinh_sach`, bấm **Gán cho học sinh đã tick**.
 
 **Chỉ một em duy nhất thuộc diện dự trữ.** Cả kịch bản xoay quanh em này.
 
-## Bước 4 — Chấm điểm
+## Bước 5 — Chấm điểm
 
 Tab **Chấm điểm (mù)**. Điểm phải gõ **đúng như bảng** — kết quả ở dưới chỉ đúng
 với đúng bộ điểm này:
@@ -64,7 +85,7 @@ với đúng bộ điểm này:
 | HS07 | | | 8.5 |
 | HS08 | | 6.5 | |
 
-## Bước 5 — Chạy phân bổ
+## Bước 6 — Chạy phân bổ
 
 Tab **Vận hành pipeline** → **Chạy phân bổ**. Rồi sang tab **Kết quả**.
 
@@ -119,7 +140,9 @@ vọng**. Thuật toán không nhét học sinh vào CLB họ không chọn. Mu�
 
 Thuật toán có một bước bốc thăm (Single Tie-Breaking) để xử lý **hai em bằng
 điểm nhau**. Bộ điểm trên **cố ý không có cặp nào bằng nhau trong cùng một CLB**,
-nên bước bốc thăm không bao giờ được dùng tới.
+nên bước bốc thăm không bao giờ được dùng tới. Điểm quyết tâm (Bước 3) cũng không đổi kết quả: mọi em
+đều đã thi mọi CLB mình ghi, nên quỹ 1 chỉ dùng để phá hoà khi hai em **bằng điểm thi** — mà ở đây
+không có cặp nào bằng nhau. Test canh cả hai cấu hình (bật có điểm, và tắt rõ ràng).
 
 Đã chạy thử với 5 hạt giống ngẫu nhiên khác nhau (1, 7, 42, 999, 12345) — **kết
 quả giống hệt nhau cả 5 lần**. Nghĩa là bạn có thể tự kiểm bằng bút chì trên

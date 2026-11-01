@@ -129,6 +129,7 @@ def cau_2():
         d = tempfile.mkdtemp()
         try:
             api = PipelineAPI(os.path.join(d, "app.db"))
+            __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
             api.create_or_update_club("clb_a", "CLB A", 5, 0, "")
             api.create_or_update_club("clb_b", "CLB B", 5, 0, "")
             for sid in thu_tu_hs:

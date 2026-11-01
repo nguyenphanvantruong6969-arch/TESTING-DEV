@@ -142,6 +142,7 @@ def sinh_csv(n_hs, n_clb, n_buoi, seed, ty_le=1.0, ten_hs=None, ten_clb=None,
 def dung(n_hs, n_clb, n_buoi=1, seed=SEED, chay=True, **kw):
     d = tempfile.mkdtemp(prefix="stress_")
     api = PipelineAPI(os.path.join(d, "app.db"))
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     api.thu_muc_xuat = os.path.join(d, "TaiXuong")
     os.makedirs(api.thu_muc_xuat)
     for text in sinh_csv(n_hs, n_clb, n_buoi, seed, **kw):
@@ -445,6 +446,7 @@ def nhom_4():
     print("\n4. TRẠNG THÁI LẠ")
     d = tempfile.mkdtemp()
     api = PipelineAPI(os.path.join(d, "app.db"))
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     api.thu_muc_xuat = d
     r = api.export_ket_qua("")
     ghi(4, "CSDL trống hoàn toàn", [] if r["ok"] and load_workbook(r["data"]["path"]).sheetnames == TRANG

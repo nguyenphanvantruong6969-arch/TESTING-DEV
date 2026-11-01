@@ -22,6 +22,15 @@ import sqlite3
 import pytest
 
 from api import PipelineAPI
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 def _clb_co_diem(api, diem_theo_em, club="clb_a", suc_chua=5):
@@ -177,6 +186,8 @@ def test_bo_du_lieu_that_khong_sinh_canh_bao_nao(api):
     for bo in ("vi_du_huong_dan", "bo_sach"):
         tm = os.path.join(goc, "du_lieu_test", bo)
         a = PipelineAPI(os.path.join(os.path.dirname(api.db_path), bo + ".db"))
+        if bo == "bo_sach":      # A13.13: dữ liệu của báo cáo đề tài, giữ nguyên => Wharton TẮT rõ ràng
+            tat_wharton(a)
         for t in sorted(os.listdir(tm)):
             if not t.endswith(".xlsx"):
                 continue

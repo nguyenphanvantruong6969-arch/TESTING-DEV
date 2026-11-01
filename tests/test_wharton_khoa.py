@@ -17,6 +17,7 @@ import pytest
 
 import api as api_mod
 from _wharton import bat_wharton, dong_bids, ma_loi
+from _wharton import tat_wharton  # noqa: E402
 from test_wharton import sinh_bo
 from test_wharton_pipeline import _nap_bo_vao_api, _trang_thai_stb
 
@@ -140,6 +141,7 @@ def test_loi_o_buoc_nhat_ky_khoa_rollback_ca_giao_dich(da_chay, monkeypatch):
 def test_wharton_tat_chay_xong_khong_co_dong_khoa_va_khong_nhat_ky(tmp_path):
     bo = sinh_bo(79, n_hs=12, n_clb=4)
     api = api_mod.PipelineAPI(str(tmp_path / "t.db"))
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     for cid in bo.cids:
         assert api.create_or_update_club(cid, cid, bo.cap[cid], 0, "", "")["ok"]
     for sid in bo.sids:
@@ -247,6 +249,7 @@ def test_mo_khoa_sai_chu_thi_khong_doi_gi(khoa_san, go):
 
 
 def test_mo_khoa_khi_wharton_tat_bao_chua_bat(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     kq = api.mo_khoa_wharton("MO")
     assert [e["code"] for e in kq["errors"]] == ["wharton_chua_bat"]
     assert api.get_wharton_lock_status()["data"]["is_locked"] is False

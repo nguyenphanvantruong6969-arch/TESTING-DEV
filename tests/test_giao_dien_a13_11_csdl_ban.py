@@ -17,6 +17,15 @@ from playwright.sync_api import sync_playwright  # noqa: E402
 import browser_host  # noqa: E402
 
 from _trinh_duyet import CHROMIUM  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAU_BAN = "đang bận"

@@ -232,10 +232,10 @@ tuỳ chọn:
 
 ### 2.8 · Xếp hạng nguyện vọng — trường nhiều buổi
 
-Tệp mẫu: `mau_csv/08_nguyen_vong_nhieu_buoi.csv` · 532 B · 6 dòng dữ liệu
+Tệp mẫu: `mau_csv/08_nguyen_vong_nhieu_buoi.csv` · 697 B · 6 dòng dữ liệu (có thêm cột `<buổi>_wp_<số>` = điểm quyết tâm MÔ PHỎNG, xem mục "Điểm quyết tâm")
 
 ```csv
-student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2
+student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
 HS001,Nguyễn Văn An,,clb_nhiepanh,clb_covua,clb_robotics,clb_khoahoc,clb_bongro,
 HS002,Trần Thị Bình,khoi_10,clb_nhiepanh,,,,clb_lamvuon,clb_bongro
 ```
@@ -451,7 +451,7 @@ tìm chỗ sai.
             └── sinh_du_lieu.py     21 734 B · 496 dòng
 ```
 
-Không có `.claude/settings.json`, không có hook, không có kỹ năng nào khác.
+`.claude/settings.json` chỉ đăng ký một hook Stop cho phiên làm việc của Claude (`.claude/hooks/handoff_khi_day_ngu_canh.py`: nhắc ghi tệp bàn giao `docs/phien/` khi ngữ cảnh gần đầy); nó không đụng tới phần mềm hay dữ liệu. Các kỹ năng khác trong `.claude/skills/` (soát mã, Google Forms, xử lí raw, dựng workspace) nằm ngoài phạm vi mục này.
 
 ### 4.1 · Toàn văn `SKILL.md`
 
@@ -546,18 +546,21 @@ Chèn hay xoá cột trong một nhóm thì báo lỗi nêu sheet, cột, nhóm 
 - Điểm cho câu lạc bộ em không xếp nguyện vọng thì sổ **không chứa được** (điểm
   luôn nằm cạnh một cột CLB) — điều 8 dưới đây chặn nó từ trước.
 
-## Điểm quyết tâm (tuỳ chọn, mục A13) — dữ liệu MÔ PHỎNG
+## Điểm quyết tâm (mục A13; MẶC ĐỊNH BẬT từ A13.13) — dữ liệu MÔ PHỎNG
 
-Chỉ dùng khi được yêu cầu ("có điểm quyết tâm", "dữ liệu mẫu có Wharton"). Luật của phần mềm:
+Mặc định mọi lệnh `ngau`, `tao`, `ap` sinh kèm điểm; tắt bằng `--khong-diem-quyet-tam`. Điểm luôn là dữ liệu MÔ PHỎNG. Luật của phần mềm:
 mỗi em có **hai quỹ cho MỖI buổi** — quỹ 1 chia cho các CLB em **có tick thi**, quỹ 2 chia
 cho các CLB **còn lại** — mỗi quỹ đúng **100** điểm, số nguyên ≥ 0. Quỹ chỉ có một CLB mà để
 trống thì phần mềm tự điền 100. Ô điểm nằm cạnh ô CLB của nguyện vọng đó (nhiều buổi vẫn dùng
 đúng cột này: nhóm xét và buổi suy từ CLB), nên **không cần đổi định dạng sổ**.
 
 ```bash
-# Sinh mới, có điểm. Sổ ghi ra có cột "Điểm quyết tâm"; kèm DQT_KIEU_CHIA.json
+# Sinh mới (mặc định có điểm). Sổ ghi ra có cột "Điểm quyết tâm"; kèm DQT_KIEU_CHIA.json
 python scripts/sinh_du_lieu.py ngau --ra ./bo_moi --hoc-sinh 120 --buoi thu_2,thu_4 \
-    --diem-quyet-tam hop_le --kieu-chia tron
+    --kieu-chia tron
+
+# Sinh mới KHÔNG điểm (đầu ra như trước A13.13)
+python scripts/sinh_du_lieu.py ngau --ra ./bo_cu --hoc-sinh 120 --khong-diem-quyet-tam
 
 # Áp lên một sổ đã có, giữ nguyên CLB, nguyện vọng, điểm thi
 python scripts/sinh_du_lieu.py ap SO_CU.xlsx --ra ./bo_moi --diem-quyet-tam hop_le --seed 3
@@ -565,8 +568,8 @@ python scripts/sinh_du_lieu.py ap SO_CU.xlsx --ra ./bo_moi --diem-quyet-tam hop_
 
 | `--diem-quyet-tam` | Ra gì |
 |---|---|
-| `khong` (mặc định) | Như cũ: không cột, không điểm |
-| `hop_le` | Mọi quỹ của mọi em đủ 100, đúng tập CLB, đúng nhóm — chạy xếp ngay |
+| `khong` | Như cũ: không cột, không điểm (cũng là `--khong-diem-quyet-tam`) |
+| `hop_le` (mặc định) | Mọi quỹ của mọi em đủ 100, đúng tập CLB, đúng nhóm — chạy xếp ngay |
 | `co_loi` | `hop_le` rồi cố ý làm sai mỗi loại ≥ 3 em (thiếu, thừa, điểm ở ô nguyện vọng trống, một quỹ chung cho cả hai nhóm, toàn 0); ghi `DQT_BANG_LOI.json` |
 | `trong` | Có cột nhưng để trống hết — thử tự điền và học sinh nhập ở kiosk |
 
@@ -985,7 +988,7 @@ Mọi con số dưới đây **đo lại từ tệp thật** khi viết tài li�
 | `05_danh_sach_club.csv` | 239 B | 5 | `club_id,name,capacity,reserve_capacity,reserve_group` |
 | `06_danh_sach_club_nhieu_buoi.csv` | 309 B | 6 | `club_id,name,capacity,reserve_capacity,reserve_group,buoi` |
 | `07_chon_club_thi_nhieu_buoi.csv` | 351 B | 6 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2` |
-| `08_nguyen_vong_nhieu_buoi.csv` | 532 B | 6 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2` |
+| `08_nguyen_vong_nhieu_buoi.csv` | 697 B | 6 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
 
 Giao diện **không** nhận các tệp trên nữa: nó chỉ nhận **Sổ nhập CLB**, một tệp
 Excel hai trang (định nghĩa: `so_nhap.py`, hướng dẫn: `mau_csv/HUONG_DAN_SO_NHAP.md`).
@@ -1019,7 +1022,7 @@ bộ · 45 chỗ · 24 học sinh · 33 ô điểm.** Suất dự trữ: 5 chỗ
 |---|---|---|---|
 | `01_danh_sach_CLB.csv` | 434 B | 9 | `club_id,name,capacity,reserve_capacity,reserve_group,buoi` |
 | `02_chon_CLB_muon_thi.csv` | 1 439 B | 24 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2,test_club_3,score_3` |
-| `03_xep_hang_nguyen_vong.csv` | 2 050 B | 24 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2` |
+| `03_xep_hang_nguyen_vong.csv` | 2 548 B | 24 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
 
 Buổi: `thu_2` `thu_4` `thu_6`. Điểm ghi bằng **dấu phẩy thập phân trong ngoặc kép**
 (`"9,5"`) — đúng cách Excel bản tiếng Việt lưu.
@@ -1036,7 +1039,7 @@ nên ba tệp không thể lệch nhau. Bộ sinh này **tất định, không d
 | `TEST_02_chon_CLB_muon_thi.xlsx` | 14 111 B | 120 em, mỗi em thi 2–5 CLB, **kèm sẵn 396 ô điểm** | nạp thứ hai |
 | `TEST_03_xep_hang_nguyen_vong.xlsx` | 11 355 B | cùng 120 em, mỗi em 2–5 nguyện vọng | nạp thứ ba |
 | `TEST_04_CO_LOI_CO_Y.xlsx` | 7 168 B | 10 dòng, **cố ý sai 6 chỗ** | kiểm phần mềm **có** cảnh báo không — [Phần 6](#phần-6--test_04_co_loi_co_yxlsx--sáu-lỗi-cài-sẵn) |
-| `app_DEMO_da_cham_diem.db` | 147 456 B | CSDL dựng sẵn tới ngay trước bước cuối: đã nạp, đã chấm điểm, **0 cảnh báo** | demo |
+| `app_DEMO_da_cham_diem.db` | 278 528 B | CSDL dựng sẵn tới ngay trước bước cuối: nạp `SO_NHAP_DQT_120HS_HOP_LE.xlsx` (nguyện vọng + điểm thi như bộ TEST, **thêm điểm quyết tâm MÔ PHỎNG**), Wharton BẬT, đã chấm điểm, 3 cảnh báo mức thường (`health_oversubscribed_buoi`, bộ cố ý cạnh tranh cao), 0 nghiêm trọng. Bản cũ (bộ ba TEST, Wharton tắt) dựng bằng `tao_db_demo.py --tat-wharton` | demo |
 
 Mỗi tệp `.xlsx` có sheet **"Ghi chú"** giải thích nội dung ngay trong tệp.
 
@@ -1169,7 +1172,7 @@ dùng `random`** — mọi giá trị viết thẳng trong hai bảng `CLB` và 
 |---|---|---|---|
 | `VIDU_01_danh_sach_CLB.csv` | 195 B | 4 | `club_id,name,capacity,reserve_capacity,reserve_group` |
 | `VIDU_02_chon_CLB_muon_thi.csv` | 619 B | 10 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2` |
-| `VIDU_03_xep_hang_nguyen_vong.csv` | 516 B | 10 | `student_id,name,reserve_group,pref_1,pref_2` |
+| `VIDU_03_xep_hang_nguyen_vong.csv` | 585 B | 10 | `student_id,name,reserve_group,pref_1,pref_2,wp_1,wp_2` |
 
 Có cả bản `.xlsx`: 6 396 B · 6 729 B · 6 486 B.
 
@@ -1564,7 +1567,8 @@ cũng ra đúng bộ đó. Đây là lý do có thể tin các bảng ở [Phầ
 ```bash
 # ── Bộ cạnh tranh cao + CSDL demo ──────────────────────────────────
 ./.venv/bin/python du_lieu_test/tao_du_lieu_test.py     # TEST_01..04.xlsx   SEED = 2026
-./.venv/bin/python du_lieu_test/tao_db_demo.py          # app_DEMO_da_cham_diem.db
+./.venv/bin/python du_lieu_test/tao_db_demo.py          # app_DEMO_da_cham_diem.db (Wharton BẬT, có điểm quyết tâm mô phỏng)
+./.venv/bin/python du_lieu_test/tao_db_demo.py --tat-wharton   # bản cũ: bộ ba TEST, Wharton tắt (tái lập số liệu đã công bố)
 
 # ── Năm bộ CSV chạy thử ────────────────────────────────────────────
 ./.venv/bin/python du_lieu_test/bo_sach/tao_bo_sach.py               # SEED = 9090

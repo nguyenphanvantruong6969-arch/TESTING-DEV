@@ -9,7 +9,13 @@ Kịch bản cố ý KHÔNG có hai em bằng điểm trong cùng một club, n�
 thăm (STB) không bao giờ được dùng tới và kết quả không phụ thuộc seed.
 """
 
+import os
+import random
+import sys
+
 import pytest
+
+from _wharton import tat_wharton
 
 CLB = [
     ("clb_nhiepanh", "CLB Nhiếp ảnh", 3, 1, "chinh_sach"),
@@ -43,7 +49,21 @@ KET_QUA_HUA = {
 LAP_DAY_HUA = {"clb_nhiepanh": 3, "clb_covua": 2, "clb_nauan": 1}
 
 
-def _dung_kich_ban(api):
+SEED_DQT = 112026105     # seed ghi trong NHAP_TAY.md, Bước 3
+
+
+def diem_quyet_tam():
+    """{mã em: {CLB: điểm}} do MÁY sinh (cùng hàm chia với `them_diem_quyet_tam_vao_mau.py`).
+
+    Mọi em tick thi mọi CLB mình ghi nên chỉ có quỹ 1; quỹ một CLB thì 100."""
+    goc = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(goc, "du_lieu_test"))
+    from them_diem_quyet_tam_vao_mau import chia_diem
+    rng = random.Random(SEED_DQT)
+    return {ma: dict(zip(nv, chia_diem(rng, len(nv)))) for ma, _, _, nv, _ in HOC_SINH}
+
+
+def _dung_kich_ban(api, co_diem_quyet_tam=True):
     """Gọi ĐÚNG các hàm mà giao diện gọi khi người dùng gõ tay."""
     for cid, ten, cap, rcap, nhom in CLB:
         assert api.create_or_update_club(cid, ten, cap, rcap, nhom)["ok"]
@@ -53,6 +73,8 @@ def _dung_kich_ban(api):
             assert api.set_student_reserve_group(ma, nhom)["ok"]
         assert api.submit_test_selection(ma, sorted(diem))["ok"]
         assert api.submit_preferences(ma, nv)["ok"]
+        if co_diem_quyet_tam:       # Bước 3 của NHAP_TAY.md: quỹ 1 chia đủ 100
+            assert api.submit_wharton(ma, diem_quyet_tam()[ma], {})["ok"]
     for cid, *_ in CLB:
         ds = [{"student_id": ma, "score": diem[cid]}
               for ma, _, _, _, diem in HOC_SINH if cid in diem]
@@ -107,3 +129,29 @@ def test_khong_phu_thuoc_boc_tham(api, seed):
     _dung_kich_ban(api)
     assert api.run_pipeline(seed=seed)["ok"]
     assert _bang_ket_qua(api) == KET_QUA_HUA
+
+
+def test_tat_ro_rang_khong_diem_quyet_tam_van_ra_dung_bang_do(api):
+    """Bước 3 không làm đổi kết quả: tắt RÕ RÀNG và bỏ bước 3 thì bảng y nguyên."""
+    tat_wharton(api)
+    _dung_kich_ban(api, co_diem_quyet_tam=False)
+    assert api.run_pipeline(seed=42)["ok"]
+    assert _bang_ket_qua(api) == KET_QUA_HUA
+
+
+def test_tai_lieu_in_dung_bang_diem_quyet_tam_do_may_sinh():
+    """Bảng ở Bước 3 của NHAP_TAY.md phải là đúng số máy sinh (không gõ tay)."""
+    import io
+    goc = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with io.open(os.path.join(goc, "du_lieu_test", "NHAP_TAY.md"), encoding="utf-8") as f:
+        tai_lieu = f.read()
+    assert "random.Random(%d)" % SEED_DQT in tai_lieu and "MÔ PHỎNG" in tai_lieu
+    ten_cot = ["clb_nhiepanh", "clb_covua", "clb_nauan"]
+    for ma, diem in diem_quyet_tam().items():
+        dong = "| %s | %s |" % (ma, " | ".join(str(diem[c]) if c in diem else "" for c in ten_cot))
+        assert " ".join(dong.split()) in " ".join(tai_lieu.split()), dong
+
+
+def test_diem_quyet_tam_moi_em_chia_dung_100():
+    for ma, diem in diem_quyet_tam().items():
+        assert sum(diem.values()) == 100, (ma, diem)

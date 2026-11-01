@@ -24,6 +24,8 @@ import os
 
 import pytest
 
+from _wharton import tat_wharton
+
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 BO_MAU = {
@@ -42,7 +44,9 @@ BAM_MONG_DOI = {
     "bo_nhieu_buoi": "9bf94b80a2d35e5fabc6a732d0377faf70983e59b3e49b55922b458fab0a22f3",
     "bo_sau_buoi": "dfd955de442fb51da6e831c758c693d5b4de2800fc2deed8af224d442a64e8f3",
     "vi_du_huong_dan": "0306924fe367540bf98632c1ea58f32a81465af556c7a26ba4a6c3c68324a897",
-    "vi_du_day_du": "2600700b96508e61cf66c69e84941d4114dd663c65ec392e987d4fbdefeea20b",
+    # A13.13: bỏ nguyện vọng thứ Hai clb_bongro của HS024 trong dữ liệu (tao_bo_mau.py) để đúng một em
+    # trắng tay khi bật điểm quyết tâm; thuật toán KHÔNG đổi, chỉ đổi dữ liệu nên băm đổi theo.
+    "vi_du_day_du": "dfa6ee1dd57d6bf30f42e1b9a61984ca40fab77d9975378835a89470904edbaa",
 }
 
 
@@ -71,6 +75,14 @@ def chay_bo(api, ten_bo: str) -> str:
     kq = api.run_pipeline(seed=42)
     assert kq["ok"], kq.get("errors")
     return bam_ket_qua(api)
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: bản chụp kết quả này canh THUẬT TOÁN trên các bộ không có điểm quyết tâm; mặc định
+    Wharton đã BẬT nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 @pytest.mark.parametrize("ten_bo", sorted(BO_MAU))

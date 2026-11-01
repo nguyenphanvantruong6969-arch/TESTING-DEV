@@ -29,6 +29,7 @@ CHO_DOI = {"xep_duoc": 108, "tong": 120, "so_vong": 7}
 def main():
     d = tempfile.mkdtemp()
     api = PipelineAPI(os.path.join(d, "app.db"))
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
 
     t = time.perf_counter()
     for ten in ("TEST_01_danh_sach_CLB.xlsx", "TEST_02_chon_CLB_muon_thi.xlsx",

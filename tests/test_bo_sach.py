@@ -16,6 +16,15 @@ import io
 import os
 
 import pytest
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: bộ `bo_sach` là dữ liệu của báo cáo đề tài, GIỮ NGUYÊN (không có điểm quyết tâm);
+    số liệu đã công bố tái lập được nên mọi lần chạy bộ này tắt Wharton RÕ RÀNG."""
+    tat_wharton(api)
+    return api
 
 BO_SACH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -126,6 +135,7 @@ def test_hai_duong_vao_cho_cung_ket_qua(api, tmp_path):
     conn.close()
 
     api2 = PipelineAPI(str(tmp_path / "app2.db"))
+    tat_wharton(api2)         # A13.13: cùng bộ `bo_sach` => tắt RÕ RÀNG
     _nap(api2, ".csv")
     assert api2.run_pipeline(seed=42)["ok"]
     conn = sqlite3.connect(api2.db_path)

@@ -11,10 +11,13 @@ import sqlite3
 
 import pytest
 
+from _wharton import tat_wharton
+
 
 @pytest.fixture
 def hai_em(api):
     """CLB A một chỗ. HS1 5 điểm, HS2 9 điểm -> HS2 vào A, HS1 sang B."""
+    tat_wharton(api)         # A13.13: nền là hành vi cũ, không có điểm quyết tâm
     assert api.create_or_update_club("A", "CLB A", 1, 0, "")["ok"]
     assert api.create_or_update_club("B", "CLB B", 5, 0, "")["ok"]
     for ma in ("HS1", "HS2"):

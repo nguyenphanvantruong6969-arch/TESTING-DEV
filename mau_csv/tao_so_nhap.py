@@ -23,6 +23,7 @@ tệp đều ra cùng một CSDL — `tests/test_so_nhap.py` canh điều đó.
 """
 
 import csv
+import re
 import os
 import sys
 
@@ -63,11 +64,39 @@ def _doc(duong_dan):
     return [dict(zip(dong[0], r)) for r in dong[1:]]
 
 
+_RE_PREF = re.compile(r"^(?:(?P<buoi>.+)_)?pref_(?P<k>\d+)$")
+
+
+def _gan_diem_w(students, dong_nv):
+    """Gắn `diem_w` (A13.13) vào nguyện vọng từ cột `wp_k` / `<buoi>_wp_k` của tệp nguyện vọng.
+
+    Ghép cột `wp` với cột `pref` cùng tiền tố buổi và cùng hậu tố số (như phần mềm). Không có
+    cột `wp` thì không làm gì (sổ cũ giữ nguyên).
+    """
+    if not dong_nv or not any(re.match(r"^(?:.+_)?wp_\d+$", c or "") for c in dong_nv[0]):
+        return
+    theo_sid = {s["student_id"]: s for s in students}
+    for r in dong_nv:
+        s = theo_sid.get((r.get("student_id") or "").strip())
+        if not s:
+            continue
+        cid_w = {}
+        for c in r:
+            if _RE_PREF.match(c or ""):
+                cid, w = (r.get(c) or "").strip(), (r.get(c.replace("pref_", "wp_")) or "").strip()
+                if cid and w:
+                    cid_w[cid] = int(float(w))
+        for x in s["nv"]:
+            if x["club_id"] in cid_w:
+                x["diem_w"] = cid_w[x["club_id"]]
+
+
 def _tu_ba_tep(thu_muc, ten, duoi=".csv", tien_to=""):
-    clubs, students, ngoai_nv = so_nhap.tu_csv(*(
-        _doc(os.path.join(thu_muc, tien_to + t + duoi)) for t in ten))
+    dong = [_doc(os.path.join(thu_muc, tien_to + t + duoi)) for t in ten]
+    clubs, students, ngoai_nv = so_nhap.tu_csv(*dong)
     if ngoai_nv:
         raise SystemExit(f"{thu_muc}: thi CLB không có trong nguyện vọng: {ngoai_nv}")
+    _gan_diem_w(students, dong[2])
     return clubs, students
 
 
@@ -85,14 +114,15 @@ def tao_mau_trong() -> str:
     return ra
 
 
+def tao_du_lieu_test_mot(thu_muc, tien_to, duoi, ten) -> str:
+    clubs, students = _tu_ba_tep(thu_muc, TEN_BA_TEP, duoi, tien_to + "_")
+    p = os.path.join(thu_muc, ten)
+    so_nhap.ghi_so_nhap(p, clubs, students)       # có cột wp trong CSV thì sổ có cột Điểm quyết tâm
+    return p
+
+
 def tao_du_lieu_test() -> list:
-    ra = []
-    for thu_muc, tien_to, duoi, ten in BO_DU_LIEU_TEST:
-        clubs, students = _tu_ba_tep(thu_muc, TEN_BA_TEP, duoi, tien_to + "_")
-        p = os.path.join(thu_muc, ten)
-        so_nhap.ghi_so_nhap(p, clubs, students)
-        ra.append(p)
-    return ra
+    return [tao_du_lieu_test_mot(*b) for b in BO_DU_LIEU_TEST]
 
 
 # Sổ cố ý sai: từ bộ 10 em, mỗi lỗi một chỗ, để thử bảng lỗi của màn hình

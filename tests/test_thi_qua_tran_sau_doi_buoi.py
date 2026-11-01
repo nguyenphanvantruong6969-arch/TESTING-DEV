@@ -19,6 +19,16 @@ không chỉ là chuyện hình thức. Nhưng thuật toán vẫn chạy đúng
 
 
 import rbda_priority_pipeline as loi
+import pytest
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 def _ma(bao_cao):

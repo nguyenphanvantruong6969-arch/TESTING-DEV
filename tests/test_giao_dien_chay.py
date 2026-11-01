@@ -37,6 +37,15 @@ BO_MAU = os.path.join(GOC, "du_lieu_test", "bo_nhieu_buoi")
 
 from _trinh_duyet import CHROMIUM  # noqa: E402
 from _so_nhap_mau import CHO_SAN_SANG, clb, ghi_so  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 def _nap_du_lieu(api):

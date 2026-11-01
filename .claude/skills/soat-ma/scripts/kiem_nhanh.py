@@ -263,6 +263,11 @@ for ten, tep in d.BO_DU_LIEU[:so_bo]:
         with tempfile.TemporaryDirectory() as tam:
             db = d.nap_bo(tam, tep)
             a = api_mod.PipelineAPI(db)
+            try:   # A13.13: mặc định BẬT Wharton; so trùng khít với luật cũ cần tắt RÕ RÀNG
+                import cau_hinh_ws
+                cau_hinh_ws.ghi_cau_hinh(db, {"rules": {"wharton": False}})
+            except ValueError:   # nhánh so sánh cũ chưa có khoá wharton
+                pass
             r = a.run_pipeline(seed=seed)
             with a._ket_noi_doc() as cur:
                 mr = [list(x) for x in cur.execute(

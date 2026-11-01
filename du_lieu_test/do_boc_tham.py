@@ -109,6 +109,7 @@ def nap_bo_mau():
     try:
         duong_db = os.path.join(thu_muc, "app.db")
         api = PipelineAPI(duong_db, thu_muc_xuat=thu_muc)
+        __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
         for ten in TEP_MAU:
             with open(os.path.join(BO_MAU, ten), encoding="utf-8-sig") as f:
                 kq = api.import_csv_auto(f.read())

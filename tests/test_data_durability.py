@@ -21,6 +21,15 @@ import pytest
 import api as api_module
 from api import PipelineAPI
 from recovery import RecoveryAPI
+from _wharton import tat_wharton  # noqa: E402
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; các test ở tệp này dựng dữ liệu KHÔNG có điểm quyết tâm để
+    kiểm chuyện khác, nên tắt RÕ RÀNG (không autouse toàn cục)."""
+    tat_wharton(api)
+    return api
 
 
 def _seed_small_scenario(api):
@@ -236,6 +245,7 @@ def test_recovery_start_fresh_preserves_corrupt_file_and_creates_new_db(tmp_path
 def test_recovery_restore_from_backup_recovers_full_history(tmp_path):
     db_path = str(tmp_path / "app.db")
     api = PipelineAPI(db_path)
+    tat_wharton(api)          # A13.13: dữ liệu mô phỏng không có điểm quyết tâm
     _seed_small_scenario(api)
     res = api.run_pipeline(seed=1)
     assert res["ok"] is True

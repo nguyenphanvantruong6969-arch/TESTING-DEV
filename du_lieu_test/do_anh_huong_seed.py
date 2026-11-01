@@ -68,6 +68,7 @@ def nap_bo(thu_muc_tam, duong_dan_tuong_doi):
     """Nạp các file CSV vào một CSDL tạm, trả về đường dẫn CSDL."""
     duong_db = os.path.join(thu_muc_tam, "app.db")
     api = PipelineAPI(duong_db)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     for rel in duong_dan_tuong_doi:
         duong = os.path.join(GOC, rel)
         if rel.endswith(".xlsx"):

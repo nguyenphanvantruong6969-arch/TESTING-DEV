@@ -19,6 +19,7 @@ openpyxl = pytest.importorskip("openpyxl")
 
 import so_nhap  # noqa: E402
 from _wharton import bat_wharton, chen_bids, dong_bids, dung_clb, dung_hs  # noqa: E402
+from _wharton import tat_wharton  # noqa: E402
 from api import PipelineAPI  # noqa: E402
 
 CFG_W = {"rules": {"wharton": True, "max_choices": 10, "max_tests": 5, "score_scope": "per_slot"}}
@@ -285,6 +286,7 @@ def test_xuat_roi_nap_lai_hai_hang_wharton_bids_giong_het(api, tmp_path):
 
 
 def test_xuat_tat_wharton_van_hai_hang_khong_co_cot_quyet_tam(api):
+    tat_wharton(api)               # A13.13: mặc định đã BẬT, test này cần trạng thái tắt
     _dung_du_lieu(api)
     with open(api.export_du_lieu_dau_vao()["data"]["path"], "rb") as f:
         ws = _wb(f.read())[HS]

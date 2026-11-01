@@ -40,6 +40,7 @@ MAU = ["var(--cam)", "var(--reu)", "var(--vang)", "var(--gach)"]
 def chay_pipeline():
     with tempfile.TemporaryDirectory() as tmp:
         api = PipelineAPI(os.path.join(tmp, "app.db"))
+        __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
         canh_bao_nhap = []
         for ten in TEN_FILE:
             p = os.path.join(BO_SACH, ten + ".csv")

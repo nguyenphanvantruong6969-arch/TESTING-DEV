@@ -58,6 +58,10 @@ CLB. Cả hướng dẫn này dùng đúng bộ đó, nên bạn làm theo tới
 > ⚠️ Mọi bộ dữ liệu đi kèm phần mềm đều là **DỮ LIỆU MÔ PHỎNG** — tên và điểm
 > đều là bịa. Không được trình bày như số liệu khảo sát thật.
 
+Bộ ví dụ đã có sẵn **điểm quyết tâm mô phỏng hợp lệ** (cột `wp_1`, `wp_2` trong tệp nguyện
+vọng, cột "Điểm quyết tâm" trong sổ), vì không gian làm việc Trường học bật sẵn tính năng này nên
+nạp là chạy được ngay. Bảng kết quả đúng ở phần dưới **không đổi** so với khi chưa có các cột đó.
+
 ---
 
 ## 3. Mở phần mềm lần đầu
@@ -826,7 +830,7 @@ công. Bộ ví dụ chạy xong sau **2 vòng**.
 Hai nhóm:
 
 - **Xét điểm thi** — em **có thi** CLB đó: xếp theo **điểm**, cao trước.
-- **Xét điểm quyết tâm** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**.
+- **Xét điểm quyết tâm** — em **không thi** nhưng có xếp nguyện vọng: xếp theo **số bốc thăm**; khi không gian làm việc bật điểm quyết tâm (mặc định của Trường học) thì xếp theo **điểm quyết tâm** em đã chia cho CLB đó, cao trước, bằng nhau mới đến số bốc thăm.
 
 Nhóm xét điểm thi luôn đứng trên nhóm xét điểm quyết tâm. Bằng điểm nhau thì **số bốc thăm** phân định.
 
@@ -986,7 +990,9 @@ và **sau** điểm thi; thứ tự nguyện vọng không bao giờ ảnh hư�
 
 ### Bật ở đâu
 
-Màn **Không gian làm việc** → tạo mới → bước luật → ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã bật sẵn).
+Không gian làm việc **Trường học** (kể cả khi tạo mới hoặc mở lại dữ liệu cũ chưa có cấu hình) **bật sẵn** điểm quyết tâm.
+Muốn tắt: Màn **Không gian làm việc** → tạo mới → bước luật → bỏ chọn ô **Dùng điểm quyết tâm** (hoặc chọn một mẫu đã tắt).
+Khi bật mà học sinh chưa chia đủ điểm thì phần mềm **không chạy xếp** và báo rõ ai còn thiếu: hãy điền đủ điểm, hoặc tắt tính năng nếu không dùng.
 Ô này chỉ dùng được khi cách xếp ưu tiên có điểm (Theo điểm, hoặc Nhóm trước rồi đến điểm) **và** điểm tính
 riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một điểm duy nhất" thì ô tự khoá và bỏ chọn.
 

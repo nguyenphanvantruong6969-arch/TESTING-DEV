@@ -31,6 +31,7 @@ QUY_MO = [(200, 10), (500, 25), (1000, 50), (2000, 50)]
 def dung(n_hs, n_clb):
     d = tempfile.mkdtemp()
     api = PipelineAPI(os.path.join(d, "app.db"))
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     for text in sinh_csv(n_hs, n_clb, 5, 1.08):
         api.import_csv_auto(text)
     api.run_pipeline(seed=42)

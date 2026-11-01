@@ -44,7 +44,7 @@ import workspace as ws
 from api import PipelineAPI
 import browser_host
 root = %(root)r
-slug = ws.tao(root, "Thu stress")
+slug = ws.tao(root, "Thu stress", {"rules": {"wharton": False}})   # A13.13: mặc định đã BẬT
 api = PipelineAPI(ws.duong_dan_db(root, slug), thu_muc_xuat=%(tai_ve)r, thu_muc_goc_ws=root)
 r = c.nap_so(api, %(so)r); assert r["ok"], r
 assert api.run_pipeline(42)["ok"]

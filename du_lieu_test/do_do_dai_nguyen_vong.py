@@ -24,17 +24,24 @@ Thí nghiệm này CẮT BỚT nguyện vọng của những em vốn đã khai 
 minh rằng bắt em khai thêm CLB em KHÔNG muốn thì có lợi: khai thêm CLB không
 muốn thì em có thể bị xếp đúng vào đó, và với em như thế còn tệ hơn không có
 suất.
+
+CHUẨN BỊ DỮ LIỆU
+Đọc `du_lieu_test/bo_sach/SACH_0{1,2,3}_*.csv`. Các tệp này CÓ SẴN trong kho;
+nếu thiếu thì sinh lại bằng `python du_lieu_test/bo_sach/tao_bo_sach.py`
+(seed cố định 9090). Chạy được từ bất kỳ thư mục nào, trên bất kỳ máy nào
+(đường dẫn tính từ vị trí tệp). Wharton được TẮT tường minh để số đo cũ tái lập.
 """
 import collections, os, shutil, sys, tempfile
-sys.path.insert(0, "/home/user/truong/rbda-kiosk")
+GOC = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(GOC))
 import rbda_priority_pipeline as loi
 from api import PipelineAPI
-GOC = "/home/user/truong/rbda-kiosk/du_lieu_test"
 F = ["bo_sach/SACH_01_danh_sach_CLB.csv","bo_sach/SACH_02_chon_CLB_muon_thi.csv","bo_sach/SACH_03_xep_hang_nguyen_vong.csv"]
 N_SEED = 50
 tm = tempfile.mkdtemp()
 try:
     db = os.path.join(tm,"app.db"); api = PipelineAPI(db)
+    __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
     for rel in F: api.import_csv_auto(open(os.path.join(GOC,rel),encoding="utf-8-sig").read())
     students, clubs, diem, ung_vien_goc, nv_goc, _ = loi.load_from_sqlite(db)
     fn = loi.default_reserve_eligible_fn(students, clubs)

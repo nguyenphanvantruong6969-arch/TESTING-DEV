@@ -45,3 +45,13 @@ def dung_hs(api, *ds, tick=None):
         assert api.create_student_if_missing(sid, "Em " + sid)["ok"]
     for sid, clbs in (tick or {}).items():
         assert api.submit_test_selection(sid, clbs)["ok"]
+
+
+def tat_wharton(api_hoac_db):
+    """Đặt `rules.wharton = False` tường minh (A13.13: mặc định đã BẬT).
+
+    Dùng cho test lấy hành vi cũ làm nền (dữ liệu không có điểm quyết tâm). Nhận `PipelineAPI`
+    hoặc đường dẫn CSDL. Không dùng autouse: test về mặc định mới phải thấy mặc định thật.
+    """
+    db = getattr(api_hoac_db, "db_path", api_hoac_db)
+    ch.ghi_cau_hinh(db, {"rules": {"wharton": False}})

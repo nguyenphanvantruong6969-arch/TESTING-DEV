@@ -576,7 +576,7 @@ def diem_wharton_hieu_luc(
 
 # Năm khoá luật của workspace mà THUẬT TOÁN đọc (hai khoá còn lại, trần nguyện vọng và trần
 # thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ. `wharton` (mục A13)
-# mặc định TẮT; xem `dung_wharton` và `_luat_de_ghi_hoac_bam`.
+# mặc định TẮT ở tầng thuật toán (mặc định BẬT là của cau_hinh_ws, A13.13); xem `dung_wharton` và `_luat_de_ghi_hoac_bam`.
 LUAT_XEP_MAC_DINH = {"priority": "score", "tier_mode": "reserve",
                      "score_scope": "per_slot", "tiers": [], "wharton": False}
 

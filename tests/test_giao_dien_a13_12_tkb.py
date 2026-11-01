@@ -5,7 +5,16 @@ import pytest
 
 pytest.importorskip("playwright", reason="chưa cài playwright")
 
+from _wharton import tat_wharton  # noqa: E402
 from test_giao_dien_thu_gon_ket_qua import trang  # noqa: E402,F401
+
+
+@pytest.fixture
+def api(api):
+    """A13.13: mặc định BẬT Wharton; dữ liệu của `trang` không có điểm quyết tâm nên tắt RÕ RÀNG
+    (fixture `api` ghi đè ở tệp gốc không áp cho tệp nhập `trang`)."""
+    tat_wharton(api)
+    return api
 
 
 def test_tim_khong_khop_giu_o_tim_va_go_lai_thi_co_ket_qua(trang):  # noqa: F811

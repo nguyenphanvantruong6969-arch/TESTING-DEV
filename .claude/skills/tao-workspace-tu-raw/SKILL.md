@@ -113,6 +113,7 @@ Gửi ba tệp (SendUserFile), tóm tắt: số người / chỗ / buổi, độ
 | `tier_mode` | `reserve` · `strict` | nhóm chỉ hưởng SUẤT DÀNH RIÊNG ở chỗ khai suất (mặc định) · nhóm xếp CỨNG trước (thâm niên, năm cuối…) |
 | `score_scope` | `per_slot` · `per_person` | điểm thi từng chỗ · một điểm cho cả người |
 | `tiers` | danh sách mã nhóm, tốt nhất đầu tiên | chỉ khi xếp cứng (`strict` hoặc `priority` có `tier`) |
+| `wharton` | `true` · `false` | điểm quyết tâm. **Raw của khách là dữ liệu THẬT và không có điểm này; KHÔNG được bịa.** Spec không ghi `rules.wharton` thì script ghi `wharton: false` vào workspace (mặc định của phần mềm là BẬT từ A13.13, sẽ chặn chạy) và báo người dùng đúng một câu: "Dữ liệu không có điểm quyết tâm nên đã tắt tính năng này." (in ra ở lệnh `dung`, có trong `ghi_chu` của `--json` và trong `BAO_CAO_SOAT.md`). Chỉ ghi `true` khi raw thật sự có điểm quyết tâm |
 
 Luật nhóm: `reserve` → mọi nhóm của người phải có chỗ dành suất (không thì `nhom_mo_coi`);
 `strict` → mọi nhóm phải nằm trong `tiers` (không thì `nhom_ngoai_tiers`).

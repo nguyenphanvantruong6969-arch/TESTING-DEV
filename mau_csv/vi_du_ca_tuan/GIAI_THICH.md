@@ -98,6 +98,10 @@ HS001,Trần Thanh Linh,khoi_10,clb_robotics,clb_bongro,,clb_tinhoc,...
 HS004,Dương Thanh Phúc,,clb_covua,,,,,,,,,clb_nauan,,,clb_tranhbien,,,clb_thuvien,clb_dangian,clb_coking
 ```
 
+- **Điểm quyết tâm (A13.13):** workspace trường học bật sẵn tính năng này, nên tệp có thêm các
+  cột **`<buổi>_wp_<số>`** (đi cặp với `<buổi>_pref_<số>`): mỗi buổi mỗi em chia 100 điểm cho các
+  câu lạc bộ đã thi và 100 điểm cho các câu lạc bộ không thi. Các số là dữ liệu **MÔ PHỎNG** do
+  `du_lieu_test/them_diem_quyet_tam_vao_mau.py` sinh (seed cố định).
 - Tên cột là **`<buổi>_pref_<số>`**, thứ tự **đếm lại từ 1 ở mỗi buổi**. Không
   có `thu_3_pref_4` khi thứ Ba chỉ có 3 nguyện vọng.
 - Chuỗi buổi trong tên cột phải **khớp từng ký tự** với cột `buoi` của tệp 1.

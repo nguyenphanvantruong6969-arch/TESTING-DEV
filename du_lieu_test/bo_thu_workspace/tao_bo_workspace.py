@@ -55,6 +55,7 @@ CAU_HINH = {
         "tier_mode": "reserve",
         "score_scope": "per_slot",
         "tiers": [],
+        "wharton": False,   # A13.13: mặc định đã BẬT; bộ thử này không có điểm quyết tâm
     },
 }
 

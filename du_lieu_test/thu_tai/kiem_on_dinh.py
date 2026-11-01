@@ -35,6 +35,7 @@ def main():
         d = tempfile.mkdtemp()
         duong_db = os.path.join(d, "app.db")
         api = PipelineAPI(duong_db)
+        __import__("cau_hinh_ws").ghi_cau_hinh(api.db_path, {"rules": {"wharton": False}})  # A13.13: mặc định đã BẬT; số liệu cũ = tắt RÕ RÀNG
         for text in sinh_csv(n_hs, n_clb, 5, 1.08):
             api.import_csv_auto(text)
         run = api.run_pipeline(seed=42)

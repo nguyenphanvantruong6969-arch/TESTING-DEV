@@ -99,7 +99,8 @@ thêm khi giá trị có dấu phẩy; không phải gõ tay.
 **3. Em không thi câu lạc bộ nào cũng là một dòng hợp lệ.** `HS003` để trống
 hết. Em ấy vẫn xếp nguyện vọng bình thường ở tệp 3, chỉ là em ấy sẽ đứng ở
 **nhóm xét điểm quyết tâm** — nhóm của những em không dự thi — tại mọi câu lạc bộ có tổ chức
-thi, và thứ tự trong nhóm đó do bốc thăm quyết định.
+thi, và thứ tự trong nhóm đó do điểm quyết tâm (nếu tính năng bật, xem dưới) rồi đến bốc thăm quyết
+định.
 
 **4. Chỉ 3 trong 9 câu lạc bộ có thi.** `clb_tinhoc`, `clb_robotics`,
 `clb_tienganh` — mỗi buổi một câu lạc bộ. Sáu câu lạc bộ còn lại không ai khai
@@ -118,11 +119,18 @@ Tệp này nói **em muốn vào câu lạc bộ nào, theo thứ tự ưu tiên
 buổi.
 
 ```csv
-student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2
-HS001,Nguyễn Văn An,,clb_tinhoc,clb_bongro,clb_robotics,clb_nauan,clb_tienganh,clb_covua
-HS002,Trần Thị Bình,chinh_sach,clb_vanhoc,clb_tinhoc,clb_mythuat,,clb_tienganh,
-HS003,Lê Minh Cường,,clb_bongro,,clb_nauan,clb_mythuat,clb_lamvuon,
+student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
+HS001,Nguyễn Văn An,,clb_tinhoc,clb_bongro,clb_robotics,clb_nauan,clb_tienganh,clb_covua,100,100,100,100,100,100
+HS002,Trần Thị Bình,chinh_sach,clb_vanhoc,clb_tinhoc,clb_mythuat,,clb_tienganh,,100,100,100,,100,
+HS003,Lê Minh Cường,,clb_bongro,,clb_nauan,clb_mythuat,clb_lamvuon,,100,,31,69,100,
 ```
+
+**Điểm quyết tâm (cột `<buổi>_wp_<thứ tự>`, A13.13).** Workspace trường học bật sẵn điểm quyết
+tâm, nên tệp này có thêm 6 cột `thu_2_wp_1` … `thu_6_wp_2`, mỗi cột đi cặp với cột `pref` cùng hậu
+tố. Mỗi buổi, mỗi em chia **100 điểm cho các câu lạc bộ em đã thi** và **100 điểm cho các câu lạc bộ
+không thi**; chỉ có một câu lạc bộ trong nhóm thì ghi 100. **Các số này là dữ liệu MÔ PHỎNG** do máy
+sinh bằng `du_lieu_test/them_diem_quyet_tam_vao_mau.py` (seed cố định), không phải em nào thật chia.
+Kết quả xếp ở trên (23 / 24 em) là kết quả với đúng các số này.
 
 Tên cột là **`<buổi>_pref_<thứ tự>`**. Buổi trong tên cột phải trùng đúng nhãn
 đã khai ở cột `buoi` của tệp 1.

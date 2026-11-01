@@ -290,12 +290,19 @@ TIEU_DE_BC = OrderedDict([
 ])
 
 
+# A13.13: workspace trường học BẬT điểm quyết tâm mặc định; raw của Forms KHÔNG có điểm đó (và kỹ
+# năng này không được bịa), nên sổ ra không có điểm quyết tâm: phải tắt tính năng trước khi nạp.
+GHI_CHU_DIEM_QUYET_TAM = ("Dữ liệu không có điểm quyết tâm nên cần TẮT \"Dùng điểm quyết tâm\" trong "
+                          "cấu hình không gian làm việc trước khi nạp sổ này.")
+
+
 def viet_bao_cao(clb, hs, bc, co_clb):
     L = ["# Báo cáo xử lí dữ liệu raw", ""]
     n_thi = sum(len(h["diem"]) for h in hs)
     L += ["- Học sinh được xuất: **%d**" % len(hs),
           "- Bài thi được tính điểm: **%d**" % n_thi,
           "- Số loại bất thường có mặt: **%d**" % sum(1 for v in bc.values() if v), ""]
+    L += ["> **Điểm quyết tâm: sổ này KHÔNG có.** " + GHI_CHU_DIEM_QUYET_TAM, ""]
     if not co_clb:
         L += ["> **Chưa có chỉ tiêu CLB.** Trong SO_NHAP_CLB.xlsx, cột Chỉ tiêu của sheet "
               "\"1. CLB\" đang trống. Điền chỉ tiêu (số lớn hơn 0) cho mọi CLB trước khi nạp.", ""]
@@ -412,6 +419,7 @@ def main(argv=None):
             print("  %s: %d" % (ten, len(bc[k])))
     if not a.clb:
         print("CHƯA CÓ CHỈ TIÊU: điền cột Chỉ tiêu ở sheet \"1. CLB\" của SO_NHAP_CLB.xlsx trước khi nạp.")
+    print("ℹ " + GHI_CHU_DIEM_QUYET_TAM)
     print("Chi tiết: BAO_CAO_BAT_THUONG.md")
     return 0
 

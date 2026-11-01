@@ -13,7 +13,7 @@ Tái lập mọi số dưới đây:
 
 ```bash
 ./.venv/bin/python du_lieu_test/tao_du_lieu_test.py   # sinh lại 4 tệp Excel
-./.venv/bin/python du_lieu_test/tao_db_demo.py        # dựng lại CSDL demo
+./.venv/bin/python du_lieu_test/tao_db_demo.py --tat-wharton   # dựng lại CSDL demo bản số liệu (bộ ba TEST, Wharton tắt)
 ./.venv/bin/python -m pytest -q                       # chạy bộ kiểm thử
 ```
 

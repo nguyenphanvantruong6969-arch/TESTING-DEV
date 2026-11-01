@@ -563,8 +563,8 @@ MESSAGES = {
         "en": "Commitment points aren't turned on for this workspace.",
     },
     "wharton_ho_so_chua_hop_le": {
-        "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy sửa rồi chạy lại.",
-        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fix them and run again.",
+        "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy điền đủ điểm quyết tâm cho những {person_l} này rồi chạy lại, hoặc tắt \"Dùng điểm quyết tâm\" trong cấu hình không gian làm việc nếu không dùng tính năng này.",
+        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fill in their commitment points and run again, or turn off \"Use commitment points\" in the workspace settings if this feature is not used.",
     },
     "health_wharton_chua_hop_le": {
         "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",
