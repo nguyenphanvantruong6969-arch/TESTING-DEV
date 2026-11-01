@@ -1132,7 +1132,7 @@ class NhapDuLieuMixin:
             luat = self._luat_nghiem()
             tran_nv = luat["max_choices"]        # trần của workspace; đọc TRƯỚC khi mở giao dịch
             nhom_cung = nhom_xep_cung(luat_xep_cua(luat))
-            bat_wharton = dung_wharton(luat)     # điểm Wharton (A13); mặc định tắt
+            bat_wharton = dung_wharton(luat)     # điểm Wharton (A13); mặc định bật từ A13.13
             fieldnames, rows = self._parse_csv_rows(csv_text)
             if not rows:
                 return _fail(err("csv_empty"))
