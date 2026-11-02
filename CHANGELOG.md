@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-11-02 — A14 — phần A (nền, nhập, API): lớp của học sinh
+
+Mỗi học sinh có thể có "lớp" (vd 10H1A) CHỈ để hiển thị, sắp, lọc, xuất cho giáo viên chủ nhiệm. Thuật toán phân bổ KHÔNG đọc lớp. Phần B (xuất + giao diện) ở nhánh `claude/a14-giao-dien`.
+
+**NGOẠI LỆ BẤT BIẾN 7 (Truong duyệt 02/11/2026).** Hợp đồng cột CSV đổi có chủ đích: cột TUỲ CHỌN `class_id` ngay sau `reserve_group` trong CSV nguyện vọng và CSV chọn thi; Sổ nhập thêm cột "Lớp" (nhãn `cohort`) ngay sau "Họ tên". Không có cột / ô trống thì giữ lớp cũ; lần ghi sau cùng thắng. Không lớp nào thì `thanh_csv` và Sổ xuất ra giống từng byte như cũ.
+
+- **Schema:** `students.class_id TEXT` (NULL = chưa có); `di_tru_schema` bước 7 `ALTER TABLE` có sao lưu `.bak-` khi bảng đã có dữ liệu, chạy lặp an toàn.
+- **`chuan_hoa_lop(raw)`** (`rbda_priority_pipeline.py`): cắt hai đầu, gộp khoảng trắng liên tiếp, IN HOA; rỗng → None. Không ép mẫu.
+- **Từ vựng:** danh từ thứ sáu `cohort` (vi "Lớp", en "Class") ở `nhan_ws.py`; cấu hình cũ thiếu `cohort` lấy mặc định. Kỹ năng `tao-workspace-tu-raw` nhận `labels.cohort` tuỳ chọn. Bản JS (`i18n.js`, `js/075_workspace.js`) thuộc phần B.
+- **Nhập:** `import_preferences_csv`, `import_test_selection_csv` (dài: giá trị không trống đầu tiên); `so_nhap` đọc theo tên cột (Lớp, Mã lớp, Lop, Class, Class ID, class_id, nhãn `cohort`), `doc_so_nhap` → `class_id` (None = sổ không có cột; "" = ô trống), `ghi_so_nhap(co_lop=)`; `tao_so_nhap_mau` luôn có cột Lớp; `export_du_lieu_dau_vao` có cột Lớp khi có em có lớp (hai chỗ trong `api_xuat.py`). Cảnh báo `so_nhap_canh_bao_thieu_lop` {n} chỉ khi Sổ có cột mà n ô trống.
+- **API:** `list_students_admin(sort_by, class_id)`, `set_student_class`, `list_classes`, `create_student_if_missing(class_id)`, `submit_preferences(class_id)` (lớp phải nằm trong `list_classes`, sai → `lop_khong_co_trong_danh_sach`), `get_match_results(class_id, sort_by)`. Mã lỗi mới: `error_saving_student_class`, `error_reading_classes`, `lop_khong_co_trong_danh_sach`, `so_nhap_canh_bao_thieu_lop`.
+- **Test mới:** `tests/test_a14_lop_backend.py` (11), `tests/test_a14_lop_nhap.py` (18), `tests/test_a14_tu_vung_cohort.py` (22) — gồm các bất biến: `match_results` giống hệt khi có / không lớp; `class_id` không có trong lõi phân bổ; đổi lớp không làm `ket_qua_cu`; `run_history` không đụng.
+- **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` và `tests/test_wharton_ma_loi.py` (danh sách danh từ thành sáu).
+
 ## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
 
 - **`du_lieu_test/tao_db_demo.py`:** mặc định dựng CSDL demo với Wharton BẬT (không ghi `wharton: false`), nạp `SO_NHAP_DQT_120HS_HOP_LE.xlsx` qua `import_so_nhap` (chọn bản 120HS vì giữ nguyên nguyện vọng và điểm thi của `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm MÔ PHỎNG; nhỏ, demo nhanh). Vẫn dừng trước khi chạy phân bổ. Cờ mới `--tat-wharton` dựng y như trước (TEST_01..03, `wharton: false`); cờ `--ra` chọn tệp đầu ra (mặc định giữ chỗ cũ). Đã so với bản dựng ở `cee2940`: 14/15 bảng trùng khít từng dòng, chỉ `workspace_settings` khác (có khoá `wharton=false`) — đúng dự kiến.

@@ -229,6 +229,7 @@ tuỳ chọn:
 | Cột | Bắt buộc | Quy tắc |
 |---|---|---|
 | `reserve_group` | | Gán nhóm dự trữ cho **học sinh**, ngay trong tệp. Có giá trị = ghi đè nhóm cũ; để trống = giữ nguyên; không có cột = giữ nguyên |
+| `class_id` | | Lớp của học sinh (vd `10H1A`), đặt ngay sau `reserve_group`. Chỉ để hiển thị / sắp / lọc / xuất; **không ảnh hưởng kết quả xếp**. Tự cắt khoảng trắng thừa và viết HOA. Có giá trị = ghi đè lớp cũ; để trống hoặc không có cột = giữ nguyên |
 
 ### 2.8 · Xếp hạng nguyện vọng — trường nhiều buổi
 
@@ -245,6 +246,7 @@ HS002,Trần Thị Bình,khoi_10,clb_nhiepanh,,,,clb_lamvuon,clb_bongro
 | `student_id` | ✅ | |
 | `name` | | |
 | `reserve_group` | | như 2.7 |
+| `class_id` | | như 2.7 (cột lớp tuỳ chọn, đặt sau `reserve_group`) |
 | `<buổi>_pref_<số>` | | Tên buổi + `_pref_` + số. **Số đếm lại từ 1 ở mỗi buổi**. Tối đa 10 mỗi buổi |
 
 Dòng `HS002` ở trên minh hoạ cả hai điều: em bỏ trống hẳn `thu_4` (bận ngày đó —

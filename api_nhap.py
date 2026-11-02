@@ -14,6 +14,7 @@ from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    chuan_hoa_lop,
     khoa_sap_buoi,
     sap_buoi,
     BUOI_MAC_DINH,
@@ -351,6 +352,10 @@ class NhapDuLieuMixin:
             canh_bao.append(err("so_nhap_canh_bao_xoa_diem", n=n_xoa))
         if n_bo:
             canh_bao.append(err("so_nhap_canh_bao_bo_nhom", n=n_bo))
+        # A14: Sổ CÓ cột lớp (class_id không phải None) mà n em để trống ô -> báo; lớp cũ được giữ.
+        n_thieu_lop = sum(1 for x in du_lieu["students"] if x.get("class_id") == "")
+        if n_thieu_lop:
+            canh_bao.append(err("so_nhap_canh_bao_thieu_lop", n=n_thieu_lop))
         if ngoai and du_lieu["clubs"]:
             canh_bao.append(err("so_nhap_canh_bao_clb_ngoai_so", n=len(ngoai),
                                 ten=", ".join(ngoai[:5])))
@@ -927,6 +932,20 @@ class NhapDuLieuMixin:
         return canh_bao
 
     @staticmethod
+    def _nho_lop(lop_tho: dict, sid, raw) -> None:
+        """Ghi nhớ lớp (đã chuẩn hoá) của `sid`; ô trống không xoá giá trị đã nhớ."""
+        lop = chuan_hoa_lop(raw)
+        if lop:
+            lop_tho[sid] = lop
+
+    @staticmethod
+    def _ghi_lop(cur, student_id: str, lop) -> None:
+        """A14: có lớp thì GHI ĐÈ (lần ghi sau cùng thắng); không có thì giữ lớp cũ."""
+        if lop:
+            cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                        (lop, student_id))
+
+    @staticmethod
     def _ghi_nhom_du_tru(cur, student_id: str, reserve_group: str) -> str:
         """Trả về nhãn đã chuẩn hoá (chuỗi rỗng nếu không ghi gì) để bên
         gọi đếm được từng nhãn phục vụ _soat_nhom_du_tru_la."""
@@ -1148,6 +1167,7 @@ class NhapDuLieuMixin:
 
             # Gom thanh { student_id: (name, [club_id_theo_thu_tu], nhom) }
             grouped: dict = {}
+            lop_tho: dict = {}      # A14: sid -> lớp đã chuẩn hoá (chỉ khi ô có giá trị)
             canh_bao_buoi: list = []
             if cot_theo_buoi:
                 # Bo cot theo buoi: thu_3_pref_1, thu_3_pref_2, thu_5_pref_1...
@@ -1185,6 +1205,7 @@ class NhapDuLieuMixin:
                             thu_tu.append(cid)
                     grouped[sid] = (row.get("name", ""), thu_tu,
                                     row.get("reserve_group", ""))
+                    self._nho_lop(lop_tho, sid, row.get("class_id"))
                     if bat_wharton and cot_wp:
                         cot_pref = {}
                         for b, cs in cot_theo_buoi.items():
@@ -1204,6 +1225,7 @@ class NhapDuLieuMixin:
                     ordered = [row[c] for c in pref_cols if row.get(c)]
                     grouped[sid] = (row.get("name", ""), ordered,
                                     row.get("reserve_group", ""))
+                    self._nho_lop(lop_tho, sid, row.get("class_id"))
                     if bat_wharton and cot_wp:
                         cot_pref = {(None, int(c.split("_")[1])): c for c in pref_cols
                                     if c.split("_")[1].isdigit()}
@@ -1228,6 +1250,9 @@ class NhapDuLieuMixin:
                     nhom = next((r.get("reserve_group") for r in sid_rows
                                  if r.get("reserve_group")), "")
                     grouped[sid] = (name, [r["club_id"] for r in sid_rows], nhom)
+                    self._nho_lop(lop_tho, sid, next(
+                        (r.get("class_id") for r in sid_rows
+                         if chuan_hoa_lop(r.get("class_id"))), None))
                     if bat_wharton and co_wp:
                         wp_tho[sid] = [(r["club_id"], (r.get("wp") or "").strip(), "wp")
                                        for r in sid_rows if (r.get("wp") or "").strip()]
@@ -1326,6 +1351,7 @@ class NhapDuLieuMixin:
                         continue
                     n_created += ket == "tao_moi"
 
+                    self._ghi_lop(cur, sid, lop_tho.get(sid))
                     nhan = self._ghi_nhom_du_tru(cur, sid, nhom_du_tru)
                     if nhan:
                         nhom_da_ghi[nhan] = nhom_da_ghi.get(nhan, 0) + 1
@@ -1429,6 +1455,7 @@ class NhapDuLieuMixin:
             is_wide = any(f.startswith("test_club_") for f in fieldnames)
 
             grouped: dict = {}
+            lop_tho: dict = {}      # A14: sid -> lớp đã chuẩn hoá (chỉ khi ô có giá trị)
             diem_tho: dict = {}     # sid -> {club_id thô: chuỗi điểm}
             loi_som: list = []      # lỗi phát hiện trước khi mở CSDL
 
@@ -1473,6 +1500,7 @@ class NhapDuLieuMixin:
                                                student_id=sid, cot=n))
                     grouped[sid] = (row.get("name", ""), selected,
                                     row.get("reserve_group", ""))
+                    self._nho_lop(lop_tho, sid, row.get("class_id"))
                     if diem_hs:
                         diem_tho[sid] = diem_hs
             else:
@@ -1486,6 +1514,8 @@ class NhapDuLieuMixin:
                     grouped[sid] = (row.get("name") or name,
                                     clubs_list + [row["club_id"]],
                                     row.get("reserve_group") or nhom)
+                    if sid not in lop_tho:      # như `name`: giá trị không trống ĐẦU TIÊN
+                        self._nho_lop(lop_tho, sid, row.get("class_id"))
                     d = (row.get("score") or "").strip()
                     if d:
                         diem_tho.setdefault(sid, {})[row["club_id"]] = d
@@ -1550,6 +1580,7 @@ class NhapDuLieuMixin:
                         continue
                     n_created += ket == "tao_moi"
 
+                    self._ghi_lop(cur, sid, lop_tho.get(sid))
                     nhan = self._ghi_nhom_du_tru(cur, sid, nhom_du_tru)
                     if nhan:
                         nhom_da_ghi[nhan] = nhom_da_ghi.get(nhan, 0) + 1
