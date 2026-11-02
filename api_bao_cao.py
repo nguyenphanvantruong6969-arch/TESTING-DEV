@@ -242,11 +242,14 @@ class BaoCaoMixin:
         except Exception as e:
             return _fail(err("error_reading_club_stats", detail=str(e)))
 
-    def get_thoi_khoa_bieu(self, search: str = ""):
+    def get_thoi_khoa_bieu(self, search: str = "", class_id=None):
         """Thời khoá biểu tuần: mỗi em một dòng, mỗi buổi một ô.
 
         Đây là sản phẩm chính của bản nhiều buổi — thứ nhà trường in ra
         dán bảng và phát cho học sinh.
+
+        A14 — mỗi em có `class_id` (chỉ để hiển thị). `class_id=None` là mọi em (hành vi cũ),
+        `""` chỉ em chưa có lớp, còn lại lọc đúng lớp (cùng quy ước với `list_students_admin`).
         """
         try:
             with self._ket_noi_doc() as cur:
@@ -254,15 +257,25 @@ class BaoCaoMixin:
                 query = """
                     SELECT m.student_id, s.name, m.buoi, m.club_id,
                            c.name AS club_name, m.matched_tier,
-                           m.rank_in_student_pref
+                           m.rank_in_student_pref, s.class_id
                     FROM match_results m
                     JOIN students s ON s.student_id = m.student_id
                     LEFT JOIN clubs c ON c.club_id = m.club_id
                 """
-                params = ()
+                params: tuple = ()
+                dieu_kien = []
                 if search:
-                    query += " WHERE khop_tim(m.student_id, ?) OR khop_tim(s.name, ?)"
+                    dieu_kien.append("(khop_tim(m.student_id, ?) OR khop_tim(s.name, ?))")
                     params = (search, search)
+                if class_id is not None:
+                    lop_loc = chuan_hoa_lop(class_id)
+                    if lop_loc is None:
+                        dieu_kien.append("s.class_id IS NULL")
+                    else:
+                        dieu_kien.append("s.class_id = ?")
+                        params += (lop_loc,)
+                if dieu_kien:
+                    query += " WHERE " + " AND ".join(dieu_kien)
                 rows = cur.execute(query + " ORDER BY m.student_id, m.buoi COLLATE THU_TU_BUOI",
                                    params).fetchall()
 
@@ -271,6 +284,7 @@ class BaoCaoMixin:
                 em = theo_em.setdefault(r["student_id"], {
                     "student_id": r["student_id"],
                     "name": r["name"],
+                    "class_id": r["class_id"],
                     "theo_buoi": {},
                     "so_clb": 0,
                     "so_nv1": 0,
@@ -368,7 +382,7 @@ class BaoCaoMixin:
                 rows = cur.execute("""
                     SELECT m.student_id, s.name, m.buoi,
                            m.rank_in_student_pref, m.matched_tier,
-                           s.reserve_group
+                           s.reserve_group, s.class_id
                     FROM match_results m
                     LEFT JOIN students s ON s.student_id = m.student_id
                     WHERE m.club_id = ?
