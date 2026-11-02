@@ -188,3 +188,38 @@ def test_export_theo_lop_mac_dinh_vao_tai_xuong(api, tmp_path):
     r = api.export_theo_lop()
     assert r["ok"], r["errors"]
     assert os.path.basename(os.path.dirname(r["data"]["thu_muc"])) == "TaiXuong_gia"
+
+
+def test_export_theo_lop_loi_giua_chung_xoa_thu_muc_do(api, tmp_path, monkeypatch):
+    _nap(api)
+    cu = api._ghi_tep_lop
+    lan = []
+
+    def hong_lan_hai(path, du, lop, dong, da_dung):
+        lan.append(path)
+        if len(lan) == 2:
+            raise OSError("đầy đĩa giả")
+        return cu(path, du, lop, dong, da_dung)
+
+    monkeypatch.setattr(api, "_ghi_tep_lop", hong_lan_hai)
+    (tmp_path / "ban_khac").mkdir()
+    (tmp_path / "ban_khac" / "giu.txt").write_text("x")
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"] is False and r["errors"][0]["code"] == "error_exporting_excel"
+    assert len(lan) == 2
+    assert not (tmp_path / "ra").exists()                 # thư mục dở đã bị xoá
+    assert (tmp_path / "ban_khac" / "giu.txt").exists()   # không đụng thứ khác
+    monkeypatch.undo()
+    assert api.export_theo_lop(str(tmp_path / "ra"))["ok"]      # xuất lại bình thường
+
+
+def test_export_theo_lop_loi_khong_xoa_thu_muc_co_san(api, tmp_path, monkeypatch):
+    """Đường tuyệt đối đã có thư mục `ra`: lần xuất tạo `ra (2)`; lỗi chỉ xoá `ra (2)`."""
+    _nap(api)
+    (tmp_path / "ra").mkdir()
+    (tmp_path / "ra" / "cu.xlsx").write_text("cu")
+    monkeypatch.setattr(api, "_ghi_tep_lop",
+                        lambda *a, **k: (_ for _ in ()).throw(OSError("hỏng giả")))
+    assert api.export_theo_lop(str(tmp_path / "ra"))["ok"] is False
+    assert (tmp_path / "ra" / "cu.xlsx").read_text() == "cu"
+    assert not (tmp_path / "ra (2)").exists()

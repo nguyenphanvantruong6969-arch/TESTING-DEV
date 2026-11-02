@@ -19,6 +19,8 @@ const TAB_LOADERS = {
   fallback: () => loadFallbackTab(),
   admin: () => loadAdminTab(),
   scoring: () => loadScoringTab(),
+  members: () => loadMembersTab(),
+  theolop: () => loadTheoLopTab(),
 };
 
 function initTabs() {

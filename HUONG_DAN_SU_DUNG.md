@@ -511,6 +511,7 @@ Mỗi học sinh có thể có một **Lớp** (ví dụ `10H1A`). Lớp chỉ �
 - **Gán lớp:** thẻ **04 → Học sinh**, gõ lớp vào ô ở cột *Lớp* rồi rời ô (để trống là xoá lớp). Cùng thẻ có ô **lọc theo lớp** (*Tất cả*, từng lớp, *Chưa có lớp*) và ô **sắp theo lớp**. Thẻ **02** cũng có cột Lớp, ô lọc và ô sắp.
 - **Thẻ 03 (nhập tại chỗ):** khi trường đã có ít nhất một lớp, mỗi em phải **chọn lớp** từ danh sách trước khi bấm Lưu (ô hiện sẵn lớp hiện tại của em). Trường chưa có lớp nào thì ô này ẩn.
 - **Gửi giáo viên chủ nhiệm:** ở thẻ **02**, bấm **Xuất theo lớp** (khoá khi chưa có kết quả). Ra một thư mục, mỗi lớp một tệp Excel; em chưa có lớp nằm trong `_chua_co_lop.xlsx`; dòng tô đỏ là em chưa có chỗ. Trong Sổ kết quả cũng có trang **Theo lớp** với nội dung tương tự.
+- **Xem ngay trên màn hình, không cần xuất tệp:** thanh bên có hai thẻ chỉ đọc. Thẻ **06** *Thành viên CLB*: chọn một CLB để xem ai được xếp vào (cho người phụ trách CLB; trường nhiều buổi thì tên CLB ghi kèm buổi). Thẻ **07** *Theo lớp*: chọn một lớp để xem từng em được xếp CLB nào, mỗi buổi một cột theo thứ tự ngày trong tuần, ô trống là *—*, dòng tô đỏ là em chưa có CLB nào (cho giáo viên chủ nhiệm). Cả hai thẻ chỉ có kết quả xếp, không có điểm hay số bốc thăm, và hiện *chưa có kết quả* khi chưa chạy sắp xếp.
 - Các tệp **theo lớp không có điểm, điểm quyết tâm hay số bốc thăm**, nên gửi được cho giáo viên chủ nhiệm. Các tệp khác vẫn theo cảnh báo bên dưới.
 
 > ⚠️ **Tệp dữ liệu đầu vào và tệp hồ sơ học sinh có ĐIỂM CHẤM và SỐ BỐC THĂM.**

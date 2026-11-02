@@ -46,6 +46,12 @@
       <button class="nav-item" data-tab="scoring">
         <span class="nav-icon">05</span> <span data-i18n="nav_scoring">Nhập điểm</span>
       </button>
+      <button class="nav-item" data-tab="members">
+        <span class="nav-icon">06</span> <span data-i18n="nav_members">Thành viên {slot_sl}</span>
+      </button>
+      <button class="nav-item" data-tab="theolop">
+        <span class="nav-icon">07</span> <span data-i18n="nav_theo_lop">Theo {cohort_l}</span>
+      </button>
     </div>
 
     <div class="sidebar-footer">
@@ -930,6 +936,51 @@
       </div>
     </section>
 
+    <!-- ---------- TAB 6: THÀNH VIÊN CLB (chỉ đọc; A14) ---------- -->
+    <section class="view" id="view-members">
+      <header class="view-header">
+        <h1 data-i18n="members_title">Thành viên {slot_sl}</h1>
+        <p class="view-desc" data-i18n="members_desc">Chọn một {slot_l} để xem ai được xếp vào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho người phụ trách {slot_l}.</p>
+      </header>
+      <div class="panel">
+        <div class="search-row">
+          <label class="lop-nhan" for="membersClub" data-i18n="members_chon">Chọn {slot_l}</label>
+          <select id="membersClub" class="text-input"></select>
+        </div>
+        <div id="membersEmpty" class="empty-state" hidden></div>
+        <table class="data-table" id="membersTable" hidden>
+          <caption class="the-xem-dem" id="membersDem"></caption>
+          <thead><tr>
+            <th data-i18n="th_stt">STT</th>
+            <th data-i18n="th_student_id">Mã học sinh</th>
+            <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_cohort">{cohort}</th>
+          </tr></thead>
+          <tbody id="membersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- TAB 7: THEO LỚP (chỉ đọc; A14) ---------- -->
+    <section class="view" id="view-theolop">
+      <header class="view-header">
+        <h1 data-i18n="theolop_title">Theo {cohort_l}</h1>
+        <p class="view-desc" data-i18n="theolop_desc">Chọn một {cohort_l} để xem từng {person_l} được xếp vào {slot_l} nào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho giáo viên chủ nhiệm.</p>
+      </header>
+      <div class="panel">
+        <div class="search-row">
+          <label class="lop-nhan" for="theoLopChon" data-i18n="theolop_chon">Chọn {cohort_l}</label>
+          <select id="theoLopChon" class="text-input text-input-sm"></select>
+        </div>
+        <div id="theoLopEmpty" class="empty-state" hidden></div>
+        <table class="data-table" id="theoLopTable" hidden>
+          <caption class="the-xem-dem" id="theoLopDem"></caption>
+          <thead><tr id="theoLopHead"></tr></thead>
+          <tbody id="theoLopBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ---------- TAB 5: NHẬP ĐIỂM ---------- -->
     <section class="view" id="view-scoring">
       <header class="view-header">
@@ -1013,6 +1064,7 @@
 <script src="js/06_cham_diem.js"></script>
 <script src="js/07_ngon_ngu.js"></script>
 <script src="js/075_workspace.js"></script>
+<script src="js/09_the_xem.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>

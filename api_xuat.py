@@ -7,6 +7,7 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 import datetime
 import os
 import re
+import shutil
 import sys
 
 from api_chung import (
@@ -411,6 +412,7 @@ class XuatKetQuaMixin:
         return self._khoa_xuat(self._export_theo_lop_da_khoa, output_path)
 
     def _export_theo_lop_da_khoa(self, output_path: str):
+        thu_muc, da_tao = None, False
         try:
             if self._chua_co_ket_qua():
                 return _fail(err("xuat_chua_co_ket_qua"))
@@ -422,6 +424,7 @@ class XuatKetQuaMixin:
                 thu_muc = self._duong_xuat(output_path, "ket_qua_theo_lop")
             du = self._du_lieu_xuat()
             os.makedirs(thu_muc)
+            da_tao = True              # từ đây thư mục là CỦA lần xuất này
             da_dung: set = {"_chua_co_lop"}        # giữ chỗ trước: lớp tên "_chua_co_lop" không đè
             n = 0
             for lop, dong in du["theo_lop"]["nhom"]:
@@ -433,6 +436,10 @@ class XuatKetQuaMixin:
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
+            # Lỗi giữa chừng: xoá thư mục dở do CHÍNH lần xuất này tạo ra (không bao giờ thư mục
+            # có sẵn), để không còn thư mục thiếu lớp trông như đã xuất đủ.
+            if da_tao and thu_muc:
+                shutil.rmtree(thu_muc, ignore_errors=True)
             return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
     def _trang_chua_co_cho(self, t, bao, co_ket_qua):

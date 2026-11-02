@@ -140,6 +140,10 @@ function reapplyDynamicTextForLangChange() {
         if (daTick.has(cb.dataset.studentId)) cb.checked = true;
       });
     });
+  } else if (tab === "members") {
+    loadMembersTab();
+  } else if (tab === "theolop") {
+    loadTheoLopTab();
   } else if (tab === "scoring") {
     loadScoringOverview();
     if (currentScoringClub) {
@@ -162,6 +166,9 @@ function reapplyDynamicTextForLangChange() {
        CO tren man hinh (o da tick, thu tu dang xep), khong nap lai CSDL,
        de khong mat thao tac chua luu. */
     loadFallbackStudentList();
+    /* A14: chữ của các ô thả xuống lớp (dòng "— Chọn lớp —") đổi theo ngôn ngữ ngay. */
+    if (!el("kioskLopHang").hidden) napOChonLopKiosk(el("kioskLop"), el("kioskLop").value);
+    napOChonLopTaoMoi();
     if (currentFallbackStudent) {
       const daTick = Array.from(
         document.querySelectorAll("#testSelectionGrid .option-row.is-checked")
