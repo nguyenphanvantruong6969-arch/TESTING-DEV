@@ -6,7 +6,6 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 
 import datetime
 import os
-import re
 import shutil
 import sys
 
@@ -334,12 +333,6 @@ class XuatKetQuaMixin:
     # THEO LỚP (A14): bản để GỬI GIÁO VIÊN CHỦ NHIỆM. Chỉ có kết quả — KHÔNG điểm thi, điểm
     # quyết tâm, số bốc thăm hay diện trúng tuyển. Một khối mỗi lớp, em chưa có chỗ tô đỏ.
     # -----------------------------------------------------------------
-    @staticmethod
-    def _khoa_lop_xuat(lop: str):
-        """Khoá sắp tự nhiên: "10A2" đứng trước "10A10"."""
-        return [(0, int(p), "") if p.isdigit() else (1, 0, p.casefold())
-                for p in re.split(r"(\d+)", lop or "") if p]
-
     def _du_lieu_theo_lop(self, rows, ds_buoi, nhieu_buoi) -> dict:
         """{"cot": tiêu đề cột, "nhom": [(lớp|None, [dòng])]}; dòng = [mã, họ tên, ô buổi...].
 
@@ -354,7 +347,7 @@ class XuatKetQuaMixin:
             o = [em["o"].get(b, "") for b in ds_buoi] if nhieu_buoi else [
                 next(iter(em["o"].values()), "")]
             theo_lop.setdefault(em["lop"], []).append([sid, em["ho_ten"]] + o)
-        thu_tu = sorted((k for k in theo_lop if k is not None), key=self._khoa_lop_xuat)
+        thu_tu = sorted((k for k in theo_lop if k is not None), key=self._khoa_lop_tu_nhien)
         nhom = [(k, theo_lop[k]) for k in thu_tu]
         if None in theo_lop:
             nhom.append((None, theo_lop[None]))

@@ -291,3 +291,36 @@ def test_export_theo_lop_ten_lop_nhieu_byte_khong_vuot_gioi_han_he_dieu_hanh(api
     r = api.export_theo_lop(str(tmp_path / "ra"))
     assert r["ok"], r["errors"]
     assert all(len(t.encode("utf-8")) <= 255 for t in os.listdir(r["data"]["thu_muc"]))
+
+
+# ------------------------------------------------------------------ B4: một hàm sắp lớp duy nhất
+def test_khong_co_ham_rieng_trung_ten_giua_cac_mixin():
+    """Hai mixin cùng đặt `_ten` thì cái đứng trước trong MRO đè cái kia (đã từng xảy ra với
+    `_khoa_lop_tu_nhien`). Hàm riêng (tên bắt đầu bằng `_`) chỉ được định nghĩa ở MỘT lớp."""
+    import collections
+
+    import api as api_mod
+    dem = collections.defaultdict(list)
+    for cls in api_mod.PipelineAPI.__mro__:
+        for ten in vars(cls):
+            if ten.startswith("_") and not ten.startswith("__"):
+                dem[ten].append(cls.__name__)
+    trung = {t: c for t, c in dem.items() if len(c) > 1}
+    assert not trung, trung
+
+
+def test_api_xuat_khong_con_ham_sap_lop_rieng():
+    import api_xuat
+    assert not hasattr(api_xuat.XuatKetQuaMixin, "_khoa_lop_xuat")
+
+
+def test_lop_ten_la_10_mu_2_khong_lam_hong_xuat(api, tmp_path):
+    _nap(api)
+    _dat_lop(api, "HS001", "10²")
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"], r["errors"]
+    p = _xuat(api, tmp_path, "kq2.xlsx")
+    ws = load_workbook(p)["Theo lớp"]
+    khoi = [str(row[0].value).split(" · ")[0] for row in ws.iter_rows()
+            if row[0].value and str(row[0].value).startswith("Lớp:")]
+    assert "Lớp: 10²" in khoi
