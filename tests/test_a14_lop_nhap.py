@@ -58,7 +58,8 @@ def test_csv_chon_thi_dang_ngang_va_dai(api_clb):
 
 
 def test_csv_khong_cot_hoac_o_trong_giu_lop_cu(api_clb):
-    assert api_clb.create_student_if_missing("S1", "An", class_id="10H1")["ok"]
+    assert api_clb.create_student_if_missing("S1", "An")["ok"]
+    assert api_clb.set_student_class("S1", "10H1")["ok"]
     assert api_clb.import_preferences_csv("student_id,name,pref_1\nS1,An,A\n")["ok"]
     assert _lop(api_clb)["S1"] == "10H1"
     assert api_clb.import_preferences_csv(
@@ -160,7 +161,8 @@ def test_canh_bao_thieu_lop_chi_khi_so_co_cot(api_clb):
 
 
 def test_import_so_nhap_giu_lop_cu_khi_o_trong_va_bao(api_clb):
-    api_clb.create_student_if_missing("S2", "Ba", class_id="9C")
+    api_clb.create_student_if_missing("S2", "Ba")
+    api_clb.set_student_class("S2", "9C")
     _, b64 = _doc([_hs("S1", "An", "10H1"), _hs("S2", "Ba", "")], co_lop=True)
     kq = api_clb.import_so_nhap(b64)
     assert kq["ok"], kq
@@ -172,7 +174,8 @@ def test_import_so_nhap_giu_lop_cu_khi_o_trong_va_bao(api_clb):
 
 def test_xuat_du_lieu_dau_vao_co_lop_khi_co_em_co_lop_va_nap_lai(api_clb, tmp_path):
     for sid, lop in [("S1", "10H1"), ("S2", None)]:
-        api_clb.create_student_if_missing(sid, "Em " + sid, class_id=lop)
+        api_clb.create_student_if_missing(sid, "Em " + sid)
+        api_clb.set_student_class(sid, lop)
         assert api_clb.submit_preferences(sid, ["A", "B"])["ok"]
     kq = api_clb.export_du_lieu_dau_vao(str(tmp_path / "so.xlsx"))
     assert kq["ok"], kq

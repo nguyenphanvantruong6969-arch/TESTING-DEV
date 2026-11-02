@@ -55,15 +55,21 @@ def _sql(api, cau, tham_so=()):
 def api_nho(api):
     for sid, ten, lop in [("A1", "An", "10H2A"), ("A2", "Ba", "10H10A"), ("A3", "Cu", None),
                           ("A4", "Dũng", "10H2A"), ("A5", "Em", "9C")]:
-        assert api.create_student_if_missing(sid, ten, class_id=lop)["ok"]
+        assert api.create_student_if_missing(sid, ten)["ok"]
+        assert api.set_student_class(sid, lop)["ok"]
     return api
 
 
 # ------------------------------------------------------------------ API quản lý
 
-def test_create_student_if_missing_chuan_hoa_lop(api):
+def test_create_student_if_missing_class_id(api):
+    assert api.create_student_if_missing("O", "Mẫu")["ok"]
+    assert api.set_student_class("O", "10H1A")["ok"]
     assert api.create_student_if_missing("X1", "Xa", class_id=" 10h1a ")["ok"]
     assert _sql(api, "SELECT class_id FROM students WHERE student_id='X1'") == [("10H1A",)]
+    kq = api.create_student_if_missing("X3", "Xc", class_id="12Z9")
+    assert not kq["ok"] and kq["errors"][0]["code"] == "lop_khong_co_trong_danh_sach"
+    assert _sql(api, "SELECT 1 FROM students WHERE student_id='X3'") == []     # không tạo em
     assert api.create_student_if_missing("X2", "Xb")["ok"]          # không truyền: y như cũ
     assert _sql(api, "SELECT class_id FROM students WHERE student_id='X2'") == [(None,)]
 
@@ -209,3 +215,22 @@ def test_run_history_khong_bi_dung(api):
     api.set_student_class(sid, "10H5")
     api.list_classes()
     assert _sql(api, "SELECT * FROM run_history ORDER BY rowid") == truoc
+
+
+def test_submit_test_selection_class_id(api_nho):
+    api_nho.create_or_update_club("C1", "CLB 1", 5, 0, "")
+    assert api_nho.submit_test_selection("A3", ["C1"])["ok"]
+    assert _sql(api_nho, "SELECT class_id FROM students WHERE student_id='A3'") == [(None,)]
+    assert api_nho.submit_test_selection("A3", ["C1"], "9c")["ok"]
+    assert _sql(api_nho, "SELECT class_id FROM students WHERE student_id='A3'") == [("9C",)]
+    kq = api_nho.submit_test_selection("A3", [], "12Z9")      # sai lớp: KHÔNG ghi tick
+    assert kq["errors"][0] == {"code": "lop_khong_co_trong_danh_sach",
+                               "params": {"class_id": "12Z9"}}
+    assert _sql(api_nho, "SELECT club_id FROM club_test_selection WHERE student_id='A3'") == [("C1",)]
+    assert api_nho.submit_test_selection("A3", ["C1"], "")["ok"]
+    assert _sql(api_nho, "SELECT class_id FROM students WHERE student_id='A3'") == [(None,)]
+
+
+def test_get_student_entry_state_co_class_id(api_nho):
+    assert api_nho.get_student_entry_state("A1")["data"]["class_id"] == "10H2A"
+    assert api_nho.get_student_entry_state("A3")["data"]["class_id"] is None
