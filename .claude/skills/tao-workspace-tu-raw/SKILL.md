@@ -64,7 +64,7 @@ In từng bảng (mỗi sheet / mỗi CSV): số dòng, từng cột với số 
 |---|---|
 | **Dạng nguyện vọng** | xem bảng "Bốn dạng" bên dưới |
 | **Cột** mã, tên, nhóm, điểm | từ `soi` |
-| **Từ vựng** 5 danh từ (vi + en) | từ ngành: công ty → Nhân viên/Dự án; KTX → Sinh viên/Phòng; sự kiện → Khách/Phiên; đề tài → Sinh viên/Đề tài. `session` là đơn vị THỜI GIAN mà mỗi người được tối đa một chỗ (Buổi/Ngày/Ca/Đợt). |
+| **Từ vựng** 5 danh từ (vi + en) và `cohort` TUỲ CHỌN (mặc định Lớp/Class; chỉ đặt khi "lớp" là Phòng ban/Khoá/Đội…) | từ ngành: công ty → Nhân viên/Dự án; KTX → Sinh viên/Phòng; sự kiện → Khách/Phiên; đề tài → Sinh viên/Đề tài. `session` là đơn vị THỜI GIAN mà mỗi người được tối đa một chỗ (Buổi/Ngày/Ca/Đợt). |
 | **Buổi** | có cột buổi? Không có mà người dùng nói "mỗi người một chỗ" → một buổi (bỏ trống). Nên dùng nhãn thứ trong tuần (Thứ 2…Chủ nhật) — xem "Giới hạn". |
 | **Chỉ tiêu** từng chỗ | raw không có → HỎI, không đoán |
 | **Luật** | xem bảng "Luật" |
@@ -117,6 +117,8 @@ Gửi ba tệp (SendUserFile), tóm tắt: số người / chỗ / buổi, độ
 
 Luật nhóm: `reserve` → mọi nhóm của người phải có chỗ dành suất (không thì `nhom_mo_coi`);
 `strict` → mọi nhóm phải nằm trong `tiers` (không thì `nhom_ngoai_tiers`).
+`labels.cohort` là TUỲ CHỌN (bỏ đi thì lấy mặc định Lớp / Class); nhãn này chỉ dùng cho cột "lớp" để hiển thị / sắp / lọc, thuật toán không đọc.
+
 `industry`: `school` · `company` · `event` · `custom`.
 
 ## Spec đầy đủ
@@ -131,7 +133,8 @@ Luật nhóm: `reserve` → mọi nhóm của người phải có chỗ dành su
       "slot":    {"vi": "Dự án",          "en": "Project"},
       "session": {"vi": "Ngày",           "en": "Day"},
       "group":   {"vi": "Diện ưu tiên",   "en": "Priority group"},
-      "score":   {"vi": "Điểm phỏng vấn", "en": "Interview score"}
+      "score":   {"vi": "Điểm phỏng vấn", "en": "Interview score"},
+      "cohort":  {"vi": "Phòng ban",      "en": "Department"}
     },
     "rules": {"max_choices": 5, "max_tests": 2, "priority": "score",
               "tier_mode": "reserve", "score_scope": "per_slot", "tiers": []}

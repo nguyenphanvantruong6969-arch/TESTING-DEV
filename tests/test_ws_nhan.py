@@ -232,7 +232,7 @@ def test_tham_so_diem_goc_khong_dung_ten_danh_tu():
     import re
     for ma, d in MESSAGES.items():
         for lang in ("vi", "en"):
-            for ten in re.findall(r"\{(person|slot|session|group|score)\}", d[lang]):
+            for ten in re.findall(r"\{(person|slot|session|group|score|cohort)\}", d[lang]):
                 # được phép: là DANH TỪ, và không có lời gọi err() nào truyền tham số trùng tên
                 assert ten in nhan_ws.DANH_TU
 
