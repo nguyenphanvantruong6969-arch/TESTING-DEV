@@ -1,4 +1,4 @@
-# Sổ đăng ký 33 mục sửa mã nguồn (+ A13, thêm 24/10/2026)
+# Sổ đăng ký 33 mục sửa mã nguồn (+ A13, thêm 24/10/2026; + A14, thêm 02/11/2026)
 
 Nguồn duy nhất: `ke_hoach_thay_doi.json` (tệp này sinh từ đó). Số dòng lấy từ bản build — định vị theo **tên hàm**.
 Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không cần. Quy mô: S/M/L/XL (xem CLAUDE.md).
