@@ -343,3 +343,28 @@ def test_doi_ngon_ngu_ve_lai_chu_o_tha_xuong_lop_o_kiosk(mo):
     page.wait_for_function("() => document.querySelector('#kioskLop option').textContent.includes('Choose')")
     assert page.locator("#kioskLop option").first.inner_text() == "— Choose class —"
     assert not loi, loi
+
+
+@pytest.mark.parametrize("ngon", ["vi", "en"])
+def test_cho_giu_cohort_duoc_dien_that_tren_moi_the(mo, ngon):
+    """Không thẻ nào được hiện nguyên "{cohort_l}" / "{cohort}" / "{person_l}"... (cả vi lẫn en)."""
+    page, api, loi = mo({"HS1": "10A1"}, chay=True)
+    if ngon == "en":
+        page.locator("#btnLangToggle").click()
+        page.wait_for_function("() => document.documentElement.lang === 'en' || "
+                               "document.getElementById('btnLangToggle').textContent.trim() === 'VI'")
+    for ten in ("pipeline", "results", "fallback", "admin", "scoring", "members", "theolop"):
+        page.locator('.nav-item[data-tab="%s"]' % ten).click()
+        page.wait_for_timeout(400)
+        if ten == "admin":
+            page.locator("#qlTabHs").click()
+            page.wait_for_timeout(300)
+        chu = page.evaluate("() => document.body.innerText")
+        assert not re.search(r"\{(person|slot|session|group|score|cohort)(_\w+)?\}", chu), (ngon, ten)
+    # nhãn lớp đổi trong workspace thì chữ trên màn hình đổi theo ("Phòng ban" thay "Lớp")
+    page.evaluate("() => I18N.applyLabels({cohort: {vi: 'Phòng ban', en: 'Department'}})")
+    page.locator('.nav-item[data-tab="theolop"]').click()
+    page.wait_for_timeout(300)
+    chu = page.locator("#view-theolop .view-header").inner_text()
+    assert ("Phòng ban" if ngon == "vi" else "Department").casefold() in chu.casefold()
+    assert not loi, loi
