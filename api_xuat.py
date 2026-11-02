@@ -416,6 +416,17 @@ class XuatKetQuaMixin:
         t.xong(ngang=len(tl["cot"]) > 7)
         wb.save(path)
 
+    @staticmethod
+    def _cat_ten_tep(ten: str, toi_da: int = 100) -> str:
+        """Cắt tên tệp còn tối đa `toi_da` ký tự VÀ chừng 200 byte UTF-8 (hệ điều hành giới hạn
+        255 byte một tên, tiếng Việt có dấu 3 byte một chữ). Tên lớp do người dùng đặt có thể
+        rất dài; tên thật vẫn đủ trong tiêu đề khối, tên tệp chỉ cần nhận ra. Gọi TRƯỚC
+        `_ten_chua_dung` để hai tên cùng phần đầu vẫn ra hai tệp khác nhau."""
+        ten = ten[:toi_da]
+        while len(ten.encode("utf-8")) > 200:
+            ten = ten[:-1]
+        return ten.rstrip(" .") or "lop"
+
     def export_theo_lop(self, output_path: str = ""):
         """Xuất MỘT THƯ MỤC, mỗi lớp một tệp .xlsx một trang (để gửi giáo viên chủ nhiệm), cộng
         `_chua_co_lop.xlsx` nếu có em chưa có lớp. Không có điểm hay số bốc thăm.
@@ -443,7 +454,7 @@ class XuatKetQuaMixin:
             n = 0
             for lop, dong in du["theo_lop"]["nhom"]:
                 ten = "_chua_co_lop" if lop is None else self._ten_chua_dung(
-                    self._ten_file_an_toan(str(lop), "lop"), da_dung)
+                    self._cat_ten_tep(self._ten_file_an_toan(str(lop), "lop")), da_dung)
                 self._ghi_tep_lop(os.path.join(thu_muc, ten + ".xlsx"), du, lop, dong, set())
                 n += 1
             return _ok({"thu_muc": thu_muc, "n_tep": n, "ket_qua_cu": du["ket_qua_cu"]})

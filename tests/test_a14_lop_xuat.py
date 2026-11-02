@@ -258,3 +258,36 @@ def test_trang_theo_lop_trong_so_ket_qua_cung_ghi_dong_ket_qua_cu(api, tmp_path)
     p = _xuat(api, tmp_path)
     ws = load_workbook(p)["Theo lớp"]
     assert any("có thể đã cũ" in str(c.value) for row in ws.iter_rows() for c in row if c.value)
+
+
+# ------------------------------------------------------------------ B3: tên lớp dài
+def test_export_theo_lop_ten_lop_dai_khong_lam_hong_ca_lan_xuat(api, tmp_path):
+    _nap(api)
+    _dat_lop(api, "HS001", "L" * 300)
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"], r["errors"]
+    ten = os.listdir(r["data"]["thu_muc"])
+    assert len(ten) == 5                                  # 10A1, 10A2, 10A10, lớp dài, chưa có lớp
+    assert all(len(t) <= 110 for t in ten), [len(t) for t in ten]
+
+
+def test_export_theo_lop_hai_lop_dai_trung_phan_dau_van_ra_hai_tep(api, tmp_path):
+    _nap(api)
+    _dat_lop(api, "HS001", "K" * 200 + "1")
+    _dat_lop(api, "HS002", "K" * 200 + "2")
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"], r["errors"]
+    ten = os.listdir(r["data"]["thu_muc"])
+    assert len(ten) == len(set(t.casefold() for t in ten)) == 5     # 10A2, 10A1, hai lớp dài, chưa có lớp
+    # tên lớp thật vẫn đủ trong tiêu đề khối, không bị cắt theo tên tệp
+    chu = [str(c.value) for f in ten for ws in load_workbook(os.path.join(r["data"]["thu_muc"], f)).worksheets
+           for row in ws.iter_rows() for c in row if isinstance(c.value, str)]
+    assert any(("K" * 200 + "1") in c for c in chu)
+
+
+def test_export_theo_lop_ten_lop_nhieu_byte_khong_vuot_gioi_han_he_dieu_hanh(api, tmp_path):
+    _nap(api)
+    _dat_lop(api, "HS001", "Ệ" * 300)                    # 3 byte mỗi chữ: 100 chữ đã 300 byte
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"], r["errors"]
+    assert all(len(t.encode("utf-8")) <= 255 for t in os.listdir(r["data"]["thu_muc"]))
