@@ -88,6 +88,14 @@ CLB không em nào có điểm là CLB **không tổ chức thi**.
 An thích Tin học nhất và đã thi được 9,5. Nguyện vọng 2 là Bóng rổ, CLB không
 thi tuyển. Nguyện vọng 3 là Robotics: An đã thi nhưng chưa có điểm.
 
+### Cột Lớp (tuỳ chọn)
+
+Sổ mẫu có cột **Lớp** ngay sau **Họ tên** (vd `10H1A`). Cột này CHỈ để hiển thị, sắp, lọc và xuất danh sách cho giáo viên chủ nhiệm; **không ảnh hưởng kết quả xếp**. Phần mềm tự cắt khoảng trắng thừa và viết HOA ("10h1a" và "10H1A" là một lớp).
+
+- Ô có giá trị: ghi đè lớp cũ của em đó.
+- Ô trống, hoặc sổ không có cột Lớp: giữ nguyên lớp cũ. Sổ CÓ cột mà có ô trống thì phần mềm báo số em chưa có lớp (chỉ cảnh báo, vẫn nạp).
+- Cột tên khác cũng nhận: Mã lớp, Lop, Class, Class ID, class_id.
+
 ---
 
 ## Sổ có lỗi thì sao

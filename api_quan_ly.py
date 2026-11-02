@@ -8,6 +8,7 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 import getpass
 import json
 import os
+import re
 
 from api_chung import (
     _now,
@@ -18,6 +19,7 @@ from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    chuan_hoa_lop,
     BUOI_MAC_DINH,
     WHARTON_NGAN_SACH,
     WHARTON_TU_DIEN_MOT_CLB,
@@ -314,7 +316,16 @@ class QuanLyMixin:
         except Exception as e:
             return _fail(err("error_bulk_assigning", detail=str(e)))
 
-    def list_students_admin(self, search: str = "", page: int = 1, page_size: int = 100):
+    @staticmethod
+    def _khoa_lop_tu_nhien(lop):
+        """Khoá sắp tự nhiên của tên lớp: 10H2A trước 10H10A; lớp trống (None/"") ở CUỐI."""
+        if not lop:
+            return (1, ())
+        return (0, tuple((0, int(p), "") if p.isdigit() else (1, 0, p)
+                         for p in re.findall(r"\d+|\D+", lop)))
+
+    def list_students_admin(self, search: str = "", page: int = 1, page_size: int = 100,
+                            sort_by: str = "student_id", class_id=None):
         """
         Danh sách học sinh kèm reserve_group hiện tại, cho tab quản lý.
         CÓ PHÂN TRANG (trước đây LIMIT 100 cứng khiến trường >100 học
@@ -328,6 +339,10 @@ class QuanLyMixin:
         Kèm luôn tested_clubs [{club_id, name, buoi}] và ranked_clubs
         [{club_id, name, buoi, rank}] (theo thứ tự nguyện vọng) để thẻ
         kết quả tìm kiếm hiện được TÊN CLB em đã chọn.
+
+        A14 — mỗi dòng có `class_id` (None = chưa có lớp). `sort_by="class_id"`: thứ tự tự
+        nhiên (10H2A trước 10H10A), em chưa có lớp ở cuối, rồi `student_id`. `class_id=None`
+        là mọi em; `""` chỉ những em chưa có lớp; còn lại lọc đúng lớp đó.
         """
         try:
             page = max(1, int(page))
@@ -336,11 +351,19 @@ class QuanLyMixin:
 
             with self._ket_noi_doc() as cur:
 
-                where_clause = ""
+                dieu_kien: list = []
                 params: tuple = ()
                 if search:
-                    where_clause = " WHERE khop_tim(s.student_id, ?) OR khop_tim(s.name, ?)"
+                    dieu_kien.append("(khop_tim(s.student_id, ?) OR khop_tim(s.name, ?))")
                     params = (search, search)
+                if class_id is not None:
+                    lop_loc = chuan_hoa_lop(class_id)
+                    if lop_loc is None:
+                        dieu_kien.append("s.class_id IS NULL")
+                    else:
+                        dieu_kien.append("s.class_id = ?")
+                        params += (lop_loc,)
+                where_clause = (" WHERE " + " AND ".join(dieu_kien)) if dieu_kien else ""
 
                 total = cur.execute(
                     f"SELECT COUNT(*) FROM students s{where_clause}", params
@@ -350,9 +373,25 @@ class QuanLyMixin:
                 page = min(page, max(1, (total + page_size - 1) // page_size))
                 offset = (page - 1) * page_size
 
+                theo_lop = sort_by == "class_id"
+                if theo_lop:
+                    # Sắp tự nhiên không làm được bằng SQL thuần: sắp mã trong Python rồi cắt trang.
+                    thu_tu = sorted(
+                        cur.execute(
+                            f"SELECT s.student_id, s.class_id FROM students s{where_clause}",
+                            params).fetchall(),
+                        key=lambda r: (self._khoa_lop_tu_nhien(r[1]), r[0]))
+                    ma_trang = [r[0] for r in thu_tu[offset:offset + page_size]]
+                    loc_trang = " WHERE s.student_id IN (%s)" % ",".join("?" * len(ma_trang))
+                    sql_cuoi, tham_so_cuoi = "", tuple(ma_trang)
+                else:
+                    loc_trang, tham_so_cuoi = where_clause, params
+                    sql_cuoi = "ORDER BY s.student_id LIMIT ? OFFSET ?"
+                    tham_so_cuoi = params + (page_size, offset)
+
                 rows = cur.execute(
                     f"""
-                    SELECT s.student_id, s.name, s.reserve_group,
+                    SELECT s.student_id, s.name, s.reserve_group, s.class_id,
                            COALESCE(ts.n_tested, 0) AS n_tested,
                            COALESCE(pr.n_ranked, 0) AS n_ranked
                     FROM students s
@@ -364,11 +403,14 @@ class QuanLyMixin:
                         SELECT student_id, COUNT(*) AS n_ranked
                         FROM preferences GROUP BY student_id
                     ) pr ON pr.student_id = s.student_id
-                    {where_clause}
-                    ORDER BY s.student_id LIMIT ? OFFSET ?
+                    {loc_trang}
+                    {sql_cuoi}
                     """,
-                    params + (page_size, offset),
+                    tham_so_cuoi,
                 ).fetchall()
+                if theo_lop:
+                    vi_tri = {m: i for i, m in enumerate(ma_trang)}
+                    rows = sorted(rows, key=lambda r: vi_tri[r["student_id"]])
 
                 # Tên CLB đã chọn thi / đã xếp nguyện vọng, CHỈ cho các em
                 # của trang này — để thẻ tìm kiếm ở tab Nhập tại chỗ nói
@@ -464,7 +506,7 @@ class QuanLyMixin:
             bat_wharton = dung_wharton(self._cfg_ws()["rules"])
             with self._ket_noi_doc() as cur:
                 student = cur.execute(
-                    "SELECT student_id, name FROM students WHERE student_id = ?",
+                    "SELECT student_id, name, class_id FROM students WHERE student_id = ?",
                     (student_id,),
                 ).fetchone()
                 if not student:
@@ -487,6 +529,7 @@ class QuanLyMixin:
                 du_lieu = {
                     "student_id": student["student_id"],
                     "name": student["name"],
+                    "class_id": student["class_id"],
                     "tested_clubs": tested,
                     "ranked_clubs": prefs,
                 }
@@ -1206,12 +1249,15 @@ class QuanLyMixin:
             "SELECT club_id FROM clubs WHERE club_id IN (%s)" % dau_hoi, list(ma_clb))}
         return [c for c in ma_clb if c not in co]
 
-    def submit_test_selection(self, student_id: str, club_ids: list):
+    def submit_test_selection(self, student_id: str, club_ids: list, class_id=None):
         """
         BƯỚC 1 (độc lập với xếp hạng) — tick-box club muốn thi/xét.
         Ghi đè toàn bộ lựa chọn cũ của học sinh này. Điểm đã chấm cho CLB
         bị bỏ tick bị xoá theo (`n_scores_removed`), xem
         `_xoa_diem_khong_con_tick`.
+
+        A14 — `class_id`: None = không đụng lớp; có giá trị thì phải nằm trong `list_classes`
+        (sai -> `lop_khong_co_trong_danh_sach`, không ghi gì); "" = xoá lớp. Cùng giao dịch.
         """
         try:
             if not isinstance(club_ids, list):
@@ -1228,6 +1274,9 @@ class QuanLyMixin:
                 ).fetchone()
                 if not exists:
                     return _fail(err("student_not_found", student_id=student_id))
+                doi_lop, lop_moi, loi_lop = self._kiem_lop(cur, class_id)
+                if loi_lop:
+                    return _fail(loi_lop)
 
                 # Điểm quyết tâm đang khoá và em đã có điểm: không đổi ô tick (A13.8). Gửi lại đúng
                 # tập cũ thì vẫn ok.
@@ -1260,6 +1309,9 @@ class QuanLyMixin:
                     [(student_id, cid) for cid in club_ids],
                 )
                 n_xoa = self._xoa_diem_khong_con_tick(cur, student_id)
+                if doi_lop:
+                    cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                                (lop_moi, student_id))
             return _ok({"student_id": student_id, "n_selected": len(club_ids),
                         "n_scores_removed": n_xoa})
         except CauHinhHong as e:
@@ -1267,11 +1319,14 @@ class QuanLyMixin:
         except Exception as e:
             return _fail(err("error_saving_test_selection", detail=str(e)))
 
-    def submit_preferences(self, student_id: str, ordered_club_ids: list):
+    def submit_preferences(self, student_id: str, ordered_club_ids: list, class_id=None):
         """
         BƯỚC 2 (độc lập với tick-box thi) — xếp hạng nguyện vọng,
         tối đa `rules.max_choices` mỗi buổi (mặc định 10 — giới hạn Microsoft Forms
         Ranking, giữ đồng bộ với luồng nhập chính).
+
+        A14 — `class_id`: None = không đụng tới lớp; có giá trị thì phải là một lớp đã có trong
+        `list_classes` (sai -> `lop_khong_co_trong_danh_sach`); "" = xoá lớp của em.
         """
         try:
             if not isinstance(ordered_club_ids, list):
@@ -1303,6 +1358,10 @@ class QuanLyMixin:
                     if cu_nv != ordered_club_ids:
                         return _fail(err("wharton_da_khoa"))
 
+                doi_lop, lop_moi, loi_lop = self._kiem_lop(cur, class_id)
+                if loi_lop:
+                    return _fail(loi_lop)
+
                 invalid = self._ma_clb_khong_ton_tai(cur, ordered_club_ids)
                 # Soat TRUOC tran moi buoi: ma CLB la khong co buoi, bi
                 # don vao buoi mac dinh va bao nham "qua nhieu".
@@ -1321,6 +1380,9 @@ class QuanLyMixin:
                     "INSERT INTO preferences (student_id, club_id, rank) VALUES (?, ?, ?)",
                     [(student_id, cid, i + 1) for i, cid in enumerate(ordered_club_ids)],
                 )
+                if doi_lop:
+                    cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                                (lop_moi, student_id))
                 # Bỏ một CLB khỏi nguyện vọng thì điểm Wharton đặt ở CLB đó đi theo (đặc tả
                 # 4.2); các dòng khác giữ nguyên. Đặt SAU khi ghi nguyện vọng mới.
                 cu_w = self._doc_diem_wharton_cua_em(cur, student_id)
@@ -1339,7 +1401,52 @@ class QuanLyMixin:
         except Exception as e:
             return _fail(err("error_saving_preferences", detail=str(e)))
 
-    def create_student_if_missing(self, student_id: str, name: str):
+    @staticmethod
+    def _kiem_lop(cur, class_id):
+        """A14 — (doi_lop, lop, loi): `class_id` None = không đụng lớp; có giá trị thì chuẩn hoá
+        và phải nằm trong các lớp đang có (`list_classes`); "" = xoá lớp. `loi` khác None thì
+        bên gọi trả lỗi và KHÔNG ghi gì."""
+        if class_id is None:
+            return False, None, None
+        lop = chuan_hoa_lop(class_id)
+        if lop is not None and not cur.execute(
+                "SELECT 1 FROM students WHERE class_id = ? LIMIT 1", (lop,)).fetchone():
+            return True, lop, err("lop_khong_co_trong_danh_sach", class_id=lop)
+        return True, lop, None
+
+    def set_student_class(self, student_id: str, class_id):
+        """A14: đặt lớp của một em. `""`/None = xoá lớp. Lần ghi sau cùng thắng.
+
+        Lớp CHỈ để hiển thị / sắp / lọc / xuất; đổi lớp không làm kết quả đã chạy thành cũ."""
+        try:
+            student_id = (student_id or "").strip()
+            lop = chuan_hoa_lop(class_id)
+            with self._ket_noi_ghi() as cur:
+                if not cur.execute("SELECT 1 FROM students WHERE student_id = ?",
+                                   (student_id,)).fetchone():
+                    return _fail(err("student_not_found", student_id=student_id))
+                cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                            (lop, student_id))
+            return _ok({"student_id": student_id, "class_id": lop})
+        except Exception as e:
+            return _fail(err("error_saving_student_class", detail=str(e)))
+
+    def list_classes(self):
+        """A14: {classes: [{class_id, n}] (thứ tự tự nhiên), n_khong_lop}."""
+        try:
+            with self._ket_noi_doc() as cur:
+                cac_lop = [{"class_id": r[0], "n": r[1]} for r in cur.execute(
+                    "SELECT class_id, COUNT(*) FROM students "
+                    "WHERE class_id IS NOT NULL AND class_id <> '' GROUP BY class_id")]
+                n_khong = cur.execute(
+                    "SELECT COUNT(*) FROM students "
+                    "WHERE class_id IS NULL OR class_id = ''").fetchone()[0]
+            cac_lop.sort(key=lambda d: self._khoa_lop_tu_nhien(d["class_id"]))
+            return _ok({"classes": cac_lop, "n_khong_lop": n_khong})
+        except Exception as e:
+            return _fail(err("error_reading_classes", detail=str(e)))
+
+    def create_student_if_missing(self, student_id: str, name: str, class_id=None):
         """Kiosk fallback: nếu học sinh chưa có trong students, tạo mới (chưa có STB).
 
         Mã và tên bỏ khoảng trắng đầu / cuối như đường nạp Sổ (`o_thanh_chu`): "A01" và "  A01 "
@@ -1354,12 +1461,18 @@ class QuanLyMixin:
                 exists = cur.execute(
                     "SELECT 1 FROM students WHERE student_id = ?", (student_id,)
                 ).fetchone()
+                doi_lop, lop_moi, loi_lop = self._kiem_lop(cur, class_id)
+                if loi_lop:
+                    return _fail(loi_lop)
                 if not exists:
                     cur.execute(
-                        "INSERT INTO students (student_id, name, stb_number, reserve_group) "
-                        "VALUES (?, ?, NULL, NULL)",
-                        (student_id, name),
+                        "INSERT INTO students (student_id, name, stb_number, reserve_group, class_id) "
+                        "VALUES (?, ?, NULL, NULL, ?)",
+                        (student_id, name, lop_moi),
                     )
+                elif doi_lop:
+                    cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                                (lop_moi, student_id))
             return _ok({"student_id": student_id, "created": not exists})
         except Exception as e:
             return _fail(err("error_creating_student", detail=str(e)))

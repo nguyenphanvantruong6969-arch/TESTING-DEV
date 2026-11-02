@@ -1081,9 +1081,9 @@ class XuatKetQuaMixin:
             "COALESCE(reserve_group, ''), buoi FROM clubs ORDER BY club_id")]
         n_ten_doi = so_nhap.ten_khong_trung(clubs)
         hs = {r[0]: {"student_id": r[0], "name": r[1] or "", "reserve_group": r[2],
-                     "nv": []}
+                     "class_id": r[3], "nv": []}
               for r in cur.execute(
-                  "SELECT student_id, name, COALESCE(reserve_group, '') "
+                  "SELECT student_id, name, COALESCE(reserve_group, ''), class_id "
                   "FROM students ORDER BY student_id")}
         # Workspace chấm điểm theo NGƯỜI: điểm chung của mỗi người đi vào cột "Điểm" của sổ.
         if self._cfg_ws(nghiem=True)["rules"]["score_scope"] == "per_person":
@@ -1134,7 +1134,8 @@ class XuatKetQuaMixin:
             path = self._duong_xuat(output_path, ten)
             with self._ket_noi_doc() as cur:
                 clubs, students, n_ngoai, n_ten_doi = self._du_lieu_so_nhap(cur)
-            so_nhap.ghi_so_nhap(path, clubs, students, cfg=self._cfg_ws(nghiem=True))
+            so_nhap.ghi_so_nhap(path, clubs, students, cfg=self._cfg_ws(nghiem=True),
+                                co_lop=any(x.get("class_id") for x in students))   # A14
             return _ok({
                 "path": path,
                 "dir": os.path.dirname(path),
@@ -1227,7 +1228,8 @@ class XuatKetQuaMixin:
             with self._ket_noi_doc() as cur:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
             so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
-                                 luon_co_cot_w=True)       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
+                                 luon_co_cot_w=True,       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
+                                 co_lop=True)              # và cột Lớp (A14, đã duyệt)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except LoiDuongXuat as e:
