@@ -368,3 +368,16 @@ def test_cho_giu_cohort_duoc_dien_that_tren_moi_the(mo, ngon):
     chu = page.locator("#view-theolop .view-header").inner_text()
     assert ("Phòng ban" if ngon == "vi" else "Department").casefold() in chu.casefold()
     assert not loi, loi
+
+
+def test_xuat_theo_lop_hien_canh_bao_ket_qua_cu(mo, tmp_path):
+    """B1: sửa dữ liệu sau lần chạy rồi bấm "Xuất theo lớp" → dòng cảnh báo như các nút xuất khác."""
+    page, api, loi = mo({"HS1": "10A1"}, chay=True)
+    assert api.submit_preferences("HS2", ["B", "A"])["ok"]
+    page.locator('[data-tab="results"]').click()
+    page.wait_for_function("() => !document.getElementById('btnXuatTheoLop').disabled")
+    page.locator("#btnXuatTheoLop").click()
+    page.wait_for_function("() => document.getElementById('xuatFeedback').textContent.trim() !== ''")
+    chu = page.locator("#xuatFeedback").inner_text()
+    assert "tệp theo lớp" in chu and "đã cũ" in chu.casefold(), chu
+    assert not loi, loi

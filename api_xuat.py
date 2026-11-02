@@ -166,6 +166,7 @@ class XuatKetQuaMixin:
                               co_ket_qua, ket_qua_cu)
         self._trang_danh_sach(trang["Danh sách {person_l}"], du, co_ket_qua)
         self._trang_theo_clb(trang["Theo {slot_sl}"], du)
+        du["ket_qua_cu"] = ket_qua_cu
         self._trang_theo_lop(trang["Theo {cohort_l}"], du)
         self._trang_chua_co_cho(trang["Chưa có chỗ"], bao, co_ket_qua)
         if self.TRANG_DIEM_CHUAN in trang:
@@ -373,10 +374,21 @@ class XuatKetQuaMixin:
                to_do=lambda d: not any(d[3:]), rong="(chưa có em nào)")
         t.hang += 1
 
+    @staticmethod
+    def _dong_ket_qua_cu(t, du):
+        """Dòng cảnh báo đỏ khi dữ liệu đã sửa sau lần chạy (như trang Hướng dẫn): tệp này đi
+        thẳng tới giáo viên chủ nhiệm, nên phải tự nói được nó có thể đã cũ."""
+        from so_excel import CHU_CANH_BAO
+
+        if du.get("ket_qua_cu"):
+            t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, kết quả có thể "
+                      "đã cũ. Hãy chạy lại rồi xuất lại.", CHU_CANH_BAO)
+
     def _trang_theo_lop(self, t, du):
         t.tieu_de("DANH SÁCH TỪNG {cohort_u}",
                   "Mỗi {cohort_l} một khối, in mỗi {cohort_l} một trang để gửi giáo viên chủ "
                   "nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+        self._dong_ket_qua_cu(t, du)
         tl = du["theo_lop"]
         for n, (lop, dong) in enumerate(tl["nhom"]):
             if n:
@@ -399,6 +411,7 @@ class XuatKetQuaMixin:
         t = Trang(ws, du.get("nhan"))
         t.tieu_de("DANH SÁCH {cohort_u}" + ("" if lop is None else " " + str(lop).upper()),
                   "Gửi giáo viên chủ nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+        self._dong_ket_qua_cu(t, du)
         self._khoi_theo_lop(t, tl, lop, dong)
         t.xong(ngang=len(tl["cot"]) > 7)
         wb.save(path)
@@ -423,6 +436,7 @@ class XuatKetQuaMixin:
             else:
                 thu_muc = self._duong_xuat(output_path, "ket_qua_theo_lop")
             du = self._du_lieu_xuat()
+            du["ket_qua_cu"] = self._ket_qua_cu()
             os.makedirs(thu_muc)
             da_tao = True              # từ đây thư mục là CỦA lần xuất này
             da_dung: set = {"_chua_co_lop"}        # giữ chỗ trước: lớp tên "_chua_co_lop" không đè
@@ -432,7 +446,7 @@ class XuatKetQuaMixin:
                     self._ten_file_an_toan(str(lop), "lop"), da_dung)
                 self._ghi_tep_lop(os.path.join(thu_muc, ten + ".xlsx"), du, lop, dong, set())
                 n += 1
-            return _ok({"thu_muc": thu_muc, "n_tep": n})
+            return _ok({"thu_muc": thu_muc, "n_tep": n, "ket_qua_cu": du["ket_qua_cu"]})
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:

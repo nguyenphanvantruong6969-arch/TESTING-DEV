@@ -223,3 +223,38 @@ def test_export_theo_lop_loi_khong_xoa_thu_muc_co_san(api, tmp_path, monkeypatch
     assert api.export_theo_lop(str(tmp_path / "ra"))["ok"] is False
     assert (tmp_path / "ra" / "cu.xlsx").read_text() == "cu"
     assert not (tmp_path / "ra (2)").exists()
+
+
+# ------------------------------------------------------------------ B1: kết quả cũ
+def _noi_dung_chu(path):
+    wb = load_workbook(path)
+    return [str(c.value) for ws in wb.worksheets for row in ws.iter_rows() for c in row
+            if isinstance(c.value, str)]
+
+
+def test_export_theo_lop_bao_ket_qua_cu_sau_khi_sua_nguyen_vong(api, tmp_path):
+    _nap(api)
+    assert api.submit_preferences("HS002", ["b", "a"])["ok"]       # sửa dữ liệu SAU lần chạy
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["ok"], r["errors"]
+    assert r["data"]["ket_qua_cu"] is True
+    for ten in os.listdir(r["data"]["thu_muc"]):
+        chu = _noi_dung_chu(os.path.join(r["data"]["thu_muc"], ten))
+        assert any("có thể đã cũ" in c for c in chu), ten
+
+
+def test_export_theo_lop_khong_bao_cu_khi_du_lieu_chua_doi(api, tmp_path):
+    _nap(api)
+    r = api.export_theo_lop(str(tmp_path / "ra"))
+    assert r["data"]["ket_qua_cu"] is False
+    for ten in os.listdir(r["data"]["thu_muc"]):
+        assert not any("có thể đã cũ" in c
+                       for c in _noi_dung_chu(os.path.join(r["data"]["thu_muc"], ten)))
+
+
+def test_trang_theo_lop_trong_so_ket_qua_cung_ghi_dong_ket_qua_cu(api, tmp_path):
+    _nap(api)
+    assert api.submit_preferences("HS002", ["b", "a"])["ok"]
+    p = _xuat(api, tmp_path)
+    ws = load_workbook(p)["Theo lớp"]
+    assert any("có thể đã cũ" in str(c.value) for row in ws.iter_rows() for c in row if c.value)
