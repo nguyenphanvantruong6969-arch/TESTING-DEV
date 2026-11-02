@@ -190,7 +190,7 @@ def test_ket_qua_loc_va_xuat_theo_lop(mo, tmp_path):
 
 
 # ------------------------------------------------------------------ workspace và chữ
-def test_workspace_co_o_nhan_thu_sau_cohort(mo_trang):
+def test_workspace_co_o_nhan_thu_sau_cohort(mo_trang):  # noqa: F811
     page, api, goc, loi = mo_trang()
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
@@ -223,3 +223,18 @@ def test_chu_moi_vi_sach_tieng_anh_va_en_khong_dung_you():
         assert not TU_ANH_CAM.search(re.sub(r"\{\w+\}", "", v)), (k, v)
     for k, v in en:
         assert not re.search(r"\byou\b", v, re.I), (k, v)
+
+
+def test_quan_ly_lan_mo_dau_hien_du_so_em_va_giu_chon_chua_co_lop(mo):
+    """Lần mở đầu (ô lọc còn rỗng) phải ra ĐỦ mọi em; chọn "Chưa có lớp" thì giữ sau khi tải lại."""
+    page, api, loi = mo({"HS1": "10A1", "HS2": "10A2"})
+    _sang_quan_ly_hs(page)
+    assert len(_hang_quan_ly(page)) == 3
+    assert page.locator("#adminLopLoc").input_value() == "__tat_ca__"
+    page.select_option("#adminLopLoc", "")
+    page.wait_for_function("() => document.querySelectorAll('#adminStudentTableBody tr').length === 1")
+    page.evaluate("() => loadAdminStudents()")
+    page.wait_for_timeout(500)
+    assert page.locator("#adminLopLoc").input_value() == ""
+    assert [h[0] for h in _hang_quan_ly(page)] == ["HS3"]
+    assert not loi, loi
