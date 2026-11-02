@@ -262,6 +262,18 @@ MESSAGES = {
         "vi": "Không lưu được nguyện vọng. Hãy thử lại.",
         "en": "Couldn't save the preferences. Try again.",
     },
+    "lop_sai_kieu": {
+        "vi": "{cohort} phải là chữ hoặc số.",
+        "en": "The {cohort_l} must be text or a number.",
+    },
+    "lop_qua_dai": {
+        "vi": "Tên {cohort_l} quá dài (tối đa {toi_da} ký tự).",
+        "en": "The {cohort_l} name is too long (at most {toi_da} characters).",
+    },
+    "canh_bao_lop_bi_cat": {
+        "vi": "{n} tên {cohort_l} dài quá {toi_da_cat} ký tự nên đã bị cắt bớt. Kiểm lại tên {cohort_l} trong tệp.",
+        "en": "{n} {cohort_l} name(s) were longer than {toi_da_cat} characters and were shortened. Check the {cohort_l} names in the file.",
+    },
     "nhan_trung_danh_tu": {
         "vi": "Hai mục trong bước Từ vựng đang cùng tên \"{nhan}\". Hãy đặt tên khác nhau cho từng mục, nếu không Sổ nhập sẽ đọc nhầm cột.",
         "en": "Two items in the vocabulary step have the same name \"{nhan}\". Give each item its own name, otherwise the entry workbook would read the wrong column.",
