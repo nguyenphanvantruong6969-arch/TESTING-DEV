@@ -504,6 +504,15 @@ thứ mấy, số bốc thăm, và kết quả.
   không có dòng để đánh dấu. Bật **Hiện cả em chưa được xếp** — mỗi em như vậy thêm
   một dòng ghi *Cả tuần*.
 
+#### Lớp của học sinh, và gửi kết quả cho giáo viên chủ nhiệm
+
+Mỗi học sinh có thể có một **Lớp** (ví dụ `10H1A`). Lớp chỉ để xem, lọc, sắp và xuất; **không ảnh hưởng tới kết quả xếp**.
+
+- **Gán lớp:** thẻ **04 → Học sinh**, gõ lớp vào ô ở cột *Lớp* rồi rời ô (để trống là xoá lớp). Cùng thẻ có ô **lọc theo lớp** (*Tất cả*, từng lớp, *Chưa có lớp*) và ô **sắp theo lớp**. Thẻ **02** cũng có cột Lớp, ô lọc và ô sắp.
+- **Thẻ 03 (nhập tại chỗ):** khi trường đã có ít nhất một lớp, mỗi em phải **chọn lớp** từ danh sách trước khi bấm Lưu (ô hiện sẵn lớp hiện tại của em). Trường chưa có lớp nào thì ô này ẩn.
+- **Gửi giáo viên chủ nhiệm:** ở thẻ **02**, bấm **Xuất theo lớp** (khoá khi chưa có kết quả). Ra một thư mục, mỗi lớp một tệp Excel; em chưa có lớp nằm trong `_chua_co_lop.xlsx`; dòng tô đỏ là em chưa có chỗ. Trong Sổ kết quả cũng có trang **Theo lớp** với nội dung tương tự.
+- Các tệp **theo lớp không có điểm, điểm quyết tâm hay số bốc thăm**, nên gửi được cho giáo viên chủ nhiệm. Các tệp khác vẫn theo cảnh báo bên dưới.
+
 > ⚠️ **Tệp dữ liệu đầu vào và tệp hồ sơ học sinh có ĐIỂM CHẤM và SỐ BỐC THĂM.**
 > Không gửi cho giáo viên chấm điểm — chấm mù chỉ còn ý nghĩa khi người chấm không
 > thấy những con số đó.

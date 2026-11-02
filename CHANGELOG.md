@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-11-02 — A14 — phần B (xuất theo lớp và giao diện lớp)
+
+Phần B của mục A14 "Lớp của học sinh" (phần A: cột `students.class_id`, `chuan_hoa_lop`, danh từ `cohort`, các API lớp). Lớp chỉ để hiển thị, lọc, sắp và xuất cho giáo viên chủ nhiệm; thuật toán, `match_results`, `run_history` không đổi.
+
+- **`api_xuat.py`:** trang mới **"Theo lớp"** trong Sổ kết quả, LUÔN có, đứng sau "Theo CLB" (sổ từ 6 thành 7 trang; 8 khi bật điểm quyết tâm). Mỗi lớp một khối (thứ tự tự nhiên: 10A2 trước 10A10), ngắt trang giữa các lớp, khối cuối "Chưa có lớp" nếu có em trống lớp. Không có điểm thi, điểm quyết tâm, số bốc thăm hay diện trúng tuyển; nhiều buổi thì mỗi buổi một cột; em chưa có chỗ tô đỏ. Trang Hướng dẫn thêm một dòng nói trang này không có điểm, gửi giáo viên chủ nhiệm được.
+- **`export_theo_lop(output_path="")`:** API mới, ra MỘT THƯ MỤC, mỗi lớp một `.xlsx` một trang, thêm `_chua_co_lop.xlsx` nếu cần; tên tệp qua `_ten_file_an_toan` + `_ten_chua_dung`; đường dẫn theo `_duong_xuat` (đường tuyệt đối đã có thì thành `x (2)`, không ghi đè); chạy dưới `_khoa_xuat`; chưa có kết quả → `xuat_chua_co_ket_qua`, không tạo gì. Trả {thu_muc, n_tep}.
+- **Cột "Lớp" ngay sau "Họ tên"** (luôn có, kể cả trống): trang Danh sách (một buổi và bảng thời khoá biểu nhiều buổi, CHỈ bản Excel qua `du["tkb_xlsx"]`), trang "Theo CLB", CSV tổng, CSV `_theo_club`. KHÔNG đổi: CSV thời khoá biểu, CSV từng buổi, CSV số bốc thăm, `export_hoc_sinh_csv`, báo cáo Word.
+- **Giao diện:** thẻ Quản lý/Học sinh có cột Lớp, ô lọc (Tất cả / từng lớp / Chưa có lớp), ô sắp theo lớp, ô sửa lớp từng em (`set_student_class`). Thẻ Kết quả có cột Lớp, ô lọc, ô sắp, nút **Xuất theo lớp** (khoá khi chưa có kết quả). Kiosk (thẻ 03) có danh sách thả xuống cố định từ `list_classes`: có lớp thì BẮT BUỘC chọn trước khi Lưu (cả tạo em mới), không có lớp nào thì ẩn. Workspace có ô nhãn thứ 6 cho `cohort`. `i18n.js` thêm `cohort` vào bản JS của danh từ (`NHAN_MAC_DINH`, `CHO_GIU_DANH_TU`); chữ mới ở `i18n.js` (vi + en), `js/075_workspace.js` thêm `cohort` vào `WS_DANH_TU`.
+- **Test mới:** `tests/test_a14_lop_xuat.py` (12 ca), `tests/test_giao_dien_a14_lop.py` (9 ca, Chromium).
+- **Test cũ sửa có chủ đích (trang mới luôn có):** `tests/test_so_excel_de_dung.py` (`CAC_TRANG`), `tests/test_ws_nhan.py` (3 ca danh sách tên trang).
+
 ## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
 
 - **`du_lieu_test/tao_db_demo.py`:** mặc định dựng CSDL demo với Wharton BẬT (không ghi `wharton: false`), nạp `SO_NHAP_DQT_120HS_HOP_LE.xlsx` qua `import_so_nhap` (chọn bản 120HS vì giữ nguyên nguyện vọng và điểm thi của `SO_NHAP_MAU_120HS_3BUOI.xlsx`, chỉ thêm điểm quyết tâm MÔ PHỎNG; nhỏ, demo nhanh). Vẫn dừng trước khi chạy phân bổ. Cờ mới `--tat-wharton` dựng y như trước (TEST_01..03, `wharton: false`); cờ `--ra` chọn tệp đầu ra (mặc định giữ chỗ cũ). Đã so với bản dựng ở `cee2940`: 14/15 bảng trùng khít từng dòng, chỉ `workspace_settings` khác (có khoá `wharton=false`) — đúng dự kiến.
