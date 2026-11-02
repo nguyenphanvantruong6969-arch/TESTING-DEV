@@ -13,6 +13,7 @@ Mỗi học sinh có thể có "lớp" (vd 10H1A) CHỈ để hiển thị, sắ
 - **API:** `list_students_admin(sort_by, class_id)`, `set_student_class`, `list_classes`, `create_student_if_missing(class_id)`, `submit_preferences(class_id)` (lớp phải nằm trong `list_classes`, sai → `lop_khong_co_trong_danh_sach`), `get_match_results(class_id, sort_by)`. Mã lỗi mới: `error_saving_student_class`, `error_reading_classes`, `lop_khong_co_trong_danh_sach`, `so_nhap_canh_bao_thieu_lop`.
 - **Test mới:** `tests/test_a14_lop_backend.py` (11), `tests/test_a14_lop_nhap.py` (18), `tests/test_a14_tu_vung_cohort.py` (22) — gồm các bất biến: `match_results` giống hệt khi có / không lớp; `class_id` không có trong lõi phân bổ; đổi lớp không làm `ket_qua_cu`; `run_history` không đụng.
 - **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` và `tests/test_wharton_ma_loi.py` (danh sách danh từ thành sáu); `tests/test_ws_nhan.py` thêm đúng 4 mã lỗi mới vào `MA_MOI_SAU_ANH_CHUP` (theo tiền lệ A13).
+- **Test cũ khác sửa có chủ đích (thay đổi đã duyệt: Sổ mẫu có cột Lớp, `get_student_entry_state` thêm `class_id`, thêm 3 tệp test):** `tests/test_ws_so_nhap.py` (3 ca), `tests/test_ws_luat.py`, `tests/test_ws_sua_loi_3.py` (dòng học sinh thêm một ô cho cột Lớp; vị trí NV1 dịch một cột), `tests/test_wharton_kiosk.py` (thêm khoá `class_id`), `docs/ke_hoach/CLAUDE_CHI_TIET.md` (168 → 171 tệp test).
 
 ## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
 

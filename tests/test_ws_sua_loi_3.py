@@ -296,8 +296,8 @@ def _so_voi_diem(api, hang_hs):
 def test_so_theo_clb_nap_vao_workspace_theo_nguoi_bao_loi(goc, tmp_path):
     cu = _api(goc, tmp_path, ten="Cũ")
     assert cu.create_or_update_club("a", "A", 2, 0, "")["ok"]
-    # cột mẫu: Mã HS, Họ tên, Nhóm, NV1, Điểm 1, ...
-    b64 = _so_voi_diem(cu, ["N1", "Lan", None, "A", 8.5])
+    # cột mẫu: Mã HS, Họ tên, Lớp (A14), Nhóm, NV1, Điểm 1, ...
+    b64 = _so_voi_diem(cu, ["N1", "Lan", None, None, "A", 8.5])
     moi = _api(goc, tmp_path, {"rules": {"score_scope": "per_person"}}, ten="Mới")
     res = moi.import_so_nhap(b64)
     assert res["ok"] is False

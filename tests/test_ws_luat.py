@@ -360,8 +360,8 @@ def test_nap_so_diem_theo_nguoi_ghi_o_nguoi_va_nap_lai_xoa_diem(goc, tmp_path):
     api.create_or_update_club("a", "Dự án A", 3, 0, "")
     wb = openpyxl.load_workbook(api.tao_so_nhap_mau()["data"]["path"])
     hs = wb["2. Nhân viên"]
-    hs.append(["N1", "Lan", None, 8.5, "Dự án A"])
-    hs.append(["N2", "Mai", None, "thi", "Dự án A"])
+    hs.append(["N1", "Lan", None, None, 8.5, "Dự án A"])      # A14: cột Lớp sau Họ tên
+    hs.append(["N2", "Mai", None, None, "thi", "Dự án A"])
     b = io.BytesIO()
     wb.save(b)
     assert api.import_so_nhap(base64.b64encode(b.getvalue()).decode())["ok"]
@@ -369,7 +369,7 @@ def test_nap_so_diem_theo_nguoi_ghi_o_nguoi_va_nap_lai_xoa_diem(goc, tmp_path):
     assert diem == {"N1": 8.5, "N2": None}
     # nạp lại với ô điểm trống: xoá điểm cũ (sổ là bản đầy đủ)
     wb2 = openpyxl.load_workbook(api.tao_so_nhap_mau()["data"]["path"])
-    wb2["2. Nhân viên"].append(["N1", "Lan", None, None, "Dự án A"])
+    wb2["2. Nhân viên"].append(["N1", "Lan", None, None, None, "Dự án A"])
     b2 = io.BytesIO()
     wb2.save(b2)
     assert api.import_so_nhap(base64.b64encode(b2.getvalue()).decode())["ok"]

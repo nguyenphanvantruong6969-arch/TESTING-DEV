@@ -11,14 +11,20 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 
 ## Plan
 - [x] Step 1 base: DEFAULT_SCHEMA + di_tru_schema (backup) + chuan_hoa_lop + `cohort` noun + skill
-- [ ] Step 2: CSV import (preferences / test selection), so_nhap (read/write/warn), api_quan_ly
+- [x] Step 2: CSV import (preferences / test selection), so_nhap (read/write/warn), api_quan_ly
       (list_students_admin, set_student_class, list_classes, create_student_if_missing, kiosk Save),
       api_bao_cao.get_match_results, i18n_errors, registry rows, CHANGELOG, TIEN_DO, docs
-- [ ] Invariant tests: match_results identical with/without class; no class_id in core; fingerprint unchanged; run_history untouched
+- [x] Invariant tests: match_results identical with/without class; no class_id in core; fingerprint unchanged; run_history untouched
 
 ## Current state
-- Done: step 1 (tests/test_a14_tu_vung_cohort.py).
-- Tests to run: test_a14_*.py, test_so_nhap.py, test_ket_qua_khong_doi.py, test_ws_nhan.py, test_skill_tao_workspace.py
+- DONE (part A): base + CSV/So nhap import + So mau/export co_lop + APIs (list_students_admin, set_student_class,
+  list_classes, create_student_if_missing, submit_test_selection/submit_preferences class_id, get_student_entry_state,
+  get_match_results) + i18n errors + skill + docs/registry/CHANGELOG/TIEN_DO.
+- Coordinator contract: class_id is 3rd optional positional arg; must exist in list_classes else
+  `lop_khong_co_trong_danh_sach`, nothing written. api_bao_cao.py now owned by session B (do not edit).
+- Tests: tests/test_a14_*.py (51+2 cases) green; related (non-UI) run: 2022 pass, 8 old failures all fixed
+  (see CHANGELOG). soat-ma kiem_nhanh 7/7 PASS. UI/browser tests NOT run here (session B).
+- Open: static samples in mau_csv/ (SO_NHAP_CLB.xlsx etc.) were not regenerated with a Lop column.
 
 ## Decisions and gotchas
 - Wharton default is ON: allocation tests without determination points need a LOCAL `api` fixture calling tests/_wharton.py::tat_wharton (no autouse).
@@ -34,3 +40,4 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-02 | Sonnet | Step 1 base | |
+| 2026-11-02 | Sonnet | Step 2 import/API/docs, old-test fixes, soat-ma | final |
