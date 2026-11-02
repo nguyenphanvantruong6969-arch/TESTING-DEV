@@ -411,3 +411,22 @@ def test_kiosk_luu_xong_thi_o_lop_het_chua_luu_va_chon_lai_ve_nhu_cu_cung_het(mo
     page.select_option("#kioskLop", "10A1")                            # ...đổi lại đúng giá trị đã lưu
     assert page.locator("#kioskLopChuaLuu").is_hidden()
     assert not loi, loi
+
+
+@pytest.mark.parametrize("ngon", ["vi", "en"])
+def test_dong_nhac_chua_co_lop_goi_dung_ten_the_tren_thanh_ben(mo, ngon):
+    """B5: dòng nhắc ở thẻ 07 gọi đúng tên thẻ 04 như thanh bên (không viết cứng), theo nhãn workspace."""
+    page, api, loi = mo({}, chay=True)
+    if ngon == "en":
+        page.locator("#btnLangToggle").click()
+        page.wait_for_function("() => document.getElementById('btnLangToggle').textContent.trim() === 'VI'")
+    page.evaluate("() => I18N.applyLabels({slot: {vi: 'Dự án', en: 'Project'}})")
+    _mo_the(page, "theolop")
+    page.wait_for_function("() => !document.getElementById('theoLopEmpty').hidden")
+    ten_the = page.locator('.nav-item[data-tab="admin"] [data-i18n="nav_admin"]').inner_text().strip()
+    ten_muc = page.locator("#qlTabHs").inner_text().strip()
+    chu = page.locator("#theoLopEmpty").inner_text()
+    assert ten_the in chu and ten_muc in chu, (ten_the, ten_muc, chu)
+    assert ("Dự án" if ngon == "vi" else "Project").casefold() in ten_the.casefold()
+    assert "{" not in chu and "Quản lý." not in chu
+    assert not loi, loi

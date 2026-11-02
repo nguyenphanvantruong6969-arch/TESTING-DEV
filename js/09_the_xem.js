@@ -11,8 +11,8 @@ const THE_XEM_CHUA_CHON = "";          // ô chọn CLB: giá trị của dòng 
 const THE_XEM_LOP_CHUA_CHON = "__chua_chon__";   // ô chọn lớp ("" là lớp thật: Chưa có lớp)
 
 /* Nội dung rỗng + lý do: hiện dòng chữ, ẩn bảng. */
-function theXemBaoRong(oRong, oBang, khoaChu) {
-  oRong.textContent = t(khoaChu);
+function theXemBaoRong(oRong, oBang, khoaChu, thamSo) {
+  oRong.textContent = t(khoaChu, thamSo);
   oRong.hidden = false;
   oBang.hidden = true;
 }
@@ -100,7 +100,9 @@ function loadTheoLopTab() {
     sel.value = Array.from(sel.options).some((o) => o.value === giu) ? giu : THE_XEM_LOP_CHUA_CHON;
     sel.disabled = !coKq || !d.classes.length;
     if (!coKq) { theXemBaoRong(el("theoLopEmpty"), el("theoLopTable"), "the_xem_chua_co_ket_qua"); return; }
-    if (!d.classes.length) { theXemBaoRong(el("theoLopEmpty"), el("theoLopTable"), "theolop_khong_co_lop"); return; }
+    if (!d.classes.length) { theXemBaoRong(el("theoLopEmpty"), el("theoLopTable"), "theolop_khong_co_lop",
+      /* gọi đúng tên thẻ 04 và mục Học sinh như đang hiện ở thanh bên (theo nhãn workspace) */
+      { the: t("nav_admin"), muc: t("ql_tab_hs") }); return; }
     el("theoLopEmpty").hidden = true;
     veTheoLop();
   });
