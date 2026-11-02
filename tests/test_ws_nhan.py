@@ -77,6 +77,9 @@ MA_MOI_SAU_ANH_CHUP = {
     "http_bi_tu_choi", "http_khong_co_dich", "http_khong_co_ham", "http_than_qua_lon",
     # A13.12 (soát nhập 3.1): mã rỗng khi tạo học sinh.
     "student_id_required",
+    # A14: lớp của học sinh.
+    "error_reading_classes", "error_saving_student_class", "lop_khong_co_trong_danh_sach",
+    "so_nhap_canh_bao_thieu_lop",
 }
 
 

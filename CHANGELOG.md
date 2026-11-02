@@ -12,7 +12,7 @@ Mỗi học sinh có thể có "lớp" (vd 10H1A) CHỈ để hiển thị, sắ
 - **Nhập:** `import_preferences_csv`, `import_test_selection_csv` (dài: giá trị không trống đầu tiên); `so_nhap` đọc theo tên cột (Lớp, Mã lớp, Lop, Class, Class ID, class_id, nhãn `cohort`), `doc_so_nhap` → `class_id` (None = sổ không có cột; "" = ô trống), `ghi_so_nhap(co_lop=)`; `tao_so_nhap_mau` luôn có cột Lớp; `export_du_lieu_dau_vao` có cột Lớp khi có em có lớp (hai chỗ trong `api_xuat.py`). Cảnh báo `so_nhap_canh_bao_thieu_lop` {n} chỉ khi Sổ có cột mà n ô trống.
 - **API:** `list_students_admin(sort_by, class_id)`, `set_student_class`, `list_classes`, `create_student_if_missing(class_id)`, `submit_preferences(class_id)` (lớp phải nằm trong `list_classes`, sai → `lop_khong_co_trong_danh_sach`), `get_match_results(class_id, sort_by)`. Mã lỗi mới: `error_saving_student_class`, `error_reading_classes`, `lop_khong_co_trong_danh_sach`, `so_nhap_canh_bao_thieu_lop`.
 - **Test mới:** `tests/test_a14_lop_backend.py` (11), `tests/test_a14_lop_nhap.py` (18), `tests/test_a14_tu_vung_cohort.py` (22) — gồm các bất biến: `match_results` giống hệt khi có / không lớp; `class_id` không có trong lõi phân bổ; đổi lớp không làm `ket_qua_cu`; `run_history` không đụng.
-- **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` và `tests/test_wharton_ma_loi.py` (danh sách danh từ thành sáu).
+- **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` và `tests/test_wharton_ma_loi.py` (danh sách danh từ thành sáu); `tests/test_ws_nhan.py` thêm đúng 4 mã lỗi mới vào `MA_MOI_SAU_ANH_CHUP` (theo tiền lệ A13).
 
 ## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
 
