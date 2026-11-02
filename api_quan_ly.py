@@ -19,6 +19,7 @@ from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    LOP_TOI_DA,
     chuan_hoa_lop,
     BUOI_MAC_DINH,
     WHARTON_NGAN_SACH,
@@ -321,8 +322,9 @@ class QuanLyMixin:
         """Khoá sắp tự nhiên của tên lớp: 10H2A trước 10H10A; lớp trống (None/"") ở CUỐI."""
         if not lop:
             return (1, ())
-        return (0, tuple((0, int(p), "") if p.isdigit() else (1, 0, p)
-                         for p in re.findall(r"\d+|\D+", lop)))
+        # Chỉ chữ số ASCII 0-9 mới là số: "²" hay "①" qua isdigit() vẫn True nhưng int() ném lỗi.
+        return (0, tuple((0, int(p), "") if p[0] in "0123456789" else (1, 0, p)
+                         for p in re.findall(r"[0-9]+|[^0-9]+", lop)))
 
     def list_students_admin(self, search: str = "", page: int = 1, page_size: int = 100,
                             sort_by: str = "student_id", class_id=None):
@@ -1402,13 +1404,28 @@ class QuanLyMixin:
             return _fail(err("error_saving_preferences", detail=str(e)))
 
     @staticmethod
+    def _lop_hop_le(class_id):
+        """A14 — (lop, loi): kiểu phải là str / int / float (bool, list, dict… bị từ chối), rồi
+        chuẩn hoá và đo độ dài SAU chuẩn hoá (> LOP_TOI_DA -> `lop_qua_dai`). None = không có lớp."""
+        if class_id is None:
+            return None, None
+        if isinstance(class_id, bool) or not isinstance(class_id, (str, int, float)):
+            return None, err("lop_sai_kieu")
+        lop = chuan_hoa_lop(class_id)
+        if lop is not None and len(lop) > LOP_TOI_DA:
+            return None, err("lop_qua_dai", toi_da=LOP_TOI_DA)
+        return lop, None
+
+    @staticmethod
     def _kiem_lop(cur, class_id):
         """A14 — (doi_lop, lop, loi): `class_id` None = không đụng lớp; có giá trị thì chuẩn hoá
         và phải nằm trong các lớp đang có (`list_classes`); "" = xoá lớp. `loi` khác None thì
         bên gọi trả lỗi và KHÔNG ghi gì."""
         if class_id is None:
             return False, None, None
-        lop = chuan_hoa_lop(class_id)
+        lop, loi = QuanLyMixin._lop_hop_le(class_id)
+        if loi:
+            return True, None, loi
         if lop is not None and not cur.execute(
                 "SELECT 1 FROM students WHERE class_id = ? LIMIT 1", (lop,)).fetchone():
             return True, lop, err("lop_khong_co_trong_danh_sach", class_id=lop)
@@ -1420,7 +1437,9 @@ class QuanLyMixin:
         Lớp CHỈ để hiển thị / sắp / lọc / xuất; đổi lớp không làm kết quả đã chạy thành cũ."""
         try:
             student_id = (student_id or "").strip()
-            lop = chuan_hoa_lop(class_id)
+            lop, loi = self._lop_hop_le(class_id)
+            if loi:
+                return _fail(loi)
             with self._ket_noi_ghi() as cur:
                 if not cur.execute("SELECT 1 FROM students WHERE student_id = ?",
                                    (student_id,)).fetchone():

@@ -80,6 +80,10 @@ MA_MOI_SAU_ANH_CHUP = {
     # A14: lớp của học sinh.
     "error_reading_classes", "error_saving_student_class", "lop_khong_co_trong_danh_sach",
     "so_nhap_canh_bao_thieu_lop",
+    # A14 sửa A1: hai danh từ cùng nhãn.
+    "nhan_trung_danh_tu", "so_nhap_canh_bao_nhan_trung",
+    # A14 sửa A4: giới hạn đầu vào lớp.
+    "lop_sai_kieu", "lop_qua_dai", "canh_bao_lop_bi_cat",
 }
 
 

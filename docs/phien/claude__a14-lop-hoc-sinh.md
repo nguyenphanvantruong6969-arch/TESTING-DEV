@@ -24,6 +24,7 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
   `lop_khong_co_trong_danh_sach`, nothing written. api_bao_cao.py now owned by session B (do not edit).
 - Tests: tests/test_a14_*.py (51+2 cases) green; related (non-UI) run: 2022 pass, 8 old failures all fixed
   (see CHANGELOG). soat-ma kiem_nhanh 7/7 PASS. UI/browser tests NOT run here (session B).
+- Post-review fixes A1-A6 done (tests/test_a14_sua_sau_soat.py, 26 cases); see CHANGELOG.
 - Open: static samples in mau_csv/ (SO_NHAP_CLB.xlsx etc.) were not regenerated with a Lop column.
 
 ## Decisions and gotchas
@@ -41,3 +42,4 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 |---|---|---|---|
 | 2026-11-02 | Sonnet | Step 1 base | |
 | 2026-11-02 | Sonnet | Step 2 import/API/docs, old-test fixes, soat-ma | final |
+| 2026-11-02 | Sonnet | Cross-review fixes A1-A6 | one commit per item (A2-A4 together) |

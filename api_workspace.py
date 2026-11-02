@@ -81,6 +81,8 @@ def _ws_phuong_thuc(ham):
             return _fail(err(e.code, **e.params))
         except LoiDuongXuat as e:
             return _fail(e.loi)
+        except cau_hinh_ws.NhanTrung as e:
+            return _fail(err("nhan_trung_danh_tu", a=e.a, b=e.b, nhan=e.nhan))
         except ValueError as e:
             # workspace.py / cau_hinh_ws.py nêu lý do bằng tiếng Việt: để ở
             # "chi tiết kỹ thuật" (giao diện gấp sẵn), câu chính thì song ngữ.

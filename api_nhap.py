@@ -8,12 +8,14 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 import csv
 import io
 import re
+import cau_hinh_ws
 import so_nhap
 from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    LOP_TOI_DA,
     chuan_hoa_lop,
     khoa_sap_buoi,
     sap_buoi,
@@ -352,6 +354,11 @@ class NhapDuLieuMixin:
             canh_bao.append(err("so_nhap_canh_bao_xoa_diem", n=n_xoa))
         if n_bo:
             canh_bao.append(err("so_nhap_canh_bao_bo_nhom", n=n_bo))
+        # Cấu hình ĐÃ LƯU từ trước mà hai danh từ trùng nhãn (A14): cột đọc theo thứ tự trong Sổ.
+        trung = cau_hinh_ws.cac_cap_nhan_trung(self._cfg_ws()["labels"])
+        if trung:
+            canh_bao.append(err("so_nhap_canh_bao_nhan_trung", a=trung[0][0], b=trung[0][1],
+                                nhan=trung[0][2]))
         # A14: Sổ CÓ cột lớp (class_id không phải None) mà n em để trống ô -> báo; lớp cũ được giữ.
         n_thieu_lop = sum(1 for x in du_lieu["students"] if x.get("class_id") == "")
         if n_thieu_lop:
@@ -939,11 +946,15 @@ class NhapDuLieuMixin:
             lop_tho[sid] = lop
 
     @staticmethod
-    def _ghi_lop(cur, student_id: str, lop) -> None:
-        """A14: có lớp thì GHI ĐÈ (lần ghi sau cùng thắng); không có thì giữ lớp cũ."""
-        if lop:
-            cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
-                        (lop, student_id))
+    def _ghi_lop(cur, student_id: str, lop) -> int:
+        """A14: có lớp thì GHI ĐÈ (lần ghi sau cùng thắng); không có thì giữ lớp cũ. Dài quá
+        LOP_TOI_DA thì CẮT (không chặn cả lần nhập); trả 1 nếu đã cắt, 0 nếu không."""
+        if not lop:
+            return 0
+        cat = len(lop) > LOP_TOI_DA
+        cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?",
+                    (lop[:LOP_TOI_DA].rstrip(), student_id))
+        return int(cat)
 
     @staticmethod
     def _ghi_nhom_du_tru(cur, student_id: str, reserve_group: str) -> str:
@@ -1276,6 +1287,7 @@ class NhapDuLieuMixin:
                 khoa_nv = bat_wharton and self._wharton_dang_khoa(cur)
 
                 n_created, n_updated, n_skipped = 0, 0, 0
+                n_lop_cat = 0
                 sids_da_ghi: list = []
                 n_w_doi = 0
                 # Dem RIENG voi n_skipped. "Bo mot buoi cua mot em" va "bo
@@ -1351,7 +1363,7 @@ class NhapDuLieuMixin:
                         continue
                     n_created += ket == "tao_moi"
 
-                    self._ghi_lop(cur, sid, lop_tho.get(sid))
+                    n_lop_cat += self._ghi_lop(cur, sid, lop_tho.get(sid))
                     nhan = self._ghi_nhom_du_tru(cur, sid, nhom_du_tru)
                     if nhan:
                         nhom_da_ghi[nhan] = nhom_da_ghi.get(nhan, 0) + 1
@@ -1407,6 +1419,8 @@ class NhapDuLieuMixin:
                         {"so_em_doi": n_w_doi, "so_dong_nap": n_updated})
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
+                if n_lop_cat:
+                    row_errors.append(err("canh_bao_lop_bi_cat", n=n_lop_cat, toi_da_cat=LOP_TOI_DA))
                 if khoa_w and any(wp_tho.values()):
                     row_errors.append(err("wharton_da_khoa"))
                 if bat_wharton:
@@ -1525,6 +1539,7 @@ class NhapDuLieuMixin:
                 existing_students = {r[0] for r in cur.execute("SELECT student_id FROM students")}
 
                 n_created, n_updated, n_skipped, n_diem = 0, 0, 0, 0
+                n_lop_cat = 0
                 n_diem_xoa = 0
                 n_buoi_bo_qua = 0
                 buoi_cua_clb = self._buoi_cua_clb(cur)
@@ -1580,7 +1595,7 @@ class NhapDuLieuMixin:
                         continue
                     n_created += ket == "tao_moi"
 
-                    self._ghi_lop(cur, sid, lop_tho.get(sid))
+                    n_lop_cat += self._ghi_lop(cur, sid, lop_tho.get(sid))
                     nhan = self._ghi_nhom_du_tru(cur, sid, nhom_du_tru)
                     if nhan:
                         nhom_da_ghi[nhan] = nhom_da_ghi.get(nhan, 0) + 1
@@ -1646,6 +1661,8 @@ class NhapDuLieuMixin:
                                               student_id=sid, n=n_xoa))
 
                 row_errors.extend(self._soat_nhom_du_tru_la(cur, nhom_da_ghi, nhom_cung))
+                if n_lop_cat:
+                    row_errors.append(err("canh_bao_lop_bi_cat", n=n_lop_cat, toi_da_cat=LOP_TOI_DA))
                 if n_diem_bo_che_do:
                     row_errors.append(err("csv_score_ignored_mode", n=n_diem_bo_che_do))
 

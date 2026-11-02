@@ -102,6 +102,36 @@ def _nhan_thieu_en_lay_vi(goc: dict, da_tron: dict) -> None:
             da_tron["labels"][dt]["en"] = da_tron["labels"][dt]["vi"]
 
 
+class NhanTrung(ValueError):
+    """Hai danh từ có CÙNG nhãn (sau strip + casefold, riêng vi và riêng en).
+
+    Cột của Sổ nhập đọc theo TÊN: hai danh từ trùng nhãn thì hai cột trùng tên và sổ bị đọc
+    nhầm (vd nhóm ưu tiên đặt tên "Lớp" cạnh cột Lớp). Mang `a`, `b` (khoá danh từ) và `nhan`."""
+
+    def __init__(self, a, b, nhan):
+        super().__init__("Hai danh từ %s và %s đang cùng nhãn %r; mỗi danh từ cần một nhãn riêng."
+                         % (a, b, nhan))
+        self.a, self.b, self.nhan = a, b, nhan
+
+
+def cac_cap_nhan_trung(labels: dict) -> list:
+    """[(a, b, nhãn)] — mọi cặp danh từ cùng nhãn trong `labels` (đã chuẩn hoá), theo thứ tự
+    DANH_TU; vi và en xét riêng. Cùng một cặp chỉ nêu một lần."""
+    ra, da_co = [], set()
+    for ngon in ("vi", "en"):
+        thay: dict = {}
+        for dt in DANH_TU:
+            nhan = str((labels.get(dt) or {}).get(ngon) or "").strip()
+            khoa = nhan.casefold()
+            if not khoa:
+                continue
+            if khoa in thay and (thay[khoa], dt) not in da_co:
+                da_co.add((thay[khoa], dt))
+                ra.append((thay[khoa], dt, nhan))
+            thay.setdefault(khoa, dt)
+    return ra
+
+
 def _la_so_nguyen(v) -> bool:
     # bool là lớp con của int: True không được lọt qua như "1".
     return isinstance(v, int) and not isinstance(v, bool)
@@ -113,7 +143,7 @@ def _ghi_ro_wharton(cfg) -> bool:
         and "wharton" in cfg["rules"]
 
 
-def _chuan_hoa(cfg) -> dict:
+def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
     """Trộn `cfg` lên mặc định, kiểm, và trả bản ĐẦY ĐỦ đã chuẩn hoá.
 
     Ném ValueError với câu nói rõ trường nào sai. Không sửa `cfg` của người gọi.
@@ -163,6 +193,12 @@ def _chuan_hoa(cfg) -> dict:
                 raise ValueError("labels.%s.%s không được bắt đầu bằng '%s' "
                                  "(Excel sẽ hiểu là công thức)." % (dt, ngon, chu[0]))
         kq["labels"][dt] = {"vi": vi, "en": en or vi}
+    # Hai danh từ cùng nhãn làm Sổ nhập đọc nhầm cột (A14). Chỉ chặn khi GHI / kiểm cấu hình mới;
+    # cấu hình ĐÃ LƯU từ trước mà trùng vẫn đọc được (`doc_cau_hinh` truyền kiem_trung=False).
+    if kiem_trung:
+        trung = cac_cap_nhan_trung(kq["labels"])
+        if trung:
+            raise NhanTrung(*trung[0])
 
     # --- luật ---
     luat = kq["rules"]
@@ -280,7 +316,7 @@ def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
             conn.close()
         if not dong or dong[0] is None:
             return mac_dinh
-        return _chuan_hoa(json.loads(dong[0]))
+        return _chuan_hoa(json.loads(dong[0]), kiem_trung=False)
     except (sqlite3.Error, ValueError):
         # json.JSONDecodeError là con của ValueError, nên một câu bắt đủ cả
         # JSON hỏng lẫn giá trị sai.
