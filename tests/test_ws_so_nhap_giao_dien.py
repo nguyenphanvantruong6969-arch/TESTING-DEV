@@ -71,7 +71,7 @@ def test_tai_so_mau_cua_workspace_cong_ty(mo_trang):
     wb = _tai_mau(page, xuat)
     assert wb.sheetnames == ["1. Dự án", "2. Nhân viên", "Hướng dẫn"]
     tieu_de = [c.value for c in wb["2. Nhân viên"][1]]
-    assert tieu_de[:3] == ["Mã HS", "Họ tên", "Cấp bậc"]
+    assert tieu_de[:4] == ["Mã HS", "Họ tên", "Lớp", "Cấp bậc"]      # A14: sổ mẫu luôn có cột Lớp (đã duyệt)
     assert sum(1 for t in tieu_de if str(t).startswith("Nguyện vọng")) == 3     # max_choices
     assert wb["1. Dự án"]["A2"].value == "Dự án A"
     assert not loi, loi

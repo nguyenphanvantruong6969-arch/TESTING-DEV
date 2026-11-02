@@ -43,7 +43,7 @@ Phần B của mục A14 "Lớp của học sinh" (phần A: cột `students.cla
   - **B6** `tests/_trinh_duyet.py` tìm Chromium ở `chromium-N/chrome-linux64/chrome` và tệp `chromium` chạy được (trước chỉ `chrome-linux/chrome`, nên test giao diện bị bỏ qua im lặng khi thiếu `RBDA_TEST_CHROMIUM`); hành vi không đổi khi đã đặt biến. Test mới `tests/test_trinh_duyet_tim.py` (7 ca).
   - **B7** Tài liệu: mục này, `js/_danh_sach.txt` thêm `09_the_xem`, bản ghi bàn giao.
 - **Test mới (số ca thật):** `tests/test_a14_lop_xuat.py` (23 ca), `tests/test_a14_the_xem.py` (8 ca, backend + thứ tự tệp JS), `tests/test_giao_dien_a14_lop.py` (24 ca, Chromium), `tests/test_trinh_duyet_tim.py` (7 ca).
-- **Test cũ sửa có chủ đích (trang mới luôn có):** `tests/test_so_excel_de_dung.py` (`CAC_TRANG`), `tests/test_ws_nhan.py` (3 ca danh sách tên trang).
+- **Test cũ sửa có chủ đích (trang mới luôn có):** `tests/test_so_excel_de_dung.py` (`CAC_TRANG`), `tests/test_ws_nhan.py` (3 ca danh sách tên trang), `tests/test_ws_so_nhap_giao_dien.py` (tiêu đề Sổ mẫu có cột Lớp sau Họ tên; thay đổi đã duyệt của phần A, test trình duyệt nên A chưa chạy).
 
 ## 2026-11-01 — A13.13 (phần tiếp theo) CSDL demo thể hiện điểm quyết tâm + vá đường dẫn cứng
 
