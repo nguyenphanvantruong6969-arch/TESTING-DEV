@@ -128,7 +128,7 @@ function veTheoLop() {
       const o = (dsBuoi.length ? dsBuoi : []).map((b) => {
         const x = e.theo_buoi[b];
         const ten = x && x.club_id ? (x.club_name || x.club_id) : "";
-        return ten ? `<td>${esc(ten)}</td>` : `<td class="o-trong">${esc(t("theolop_o_trong"))}</td>`;
+        return ten ? `<td>${esc(ten)}</td>` : `<td class="o-trong">—</td>`;
       });
       tr.innerHTML = `<td class="num">${i + 1}</td><td>${esc(e.student_id)}</td><td>${esc(e.name || "")}</td>` +
         o.join("");

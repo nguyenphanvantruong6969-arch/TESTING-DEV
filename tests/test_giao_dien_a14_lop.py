@@ -219,15 +219,15 @@ TU_ANH_CAM = re.compile(r"\b(class|filter|export|sort|save|student|club|choose|a
 
 
 def test_chu_moi_vi_sach_tieng_anh_va_en_khong_dung_you():
-    """Đọc thẳng i18n.js: 36 khoá mới (cả hai thẻ xem) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
+    """Đọc thẳng i18n.js: 35 khoá mới (cả hai thẻ xem) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
     with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
         nguon = f.read()
     mach = re.compile(r'^\s{6}((?:lop_|kiosk_lop|th_cohort|btn_xuat_theo_lop|xuat_theo_lop|'
                       r'xuat_kq_theo_lop|xuat_muc_theo_lop|aria_loc_lop|aria_sap_xep|toast_lop|'
                       r'ws_dt_cohort|nav_members|nav_theo_lop|th_stt|members_|theolop_|the_xem_)\w*): "(.*)",$', re.M)
     cap = mach.findall(nguon)
-    assert len(cap) == 72, len(cap)                  # 36 khoá × 2 ngôn ngữ
-    vi, en = cap[:36], cap[36:]
+    assert len(cap) == 70, len(cap)                  # 35 khoá × 2 ngôn ngữ
+    vi, en = cap[:35], cap[35:]
     assert [k for k, _ in vi] == [k for k, _ in en]
     for k, v in vi:
         assert not TU_ANH_CAM.search(re.sub(r"\{\w+\}", "", v)), (k, v)
@@ -279,7 +279,7 @@ def test_the_thanh_vien_clb_chon_clb_ra_bang_khong_diem(mo):
     page.wait_for_function("() => !document.getElementById('membersTable').hidden")
     assert page.locator("#membersDem").inner_text() == "Đã xếp 3/5 chỗ"
     assert [x.casefold() for x in page.locator("#membersTable thead th").all_inner_texts()] == [
-        "stt", "mã học sinh", "họ tên", "lớp"]            # CSS viết hoa tiêu đề cột
+        "thứ tự", "mã học sinh", "họ tên", "lớp"]            # CSS viết hoa tiêu đề cột
     hang = page.locator("#membersTableBody tr").all_inner_texts()
     assert len(hang) == 3 and hang[0].split("\t")[:2] == ["1", "HS1"]
     assert not loi, loi
@@ -303,7 +303,7 @@ def test_the_theo_lop_mot_buoi_mot_cot_va_dong_do(mo):
     page.select_option("#theoLopChon", "10A1")
     page.wait_for_function("() => !document.getElementById('theoLopTable').hidden")
     assert [x.casefold() for x in page.locator("#theoLopHead th").all_inner_texts()] == [
-        "stt", "mã học sinh", "họ tên", "câu lạc bộ"]
+        "thứ tự", "mã học sinh", "họ tên", "câu lạc bộ"]
     assert page.locator("#theoLopBody tr").count() == 2
     assert page.locator("#theoLopDem").inner_text() == "2 học sinh · 0 chưa có chỗ"
     page.select_option("#theoLopChon", "")                       # Chưa có lớp
@@ -318,7 +318,7 @@ def test_the_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do(mo):
     page.select_option("#theoLopChon", "10A1")
     page.wait_for_function("() => !document.getElementById('theoLopTable').hidden")
     assert [x.casefold() for x in page.locator("#theoLopHead th").all_inner_texts()] == [
-        "stt", "mã học sinh", "họ tên", "2", "3", "10"]            # theo thứ tự, không theo vần
+        "thứ tự", "mã học sinh", "họ tên", "2", "3", "10"]            # theo thứ tự, không theo vần
     tong = page.locator("#theoLopBody tr").all_inner_texts()
     assert len(tong) == 3 and any("—" in r for r in tong)          # ô trống ghi —
     do = page.locator("#theoLopBody tr.dong-do").count()
@@ -338,10 +338,10 @@ def test_the_theo_lop_chua_co_lop_nao_hien_dong_nhac(mo):
 def test_doi_ngon_ngu_ve_lai_chu_o_tha_xuong_lop_o_kiosk(mo):
     page, api, loi = mo({"HS1": "10A1"})
     _chon_hs(page, "HS2")
-    assert page.locator("#kioskLop option").first.inner_text() == "— Chọn lớp —"
+    assert page.locator("#kioskLop option").first.inner_text() == "Chọn lớp…"
     page.locator("#btnLangToggle").click()
     page.wait_for_function("() => document.querySelector('#kioskLop option').textContent.includes('Choose')")
-    assert page.locator("#kioskLop option").first.inner_text() == "— Choose class —"
+    assert page.locator("#kioskLop option").first.inner_text() == "Choose class…"
     assert not loi, loi
 
 
