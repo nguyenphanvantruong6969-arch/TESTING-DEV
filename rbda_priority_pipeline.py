@@ -1833,7 +1833,8 @@ CREATE TABLE IF NOT EXISTS students (
     name TEXT,
     stb_number INTEGER,
     reserve_group TEXT,         -- vd: 'khoi10', 'chinh_sach', hoặc NULL
-    diem_ca_nhan REAL           -- điểm của cả NGƯỜI (workspace score_scope = per_person); NULL = chưa có
+    diem_ca_nhan REAL,          -- điểm của cả NGƯỜI (workspace score_scope = per_person); NULL = chưa có
+    class_id TEXT               -- lớp (A14): CHỈ để hiển thị / sắp / lọc / xuất; thuật toán KHÔNG đọc; NULL = chưa có
 );
 """ + "".join(
     "\nCREATE TABLE IF NOT EXISTS %s (%s);\n" % (ten, than)
@@ -2175,6 +2176,18 @@ def _dung_lai_bang_co_rang_buoc(db_path: str) -> bool:
         conn.close()
 
 
+def chuan_hoa_lop(raw) -> str | None:
+    """Chuẩn hoá tên lớp (A14): cắt hai đầu, gộp khoảng trắng liên tiếp thành MỘT, IN HOA.
+
+    Rỗng / chỉ khoảng trắng / None -> None (chưa có lớp). Không ép mẫu ("10H1A" hay
+    "Ca sáng" đều được). Dùng chung cho API, nhập CSV, Sổ nhập và xuất.
+    """
+    if raw is None:
+        return None
+    chu = " ".join(str(raw).split()).upper()
+    return chu or None
+
+
 def _co_cot(cur, bang: str, cot: str) -> bool:
     """Bảng `bang` đã có cột `cot` chưa? Dùng để di trú idempotent."""
     return any(r[1] == cot for r in cur.execute("PRAGMA table_info(%s)" % bang))
@@ -2220,6 +2233,21 @@ def di_tru_schema(db_path: str) -> list[str]:
         if "students" in co_bang and not _co_cot(cur, "students", "diem_ca_nhan"):
             cur.execute("ALTER TABLE students ADD COLUMN diem_ca_nhan REAL")
             da_lam.append("students.diem_ca_nhan")
+
+        # 7. `students.class_id` (A14) — lớp của học sinh, CHỈ để hiển thị / sắp / lọc / xuất.
+        #    NULL với mọi dòng cũ. Có dữ liệu thì sao lưu trước (cùng cách đặt tên `.bak-`).
+        if "students" in co_bang and not _co_cot(cur, "students", "class_id"):
+            if cur.execute("SELECT 1 FROM students LIMIT 1").fetchone():
+                import datetime
+                import sqlite3
+                ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                dich = sqlite3.connect("%s.bak-%s" % (db_path, ts))
+                try:
+                    conn.backup(dich)
+                finally:
+                    dich.close()
+            cur.execute("ALTER TABLE students ADD COLUMN class_id TEXT")
+            da_lam.append("students.class_id")
 
         for bang in ("run_meta", "run_history"):
             if bang not in co_bang:

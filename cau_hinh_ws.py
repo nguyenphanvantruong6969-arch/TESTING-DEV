@@ -1,7 +1,7 @@
 """
 cau_hinh_ws.py
 ==============
-Cấu hình của một không gian làm việc (workspace): TỪ VỰNG (5 danh từ, mỗi
+Cấu hình của một không gian làm việc (workspace): TỪ VỰNG (6 danh từ, mỗi
 danh từ có nhãn vi/en) và LUẬT XẾP. Lưu TRONG app.db của chính workspace đó,
 bảng `workspace_settings(key, value)`, một hàng khoá 'config' chứa JSON.
 
@@ -37,7 +37,7 @@ KHOA_CAU_HINH = "config"
 # nên CSDL đang bị tiến trình khác giữ thì báo "đang bận" sau vài giây chứ không đứng hình.
 CHO_KHOA_DOC_CAU_HINH_MS = 2500
 
-# Năm danh từ (DANH_TU, nguồn duy nhất ở nhan_ws.py): mọi nhãn hiển thị đều đi qua
+# Sáu danh từ (DANH_TU, nguồn duy nhất ở nhan_ws.py): mọi nhãn hiển thị đều đi qua
 # chúng, nên tập này là cố định — gõ sai tên danh từ phải báo lỗi chứ không được
 # lặng lẽ thành một nhãn mồ côi.
 
