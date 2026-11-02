@@ -242,6 +242,14 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không lưu được nguyện vọng. Hãy thử lại.",
     "en": "Couldn't save the preferences. Try again."
   },
+  "nhan_trung_danh_tu": {
+    "vi": "Hai mục trong bước Từ vựng đang cùng tên \"{nhan}\". Hãy đặt tên khác nhau cho từng mục, nếu không Sổ nhập sẽ đọc nhầm cột.",
+    "en": "Two items in the vocabulary step have the same name \"{nhan}\". Give each item its own name, otherwise the entry workbook would read the wrong column."
+  },
+  "so_nhap_canh_bao_nhan_trung": {
+    "vi": "Cấu hình đang lưu có hai mục cùng tên \"{nhan}\" ({a} và {b}). Phần mềm đọc cột theo thứ tự trong Sổ; nên đặt lại để hai mục có tên khác nhau.",
+    "en": "The saved settings give two items the same name \"{nhan}\" ({a} and {b}). Columns are read in workbook order; rename them so the two items differ."
+  },
   "error_saving_student_class": {
     "vi": "Không lưu được {cohort_l} của {person_l}. Hãy thử lại.",
     "en": "Couldn't save the {cohort_l} of the {person_l}. Try again."

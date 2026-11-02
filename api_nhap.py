@@ -8,6 +8,7 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 import csv
 import io
 import re
+import cau_hinh_ws
 import so_nhap
 from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
@@ -352,6 +353,11 @@ class NhapDuLieuMixin:
             canh_bao.append(err("so_nhap_canh_bao_xoa_diem", n=n_xoa))
         if n_bo:
             canh_bao.append(err("so_nhap_canh_bao_bo_nhom", n=n_bo))
+        # Cấu hình ĐÃ LƯU từ trước mà hai danh từ trùng nhãn (A14): cột đọc theo thứ tự trong Sổ.
+        trung = cau_hinh_ws.cac_cap_nhan_trung(self._cfg_ws()["labels"])
+        if trung:
+            canh_bao.append(err("so_nhap_canh_bao_nhan_trung", a=trung[0][0], b=trung[0][1],
+                                nhan=trung[0][2]))
         # A14: Sổ CÓ cột lớp (class_id không phải None) mà n em để trống ô -> báo; lớp cũ được giữ.
         n_thieu_lop = sum(1 for x in du_lieu["students"] if x.get("class_id") == "")
         if n_thieu_lop:

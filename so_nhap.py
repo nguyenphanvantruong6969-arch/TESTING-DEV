@@ -372,9 +372,23 @@ def la_so_nhap(ten_cac_sheet, cfg=None) -> bool:
 def _khop_cot(tieu_de, bang_ten):
     """{khoá: chỉ số cột} theo bảng tên. Cột đầu khớp được giữ."""
     vi_tri = {}
+    # Cột lớp và cột nhóm ưu tiên có thể TRÙNG tên (cấu hình cũ đặt hai nhãn giống nhau). Khi đó
+    # gán theo thứ tự cột mà `ghi_so_nhap` ghi (Lớp trước Nhóm); chỉ MỘT cột trùng tên thì là
+    # Nhóm — như trước khi có cột Lớp.
+    mo_ho = [i for i, t in enumerate(tieu_de)
+             if {"class_id", "reserve_group"} <= {k for k, ten in bang_ten.items()
+                                                  if bo_dau(t) in ten}]
+    ep = {}
+    if len(mo_ho) >= 2:
+        ep[mo_ho[0]] = "class_id"
+        ep.update({i: "reserve_group" for i in mo_ho[1:]})
+    else:
+        ep.update({i: "reserve_group" for i in mo_ho})
     for i, t in enumerate(tieu_de):
         b = bo_dau(t)
         for khoa, cac_ten in bang_ten.items():
+            if i in ep and khoa != ep[i]:
+                continue
             if b in cac_ten and khoa not in vi_tri:
                 vi_tri[khoa] = i
                 break
