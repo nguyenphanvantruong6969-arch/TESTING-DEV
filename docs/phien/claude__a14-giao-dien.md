@@ -20,9 +20,9 @@ Algorithm, match_results, run_history untouched.
 - [x] ruff, soat-ma (kiem_nhanh 7/7), CHANGELOG "A14 — phần B", TIEN_DO, HUONG_DAN_SU_DUNG, push (no PR)
 
 ## Current state (overwrite each handoff)
-- Done: export + UI + docs; merged A; 22 new tests green; 283 related old tests green; kiem_nhanh 7/7.
-- Open: tests/test_ws_nhan.py::test_moi_ma_loi_mac_dinh_giong_het_anh_chup is red because A's 4 new error codes are missing from MA_MOI_SAU_ANH_CHUP (A's gap, reported to coordinator; B did not edit).
-- soat-ma notes (report only): language switch does not re-render the class dropdown texts until the next load; export_theo_lop leaves a partial folder if a mid-way write fails.
+- Done: export + UI + docs; merged A (latest); two read-only view tabs 06 (club members) and 07 (by class) in js/09_the_xem.js; language switch re-renders class dropdowns; export_theo_lop removes the half-made folder on failure.
+- Tests: new 14 + 7 + 17 green; 435 related old+new green (incl. test_ws_nhan after A added its 4 codes); kiem_nhanh 7/7.
+- Open: nothing known. Screenshots of both tabs are in the session scratchpad (not committed).
 
 ## Decisions and gotchas (keep short)
 - Name clash: api_xuat._khoa_lop_xuat (was _khoa_lop_tu_nhien, shadowed A's method on PipelineAPI).
@@ -31,7 +31,7 @@ Algorithm, match_results, run_history untouched.
 - tkb_xlsx (Excel only) carries the Lớp column; du["tkb"] (CSV) unchanged.
 
 ## Next steps (ordered)
-1. After A fixes MA_MOI_SAU_ANH_CHUP, merge again and rerun test_ws_nhan.py.
+1. Wait for coordinator review; merge A again only if A pushes more.
 
 ## Files touched
 - api_xuat.py, index.html, i18n.js, js/02,03,04,05,075, tests/test_a14_lop_xuat.py, tests/test_giao_dien_a14_lop.py, tests/test_so_excel_de_dung.py + test_ws_nhan.py (sheet list)
@@ -41,3 +41,4 @@ Algorithm, match_results, run_history untouched.
 |---|---|---|---|
 | 2026-11-02 | Sonnet | export + UI + tests written | waiting on A's APIs |
 | 2026-11-02 | Sonnet | merged A, fixed name clash + filter bug, soat-ma | final report sent |
+| 2026-11-02 | Sonnet | tabs 06/07, lang re-render, export cleanup, tests, soat-ma | final report sent |
