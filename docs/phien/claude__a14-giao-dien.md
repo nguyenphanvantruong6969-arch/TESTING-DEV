@@ -34,7 +34,12 @@ Algorithm, match_results, run_history untouched.
 1. Wait for coordinator review; merge A again only if A pushes more.
 
 ## Files touched
-- api_xuat.py, index.html, i18n.js, js/02,03,04,05,075, tests/test_a14_lop_xuat.py, tests/test_giao_dien_a14_lop.py, tests/test_so_excel_de_dung.py + test_ws_nhan.py (sheet list)
+- api_xuat.py: Theo lớp sheet, export_theo_lop (ket_qua_cu, dọn thư mục dở, cắt tên tệp), cột Lớp
+- api_bao_cao.py: get_thoi_khoa_bieu(class_id), get_danh_sach_clb.class_id
+- index.html, style.css, i18n.js: UI lớp, thẻ 06/07, chữ vi+en
+- js/01_khung.js (TAB_LOADERS), js/02_van_hanh.js, js/03_ket_qua.js, js/04_nhap_tai_cho.js (kiosk lớp, chưa lưu), js/05_quan_ly.js, js/07_ngon_ngu.js, js/075_workspace.js, js/08_khoi_dong.js, js/09_the_xem.js (mới), js/_danh_sach.txt
+- tests/_trinh_duyet.py (+ test_trinh_duyet_tim.py), test_a14_lop_xuat.py, test_a14_the_xem.py, test_giao_dien_a14_lop.py; test_so_excel_de_dung.py, test_ws_nhan.py (kỳ vọng trang Theo lớp)
+- CHANGELOG.md, docs/ke_hoach/SO_DANG_KY_33_MUC.md, TIEN_DO.md, HUONG_DAN_SU_DUNG.md
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -42,3 +47,4 @@ Algorithm, match_results, run_history untouched.
 | 2026-11-02 | Sonnet | export + UI + tests written | waiting on A's APIs |
 | 2026-11-02 | Sonnet | merged A, fixed name clash + filter bug, soat-ma | final report sent |
 | 2026-11-02 | Sonnet | tabs 06/07, lang re-render, export cleanup, tests, soat-ma | final report sent |
+| 2026-11-02 | Sonnet | cross-review fixes B1-B7 (A merged last) | see CHANGELOG |

@@ -471,6 +471,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
 - **Hiện trạng:** Học sinh chỉ có mã, tên, nhóm ưu tiên; không lọc / sắp / xuất được theo lớp.
 - **Thay đổi:** `students.class_id` TEXT (NULL = chưa có lớp); danh từ từ vựng thứ sáu `cohort` (Lớp / Class); `chuan_hoa_lop` (cắt, gộp khoảng trắng, IN HOA). Lớp CHỈ để hiển thị / sắp / lọc / xuất; thuật toán KHÔNG đọc, không vào `dau_van_tay_du_lieu`, không đụng `run_history`. Lần ghi sau cùng thắng; không cột hoặc ô trống giữ lớp cũ.
 - **NGOẠI LỆ BẤT BIẾN 7 (Truong duyệt 02/11/2026):** cột CSV TUỲ CHỌN `class_id` ngay sau `reserve_group` trong CSV nguyện vọng và CSV chọn thi; Sổ nhập có cột "Lớp" ngay sau "Họ tên" (Sổ mẫu luôn có). Không có cột thì mọi tệp giống từng byte như cũ.
+- **DUYỆT NGOẠI LỆ TRÙNG KHÍT TỆP XUẤT (Truong duyệt 02/11/2026, phần B):** trang "Theo lớp" và cột "Lớp" LUÔN có trong Sổ kết quả và CSV kết quả (tệp tổng, `_theo_club`) kể cả khi không em nào có lớp. Không đổi: `match_results`, CSV thời khoá biểu, CSV từng buổi, CSV số bốc thăm, tệp tổng hợp.
 - **Rủi ro:** Thấp. Cột mới mặc định NULL.
 - **Kiểm nhận:** `match_results` giống hệt khi gán lớp ngẫu nhiên; `class_id` không có trong lõi ngoài schema / di_tru_schema / chuan_hoa_lop; đổi lớp sau khi chạy vẫn `ket_qua_cu = False`; `run_history` không đổi. tests/test_a14_*.py.
 - **Phụ thuộc:** không

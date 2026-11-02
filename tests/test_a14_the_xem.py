@@ -76,3 +76,15 @@ def test_danh_sach_clb_co_class_id_moi_thanh_vien(api_tuan):
 def test_tkb_chua_chay_xep_khong_co_em(api):
     api.create_or_update_club("a", "CLB A", 1, 0, "")
     assert api.get_thoi_khoa_bieu()["data"]["hoc_sinh"] == []
+
+
+def test_danh_sach_tep_js_khop_thu_tu_trong_index_html():
+    """B7: js/_danh_sach.txt (tài liệu thứ tự nạp) phải khớp các thẻ <script src="js/..."> của index.html."""
+    import os
+    import re
+    goc = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(goc, "index.html"), encoding="utf-8") as f:
+        trong_html = re.findall(r'<script src="js/([^"]+)\.js"></script>', f.read())
+    with open(os.path.join(goc, "js", "_danh_sach.txt"), encoding="utf-8") as f:
+        trong_ds = [x.strip() for x in f.read().splitlines() if x.strip()]
+    assert trong_ds == trong_html
