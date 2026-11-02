@@ -18,6 +18,7 @@ from _wharton import dung_clb, dung_hs, tat_wharton  # noqa: E402
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 from _trinh_duyet import CHROMIUM  # noqa: E402
+from test_ws_giao_dien import mo_trang  # noqa: E402,F401
 
 
 @pytest.fixture
@@ -172,13 +173,13 @@ def test_ket_qua_nut_xuat_theo_lop_khoa_khi_chua_co_ket_qua(mo):
 def test_ket_qua_loc_va_xuat_theo_lop(mo, tmp_path):
     page, api, loi = mo({"HS1": "10A1", "HS2": "10A2"}, chay=True)
     page.locator('[data-tab="results"]').click()
-    page.wait_for_selector("#resultsTableBody tr")
+    page.wait_for_selector("#resultsTableBody tr", state="attached")
     assert page.locator("#btnXuatTheoLop").is_enabled()
     heads = page.locator("#view-results #dsXepPanel thead th").all_inner_texts()
     assert heads[heads.index("Họ tên") + 1] == "Lớp"
     page.select_option("#resultsLopLoc", "10A2")
     page.wait_for_function("() => document.querySelectorAll('#resultsTableBody tr').length === 1")
-    assert page.locator("#resultsTableBody tr").first.inner_text().count("HS2") == 1
+    assert page.locator("#resultsTableBody tr").first.locator("td").nth(1).inner_text() == "HS2"
     page.select_option("#resultsLopLoc", "__tat_ca__")
     page.locator("#btnXuatTheoLop").click()
     page.wait_for_function("() => document.getElementById('xuatFeedback').textContent.includes('3 tệp')")
@@ -189,8 +190,8 @@ def test_ket_qua_loc_va_xuat_theo_lop(mo, tmp_path):
 
 
 # ------------------------------------------------------------------ workspace và chữ
-def test_workspace_co_o_nhan_thu_sau_cohort(mo):
-    page, api, loi = mo()
+def test_workspace_co_o_nhan_thu_sau_cohort(mo_trang):
+    page, api, goc, loi = mo_trang()
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Công ty ABC")

@@ -58,7 +58,7 @@ function themOption(sel, value, text) {
 /* Ô LỌC: Tất cả / từng lớp / Chưa có lớp. Giữ giá trị đang chọn nếu lớp đó còn. */
 function napOLocLop(sel, d) {
   if (!sel) return;
-  const cu = sel.value || LOP_TAT_CA;
+  const cu = sel.options.length ? sel.value : LOP_TAT_CA;   // "" là lựa chọn thật (Chưa có lớp)
   clear(sel);
   themOption(sel, LOP_TAT_CA, t("lop_tat_ca"));
   d.classes.forEach((c) => themOption(sel, c.class_id, c.class_id + " (" + c.n + ")"));
@@ -68,7 +68,7 @@ function napOLocLop(sel, d) {
 
 /* Tham số `class_id` gửi lên: null = không lọc; "" = chưa có lớp; còn lại là tên lớp. */
 function lopLocThamSo(sel) {
-  return !sel || sel.value === LOP_TAT_CA ? null : sel.value;
+  return !sel || !sel.options.length || sel.value === LOP_TAT_CA ? null : sel.value;
 }
 
 /* Ô CHỌN ở kiosk: danh sách CỐ ĐỊNH từ list_classes (không gõ tự do). Không có lớp nào thì ẩn. */

@@ -333,7 +333,7 @@ class XuatKetQuaMixin:
     # quyết tâm, số bốc thăm hay diện trúng tuyển. Một khối mỗi lớp, em chưa có chỗ tô đỏ.
     # -----------------------------------------------------------------
     @staticmethod
-    def _khoa_lop_tu_nhien(lop: str):
+    def _khoa_lop_xuat(lop: str):
         """Khoá sắp tự nhiên: "10A2" đứng trước "10A10"."""
         return [(0, int(p), "") if p.isdigit() else (1, 0, p.casefold())
                 for p in re.split(r"(\d+)", lop or "") if p]
@@ -352,7 +352,7 @@ class XuatKetQuaMixin:
             o = [em["o"].get(b, "") for b in ds_buoi] if nhieu_buoi else [
                 next(iter(em["o"].values()), "")]
             theo_lop.setdefault(em["lop"], []).append([sid, em["ho_ten"]] + o)
-        thu_tu = sorted((k for k in theo_lop if k is not None), key=self._khoa_lop_tu_nhien)
+        thu_tu = sorted((k for k in theo_lop if k is not None), key=self._khoa_lop_xuat)
         nhom = [(k, theo_lop[k]) for k in thu_tu]
         if None in theo_lop:
             nhom.append((None, theo_lop[None]))
