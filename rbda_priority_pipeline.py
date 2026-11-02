@@ -2234,20 +2234,20 @@ def di_tru_schema(db_path: str) -> list[str]:
                 "SELECT name FROM sqlite_master WHERE type = 'table'")
         }
 
-        if "clubs" in co_bang and not _co_cot(cur, "clubs", "buoi"):
-            cur.execute("ALTER TABLE clubs ADD COLUMN buoi TEXT")
-            da_lam.append("clubs.buoi")
+        da_chup: list = []
 
-        # 6. `students.diem_ca_nhan` — điểm theo NGƯỜI cho workspace per_person. Cột mới,
-        #    NULL với mọi dòng cũ; không workspace nào khác đọc nó.
-        if "students" in co_bang and not _co_cot(cur, "students", "diem_ca_nhan"):
-            cur.execute("ALTER TABLE students ADD COLUMN diem_ca_nhan REAL")
-            da_lam.append("students.diem_ca_nhan")
-
-        # 7. `students.class_id` (A14) — lớp của học sinh, CHỈ để hiển thị / sắp / lọc / xuất.
-        #    NULL với mọi dòng cũ. Có dữ liệu thì sao lưu trước (cùng cách đặt tên `.bak-`).
-        if "students" in co_bang and not _co_cot(cur, "students", "class_id"):
-            if cur.execute("SELECT 1 FROM students LIMIT 1").fetchone():
+        def sao_luu_truoc_khi_sua():
+            """Chụp CSDL MỘT lần, ngay trước việc di trú đầu tiên cần sửa schema (A14), và chỉ khi
+            đã có dữ liệu. Lỗi ghi tệp sao lưu (thư mục không ghi được, hết chỗ) KHÔNG được làm hỏng
+            việc mở workspace: các bước dưới chỉ THÊM cột / dựng lại bảng trong giao dịch, nên bỏ
+            qua bản chụp là rủi ro nhỏ hơn việc không mở được dữ liệu (cùng tinh thần với bước 5)."""
+            if da_chup:
+                return
+            da_chup.append(True)
+            try:
+                if not any(t in co_bang and cur.execute(
+                        "SELECT 1 FROM %s LIMIT 1" % t).fetchone() for t in ("students", "clubs")):
+                    return
                 import datetime
                 import sqlite3
                 ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -2256,6 +2256,25 @@ def di_tru_schema(db_path: str) -> list[str]:
                     conn.backup(dich)
                 finally:
                     dich.close()
+            except Exception:
+                pass
+
+        if "clubs" in co_bang and not _co_cot(cur, "clubs", "buoi"):
+            sao_luu_truoc_khi_sua()
+            cur.execute("ALTER TABLE clubs ADD COLUMN buoi TEXT")
+            da_lam.append("clubs.buoi")
+
+        # 6. `students.diem_ca_nhan` — điểm theo NGƯỜI cho workspace per_person. Cột mới,
+        #    NULL với mọi dòng cũ; không workspace nào khác đọc nó.
+        if "students" in co_bang and not _co_cot(cur, "students", "diem_ca_nhan"):
+            sao_luu_truoc_khi_sua()
+            cur.execute("ALTER TABLE students ADD COLUMN diem_ca_nhan REAL")
+            da_lam.append("students.diem_ca_nhan")
+
+        # 7. `students.class_id` (A14) — lớp của học sinh, CHỈ để hiển thị / sắp / lọc / xuất.
+        #    NULL với mọi dòng cũ. Có dữ liệu thì sao lưu trước (cùng cách đặt tên `.bak-`).
+        if "students" in co_bang and not _co_cot(cur, "students", "class_id"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE students ADD COLUMN class_id TEXT")
             da_lam.append("students.class_id")
 
@@ -2265,16 +2284,19 @@ def di_tru_schema(db_path: str) -> list[str]:
             for cot, kieu in (("che_do_boc_tham", "TEXT"), ("so_buoi", "INTEGER"),
                               ("buoi_da_chay", "TEXT")):
                 if not _co_cot(cur, bang, cot):
+                    sao_luu_truoc_khi_sua()
                     cur.execute("ALTER TABLE %s ADD COLUMN %s %s" % (bang, cot, kieu))
                     da_lam.append("%s.%s" % (bang, cot))
 
         # `run_history.luat_xep` — luật xếp đã dùng. ADD COLUMN, NULL cho mọi dòng cũ (= luật
         # mặc định, đúng với mọi lần chạy trước khi có workspace). Không dựng lại bảng.
         if "run_history" in co_bang and not _co_cot(cur, "run_history", "luat_xep"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE run_history ADD COLUMN luat_xep TEXT")
             da_lam.append("run_history.luat_xep")
 
         if "match_results" in co_bang and not _co_cot(cur, "match_results", "buoi"):
+            sao_luu_truoc_khi_sua()
             cur.executescript("""
                 CREATE TABLE match_results_moi (
                     student_id TEXT NOT NULL,
@@ -2304,6 +2326,7 @@ def di_tru_schema(db_path: str) -> list[str]:
         #    trong CSDL. Không có lần chạy nào thì để NULL: lần chạy kế tiếp
         #    sẽ nhận hạt giống được gõ và ghi vào khoá.
         if "stb_lock" in co_bang and not _co_cot(cur, "stb_lock", "seed"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE stb_lock ADD COLUMN seed INTEGER")
             if "run_meta" in co_bang:
                 cur.execute(
