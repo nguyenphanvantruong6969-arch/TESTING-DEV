@@ -381,3 +381,33 @@ def test_xuat_theo_lop_hien_canh_bao_ket_qua_cu(mo, tmp_path):
     chu = page.locator("#xuatFeedback").inner_text()
     assert "tệp theo lớp" in chu and "đã cũ" in chu.casefold(), chu
     assert not loi, loi
+
+
+def test_kiosk_doi_o_lop_la_chua_luu_va_sang_em_khac_phai_bam_hai_lan(mo):
+    """B2: đổi ô lớp mà chưa Lưu là thay đổi chưa lưu như tick thi / nguyện vọng."""
+    page, api, loi = mo({"HS1": "10A1"})
+    _chon_hs(page, "HS2")
+    assert page.locator("#kioskLopChuaLuu").is_hidden()
+    page.select_option("#kioskLop", "10A1")
+    assert page.locator("#kioskLopChuaLuu").is_visible()
+    page.locator('.hs-card[data-student-id="HS3"]').click()          # lần 1: chỉ nhắc
+    assert page.evaluate("() => currentFallbackStudent") == "HS2"
+    assert page.locator("#toastStack").inner_text().strip() != ""
+    page.locator('.hs-card[data-student-id="HS3"]').click()          # lần 2: đi thật
+    page.wait_for_function("() => currentFallbackStudent === 'HS3'")
+    assert not loi, loi
+
+
+def test_kiosk_luu_xong_thi_o_lop_het_chua_luu_va_chon_lai_ve_nhu_cu_cung_het(mo):
+    page, api, loi = mo({"HS1": "10A1"})
+    _chon_hs(page, "HS2")
+    page.select_option("#kioskLop", "10A1")
+    page.locator("#rankingSourceGrid .option-row").first.click()
+    page.locator("#btnSubmitPreferences").click()
+    page.wait_for_function("() => document.getElementById('preferencesFeedback').textContent.trim() !== ''")
+    assert page.locator("#kioskLopChuaLuu").is_hidden()
+    page.select_option("#kioskLop", "")                                # đổi rồi...
+    assert page.locator("#kioskLopChuaLuu").is_visible()
+    page.select_option("#kioskLop", "10A1")                            # ...đổi lại đúng giá trị đã lưu
+    assert page.locator("#kioskLopChuaLuu").is_hidden()
+    assert not loi, loi

@@ -30,6 +30,7 @@ let whartonState = null;   // state cua em dang mo (co khoa `wharton`); null = w
 let daLuuWharton = "";     // dang chuoi cua diem Wharton DA LUU, theo tung o nhap (xem whartonChuoi)
 let daLuuThi = [];   // o tick thi da luu, da sap
 let daLuuNv = [];    // thu tu nguyen vong da luu
+let daLuuLop = "";   // lop cua em DA LUU ("" = chua co); o chon lop khac gia tri nay la "chua luu" (A14)
 let choRoiDi = null; // hen gio cua lan bam roi di thu nhat
 let khoaRoiDi = null; // lan bam thu nhat la DI DAU (xac nhan phai cung cho)
 
@@ -120,6 +121,11 @@ function nvChuaLuu() {
   return !!currentFallbackStudent && currentRanking.join("|") !== daLuuNv.join("|");
 }
 
+/* A14: o lop dang hien (khong bi an) khac lop da luu. */
+function lopChuaLuu() {
+  return !!currentFallbackStudent && !el("kioskLopHang").hidden && el("kioskLop").value !== daLuuLop;
+}
+
 function whartonChuaLuu() {
   return !!currentFallbackStudent && !!whartonState && whartonChuoi() !== daLuuWharton;
 }
@@ -128,6 +134,7 @@ function veDauChuaLuu() {
   el("chuaLuuThi").hidden = !thiChuaLuu();
   el("chuaLuuNv").hidden = !nvChuaLuu();
   el("chuaLuuWharton").hidden = !whartonChuaLuu();
+  el("kioskLopChuaLuu").hidden = !lopChuaLuu();
 }
 
 /* Chay `hanhDong` neu khong con gi chua luu; neu con, lan bam dau chi
@@ -135,7 +142,7 @@ function veDauChuaLuu() {
    bo thay doi va di tiep. Cung cho la bat buoc: bam em khac roi bam sang
    the khac khong phai la "xac nhan bo thay doi" cho viec doi the. */
 function roiDiNeuDuoc(hanhDong, khoa) {
-  if (!thiChuaLuu() && !nvChuaLuu() && !whartonChuaLuu()) {
+  if (!thiChuaLuu() && !nvChuaLuu() && !whartonChuaLuu() && !lopChuaLuu()) {
     hanhDong();
     return;
   }
@@ -171,6 +178,7 @@ function boChonHocSinhDuPhong() {
   currentRanking = [];
   daLuuThi = [];
   daLuuNv = [];
+  daLuuLop = "";
   if (choRoiDi) { clearTimeout(choRoiDi); choRoiDi = null; khoaRoiDi = null; }
   renderWhartonStep(null);
   el("fallbackWorkArea").hidden = true;
@@ -210,6 +218,7 @@ function initFallbackHandlers() {
   });
   el("kioskLop").addEventListener("change", () => {
     if (el("kioskLop").value) el("kioskLopNhac").hidden = true;
+    veDauChuaLuu();
   });
   el("btnCreateStudent").addEventListener("click", () => {
     const id = el("newStudentId").value.trim();
@@ -258,6 +267,7 @@ function initFallbackHandlers() {
            da cham ma im lang la mat du lieu khong ai hay. */
         if (conMo) {
           daLuuThi = checked.slice().sort();
+          if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
           lamMoiBuoc3(true);          /* doi o tick la doi quy cua tung CLB o Buoc 3 */
           const m = res.data.n_scores_removed || 0;
@@ -314,6 +324,7 @@ function initFallbackHandlers() {
       if (res.ok) {
         if (conMo) {
           daLuuNv = chup;
+          if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
           lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
           feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
@@ -329,7 +340,7 @@ function initFallbackHandlers() {
      du lieu DA LUU: con thay doi chua luu thi nhac luu truoc. */
   el("btnXuatEmNay").addEventListener("click", () => {
     if (!currentFallbackStudent) return;
-    if (thiChuaLuu() || nvChuaLuu() || whartonChuaLuu()) {
+    if (thiChuaLuu() || nvChuaLuu() || whartonChuaLuu() || lopChuaLuu()) {
       showToast(t("fallback_xuat_chua_luu"), "error");
       return;
     }
@@ -508,6 +519,7 @@ function selectFallbackStudent(studentId) {
 
     el("fallbackWorkArea").hidden = false;
     veOLopKiosk(stateRes.data.class_id);
+    daLuuLop = el("kioskLopHang").hidden ? "" : el("kioskLop").value;
     const nhan = el("currentStudentLabel");
     nhan.innerHTML =
       `<span class="hs-dang-chon-ten">${esc(stateRes.data.name)}</span>` +
