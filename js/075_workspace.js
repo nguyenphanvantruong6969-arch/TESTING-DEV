@@ -16,7 +16,7 @@
 */
 "use strict";
 
-const WS_DANH_TU = ["person", "slot", "session", "group", "score"];
+const WS_DANH_TU = ["person", "slot", "session", "group", "score", "cohort"];
 const WS_NGANH = ["school", "company", "event", "custom"];
 const WS_TONG_BUOC = 4;
 

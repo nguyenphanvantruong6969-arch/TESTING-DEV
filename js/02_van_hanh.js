@@ -308,6 +308,7 @@ function capNhatKhoaVanHanh() {
   el("btnClearQueue").disabled = khoa.dangChay || khoa.dangNhap;
   el("btnTaiSoMau").disabled = khoa.dangChay || khoa.dangNhap;
   if (el("btnXuatTuyChon")) el("btnXuatTuyChon").disabled = khoa.dangChay || khoa.dangXuat;
+  if (typeof capNhatNutXuatTheoLop === "function") capNhatNutXuatTheoLop();
 
   const zone = el("dropZone");
   const khoaTha = khoaVungTha();

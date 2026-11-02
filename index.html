@@ -275,7 +275,9 @@
         </div>
         <div class="search-row">
           <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất các mục đã chọn</button>
+          <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
         </div>
+        <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo {cohort_l}: mỗi {cohort_l} một tệp Excel, chỉ có kết quả xếp, không có điểm hay số bốc thăm — gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
         <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 03 thì bấm "Xuất CSV em này" ngay tại đó.</p>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
@@ -520,6 +522,11 @@
           <div class="panel-actions">
             <span id="unmatchedBadge" class="unmatched-badge" hidden></span>
             <input type="text" id="resultsSearch" class="text-input" data-i18n-placeholder="placeholder_results_search" placeholder="Tìm theo mã hoặc tên học sinh…">
+            <select id="resultsLopLoc" class="text-input text-input-sm" data-i18n-aria-label="aria_loc_lop"></select>
+            <select id="resultsSapXep" class="text-input text-input-sm" data-i18n-aria-label="aria_sap_xep">
+              <option value="student_id" data-i18n="lop_sap_theo_ma">Theo mã {person_l}</option>
+              <option value="class_id" data-i18n="lop_sap_theo_lop">Theo {cohort_l}</option>
+            </select>
           </div>
         </div>
         <div class="panel-body" id="dsXepPanelBody">
@@ -537,6 +544,7 @@
                 <th class="cot-chon"><input type="checkbox" id="chonTatCaKetQua" data-i18n-aria-label="aria_chon_tat_ca_dang_hien"></th>
                 <th data-i18n="th_student_id">Mã học sinh</th>
                 <th data-i18n="th_name">Họ tên</th>
+                <th data-i18n="th_cohort">{cohort}</th>
                 <th class="cot-buoi" data-i18n="th_buoi">Buổi</th>
                 <th data-i18n="th_club">Câu lạc bộ</th>
                 <th data-i18n="th_tier">Loại chỗ</th>
@@ -573,6 +581,7 @@
         <div class="new-student-row">
           <input type="text" id="newStudentId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_new_student_id" placeholder="Mã học sinh mới">
           <input type="text" id="newStudentName" class="text-input" data-i18n-placeholder="placeholder_full_name" placeholder="Họ tên">
+          <select id="newStudentLop" class="text-input text-input-sm" data-i18n-aria-label="kiosk_lop_nhan" hidden></select>
           <button class="btn btn-secondary" id="btnCreateStudent" data-i18n="btn_create_student">Tạo học sinh mới</button>
         </div>
       </div>
@@ -588,6 +597,12 @@
         </div>
 
         <div class="save-feedback xuat-ket-qua" id="fallbackXuatFeedback"></div>
+        <!-- A14: lớp của em. Chỉ hiện khi đã có ít nhất một lớp; khi hiện thì BẮT BUỘC chọn trước khi Lưu. -->
+        <div class="lop-kiosk-hang" id="kioskLopHang" hidden>
+          <label class="lop-nhan" for="kioskLop" data-i18n="kiosk_lop_nhan">{cohort}</label>
+          <select id="kioskLop" class="text-input text-input-sm"></select>
+          <span class="chua-luu" id="kioskLopNhac" role="status" hidden data-i18n="kiosk_lop_nhac">Chọn {cohort_l} của {person_l} này trước khi lưu.</span>
+        </div>
         <div class="fallback-steps">
           <div class="fallback-step">
             <h3 data-i18n="fallback_step1_title">Bước 1. Chọn CLB dự thi</h3>
@@ -716,6 +731,16 @@
           <button class="btn btn-secondary" id="btnAdminXuatHs" data-i18n="btn_admin_xuat_hs">Xuất CSV học sinh đã đánh dấu</button>
           <span class="chon-hs-dem" id="adminDemDanhDau"></span>
         </div>
+        <!-- A14: lọc và sắp theo lớp. Danh sách lớp nạp từ list_classes (js/04 napOChonLop). -->
+        <div class="search-row" id="adminLopHang">
+          <label class="lop-nhan" for="adminLopLoc" data-i18n="lop_loc_nhan">Lọc theo {cohort_l}</label>
+          <select id="adminLopLoc" class="text-input text-input-sm"></select>
+          <label class="lop-nhan" for="adminSapXep" data-i18n="lop_sap_nhan">Sắp xếp</label>
+          <select id="adminSapXep" class="text-input text-input-sm">
+            <option value="student_id" data-i18n="lop_sap_theo_ma">Theo mã {person_l}</option>
+            <option value="class_id" data-i18n="lop_sap_theo_lop">Theo {cohort_l}</option>
+          </select>
+        </div>
         <div class="save-feedback xuat-ket-qua" id="adminXuatFeedback"></div>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
         <table class="data-table">
@@ -723,6 +748,7 @@
             <th><input type="checkbox" id="adminChonTatCa" data-i18n-aria-label="aria_chon_tat_ca_trang"></th>
             <th data-i18n="th_student_id">Mã học sinh</th>
             <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_cohort">{cohort}</th>
             <th data-i18n="th_current_reserve_group">Nhãn dự trữ hiện tại</th>
           </tr></thead>
           <tbody id="adminStudentTableBody"></tbody>

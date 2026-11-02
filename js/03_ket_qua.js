@@ -908,7 +908,12 @@ function loadSuatDuTru() {
 }
 
 function loadMatchResults(search) {
-  callApiMoiNhat("ket_qua", "get_match_results", search || "").then((res) => {
+  Promise.all([
+    callApiMoiNhat("ket_qua", "get_match_results", search || "",
+      lopLocThamSo(el("resultsLopLoc")), el("resultsSapXep").value),
+    layDsLop(),
+  ]).then(([res, dsLop]) => {
+    napOLocLop(el("resultsLopLoc"), dsLop);
     const body = el("resultsTableBody");
     const empty = el("resultsEmptyState");
     const badge = el("unmatchedBadge");
@@ -977,7 +982,7 @@ function loadMatchResults(search) {
       tr.innerHTML =
         `<td class="cot-chon"><input type="checkbox" class="chon-hs" data-student-id="${esc(r.student_id)}"` +
         `${hsDaChon.has(r.student_id) ? " checked" : ""} aria-label="${esc(r.student_id)}"></td>` +
-        `<td>${esc(r.student_id)}</td><td>${esc(r.name)}</td>` +
+        `<td>${esc(r.student_id)}</td><td>${esc(r.name)}</td><td>${esc(r.class_id || "")}</td>` +
         `<td class="cot-buoi">${esc(r.caTuan ? t("ca_tuan") : nhanBuoi(r.buoi))}</td><td>${clubCell}</td>` +
         `<td>${esc(tierLabel)}</td><td>${esc(r.rank_in_student_pref ?? "—")}</td>`;
       /* An o buoi NGAY TREN dong vua ve. Vong an `.cot-buoi` o tren chay
@@ -1095,6 +1100,15 @@ function initResultsHandlers() {
       boHsKhongConTonTai]]);
   });
 
+  /* A14: lọc / sắp theo lớp, và xuất mỗi lớp một tệp cho giáo viên chủ nhiệm. */
+  ["resultsLopLoc", "resultsSapXep"].forEach((id) => {
+    el(id).addEventListener("change", () => loadMatchResults(el("resultsSearch").value));
+  });
+  el("btnXuatTheoLop").addEventListener("click", () => {
+    chayXuat([["xuat_muc_theo_lop", "export_theo_lop", [""],
+      (d) => t("xuat_kq_theo_lop", { n: d.n_tep, path: d.thu_muc })]]);
+  });
+
   el("btnBoChonHs").addEventListener("click", () => {
     hsDaChon.clear();
     document.querySelectorAll("#resultsTableBody .chon-hs").forEach((cb) => { cb.checked = false; });
@@ -1188,7 +1202,7 @@ function chayXuat(dsMuc, oPhanHoi) {
               dong.push(noi(res.data));
               if (res.data.ket_qua_cu) cu = true;
               if (res.data.loi_csv) coLoi = true; // so Excel co, CSV hong: van hien duong dan
-              if (!duongMo) duongMo = res.data.dir || res.data.path || null;
+              if (!duongMo) duongMo = res.data.dir || res.data.thu_muc || res.data.path || null;
             } else {
               coLoi = true;
               dong.push(t("xuat_kq_loi", { muc: t(khoaMuc), errors: trErrs(res.errors).join("; ") }));
@@ -1270,6 +1284,13 @@ function khoaXuatKetQua(khoa) {
   }
   xuatKetQuaDangKhoa = khoa;
   el("xuatKetQuaKhoa").hidden = !khoa;
+  capNhatNutXuatTheoLop();
+}
+
+/* Nút "Xuất theo lớp": khoá khi chưa có kết quả (như mục xuất kết quả) và khi đang chạy / đang xuất. */
+function capNhatNutXuatTheoLop() {
+  const n = el("btnXuatTheoLop");
+  if (n) n.disabled = xuatKetQuaDangKhoa || khoa.dangChay || khoa.dangXuat;
 }
 
 /* Dai "ket qua co the da cu" + so dong thay doi canh o tick tuong ung. */
