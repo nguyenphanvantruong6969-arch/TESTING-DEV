@@ -18,6 +18,12 @@ def api(api):
     return api
 
 
+def _dat_lop(api, sid, lop):
+    """Gán lớp thẳng vào cột (test xuất không phụ thuộc API sửa lớp của phiên A)."""
+    with api._ket_noi_ghi() as cur:
+        cur.execute("UPDATE students SET class_id = ? WHERE student_id = ?", (lop or None, sid))
+
+
 def _nap(api, buoi=False):
     """6 em; CLB 'a' chỉ 1 chỗ nên có em chưa có chỗ. Lớp: 10A2, 10A10, 10A1, (trống)."""
     if buoi:
@@ -37,7 +43,7 @@ def _nap(api, buoi=False):
     assert r["ok"], r["errors"]
     for sid, lop in (("HS001", "10A2"), ("HS002", "10A10"), ("HS003", "10A2"),
                      ("HS004", "10A1"), ("HS005", "10A1")):
-        assert api.set_student_class(sid, lop)["ok"]
+        _dat_lop(api, sid, lop)
     assert api.run_pipeline(seed=7)["ok"]
     return api
 
@@ -151,15 +157,15 @@ def test_export_theo_lop_so_tep_va_chua_co_lop(api, tmp_path):
 def test_export_theo_lop_khong_em_nao_co_lop_chi_tep_chua_co_lop(api, tmp_path):
     _nap(api)
     for sid in ("HS001", "HS002", "HS003", "HS004", "HS005"):
-        api.set_student_class(sid, "")
+        _dat_lop(api, sid, None)
     r = api.export_theo_lop(str(tmp_path / "ra"))
     assert sorted(os.listdir(r["data"]["thu_muc"])) == ["_chua_co_lop.xlsx"]
 
 
 def test_export_theo_lop_ten_la_va_trung_khong_de(api, tmp_path):
     _nap(api)
-    api.set_student_class("HS001", "10/A:2")      # ký tự cấm trong tên tệp
-    api.set_student_class("HS002", "10_A_2")      # trùng sau khi làm sạch
+    _dat_lop(api, "HS001", "10/A:2")      # ký tự cấm trong tên tệp
+    _dat_lop(api, "HS002", "10_A_2")      # trùng sau khi làm sạch
     r = api.export_theo_lop(str(tmp_path / "ra"))
     ten = os.listdir(r["data"]["thu_muc"])
     assert "10_A_2.xlsx" in ten and "10_A_2_2.xlsx" in ten

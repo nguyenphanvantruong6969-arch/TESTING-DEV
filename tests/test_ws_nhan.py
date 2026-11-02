@@ -423,7 +423,7 @@ def test_so_excel_cong_ty_dung_tu_cua_workspace(tmp_path):
     assert res["ok"], res["errors"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
     assert wb.sheetnames == ["Hướng dẫn", "Danh sách nhân viên", "Theo dự án",
-                             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
+                             "Theo lớp", "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
     ds = wb["Danh sách nhân viên"]
     dau = [c.value for c in ds[4]]
     assert dau[:2] == ["Mã nhân viên", "Họ tên"] and "Mã dự án" in dau and "Tên dự án" in dau
@@ -505,7 +505,7 @@ def test_mac_dinh_truong_hoc_ten_trang_excel_khong_doi(api, tmp_path):
     assert api.export_csv(ra)["ok"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
     assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB",
-                             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
+                             "Theo lớp", "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
     assert wb["Danh sách học sinh"]["A1"].value == "DANH SÁCH HỌC SINH VÀ CÂU LẠC BỘ"
 
 
@@ -518,5 +518,5 @@ def test_mac_dinh_moi_them_dung_trang_diem_chuan(api, tmp_path):
     ra = str(tmp_path / "kq.csv")
     assert api.export_csv(ra)["ok"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
-    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Chưa có chỗ",
-                             "Điểm chuẩn", "Thống kê", "Dấu vết (kỹ thuật)"]
+    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Theo lớp",
+                             "Chưa có chỗ", "Điểm chuẩn", "Thống kê", "Dấu vết (kỹ thuật)"]

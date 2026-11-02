@@ -414,7 +414,12 @@ class XuatKetQuaMixin:
         try:
             if self._chua_co_ket_qua():
                 return _fail(err("xuat_chua_co_ket_qua"))
-            thu_muc = self._duong_xuat(output_path, "ket_qua_theo_lop")
+            if os.path.isabs((output_path or "").strip()):
+                # Thư mục đích là cái MỚI: đường tuyệt đối đã có thì thành "x (2)" (không ghi đè);
+                # `_duong_xuat` sẽ từ chối vì nó coi thư mục có sẵn là nhầm với tệp.
+                thu_muc = duong_dan_khong_de(output_path.strip().rstrip("/\\"))
+            else:
+                thu_muc = self._duong_xuat(output_path, "ket_qua_theo_lop")
             du = self._du_lieu_xuat()
             os.makedirs(thu_muc)
             da_dung: set = {"_chua_co_lop"}        # giữ chỗ trước: lớp tên "_chua_co_lop" không đè
