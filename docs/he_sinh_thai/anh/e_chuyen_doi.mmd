@@ -1,0 +1,9 @@
+flowchart TD
+  S(["V1: Google Forms, Sheets<br/>và Apps Script theo lô"]) --> M["Đo sau mỗi đợt và mỗi ngày mở"]
+  M --> T["Ngưỡng chuyển đổi, đo được:<br/>1. Độ trễ đồng bộ p95 quá 30 phút, 3 ngày liên tiếp<br/>2. Thời gian trigger dùng quá 50% hạn mức đã xác minh<br/>3. Lỗi khoá hoặc lỗi 429 quá 1% số lần chạy lô<br/>4. Tab xử lý quá 50% giới hạn ô, hoặc bảng điều khiển tải quá 10 giây<br/>5. Cần truy vấn nhiều bảng mà bộ lọc và công thức không làm nổi"]
+  T --> Q{"Có ít nhất một<br/>ngưỡng bị vượt?"}
+  Q -->|"Không"| K(["Giữ V1"])
+  Q -->|"Có"| X["Thử biện pháp rẻ trước:<br/>lô nhỏ hơn, tách một Sheets<br/>cho mỗi khối lớp, lưu trữ đợt cũ"]
+  X --> R{"Đo lại một đợt:<br/>còn vượt ngưỡng?"}
+  R -->|"Hết vượt"| K
+  R -->|"Vẫn vượt"| MG(["Chuyển V2: Supabase free và<br/>trang web tĩnh, giữ nguyên<br/>tên bảng và tên cột"])

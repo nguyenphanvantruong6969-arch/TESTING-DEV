@@ -1,0 +1,22 @@
+flowchart TD
+  S(["Học sinh bấm Gửi"]) --> O{"Biểu mẫu đang mở?"}
+  O -->|"Không"| C1["Google Forms từ chối,<br/>hiện thông báo đã đóng"]
+  O -->|"Có"| V1{"Biểu mẫu kiểm tra:<br/>trường bắt buộc, định dạng,<br/>số lượng lựa chọn tối đa"}
+  V1 -->|"Sai"| E1["Học sinh sửa và gửi lại"]
+  V1 -->|"Đúng"| W["Google ghi một dòng mới<br/>vào tab RAW kèm thời gian"]
+  W --> T["Trigger lô chạy"]
+  T --> L{"Lấy khoá LockService<br/>trong thời gian chờ"}
+  L -->|"Không được"| R1["Ghi loi_dong_bo,<br/>thử lại ở lần trigger sau"]
+  L -->|"Được"| RD["Đọc các dòng RAW<br/>sau con trỏ đã xử lý"]
+  RD --> P{"Mã học sinh có trong<br/>danh sách lớp?"}
+  P -->|"Không"| ER["Trạng thái: lỗi mã<br/>admin sửa hoặc từ chối"]
+  P -->|"Có"| D{"Đã có phiếu giữ<br/>của mã này trong đợt?"}
+  D -->|"Có"| DP["Phiếu mới: bo_nop_trung<br/>giữ phiếu đầu, ghi nhật ký"]
+  D -->|"Không"| OK["Chuẩn hoá và chấm bài<br/>trạng thái: hop_le, cho_duyet"]
+  OK --> WR["Ghi tab đã xử lý<br/>rồi mới dời con trỏ"]
+  DP --> WR
+  ER --> WR
+  WR --> F{"Lỗi khi ghi?"}
+  F -->|"Có, thử lại tối đa 3 lần"| R1
+  F -->|"Quá 3 lần"| N["Email báo lỗi cho admin,<br/>con trỏ giữ nguyên"]
+  F -->|"Không"| Z(["Xong lô, ghi nhật ký"])

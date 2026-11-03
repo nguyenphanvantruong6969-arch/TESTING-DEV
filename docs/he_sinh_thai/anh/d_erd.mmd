@@ -1,0 +1,70 @@
+erDiagram
+  KY_DANG_KY ||--o{ PHIEU : "có"
+  HOC_SINH ||--o{ PHIEU : "nộp"
+  PHIEU ||--|| RAW : "bắt nguồn từ"
+  PHIEU ||--o{ NGUYEN_VONG : "gồm"
+  PHIEU ||--o{ BAI_THI : "gồm"
+  CLB ||--o{ NGUYEN_VONG : "được chọn"
+  CLB ||--o{ BAI_THI : "được thi"
+  PHIEU ||--o{ NHAT_KY : "được ghi"
+  KY_DANG_KY {
+    string ky_id PK
+    string ten
+    string doi_tuong
+    datetime mo
+    datetime dong
+    string trang_thai
+    string form_id
+  }
+  RAW {
+    string raw_id PK
+    string ky_id
+    int so_dong
+    datetime thoi_gian
+    string noi_dung
+  }
+  HOC_SINH {
+    string student_id PK
+    string ho_ten
+    string lop
+    string email
+  }
+  PHIEU {
+    string phieu_id PK
+    string raw_id FK
+    string ky_id FK
+    string student_id FK
+    string trang_thai_xu_ly
+    string trang_thai_duyet
+    int ban_giu
+    string nguoi_duyet
+    datetime thoi_gian_duyet
+  }
+  NGUYEN_VONG {
+    string phieu_id FK
+    string buoi
+    int hang
+    string club_id FK
+  }
+  BAI_THI {
+    string phieu_id FK
+    string club_id FK
+    string buoi
+    float diem
+  }
+  CLB {
+    string club_id PK
+    string ten
+    string buoi
+    int chi_tieu
+  }
+  NHAT_KY {
+    string log_id PK
+    datetime thoi_gian
+    string nguoi
+    string hanh_dong
+    string doi_tuong_id
+    string truoc
+    string sau
+    string ly_do
+  }

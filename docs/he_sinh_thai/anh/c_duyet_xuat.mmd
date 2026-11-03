@@ -1,0 +1,20 @@
+flowchart TD
+  A(["Admin mở bảng điều khiển"]) --> B["Xem số lượng:<br/>chờ duyệt, lỗi, cảnh báo, trùng"]
+  B --> C["Lọc phiếu cần xử lý"]
+  C --> D{"Từng nhóm"}
+  D -->|"Hợp lệ"| E["Duyệt hàng loạt"]
+  D -->|"Lỗi hoặc cảnh báo"| F["Sửa ô hoặc từ chối<br/>bắt buộc ghi lý do"]
+  D -->|"Trùng"| G["Xác nhận giữ phiếu đầu<br/>hoặc đổi sang phiếu khác"]
+  E --> H["nhat_ky: ai, lúc nào,<br/>trước và sau"]
+  F --> H
+  G --> H
+  H --> I{"Còn phiếu<br/>cho_duyet hoặc lỗi?"}
+  I -->|"Còn"| C
+  I -->|"Hết"| J["Admin bấm Chốt đợt"]
+  J --> K{"Hộp xác nhận hiện:<br/>số phiếu duyệt, từ chối,<br/>số CLB thiếu chỉ tiêu"}
+  K -->|"Huỷ"| B
+  K -->|"Đồng ý"| L["Khoá đợt: không nhận<br/>thêm và không sửa thêm"]
+  L --> M["Tạo tab xuất và tệp<br/>RAW_PHIEU.xlsx, CSV"]
+  M --> N["Tải về máy chạy kiosk"]
+  N --> O["xu_li_raw.py ra<br/>SO_NHAP_CLB.xlsx"]
+  O --> P(["Nạp vào kiosk, chạy RB-DA"])
