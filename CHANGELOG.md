@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-03 — T1a, T1b (nhánh `claude/epic-knuth-801pkw`; Truong duyệt, bỏ qua sổ đăng ký)
+
+- **T1a — sổ mẫu chính có cột Lớp:** `mau_csv/SO_NHAP_CLB.xlsx` là sổ TRỐNG (không có học sinh nào để gán lớp). Nó giờ có cột **Lớp** ngay sau **Họ tên**, giống hệt sổ phần mềm tạo (`tao_so_nhap_mau`, A14). `mau_csv/tao_so_nhap.py::tao_mau_trong` gọi `ghi_so_nhap(..., co_lop=True)`; tệp sinh lại bằng kịch bản, không sửa tay. `HUONG_DAN_SO_NHAP.md` ghi đây là sổ mẫu chính. Hai sổ ví dụ `vi_du_*` GIỮ NGUYÊN (khớp từng dòng với bộ ba CSV, mà CSV ví dụ không có lớp).
+- **T1b — nhãn trùng cũ không chặn lưu:** `cau_hinh_ws.ghi_cau_hinh` chỉ ném `NhanTrung` khi cấu hình mới có cặp danh từ trùng nhãn mà cấu hình ĐANG LƯU chưa có. Workspace cũ đã trùng đổi tên / đổi luật được; thêm cặp trùng thứ hai vẫn bị chặn; sửa hết trùng thì qua. `chuan_hoa()` (kiểm trước khi dựng workspace) và cảnh báo nhập `so_nhap_canh_bao_nhan_trung` giữ nguyên.
+- **Test:** mới `tests/test_t1b_nhan_trung_cu.py` (6); sửa `tests/test_so_nhap.py::test_mau_trong_doc_duoc_va_dung_bo_cuc` (tiêu đề có Lớp).
+
 ## 2026-11-02 — A14 — phần A (nền, nhập, API): lớp của học sinh
 
 Mỗi học sinh có thể có "lớp" (vd 10H1A) CHỈ để hiển thị, sắp, lọc, xuất cho giáo viên chủ nhiệm. Thuật toán phân bổ KHÔNG đọc lớp. Phần B (xuất + giao diện) ở nhánh `claude/a14-giao-dien`.

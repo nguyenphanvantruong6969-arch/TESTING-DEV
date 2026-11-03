@@ -110,7 +110,8 @@ def tao_vi_du(ten_bo: str) -> str:
 
 def tao_mau_trong() -> str:
     ra = os.path.join(THU_MUC, TEN_MAU)
-    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True)   # A13.7: mẫu trống có cột Điểm quyết tâm
+    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True,   # A13.7: mẫu trống có cột Điểm quyết tâm
+                        co_lop=True)          # T1a: và cột Lớp sau Họ tên, như sổ mẫu phần mềm tạo (A14)
     return ra
 
 

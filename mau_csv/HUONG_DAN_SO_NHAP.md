@@ -15,7 +15,7 @@ không còn tên cột tiếng Anh, không phải nhớ thứ tự nạp.
 | Cách | Khi nào |
 |---|---|
 | Bấm **Tải sổ nhập mẫu** ở màn hình **01 · Vận hành** | Cách nên dùng. Phần mềm đã có CLB thì sổ **điền sẵn** danh sách CLB, chỉ còn điền học sinh |
-| Mở `mau_csv/SO_NHAP_CLB.xlsx` | Sổ trống |
+| Mở `mau_csv/SO_NHAP_CLB.xlsx` | **Sổ mẫu chính**: sổ trống, giống hệt sổ phần mềm tạo ra (có cả cột **Lớp** sau **Họ tên**) |
 | Mở `mau_csv/vi_du_day_du/SO_NHAP_CLB_vi_du.xlsx` | Muốn xem một sổ đã điền đầy đủ (3 buổi, 9 CLB, 24 học sinh) |
 | Chạy skill `xu-li-raw-forms` trên kết quả Google Forms | Học sinh đăng ký qua biểu mẫu: skill ra thẳng sổ này |
 

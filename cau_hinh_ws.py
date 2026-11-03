@@ -335,7 +335,13 @@ def ghi_cau_hinh(db_path: str, cfg: dict) -> dict:
     Raises:
         ValueError: `cfg` sai — chưa ghi gì.
     """
-    day_du = _chuan_hoa(cfg)
+    day_du = _chuan_hoa(cfg, kiem_trung=False)
+    # T1b: chỉ chặn cặp danh từ trùng nhãn MỚI so với cấu hình đang lưu. Workspace cũ đã trùng
+    # từ trước vẫn đổi tên / đổi luật được; sửa nhãn cho hết trùng thì đương nhiên qua.
+    da_co = {(a, b) for a, b, _ in cac_cap_nhan_trung(doc_cau_hinh(db_path)["labels"])}
+    for a, b, nhan_trung in cac_cap_nhan_trung(day_du["labels"]):
+        if (a, b) not in da_co:
+            raise NhanTrung(a, b, nhan_trung)
     conn = connect_db(db_path)
     try:
         # Tự dựng bảng: workspace dựng từ CSDL cũ chưa qua init_db vẫn ghi được.
