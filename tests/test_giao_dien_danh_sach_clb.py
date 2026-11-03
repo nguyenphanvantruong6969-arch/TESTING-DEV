@@ -65,7 +65,7 @@ def trang(api):
     loi = []
     page.on("pageerror", lambda e: loi.append(str(e)))
     page.goto(url)
-    page.click('.nav-item[data-tab="results"]')
+    page.click('.nav-item[data-tab="others"]')
     # Mục này THU GỌN SẴN (xem MAC_DINH_DONG), nên phải mở ra trước: một
     # hàng nằm trong thân đang đóng thì Playwright coi là chưa hiện, và
     # `wait_for_selector` sẽ chờ hết giờ chứ không báo gì rõ ràng.
@@ -230,7 +230,7 @@ def trang_chay_mot_buoi(api):
     loi = []
     page.on("pageerror", lambda e: loi.append(str(e)))
     page.goto(url)
-    page.click('.nav-item[data-tab="results"]')
+    page.click('.nav-item[data-tab="others"]')
     page.wait_for_selector("#clbPanel .panel-toggle")
     page.click("#clbPanel .panel-toggle")
     page.wait_for_selector("#clbBody tr")
@@ -242,7 +242,7 @@ def trang_chay_mot_buoi(api):
 def test_cot_buoi_khong_bi_bang_khac_tat_ho(trang_chay_mot_buoi):
     """LỖI THẬT, đã đo trước khi sửa.
 
-    `loadMatchResults` quét `#view-results .cot-buoi` rồi bật/tắt theo số
+    `loadMatchResults` quét `#view-others .cot-buoi` rồi bật/tắt theo số
     buổi có trong KẾT QUẢ. Bảng này đếm theo DANH SÁCH CÂU LẠC BỘ. Hai quy
     tắc khác nhau ghi lên cùng một lớp CSS thì bên chạy sau thắng — và vì
     hai hàm chạy bất đồng bộ, "bên chạy sau" không cố định.
@@ -276,7 +276,7 @@ def test_truong_mot_buoi_van_giau_cot_buoi(api):
         br = pw.chromium.launch(executable_path=CHROMIUM, args=["--no-sandbox"])
         page = br.new_page(bypass_csp=True)  # CSP chan eval cua wait_for_function; test CSP rieng o test_giao_dien_sua_loi_p1
         page.goto(url)
-        page.click('.nav-item[data-tab="results"]')
+        page.click('.nav-item[data-tab="others"]')
         page.wait_for_selector("#clbPanel .panel-toggle")
         page.click("#clbPanel .panel-toggle")
         page.wait_for_selector("#clbBody tr")
@@ -301,7 +301,7 @@ def test_cau_lac_bo_bi_xoa_thi_dong_danh_sach_chu_khong_bao_loi_do(trang):
     # luot mo, tai lai thi moi loi goi phan mem deu hong va bang nao cung
     # trang — test se do vi ly do chang lien quan gi toi loi dang kiem.
     page.click('.nav-item[data-tab="pipeline"]')
-    page.click('.nav-item[data-tab="results"]')
+    page.click('.nav-item[data-tab="others"]')
     page.wait_for_function(
         "() => [...document.querySelectorAll('#clbBody tr')]"
         ".some(r => r.children[1].textContent.trim() === 'clb_rong_moi')")
@@ -313,7 +313,7 @@ def test_cau_lac_bo_bi_xoa_thi_dong_danh_sach_chu_khong_bao_loi_do(trang):
 
     assert api.delete_club("clb_rong_moi")["ok"]
     page.click('.nav-item[data-tab="pipeline"]')
-    page.click('.nav-item[data-tab="results"]')
+    page.click('.nav-item[data-tab="others"]')
     page.wait_for_timeout(900)
 
     assert page.eval_on_selector("#clbDsArea", "e => e.hidden") is True

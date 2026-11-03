@@ -128,6 +128,8 @@ function reapplyDynamicTextForLangChange() {
     loadHealthReport();
     if (!el("historyTable").hidden) loadRunHistory();
   } else if (tab === "results") {
+    loadKetQuaTab();
+  } else if (tab === "others") {
     loadResultsTab();
   } else if (tab === "admin") {
     /* Ve lai tu CSDL xoa sach o da tick — nguoi dung dang chon 30 em de
@@ -140,10 +142,6 @@ function reapplyDynamicTextForLangChange() {
         if (daTick.has(cb.dataset.studentId)) cb.checked = true;
       });
     });
-  } else if (tab === "members") {
-    loadMembersTab();
-  } else if (tab === "theolop") {
-    loadTheoLopTab();
   } else if (tab === "scoring") {
     loadScoringOverview();
     if (currentScoringClub) {

@@ -249,7 +249,7 @@ def _kiem_csp(page, url, loi):
             if "Content Security Policy" in m.text else None)
     page.goto(url)
     page.wait_for_selector("#dropZone")
-    for tab in ("results", "fallback", "admin", "scoring", "pipeline"):
+    for tab in ("results", "others", "fallback", "admin", "scoring", "pipeline"):
         _sang_tab(page, tab)
         page.wait_for_timeout(300)
     page.reload()

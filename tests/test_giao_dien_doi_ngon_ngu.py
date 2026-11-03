@@ -195,7 +195,7 @@ def test_khong_tab_nao_con_sot_chuoi_tieng_viet(trang):
 
     _sang_tieng_anh(page)
     sot_tat_ca = {}
-    for tab in ("pipeline", "results", "fallback", "admin", "scoring"):
+    for tab in ("pipeline", "results", "others", "fallback", "admin", "scoring"):
         page.locator('[data-tab="%s"]' % tab).click()
         page.wait_for_timeout(400)
         chu = page.locator("body").inner_text()

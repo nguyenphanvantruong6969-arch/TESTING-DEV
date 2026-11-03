@@ -2342,6 +2342,25 @@ html.tat-hieu-ung .status-strip:hover {
    noi bat len, vi no nghia la mot phan chinh sach uu tien da boc hoi. */
 /* A14: hai thẻ xem chỉ đọc (06 Thành viên, 07 Theo lớp). */
 .the-xem-dem { text-align: left; font-weight: 600; padding: 8px 0; color: var(--ink-soft); }
+
+/* Thẻ 02 Kết quả: hai tầng nút chọn (cách xem, cách sắp). Nút to, rõ cho màn hình họp. */
+/* .main co theo nội dung (margin auto); thẻ Kết quả có bảng hẹp ở Theo CLB nên giữ rộng như nhau ở cả ba cách xem */
+.main:has(#view-results.is-active) { width: 100%; box-sizing: border-box; }
+.kq-chon-hang { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.kq-chon-hang-phu { margin-bottom: 14px; }
+.kq-chon-hang-phu[hidden] { display: none; }   /* .search-row đặt display:flex nên đè thuộc tính hidden */
+.kq-seg { display: inline-flex; border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; background: var(--paper); }
+.kq-seg-nut {
+  appearance: none; border: 0; background: transparent; color: var(--ink);
+  font: inherit; font-weight: 600; font-size: 16px; padding: 12px 22px; cursor: pointer;
+  border-right: 1px solid var(--hairline);
+}
+.kq-seg-nut:last-child { border-right: 0; }
+.kq-seg-nut:hover { background: var(--paper-hover); }
+.kq-seg-nut:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+.kq-seg-nut.is-on { background: var(--moss); color: #fff; }
+.kq-seg-nho .kq-seg-nut { font-size: 14px; font-weight: 500; padding: 8px 16px; }
+.kq-seg-nhan { color: var(--slate); font-size: 14px; }
 .data-table tr.dong-do td { background: var(--rust-soft); }
 .data-table td.o-trong { color: var(--slate); }
 .data-table td.is-canh-bao-o {

@@ -198,7 +198,7 @@ def test_chua_chay_khong_co_bieu_do_va_nhac_chay(mo):
     page.locator('#qlTabs [data-ql-tab="dc"]').click()
     page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlRong:not([hidden])")
     assert page.locator("#dcChiTiet").is_hidden() and page.locator("#dcChonHop").is_hidden()
-    page.locator('[data-tab="results"]').click()
+    page.locator('[data-tab="others"]').click()
     assert page.locator("#dcKqPanel").is_hidden()
     assert not loi, loi
 
@@ -206,7 +206,7 @@ def test_chua_chay_khong_co_bieu_do_va_nhac_chay(mo):
 # ------------------------------------------------------------------ tab Kết quả: đóng sẵn, không nhớ
 
 def test_ket_qua_muc_dong_san_mo_duoc_vao_lai_thi_dong(mo):
-    page, api, loi, _ = mo(tab="results")
+    page, api, loi, _ = mo(tab="others")
     page.wait_for_selector("#dcKqPanel:not([hidden])")
     assert page.locator("#dcKqBody").is_hidden()
     assert page.locator("#btnDcKqMo").get_attribute("aria-expanded") == "false"
@@ -222,7 +222,7 @@ def test_ket_qua_muc_dong_san_mo_duoc_vao_lai_thi_dong(mo):
     page.evaluate("window.I18N.setLang('vi')")
     # rời thẻ rồi vào lại: đóng
     page.locator('[data-tab="admin"]').click()
-    page.locator('[data-tab="results"]').click()
+    page.locator('[data-tab="others"]').click()
     page.wait_for_selector("#dcKqPanel:not([hidden])")
     assert page.locator("#dcKqBody").is_hidden()
     assert page.locator("#btnDcKqMo").inner_text() == "Xem điểm chuẩn"
@@ -238,7 +238,7 @@ def test_tat_tinh_nang_hai_phan_khong_hien(mo):
     page.locator('#qlTabs [data-ql-tab="du_lieu"]').click()
     page.wait_for_selector("#btnResetAll")
     assert page.locator("#adminDiemChuanBlock").is_hidden()
-    page.locator('[data-tab="results"]').click()
+    page.locator('[data-tab="others"]').click()
     page.wait_for_selector("#fillPanel")
     assert page.locator("#dcKqPanel").is_hidden()
     assert not loi, loi

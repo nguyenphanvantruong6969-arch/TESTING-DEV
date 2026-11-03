@@ -361,53 +361,7 @@ function loadSoBocTham(search) {
   });
 }
 
-/* ---- Thời khoá biểu + độ phủ (thẻ Kết quả) ---- */
-
-function loadThoiKhoaBieu(search) {
-  const panel = el("tkbPanel");
-  if (!panel) return;
-  callApiMoiNhat("tkb", "get_thoi_khoa_bieu", search || "").then((res) => {
-    /* Tìm không khớp em nào thì chỉ bảng rỗng, KHÔNG ẩn cả panel: ô tìm nằm trong panel, ẩn đi là
-       người dùng không sửa được chuỗi tìm (A13.12, 3.6). Hết em thật (không tìm) mới ẩn. */
-    if (!res.ok || res.data.ds_buoi.length < 2 || (!res.data.hoc_sinh.length && !(search || "").trim())) {
-      panel.hidden = true;
-      return;
-    }
-    panel.hidden = false;
-    const dsBuoi = res.data.ds_buoi;
-
-    const head = el("tkbHead");
-    clear(head);
-    head.innerHTML =
-      `<th>${esc(t("th_student_id"))}</th><th>${esc(t("th_name"))}</th>` +
-      dsBuoi.map((b) => `<th>${esc(nhanBuoi(b))}</th>`).join("") +
-      `<th class="num">${esc(t("tkb_so_clb"))}</th>`;
-
-    const body = el("tkbBody");
-    clear(body);
-    /* Dung ca bang trong mot DocumentFragment roi gan MOT lan: gan tung
-       dong vao bang dang hien la trinh duyet tinh lai bo cuc moi dong —
-       voi 400-800 dong va moi lan go phim tim kiem, do la cai giat. */
-    const manh = document.createDocumentFragment();
-    res.data.hoc_sinh.forEach((em) => {
-      const o = dsBuoi.map((b) => {
-        const c = em.theo_buoi[b];
-        if (!c || !c.club_id) {
-          return `<td><span class="tkb-trong">—</span></td>`;
-        }
-        const lop = c.matched_tier === "reserve" ? " is-du-tru" : "";
-        return `<td><span class="tkb-o${lop}">${esc(c.club_name || c.club_id)}</span></td>`;
-      }).join("");
-      const tr = document.createElement("tr");
-      tr.innerHTML =
-        `<td>${esc(em.student_id)}</td><td>${esc(em.name)}</td>` + o +
-        `<td class="num">${esc(em.so_clb)}</td>`;
-      manh.appendChild(tr);
-    });
-    body.appendChild(manh);
-    veDemMuc("tkbPanel", "dem_hoc_sinh", res.data.hoc_sinh.length);
-  });
-}
+/* ---- Độ phủ (thẻ Dữ liệu khác). Thời khoá biểu từng học sinh nằm ở thẻ Kết quả (js/09_the_xem.js). ---- */
 
 function loadDoPhu() {
   const panel = el("doPhuPanel");
@@ -1318,7 +1272,7 @@ function initAdminHandlers() {
      em vua tim — mot em khong con ton tai. */
   function donSachSauKhiXoaDuLieu() {
     ["studentSearchInput", "newStudentId", "newStudentName", "adminStudentSearch",
-     "resultsSearch", "tkbSearch", "thamSearch"].forEach((id) => {
+     "resultsSearch", "kqTimKiem", "thamSearch"].forEach((id) => {
       if (el(id)) el(id).value = "";
     });
     boChonHocSinhDuPhong();
@@ -1994,7 +1948,7 @@ function initDiemChuanKetQua() {
     if (dc.moKq) veTongQuanDiemChuan(el("dcKqTongQuan"), dc.rowsKq || []);
     else clear(el("dcKqTongQuan"));
   });
-  const view = el("view-results");
+  const view = el("view-others");
   if (view && window.MutationObserver) {
     new MutationObserver(() => {
       if (!view.classList.contains("is-active")) dongDiemChuanKq();

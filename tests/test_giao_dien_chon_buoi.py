@@ -319,7 +319,7 @@ class TestChuyenTheGiuLuaChon:
             _the(page, nhan).click()
         assert _dang_chon(page) == ["thu_5"]
 
-        page.click('.nav-item[data-tab="results"]')
+        page.click('.nav-item[data-tab="others"]')
         page.click('.nav-item[data-tab="pipeline"]')
         page.wait_for_timeout(800)       # để loadChonBuoi kịp trả về
 

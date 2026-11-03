@@ -15,12 +15,11 @@
    tep js/ nap SAU tep nay, nen luc dong nay chay chung chua ton tai. */
 const TAB_LOADERS = {
   pipeline: () => loadPipelineTab(),
-  results: () => loadResultsTab(),
+  results: () => loadKetQuaTab(),
+  others: () => loadResultsTab(),
   fallback: () => loadFallbackTab(),
   admin: () => loadAdminTab(),
   scoring: () => loadScoringTab(),
-  members: () => loadMembersTab(),
-  theolop: () => loadTheoLopTab(),
 };
 
 function initTabs() {

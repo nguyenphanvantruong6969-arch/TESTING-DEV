@@ -68,7 +68,7 @@ def trang(api):
         page = br.new_page(bypass_csp=True)
         page.goto(url)
         page.wait_for_selector("#dropZone")
-        page.locator('.nav-item[data-tab="results"]').click()
+        page.locator('.nav-item[data-tab="others"]').click()
         page.evaluate("document.fonts.ready")
         yield page
         br.close()
