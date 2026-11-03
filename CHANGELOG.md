@@ -10,7 +10,7 @@
 
 - **G1 (T2, tràn ngang):** `.main { min-width: 0 }` (cột `1fr` của lưới không còn nở theo bảng rộng, nên bảng chỉ cuộn ngang trong `.scroll-x`, trang thì không); ô CLB `min-width` 7em. Test mới `test_khong_tran_ngang_trang_voi_ten_clb_rat_dai` (độ rộng 600, 1024, 1280; tên CLB 60 ký tự; ba cách xem; `scrollWidth <= innerWidth`). Đã thử gỡ dòng sửa: test đỏ ở 600 và 1024.
 - **G2 (tài liệu):** `HUONG_DAN_SU_DUNG.md` bảng "xuất hồ sơ học sinh" đổi số thẻ (04, 03, 05) và đoạn lớp mô tả đúng: lọc và sắp theo lớp ở thẻ 03, cột Lớp và cách xem Theo lớp ở thẻ 02.
-- **G3 (chữ sheet Hướng dẫn):** bỏ dấu gạch dài và xưng "em" trong các dòng hướng dẫn của `so_nhap.py` (cả bản hằng số lẫn bản dựng theo cấu hình); sinh lại `mau_csv/SO_NHAP_CLB.xlsx`. Test kiểm mọi dòng hướng dẫn của sổ mẫu: không "—", không từ "em/tôi/tớ". Các sheet khác không đổi.
+- **G3 (chữ sheet Hướng dẫn):** bỏ dấu gạch dài và xưng "em" trong các dòng hướng dẫn của `so_nhap.py` (cả bản hằng số lẫn bản dựng theo cấu hình); sinh lại `mau_csv/SO_NHAP_CLB.xlsx`. Test kiểm mọi dòng hướng dẫn của sổ mẫu: không "—", không từ "em/tôi/tớ". Các sheet khác không đổi. Sinh lại sáu sổ `du_lieu_test/SO_NHAP_DQT_*.xlsx` bằng `sinh_du_lieu_diem_quyet_tam.py` (test `test_sinh_lai_bang_script_ra_dung_noi_dung_o` đòi tệp khớp script).
 
 ### T1/T2 sửa vòng 1 (tester: 2 lớn, 5 vừa, 3 nhỏ)
 
