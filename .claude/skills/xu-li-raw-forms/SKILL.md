@@ -41,7 +41,12 @@ python .claude/skills/xu-li-raw-forms/scripts/xu_li_raw.py \
     --ra   ./nap
 ```
 
-- `--raw` bắt buộc. Nhận `.xlsx` hoặc `.csv`.
+- `--raw` bắt buộc. Nhận `.xlsx` hoặc `.csv`, hoặc **một thư mục** các phần
+  `<tên>_p01.csv`, `_p02.csv`, ... (đợt trên 1.000 phiếu xuất theo phần). Script
+  ghép theo số phần (p2 trước p10) và **dừng, không ghi tệp nào** khi: thiếu
+  phần, tiêu đề các phần khác nhau, có hai bộ xuất (tiền tố khác) trong cùng thư
+  mục, hoặc một phiếu nằm ở hai phần. Khi đó xuất tiếp cho đủ, hoặc để mỗi bộ
+  một thư mục, rồi chạy lại.
 - `--dap-an` nên có. Thiếu thì dùng cột `diem` có sẵn trong raw, không chấm lại.
 - `--clb` là danh sách CLB đã điền chỉ tiêu: một Sổ nhập CLB (đọc sheet
   `1. CLB`), hoặc tệp kiểu cũ có cột `club_id, name, capacity, reserve_capacity,

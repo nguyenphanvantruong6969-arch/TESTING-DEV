@@ -77,6 +77,53 @@ def doc_bang(duong):
     return tieu_de, [dict(zip(tieu_de, r + [""] * (len(tieu_de) - len(r)))) for r in dong[1:]]
 
 
+_PHAN = re.compile(r"^(.*)_p(\d+)\.(csv|xlsx)$", re.IGNORECASE)
+
+
+def doc_raw(duong):
+    """Đọc RAW: một tệp (.xlsx / .csv) như doc_bang, hoặc MỘT THƯ MỤC các phần
+    <tiền tố>_p01.csv, _p02.csv, ... do bước xuất theo phần tạo (T4-K3).
+
+    Ghép các phần theo số phần (p2 trước p10). Từ chối, không ghép bừa, khi:
+    không có phần nào; nhiều bộ xuất (tiền tố khác nhau) lẫn trong thư mục;
+    thiếu phần (số phần không liền từ 1); tiêu đề các phần khác nhau; một
+    phieu_so nằm ở hai phần.
+    """
+    if not os.path.isdir(duong):
+        return doc_bang(duong)
+    ten_tm = os.path.basename(os.path.normpath(duong))
+    phan = {}
+    for ten in os.listdir(duong):
+        m = _PHAN.match(ten)
+        if m:
+            phan.setdefault(m.group(1), []).append((int(m.group(2)), ten))
+    if not phan:
+        raise LoiDauVao("%s: thư mục không có phần nào dạng <tên>_p01.csv" % ten_tm)
+    if len(phan) > 1:
+        raise LoiDauVao("%s: có nhiều bộ xuất lẫn nhau (%s); để mỗi bộ một thư mục"
+                        % (ten_tm, ", ".join(sorted(phan))))
+    ds = sorted(next(iter(phan.values())))
+    so_phan = [k for k, _ in ds]
+    if so_phan != list(range(1, len(ds) + 1)):
+        thieu = sorted(set(range(1, max(so_phan) + 1)) - set(so_phan))
+        raise LoiDauVao("%s: thiếu phần %s hoặc số phần trùng; xuất tiếp cho đủ rồi chạy lại"
+                        % (ten_tm, ", ".join("p%02d" % k for k in thieu) or "?"))
+    tieu_de, tat_ca, noi_phieu = None, [], {}
+    for k, ten in ds:
+        td, dong = doc_bang(os.path.join(duong, ten))
+        if tieu_de is None:
+            tieu_de = td
+        elif td != tieu_de:
+            raise LoiDauVao("%s: tiêu đề của %s khác phần đầu" % (ten_tm, ten))
+        for r in dong:
+            ps = r.get("phieu_so", "")
+            if noi_phieu.setdefault(ps, k) != k:
+                raise LoiDauVao("%s: phiếu số %s nằm ở hai phần (p%02d và p%02d)"
+                                % (ten_tm, ps, noi_phieu[ps], k))
+        tat_ca.extend(dong)
+    return tieu_de, tat_ca
+
+
 def _can_cot(ten, tieu_de, can):
     thieu = [c for c in can if c not in tieu_de]
     if thieu:
@@ -350,7 +397,7 @@ def doc_clb_tu_so(duong):
 
 
 def chay(duong_raw, thu_muc_ra, duong_dap_an=None, duong_clb=None):
-    td, raw = doc_bang(duong_raw)
+    td, raw = doc_raw(duong_raw)
     _can_cot("RAW_PHIEU", td, COT_RAW)
     dap_an = None
     if duong_dap_an:
@@ -401,7 +448,7 @@ def main(argv=None):
         if hasattr(_luong, "reconfigure"):
             _luong.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--raw", required=True, help="RAW_PHIEU.xlsx (hoặc .csv)")
+    p.add_argument("--raw", required=True, help="RAW_PHIEU.xlsx (hoặc .csv), hoặc thư mục các phần _p01.csv, _p02.csv...")
     p.add_argument("--dap-an", help="DAP_AN.xlsx; có thì chấm lại theo đáp án gốc")
     p.add_argument("--clb", help="SO_NHAP_CLB.xlsx (sheet 1. CLB) hoặc danh sách CLB "
                                  "(.xlsx/.csv) đã điền chỉ tiêu")
