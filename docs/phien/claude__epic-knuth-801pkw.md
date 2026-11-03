@@ -22,33 +22,33 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 
 ## Plan (written by Opus; ticked by Sonnet)
 T1a
-- [ ] Find how `mau_csv/SO_NHAP_CLB.xlsx` is built (`mau_csv/tao_so_nhap.py`) vs the generated sample
+- [x] Find how `mau_csv/SO_NHAP_CLB.xlsx` is built (`mau_csv/tao_so_nhap.py`) vs the generated sample
       (A14 adds "Lớp" after "Họ tên"). Give every student a SIMULATED class (fixed seed, plausible
       names like 10A1, 11A2...), regenerate the xlsx, keep everything else byte-for-byte equal in meaning.
-- [ ] Docs: `mau_csv/HUONG_DAN_SO_NHAP.md` (+ HUONG_DAN_SU_DUNG if it names a sample) say this file is
+- [x] Docs: `mau_csv/HUONG_DAN_SO_NHAP.md` (+ HUONG_DAN_SU_DUNG if it names a sample) say this file is
       THE main sample. Fix tests that pin the old header/hash.
 T1b
-- [ ] `cau_hinh_ws` / `api_workspace`: a save is rejected only when it introduces a duplicate pair
+- [x] `cau_hinh_ws` / `api_workspace`: a save is rejected only when it introduces a duplicate pair
       that the currently STORED config does not already have. Old duplicates pass (keep the existing
       warning path). New duplicates still get `nhan_trung_danh_tu`. Test both directions.
 T2
-- [ ] Sidebar: 01 Vận hành, 02 Kết quả, 03 Dữ liệu khác, then Nhập tại chỗ, Quản lý, Nhập điểm
+- [x] Sidebar: 01 Vận hành, 02 Kết quả, 03 Dữ liệu khác, then Nhập tại chỗ, Quản lý, Nhập điểm
       (renumber). Remove tabs `members` and `theolop` as separate nav items.
-- [ ] Kết quả tier 1 (segmented control): Theo lớp | Theo CLB | Theo mã học sinh.
+- [x] Kết quả tier 1 (segmented control): Theo lớp | Theo CLB | Theo mã học sinh.
       Tier 2 (sort control): Theo ngày trong tuần | Theo mã học sinh | Theo lớp (the last one ONLY
       when tier 1 = Theo mã học sinh). One picker (class / club) or search box per tier-1 view.
       Remember last tier-1/tier-2 choice per machine (localStorage, try/catch). No scores, no lottery
       numbers in Kết quả (it is for BGH, club heads, homeroom teachers).
-- [ ] Dữ liệu khác = every remaining 02 section (summary, export, fill stats, coverage, preference
+- [x] Dữ liệu khác = every remaining 02 section (summary, export, fill stats, coverage, preference
       distribution, unplaced, reserve, cutoffs, lottery numbers, full match list...).
-- [ ] i18n vi+en, text rules (no em dash, no "em/tôi/tớ" in UI descriptions), language switch re-render.
-- [ ] Update/replace Chromium UI tests that click the old tabs; new tests for tiers.
+- [x] i18n vi+en, text rules (no em dash, no "em/tôi/tớ" in UI descriptions), language switch re-render.
+- [x] Update/replace Chromium UI tests that click the old tabs; new tests for tiers.
 Both
-- [ ] Related tests green, ruff, soat-ma, CHANGELOG, TIEN_DO, push. Opus runs the FULL suite at the end.
+- [x] Related tests green, ruff, soat-ma, CHANGELOG, TIEN_DO, push. Opus runs the FULL suite at the end.
 
 ## Current state (overwrite each handoff)
-- Done so far: branch fast-forwarded to origin/claude/a14-giao-dien (856ecdb). Plan written.
-- In progress: Sonnet implementer session started for T1 then T2.
+- Done: T1a, T1b (dcf5011), T2 (6a070da). 291 related tests pass; ruff clean; soat-ma machine part 7/7.
+- Waiting: Opus runs the full suite and the tester loop.
 
 ## Decisions and gotchas (keep short)
 - Truong's task file overrides rule 1 (registry) and asks for son sessions (rule 10 waived for this).
@@ -56,7 +56,7 @@ Both
   Opus plans fixes, implementer session fixes; repeat until no bug.
 
 ## Next steps (ordered)
-1. Implementer finishes T1, T2 and reports to the Opus session.
+1. Opus: full suite, tester loop, fix plans.
 
 ## Files touched
 - docs/phien/claude__epic-knuth-801pkw.md: this file
@@ -65,3 +65,4 @@ Both
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-03 | Opus | ff to a14-giao-dien, wrote plan for T1/T2 | coordinator session |
+| 2026-11-03 | Sonnet | T1a, T1b, T2 implemented, tests green, pushed | static sample is a blank template (only Lớp column added); day sort = earliest session with a club |
