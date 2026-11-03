@@ -274,10 +274,19 @@ def test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien(tmp_path):
     db = str(tmp_path / "cu2.db")
     rp.init_db(db)
     conn = sqlite3.connect(db)
+    # Dựng bảng CŨ bằng CREATE TABLE tường minh, KHÔNG dùng `ALTER TABLE ... DROP COLUMN`: bản
+    # SQLite cũ ở CI viết lại hỏng câu CREATE khi bỏ liên tiếp hai cột đứng cạnh dòng có chú
+    # thích `--` ("incomplete input"). Kết quả giống hệt: students thiếu diem_ca_nhan và
+    # class_id, clubs thiếu buoi; bảng đang rỗng nên bỏ rồi dựng lại không mất gì.
+    conn.execute("PRAGMA foreign_keys = OFF")
+    conn.execute("DROP TABLE students")
+    conn.execute("CREATE TABLE students (student_id TEXT PRIMARY KEY, name TEXT, "
+                 "stb_number INTEGER, reserve_group TEXT)")
+    conn.execute("DROP TABLE clubs")
+    conn.execute("CREATE TABLE clubs (club_id TEXT PRIMARY KEY, name TEXT, "
+                 "capacity INTEGER NOT NULL CHECK (capacity > 0), "
+                 "reserve_capacity INTEGER NOT NULL DEFAULT 0, reserve_group TEXT)")
     conn.execute("INSERT INTO students (student_id, name) VALUES ('S1', 'An')")
-    conn.execute("ALTER TABLE students DROP COLUMN class_id")
-    conn.execute("ALTER TABLE students DROP COLUMN diem_ca_nhan")
-    conn.execute("ALTER TABLE clubs DROP COLUMN buoi")
     conn.commit()
     conn.close()
     da_lam = rp.di_tru_schema(db)
@@ -287,6 +296,11 @@ def test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien(tmp_path):
     cu = [b for b in baks if "buoi" not in [r[1] for r in sqlite3.connect(b).execute(
         "PRAGMA table_info(clubs)")]]
     assert len(cu) == 1                                   # đúng một bản chụp TRƯỚC khi sửa gì
+    chup = sqlite3.connect(cu[0])                         # và bản chụp có DỮ LIỆU, không phải tệp rỗng
+    try:
+        assert chup.execute("SELECT student_id FROM students").fetchall() == [("S1",)]
+    finally:
+        chup.close()
     assert rp.di_tru_schema(db) == []                     # lặp lại: không làm gì, không sao lưu thêm
     assert len(glob.glob(db + ".bak-*")) == len(baks)
 
