@@ -25,7 +25,6 @@ import csv
 import io
 import os
 import random
-import re
 import sys
 
 import openpyxl

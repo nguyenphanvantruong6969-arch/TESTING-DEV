@@ -80,10 +80,10 @@ CLB không em nào có điểm là CLB **không tổ chức thi**.
 
 ## Ví dụ một dòng học sinh
 
-| Mã HS | Họ tên | Nhóm ưu tiên | Nguyện vọng 1 | | Nguyện vọng 2 | | Nguyện vọng 3 | |
-|---|---|---|---|---|---|---|---|---|
-| | | | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** |
-| HS001 | Nguyễn Văn An | | CLB Tin học | 9,5 | CLB Bóng rổ | | CLB Robotics | thi |
+| Mã HS | Họ tên | Lớp | Nhóm ưu tiên | Nguyện vọng 1 | | Nguyện vọng 2 | | Nguyện vọng 3 | |
+|---|---|---|---|---|---|---|---|---|---|
+| | | | | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** | **CLB** | **Điểm thi** |
+| HS001 | Nguyễn Văn An | 10A1 | | CLB Tin học | 9,5 | CLB Bóng rổ | | CLB Robotics | thi |
 
 An thích Tin học nhất và đã thi được 9,5. Nguyện vọng 2 là Bóng rổ, CLB không
 thi tuyển. Nguyện vọng 3 là Robotics: An đã thi nhưng chưa có điểm.
@@ -95,6 +95,7 @@ Sổ mẫu có cột **Lớp** ngay sau **Họ tên** (vd `10H1A`). Cột này C
 - Ô có giá trị: ghi đè lớp cũ của em đó.
 - Ô trống, hoặc sổ không có cột Lớp: giữ nguyên lớp cũ. Sổ CÓ cột mà có ô trống thì phần mềm báo số em chưa có lớp (chỉ cảnh báo, vẫn nạp).
 - Cột tên khác cũng nhận: Mã lớp, Lop, Class, Class ID, class_id.
+- Các sổ mẫu và ví dụ trong kho (`SO_NHAP_CLB.xlsx`, `vi_du_day_du`, `vi_du_ca_tuan`, `du_lieu_test/vi_du_huong_dan`) có cột Lớp với lớp **MÔ PHỎNG** (`10A1` … `12A3`) do `du_lieu_test/them_lop_vao_mau.py` gán bằng seed cố định; không phải dữ liệu thật. Bộ CSV mẫu tương ứng có cột tuỳ chọn `class_id` ngay sau `reserve_group`.
 
 ---
 

@@ -71,10 +71,10 @@ Tệp này nói **em nào muốn thi vào câu lạc bộ nào**, và kèm luôn
 trường đã chấm xong trên giấy.
 
 ```csv
-student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2,test_club_3,score_3
-HS001,Nguyễn Văn An,,clb_tinhoc,"9,5",clb_robotics,"8,0",clb_tienganh,"7,5"
-HS002,Trần Thị Bình,chinh_sach,clb_tinhoc,"6,0",clb_tienganh,"8,5",,
-HS003,Lê Minh Cường,,,,,,,
+student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2,test_club_3,score_3
+HS001,Nguyễn Văn An,,12A1,clb_tinhoc,"9,5",clb_robotics,"8,0",clb_tienganh,"7,5"
+HS002,Trần Thị Bình,chinh_sach,11A3,clb_tinhoc,"6,0",clb_tienganh,"8,5",,
+HS003,Lê Minh Cường,,11A3,,,,,,
 ```
 
 | Cột | Bắt buộc | Ghi chú |
@@ -119,10 +119,10 @@ Tệp này nói **em muốn vào câu lạc bộ nào, theo thứ tự ưu tiên
 buổi.
 
 ```csv
-student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
-HS001,Nguyễn Văn An,,clb_tinhoc,clb_bongro,clb_robotics,clb_nauan,clb_tienganh,clb_covua,100,100,100,100,100,100
-HS002,Trần Thị Bình,chinh_sach,clb_vanhoc,clb_tinhoc,clb_mythuat,,clb_tienganh,,100,100,100,,100,
-HS003,Lê Minh Cường,,clb_bongro,,clb_nauan,clb_mythuat,clb_lamvuon,,100,,31,69,100,
+student_id,name,reserve_group,class_id,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
+HS001,Nguyễn Văn An,,12A1,clb_tinhoc,clb_bongro,clb_robotics,clb_nauan,clb_tienganh,clb_covua,100,100,100,100,100,100
+HS002,Trần Thị Bình,chinh_sach,11A3,clb_vanhoc,clb_tinhoc,clb_mythuat,,clb_tienganh,,100,100,100,,100,
+HS003,Lê Minh Cường,,11A3,clb_bongro,,clb_nauan,clb_mythuat,clb_lamvuon,,100,,31,69,100,
 ```
 
 **Điểm quyết tâm (cột `<buổi>_wp_<thứ tự>`, A13.13).** Workspace trường học bật sẵn điểm quyết
