@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-03 — Z-SOAT-2 (ngoài sổ, Truong duyệt 03/11/2026): `soat-ma` tìm ruff trên PATH
+
+- **`.claude/skills/soat-ma/scripts/kiem_nhanh.py::kiem_ruff`:** trước chỉ chạy `python -m ruff`, nên máy cài ruff bằng pipx / uv (máy cloud) luôn báo KHÔNG ĐẠT "chưa cài ruff" dù mã sạch. Nay khi Python không có mô-đun ruff thì thử `ruff` trên PATH (`shutil.which`); không có ở đâu cả mới báo chưa cài. Máy đã có mô-đun ruff: không đổi.
+- **Test:** `tests/test_skill_soat_ma.py` thêm 2 ca (`test_ruff_chi_co_tren_path_van_chay`, `test_ruff_khong_co_o_dau_ca_thi_bao_chua_cai`); `_co_ruff` nhận cả ruff trên PATH nên ca cũ `test_ruff_dat_va_khong_dat` không còn bị bỏ qua trên máy đó. 47 ca xanh.
+
 ## 2026-11-03 — A14-B10 (ngoài sổ, Truong duyệt 03/11/2026): bỏ `DROP COLUMN` ở hai test A14 còn lại
 
 Cùng kiểu rủi ro với B9 (SQLite của CI báo "incomplete input"). Chỉ sửa test, không đụng mã sản phẩm.

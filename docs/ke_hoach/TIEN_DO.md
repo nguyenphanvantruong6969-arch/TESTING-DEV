@@ -28,3 +28,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | T4-K1 (ngoài sổ, Truong duyệt 03/11/2026) | chưa | | | | Mục 11.2 số 1 của T4: cột `lop` tuỳ chọn ngoài `COT_RAW` trong skill xu-li-raw-forms và `chamTheoCLB` (tham số mặc định tắt). Giao Con-4 |
 | T4-K2 (ngoài sổ, Truong duyệt 03/11/2026) | chưa (chờ tester soát xong lượt 3 của T4) | | | | Mục 11.2 số 2 của T4: hàm Apps Script lô, trigger, menu quản trị, xuất theo phần (ràng buộc mục 11.3). Giao Con-4 |
 | A14-B10 (ngoài sổ, Truong duyệt) | xong | 2026-11-03 | tests/test_a14_tu_vung_cohort.py, tests/test_a14_sua_sau_soat.py, CHANGELOG.md | (không có tệp mới; hàm phụ trợ `_bo_cot`) | Bỏ `DROP COLUMN` ở hai test A14 còn lại, cùng rủi ro với B9 |
+| Z-SOAT-2 (ngoài sổ, Truong duyệt) | xong | 2026-11-03 | .claude/skills/soat-ma/scripts/kiem_nhanh.py, tests/test_skill_soat_ma.py, CHANGELOG.md | 2 ca mới trong tests/test_skill_soat_ma.py | `kiem_ruff` tìm ruff trên PATH khi Python không có mô-đun ruff |

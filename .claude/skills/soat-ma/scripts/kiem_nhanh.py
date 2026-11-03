@@ -31,6 +31,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -167,7 +168,16 @@ def kiem_ruff(goc):
         return False, ["không chạy được ruff: %s" % e]
     ra = (r.stdout + r.stderr).strip()
     if r.returncode != 0 and "No module named ruff" in ra:
-        return False, ["chưa cài ruff (pip install -r requirements-dev.txt)"]
+        # Không có trong Python đang chạy: thử ruff trên PATH (cài bằng pipx / uv, máy cloud).
+        tep = shutil.which("ruff")
+        if not tep:
+            return False, ["chưa cài ruff (pip install -r requirements-dev.txt)"]
+        try:
+            r = subprocess.run([tep, "check", "."], cwd=goc, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError as e:
+            return False, ["không chạy được ruff: %s" % e]
+        ra = (r.stdout + r.stderr).strip()
     return r.returncode == 0, [] if r.returncode == 0 else ra.splitlines()[-12:]
 
 
