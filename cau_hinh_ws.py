@@ -1,7 +1,7 @@
 """
 cau_hinh_ws.py
 ==============
-Cấu hình của một không gian làm việc (workspace): TỪ VỰNG (5 danh từ, mỗi
+Cấu hình của một không gian làm việc (workspace): TỪ VỰNG (6 danh từ, mỗi
 danh từ có nhãn vi/en) và LUẬT XẾP. Lưu TRONG app.db của chính workspace đó,
 bảng `workspace_settings(key, value)`, một hàng khoá 'config' chứa JSON.
 
@@ -37,7 +37,7 @@ KHOA_CAU_HINH = "config"
 # nên CSDL đang bị tiến trình khác giữ thì báo "đang bận" sau vài giây chứ không đứng hình.
 CHO_KHOA_DOC_CAU_HINH_MS = 2500
 
-# Năm danh từ (DANH_TU, nguồn duy nhất ở nhan_ws.py): mọi nhãn hiển thị đều đi qua
+# Sáu danh từ (DANH_TU, nguồn duy nhất ở nhan_ws.py): mọi nhãn hiển thị đều đi qua
 # chúng, nên tập này là cố định — gõ sai tên danh từ phải báo lỗi chứ không được
 # lặng lẽ thành một nhãn mồ côi.
 
@@ -102,6 +102,51 @@ def _nhan_thieu_en_lay_vi(goc: dict, da_tron: dict) -> None:
             da_tron["labels"][dt]["en"] = da_tron["labels"][dt]["vi"]
 
 
+class NhanTrung(ValueError):
+    """Hai danh từ có CÙNG nhãn (sau strip + casefold, riêng vi và riêng en).
+
+    Cột của Sổ nhập đọc theo TÊN: hai danh từ trùng nhãn thì hai cột trùng tên và sổ bị đọc
+    nhầm (vd nhóm ưu tiên đặt tên "Lớp" cạnh cột Lớp). Mang `a`, `b` (khoá danh từ) và `nhan`."""
+
+    def __init__(self, a, b, nhan):
+        super().__init__("Hai danh từ %s và %s đang cùng nhãn %r; mỗi danh từ cần một nhãn riêng."
+                         % (a, b, nhan))
+        self.a, self.b, self.nhan = a, b, nhan
+
+
+def cac_cap_nhan_trung(labels: dict) -> list:
+    """[(a, b, nhãn)] — mọi cặp danh từ cùng nhãn trong `labels` (đã chuẩn hoá), theo thứ tự
+    DANH_TU; vi và en xét riêng. Cùng một cặp chỉ nêu một lần."""
+    ra, da_co = [], set()
+    for ngon in ("vi", "en"):
+        thay: dict = {}
+        for dt in DANH_TU:
+            nhan = str((labels.get(dt) or {}).get(ngon) or "").strip()
+            khoa = nhan.casefold()
+            if not khoa:
+                continue
+            if khoa in thay and (thay[khoa], dt) not in da_co:
+                da_co.add((thay[khoa], dt))
+                ra.append((thay[khoa], dt, nhan))
+            thay.setdefault(khoa, dt)
+    return ra
+
+
+def _khoa_cap_trung(labels: dict) -> set:
+    """{(ngôn ngữ, a, b, nhãn casefold)} — để so một cặp trùng với cặp trùng ĐÃ CÓ."""
+    ra = set()
+    for ngon in ("vi", "en"):
+        thay: dict = {}
+        for dt in DANH_TU:
+            khoa = str((labels.get(dt) or {}).get(ngon) or "").strip().casefold()
+            if not khoa:
+                continue
+            if khoa in thay:
+                ra.add((ngon, thay[khoa], dt, khoa))
+            thay.setdefault(khoa, dt)
+    return ra
+
+
 def _la_so_nguyen(v) -> bool:
     # bool là lớp con của int: True không được lọt qua như "1".
     return isinstance(v, int) and not isinstance(v, bool)
@@ -113,7 +158,7 @@ def _ghi_ro_wharton(cfg) -> bool:
         and "wharton" in cfg["rules"]
 
 
-def _chuan_hoa(cfg) -> dict:
+def _chuan_hoa(cfg, kiem_trung: bool = True, cho_phep_trung_nhu: dict | None = None) -> dict:
     """Trộn `cfg` lên mặc định, kiểm, và trả bản ĐẦY ĐỦ đã chuẩn hoá.
 
     Ném ValueError với câu nói rõ trường nào sai. Không sửa `cfg` của người gọi.
@@ -163,6 +208,20 @@ def _chuan_hoa(cfg) -> dict:
                 raise ValueError("labels.%s.%s không được bắt đầu bằng '%s' "
                                  "(Excel sẽ hiểu là công thức)." % (dt, ngon, chu[0]))
         kq["labels"][dt] = {"vi": vi, "en": en or vi}
+    # Hai danh từ cùng nhãn làm Sổ nhập đọc nhầm cột (A14). Chỉ chặn khi GHI / kiểm cấu hình mới;
+    # cấu hình ĐÃ LƯU từ trước mà trùng vẫn đọc được (`doc_cau_hinh` truyền kiem_trung=False).
+    # Cặp trùng Y HỆT cấu hình `cho_phep_trung_nhu` (cấu hình đang lưu / nguồn nhân bản) thì để
+    # qua: người dùng không đổi nhãn, chỉ đổi tên workspace hay nhân bản. Cặp MỚI hoặc bị đổi
+    # thì vẫn từ chối.
+    if kiem_trung:
+        cu = _khoa_cap_trung(cho_phep_trung_nhu["labels"]) if (
+            isinstance(cho_phep_trung_nhu, dict) and isinstance(
+                cho_phep_trung_nhu.get("labels"), dict)) else set()
+        moi = _khoa_cap_trung(kq["labels"])
+        if moi - cu:
+            trung = [t for t in cac_cap_nhan_trung(kq["labels"])
+                     if any((n, t[0], t[1], t[2].casefold()) in moi - cu for n in ("vi", "en"))]
+            raise NhanTrung(*trung[0])
 
     # --- luật ---
     luat = kq["rules"]
@@ -240,13 +299,13 @@ def tron_len(da_luu: dict, moi: dict) -> dict:
     return kq
 
 
-def chuan_hoa(cfg: dict) -> dict:
+def chuan_hoa(cfg: dict, cho_phep_trung_nhu: dict | None = None) -> dict:
     """Kiểm `cfg` (có thể thiếu khoá) và trả bản đầy đủ đã chuẩn hoá — không ghi gì.
 
     Cho nơi khác cần biết một cấu hình có hợp lệ không TRƯỚC khi làm việc tốn
     kém (vd dựng thư mục workspace). Ném ValueError như `ghi_cau_hinh`.
     """
-    return _chuan_hoa(cfg)
+    return _chuan_hoa(cfg, cho_phep_trung_nhu=cho_phep_trung_nhu)
 
 
 def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
@@ -280,7 +339,7 @@ def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
             conn.close()
         if not dong or dong[0] is None:
             return mac_dinh
-        return _chuan_hoa(json.loads(dong[0]))
+        return _chuan_hoa(json.loads(dong[0]), kiem_trung=False)
     except (sqlite3.Error, ValueError):
         # json.JSONDecodeError là con của ValueError, nên một câu bắt đủ cả
         # JSON hỏng lẫn giá trị sai.
@@ -289,7 +348,7 @@ def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
         return mac_dinh
 
 
-def ghi_cau_hinh(db_path: str, cfg: dict) -> dict:
+def ghi_cau_hinh(db_path: str, cfg: dict, cho_phep_trung_nhu: dict | None = None) -> dict:
     """Kiểm rồi ghi cấu hình. Trả về bản đầy đủ đã chuẩn hoá và đã ghi.
 
     `cfg` có thể thiếu khoá (trộn lên mặc định). Ghi BẢN ĐẦY ĐỦ chứ không ghi
@@ -299,7 +358,9 @@ def ghi_cau_hinh(db_path: str, cfg: dict) -> dict:
     Raises:
         ValueError: `cfg` sai — chưa ghi gì.
     """
-    day_du = _chuan_hoa(cfg)
+    # Nhãn trùng: chỉ cặp trùng đã có trong cấu hình đang lưu (hoặc `cho_phep_trung_nhu`) được giữ.
+    day_du = _chuan_hoa(cfg, cho_phep_trung_nhu=(
+        cho_phep_trung_nhu if cho_phep_trung_nhu is not None else doc_cau_hinh(db_path)))
     conn = connect_db(db_path)
     try:
         # Tự dựng bảng: workspace dựng từ CSDL cũ chưa qua init_db vẫn ghi được.

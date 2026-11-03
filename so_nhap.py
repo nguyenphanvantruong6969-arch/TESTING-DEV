@@ -125,6 +125,11 @@ def nhan_nhom(cfg=None) -> str:
     return dang_chu(_cfg(cfg)["nhan"], "group", "", "vi")
 
 
+def nhan_lop(cfg=None) -> str:
+    """Tiêu đề cột lớp (A14): nhãn `cohort` tiếng Việt ("Lớp" mặc định)."""
+    return dang_chu(_cfg(cfg)["nhan"], "cohort", "", "vi")
+
+
 def nhan_diem(cfg=None) -> str:
     """Tiêu đề cột điểm: nhãn của danh từ 'score' ('Điểm' mặc định)."""
     return dang_chu(_cfg(cfg)["nhan"], "score", "", "vi")
@@ -292,6 +297,8 @@ _TEN_COT_HS = {
     "student_id": {"ma hs", "ma hoc sinh", "ma", "ma so", "ma so hoc sinh"},
     "name": {"ho ten", "ho va ten", "ten", "ten hoc sinh"},
     "reserve_group": {"nhom uu tien", "nhom du tru", "doi tuong uu tien"},
+    # A14: lớp (chỉ để hiển thị / sắp / lọc / xuất; thuật toán không đọc).
+    "class_id": {"lop", "ma lop", "class", "class id"},
 }
 _MAU_NV = re.compile(r"^(?:nv|nguyen vong)\s*(\d+)$")
 _MAU_DIEM = re.compile(r"^diem(?: nv| thi)?\s*(\d+)$")
@@ -314,6 +321,7 @@ def _ten_cot_hs(cfg=None) -> dict:
     ra["student_id"] |= {"ma " + x for x in nguoi}
     ra["name"] |= {"ten " + x for x in nguoi}
     ra["reserve_group"] |= _bien_the(cfg, "group")
+    ra["class_id"] |= _bien_the(cfg, "cohort")
     return ra
 
 
@@ -364,9 +372,23 @@ def la_so_nhap(ten_cac_sheet, cfg=None) -> bool:
 def _khop_cot(tieu_de, bang_ten):
     """{khoá: chỉ số cột} theo bảng tên. Cột đầu khớp được giữ."""
     vi_tri = {}
+    # Cột lớp và cột nhóm ưu tiên có thể TRÙNG tên (cấu hình cũ đặt hai nhãn giống nhau). Khi đó
+    # gán theo thứ tự cột mà `ghi_so_nhap` ghi (Lớp trước Nhóm); chỉ MỘT cột trùng tên thì là
+    # Nhóm — như trước khi có cột Lớp.
+    mo_ho = [i for i, t in enumerate(tieu_de)
+             if {"class_id", "reserve_group"} <= {k for k, ten in bang_ten.items()
+                                                  if bo_dau(t) in ten}]
+    ep = {}
+    if len(mo_ho) >= 2:
+        ep[mo_ho[0]] = "class_id"
+        ep.update({i: "reserve_group" for i in mo_ho[1:]})
+    else:
+        ep.update({i: "reserve_group" for i in mo_ho})
     for i, t in enumerate(tieu_de):
         b = bo_dau(t)
         for khoa, cac_ten in bang_ten.items():
+            if i in ep and khoa != ep[i]:
+                continue
             if b in cac_ten and khoa not in vi_tri:
                 vi_tri[khoa] = i
                 break
@@ -665,6 +687,8 @@ def _doc_sheet_hs(ws, clubs, loi, cfg=None, ten_sheet=SHEET_HS) -> list:
             return []
     elif tiep:
         dong_iter = itertools.chain([tiep], dong_iter)
+    from rbda_priority_pipeline import chuan_hoa_lop     # nhập muộn như `tu_csv` (xem sap_buoi)
+
     cot = _khop_cot(tieu_de, _ten_cot_hs(cfg))
     cau_hinh = _cfg(cfg)
     ca_nhan = cau_hinh["per_person"]
@@ -842,6 +866,10 @@ def _doc_sheet_hs(ws, clubs, loi, cfg=None, ten_sheet=SHEET_HS) -> list:
             # Cột có mà ô trống -> "" = em không thuộc nhóm nào.
             "reserve_group": (lay(o, cot["reserve_group"])
                               if "reserve_group" in cot else None),
+            # A14: lớp. None = sổ KHÔNG có cột lớp (giữ lớp cũ); "" = có cột mà ô trống
+            # (cũng giữ lớp cũ, nhưng được đếm vào cảnh báo thiếu lớp); còn lại là lớp đã chuẩn hoá.
+            "class_id": (chuan_hoa_lop(lay(o, cot["class_id"])) or ""
+                         if "class_id" in cot else None),
             "nv": nv, "dong": so_dong,
             # Điểm theo người (chế độ per_person): chuỗi gốc của ô — số, chữ `thi` hay
             # trống. None = sổ không có cột điểm chung (điểm theo từng CLB, ở `nv`).
@@ -885,13 +913,17 @@ def thanh_csv(du_lieu: dict) -> dict:
     n_nv = max([len(s["nv"]) for s in hs] + [1])
     # Sổ có cột "Điểm W k" thì tệp nguyện vọng có thêm `wp_k` đi cặp `pref_k` (mục A13).
     co_w = any("diem_w" in x for s in hs for x in s["nv"])
-    thi = [["student_id", "name", "reserve_group"]
+    # A14: cột `class_id` CHỈ khi có em có lớp; không lớp thì tệp giống từng byte như cũ.
+    co_lop = any(s.get("class_id") for s in hs)
+    thi = [["student_id", "name", "reserve_group"] + (["class_id"] if co_lop else [])
            + [c for k in range(1, n_thi + 1) for c in (f"test_club_{k}", f"score_{k}")]]
-    nv = [["student_id", "name", "reserve_group"]
+    nv = [["student_id", "name", "reserve_group"] + (["class_id"] if co_lop else [])
           + [f"pref_{k}" for k in range(1, n_nv + 1)]
           + ([f"wp_{k}" for k in range(1, n_nv + 1)] if co_w else [])]
     for s in hs:
         dau = [s["student_id"], s["name"], s["reserve_group"] or ""]
+        if co_lop:
+            dau.append(s.get("class_id") or "")
         o_thi = [v for x in s["nv"] if x["thi"] for v in (x["club_id"], x["diem"])]
         thi.append(dau + o_thi + [""] * (2 * n_thi - len(o_thi)))
         o_nv = [x["club_id"] for x in s["nv"]]
@@ -1140,7 +1172,7 @@ def ten_khong_trung(clubs) -> int:
 
 
 def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=True,
-                cfg=None, luon_co_cot_w: bool = False):
+                cfg=None, luon_co_cot_w: bool = False, co_lop: bool = False):
     """Ghi sổ nhập ra tệp .xlsx (đường dẫn hoặc tệp nhị phân đang mở).
 
     clubs:    dict có name, capacity, reserve_capacity, reserve_group, buoi, club_id
@@ -1160,6 +1192,8 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
                   điểm theo NGƯỜI (per_person): MỘT cột "<điểm>" sau cột nhóm;
                 * tiêu đề cột nhóm = nhãn của nhóm ưu tiên.
               Cấu hình của trường học mặc định cho ra sổ GIỐNG HỆT cfg=None.
+    co_lop:   True thì thêm cột "Lớp" (nhãn `cohort`) NGAY SAU "Họ tên" (A14). Mặc định False =
+              sổ y như cũ. Cột vắng mặt khi đọc nghĩa là giữ lớp cũ.
     luon_co_cot_w: True thì sổ CÓ cột "Điểm quyết tâm" dù workspace tắt tính năng (A13.7: sổ
               MẪU phát cho người dùng), kèm ghi chú trong sheet Hướng dẫn. Mặc định False = như
               cũ: cột chỉ có khi `rules.wharton` bật. Không có tác dụng với điểm theo người.
@@ -1244,6 +1278,8 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # ---- 2. Học sinh ----------------------------------------------------
     wh = wb.create_sheet(sheet_hs)
     cot_dau = cot_hs_dau(cfg) if co_nhom else cot_hs_dau(cfg)[:2]
+    if co_lop:
+        cot_dau = cot_dau[:2] + [nhan_lop(cfg)] + cot_dau[2:]
     if ca_nhan:
         cot_dau = cot_dau + [ten_diem]        # MỘT cột điểm chung, ngay sau cột nhóm
     nv1 = len(cot_dau) + 1                    # số thứ tự cột NV1 (tính từ 1)
@@ -1296,6 +1332,8 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
 
     for s in students:
         hang = [s.get("student_id", ""), s.get("name", "")]
+        if co_lop:
+            hang.append(s.get("class_id") or None)
         if co_nhom:
             hang.append(s.get("reserve_group") or None)
         if ca_nhan:
@@ -1321,8 +1359,10 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     cot_cuoi = len(tieu_de)
     wh.column_dimensions["A"].width = 11
     wh.column_dimensions["B"].width = 24
+    if co_lop:
+        wh.column_dimensions["C"].width = 10
     if co_nhom:
-        wh.column_dimensions["C"].width = 13
+        wh.column_dimensions[get_column_letter(3 + bool(co_lop))].width = 13
     if ca_nhan:
         wh.column_dimensions[get_column_letter(nv1 - 1)].width = 10   # cột điểm chung
     for col in range(nv1, cot_cuoi + 1):
@@ -1428,7 +1468,7 @@ def tu_csv(clubs_rows, thi_rows, nv_rows):
     (student_id, club_id) thi một CLB KHÔNG có trong nguyện vọng: sổ nhập
     không chứa được những ô đó.
     """
-    from rbda_priority_pipeline import sap_buoi
+    from rbda_priority_pipeline import chuan_hoa_lop, sap_buoi
 
     clubs = [{
         "club_id": r["club_id"], "name": r.get("name") or r["club_id"],
@@ -1443,9 +1483,10 @@ def tu_csv(clubs_rows, thi_rows, nv_rows):
     def lay_hs(r):
         sid = (r.get("student_id") or "").strip()
         s = hs.setdefault(sid, {"student_id": sid, "name": "", "reserve_group": "",
-                                "nv": [], "_thi": {}})
+                                "class_id": None, "nv": [], "_thi": {}})
         s["name"] = s["name"] or (r.get("name") or "")
         s["reserve_group"] = s["reserve_group"] or (r.get("reserve_group") or "")
+        s["class_id"] = s.get("class_id") or chuan_hoa_lop(r.get("class_id"))
         return s
 
     for r in nv_rows:

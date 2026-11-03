@@ -77,6 +77,13 @@ MA_MOI_SAU_ANH_CHUP = {
     "http_bi_tu_choi", "http_khong_co_dich", "http_khong_co_ham", "http_than_qua_lon",
     # A13.12 (soát nhập 3.1): mã rỗng khi tạo học sinh.
     "student_id_required",
+    # A14: lớp của học sinh.
+    "error_reading_classes", "error_saving_student_class", "lop_khong_co_trong_danh_sach",
+    "so_nhap_canh_bao_thieu_lop",
+    # A14 sửa A1: hai danh từ cùng nhãn.
+    "nhan_trung_danh_tu", "so_nhap_canh_bao_nhan_trung",
+    # A14 sửa A4: giới hạn đầu vào lớp.
+    "lop_sai_kieu", "lop_qua_dai", "canh_bao_lop_bi_cat",
 }
 
 
@@ -232,7 +239,7 @@ def test_tham_so_diem_goc_khong_dung_ten_danh_tu():
     import re
     for ma, d in MESSAGES.items():
         for lang in ("vi", "en"):
-            for ten in re.findall(r"\{(person|slot|session|group|score)\}", d[lang]):
+            for ten in re.findall(r"\{(person|slot|session|group|score|cohort)\}", d[lang]):
                 # được phép: là DANH TỪ, và không có lời gọi err() nào truyền tham số trùng tên
                 assert ten in nhan_ws.DANH_TU
 
@@ -423,7 +430,7 @@ def test_so_excel_cong_ty_dung_tu_cua_workspace(tmp_path):
     assert res["ok"], res["errors"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
     assert wb.sheetnames == ["Hướng dẫn", "Danh sách nhân viên", "Theo dự án",
-                             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
+                             "Theo lớp", "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
     ds = wb["Danh sách nhân viên"]
     dau = [c.value for c in ds[4]]
     assert dau[:2] == ["Mã nhân viên", "Họ tên"] and "Mã dự án" in dau and "Tên dự án" in dau
@@ -505,7 +512,7 @@ def test_mac_dinh_truong_hoc_ten_trang_excel_khong_doi(api, tmp_path):
     assert api.export_csv(ra)["ok"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
     assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB",
-                             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
+                             "Theo lớp", "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
     assert wb["Danh sách học sinh"]["A1"].value == "DANH SÁCH HỌC SINH VÀ CÂU LẠC BỘ"
 
 
@@ -518,5 +525,5 @@ def test_mac_dinh_moi_them_dung_trang_diem_chuan(api, tmp_path):
     ra = str(tmp_path / "kq.csv")
     assert api.export_csv(ra)["ok"]
     wb = openpyxl.load_workbook(os.path.splitext(ra)[0] + ".xlsx")
-    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Chưa có chỗ",
-                             "Điểm chuẩn", "Thống kê", "Dấu vết (kỹ thuật)"]
+    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Theo lớp",
+                             "Chưa có chỗ", "Điểm chuẩn", "Thống kê", "Dấu vết (kỹ thuật)"]

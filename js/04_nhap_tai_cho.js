@@ -30,8 +30,83 @@ let whartonState = null;   // state cua em dang mo (co khoa `wharton`); null = w
 let daLuuWharton = "";     // dang chuoi cua diem Wharton DA LUU, theo tung o nhap (xem whartonChuoi)
 let daLuuThi = [];   // o tick thi da luu, da sap
 let daLuuNv = [];    // thu tu nguyen vong da luu
+let daLuuLop = "";   // lop cua em DA LUU ("" = chua co); o chon lop khac gia tri nay la "chua luu" (A14)
 let choRoiDi = null; // hen gio cua lan bam roi di thu nhat
 let khoaRoiDi = null; // lan bam thu nhat la DI DAU (xac nhan phai cung cho)
+
+/* ---- A14: LỚP của học sinh ----
+   Chỉ để hiển thị / lọc / sắp / xuất cho giáo viên chủ nhiệm; thuật toán không đọc lớp.
+   `list_classes` trả {classes:[{class_id,n}], n_khong_lop}. Ba nơi dùng chung: bộ lọc ở thẻ Quản lý
+   và thẻ Kết quả, và ô chọn CỐ ĐỊNH ở kiosk. */
+const LOP_TAT_CA = "__tat_ca__";     // giá trị ô lọc "tất cả"; "" = chưa có lớp
+let dsLopHienCo = [];                // [class_id] lần nạp gần nhất
+
+function layDsLop() {
+  return callApi("list_classes").then((res) => {
+    const d = res.ok ? res.data : { classes: [], n_khong_lop: 0 };
+    dsLopHienCo = d.classes.map((c) => c.class_id);
+    return d;
+  });
+}
+
+function themOption(sel, value, text) {
+  const o = document.createElement("option");
+  o.value = value;
+  o.textContent = text;
+  sel.appendChild(o);
+}
+
+/* Ô LỌC: Tất cả / từng lớp / Chưa có lớp. Giữ giá trị đang chọn nếu lớp đó còn. */
+function napOLocLop(sel, d) {
+  if (!sel) return;
+  const cu = sel.options.length ? sel.value : LOP_TAT_CA;   // "" là lựa chọn thật (Chưa có lớp)
+  clear(sel);
+  themOption(sel, LOP_TAT_CA, t("lop_tat_ca"));
+  d.classes.forEach((c) => themOption(sel, c.class_id, c.class_id + " (" + c.n + ")"));
+  if (d.n_khong_lop) themOption(sel, "", t("lop_chua_co") + " (" + d.n_khong_lop + ")");
+  sel.value = Array.from(sel.options).some((o) => o.value === cu) ? cu : LOP_TAT_CA;
+}
+
+/* Tham số `class_id` gửi lên: null = không lọc; "" = chưa có lớp; còn lại là tên lớp. */
+function lopLocThamSo(sel) {
+  return !sel || !sel.options.length || sel.value === LOP_TAT_CA ? null : sel.value;
+}
+
+/* Ô CHỌN ở kiosk: danh sách CỐ ĐỊNH từ list_classes (không gõ tự do). Không có lớp nào thì ẩn. */
+function napOChonLopKiosk(sel, lopHienTai) {
+  clear(sel);
+  themOption(sel, "", t("kiosk_lop_chon"));
+  dsLopHienCo.forEach((c) => themOption(sel, c, c));
+  sel.value = dsLopHienCo.indexOf(lopHienTai) !== -1 ? lopHienTai : "";
+}
+
+/* Ô chọn lớp của form "Tạo học sinh mới": ẩn khi chưa có lớp nào. */
+function napOChonLopTaoMoi() {
+  const sel = el("newStudentLop");
+  const giu = sel.value;
+  sel.hidden = dsLopHienCo.length === 0;
+  napOChonLopKiosk(sel, giu);
+}
+
+function veOLopKiosk(lopHienTai) {
+  const coLop = dsLopHienCo.length > 0;
+  el("kioskLopHang").hidden = !coLop;
+  el("kioskLopNhac").hidden = true;
+  if (coLop) napOChonLopKiosk(el("kioskLop"), lopHienTai || "");
+}
+
+/* Lớp gửi kèm khi Lưu: null = ô ẩn (không có lớp nào) nên không đụng; undefined = BẮT BUỘC mà chưa chọn. */
+function lopKioskDeGui() {
+  if (el("kioskLopHang").hidden) return null;
+  const v = el("kioskLop").value;
+  if (!v) {
+    el("kioskLopNhac").hidden = false;
+    el("kioskLop").focus();
+    return undefined;
+  }
+  el("kioskLopNhac").hidden = true;
+  return v;
+}
 
 function thiDangTick() {
   return Array.from(document.querySelectorAll("#testSelectionGrid .option-row.is-checked"))
@@ -46,6 +121,11 @@ function nvChuaLuu() {
   return !!currentFallbackStudent && currentRanking.join("|") !== daLuuNv.join("|");
 }
 
+/* A14: o lop dang hien (khong bi an) khac lop da luu. */
+function lopChuaLuu() {
+  return !!currentFallbackStudent && !el("kioskLopHang").hidden && el("kioskLop").value !== daLuuLop;
+}
+
 function whartonChuaLuu() {
   return !!currentFallbackStudent && !!whartonState && whartonChuoi() !== daLuuWharton;
 }
@@ -54,6 +134,7 @@ function veDauChuaLuu() {
   el("chuaLuuThi").hidden = !thiChuaLuu();
   el("chuaLuuNv").hidden = !nvChuaLuu();
   el("chuaLuuWharton").hidden = !whartonChuaLuu();
+  el("kioskLopChuaLuu").hidden = !lopChuaLuu();
 }
 
 /* Chay `hanhDong` neu khong con gi chua luu; neu con, lan bam dau chi
@@ -61,7 +142,7 @@ function veDauChuaLuu() {
    bo thay doi va di tiep. Cung cho la bat buoc: bam em khac roi bam sang
    the khac khong phai la "xac nhan bo thay doi" cho viec doi the. */
 function roiDiNeuDuoc(hanhDong, khoa) {
-  if (!thiChuaLuu() && !nvChuaLuu() && !whartonChuaLuu()) {
+  if (!thiChuaLuu() && !nvChuaLuu() && !whartonChuaLuu() && !lopChuaLuu()) {
     hanhDong();
     return;
   }
@@ -79,6 +160,7 @@ function roiDiNeuDuoc(hanhDong, khoa) {
 }
 
 function loadFallbackTab() {
+  layDsLop().then(() => napOChonLopTaoMoi());
   fallbackStudentPage = 1;
   loadFallbackStudentList();
   /* Em dang mo co the da bi xoa o noi khac (vung nguy hiem, xoa hoc
@@ -96,6 +178,7 @@ function boChonHocSinhDuPhong() {
   currentRanking = [];
   daLuuThi = [];
   daLuuNv = [];
+  daLuuLop = "";
   if (choRoiDi) { clearTimeout(choRoiDi); choRoiDi = null; khoaRoiDi = null; }
   renderWhartonStep(null);
   el("fallbackWorkArea").hidden = true;
@@ -133,6 +216,10 @@ function initFallbackHandlers() {
     fallbackStudentPage += 1;
     loadFallbackStudentList();
   });
+  el("kioskLop").addEventListener("change", () => {
+    if (el("kioskLop").value) el("kioskLopNhac").hidden = true;
+    veDauChuaLuu();
+  });
   el("btnCreateStudent").addEventListener("click", () => {
     const id = el("newStudentId").value.trim();
     const name = el("newStudentName").value.trim();
@@ -140,7 +227,14 @@ function initFallbackHandlers() {
       showToast(t("toast_need_id_and_name"), "error");
       return;
     }
-    roiDiNeuDuoc(() => khiBan(el("btnCreateStudent"), () => callApi("create_student_if_missing", id, name)).then((res) => {
+    /* A14: có lớp trong danh sách thì em mới cũng phải chọn lớp. */
+    const lopMoi = el("newStudentLop").hidden ? null : el("newStudentLop").value;
+    if (lopMoi === "") {
+      showToast(t("kiosk_lop_nhac"), "error");
+      el("newStudentLop").focus();
+      return;
+    }
+    roiDiNeuDuoc(() => khiBan(el("btnCreateStudent"), () => callApi("create_student_if_missing", id, name, lopMoi)).then((res) => {
       if (!res.ok) {
         showErrorToast(res.errors);
         return;
@@ -148,6 +242,8 @@ function initFallbackHandlers() {
       showToast(res.data.created ? t("toast_student_created") : t("toast_student_exists"), "success");
       el("newStudentId").value = "";
       el("newStudentName").value = "";
+      el("newStudentLop").value = "";
+      layDsLop().then(() => napOChonLopTaoMoi());
       loadFallbackStudentList();
       selectFallbackStudent(id);
     }), "tao:" + id);
@@ -161,7 +257,9 @@ function initFallbackHandlers() {
     const checked = Array.from(document.querySelectorAll("#testSelectionGrid .option-row.is-checked")).map(
       (row) => row.dataset.clubId
     );
-    khiBan(el("btnSubmitTestSelection"), () => callApi("submit_test_selection", sid, checked)).then((res) => {
+    const lop = lopKioskDeGui();
+    if (lop === undefined) { feedback(el("testSelectionFeedback"), t("kiosk_lop_nhac"), true); return; }
+    khiBan(el("btnSubmitTestSelection"), () => callApi("submit_test_selection", sid, checked, lop)).then((res) => {
       const conMo = sid === currentFallbackStudent;
       if (res.ok) {
         /* Bo tick CLB da cham diem la xoa diem do (api
@@ -169,6 +267,7 @@ function initFallbackHandlers() {
            da cham ma im lang la mat du lieu khong ai hay. */
         if (conMo) {
           daLuuThi = checked.slice().sort();
+          if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
           lamMoiBuoc3(true);          /* doi o tick la doi quy cua tung CLB o Buoc 3 */
           const m = res.data.n_scores_removed || 0;
@@ -218,11 +317,14 @@ function initFallbackHandlers() {
        lúc chờ thì CLB đó vẫn là "chưa lưu" (A13.12, soát nhập 2.3). */
     const sid = currentFallbackStudent;
     const chup = currentRanking.slice();
-    khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", sid, chup)).then((res) => {
+    const lop = lopKioskDeGui();
+    if (lop === undefined) { feedback(el("preferencesFeedback"), t("kiosk_lop_nhac"), true); return; }
+    khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", sid, chup, lop)).then((res) => {
       const conMo = sid === currentFallbackStudent;
       if (res.ok) {
         if (conMo) {
           daLuuNv = chup;
+          if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
           lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
           feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
@@ -238,7 +340,7 @@ function initFallbackHandlers() {
      du lieu DA LUU: con thay doi chua luu thi nhac luu truoc. */
   el("btnXuatEmNay").addEventListener("click", () => {
     if (!currentFallbackStudent) return;
-    if (thiChuaLuu() || nvChuaLuu() || whartonChuaLuu()) {
+    if (thiChuaLuu() || nvChuaLuu() || whartonChuaLuu() || lopChuaLuu()) {
       showToast(t("fallback_xuat_chua_luu"), "error");
       return;
     }
@@ -396,7 +498,7 @@ function danhDauTheDangChon() {
 function selectFallbackStudent(studentId) {
   const luotChon = (luotGoiMoiNhat.chon_hs = (luotGoiMoiNhat.chon_hs || 0) + 1);
   buoiTaiCho = null;
-  Promise.all([callApi("get_student_entry_state", studentId), callApi("list_clubs")]).then(([stateRes, clubsRes]) => {
+  Promise.all([callApi("get_student_entry_state", studentId), callApi("list_clubs"), layDsLop()]).then(([stateRes, clubsRes]) => {
     /* Bam nhanh hai em: chi lan bam CUOI duoc ve, xem callApiMoiNhat. */
     if (luotChon !== luotGoiMoiNhat.chon_hs) return;
     if (!stateRes.ok) {
@@ -416,6 +518,8 @@ function selectFallbackStudent(studentId) {
     ["testSelectionFeedback", "preferencesFeedback"].forEach((id) => feedback(el(id), "", false));
 
     el("fallbackWorkArea").hidden = false;
+    veOLopKiosk(stateRes.data.class_id);
+    daLuuLop = el("kioskLopHang").hidden ? "" : el("kioskLop").value;
     const nhan = el("currentStudentLabel");
     nhan.innerHTML =
       `<span class="hs-dang-chon-ten">${esc(stateRes.data.name)}</span>` +

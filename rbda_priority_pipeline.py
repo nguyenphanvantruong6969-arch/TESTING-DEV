@@ -44,6 +44,7 @@ và output của 06_ms_forms_transform.py):
            (tối đa 10 club theo giới hạn Microsoft Forms Ranking).
 """
 
+import unicodedata
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
@@ -1833,7 +1834,8 @@ CREATE TABLE IF NOT EXISTS students (
     name TEXT,
     stb_number INTEGER,
     reserve_group TEXT,         -- vd: 'khoi10', 'chinh_sach', hoặc NULL
-    diem_ca_nhan REAL           -- điểm của cả NGƯỜI (workspace score_scope = per_person); NULL = chưa có
+    diem_ca_nhan REAL,          -- điểm của cả NGƯỜI (workspace score_scope = per_person); NULL = chưa có
+    class_id TEXT               -- lớp (A14): CHỈ để hiển thị / sắp / lọc / xuất; thuật toán KHÔNG đọc; NULL = chưa có
 );
 """ + "".join(
     "\nCREATE TABLE IF NOT EXISTS %s (%s);\n" % (ten, than)
@@ -2175,6 +2177,27 @@ def _dung_lai_bang_co_rang_buoc(db_path: str) -> bool:
         conn.close()
 
 
+LOP_TOI_DA = 50      # độ dài tối đa của tên lớp SAU chuẩn hoá (A14)
+
+
+def chuan_hoa_lop(raw) -> str | None:
+    """Chuẩn hoá tên lớp (A14): NFC, bỏ ký tự vô hình (loại Cf: U+200B, U+FEFF…) và ký tự điều
+    khiển (Cc), cắt hai đầu, gộp khoảng trắng liên tiếp, IN HOA.
+
+    Rỗng / chỉ khoảng trắng / None -> None (chưa có lớp). Không ép mẫu ("10H1A" hay
+    "Ca sáng" đều được) và KHÔNG cắt độ dài (xem LOP_TOI_DA). Dùng chung cho API, nhập CSV,
+    Sổ nhập và xuất.
+    """
+    if raw is None:
+        return None
+    chu = unicodedata.normalize("NFC", str(raw))
+    chu = "".join(c for c in chu if unicodedata.category(c) != "Cf")
+    chu = " ".join(chu.split())            # tab / xuống dòng cũng là khoảng trắng: gộp trước
+    chu = "".join(c for c in chu if unicodedata.category(c) != "Cc")
+    chu = unicodedata.normalize("NFC", chu.upper())
+    return chu or None
+
+
 def _co_cot(cur, bang: str, cot: str) -> bool:
     """Bảng `bang` đã có cột `cot` chưa? Dùng để di trú idempotent."""
     return any(r[1] == cot for r in cur.execute("PRAGMA table_info(%s)" % bang))
@@ -2211,15 +2234,49 @@ def di_tru_schema(db_path: str) -> list[str]:
                 "SELECT name FROM sqlite_master WHERE type = 'table'")
         }
 
+        da_chup: list = []
+
+        def sao_luu_truoc_khi_sua():
+            """Chụp CSDL MỘT lần, ngay trước việc di trú đầu tiên cần sửa schema (A14), và chỉ khi
+            đã có dữ liệu. Lỗi ghi tệp sao lưu (thư mục không ghi được, hết chỗ) KHÔNG được làm hỏng
+            việc mở workspace: các bước dưới chỉ THÊM cột / dựng lại bảng trong giao dịch, nên bỏ
+            qua bản chụp là rủi ro nhỏ hơn việc không mở được dữ liệu (cùng tinh thần với bước 5)."""
+            if da_chup:
+                return
+            da_chup.append(True)
+            try:
+                if not any(t in co_bang and cur.execute(
+                        "SELECT 1 FROM %s LIMIT 1" % t).fetchone() for t in ("students", "clubs")):
+                    return
+                import datetime
+                import sqlite3
+                ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                dich = sqlite3.connect("%s.bak-%s" % (db_path, ts))
+                try:
+                    conn.backup(dich)
+                finally:
+                    dich.close()
+            except Exception:
+                pass
+
         if "clubs" in co_bang and not _co_cot(cur, "clubs", "buoi"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE clubs ADD COLUMN buoi TEXT")
             da_lam.append("clubs.buoi")
 
         # 6. `students.diem_ca_nhan` — điểm theo NGƯỜI cho workspace per_person. Cột mới,
         #    NULL với mọi dòng cũ; không workspace nào khác đọc nó.
         if "students" in co_bang and not _co_cot(cur, "students", "diem_ca_nhan"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE students ADD COLUMN diem_ca_nhan REAL")
             da_lam.append("students.diem_ca_nhan")
+
+        # 7. `students.class_id` (A14) — lớp của học sinh, CHỈ để hiển thị / sắp / lọc / xuất.
+        #    NULL với mọi dòng cũ. Có dữ liệu thì sao lưu trước (cùng cách đặt tên `.bak-`).
+        if "students" in co_bang and not _co_cot(cur, "students", "class_id"):
+            sao_luu_truoc_khi_sua()
+            cur.execute("ALTER TABLE students ADD COLUMN class_id TEXT")
+            da_lam.append("students.class_id")
 
         for bang in ("run_meta", "run_history"):
             if bang not in co_bang:
@@ -2227,16 +2284,19 @@ def di_tru_schema(db_path: str) -> list[str]:
             for cot, kieu in (("che_do_boc_tham", "TEXT"), ("so_buoi", "INTEGER"),
                               ("buoi_da_chay", "TEXT")):
                 if not _co_cot(cur, bang, cot):
+                    sao_luu_truoc_khi_sua()
                     cur.execute("ALTER TABLE %s ADD COLUMN %s %s" % (bang, cot, kieu))
                     da_lam.append("%s.%s" % (bang, cot))
 
         # `run_history.luat_xep` — luật xếp đã dùng. ADD COLUMN, NULL cho mọi dòng cũ (= luật
         # mặc định, đúng với mọi lần chạy trước khi có workspace). Không dựng lại bảng.
         if "run_history" in co_bang and not _co_cot(cur, "run_history", "luat_xep"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE run_history ADD COLUMN luat_xep TEXT")
             da_lam.append("run_history.luat_xep")
 
         if "match_results" in co_bang and not _co_cot(cur, "match_results", "buoi"):
+            sao_luu_truoc_khi_sua()
             cur.executescript("""
                 CREATE TABLE match_results_moi (
                     student_id TEXT NOT NULL,
@@ -2266,6 +2326,7 @@ def di_tru_schema(db_path: str) -> list[str]:
         #    trong CSDL. Không có lần chạy nào thì để NULL: lần chạy kế tiếp
         #    sẽ nhận hạt giống được gõ và ghi vào khoá.
         if "stb_lock" in co_bang and not _co_cot(cur, "stb_lock", "seed"):
+            sao_luu_truoc_khi_sua()
             cur.execute("ALTER TABLE stb_lock ADD COLUMN seed INTEGER")
             if "run_meta" in co_bang:
                 cur.execute(

@@ -242,6 +242,42 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không lưu được nguyện vọng. Hãy thử lại.",
     "en": "Couldn't save the preferences. Try again."
   },
+  "lop_sai_kieu": {
+    "vi": "{cohort} phải là chữ hoặc số.",
+    "en": "The {cohort_l} must be text or a number."
+  },
+  "lop_qua_dai": {
+    "vi": "Tên {cohort_l} quá dài (tối đa {toi_da} ký tự).",
+    "en": "The {cohort_l} name is too long (at most {toi_da} characters)."
+  },
+  "canh_bao_lop_bi_cat": {
+    "vi": "{n} tên {cohort_l} dài quá {toi_da_cat} ký tự nên đã bị cắt bớt. Kiểm lại tên {cohort_l} trong tệp.",
+    "en": "{n} {cohort_l} name(s) were longer than {toi_da_cat} characters and were shortened. Check the {cohort_l} names in the file."
+  },
+  "nhan_trung_danh_tu": {
+    "vi": "Hai mục trong bước Từ vựng đang cùng tên \"{nhan}\". Hãy đặt tên khác nhau cho từng mục, nếu không Sổ nhập sẽ đọc nhầm cột.",
+    "en": "Two items in the vocabulary step have the same name \"{nhan}\". Give each item its own name, otherwise the entry workbook would read the wrong column."
+  },
+  "so_nhap_canh_bao_nhan_trung": {
+    "vi": "Cấu hình đang lưu có hai mục cùng tên \"{nhan}\" ({a} và {b}). Phần mềm đọc cột theo thứ tự trong Sổ; nên đặt lại để hai mục có tên khác nhau.",
+    "en": "The saved settings give two items the same name \"{nhan}\" ({a} and {b}). Columns are read in workbook order; rename them so the two items differ."
+  },
+  "error_saving_student_class": {
+    "vi": "Không lưu được {cohort_l} của {person_l}. Hãy thử lại.",
+    "en": "Couldn't save the {cohort_l} of the {person_l}. Try again."
+  },
+  "error_reading_classes": {
+    "vi": "Không đọc được danh sách {cohort_l}. Hãy thử lại.",
+    "en": "Couldn't load the list of {cohort_pl}. Try again."
+  },
+  "lop_khong_co_trong_danh_sach": {
+    "vi": "{cohort} {class_id} chưa có trong danh sách {cohort_l}. Hãy chọn một {cohort_l} đã có.",
+    "en": "{cohort} {class_id} isn't in the list. Choose an existing {cohort_l}."
+  },
+  "so_nhap_canh_bao_thieu_lop": {
+    "vi": "{n} {person_l} chưa có {cohort_l} trong Sổ nhập (ô để trống). {cohort} cũ của những {person_l} này được giữ nguyên.",
+    "en": "{n} {person_pl} have no {cohort_l} in the workbook (blank cell). Their existing {cohort_l} is kept."
+  },
   "error_creating_student": {
     "vi": "Không tạo được {person_l} mới. Hãy thử lại.",
     "en": "Couldn't add the new {person_l}. Try again."

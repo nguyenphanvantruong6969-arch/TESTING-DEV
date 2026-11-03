@@ -14,6 +14,10 @@ Tạo ra:
     du_lieu_test/SO_NHAP_TEST.xlsx                   120 em, cạnh tranh cao
     du_lieu_test/SO_NHAP_CO_LOI_CO_Y.xlsx            cố ý sai 5 chỗ: thử bảng lỗi
 
+Từ A14 sổ mẫu trống và các sổ ví dụ có thêm cột "Lớp" ngay sau "Họ tên" (lớp MÔ PHỎNG, gán bởi
+`du_lieu_test/them_lop_vao_mau.py`). `SO_NHAP_CO_LOI_CO_Y.xlsx` giữ bố cục cũ (không cột Lớp)
+vì `LOI_CO_Y` trỏ vào ô cụ thể.
+
 Từ A13.4 sheet học sinh có HAI hàng tiêu đề. Các sổ trong `du_lieu_test/` được giữ nguyên ở
 dạng MỘT hàng cũ (phần mềm vẫn đọc được, và chúng thử luôn đường đọc dạng cũ); chạy lại
 kịch bản này sẽ ghi chúng ở dạng hai hàng, và `LOI_CO_Y` bên dưới đã theo dạng hai hàng.
@@ -104,20 +108,23 @@ def tao_vi_du(ten_bo: str) -> str:
     goc = os.path.join(THU_MUC, ten_bo)
     clubs, students = _tu_ba_tep(goc, TEN_BA_TEP)
     ra = os.path.join(goc, TEN_VI_DU)
-    so_nhap.ghi_so_nhap(ra, clubs, students, luon_co_cot_w=True)   # A13.7: có cột Điểm quyết tâm
+    # A13.7: có cột Điểm quyết tâm; A14: có cột Lớp (lớp MÔ PHỎNG từ them_lop_vao_mau.py)
+    so_nhap.ghi_so_nhap(ra, clubs, students, luon_co_cot_w=True, co_lop=True)
     return ra
 
 
 def tao_mau_trong() -> str:
     ra = os.path.join(THU_MUC, TEN_MAU)
-    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True)   # A13.7: mẫu trống có cột Điểm quyết tâm
+    # A13.7: mẫu trống có cột Điểm quyết tâm; A14: và cột Lớp
+    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True, co_lop=True)
     return ra
 
 
 def tao_du_lieu_test_mot(thu_muc, tien_to, duoi, ten) -> str:
     clubs, students = _tu_ba_tep(thu_muc, TEN_BA_TEP, duoi, tien_to + "_")
     p = os.path.join(thu_muc, ten)
-    so_nhap.ghi_so_nhap(p, clubs, students)       # có cột wp trong CSV thì sổ có cột Điểm quyết tâm
+    # có cột wp trong CSV thì sổ có cột Điểm quyết tâm; có class_id thì sổ có cột Lớp (A14)
+    so_nhap.ghi_so_nhap(p, clubs, students, co_lop=any(s.get("class_id") for s in students))
     return p
 
 

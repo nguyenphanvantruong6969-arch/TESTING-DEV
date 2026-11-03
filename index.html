@@ -46,6 +46,12 @@
       <button class="nav-item" data-tab="scoring">
         <span class="nav-icon">05</span> <span data-i18n="nav_scoring">Nhập điểm</span>
       </button>
+      <button class="nav-item" data-tab="members">
+        <span class="nav-icon">06</span> <span data-i18n="nav_members">Thành viên {slot_sl}</span>
+      </button>
+      <button class="nav-item" data-tab="theolop">
+        <span class="nav-icon">07</span> <span data-i18n="nav_theo_lop">Theo {cohort_l}</span>
+      </button>
     </div>
 
     <div class="sidebar-footer">
@@ -275,7 +281,9 @@
         </div>
         <div class="search-row">
           <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất các mục đã chọn</button>
+          <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
         </div>
+        <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo {cohort_l}: mỗi {cohort_l} một tệp Excel, chỉ có kết quả xếp, không có điểm hay số bốc thăm — gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
         <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 03 thì bấm "Xuất CSV em này" ngay tại đó.</p>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
@@ -520,6 +528,11 @@
           <div class="panel-actions">
             <span id="unmatchedBadge" class="unmatched-badge" hidden></span>
             <input type="text" id="resultsSearch" class="text-input" data-i18n-placeholder="placeholder_results_search" placeholder="Tìm theo mã hoặc tên học sinh…">
+            <select id="resultsLopLoc" class="text-input text-input-sm" data-i18n-aria-label="aria_loc_lop"></select>
+            <select id="resultsSapXep" class="text-input text-input-sm" data-i18n-aria-label="aria_sap_xep">
+              <option value="student_id" data-i18n="lop_sap_theo_ma">Theo mã {person_l}</option>
+              <option value="class_id" data-i18n="lop_sap_theo_lop">Theo {cohort_l}</option>
+            </select>
           </div>
         </div>
         <div class="panel-body" id="dsXepPanelBody">
@@ -537,6 +550,7 @@
                 <th class="cot-chon"><input type="checkbox" id="chonTatCaKetQua" data-i18n-aria-label="aria_chon_tat_ca_dang_hien"></th>
                 <th data-i18n="th_student_id">Mã học sinh</th>
                 <th data-i18n="th_name">Họ tên</th>
+                <th data-i18n="th_cohort">{cohort}</th>
                 <th class="cot-buoi" data-i18n="th_buoi">Buổi</th>
                 <th data-i18n="th_club">Câu lạc bộ</th>
                 <th data-i18n="th_tier">Loại chỗ</th>
@@ -573,6 +587,7 @@
         <div class="new-student-row">
           <input type="text" id="newStudentId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_new_student_id" placeholder="Mã học sinh mới">
           <input type="text" id="newStudentName" class="text-input" data-i18n-placeholder="placeholder_full_name" placeholder="Họ tên">
+          <select id="newStudentLop" class="text-input text-input-sm" data-i18n-aria-label="kiosk_lop_nhan" hidden></select>
           <button class="btn btn-secondary" id="btnCreateStudent" data-i18n="btn_create_student">Tạo học sinh mới</button>
         </div>
       </div>
@@ -588,6 +603,13 @@
         </div>
 
         <div class="save-feedback xuat-ket-qua" id="fallbackXuatFeedback"></div>
+        <!-- A14: lớp của em. Chỉ hiện khi đã có ít nhất một lớp; khi hiện thì BẮT BUỘC chọn trước khi Lưu. -->
+        <div class="lop-kiosk-hang" id="kioskLopHang" hidden>
+          <label class="lop-nhan" for="kioskLop" data-i18n="kiosk_lop_nhan">{cohort}</label>
+          <select id="kioskLop" class="text-input text-input-sm"></select>
+          <span class="chua-luu" id="kioskLopChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
+          <span class="chua-luu" id="kioskLopNhac" role="status" hidden data-i18n="kiosk_lop_nhac">Chọn {cohort_l} của {person_l} này trước khi lưu.</span>
+        </div>
         <div class="fallback-steps">
           <div class="fallback-step">
             <h3 data-i18n="fallback_step1_title">Bước 1. Chọn CLB dự thi</h3>
@@ -716,6 +738,16 @@
           <button class="btn btn-secondary" id="btnAdminXuatHs" data-i18n="btn_admin_xuat_hs">Xuất CSV học sinh đã đánh dấu</button>
           <span class="chon-hs-dem" id="adminDemDanhDau"></span>
         </div>
+        <!-- A14: lọc và sắp theo lớp. Danh sách lớp nạp từ list_classes (js/04 napOChonLop). -->
+        <div class="search-row" id="adminLopHang">
+          <label class="lop-nhan" for="adminLopLoc" data-i18n="lop_loc_nhan">Lọc theo {cohort_l}</label>
+          <select id="adminLopLoc" class="text-input text-input-sm"></select>
+          <label class="lop-nhan" for="adminSapXep" data-i18n="lop_sap_nhan">Sắp xếp</label>
+          <select id="adminSapXep" class="text-input text-input-sm">
+            <option value="student_id" data-i18n="lop_sap_theo_ma">Theo mã {person_l}</option>
+            <option value="class_id" data-i18n="lop_sap_theo_lop">Theo {cohort_l}</option>
+          </select>
+        </div>
         <div class="save-feedback xuat-ket-qua" id="adminXuatFeedback"></div>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
         <table class="data-table">
@@ -723,6 +755,7 @@
             <th><input type="checkbox" id="adminChonTatCa" data-i18n-aria-label="aria_chon_tat_ca_trang"></th>
             <th data-i18n="th_student_id">Mã học sinh</th>
             <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_cohort">{cohort}</th>
             <th data-i18n="th_current_reserve_group">Nhãn dự trữ hiện tại</th>
           </tr></thead>
           <tbody id="adminStudentTableBody"></tbody>
@@ -904,6 +937,51 @@
       </div>
     </section>
 
+    <!-- ---------- TAB 6: THÀNH VIÊN CLB (chỉ đọc; A14) ---------- -->
+    <section class="view" id="view-members">
+      <header class="view-header">
+        <h1 data-i18n="members_title">Thành viên {slot_sl}</h1>
+        <p class="view-desc" data-i18n="members_desc">Chọn một {slot_l} để xem ai được xếp vào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho người phụ trách {slot_l}.</p>
+      </header>
+      <div class="panel">
+        <div class="search-row">
+          <label class="lop-nhan" for="membersClub" data-i18n="members_chon">Chọn {slot_l}</label>
+          <select id="membersClub" class="text-input"></select>
+        </div>
+        <div id="membersEmpty" class="empty-state" hidden></div>
+        <table class="data-table" id="membersTable" hidden>
+          <caption class="the-xem-dem" id="membersDem"></caption>
+          <thead><tr>
+            <th data-i18n="th_stt">STT</th>
+            <th data-i18n="th_student_id">Mã học sinh</th>
+            <th data-i18n="th_name">Họ tên</th>
+            <th data-i18n="th_cohort">{cohort}</th>
+          </tr></thead>
+          <tbody id="membersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- TAB 7: THEO LỚP (chỉ đọc; A14) ---------- -->
+    <section class="view" id="view-theolop">
+      <header class="view-header">
+        <h1 data-i18n="theolop_title">Theo {cohort_l}</h1>
+        <p class="view-desc" data-i18n="theolop_desc">Chọn một {cohort_l} để xem từng {person_l} được xếp vào {slot_l} nào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho giáo viên chủ nhiệm.</p>
+      </header>
+      <div class="panel">
+        <div class="search-row">
+          <label class="lop-nhan" for="theoLopChon" data-i18n="theolop_chon">Chọn {cohort_l}</label>
+          <select id="theoLopChon" class="text-input text-input-sm"></select>
+        </div>
+        <div id="theoLopEmpty" class="empty-state" hidden></div>
+        <table class="data-table" id="theoLopTable" hidden>
+          <caption class="the-xem-dem" id="theoLopDem"></caption>
+          <thead><tr id="theoLopHead"></tr></thead>
+          <tbody id="theoLopBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ---------- TAB 5: NHẬP ĐIỂM ---------- -->
     <section class="view" id="view-scoring">
       <header class="view-header">
@@ -987,6 +1065,7 @@
 <script src="js/06_cham_diem.js"></script>
 <script src="js/07_ngon_ngu.js"></script>
 <script src="js/075_workspace.js"></script>
+<script src="js/09_the_xem.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>

@@ -596,7 +596,12 @@ function loadReserveGroupOptions() {
 
 function loadAdminStudents() {
   const search = el("adminStudentSearch").value.trim();
-  return callApiMoiNhat("ds_hs_quan_ly", "list_students_admin", search, adminStudentPage, ADMIN_PAGE_SIZE).then((res) => {
+  return Promise.all([
+    callApiMoiNhat("ds_hs_quan_ly", "list_students_admin", search, adminStudentPage, ADMIN_PAGE_SIZE,
+      el("adminSapXep").value, lopLocThamSo(el("adminLopLoc"))),
+    layDsLop(),
+  ]).then(([res, dsLop]) => {
+    napOLocLop(el("adminLopLoc"), dsLop);
     const body = el("adminStudentTableBody");
     const emptyState = el("adminStudentEmptyState");
     const pagination = el("adminStudentPagination");
@@ -625,7 +630,11 @@ function loadAdminStudents() {
       /* insertAdjacentHTML, khong `innerHTML +=`: cach sau phan tich lai
          ca dong va thay o tick vua tao bang mot ban sao. */
       tr.insertAdjacentHTML("beforeend",
-        `<td>${esc(s.student_id)}</td><td>${esc(s.name)}</td><td>${esc(s.reserve_group || "—")}</td>`);
+        `<td>${esc(s.student_id)}</td><td>${esc(s.name)}</td>` +
+        `<td><input type="text" class="text-input text-input-sm lop-sua" maxlength="40" ` +
+        `data-student-id="${esc(s.student_id)}" data-lop-cu="${esc(s.class_id || "")}" ` +
+        `value="${esc(s.class_id || "")}" aria-label="${esc(t("th_cohort"))} ${esc(s.student_id)}"></td>` +
+        `<td>${esc(s.reserve_group || "—")}</td>`);
       body.appendChild(tr);
     });
 
@@ -1262,7 +1271,21 @@ function initAdminHandlers() {
     demDanhDauAdmin();
   });
   el("adminStudentTableBody").addEventListener("change", (ev) => {
-    if (ev.target.classList && ev.target.classList.contains("admin-row-checkbox")) demDanhDauAdmin();
+    const o = ev.target;
+    if (!o.classList) return;
+    if (o.classList.contains("admin-row-checkbox")) demDanhDauAdmin();
+    /* A14: sửa lớp từng em (gõ tự do). Rỗng = xoá lớp. Lưu ngay khi rời ô; xong vẽ lại để lọc/sắp
+       và danh sách lớp cập nhật; hỏng thì vẽ lại để ô quay về giá trị thật. */
+    if (o.classList.contains("lop-sua")) {
+      callApi("set_student_class", o.dataset.studentId, o.value).then((res) => {
+        if (res.ok) showToast(t("toast_lop_da_luu"), "success");
+        else showErrorToast(res.errors);
+        loadAdminStudents();
+      });
+    }
+  });
+  [["adminLopLoc"], ["adminSapXep"]].forEach(([id]) => {
+    el(id).addEventListener("change", () => { adminStudentPage = 1; loadAdminStudents(); });
   });
 
   el("btnBulkAssign").addEventListener("click", () => {

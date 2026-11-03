@@ -70,7 +70,7 @@ def test_chi_dung_tham_so_da_khai_bao(ma):
     """Câu không đòi tham số nào ngoài danh sách mà chỗ gọi err() sẽ truyền."""
     for lang in ("vi", "en"):
         dung = set(re.findall(r"\{(\w+?)(?:_[lpsacuv]+)?\}", MESSAGES[ma][lang]))
-        nhan = {"person", "slot", "session", "group", "score"}
+        nhan = {"person", "slot", "session", "group", "score", "cohort"}
         assert dung - nhan <= THAM_SO[ma], (ma, lang, dung)
 
 

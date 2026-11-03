@@ -472,8 +472,10 @@ def test_api_company_xuat_mau_roi_nap_lai(goc, tmp_path):
     assert wb["1. Dự án"]["A2"].value == "Dự án A"       # CLB đang có điền sẵn
     hs = wb["2. Nhân viên"]
     # A13.7: sổ mẫu luôn có cột "Điểm quyết tâm" -> mỗi nhóm ba cột
-    assert [c.value for c in hs[1]][3:7] == ["Nguyện vọng 1", None, None, "Nguyện vọng 2"]
-    hs.append(["NV01", "Lan", None, "Dự án A", 8])
+    # A14: sổ mẫu luôn có cột "Lớp" ngay sau "Họ tên" -> NV1 dịch sang phải một cột
+    assert [c.value for c in hs[1]][2:8] == ["Lớp", "Cấp bậc", "Nguyện vọng 1", None, None,
+                                              "Nguyện vọng 2"]
+    hs.append(["NV01", "Lan", None, None, "Dự án A", 8])
     b = io.BytesIO()
     wb.save(b)
     r = api.import_so_nhap(_b64(b.getvalue()))
@@ -492,8 +494,8 @@ def test_api_mau_truong_hoc_giong_het_truoc_day(api, tmp_path):
     wb = openpyxl.load_workbook(res["data"]["path"])
     assert wb.sheetnames == ["1. CLB", "2. Học sinh", "Hướng dẫn"]
     assert [c.value for c in wb["1. CLB"][1]] == so_nhap.COT_CLB
-    # Hai hàng tiêu đề: hàng 1 có 3 cột đầu + 15 ô gộp; hàng 2 có 15 cặp CLB/Điểm thi.
-    assert len([c for c in wb["2. Học sinh"][1] if c.value]) == 3 + 15
+    # Hai hàng tiêu đề: hàng 1 có 3 cột đầu + cột Lớp (A14) + 15 ô gộp; hàng 2 có 15 cặp CLB/Điểm thi.
+    assert len([c for c in wb["2. Học sinh"][1] if c.value]) == 4 + 15
     # A13.7: sổ mẫu có thêm cột "Điểm quyết tâm" -> ba cột mỗi nhóm.
     assert len([c for c in wb["2. Học sinh"][2] if c.value]) == 3 * 15
 
@@ -505,9 +507,9 @@ def test_api_diem_theo_nguoi_nap_va_tao_mau(goc, tmp_path):
     mau = api.tao_so_nhap_mau()
     wb = openpyxl.load_workbook(mau["data"]["path"])
     hs = wb["2. Nhân viên"]
-    assert [c.value for c in hs[1]] == ["Mã HS", "Họ tên", "Cấp bậc", "Điểm", "Nguyện vọng 1",
-                                        "Nguyện vọng 2", "Nguyện vọng 3"]
-    hs.append(["NV01", "Lan", None, 8.5, "Dự án A", "Dự án B"])
+    assert [c.value for c in hs[1]] == ["Mã HS", "Họ tên", "Lớp", "Cấp bậc", "Điểm",
+                                        "Nguyện vọng 1", "Nguyện vọng 2", "Nguyện vọng 3"]
+    hs.append(["NV01", "Lan", None, None, 8.5, "Dự án A", "Dự án B"])
     b = io.BytesIO()
     wb.save(b)
     r = api.import_so_nhap(_b64(b.getvalue()))

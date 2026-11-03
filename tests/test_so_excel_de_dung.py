@@ -31,8 +31,8 @@ GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BO_NHIEU_BUOI = os.path.join(GOC, "du_lieu_test", "bo_nhieu_buoi")
 BO_MOT_BUOI = os.path.join(GOC, "du_lieu_test", "bo_sach")
 
-CAC_TRANG = ["Hướng dẫn", "Danh sách học sinh", "Theo CLB",
-             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
+CAC_TRANG = ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Theo lớp",
+             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]  # A14: "Theo lớp" luôn có
 
 
 def _nap(api, thu_muc, tep):

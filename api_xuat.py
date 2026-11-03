@@ -6,6 +6,7 @@ public ở đây vẫn là hàm của PipelineAPI và giao diện gọi được
 
 import datetime
 import os
+import shutil
 import sys
 
 from api_chung import (
@@ -92,7 +93,7 @@ class XuatKetQuaMixin:
     # phát cho giáo viên; phần kỹ thuật (hạt giống, số bốc thăm) để cuối.
     # -----------------------------------------------------------------
     TRANG_SO_EXCEL = ("Hướng dẫn", "Danh sách {person_l}", "Theo {slot_sl}",
-                      "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)")
+                      "Theo {cohort_l}", "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)")
     # Chỉ có khi workspace bật điểm quyết tâm (A13.4); đứng sau "Chưa có chỗ". Tắt thì sổ có đúng
     # sáu trang như trước.
     TRANG_DIEM_CHUAN = "Điểm chuẩn"
@@ -164,6 +165,8 @@ class XuatKetQuaMixin:
                               co_ket_qua, ket_qua_cu)
         self._trang_danh_sach(trang["Danh sách {person_l}"], du, co_ket_qua)
         self._trang_theo_clb(trang["Theo {slot_sl}"], du)
+        du["ket_qua_cu"] = ket_qua_cu
+        self._trang_theo_lop(trang["Theo {cohort_l}"], du)
         self._trang_chua_co_cho(trang["Chưa có chỗ"], bao, co_ket_qua)
         if self.TRANG_DIEM_CHUAN in trang:
             self._trang_diem_chuan(trang[self.TRANG_DIEM_CHUAN], du, co_ket_qua, ket_qua_cu)
@@ -241,6 +244,8 @@ class XuatKetQuaMixin:
                 "Mỗi em một dòng, kèm {slot_l} của em. Lọc được theo {slot_l}."),
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
+            "Theo {cohort_l}": "Danh sách từng {cohort_l} để gửi giáo viên chủ nhiệm. "
+                               "Trang này không có {score_l} hay số bốc thăm, gửi được.",
             "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
             "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo cách xét "
                           "(điểm thi, điểm quyết tâm) và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
@@ -260,7 +265,7 @@ class XuatKetQuaMixin:
 
     def _trang_danh_sach(self, t, du, co_ket_qua):
         if du["nhieu_buoi"]:
-            cot, dong = du["tkb"]
+            cot, dong = du["tkb_xlsx"]
             t.tieu_de("THỜI KHOÁ BIỂU {slot_u} CẢ TUẦN",
                       "Mỗi em một dòng, mỗi {session_l} một cột. Bấm mũi tên ở dòng "
                       "tiêu đề để lọc. Dòng tô đỏ: em chưa có {slot_l} nào.")
@@ -284,7 +289,7 @@ class XuatKetQuaMixin:
         t.tieu_de("DANH SÁCH TỪNG {slot_u}",
                   "Mỗi {slot_l} một khối. Khi in, mỗi {slot_l} sang một "
                   "trang riêng — phát thẳng cho giáo viên phụ trách.")
-        cot = ["STT", "Mã {person_l}", "Họ tên", "Nguyện vọng thứ",
+        cot = ["STT", "Mã {person_l}", "Họ tên", "{cohort}", "Nguyện vọng thứ",
                "Diện trúng tuyển", "Nhóm dự trữ"]
 
         lap = self.get_club_fill_stats()
@@ -316,13 +321,144 @@ class XuatKetQuaMixin:
                                               c.get("capacity") or 0))
             t.khoi(" · ".join(phan), len(cot))
             t.bang(cot, [
-                [i, r["student_id"], r["ho_ten"] or "",
+                [i, r["student_id"], r["ho_ten"] or "", r["lop"] or "",
                  r["rank_in_student_pref"] or "",
                  self._nhan_dien(r["matched_tier"]), r["reserve_group"] or ""]
                 for i, r in enumerate(theo_clb.get(c["club_id"], []), 1)
             ], rong="(chưa có em nào)")
             t.hang += 1
         t.xong(ngang=False)
+
+    # -----------------------------------------------------------------
+    # THEO LỚP (A14): bản để GỬI GIÁO VIÊN CHỦ NHIỆM. Chỉ có kết quả — KHÔNG điểm thi, điểm
+    # quyết tâm, số bốc thăm hay diện trúng tuyển. Một khối mỗi lớp, em chưa có chỗ tô đỏ.
+    # -----------------------------------------------------------------
+    def _du_lieu_theo_lop(self, rows, ds_buoi, nhieu_buoi) -> dict:
+        """{"cot": tiêu đề cột, "nhom": [(lớp|None, [dòng])]}; dòng = [mã, họ tên, ô buổi...].
+
+        Lớp theo thứ tự tự nhiên; nhóm "chưa có lớp" (None) đứng cuối và chỉ có khi có em."""
+        theo_em: dict = {}
+        for r in rows:
+            em = theo_em.setdefault(r["student_id"], {
+                "ho_ten": r["ho_ten"] or "", "lop": r["lop"] or None, "o": {}})
+            em["o"][r["buoi"]] = (r["ten_club"] or r["club_id"] or "") if r["club_id"] else ""
+        theo_lop: dict = {}
+        for sid, em in sorted(theo_em.items()):
+            o = [em["o"].get(b, "") for b in ds_buoi] if nhieu_buoi else [
+                next(iter(em["o"].values()), "")]
+            theo_lop.setdefault(em["lop"], []).append([sid, em["ho_ten"]] + o)
+        thu_tu = sorted((k for k in theo_lop if k is not None), key=self._khoa_lop_tu_nhien)
+        nhom = [(k, theo_lop[k]) for k in thu_tu]
+        if None in theo_lop:
+            nhom.append((None, theo_lop[None]))
+        cot = ["STT", "Mã {person_l}", "Họ tên"] + (
+            list(ds_buoi) if nhieu_buoi else ["{slot} được xếp"])
+        return {"cot": cot, "nhom": nhom}
+
+    def _khoi_theo_lop(self, t, tl, lop, dong):
+        """MỘT khối lớp: dòng tên lớp + bảng. Em chưa có chỗ ở buổi nào cũng tô đỏ."""
+        n_chua = sum(1 for d in dong if not any(d[2:]))
+        phan = [t.n("Chưa có {cohort_l}") if lop is None else t.n("{cohort}: ") + str(lop),
+                "%d em" % len(dong)]
+        if n_chua:
+            phan.append("%d em chưa có chỗ" % n_chua)
+        t.khoi(" · ".join(phan), len(tl["cot"]))
+        t.bang(tl["cot"], [[i] + d for i, d in enumerate(dong, 1)],
+               to_do=lambda d: not any(d[3:]), rong="(chưa có em nào)")
+        t.hang += 1
+
+    @staticmethod
+    def _dong_ket_qua_cu(t, du):
+        """Dòng cảnh báo đỏ khi dữ liệu đã sửa sau lần chạy (như trang Hướng dẫn): tệp này đi
+        thẳng tới giáo viên chủ nhiệm, nên phải tự nói được nó có thể đã cũ."""
+        from so_excel import CHU_CANH_BAO
+
+        if du.get("ket_qua_cu"):
+            t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, kết quả có thể "
+                      "đã cũ. Hãy chạy lại rồi xuất lại.", CHU_CANH_BAO)
+
+    def _trang_theo_lop(self, t, du):
+        t.tieu_de("DANH SÁCH TỪNG {cohort_u}",
+                  "Mỗi {cohort_l} một khối, in mỗi {cohort_l} một trang để gửi giáo viên chủ "
+                  "nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+        self._dong_ket_qua_cu(t, du)
+        tl = du["theo_lop"]
+        for n, (lop, dong) in enumerate(tl["nhom"]):
+            if n:
+                t.ngat_trang()
+            self._khoi_theo_lop(t, tl, lop, dong)
+        t.xong(ngang=len(tl["cot"]) > 7)
+
+    def _ghi_tep_lop(self, path: str, du: dict, lop, dong, da_dung: set) -> None:
+        """Một tệp .xlsx một trang cho MỘT lớp (hoặc nhóm chưa có lớp)."""
+        from openpyxl import Workbook
+
+        from so_excel import Trang
+
+        tl = du["theo_lop"]
+        wb = Workbook()
+        ws = wb.active
+        ws.title = self._ten_trang_hop_le(
+            dien_nhan("Chưa có {cohort_l}" if lop is None else str(lop), du.get("nhan")),
+            da_dung)
+        t = Trang(ws, du.get("nhan"))
+        t.tieu_de("DANH SÁCH {cohort_u}" + ("" if lop is None else " " + str(lop).upper()),
+                  "Gửi giáo viên chủ nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+        self._dong_ket_qua_cu(t, du)
+        self._khoi_theo_lop(t, tl, lop, dong)
+        t.xong(ngang=len(tl["cot"]) > 7)
+        wb.save(path)
+
+    @staticmethod
+    def _cat_ten_tep(ten: str, toi_da: int = 100) -> str:
+        """Cắt tên tệp còn tối đa `toi_da` ký tự VÀ chừng 200 byte UTF-8 (hệ điều hành giới hạn
+        255 byte một tên, tiếng Việt có dấu 3 byte một chữ). Tên lớp do người dùng đặt có thể
+        rất dài; tên thật vẫn đủ trong tiêu đề khối, tên tệp chỉ cần nhận ra. Gọi TRƯỚC
+        `_ten_chua_dung` để hai tên cùng phần đầu vẫn ra hai tệp khác nhau."""
+        ten = ten[:toi_da]
+        while len(ten.encode("utf-8")) > 200:
+            ten = ten[:-1]
+        return ten.rstrip(" .") or "lop"
+
+    def export_theo_lop(self, output_path: str = ""):
+        """Xuất MỘT THƯ MỤC, mỗi lớp một tệp .xlsx một trang (để gửi giáo viên chủ nhiệm), cộng
+        `_chua_co_lop.xlsx` nếu có em chưa có lớp. Không có điểm hay số bốc thăm.
+
+        Chỗ đặt theo `_duong_xuat` (rỗng/tương đối → Tải xuống; không ghi đè: trùng thì "x (2)").
+        Chưa có kết quả thì từ chối `xuat_chua_co_ket_qua`, không tạo gì. Trả về {thu_muc, n_tep}."""
+        return self._khoa_xuat(self._export_theo_lop_da_khoa, output_path)
+
+    def _export_theo_lop_da_khoa(self, output_path: str):
+        thu_muc, da_tao = None, False
+        try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
+            if os.path.isabs((output_path or "").strip()):
+                # Thư mục đích là cái MỚI: đường tuyệt đối đã có thì thành "x (2)" (không ghi đè);
+                # `_duong_xuat` sẽ từ chối vì nó coi thư mục có sẵn là nhầm với tệp.
+                thu_muc = duong_dan_khong_de(output_path.strip().rstrip("/\\"))
+            else:
+                thu_muc = self._duong_xuat(output_path, "ket_qua_theo_lop")
+            du = self._du_lieu_xuat()
+            du["ket_qua_cu"] = self._ket_qua_cu()
+            os.makedirs(thu_muc)
+            da_tao = True              # từ đây thư mục là CỦA lần xuất này
+            da_dung: set = {"_chua_co_lop"}        # giữ chỗ trước: lớp tên "_chua_co_lop" không đè
+            n = 0
+            for lop, dong in du["theo_lop"]["nhom"]:
+                ten = "_chua_co_lop" if lop is None else self._ten_chua_dung(
+                    self._cat_ten_tep(self._ten_file_an_toan(str(lop), "lop")), da_dung)
+                self._ghi_tep_lop(os.path.join(thu_muc, ten + ".xlsx"), du, lop, dong, set())
+                n += 1
+            return _ok({"thu_muc": thu_muc, "n_tep": n, "ket_qua_cu": du["ket_qua_cu"]})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            # Lỗi giữa chừng: xoá thư mục dở do CHÍNH lần xuất này tạo ra (không bao giờ thư mục
+            # có sẵn), để không còn thư mục thiếu lớp trông như đã xuất đủ.
+            if da_tao and thu_muc:
+                shutil.rmtree(thu_muc, ignore_errors=True)
+            return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
     def _trang_chua_co_cho(self, t, bao, co_ket_qua):
         from openpyxl.styles import Alignment
@@ -970,9 +1106,9 @@ class XuatKetQuaMixin:
             "COALESCE(reserve_group, ''), buoi FROM clubs ORDER BY club_id")]
         n_ten_doi = so_nhap.ten_khong_trung(clubs)
         hs = {r[0]: {"student_id": r[0], "name": r[1] or "", "reserve_group": r[2],
-                     "nv": []}
+                     "class_id": r[3], "nv": []}
               for r in cur.execute(
-                  "SELECT student_id, name, COALESCE(reserve_group, '') "
+                  "SELECT student_id, name, COALESCE(reserve_group, ''), class_id "
                   "FROM students ORDER BY student_id")}
         # Workspace chấm điểm theo NGƯỜI: điểm chung của mỗi người đi vào cột "Điểm" của sổ.
         if self._cfg_ws(nghiem=True)["rules"]["score_scope"] == "per_person":
@@ -1023,7 +1159,8 @@ class XuatKetQuaMixin:
             path = self._duong_xuat(output_path, ten)
             with self._ket_noi_doc() as cur:
                 clubs, students, n_ngoai, n_ten_doi = self._du_lieu_so_nhap(cur)
-            so_nhap.ghi_so_nhap(path, clubs, students, cfg=self._cfg_ws(nghiem=True))
+            so_nhap.ghi_so_nhap(path, clubs, students, cfg=self._cfg_ws(nghiem=True),
+                                co_lop=any(x.get("class_id") for x in students))   # A14
             return _ok({
                 "path": path,
                 "dir": os.path.dirname(path),
@@ -1116,7 +1253,8 @@ class XuatKetQuaMixin:
             with self._ket_noi_doc() as cur:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
             so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
-                                 luon_co_cot_w=True)       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
+                                 luon_co_cot_w=True,       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
+                                 co_lop=True)              # và cột Lớp (A14, đã duyệt)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except LoiDuongXuat as e:
@@ -1404,7 +1542,7 @@ class XuatKetQuaMixin:
             rows = cur.execute("""
                 SELECT m.student_id, s.name AS ho_ten, m.buoi, m.club_id,
                        c.name AS ten_club, m.rank_in_student_pref, m.matched_tier,
-                       s.reserve_group
+                       s.reserve_group, s.class_id AS lop
                 FROM match_results m
                 LEFT JOIN students s ON s.student_id = m.student_id
                 LEFT JOIN clubs   c ON c.club_id   = m.club_id
@@ -1417,12 +1555,12 @@ class XuatKetQuaMixin:
         # Cot "Buoi" chi xuat hien khi truong THAT SU dung nhieu buoi.
         # Mot buoi ma van co cot day gia tri "__mac_dinh__" thi giao vien
         # phai doan xem no nghia la gi.
-        cot_tong = (["Mã {person_l}", "Họ tên"]
+        cot_tong = (["Mã {person_l}", "Họ tên", "{cohort}"]
                     + (["{session}"] if nhieu_buoi else [])
                     + ["Mã {slot_sl}", "Tên {slot_sl}", "Nguyện vọng thứ",
                        "Diện trúng tuyển", "Nhóm dự trữ"])
         dong_tong = [
-            [r["student_id"], r["ho_ten"] or ""]
+            [r["student_id"], r["ho_ten"] or "", r["lop"] or ""]
             + ([r["buoi"]] if nhieu_buoi else [])
             + [
                 r["club_id"] or "",
@@ -1437,16 +1575,24 @@ class XuatKetQuaMixin:
         # Moi em MOT dong, moi buoi MOT cot — dan bang duoc, phat cho hoc
         # sinh duoc.
         tkb = None
+        tkb_xlsx = None
         tham = None
         if nhieu_buoi:
             theo_em: dict = {}
             for r in rows:
                 em = theo_em.setdefault(
-                    r["student_id"], {"ho_ten": r["ho_ten"] or "", "o": {}})
+                    r["student_id"], {"ho_ten": r["ho_ten"] or "", "lop": r["lop"] or "", "o": {}})
                 em["o"][r["buoi"]] = (
                     r["ten_club"] or r["club_id"] or "") if r["club_id"] else ""
             tkb = (["Mã {person_l}", "Họ tên"] + list(ds_buoi) + ["Số {slot_sl}"], [
                 [sid, em["ho_ten"]]
+                + [em["o"].get(b, "") for b in ds_buoi]
+                + [sum(1 for b in ds_buoi if em["o"].get(b))]
+                for sid, em in sorted(theo_em.items())
+            ])
+            # Cột Lớp chỉ ở bản Excel; CSV thời khoá biểu giữ nguyên (hợp đồng cột CSV).
+            tkb_xlsx = (["Mã {person_l}", "Họ tên", "{cohort}"] + list(ds_buoi) + ["Số {slot_sl}"], [
+                [sid, em["ho_ten"], em["lop"]]
                 + [em["o"].get(b, "") for b in ds_buoi]
                 + [sum(1 for b in ds_buoi if em["o"].get(b))]
                 for sid, em in sorted(theo_em.items())
@@ -1467,7 +1613,9 @@ class XuatKetQuaMixin:
 
         return {"rows": rows, "ds_buoi": ds_buoi, "nhieu_buoi": nhieu_buoi,
                 "cot_tong": cot_tong, "dong_tong": dong_tong,
-                "tkb": tkb, "tham": tham, "nhan": self._nhan_xuat()}
+                "tkb": tkb, "tkb_xlsx": tkb_xlsx, "tham": tham,
+                "theo_lop": self._du_lieu_theo_lop(rows, ds_buoi, nhieu_buoi),
+                "nhan": self._nhan_xuat()}
 
     def _ghi_bo_csv(self, output_path: str, du: dict) -> dict:
         """Ghi bộ `.csv` rời từ `_du_lieu_xuat`. Trả về các đường dẫn đã ghi."""
@@ -1517,9 +1665,9 @@ class XuatKetQuaMixin:
                     self._ten_file_an_toan(club_id), ten_da_dung)
             ghi(
                 os.path.join(per_club_dir, ten + ".csv"),
-                ["Mã {person_l}", "Họ tên", "Nguyện vọng thứ",
+                ["Mã {person_l}", "Họ tên", "{cohort}", "Nguyện vọng thứ",
                  "Diện trúng tuyển", "Nhóm dự trữ"],
-                [[r["student_id"], r["ho_ten"] or "",
+                [[r["student_id"], r["ho_ten"] or "", r["lop"] or "",
                   r["rank_in_student_pref"] if r["rank_in_student_pref"] else "",
                   dien(r["matched_tier"]), r["reserve_group"] or ""] for r in ds],
             )

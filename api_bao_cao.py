@@ -12,6 +12,7 @@ from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    chuan_hoa_lop,
     BUOI_MAC_DINH,
     CHE_DO_BOC_THAM_MAC_DINH,
     sap_buoi,
@@ -25,25 +26,43 @@ class BaoCaoMixin:
     # TAB "KẾT QUẢ"
     # -----------------------------------------------------------------
 
-    def get_match_results(self, search: str = ""):
-        """Bảng kết quả, lọc theo student_id/name nếu search có giá trị."""
+    def get_match_results(self, search: str = "", class_id=None, sort_by: str = "student_id"):
+        """Bảng kết quả, lọc theo student_id/name nếu search có giá trị.
+
+        A14 — mỗi dòng có `class_id` (chỉ để hiển thị). `class_id=None` là mọi em, `""` chỉ em
+        chưa có lớp, còn lại lọc đúng lớp. `sort_by="class_id"`: lớp theo thứ tự tự nhiên
+        (10H2A trước 10H10A), em chưa có lớp ở cuối, rồi student_id, rồi buổi. Lớp không bao
+        giờ ảnh hưởng tới việc ai được xếp vào đâu."""
         try:
             with self._ket_noi_doc() as cur:
                 query = """
                     SELECT m.student_id, s.name, m.buoi, m.club_id,
                            c.name as club_name, m.matched_tier,
-                           m.rank_in_student_pref
+                           m.rank_in_student_pref, s.class_id
                     FROM match_results m
                     JOIN students s ON s.student_id = m.student_id
                     LEFT JOIN clubs c ON c.club_id = m.club_id
                 """
-                params = ()
+                params: tuple = ()
+                dieu_kien = []
                 if search:
-                    query += " WHERE khop_tim(m.student_id, ?) OR khop_tim(s.name, ?)"
+                    dieu_kien.append("(khop_tim(m.student_id, ?) OR khop_tim(s.name, ?))")
                     params = (search, search)
+                if class_id is not None:
+                    lop_loc = chuan_hoa_lop(class_id)
+                    if lop_loc is None:
+                        dieu_kien.append("s.class_id IS NULL")
+                    else:
+                        dieu_kien.append("s.class_id = ?")
+                        params += (lop_loc,)
+                if dieu_kien:
+                    query += " WHERE " + " AND ".join(dieu_kien)
                 query += " ORDER BY m.student_id, m.buoi COLLATE THU_TU_BUOI"
-                rows = cur.execute(query, params).fetchall()
-            return _ok([dict(r) for r in rows])
+                rows = [dict(r) for r in cur.execute(query, params).fetchall()]
+            if sort_by == "class_id":
+                # sort ổn định: giữ thứ tự student_id, buoi trong cùng một lớp
+                rows.sort(key=lambda r: self._khoa_lop_tu_nhien(r["class_id"]))
+            return _ok(rows)
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
 
@@ -223,11 +242,14 @@ class BaoCaoMixin:
         except Exception as e:
             return _fail(err("error_reading_club_stats", detail=str(e)))
 
-    def get_thoi_khoa_bieu(self, search: str = ""):
+    def get_thoi_khoa_bieu(self, search: str = "", class_id=None):
         """Thời khoá biểu tuần: mỗi em một dòng, mỗi buổi một ô.
 
         Đây là sản phẩm chính của bản nhiều buổi — thứ nhà trường in ra
         dán bảng và phát cho học sinh.
+
+        A14 — mỗi em có `class_id` (chỉ để hiển thị). `class_id=None` là mọi em (hành vi cũ),
+        `""` chỉ em chưa có lớp, còn lại lọc đúng lớp (cùng quy ước với `list_students_admin`).
         """
         try:
             with self._ket_noi_doc() as cur:
@@ -235,15 +257,25 @@ class BaoCaoMixin:
                 query = """
                     SELECT m.student_id, s.name, m.buoi, m.club_id,
                            c.name AS club_name, m.matched_tier,
-                           m.rank_in_student_pref
+                           m.rank_in_student_pref, s.class_id
                     FROM match_results m
                     JOIN students s ON s.student_id = m.student_id
                     LEFT JOIN clubs c ON c.club_id = m.club_id
                 """
-                params = ()
+                params: tuple = ()
+                dieu_kien = []
                 if search:
-                    query += " WHERE khop_tim(m.student_id, ?) OR khop_tim(s.name, ?)"
+                    dieu_kien.append("(khop_tim(m.student_id, ?) OR khop_tim(s.name, ?))")
                     params = (search, search)
+                if class_id is not None:
+                    lop_loc = chuan_hoa_lop(class_id)
+                    if lop_loc is None:
+                        dieu_kien.append("s.class_id IS NULL")
+                    else:
+                        dieu_kien.append("s.class_id = ?")
+                        params += (lop_loc,)
+                if dieu_kien:
+                    query += " WHERE " + " AND ".join(dieu_kien)
                 rows = cur.execute(query + " ORDER BY m.student_id, m.buoi COLLATE THU_TU_BUOI",
                                    params).fetchall()
 
@@ -252,6 +284,7 @@ class BaoCaoMixin:
                 em = theo_em.setdefault(r["student_id"], {
                     "student_id": r["student_id"],
                     "name": r["name"],
+                    "class_id": r["class_id"],
                     "theo_buoi": {},
                     "so_clb": 0,
                     "so_nv1": 0,
@@ -349,7 +382,7 @@ class BaoCaoMixin:
                 rows = cur.execute("""
                     SELECT m.student_id, s.name, m.buoi,
                            m.rank_in_student_pref, m.matched_tier,
-                           s.reserve_group
+                           s.reserve_group, s.class_id
                     FROM match_results m
                     LEFT JOIN students s ON s.student_id = m.student_id
                     WHERE m.club_id = ?

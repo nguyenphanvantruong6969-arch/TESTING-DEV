@@ -273,7 +273,9 @@ def test_tep_xuat_tat_tinh_nang_giong_het_truoc(api):
     assert api.run_pipeline(seed=7)["ok"]
     wb = _trang_xuat(api)
     assert "Điểm chuẩn" not in wb.sheetnames
-    assert len(wb.sheetnames) == 6
+    # A14: trang "Theo lớp" luôn có (đã duyệt) nên sổ có bảy trang, không còn sáu.
+    assert wb.sheetnames == ["Hướng dẫn", "Danh sách học sinh", "Theo CLB", "Theo lớp",
+                             "Chưa có chỗ", "Thống kê", "Dấu vết (kỹ thuật)"]
 
 
 def test_tep_xuat_trang_diem_chuan_o_tren_o_cuoi_la_du_lieu_khong_co_cong_thuc(api):

@@ -751,7 +751,7 @@ def viet_bao_cao(duong, spec, cfg, clubs, students, phieu_bo, canh_bao, nguon_sp
              "không đưa tệp này vào kho mã.\n" % os.path.basename(nguon_spec))
     d.append("## Từ vựng và luật\n")
     d.append("| Danh từ | Nhãn (vi) | Nhãn (en) |\n|---|---|---|")
-    for k in ("person", "slot", "session", "group", "score"):
+    for k in ("person", "slot", "session", "group", "score", "cohort"):
         d.append("| `%s` | %s | %s |" % (k, nhan[k]["vi"], nhan[k]["en"]))
     r = cfg["rules"]
     d.append("\nNgành `%s` · tối đa **%s** nguyện vọng / %s · %s · ưu tiên `%s` · nhóm `%s` · "

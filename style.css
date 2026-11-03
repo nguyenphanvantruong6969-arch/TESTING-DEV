@@ -2340,6 +2340,10 @@ html.tat-hieu-ung .status-strip:hover {
 
 /* Suat du tru con thua la con so DANG NHIN cua ca muc — khac 0 thi phai
    noi bat len, vi no nghia la mot phan chinh sach uu tien da boc hoi. */
+/* A14: hai thẻ xem chỉ đọc (06 Thành viên, 07 Theo lớp). */
+.the-xem-dem { text-align: left; font-weight: 600; padding: 8px 0; color: var(--ink-soft); }
+.data-table tr.dong-do td { background: var(--rust-soft); }
+.data-table td.o-trong { color: var(--slate); }
 .data-table td.is-canh-bao-o {
   color: var(--rust-text);
   font-weight: 600;

@@ -44,7 +44,8 @@ def test_tat_wharton_trang_thai_giong_het_truoc(api):
     chen_bids(api, [("HS1", "A", 1, 100)])           # bảng có dòng nhưng workspace tắt
     st = api.get_student_entry_state("HS1")
     assert st["ok"]
-    assert st["data"] == {"student_id": "HS1", "name": "Em HS1",
+    # A14: thêm khoá `class_id` (None khi em chưa có lớp); không có khoá Wharton vì đang tắt.
+    assert st["data"] == {"student_id": "HS1", "name": "Em HS1", "class_id": None,
                           "tested_clubs": ["A"], "ranked_clubs": ["A"]}
 
 

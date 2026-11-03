@@ -1,4 +1,4 @@
-# Sổ đăng ký 33 mục sửa mã nguồn (+ A13, thêm 24/10/2026)
+# Sổ đăng ký 33 mục sửa mã nguồn (+ A13, thêm 24/10/2026; + A14, thêm 02/11/2026)
 
 Nguồn duy nhất: `ke_hoach_thay_doi.json` (tệp này sinh từ đó). Số dòng lấy từ bản build — định vị theo **tên hàm**.
 Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không cần. Quy mô: S/M/L/XL (xem CLAUDE.md).
@@ -27,6 +27,7 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
 | A11 | Đăng ký theo nhóm / cặp đôi | Viết mới · XL | A3 | – | O | – | O | R | – | – | – | – | – | – | – |
 | A12 | Ổn định là chỉ số chất lượng, không phải điều kiện chặn | Sửa mã · M | Z3 | – | – | – | O | O | – | O | O | – | – | R | R |
 | A13 | Điểm Wharton: phá hoà tầng 1 và xếp tầng 2 (FA-DAA) | Viết mới · M | – | O | – | O | O | – | – | – | O | – | – | – | – |
+| A14 | Lớp của học sinh (hiển thị, sắp, lọc, xuất) | Sửa mã · M | – | O | O | O | O | O | O | O | O | O | O | O | O |
 | B1 | Điểm và thuộc tính theo cặp (đang là một số thực ≥ 0) | Sửa mã · M | Z6 | – | R | – | – | O | R | R | – | R | R | R | R |
 | B2 | Bảng thực thể mới theo ngành | Viết mới · M mỗi ngành | Z6 | R | R | R | R | R | R | R | R | R | R | R | R |
 | B3 | Sinh danh sách sở thích từ dữ liệu | Viết mới · L | B1, Z3 | – | O | – | – | – | R | R | – | – | O | R | R |
@@ -462,6 +463,18 @@ Ký hiệu áp dụng: **R** cần làm · **O** tuỳ chọn · **–** không 
 - **A13.12 — Tầng 4 của soát A13 và toàn bộ mục chặn / nên sửa của soát hệ thống nhập (28/10/2026):** bản đồ mã của `CLAUDE.md` định vị theo tên hàm (không số dòng), thêm nhóm Điểm quyết tâm; test rollback thật tại `_ghi_nhat_ky_wharton("khoa")` và ca biên 99 / 101; F5 ở chế độ trình duyệt không còn tắt máy chủ (1.1 CHẶN); lỗi HTTP trả `{code, params}`; ô điểm quyết tâm tự điền 100 không gửi lên và không báo "chưa lưu" giả (Truong chọn cách A, bốn test cũ sửa có duyệt); kẹp trang; `create_student_if_missing` chuẩn hoá mã; `delete_club` sao lưu và báo số điểm bị xoá; chặn chấm điểm ở workspace chỉ xét nhóm. Chi tiết và cột "Đã sửa ở commit / không sửa – lý do": `CHANGELOG.md`, `BAO_CAO_SOAT_NHAP.md`.
 
 ## Nhóm B — Mô hình dữ liệu và CSDL
+
+### A14 — Lớp của học sinh (hiển thị, sắp, lọc, xuất cho giáo viên chủ nhiệm)
+- **Mức / quy mô:** Sửa mã / M
+- **Tệp:** rbda_priority_pipeline.py (schema, di_tru_schema, chuan_hoa_lop), nhan_ws.py, cau_hinh_ws.py, i18n_errors.py, so_nhap.py, api_nhap.py, api_quan_ly.py, api_bao_cao.py, api_xuat.py; phần B: xuất + giao diện
+- **Hàm:** chuan_hoa_lop, di_tru_schema, doc_so_nhap, thanh_csv, ghi_so_nhap(co_lop), import_preferences_csv, import_test_selection_csv, list_students_admin, set_student_class, list_classes, create_student_if_missing, submit_preferences, get_match_results
+- **Hiện trạng:** Học sinh chỉ có mã, tên, nhóm ưu tiên; không lọc / sắp / xuất được theo lớp.
+- **Thay đổi:** `students.class_id` TEXT (NULL = chưa có lớp); danh từ từ vựng thứ sáu `cohort` (Lớp / Class); `chuan_hoa_lop` (cắt, gộp khoảng trắng, IN HOA). Lớp CHỈ để hiển thị / sắp / lọc / xuất; thuật toán KHÔNG đọc, không vào `dau_van_tay_du_lieu`, không đụng `run_history`. Lần ghi sau cùng thắng; không cột hoặc ô trống giữ lớp cũ.
+- **NGOẠI LỆ BẤT BIẾN 7 (Truong duyệt 02/11/2026):** cột CSV TUỲ CHỌN `class_id` ngay sau `reserve_group` trong CSV nguyện vọng và CSV chọn thi; Sổ nhập có cột "Lớp" ngay sau "Họ tên" (Sổ mẫu luôn có). Không có cột thì mọi tệp giống từng byte như cũ.
+- **DUYỆT NGOẠI LỆ TRÙNG KHÍT TỆP XUẤT (Truong duyệt 02/11/2026, phần B):** trang "Theo lớp" và cột "Lớp" LUÔN có trong Sổ kết quả và CSV kết quả (tệp tổng, `_theo_club`) kể cả khi không em nào có lớp. Không đổi: `match_results`, CSV thời khoá biểu, CSV từng buổi, CSV số bốc thăm, tệp tổng hợp.
+- **Rủi ro:** Thấp. Cột mới mặc định NULL.
+- **Kiểm nhận:** `match_results` giống hệt khi gán lớp ngẫu nhiên; `class_id` không có trong lõi ngoài schema / di_tru_schema / chuan_hoa_lop; đổi lớp sau khi chạy vẫn `ket_qua_cu = False`; `run_history` không đổi. tests/test_a14_*.py.
+- **Phụ thuộc:** không
 
 ### B1 — Điểm và thuộc tính theo cặp (đang là một số thực ≥ 0)
 - **Mức / quy mô:** Sửa mã / M

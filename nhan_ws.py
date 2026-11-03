@@ -2,7 +2,7 @@
 nhan_ws.py
 ==========
 Từ vựng của workspace: điền nhãn (Học sinh / Câu lạc bộ / Buổi / Nhóm ưu tiên /
-Điểm, hay "Nhân viên / Dự án / …") vào câu chữ có chỗ giữ `{person}`, `{slot}`…
+Điểm / Lớp, hay "Nhân viên / Dự án / …") vào câu chữ có chỗ giữ `{person}`, `{slot}`…
 
 KHÔNG phụ thuộc gì (không import cau_hinh_ws, không import rbda_priority_pipeline)
 vì i18n_errors.py — mà rbda_priority_pipeline.py import — cũng dùng nó. Bản đối
@@ -36,7 +36,7 @@ from __future__ import annotations
 import copy
 import re
 
-DANH_TU = ("person", "slot", "session", "group", "score")
+DANH_TU = ("person", "slot", "session", "group", "score", "cohort")
 
 # Nhãn MẶC ĐỊNH của trường học — nguồn duy nhất; cau_hinh_ws.py lấy từ đây.
 NHAN_MAC_DINH = {
@@ -45,12 +45,13 @@ NHAN_MAC_DINH = {
     "session": {"vi": "Buổi", "en": "Session"},
     "group": {"vi": "Nhóm ưu tiên", "en": "Priority group"},
     "score": {"vi": "Điểm", "en": "Score"},
+    "cohort": {"vi": "Lớp", "en": "Class"},
 }
 
 # Dạng viết tắt đã quen dùng (vi). Chỉ áp cho ĐÚNG nhãn này.
 _VIET_TAT = {("slot", "Câu lạc bộ"): "CLB"}
 
-_RE_CHO_GIU = re.compile(r"\{(person|slot|session|group|score)(?:_([lpsacuv]+))?\}")
+_RE_CHO_GIU = re.compile(r"\{(person|slot|session|group|score|cohort)(?:_([lpsacuv]+))?\}")
 
 
 def nhan_ngon_ngu(nhan: dict | None, danh_tu: str, lang: str = "vi") -> str:

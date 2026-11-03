@@ -1968,6 +1968,37 @@
    }
   },
   {
+   "id": "A14",
+   "nhom": "A",
+   "pham_vi": "theo_nganh",
+   "ten": "Lớp của học sinh (hiển thị, sắp, lọc, xuất cho giáo viên chủ nhiệm)",
+   "tep": "rbda_priority_pipeline.py (schema, di_tru_schema, chuan_hoa_lop), nhan_ws.py, cau_hinh_ws.py, i18n_errors.py, so_nhap.py, api_nhap.py, api_quan_ly.py, api_bao_cao.py, api_xuat.py (vài dòng co_lop), skill tao-workspace-tu-raw; phần B (xuất + giao diện): api_xuat.py, js/*, index.html, i18n.js, style.css",
+   "dong": "—",
+   "ham": "chuan_hoa_lop, di_tru_schema, doc_so_nhap, thanh_csv, ghi_so_nhap(co_lop), import_preferences_csv, import_test_selection_csv, list_students_admin, set_student_class, list_classes, create_student_if_missing, submit_preferences, get_match_results",
+   "hien_trang": "Học sinh chỉ có mã, tên, nhóm ưu tiên; giáo viên chủ nhiệm không lọc / sắp / nhận được danh sách theo lớp.",
+   "thay_doi": "Cột students.class_id (NULL = chưa có lớp) và danh từ từ vựng thứ sáu `cohort` (mặc định Lớp / Class). Một hàm chuẩn hoá chuan_hoa_lop (cắt, gộp khoảng trắng, IN HOA). Lớp CHỈ để hiển thị / sắp / lọc / xuất: thuật toán không bao giờ đọc, không vào dấu vân tay dữ liệu, không đụng run_history. NGOẠI LỆ bất biến 7 (Truong duyệt 02/11/2026): cột CSV TUỲ CHỌN class_id ngay sau reserve_group trong CSV nguyện vọng và CSV chọn thi; Sổ nhập có cột Lớp sau Họ tên. Lần ghi sau cùng thắng; không cột hoặc ô trống giữ lớp cũ.",
+   "muc": "Sửa mã",
+   "quy_mo": "M",
+   "trong_so": 2,
+   "rui_ro": "Thấp: cột mới tuỳ chọn, mặc định NULL; match_results trùng khít khi có / không có lớp (có test).",
+   "kiem_nhan": "match_results giống hệt khi gán lớp ngẫu nhiên; class_id không xuất hiện trong lõi phân bổ ngoài schema / di_tru_schema / chuan_hoa_lop; đổi lớp sau khi chạy vẫn ket_qua_cu = False; run_history không bị đụng; không cột lớp thì mọi CSV / Sổ giống từng byte như cũ.",
+   "phu_thuoc": [],
+   "ap_dung": {
+    "DT": "O",
+    "KTX": "O",
+    "SK": "O",
+    "NT": "O",
+    "YT": "O",
+    "VL": "O",
+    "KT": "O",
+    "HP": "O",
+    "TS": "O",
+    "NS": "O",
+    "LG": "O",
+    "TC": "O"
+   }
+  },
+  {
    "id": "B1",
    "nhom": "B",
    "pham_vi": "theo_nganh",
