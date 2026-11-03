@@ -84,7 +84,7 @@ Vai trò: Submitter (học sinh, giáo viên) và Administrator (1 đến 2 ngư
 | GĐ-2 | Google tuần tự hoá việc ghi dòng vào tab phản hồi, không mất dòng | Đối soát số bấm Gửi với số dòng |
 | GĐ-3 | Tab phản hồi chỉ được Google thêm dòng; script V1 không ghi vào. Sửa câu hỏi sau khi mở làm đổi cột | Quy tắc V1: không sửa biểu mẫu sau khi mở |
 | GĐ-4 | Có đủ các loại trường: chữ, số, email, thả xuống, nhiều lựa chọn, tải tệp (số và email thực ra là chữ có kiểm tra định dạng) | Thu hẹp danh sách loại trường |
-| GĐ-5 | Tuỳ chọn "cho phép sửa phản hồi" tắt được; tên đúng của tuỳ chọn cần kiểm | Vẫn an toàn: khoá là ID phản hồi, lô đọc qua API; sửa phản hồi chỉ làm nội dung đọc lần sau khác lần trước, đã tính ở mục 7.3 |
+| GĐ-5 | Tuỳ chọn "cho phép sửa phản hồi" tắt được; tên đúng của tuỳ chọn cần kiểm | **Không an toàn nếu để bật.** Lô bỏ qua ID đã có ở `phieu`, và đối soát chỉ so số lượng, nên một phản hồi bị sửa sau khi đã vào `phieu` sẽ **không bị phát hiện** (số lượng không đổi). Vì vậy tắt tuỳ chọn này là **điều kiện bắt buộc** của V1: hàm mở đợt kiểm `form.canEditResponse()` và từ chối mở nếu đang bật (mục 7.3, 13.1) |
 | GĐ-6 | Có hàm đóng nhận phản hồi (`setAcceptingResponses`) và đặt thông báo khi đóng | Đóng bằng tay |
 | GĐ-7 | Dấu thời gian phản hồi có độ phân giải giây, nên hai phản hồi có thể trùng giây (nộp đồng thời lúc đỉnh) | Thiết kế đã xử lý: khoá là ID phản hồi, không phải dấu thời gian |
 | GĐ-8 | Biểu mẫu kiểm tra được mã học sinh bằng biểu thức chính quy | Chỉ kiểm ở lô |
@@ -237,7 +237,7 @@ Sơ đồ b2 (phân loại và ghi một khối):
 
 ### 7.3 Phát hiện lệch: một lớp duy nhất, đối soát số lượng
 
-- V1 tắt "cho phép sửa phản hồi" (GĐ-5). Vì lô đọc qua API và khoá là ID, việc sắp xếp, chèn hay xoá dòng ở tab RAW **không ảnh hưởng** đến lô. Quy tắc vận hành vẫn là: không sắp xếp hay lọc tại chỗ ở RAW và `phieu`, dùng chế độ xem lọc.
+- V1 **bắt buộc** tắt "cho phép sửa phản hồi" (GĐ-5): hàm mở đợt kiểm `form.canEditResponse()` và từ chối mở nếu đang bật; lô hằng ngày kiểm lại và gửi email nếu ai đó bật lên. Lý do: đối soát số lượng không thấy phản hồi bị sửa nội dung. Nếu sau này cần cho sửa, phải thêm lại một lớp phát hiện nội dung (thời điểm sửa cuối của phản hồi, hoặc băm). Vì lô đọc qua API và khoá là ID, việc sắp xếp, chèn hay xoá dòng ở tab RAW **không ảnh hưởng** đến lô. Quy tắc vận hành vẫn là: không sắp xếp hay lọc tại chỗ ở RAW và `phieu`, dùng chế độ xem lọc.
 - Lớp phát hiện duy nhất: **đối soát số lượng**. Mỗi lô so số dòng RAW (rẻ) với số hàng hợp lệ của `phieu`; lệch quá số phản hồi đang chờ (lô chưa kịp xử lý) thì ô đối soát chuyển đỏ và có email. Trước khi chốt đợt, đối soát đầy đủ ba nguồn: số dòng RAW, số phản hồi đếm qua API (đọc theo khối, chạy tiếp được) và số hàng hợp lệ của `phieu`.
 - Nếu số RAW nhỏ hơn số `phieu`: có người xoá dòng ở RAW. Không mất phiếu vì dữ liệu gốc ở Forms; ghi `nhat_ky` và cảnh báo.
 - Không còn trạng thái `raw_doi`, không còn băm nội dung và không còn kiểm băm toàn bộ trước chốt.
@@ -250,6 +250,7 @@ Sơ đồ b2 (phân loại và ghi một khối):
 - **Học sinh nộp lại để sửa câu trả lời**: phiếu sau mặc định là `bo_nop_trung`. Admin dùng menu "Giữ phiếu này" (3 bước): phiếu chọn thành `ban_giu = 1`, `cho_duyet`; phiếu giữ trước thành `ban_giu = 0`, `bo_nop_trung`; ghi `nhat_ky` (ai, lúc nào, hai `raw_key`, lý do). Đã xuất rồi thì xuất lại: mỗi lần xuất là một bộ tệp mới có giờ trong tên, không ghi đè; kiosk dùng bộ mới nhất.
 - **Mã nhập nhầm** (hai trường hợp: mã không có trong danh sách, hoặc mã hợp lệ nhưng là mã của người khác): admin dùng menu **"Gán lại mã"** (3 bước: chọn dòng, nhập mã đúng, nhập lý do). Hệ thống kiểm mã mới có trong `hoc_sinh`, cập nhật `phieu.ma_hs`, ghi `nhat_ky` (mã cũ, mã mới, lý do), rồi đánh giá lại nhóm như trên. **Câu trả lời không bị đụng.** Khi xuất, mã đã gán lại được ghi vào cột `student_id` và dòng `[student_id]` của `RAW_PHIEU`; mã học sinh tự gõ ban đầu vẫn còn ở RAW, API và `nhat_ky`.
 - **Hậu quả của mã hợp lệ nhập nhầm** nếu không ai phát hiện: phiếu được tính cho học sinh khác; phiếu thật của người đó, nếu nộp sau, trở thành `bo_nop_trung`. **Tín hiệu phát hiện** (tuỳ chọn, khi biểu mẫu thu email, GĐ-9): số email có nhiều hơn một mã học sinh, hiện trên `dieu_khien`; báo cáo của skill cũng bắt "một email nhiều mã".
+- **Khớp với luật "giữ phiếu đầu" của skill.** Hai ngoại lệ (a), (b) ở trên có thể giữ một phiếu **không** phải phiếu sớm nhất. Điều này không làm lệch kết quả, vì xuất lọc theo danh sách ID đã duyệt (`ban_giu = 1`) **trước** khi bỏ trùng (mục 11): mỗi mã chỉ còn đúng một phiếu, nên `chamTheoCLB` và `xu_li_raw.py` không còn gì để chọn. Điều kiện: bộ lọc ID phải chạy trước bước bỏ trùng; cần một test với nhóm có phiếu sớm hơn bị `bo_nop_trung` do admin giữ phiếu muộn, kiểm tệp xuất chứa đúng phiếu muộn.
 - Báo cáo của skill sẽ **ít phiếu trùng hơn trước**, vì xuất đã lọc sẵn. Nơi chứa các bất thường nay là tab `phieu`; báo cáo của skill vẫn bắt các lỗi khác (đáp án lệch, thiếu xếp hạng).
 - Mã không có trong `hoc_sinh` là `ma_la`; không có mã là `bo_khong_ma`. Hai trạng thái này có `ban_giu = 0` cho đến khi xử lý.
 
@@ -342,7 +343,7 @@ Tệp xuất dạng dài là tệp **riêng**, không tính vào Sheets của đ
 
 ### 9.3 Ngân sách trigger và biên 2 lần
 
-Quy tắc: ngân sách thiết kế không quá **một phần ba** hạn mức thấp nhất nghe được (TT-CXM).
+Quy tắc: ngân sách thiết kế **ngày thường** không quá **một phần ba** hạn mức thấp nhất nghe được (TT-CXM). **Ngoại lệ có chủ đích:** ngày đỉnh và ngày xuất được phép tới **một nửa** (45 phút nếu hạn mức là 90). Lý do: hai loại ngày này hiếm (vài ngày mỗi đợt) và vượt hạn mức chỉ làm chậm, không mất phiếu (dữ liệu gốc ở Forms). Đổi lại, biên an toàn của hai ngày này chỉ còn 2 lần thay vì 3 lần.
 
 Trigger (mục 7.6): lô mỗi 10 phút, hằng ngày, mở, đóng, và một trigger nối tiếp xuất; tối đa 5 cùng lúc (so với trần 20, TT-CXM).
 
@@ -358,7 +359,7 @@ Ngày xấu nhất cho việc nhận phiếu: biểu mẫu mở cả 24 giờ, �
 
 Biến thể: **ngày đỉnh có 12 lô bận** (mục 9.4): 12 nhân 2 phút là 24,0 cộng 132 lô nhàn nhân 3 giây là 6,6 cộng 1,5 cộng 0,3 là **khoảng 32,4 phút**. Vượt mức 30 phút của quy tắc một phần ba nhưng dưới 45 phút (một nửa hạn mức 90 phút nếu số đó đúng, TT-CXM), nên vẫn có biên.
 
-Ngày xuất (mục 11.3), lô đã ngừng: 10 phần xuất, mỗi phần giả định 200 giây là khoảng 33,3 phút, cộng sao lưu 1,5 là **khoảng 34,8 phút**, dưới 45 phút. Quy tắc: **tối đa một lần xuất đầy đủ mỗi ngày**; xuất lần hai trong cùng ngày có thể vượt hạn mức.
+Ngày xuất (mục 11.3), lô đã ngừng: 10 phần xuất, mỗi phần giả định 200 giây là khoảng 33,3 phút, cộng sao lưu 1,5 là **khoảng 34,8 phút**, dưới 45 phút. Quy tắc: **tối đa một lần xuất đầy đủ mỗi ngày**; xuất lần hai trong cùng ngày có thể vượt hạn mức. Nút "Xuất" kiểm `cau_hinh` và chặn lần xuất đầy đủ thứ hai trong ngày (admin vẫn xuất tiếp được phần dở).
 
 | Hạn mức (số trong tóm tắt, TT-CXM) | Mức dùng thiết kế | Nếu hạn mức thật bằng một nửa |
 |---|---|---|
@@ -367,6 +368,8 @@ Ngày xuất (mục 11.3), lô đã ngừng: 10 phần xuất, mỗi phần gi�
 | 20 trigger mỗi người mỗi script | Tối đa 5 | Nửa là 10: dư |
 | Trần ô 10 triệu | 3,0 triệu điển hình, 5,4 triệu xấu nhất | Nửa là 5 triệu: điển hình dư, xấu nhất không đủ, nên có quy tắc 340 câu ở 9.2 |
 | Thực thi đồng thời | Một lô, khoá script | Không phụ thuộc |
+
+**Nếu hạn mức mỗi lần chạy chỉ còn 3 phút** (phần xuất 1.000 phiếu không vừa), cỡ phần giảm còn 500 phiếu, thành 20 phần cho 10.000 phiếu. Thời gian xuất tính lại: 20 nhân (50 đến 100 giây cộng 60 giây chờ) là **khoảng 37 đến 53 phút**. Mức xấu **vượt** mục tiêu 45 phút của mục 9.4, và phút trigger ngày xuất là 20 nhân 100 giây, khoảng 33,3 phút, cộng 1,5 là khoảng 34,8 phút (không đổi, vì thời gian chờ không tính vào trigger). Hệ quả: mục tiêu 45 phút chỉ giữ khi hạn mức mỗi lần chạy là 6 phút; nếu là 3 phút thì mục tiêu thành **không quá 55 phút**, hoặc rút thời gian chờ giữa hai phần xuống khoảng 30 giây (20 nhân 130 giây, khoảng 43 phút). Chọn khi đã đo.
 
 Các giả định 3 giây, 90 giây, 200 giây, 8 và 12 lô bận phải đo ở đợt thử (mục 12).
 
@@ -463,7 +466,7 @@ Kiểm đỉnh tải: 100 đến 300 phiếu trong một phút bằng nhiều ng
 
 ### 13.1 Cần cho V1
 
-- Biểu mẫu sinh bằng `TAO_GOOGLE_FORM.gs` (đã có); tắt sửa phản hồi (GĐ-5); không sửa biểu mẫu sau khi mở.
+- Biểu mẫu sinh bằng `TAO_GOOGLE_FORM.gs` (đã có); **bắt buộc** tắt sửa phản hồi, hàm mở đợt kiểm và từ chối nếu đang bật (GĐ-5); không sửa biểu mẫu sau khi mở.
 - Một Sheets mỗi (đợt, đối tượng) với `RAW`, `hoc_sinh`, `clb`, `phieu`, `nhat_ky`, `cau_hinh`, `dieu_khien`. **Quy tắc kích cỡ: không quá khoảng 340 câu hỏi mỗi biểu mẫu** (mục 9.2), vượt thì chia hai biểu mẫu.
 - Lô: đọc qua API theo mốc gối 1 phút, khoá, upsert theo ID phản hồi, cột khoá ghi cuối và đọc lại kiểm, kiểm mã, bỏ trùng giữ phiếu sớm nhất, đối soát số lượng. Nút "Cài lại trigger" (mục 7.6).
 - Menu quản trị: duyệt hàng loạt, từ chối kèm lý do, giữ phiếu này, **gán lại mã**, chốt đợt có xác nhận, "Sao lưu ngay".
