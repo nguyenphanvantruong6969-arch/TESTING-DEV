@@ -16,6 +16,7 @@
 - **F6:** bỏ khoá mồ côi `results_title`, `results_desc`, `tkb_title`, `tkb_desc`, `tkb_so_clb` (`tests/test_ws_nhan.py` đổi mẫu `tkb_desc` thành `kq_desc`).
 - **F7:** số ít / số nhiều ở bản tiếng Anh: `kq_dem_ma_nhieu`, `theolop_dem_nhieu` (số ít chỉ khi n = 1).
 - **F8 (T2):** *Theo CLB*: tầng 2 "Theo ngày trong tuần" chia ô chọn CLB thành nhóm theo buổi (thứ tự ngày), "Theo mã học sinh" là danh sách phẳng theo vần; bảng thành viên luôn theo mã. Cột STT, mã, họ tên, lớp không xuống dòng. Ô tìm ngắn hơn (`kq_tim_ph`). Nhớ cả lớp và CLB đã chọn trong khoá `rbda_ket_qua_xem_v1` (giá trị không còn tồn tại thì lùi về mục đầu).
+- **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` (ảnh chụp chuỗi mặc định: bỏ năm khoá mồ côi khỏi phép so, cho phép đúng hai chuỗi đổi số thẻ; mẫu 20 chuỗi dùng `fill_hint`); `docs/ke_hoach/CLAUDE_CHI_TIET.md` (178 tệp, 3.299 ca).
 - **Test:** `tests/test_t1b_nhan_trung_cu.py` (thêm F1, F2, F3 và so mọi sheet sổ mẫu), `tests/test_giao_dien_t2_ket_qua.py` (thêm nhóm theo buổi, nhớ lớp / CLB, số ít số nhiều); `test_giao_dien_a14_lop.py` (khoá i18n 25 thành 26, tuỳ chọn CLB có nhóm).
 
 ### T2 — gộp thẻ 02, 06, 07 thành "Kết quả" và "Dữ liệu khác" (bảy thẻ thành sáu)

@@ -87,7 +87,23 @@ MA_MOI_SAU_ANH_CHUP = {
 }
 
 
+# Thay đổi CÓ CHỦ Ý sau ảnh chụp (T1/T2, Truong duyệt): đánh số lại thẻ (bảy thành sáu) làm đổi số thẻ
+# trong hai chuỗi, và năm khoá giao diện mồ côi của thẻ Kết quả cũ bị bỏ. Mọi chuỗi khác vẫn giống hệt.
+KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb"}
+SUA_CO_Y = {
+    ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],
+    ("loi", "so_nhap_canh_bao_clb_ngoai_so"): [("thẻ 04", "thẻ 05"), ("tab 04", "tab 05")],
+}
+
+
+def _sua_co_y(loai, khoa, chuoi):
+    for cu, moi in SUA_CO_Y.get((loai, khoa), []):
+        chuoi = chuoi.replace(cu, moi)
+    return chuoi
+
+
 def _truoc_da_doi_ten_tham_so(chuoi, ma=None):
+    chuoi = _sua_co_y("loi", ma, chuoi)
     chuoi = chuoi.replace("{score}", "{diem_goc}")
     if ma in TRAN_MAC_DINH:
         chuoi, n = re.subn(r"\b%d\b" % TRAN_MAC_DINH[ma], "{tran}", chuoi)
@@ -209,6 +225,7 @@ def test_format_message_mac_dinh_khong_doi(anh_chup):
     for ma, truoc in anh_chup["loi"].items():
         for lang in ("vi", "en"):
             mong_doi = _truoc_da_doi_ten_tham_so(truoc[lang], ma)
+            truoc = {**truoc, lang: _sua_co_y("loi", ma, truoc[lang])}
             tham_so = {k: "X" for k in re.findall(r"\{(\w+)\}", mong_doi)}
             if ma in TRAN_MAC_DINH:   # hiện lại đúng con số cũ
                 tham_so["tran"] = TRAN_MAC_DINH[ma]
@@ -292,13 +309,14 @@ def _chay_js(lenh):
 @can_node
 def test_moi_chuoi_giao_dien_mac_dinh_giong_het_anh_chup(anh_chup):
     """TOÀN BỘ UI_STRINGS (vi + en) với mặc định trường học == ảnh chụp trước thay đổi."""
-    khoa = sorted(anh_chup["ui"]["vi"])
+    khoa = sorted(set(anh_chup["ui"]["vi"]) - KHOA_UI_DA_BO)
     ra = _chay_js({"khoa": khoa})
     lech = []
     for lang in ("vi", "en"):
         for k in khoa:
-            if ra[lang][k] != anh_chup["ui"][lang][k]:
-                lech.append((lang, k, anh_chup["ui"][lang][k][:70], ra[lang][k][:70]))
+            mong = _sua_co_y("ui", k, anh_chup["ui"][lang][k])
+            if ra[lang][k] != mong:
+                lech.append((lang, k, mong[:70], ra[lang][k][:70]))
     assert not lech, lech[:10]
     assert len(khoa) > 450  # có đọc đủ bảng, không phải bảng rỗng
 
@@ -307,7 +325,7 @@ def test_moi_chuoi_giao_dien_mac_dinh_giong_het_anh_chup(anh_chup):
 MAU_20 = [
     "brand_title", "nav_admin", "nav_scoring", "label_students", "label_clubs",
     "pipeline_desc", "admin_desc", "chua_co_cho_desc", "toast_run_success",
-    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "kq_desc",
+    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "fill_hint",
     "th_score", "th_student_id", "th_club_id", "xuat_opt_ket_qua",
     "scoring_desc", "toast_reset_done_removed", "page_title",
 ]
