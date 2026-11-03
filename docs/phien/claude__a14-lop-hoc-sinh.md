@@ -32,6 +32,9 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 - Wharton default is ON: allocation tests without determination points need a LOCAL `api` fixture calling tests/_wharton.py::tat_wharton (no autouse).
 - JS mirrors of the noun list (i18n.js nounText, js/075_workspace.js WS_DANH_TU) belong to session B.
 
+## Status
+- PR #6 opened, waiting for CI (claude/a14-giao-dien -> main, includes this branch up to c3cd884). Coordinator asked A to PAUSE: no more pushes to this branch unless told.
+
 ## Next steps
 1. Step 2 as in Plan.
 
