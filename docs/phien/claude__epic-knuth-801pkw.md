@@ -47,12 +47,9 @@ Both
 - [x] Related tests green, ruff, soat-ma, CHANGELOG, TIEN_DO, push. Opus runs the FULL suite at the end.
 
 ## Current state (overwrite each handoff)
-- Done: T1a, T1b, T2 plus fix rounds 1 and 2 (HEAD before round 3: 0e56a1b). Round 3 (Opus plan): snapshot
-  tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json regenerated for the "Hướng dẫn" sheet only (cells A1, A16, A18,
-  A23, A33 differ, proved by key-by-key diff); CHANGELOG "T2 sửa vòng 3" and test comment written.
-- In progress: round 3 verification: `pytest tests/test_ws_so_nhap.py tests/test_so_nhap.py` was running in the
-  background (output in session scratchpad chay3.txt). Round 3 changes are committed and pushed by the handoff
-  commit, but NOT yet reported to Opus (no "CON-1 FIXED round 3" message sent).
+- Done: T1a, T1b, T2, fix rounds 1, 2, 3 (HEAD cebfa2c plus this handoff commit). Round 3 verified: tests/test_ws_so_nhap.py
+  and tests/test_so_nhap.py 115 passed, ruff clean; "CON-1 FIXED round 3" was SENT to Opus session_01VfPzNvdGizkwxJ8cd64rmp.
+- In progress: nothing. Waiting for Opus: full-suite result and any further fix plan.
 
 ## Decisions and gotchas (keep short)
 - Static sample mau_csv/SO_NHAP_CLB.xlsx is a blank template: only the Lớp column was added (all sheets equal the
@@ -64,10 +61,8 @@ Both
   context and a `them` parameter.
 
 ## Next steps (ordered)
-1. Check the round 3 test result (re-run tests/test_ws_so_nhap.py tests/test_so_nhap.py, ruff, kiem_nhanh).
-2. Send "CON-1 FIXED round 3" to session_01VfPzNvdGizkwxJ8cd64rmp with hashes, the list of differing keys
-   (Hướng dẫn/o/A1, A16, A18, A23, A33), and test counts.
-3. Wait for Opus: full suite result and any further fix plan.
+1. Wait for / read Opus fix plans (cross-session messages). Fix test-first, related tests only, ruff, kiem_nhanh, CHANGELOG, commit, push.
+2. Report to Opus with "CON-1 FIXED round N" (hashes, per-bug status, test counts).
 
 ## Files touched
 - Round 3: tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json, tests/test_ws_so_nhap.py, CHANGELOG.md, this file.
@@ -82,3 +77,4 @@ Both
 | 2026-11-03 | Sonnet | Fix round 2 (G1-G3) from Opus plan | see CHANGELOG "T2 sửa vòng 2" |
 | 2026-11-03 | Sonnet | Fix round 3 (snapshot of Sổ guide text) | only Hướng dẫn A1,A16,A18,A23,A33 differed |
 | 2026-11-03 | Sonnet | Handoff at context limit, round 3 committed | tests still pending, report to Opus not sent |
+| 2026-11-03 | Sonnet | Final handoff: rounds 1-3 done and reported | nothing pending on this side |
