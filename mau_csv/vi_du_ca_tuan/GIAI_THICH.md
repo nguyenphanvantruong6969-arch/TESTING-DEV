@@ -69,9 +69,9 @@ nhưng không đến mức ai cũng trượt.
 ## Tệp 2 · `02_chon_CLB_muon_thi.csv` — ai thi gì, điểm bao nhiêu
 
 ```csv
-student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2,...
-HS001,Trần Thanh Linh,khoi_10,clb_khieuvu,"9,8",clb_coking,"9,3",,,,,,
-HS002,Trịnh Thanh Sương,,clb_khieuvu,"9,5",clb_coking,"6,5",clb_dangian,"4,1",,,,
+student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2,...
+HS001,Trần Thanh Linh,khoi_10,11A3,clb_khieuvu,"9,8",clb_coking,"9,3",,,,,,
+HS002,Trịnh Thanh Sương,,10A3,clb_khieuvu,"9,5",clb_coking,"6,5",clb_dangian,"4,1",,,,
 ```
 
 - `score_N` ghép với `test_club_N` **theo con số trong tên cột**, không theo vị
@@ -93,9 +93,9 @@ HS002,Trịnh Thanh Sương,,clb_khieuvu,"9,5",clb_coking,"6,5",clb_dangian,"4,1
 ## Tệp 3 · `03_xep_hang_nguyen_vong.csv` — muốn vào đâu, ngày nào
 
 ```csv
-student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_2_pref_3,thu_3_pref_1,...,thu_7_pref_3
-HS001,Trần Thanh Linh,khoi_10,clb_robotics,clb_bongro,,clb_tinhoc,...
-HS004,Dương Thanh Phúc,,clb_covua,,,,,,,,,clb_nauan,,,clb_tranhbien,,,clb_thuvien,clb_dangian,clb_coking
+student_id,name,reserve_group,class_id,thu_2_pref_1,thu_2_pref_2,thu_2_pref_3,thu_3_pref_1,...,thu_7_pref_3
+HS001,Trần Thanh Linh,khoi_10,11A3,clb_robotics,clb_bongro,,clb_tinhoc,...
+HS004,Dương Thanh Phúc,,10A1,clb_covua,,,,,,,,,clb_nauan,,,clb_tranhbien,,,clb_thuvien,clb_dangian,clb_coking
 ```
 
 - **Điểm quyết tâm (A13.13):** workspace trường học bật sẵn tính năng này, nên tệp có thêm các

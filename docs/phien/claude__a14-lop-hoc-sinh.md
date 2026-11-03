@@ -25,7 +25,8 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 - Tests: tests/test_a14_*.py (51+2 cases) green; related (non-UI) run: 2022 pass, 8 old failures all fixed
   (see CHANGELOG). soat-ma kiem_nhanh 7/7 PASS. UI/browser tests NOT run here (session B).
 - Post-review fixes A1-A6 done (tests/test_a14_sua_sau_soat.py, 26 cases); see CHANGELOG.
-- Open: static samples in mau_csv/ (SO_NHAP_CLB.xlsx etc.) were not regenerated with a Lop column.
+- C1 (saved duplicate labels can be re-saved/cloned) and C2 (static sample workbooks/CSVs have simulated Lop; script du_lieu_test/them_lop_vao_mau.py) done.
+- Next steps / not done: skill sinh-du-lieu-clb has no simulated-class option yet.
 
 ## Decisions and gotchas
 - Wharton default is ON: allocation tests without determination points need a LOCAL `api` fixture calling tests/_wharton.py::tat_wharton (no autouse).
@@ -42,4 +43,5 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 |---|---|---|---|
 | 2026-11-02 | Sonnet | Step 1 base | |
 | 2026-11-02 | Sonnet | Step 2 import/API/docs, old-test fixes, soat-ma | final |
+| 2026-11-03 | Sonnet | C1 label re-save, C2 sample files with simulated classes | |
 | 2026-11-02 | Sonnet | Cross-review fixes A1-A6 | one commit per item (A2-A4 together) |
