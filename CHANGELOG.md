@@ -7,6 +7,7 @@ Thay đổi số 3 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_TH
 - **`xu_li_raw.py`:** hàm mới `doc_raw(duong)`. Tệp đơn: y như `doc_bang` cũ. Thư mục: ghép các phần theo số phần (thứ tự tự nhiên), từ chối bằng `LoiDauVao` (không ghi tệp nào) khi không có phần, nhiều bộ xuất lẫn nhau, thiếu phần / số phần trùng, tiêu đề lệch, hoặc một `phieu_so` ở hai phần. `chay` gọi `doc_raw`; `--raw` nhận thư mục. `COT_RAW` không đổi.
 - **`SKILL.md`:** ghi cách dùng thư mục và các trường hợp bị từ chối.
 - **Test mới:** `tests/test_skill_xu_li_raw_nhieu_phan.py` (8 ca): thư mục 3 phần cho Sổ và báo cáo giống hệt một tệp; p2 trước p10; tệp đơn như cũ; năm ca từ chối. `tests/test_skill_xu_li_raw.py` (8 ca) giữ xanh.
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 179 tệp test (canh bởi `tests/test_a13_12_tai_lieu.py`).
 - Không đụng kiosk, hợp đồng cột CSV, `match_results`.
 
 ## 2026-11-03 — T1a, T1b (nhánh `claude/epic-knuth-801pkw`; Truong duyệt, bỏ qua sổ đăng ký)
