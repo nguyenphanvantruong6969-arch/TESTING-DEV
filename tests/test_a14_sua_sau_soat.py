@@ -289,3 +289,72 @@ def test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien(tmp_path):
     assert len(cu) == 1                                   # đúng một bản chụp TRƯỚC khi sửa gì
     assert rp.di_tru_schema(db) == []                     # lặp lại: không làm gì, không sao lưu thêm
     assert len(glob.glob(db + ".bak-*")) == len(baks)
+
+
+# ------------------------------------------------------------------ C1 (ghi lại cấu hình trùng đã lưu)
+
+def _ws_trung(tmp_path):
+    """Workspace có cấu hình ĐÃ LƯU với nhãn trùng (group = cohort = "Lớp")."""
+    goc = str(tmp_path / "goc")
+    os.makedirs(goc, exist_ok=True)
+    slug = ws.tao(goc, "Cũ", {})
+    _luu_tho(ws.duong_dan_db(goc, slug), TRUNG)
+    return goc, slug
+
+
+def test_c1_doi_ten_workspace_co_nhan_trung_van_duoc_va_giu_nhan(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    ws.doi_ten(goc, slug, "Tên mới")
+    cfg = ch.doc_cau_hinh(ws.duong_dan_db(goc, slug))
+    assert cfg["name"] == "Tên mới"
+    assert cfg["labels"]["group"]["vi"] == cfg["labels"]["cohort"]["vi"] == "Lớp"
+
+
+def test_c1_api_cap_nhat_phan_khac_khong_dung_nhan_van_duoc(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config({"name": "Đổi tên"}, slug)
+    assert kq["ok"], kq
+    assert kq["data"]["config"]["labels"]["group"]["vi"] == "Lớp"
+
+
+def test_c1_nhan_ban_giu_nguyen_cau_hinh_trung_ca_co_va_khong_kem_du_lieu(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    for kem in (False, True):
+        moi = ws.nhan_ban(goc, slug, "Bản sao %s" % kem, kem)
+        cfg = ch.doc_cau_hinh(ws.duong_dan_db(goc, moi))
+        assert cfg["labels"]["group"]["vi"] == cfg["labels"]["cohort"]["vi"] == "Lớp"
+
+
+def test_c1_van_tu_choi_khi_lan_luu_nay_tao_hoac_doi_cap_trung(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    # tạo cặp trùng MỚI (person ↔ score) trên nền cấu hình đã trùng
+    kq = api.update_workspace_config(
+        {"labels": {"person": {"vi": "Điểm", "en": "Pupil"}}}, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    # ĐỔI cặp trùng sang nhãn khác mà vẫn trùng
+    kq = api.update_workspace_config({"labels": {
+        "group": {"vi": "Phòng", "en": "Dept"}, "cohort": {"vi": "Phòng", "en": "Team"}}}, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    # cấu hình lưu không bị đổi sau hai lần từ chối
+    assert ch.doc_cau_hinh(ws.duong_dan_db(goc, slug))["labels"]["group"]["vi"] == "Lớp"
+
+
+def test_c1_sua_cho_het_trung_thi_luu_duoc(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config(
+        {"labels": {"group": {"vi": "Nhóm ưu tiên", "en": "Priority group"}}}, slug)
+    assert kq["ok"], kq
+
+
+def test_c1_cau_hinh_hop_le_dat_nhan_trung_van_bi_tu_choi(tmp_path):
+    goc = str(tmp_path / "goc")
+    os.makedirs(goc)
+    slug = ws.tao(goc, "Sạch", {})
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config(TRUNG, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    with pytest.raises(ch.NhanTrung):
+        ws.tao(goc, "Mới", TRUNG)

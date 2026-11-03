@@ -204,7 +204,8 @@ def danh_sach(root: str) -> list[dict]:
     return ra
 
 
-def tao(root: str, name: str, cfg: dict | None = None) -> str:
+def tao(root: str, name: str, cfg: dict | None = None,
+        cho_phep_trung_nhu: dict | None = None) -> str:
     """Dựng workspace mới tên `name` với cấu hình `cfg` (None = mặc định trường học).
 
     Trả về slug. `cfg["name"]`, nếu có, bị `name` ghi đè. `cfg` sai thì ném
@@ -213,7 +214,7 @@ def tao(root: str, name: str, cfg: dict | None = None) -> str:
     name = _kiem_ten(name)
     cau_hinh = dict(cfg or {})
     cau_hinh["name"] = name
-    chuan_hoa(cau_hinh)
+    chuan_hoa(cau_hinh, cho_phep_trung_nhu)
 
     slug = _slug_trong(root, name)
     thu_muc = os.path.join(_thu_muc_ws(root), slug)
@@ -221,7 +222,7 @@ def tao(root: str, name: str, cfg: dict | None = None) -> str:
     try:
         db = os.path.join(thu_muc, TEN_DB)
         init_db(db)
-        ghi_cau_hinh(db, cau_hinh)
+        ghi_cau_hinh(db, cau_hinh, cho_phep_trung_nhu or {})
     except BaseException:
         # Thư mục VỪA tạo ngay trên, chưa có dữ liệu của ai: dọn là an toàn.
         shutil.rmtree(thu_muc, ignore_errors=True)
@@ -274,10 +275,10 @@ def nhan_ban(root: str, slug: str, new_name: str, kem_du_lieu: bool) -> str:
     cfg = doc_cau_hinh(nguon, nghiem=True)   # xem `doi_ten`: không nhân bản một cấu hình đoán
 
     if not kem_du_lieu:
-        return tao(root, new_name, cfg)
+        return tao(root, new_name, cfg, cho_phep_trung_nhu=cfg)   # bản sao mang nguyên nhãn cũ
 
     cfg["name"] = new_name
-    chuan_hoa(cfg)
+    chuan_hoa(cfg, cho_phep_trung_nhu=cfg)
     moi = _slug_trong(root, new_name)
     thu_muc = os.path.join(_thu_muc_ws(root), moi)
     os.makedirs(thu_muc)
