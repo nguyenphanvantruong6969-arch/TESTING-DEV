@@ -117,7 +117,8 @@ def test_nho_hai_tang_theo_may_va_mo_lai_van_con(mo):
     url = page.url
     _mo_ket_qua(page, "ma")
     _sx(page, "lop")
-    assert json.loads(page.evaluate("() => localStorage.getItem('%s')" % KHOA)) == {"tang1": "ma", "tang2": "lop"}
+    luu = json.loads(page.evaluate("() => localStorage.getItem('%s')" % KHOA))
+    assert (luu["tang1"], luu["tang2"]) == ("ma", "lop")
     trang2 = page.context.new_page()           # cùng kho lưu trữ, như mở lại chương trình
     trang2.goto(url)
     trang2.wait_for_selector("#dropZone")
@@ -216,4 +217,59 @@ def test_ket_qua_khong_bao_gio_co_diem_hay_so_boc_tham(mo):
         o = page.evaluate("""() => Array.from(document.querySelectorAll('#kqThan tr'))
             .flatMap(r => Array.from(r.children).slice(1).map(c => c.textContent.trim()))""")
         assert not any(re.fullmatch(r"-?\d+([.,]\d+)?", x) for x in o), (tang1, o)  # không ô nào là con số trơn
+    assert not loi, loi
+
+
+def test_theo_clb_tang2_ngay_nhom_theo_buoi_con_ma_la_danh_sach_phang(mo):
+    page, api, loi = mo({"HS1": "10A1"}, chay=True, nhieu_buoi=True)
+    _mo_ket_qua(page, "clb")
+    page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length === 3")
+    _sx(page, "ngay")
+    page.wait_for_function("() => document.querySelectorAll('#kqChonClb optgroup').length === 3")
+    assert page.locator("#kqChonClb optgroup").evaluate_all("g => g.map(x => x.label)") == ["2", "3", "10"]
+    _sx(page, "ma")
+    page.wait_for_function("() => document.querySelectorAll('#kqChonClb optgroup').length === 0")
+    # danh sách phẳng theo vần tên: "CLB 10" đứng trước "CLB 2" (so vần), kèm buổi
+    assert page.locator("#kqChonClb option").all_inner_texts() == ["10 · CLB 10", "2 · CLB 2", "3 · CLB 3"]
+    assert not loi, loi
+
+
+def test_nho_lop_va_clb_da_chon_sau_khi_mo_lai_va_bo_qua_neu_khong_con(mo):
+    page, api, loi = mo({"HS1": "10A1", "HS2": "10A2", "HS3": "10A2"}, chay=True)
+    url = page.url
+    _mo_ket_qua(page, "lop")
+    page.wait_for_function("() => document.querySelectorAll('#kqChonLop option').length === 2")
+    page.select_option("#kqChonLop", "10A2")
+    page.locator('#kqTang1 [data-kq="clb"]').click()
+    page.select_option("#kqChonClb", "B")
+    trang2 = page.context.new_page()
+    trang2.goto(url)
+    trang2.wait_for_selector("#dropZone")
+    trang2.locator('.nav-item[data-tab="results"]').click()
+    trang2.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length === 2")
+    assert trang2.locator("#kqChonClb").input_value() == "B"
+    trang2.locator('#kqTang1 [data-kq="lop"]').click()
+    assert trang2.locator("#kqChonLop").input_value() == "10A2"
+    # giá trị đã lưu mà không còn tồn tại thì lùi về mục đầu, không lỗi
+    trang3 = page.context.new_page()
+    trang3.add_init_script("localStorage.setItem('rbda_ket_qua_xem_v1', JSON.stringify("
+                           "{tang1: 'lop', tang2: 'ngay', lop: '99Z', clb: 'khong_co'}));")
+    loi3 = []
+    trang3.on("pageerror", lambda e: loi3.append(str(e)))
+    trang3.goto(url)
+    trang3.wait_for_selector("#dropZone")
+    trang3.locator('.nav-item[data-tab="results"]').click()
+    trang3.wait_for_function("() => document.querySelectorAll('#kqChonLop option').length === 2")
+    assert trang3.locator("#kqChonLop").input_value() == "10A1"
+    assert not loi and not loi3, (loi, loi3)
+
+
+def test_so_it_so_nhieu_tieng_anh(mo):
+    page, api, loi = mo({"HS1": "10A1"}, chay=True)
+    _mo_ket_qua(page, "ma")
+    _bang_san_sang(page, 3)
+    page.locator("#btnLangToggle").click()
+    page.wait_for_function("() => /^3 students/i.test(document.getElementById('kqDem').textContent.trim())")
+    page.fill("#kqTimKiem", "HS1")
+    page.wait_for_function("() => /^1 student$/i.test(document.getElementById('kqDem').textContent.trim())")
     assert not loi, loi

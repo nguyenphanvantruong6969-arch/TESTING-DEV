@@ -32,6 +32,7 @@ import openpyxl
 THU_MUC = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(THU_MUC))
 
+import cau_hinh_ws  # noqa: E402
 import so_nhap  # noqa: E402
 
 TEN_MAU = "SO_NHAP_CLB.xlsx"
@@ -110,7 +111,9 @@ def tao_vi_du(ten_bo: str) -> str:
 
 def tao_mau_trong() -> str:
     ra = os.path.join(THU_MUC, TEN_MAU)
-    so_nhap.ghi_so_nhap(ra, luon_co_cot_w=True,   # A13.7: mẫu trống có cột Điểm quyết tâm
+    # Cùng cấu hình mặc định như `tao_so_nhap_mau` của phần mềm: MỌI sheet (cả Hướng dẫn) khớp nhau
+    so_nhap.ghi_so_nhap(ra, cfg=cau_hinh_ws.chuan_hoa({}),
+                        luon_co_cot_w=True,   # A13.7: mẫu trống có cột Điểm quyết tâm
                         co_lop=True)          # T1a: và cột Lớp sau Họ tên, như sổ mẫu phần mềm tạo (A14)
     return ra
 

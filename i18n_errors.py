@@ -944,8 +944,8 @@ MESSAGES = {
         "en": "{n} {person_l}(s) who currently have a priority group will lose it, because their {group_v} cell in the workbook is empty.",
     },
     "so_nhap_canh_bao_clb_ngoai_so": {
-        "vi": "{n} {slot_sl} có trong phần mềm nhưng không có trong sổ ({ten}). Chúng vẫn được giữ. Nếu đó là {slot_sl} vừa đổi tên thì giữ nguyên Mã CLB khi đổi tên, rồi xoá {slot_sl} thừa ở thẻ 04.",
-        "en": "{n} {slot_l}(s) are in the app but not in the workbook ({ten}). They are kept. If one was just renamed, keep its Mã CLB when renaming, then delete the leftover {slot_l} on tab 04.",
+        "vi": "{n} {slot_sl} có trong phần mềm nhưng không có trong sổ ({ten}). Chúng vẫn được giữ. Nếu đó là {slot_sl} vừa đổi tên thì giữ nguyên Mã CLB khi đổi tên, rồi xoá {slot_sl} thừa ở thẻ 05.",
+        "en": "{n} {slot_l}(s) are in the app but not in the workbook ({ten}). They are kept. If one was just renamed, keep its Mã CLB when renaming, then delete the leftover {slot_l} on tab 05.",
     },
     "so_nhap_ma_tu_sinh_trung_clb_da_co": {
         "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): mã tự tạo \"{ma}\" trùng mã của {slot_sl} \"{ten_cu}\" đã có trong phần mềm. Nếu đây chính là {slot_sl} đó (đổi tên), điền Mã CLB là {ma_cu}; nếu là {slot_sl} khác, điền một Mã CLB mới.",

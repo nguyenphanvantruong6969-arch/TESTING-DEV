@@ -307,7 +307,7 @@ def test_moi_chuoi_giao_dien_mac_dinh_giong_het_anh_chup(anh_chup):
 MAU_20 = [
     "brand_title", "nav_admin", "nav_scoring", "label_students", "label_clubs",
     "pipeline_desc", "admin_desc", "chua_co_cho_desc", "toast_run_success",
-    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "tkb_desc",
+    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "kq_desc",
     "th_score", "th_student_id", "th_club_id", "xuat_opt_ket_qua",
     "scoring_desc", "toast_reset_done_removed", "page_title",
 ]

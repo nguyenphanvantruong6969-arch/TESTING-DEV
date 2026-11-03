@@ -62,7 +62,7 @@ xuống**, em thích nhất đứng trước. Không cần điền kín.
 | Ô Điểm | Nghĩa |
 |---|---|
 | Một số (`8,5` hoặc `8.5`) | Em đã thi CLB này, được chừng ấy điểm |
-| Chữ `thi` | Em đã thi nhưng chưa có điểm, sẽ chấm sau ở màn hình **05 · Chấm điểm** |
+| Chữ `thi` | Em đã thi nhưng chưa có điểm, sẽ chấm sau ở màn hình **06 · Nhập điểm** |
 | Trống | Em không thi CLB này |
 
 CLB không em nào có điểm là CLB **không tổ chức thi**.
@@ -158,13 +158,13 @@ sổ đó.
 
 Học sinh và CLB **không có** trong sổ thì không bị xoá; CLB như vậy được báo
 trước khi nạp (thường là CLB vừa đổi tên mà quên giữ Mã CLB). Muốn làm lại từ
-đầu: màn hình **04 · Quản lý** → Xoá dữ liệu.
+đầu: màn hình **05 · Quản lý** → Xoá dữ liệu.
 
 ---
 
 ## Lấy lại sổ từ phần mềm
 
-Màn hình **02 · Kết quả** → Xuất → **Dữ liệu đầu vào hiện tại** ghi ra một sổ
+Màn hình **03 · Dữ liệu khác** → Xuất → **Dữ liệu đầu vào hiện tại** ghi ra một sổ
 nhập đúng dữ liệu đang có, kể cả mọi chỗ sửa tay. Kéo sổ đó vào một máy khác là
 dựng lại y nguyên.
 

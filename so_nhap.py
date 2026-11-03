@@ -1010,15 +1010,22 @@ _HUONG_DAN_CO_DAU = [
 HUONG_DAN = [d for d in _HUONG_DAN_CO_DAU if d != CHO_CHEN_GHI_CHU_W]
 
 
-def huong_dan(cfg=None, ghi_chu_cot_w: bool = False) -> list:
+def huong_dan(cfg=None, ghi_chu_cot_w: bool = False, co_lop: bool = False) -> list:
     """Các dòng sheet "Hướng dẫn". `ghi_chu_cot_w` (sổ MẪU luôn có cột Điểm quyết tâm, A13.7)
     thêm đoạn nói cột đó chỉ dùng khi bật tính năng; workspace đã bật thì đã có đoạn riêng, và
     workspace không thể bật tính năng (điểm theo người, `priority = "tier"`) thì không có cột
     nên cũng không có đoạn này.
 
     Chỗ chèn đoạn là dòng đánh dấu `CHO_CHEN_GHI_CHU_W` do `_huong_dan_co_dau` đặt sẵn.
+    `co_lop` (sổ có cột Lớp, A14): thêm MỘT dòng nói cột đó tuỳ chọn, cuối Bước 2.
     """
     ra = _huong_dan_co_dau(cfg)
+    if co_lop:
+        n_lop = _cfg(cfg)
+        b3 = next(i for i, d in enumerate(ra) if d.startswith("Bước 3."))
+        ra = ra[:b3 - 1] + [
+            "        Cột %s (tuỳ chọn): ghi tự do, ví dụ 10A1. Dùng để xem và xuất danh sách theo %s." % (
+                nhan_lop(cfg), dang_chu(n_lop["nhan"], "cohort", "l", "vi"))] + ra[b3 - 1:]
     n = _cfg(cfg)
     ghi_chu = []
     if ghi_chu_cot_w and not n["wharton"] and n["wharton_bat_duoc"]:
@@ -1439,7 +1446,7 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # ---- Hướng dẫn ------------------------------------------------------
     hd = wb.create_sheet(SHEET_HD)
     hd.column_dimensions["A"].width = 90
-    for i, dong in enumerate(huong_dan(cfg, ghi_chu_cot_w=luon_co_cot_w), start=1):
+    for i, dong in enumerate(huong_dan(cfg, ghi_chu_cot_w=luon_co_cot_w, co_lop=co_lop), start=1):
         o = hd.cell(row=i, column=1, value=dong)
         if i == 1:
             o.font = Font(bold=True, size=14, color="1F3A5F")

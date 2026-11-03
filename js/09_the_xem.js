@@ -23,6 +23,7 @@ const kq = {
   coKq: false,
   nLop: 0,
   nClb: 0,
+  dsClb: [],           // CLB (đã sắp theo buổi theo ngày, rồi theo tên) cho ô chọn CLB
 };
 
 /* Nhớ lựa chọn hai tầng. Kho lưu trữ hỏng hay bị chặn thì dùng mặc định, KHÔNG làm hỏng thẻ. */
@@ -33,13 +34,16 @@ function docKqXem() {
     const luu = JSON.parse(raw);
     if (luu && KQ_TANG1.includes(luu.tang1)) kq.tang1 = luu.tang1;
     if (luu && KQ_TANG2.includes(luu.tang2)) kq.tang2 = luu.tang2;
+    /* Lớp và CLB đã chọn: nếu không còn tồn tại thì kqNapOLop / kqNapOClb tự lùi về mục đầu. */
+    if (luu && typeof luu.lop === "string") kq.lop = luu.lop;
+    if (luu && typeof luu.clb === "string") kq.clb = luu.clb;
   } catch (e) { /* dùng mặc định */ }
 }
 
 function luuKqXem() {
   try {
     if (window.localStorage) {
-      window.localStorage.setItem(KHOA_KQ_XEM, JSON.stringify({ tang1: kq.tang1, tang2: kq.tang2 }));
+      window.localStorage.setItem(KHOA_KQ_XEM, JSON.stringify({ tang1: kq.tang1, tang2: kq.tang2, lop: kq.lop, clb: kq.clb }));
     }
   } catch (e) { /* không ghi được thì thôi */ }
 }
@@ -121,14 +125,31 @@ function kqSapClb(ds) {
   return ra;
 }
 
+/* Ô chọn CLB theo tầng 2: "Theo ngày trong tuần" = nhóm theo buổi (thứ tự ngày), mỗi buổi một
+   nhóm; "Theo mã" = một danh sách phẳng theo vần tên. Trường một buổi thì luôn phẳng. */
 function kqNapOClb(ds) {
   const sel = el("kqChonClb");
   clear(sel);
   const nhieuBuoi = new Set(ds.map((c) => c.buoi)).size > 1;
-  ds.forEach((c) => {
-    const ten = c.name || c.club_id;
-    themOption(sel, c.club_id, nhieuBuoi ? nhanBuoi(c.buoi) + " · " + ten : ten);
-  });
+  const ten = (c) => c.name || c.club_id;
+  if (nhieuBuoi && kqTang2HieuLuc() === "ngay") {
+    const nhom = new Map();
+    ds.forEach((c) => {
+      if (!nhom.has(c.buoi)) {
+        const g = document.createElement("optgroup");
+        g.label = nhanBuoi(c.buoi);
+        sel.appendChild(g);
+        nhom.set(c.buoi, g);
+      }
+      const o = document.createElement("option");
+      o.value = c.club_id;
+      o.textContent = ten(c);
+      nhom.get(c.buoi).appendChild(o);
+    });
+  } else {
+    const phang = nhieuBuoi ? ds.slice().sort((a, b) => ten(a).localeCompare(ten(b), "vi")) : ds;
+    phang.forEach((c) => themOption(sel, c.club_id, nhieuBuoi ? nhanBuoi(c.buoi) + " · " + ten(c) : ten(c)));
+  }
   const co = (v) => Array.from(sel.options).some((o) => o.value === v);
   if (!co(kq.clb)) kq.clb = sel.options.length ? sel.options[0].value : "";
   sel.value = kq.clb;
@@ -143,14 +164,15 @@ function loadKetQuaTab() {
       const dsClb = clbRes.ok ? kqSapClb(clbRes.data) : [];
       kq.nLop = dsLop.classes.length;
       kq.nClb = dsClb.length;
+      kq.dsClb = dsClb;
       kqNapOLop(dsLop);
-      kqNapOClb(dsClb);
       veKetQua();
     });
 }
 
 function veKetQua() {
   kqDongBoDieuKhien();
+  kqNapOClb(kq.dsClb);       // nhóm theo ngày hay danh sách phẳng tuỳ tầng 2 (rẻ: vài chục CLB)
   el("kqRong").hidden = true;
   if (!kq.coKq) { kqBaoRong("the_xem_chua_co_ket_qua"); return Promise.resolve(); }
   if (kq.tang1 === "lop") return veKqTheoLop();
@@ -160,15 +182,16 @@ function veKetQua() {
 
 /* ---- Bảng ---- */
 
-function kqVeBang(cot, hang, dem) {
-  el("kqDau").innerHTML = cot.map((c) => `<th>${esc(c)}</th>`).join("");
+/* `cot` đầu (STT, mã, họ tên và lớp nếu có) không xuống dòng: tên CLB dài chỉ được làm ô CLB xuống dòng. */
+function kqVeBang(cot, hang, dem, soCotCoDinh) {
+  el("kqDau").innerHTML = cot.map((c, i) => `<th${i < soCotCoDinh ? ' class="kq-cd"' : ""}>${esc(c)}</th>`).join("");
   const than = el("kqThan");
   clear(than);
   const manh = document.createDocumentFragment();
   hang.forEach((h, i) => {
     const tr = document.createElement("tr");
     if (h.chuaCo) tr.className = "dong-do";
-    tr.innerHTML = `<td class="num">${i + 1}</td><td>${esc(h.student_id)}</td><td>${esc(h.name || "")}</td>` + h.o.join("");
+    tr.innerHTML = `<td class="num kq-cd">${i + 1}</td><td class="kq-cd">${esc(h.student_id)}</td><td class="kq-cd">${esc(h.name || "")}</td>` + h.o.join("");
     manh.appendChild(tr);
   });
   than.appendChild(manh);
@@ -189,7 +212,7 @@ function kqHangLich(em, dsBuoi, coLop) {
   return {
     student_id: em.student_id, name: em.name, class_id: em.class_id || "", ngay,
     chuaCo: !em.so_clb,
-    o: (coLop ? [`<td>${esc(em.class_id || "")}</td>`] : []).concat(oBuoi),
+    o: (coLop ? [`<td class="kq-cd">${esc(em.class_id || "")}</td>`] : []).concat(oBuoi),
   };
 }
 
@@ -210,7 +233,7 @@ function veKqTheoLop() {
     const dsBuoi = res.data.ds_buoi;
     const hang = kqSapHang(res.data.hoc_sinh.map((e) => kqHangLich(e, dsBuoi, false)), kqTang2HieuLuc());
     kqVeBang(kqCotLich(dsBuoi, false), hang,
-      t("theolop_dem", { n: hang.length, m: hang.filter((h) => h.chuaCo).length }));
+      t(hang.length === 1 ? "theolop_dem" : "theolop_dem_nhieu", { n: hang.length, m: hang.filter((h) => h.chuaCo).length }), 3);
   });
 }
 
@@ -221,11 +244,11 @@ function veKqTheoClb() {
     const d = res.data;
     const hang = kqSapHang(d.thanh_vien.map((m) => ({
       student_id: m.student_id, name: m.name, class_id: m.class_id || "", ngay: 0, chuaCo: false,
-      o: [`<td>${esc(m.class_id || "")}</td>`],
-    })), kqTang2HieuLuc());
+      o: [`<td class="kq-cd">${esc(m.class_id || "")}</td>`],
+    })), "ma");       // thành viên một CLB luôn theo mã (tầng 2 chỉ đổi cách xếp ô chọn CLB)
     if (!hang.length) { kqBaoRong("members_rong"); return; }
     kqVeBang([t("th_stt"), t("th_student_id"), t("th_name"), t("th_cohort")], hang,
-      t("members_dem", { x: hang.length, y: d.capacity }));
+      t("members_dem", { x: hang.length, y: d.capacity }), 4);
   });
 }
 
@@ -236,7 +259,7 @@ function veKqTheoMa() {
     const dsBuoi = res.data.ds_buoi;
     const hang = kqSapHang(res.data.hoc_sinh.map((e) => kqHangLich(e, dsBuoi, true)), kqTang2HieuLuc());
     if (!hang.length) { kqBaoRong(tim ? "kq_tim_khong_thay" : "kq_khong_co_hs"); return; }
-    kqVeBang(kqCotLich(dsBuoi, true), hang, t("kq_dem_ma", { n: hang.length }));
+    kqVeBang(kqCotLich(dsBuoi, true), hang, t(hang.length === 1 ? "kq_dem_ma" : "kq_dem_ma_nhieu", { n: hang.length }), 4);
   });
 }
 
@@ -248,8 +271,8 @@ function initKetQuaHandlers() {
   document.querySelectorAll("#kqTang2 .kq-seg-nut").forEach((n) => {
     n.addEventListener("click", () => { kq.tang2 = n.dataset.sx; luuKqXem(); veKetQua(); });
   });
-  el("kqChonLop").addEventListener("change", (ev) => { kq.lop = ev.target.value; veKetQua(); });
-  el("kqChonClb").addEventListener("change", (ev) => { kq.clb = ev.target.value; veKetQua(); });
+  el("kqChonLop").addEventListener("change", (ev) => { kq.lop = ev.target.value; luuKqXem(); veKetQua(); });
+  el("kqChonClb").addEventListener("change", (ev) => { kq.clb = ev.target.value; luuKqXem(); veKetQua(); });
   el("kqTimKiem").addEventListener("input", debounce(() => veKetQua(), 250));
   kqDongBoDieuKhien();
 }

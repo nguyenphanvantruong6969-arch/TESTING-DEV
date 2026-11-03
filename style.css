@@ -2360,6 +2360,8 @@ html.tat-hieu-ung .status-strip:hover {
 .kq-seg-nut:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
 .kq-seg-nut.is-on { background: var(--moss); color: #fff; }
 .kq-seg-nho .kq-seg-nut { font-size: 14px; font-weight: 500; padding: 8px 16px; }
+.kq-cd { white-space: nowrap; }                       /* STT, mã, họ tên, lớp không xuống dòng */
+#kqBang td:not(.kq-cd) { min-width: 9em; }           /* ô CLB được xuống dòng nhưng không bị bóp */
 .kq-seg-nhan { color: var(--slate); font-size: 14px; }
 .data-table tr.dong-do td { background: var(--rust-soft); }
 .data-table td.o-trong { color: var(--slate); }

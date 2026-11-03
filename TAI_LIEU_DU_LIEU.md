@@ -998,7 +998,7 @@ Các sổ sinh bằng `mau_csv/tao_so_nhap.py`, phần lớn từ chính các b�
 
 | Sổ | Nội dung |
 |---|---|
-| `mau_csv/SO_NHAP_CLB.xlsx` | Sổ trống phát cho trường |
+| `mau_csv/SO_NHAP_CLB.xlsx` | Sổ mẫu chính phát cho trường: trống, có cột Lớp |
 | `mau_csv/vi_du_day_du/SO_NHAP_CLB_vi_du.xlsx` | 3 buổi · 9 CLB · 24 học sinh |
 | `mau_csv/vi_du_ca_tuan/SO_NHAP_CLB_vi_du.xlsx` | 6 buổi · 18 CLB · 60 học sinh |
 | `du_lieu_test/vi_du_huong_dan/SO_NHAP_VIDU.xlsx` | 10 học sinh của sách hướng dẫn |

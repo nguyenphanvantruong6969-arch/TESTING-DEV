@@ -6,6 +6,18 @@
 - **T1b — nhãn trùng cũ không chặn lưu:** `cau_hinh_ws.ghi_cau_hinh` chỉ ném `NhanTrung` khi cấu hình mới có cặp danh từ trùng nhãn mà cấu hình ĐANG LƯU chưa có. Workspace cũ đã trùng đổi tên / đổi luật được; thêm cặp trùng thứ hai vẫn bị chặn; sửa hết trùng thì qua. `chuan_hoa()` (kiểm trước khi dựng workspace) và cảnh báo nhập `so_nhap_canh_bao_nhan_trung` giữ nguyên.
 - **Test:** mới `tests/test_t1b_nhan_trung_cu.py` (6); sửa `tests/test_so_nhap.py::test_mau_trong_doc_duoc_va_dung_bo_cuc` (tiêu đề có Lớp).
 
+### T1/T2 sửa vòng 1 (tester: 2 lớn, 5 vừa, 3 nhỏ)
+
+- **F1 (T1b):** `cau_hinh_ws._cap_trung_day_du` liệt kê MỌI cặp danh từ cùng nhãn kèm ngôn ngữ (ba danh từ cùng nhãn cho ba cặp; `cac_cap_nhan_trung` giữ nguyên cho cảnh báo nhập). `ghi_cau_hinh` chỉ từ chối khi có cặp (ngôn ngữ, a, b) mới so với mốc; báo cặp mới đầu tiên theo thứ tự `DANH_TU`, vi trước en.
+- **F2 (T1b):** `ghi_cau_hinh(..., nhan_goc=None)` và `workspace.tao(..., nhan_goc=None)`; `nhan_ban` kiểm không nghiêm phần nhãn trùng và lấy nhãn nguồn làm mốc, cả hai chế độ `kem_du_lieu`: bản sao giữ nhãn trùng cũ, trùng mới vẫn bị chặn.
+- **F3 (T1b):** `luu_mau` kiểm nghiêm: workspace cũ trùng nhãn lưu mẫu thì lỗi `nhan_trung_danh_tu`, không ghi tệp.
+- **F4 (T1a):** sổ mẫu tĩnh dựng bằng cấu hình mặc định như phần mềm (`chuan_hoa({})`), nên MỌI ô của MỌI sheet (cả Hướng dẫn) trùng sổ phần mềm tạo; `huong_dan(co_lop=True)` thêm một dòng nói cột Lớp tuỳ chọn. README, TAI_LIEU_DU_LIEU, BAN_GIAO ghi đây là sổ mẫu chính có cột Lớp.
+- **F5:** số thẻ cũ sửa lại sau khi đánh số lại (`i18n.js`, `index.html`, `i18n_errors.py` và `i18n_loi.js` sinh lại, README, HUONG_DAN_CSV, HUONG_DAN_SO_NHAP, chú thích đầu các tệp js, `api_bao_cao.py`).
+- **F6:** bỏ khoá mồ côi `results_title`, `results_desc`, `tkb_title`, `tkb_desc`, `tkb_so_clb` (`tests/test_ws_nhan.py` đổi mẫu `tkb_desc` thành `kq_desc`).
+- **F7:** số ít / số nhiều ở bản tiếng Anh: `kq_dem_ma_nhieu`, `theolop_dem_nhieu` (số ít chỉ khi n = 1).
+- **F8 (T2):** *Theo CLB*: tầng 2 "Theo ngày trong tuần" chia ô chọn CLB thành nhóm theo buổi (thứ tự ngày), "Theo mã học sinh" là danh sách phẳng theo vần; bảng thành viên luôn theo mã. Cột STT, mã, họ tên, lớp không xuống dòng. Ô tìm ngắn hơn (`kq_tim_ph`). Nhớ cả lớp và CLB đã chọn trong khoá `rbda_ket_qua_xem_v1` (giá trị không còn tồn tại thì lùi về mục đầu).
+- **Test:** `tests/test_t1b_nhan_trung_cu.py` (thêm F1, F2, F3 và so mọi sheet sổ mẫu), `tests/test_giao_dien_t2_ket_qua.py` (thêm nhóm theo buổi, nhớ lớp / CLB, số ít số nhiều); `test_giao_dien_a14_lop.py` (khoá i18n 25 thành 26, tuỳ chọn CLB có nhóm).
+
 ### T2 — gộp thẻ 02, 06, 07 thành "Kết quả" và "Dữ liệu khác" (bảy thẻ thành sáu)
 
 - **Thanh bên:** 01 Vận hành sắp xếp, 02 Kết quả (`results`), 03 Dữ liệu khác (`others`), 04 Nhập tại chỗ, 05 Quản lý CLB & dự trữ, 06 Nhập điểm. Bỏ thẻ `members` và `theolop`; `TAB_LOADERS` (`js/01_khung.js`), khởi động (`initKetQuaHandlers`) và vẽ lại khi đổi ngôn ngữ (`reapplyDynamicTextForLangChange`) theo tên mới.

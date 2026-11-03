@@ -70,14 +70,18 @@ def test_cu_trung_sua_nhan_het_trung_luu_duoc(tmp_path):
     assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
 
 
-def test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao(tmp_path):
-    """T1a: mau_csv/SO_NHAP_CLB.xlsx có cùng hai hàng tiêu đề như sổ mẫu phần mềm tạo (có Lớp)."""
+def test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet(tmp_path):
+    """T1a: mau_csv/SO_NHAP_CLB.xlsx giống sổ mẫu phần mềm tạo ở MỌI ô của MỌI sheet (cả Hướng dẫn)."""
     import openpyxl
     goc = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     api = PipelineAPI(str(tmp_path / "a.db"))
     p = api.tao_so_nhap_mau(str(tmp_path / "phan_mem.xlsx"))["data"]["path"]
-
-    def tieu_de(duong):
-        w = openpyxl.load_workbook(duong)["2. Học sinh"]
-        return [[c.value for c in w[i]] for i in (1, 2)]
-    assert tieu_de(os.path.join(goc, "mau_csv", "SO_NHAP_CLB.xlsx")) == tieu_de(p)
+    a = openpyxl.load_workbook(os.path.join(goc, "mau_csv", "SO_NHAP_CLB.xlsx"))
+    b = openpyxl.load_workbook(p)
+    assert a.sheetnames == b.sheetnames
+    for ten in a.sheetnames:
+        assert [[c.value for c in r] for r in a[ten].iter_rows()] \
+            == [[c.value for c in r] for r in b[ten].iter_rows()], ten
+    huong = [r[0].value or "" for r in a["Hướng dẫn"].iter_rows()]
+    assert any("Cột Lớp (tuỳ chọn)" in d for d in huong)
+    assert not any("—" in d and "em " in d for d in huong[:0])

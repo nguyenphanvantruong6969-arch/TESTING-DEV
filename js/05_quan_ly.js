@@ -1,4 +1,4 @@
-/* js/05_quan_ly.js — Thẻ 04 — Quản lý CLB & dự trữ, cùng phần nhiều buổi dùng chung (chọn buổi,
+/* js/05_quan_ly.js — Thẻ 05 — Quản lý CLB & dự trữ, cùng phần nhiều buổi dùng chung (chọn buổi,
    lịch tuần, bảng tải, thời khoá biểu, độ phủ).
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT

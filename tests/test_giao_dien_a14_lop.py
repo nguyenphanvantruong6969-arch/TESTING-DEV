@@ -224,15 +224,15 @@ TU_ANH_CAM = re.compile(r"\b(class|filter|export|sort|save|student|club|choose|a
 
 
 def test_chu_moi_vi_sach_tieng_anh_va_en_khong_dung_you():
-    """Đọc thẳng i18n.js: 25 khoá mới (thẻ Kết quả) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
+    """Đọc thẳng i18n.js: 26 khoá mới (thẻ Kết quả) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
     with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
         nguon = f.read()
     mach = re.compile(r'^\s{6}((?:lop_|kiosk_lop|th_cohort|btn_xuat_theo_lop|xuat_theo_lop|'
                       r'xuat_kq_theo_lop|xuat_muc_theo_lop|aria_loc_lop|aria_sap_xep|toast_lop|'
                       r'ws_dt_cohort|th_stt|members_|theolop_|the_xem_)\w*): "(.*)",$', re.M)
     cap = mach.findall(nguon)
-    assert len(cap) == 50, len(cap)                  # 25 khoá × 2 ngôn ngữ
-    vi, en = cap[:25], cap[25:]
+    assert len(cap) == 52, len(cap)                  # 26 khoá × 2 ngôn ngữ
+    vi, en = cap[:26], cap[26:]
     assert [k for k, _ in vi] == [k for k, _ in en]
     for k, v in vi:
         assert not TU_ANH_CAM.search(re.sub(r"\{\w+\}", "", v)), (k, v)
@@ -295,7 +295,9 @@ def test_theo_clb_nhieu_buoi_ghi_kem_buoi_va_sap_theo_ngay(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True, nhieu_buoi=True)
     _mo_ket_qua(page, "clb")
     page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length > 2")
-    assert page.locator("#kqChonClb option").all_inner_texts() == ["2 · CLB 2", "3 · CLB 3", "10 · CLB 10"]
+    # mặc định "Theo ngày trong tuần": nhóm theo buổi, thứ tự ngày (2, 3, 10), không theo vần
+    assert page.locator("#kqChonClb optgroup").evaluate_all("g => g.map(x => x.label)") == ["2", "3", "10"]
+    assert page.locator("#kqChonClb option").all_inner_texts() == ["CLB 2", "CLB 3", "CLB 10"]
     assert not loi, loi
 
 

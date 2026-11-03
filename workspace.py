@@ -204,16 +204,17 @@ def danh_sach(root: str) -> list[dict]:
     return ra
 
 
-def tao(root: str, name: str, cfg: dict | None = None) -> str:
+def tao(root: str, name: str, cfg: dict | None = None, nhan_goc: dict | None = None) -> str:
     """Dựng workspace mới tên `name` với cấu hình `cfg` (None = mặc định trường học).
 
     Trả về slug. `cfg["name"]`, nếu có, bị `name` ghi đè. `cfg` sai thì ném
-    ValueError TRƯỚC khi đụng tới đĩa.
+    ValueError TRƯỚC khi đụng tới đĩa. `nhan_goc` (nhãn của workspace nguồn khi nhân bản, T1b):
+    nhãn trùng đã có ở đó không bị chặn; trùng mới vẫn bị chặn.
     """
     name = _kiem_ten(name)
     cau_hinh = dict(cfg or {})
     cau_hinh["name"] = name
-    chuan_hoa(cau_hinh)
+    chuan_hoa(cau_hinh, kiem_trung=nhan_goc is None)
 
     slug = _slug_trong(root, name)
     thu_muc = os.path.join(_thu_muc_ws(root), slug)
@@ -221,7 +222,7 @@ def tao(root: str, name: str, cfg: dict | None = None) -> str:
     try:
         db = os.path.join(thu_muc, TEN_DB)
         init_db(db)
-        ghi_cau_hinh(db, cau_hinh)
+        ghi_cau_hinh(db, cau_hinh, nhan_goc=nhan_goc)
     except BaseException:
         # Thư mục VỪA tạo ngay trên, chưa có dữ liệu của ai: dọn là an toàn.
         shutil.rmtree(thu_muc, ignore_errors=True)
@@ -273,11 +274,12 @@ def nhan_ban(root: str, slug: str, new_name: str, kem_du_lieu: bool) -> str:
     nguon = os.path.join(_thu_muc_ton_tai(root, slug), TEN_DB)
     cfg = doc_cau_hinh(nguon, nghiem=True)   # xem `doi_ten`: không nhân bản một cấu hình đoán
 
+    nhan_goc = cfg["labels"]                 # T1b: nhãn trùng của bản gốc được giữ, trùng mới bị chặn
     if not kem_du_lieu:
-        return tao(root, new_name, cfg)
+        return tao(root, new_name, cfg, nhan_goc=nhan_goc)
 
     cfg["name"] = new_name
-    chuan_hoa(cfg)
+    chuan_hoa(cfg, kiem_trung=False)
     moi = _slug_trong(root, new_name)
     thu_muc = os.path.join(_thu_muc_ws(root), moi)
     os.makedirs(thu_muc)
@@ -285,7 +287,7 @@ def nhan_ban(root: str, slug: str, new_name: str, kem_du_lieu: bool) -> str:
         db = os.path.join(thu_muc, TEN_DB)
         _chep_db(nguon, db)
         init_db(db)  # nguồn từ bản cũ vẫn lên đúng schema
-        ghi_cau_hinh(db, cfg)
+        ghi_cau_hinh(db, cfg, nhan_goc=nhan_goc)
     except BaseException:
         shutil.rmtree(thu_muc, ignore_errors=True)
         raise
@@ -305,6 +307,7 @@ def luu_mau(root: str, slug: str, ten_mau: str) -> str:
     ten_mau = _kiem_ten(ten_mau)
     cfg = doc_cau_hinh(os.path.join(_thu_muc_ton_tai(root, slug), TEN_DB), nghiem=True)
     cfg["name"] = ten_mau
+    chuan_hoa(cfg)      # T1b: mẫu là cấu hình MỚI, nhãn trùng không được lọt (nếu không mẫu biến mất khỏi danh sách)
     thu_muc = os.path.join(root, THU_MUC_MAU)
     os.makedirs(thu_muc, exist_ok=True)
     duong = os.path.join(thu_muc, slug + ".json")
