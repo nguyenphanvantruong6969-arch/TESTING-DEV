@@ -1,0 +1,15 @@
+flowchart TD
+  S(["Học sinh bấm Gửi"]) --> O{"Biểu mẫu đang mở?"}
+  O -->|"Không"| C1["Forms từ chối,<br/>hiện thông báo đã đóng"]
+  O -->|"Có"| V1{"Biểu mẫu kiểm tra:<br/>bắt buộc, định dạng mã,<br/>số lựa chọn tối đa"}
+  V1 -->|"Sai"| E1["Học sinh sửa và gửi lại"]
+  V1 -->|"Đúng"| W["Forms lưu phản hồi, cấp ID<br/>và ghi một dòng vào tab RAW"]
+  W --> T["Trigger lô, mỗi 10 phút"]
+  T --> G{"Trong cửa sổ chạy lô<br/>theo cau_hinh?"}
+  G -->|"Không"| X1(["Thoát ngay"])
+  G -->|"Có"| L{"Lấy khoá LockService"}
+  L -->|"Không được"| R1["Ghi nhat_ky,<br/>thử lại lần trigger sau"]
+  L -->|"Được"| RD["Đọc phản hồi qua API từ<br/>moc_xu_ly trừ 1 phút"]
+  RD --> EX{"ID đã có ở phieu<br/>(hàng hợp lệ)?"}
+  EX -->|"Có"| SK["Bỏ qua phản hồi này"]
+  EX -->|"Chưa"| NEXT(["Phân loại và ghi khối:<br/>xem sơ đồ b2"])

@@ -1,14 +1,15 @@
 erDiagram
-  RAW ||--o| PHIEU : "tạo ra"
+  RAW ||..o| PHIEU : "đối soát số dòng"
   HOC_SINH |o--o{ PHIEU : "nộp"
   PHIEU |o--o{ NHAT_KY : "được ghi"
   RAW {
     datetime thoi_gian
     string student_id "mã học sinh gõ"
+    string email "tuỳ chọn"
     string cac_cot_cau_hoi "một cột mỗi câu"
   }
   PHIEU {
-    string raw_key PK "thoi_gian, ma_hs, bam 8 ky tu"
+    string raw_key PK "ID phản hồi của Forms"
     string ma_hs FK "tuỳ chọn"
     string trang_thai
     string ly_do
@@ -22,7 +23,7 @@ erDiagram
     string lop
   }
   CLB {
-    string club_id PK
+    string club_id PK "bảng tra, không khoá ngoại"
     string ten
     string buoi
     int chi_tieu
@@ -36,6 +37,6 @@ erDiagram
     string ly_do
   }
   CAU_HINH {
-    string khoa PK
+    string khoa PK "bảng tra, không khoá ngoại"
     string gia_tri
   }

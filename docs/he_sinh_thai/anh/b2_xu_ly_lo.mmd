@@ -1,0 +1,21 @@
+flowchart TD
+  A(["Phản hồi mới, ID chưa có ở phieu"]) --> P{"Mã học sinh"}
+  P -->|"Trống"| S1["bo_khong_ma, ban_giu = 0"]
+  P -->|"Không có trong hoc_sinh"| S2["ma_la, ban_giu = 0"]
+  P -->|"Hợp lệ"| D{"Mã đã có phiếu<br/>ban_giu = 1?"}
+  D -->|"Có"| S3["bo_nop_trung, ban_giu = 0"]
+  D -->|"Chưa"| S4["cho_duyet, ban_giu = 1"]
+  S1 --> BL
+  S2 --> BL
+  S3 --> BL
+  S4 --> BL
+  BL["Gom thành khối tối đa 500 hàng,<br/>ghi vào phieu, cột raw_key ghi cuối"] --> RV["Đọc lại khối vừa ghi:<br/>mỗi hàng có raw_key và trang_thai?"]
+  RV -->|"Thiếu"| ER["Khối chưa xong: không dời mốc,<br/>ghi nhat_ky loại lỗi"]
+  RV -->|"Đủ"| MC["Dời moc_xu_ly đến phản hồi<br/>cuối của khối đã kiểm"]
+  MC --> CAP{"Chạm trần 2 phút?"}
+  CAP -->|"Chưa, còn phản hồi"| BL
+  CAP -->|"Chưa, hết phản hồi"| OK(["Xong lô"])
+  CAP -->|"Rồi"| PR(["Có tiến triển: dừng ở ranh giới khối,<br/>lô sau đọc tiếp. Không phải lỗi"])
+  ER --> N{"3 lô liên tiếp lỗi?"}
+  N -->|"Có"| EM["Email báo lỗi cho admin"]
+  N -->|"Chưa"| RT(["Lần sau ghi đè hàng dở<br/>và đọc lại từ mốc cũ"])
