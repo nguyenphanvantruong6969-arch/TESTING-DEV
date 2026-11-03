@@ -6,6 +6,10 @@
 - **T1b — nhãn trùng cũ không chặn lưu:** `cau_hinh_ws.ghi_cau_hinh` chỉ ném `NhanTrung` khi cấu hình mới có cặp danh từ trùng nhãn mà cấu hình ĐANG LƯU chưa có. Workspace cũ đã trùng đổi tên / đổi luật được; thêm cặp trùng thứ hai vẫn bị chặn; sửa hết trùng thì qua. `chuan_hoa()` (kiểm trước khi dựng workspace) và cảnh báo nhập `so_nhap_canh_bao_nhan_trung` giữ nguyên.
 - **Test:** mới `tests/test_t1b_nhan_trung_cu.py` (6); sửa `tests/test_so_nhap.py::test_mau_trong_doc_duoc_va_dung_bo_cuc` (tiêu đề có Lớp).
 
+### T2 sửa vòng 3
+
+- Ảnh chụp `tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json` (bốn ca `test_mac_dinh_truong_hoc_cho_ra_dung_so_nhu_truoc`): sau vòng 2 (G3) chữ sheet "Hướng dẫn" đổi theo quy tắc chữ của chủ dự án. Đã so từng khoá: CHỈ năm ô `Hướng dẫn/o/A1, A16, A18, A23, A33` khác (hai ảnh `co_du_lieu` và `trong`, cả bốn cấu hình); mọi khoá khác trùng. Chỉ thay hai cây con `Hướng dẫn` bằng lập trình, giữ định dạng tệp; ghi chú ở `tests/test_ws_so_nhap.py`. Đã tìm ảnh chụp khác chứa chữ hướng dẫn: không còn tệp nào.
+
 ### T2 sửa vòng 2
 
 - **G1 (T2, tràn ngang):** `.main { min-width: 0 }` (cột `1fr` của lưới không còn nở theo bảng rộng, nên bảng chỉ cuộn ngang trong `.scroll-x`, trang thì không); ô CLB `min-width` 7em. Test mới `test_khong_tran_ngang_trang_voi_ten_clb_rat_dai` (độ rộng 600, 1024, 1280; tên CLB 60 ký tự; ba cách xem; `scrollWidth <= innerWidth`). Đã thử gỡ dòng sửa: test đỏ ở 600 và 1024.

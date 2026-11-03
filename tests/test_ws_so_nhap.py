@@ -23,6 +23,8 @@ from i18n_errors import MESSAGES  # noqa: E402
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ANH_CHUP = os.path.join(GOC, "tests", "du_lieu_ws", "so_nhap_truoc_khi_co_cfg.json")
+# T2 vòng 2 (G3, quy tắc chữ của chủ dự án): CHỈ chữ của sheet "Hướng dẫn" trong ảnh chụp đã đổi (bỏ dấu
+# gạch dài và "em" ở năm ô A1, A16, A18, A23, A33); mọi khoá khác của ảnh chụp giữ nguyên từng byte.
 
 CONG_TY = {
     "labels": {

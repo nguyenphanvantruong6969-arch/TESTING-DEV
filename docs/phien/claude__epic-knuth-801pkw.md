@@ -47,19 +47,31 @@ Both
 - [x] Related tests green, ruff, soat-ma, CHANGELOG, TIEN_DO, push. Opus runs the FULL suite at the end.
 
 ## Current state (overwrite each handoff)
-- Done: T1a, T1b (dcf5011), T2 (6a070da). 291 related tests pass; ruff clean; soat-ma machine part 7/7.
-- Waiting: Opus runs the full suite and the tester loop.
+- Done: T1a, T1b, T2 plus fix rounds 1 and 2 (HEAD before round 3: 0e56a1b). Round 3 (Opus plan): snapshot
+  tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json regenerated for the "Hướng dẫn" sheet only (cells A1, A16, A18,
+  A23, A33 differ, proved by key-by-key diff); CHANGELOG "T2 sửa vòng 3" and test comment written.
+- In progress: round 3 verification: `pytest tests/test_ws_so_nhap.py tests/test_so_nhap.py` was running in the
+  background (output in session scratchpad chay3.txt). Round 3 changes are committed and pushed by the handoff
+  commit, but NOT yet reported to Opus (no "CON-1 FIXED round 3" message sent).
 
 ## Decisions and gotchas (keep short)
-- Truong's task file overrides rule 1 (registry) and asks for son sessions (rule 10 waived for this).
-- Test/bug loop: Opus designs test prompts, a Sonnet tester session reports bugs (read-only),
-  Opus plans fixes, implementer session fixes; repeat until no bug.
+- Static sample mau_csv/SO_NHAP_CLB.xlsx is a blank template: only the Lớp column was added (all sheets equal the
+  software-generated sample). vi_du_* workbooks and other du_lieu_test sổ keep the old guide wording (no test pins them).
+- Guide sheet text rule: no em dash, no word em/tôi/tớ (so_nhap.py); six du_lieu_test/SO_NHAP_DQT_*.xlsx regenerated
+  with sinh_du_lieu_diem_quyet_tam.py.
+- test_ws_nhan.py snapshot test tolerates exactly the intended string changes (KHOA_UI_DA_BO, SUA_CO_Y).
+- Do not run git stash while background tests run. Fixture `mo` (test_giao_dien_a14_lop.py) has an explicit browser
+  context and a `them` parameter.
 
 ## Next steps (ordered)
-1. Opus: full suite, tester loop, fix plans.
+1. Check the round 3 test result (re-run tests/test_ws_so_nhap.py tests/test_so_nhap.py, ruff, kiem_nhanh).
+2. Send "CON-1 FIXED round 3" to session_01VfPzNvdGizkwxJ8cd64rmp with hashes, the list of differing keys
+   (Hướng dẫn/o/A1, A16, A18, A23, A33), and test counts.
+3. Wait for Opus: full suite result and any further fix plan.
 
 ## Files touched
-- docs/phien/claude__epic-knuth-801pkw.md: this file
+- Round 3: tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json, tests/test_ws_so_nhap.py, CHANGELOG.md, this file.
+- Earlier rounds: see CHANGELOG sections "T1a, T1b", "T2", "T2 sửa vòng 1/2".
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -68,3 +80,5 @@ Both
 | 2026-11-03 | Sonnet | T1a, T1b, T2 implemented, tests green, pushed | static sample is a blank template (only Lớp column added); day sort = earliest session with a club |
 | 2026-11-03 | Sonnet | Fix round 1 (F1-F8) from Opus plan | see CHANGELOG "T1/T2 sửa vòng 1" |
 | 2026-11-03 | Sonnet | Fix round 2 (G1-G3) from Opus plan | see CHANGELOG "T2 sửa vòng 2" |
+| 2026-11-03 | Sonnet | Fix round 3 (snapshot of Sổ guide text) | only Hướng dẫn A1,A16,A18,A23,A33 differed |
+| 2026-11-03 | Sonnet | Handoff at context limit, round 3 committed | tests still pending, report to Opus not sent |
