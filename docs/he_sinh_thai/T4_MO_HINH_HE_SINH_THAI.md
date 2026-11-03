@@ -442,6 +442,8 @@ Cần đăng ký thành mục trong sổ (quy tắc làm việc 1 của CLAUDE.m
 
 Xuất chạy thành **các phần ≤ 1.000 phiếu**, mỗi phần là một tệp CSV (`RAW_PHIEU_<ky>_<giờ>_p01.csv`, `p02`, ...) ghi bằng `DriveApp`, không dựng bảng tạm. Khi admin bấm "Xuất", phần 1 chạy ngay; xong phần nào thì tạo **trigger nối tiếp** chạy phần kế sau khoảng 1 phút và tự xoá. Trạng thái xuất (phần đã xong) nằm ở `cau_hinh`, nên bị ngắt thì bấm "Xuất tiếp" hoặc để trigger chạy lại. Mục tiêu: không quá 45 phút cho 10.000 phiếu (mục 9.4). Đợt tới 1.000 phiếu chỉ một phần.
 
+**Ràng buộc với skill `xu-li-raw-forms` (đã cài ở T4-K3, `doc_raw`):** mọi phần của một lần xuất nằm chung **một thư mục**, cùng tiền tố và cùng tiêu đề cột; số phần liền từ `p01`; `phieu_so` đánh số **liên tục qua các phần** (phần 2 tiếp số của phần 1, không đánh lại từ 1), và mọi dòng của một phiếu nằm trong **cùng một phần** (không cắt ngang phiếu). Vi phạm điều nào thì skill dừng và không ghi tệp nào. Mỗi lần xuất lại tạo thư mục mới, không ghi lẫn vào thư mục cũ.
+
 ---
 
 ## 12. Mục tiêu hiệu năng và cách kiểm
