@@ -238,12 +238,29 @@ def test_a4_ma_loi_moi_co_trong_messages():
 
 # ------------------------------------------------------------------ A5
 
+def _bo_cot(conn, bang, cot):
+    """Dựng lại `bang` thiếu cột `cot`, giữ dữ liệu, KHÔNG dùng `ALTER TABLE ... DROP COLUMN`.
+
+    Đọc schema thật bằng PRAGMA nên tự theo khi bảng thêm cột; chỉ dùng cú pháp có ở mọi bản
+    SQLite (DROP COLUMN cần 3.35 trở lên và từng làm CI báo "incomplete input", xem B9).
+    """
+    cac = [r for r in conn.execute("PRAGMA table_info(%s)" % bang) if r[1] != cot]
+    pk = [r[1] for r in sorted(cac, key=lambda r: r[5]) if r[5]]
+    dinh_nghia = ['"%s" %s' % (r[1], r[2]) for r in cac]
+    if pk:
+        dinh_nghia.append("PRIMARY KEY (%s)" % ", ".join('"%s"' % c for c in pk))
+    ten = ", ".join('"%s"' % r[1] for r in cac)
+    conn.execute("CREATE TABLE _tam_%s (%s)" % (bang, ", ".join(dinh_nghia)))
+    conn.execute("INSERT INTO _tam_%s (%s) SELECT %s FROM %s" % (bang, ten, ten, bang))
+    conn.execute("DROP TABLE %s" % bang)
+    conn.execute("ALTER TABLE _tam_%s RENAME TO %s" % (bang, bang))
+
 def _csdl_cu_co_du_lieu(tmp_path):
     db = str(tmp_path / "cu.db")
     rp.init_db(db)
     conn = sqlite3.connect(db)
     conn.execute("INSERT INTO students (student_id, name) VALUES ('S1', 'An')")
-    conn.execute("ALTER TABLE students DROP COLUMN class_id")
+    _bo_cot(conn, "students", "class_id")
     conn.commit()
     conn.close()
     return db

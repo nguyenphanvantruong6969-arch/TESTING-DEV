@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-03 — A14-B10 (ngoài sổ, Truong duyệt 03/11/2026): bỏ `DROP COLUMN` ở hai test A14 còn lại
+
+Cùng kiểu rủi ro với B9 (SQLite của CI báo "incomplete input"). Chỉ sửa test, không đụng mã sản phẩm.
+
+- Hàm phụ trợ mới `_bo_cot(conn, bang, cot)` (trong từng tệp test): đọc schema thật bằng `PRAGMA table_info`, dựng lại bảng thiếu đúng một cột (giữ khoá chính và dữ liệu) bằng `CREATE TABLE` / `INSERT ... SELECT` / `RENAME`, cú pháp có ở mọi bản SQLite. Không chép cứng schema, nên tự theo khi bảng thêm cột về sau.
+- Dùng ở `tests/test_a14_tu_vung_cohort.py::test_di_tru_schema_them_cot_vao_csdl_cu_chay_lap_va_giu_du_lieu` và `tests/test_a14_sua_sau_soat.py::_csdl_cu_co_du_lieu`. Mọi assert giữ nguyên; 48 ca của hai tệp xanh.
+- Trên nhánh này `test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien` vẫn là bản trước B9; bản sửa B9 có ở `main`, giữ nguyên để gộp không xung đột.
+
 ## 2026-11-03 — T4-K3 (ngoài sổ, Truong duyệt 03/11/2026): skill `xu-li-raw-forms` đọc thư mục nhiều phần CSV
 
 Thay đổi số 3 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md`: đợt trên 1.000 phiếu được xuất thành nhiều phần `<tên>_p01.csv`, `_p02.csv`... nên skill phải ghép được.
