@@ -1,22 +1,32 @@
 flowchart TD
   S(["Học sinh bấm Gửi"]) --> O{"Biểu mẫu đang mở?"}
-  O -->|"Không"| C1["Google Forms từ chối,<br/>hiện thông báo đã đóng"]
-  O -->|"Có"| V1{"Biểu mẫu kiểm tra:<br/>trường bắt buộc, định dạng,<br/>số lượng lựa chọn tối đa"}
+  O -->|"Không"| C1["Forms từ chối,<br/>hiện thông báo đã đóng"]
+  O -->|"Có"| V1{"Biểu mẫu kiểm tra:<br/>bắt buộc, định dạng mã,<br/>số lựa chọn tối đa"}
   V1 -->|"Sai"| E1["Học sinh sửa và gửi lại"]
-  V1 -->|"Đúng"| W["Google ghi một dòng mới<br/>vào tab RAW kèm thời gian"]
-  W --> T["Trigger lô chạy"]
-  T --> L{"Lấy khoá LockService<br/>trong thời gian chờ"}
-  L -->|"Không được"| R1["Ghi loi_dong_bo,<br/>thử lại ở lần trigger sau"]
-  L -->|"Được"| RD["Đọc các dòng RAW<br/>sau con trỏ đã xử lý"]
-  RD --> P{"Mã học sinh có trong<br/>danh sách lớp?"}
-  P -->|"Không"| ER["Trạng thái: lỗi mã<br/>admin sửa hoặc từ chối"]
-  P -->|"Có"| D{"Đã có phiếu giữ<br/>của mã này trong đợt?"}
-  D -->|"Có"| DP["Phiếu mới: bo_nop_trung<br/>giữ phiếu đầu, ghi nhật ký"]
-  D -->|"Không"| OK["Chuẩn hoá và chấm bài<br/>trạng thái: hop_le, cho_duyet"]
-  OK --> WR["Ghi tab đã xử lý<br/>rồi mới dời con trỏ"]
-  DP --> WR
-  ER --> WR
-  WR --> F{"Lỗi khi ghi?"}
-  F -->|"Có, thử lại tối đa 3 lần"| R1
-  F -->|"Quá 3 lần"| N["Email báo lỗi cho admin,<br/>con trỏ giữ nguyên"]
-  F -->|"Không"| Z(["Xong lô, ghi nhật ký"])
+  V1 -->|"Đúng"| W["Google ghi một dòng mới<br/>vào tab RAW"]
+  W --> T["Trigger lô, mỗi 10 phút"]
+  T --> G{"Trong cửa sổ mở<br/>theo cau_hinh?"}
+  G -->|"Không"| X1(["Thoát ngay"])
+  G -->|"Có"| L{"Lấy khoá LockService"}
+  L -->|"Không được"| R1["Ghi nhat_ky, thử lại<br/>ở lần trigger sau"]
+  L -->|"Được"| SG{"Dòng tại con trỏ<br/>còn đúng dấu thời gian?"}
+  SG -->|"Lệch: RAW bị sắp xếp<br/>hoặc xoá dòng"| ST["Dừng lô, ghi nhat_ky,<br/>email admin"]
+  SG -->|"Đúng"| RD["Đọc các dòng RAW sau con trỏ,<br/>tính raw_key mỗi dòng"]
+  RD --> EX{"raw_key đã có<br/>ở phieu?"}
+  EX -->|"Có"| SK(["Bỏ qua, không ghi lại"])
+  EX -->|"Chưa"| P{"Mã học sinh"}
+  P -->|"Trống"| S1["bo_khong_ma"]
+  P -->|"Không có trong hoc_sinh"| S2["ma_la"]
+  P -->|"Hợp lệ"| D{"Mã đã có phiếu<br/>ban_giu = 1?"}
+  D -->|"Có"| S3["bo_nop_trung,<br/>ban_giu = 0"]
+  D -->|"Chưa"| S4["cho_duyet,<br/>ban_giu = 1"]
+  S1 --> WR
+  S2 --> WR
+  S3 --> WR
+  S4 --> WR
+  WR["Upsert vào phieu,<br/>từng khối 500 dòng"] --> F{"Ghi thành công<br/>và chưa quá 2 phút?"}
+  F -->|"Có"| CP["Dời con trỏ sau cùng"]
+  F -->|"Lỗi hoặc bị ngắt"| RT["Con trỏ giữ nguyên,<br/>lần sau làm nốt dòng chưa có"]
+  RT --> N{"3 lô liên tiếp lỗi?"}
+  N -->|"Có"| EM["Email báo lỗi cho admin"]
+  CP --> Z(["Xong lô"])

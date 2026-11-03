@@ -1,20 +1,26 @@
 flowchart TD
-  A(["Admin mở bảng điều khiển"]) --> B["Xem số lượng:<br/>chờ duyệt, lỗi, cảnh báo, trùng"]
-  B --> C["Lọc phiếu cần xử lý"]
-  C --> D{"Từng nhóm"}
-  D -->|"Hợp lệ"| E["Duyệt hàng loạt"]
-  D -->|"Lỗi hoặc cảnh báo"| F["Sửa ô hoặc từ chối<br/>bắt buộc ghi lý do"]
-  D -->|"Trùng"| G["Xác nhận giữ phiếu đầu<br/>hoặc đổi sang phiếu khác"]
-  E --> H["nhat_ky: ai, lúc nào,<br/>trước và sau"]
+  A(["Admin mở bảng điều khiển"]) --> B["Xem số lượng theo trạng thái,<br/>đối soát RAW và phieu, tình trạng lô"]
+  B --> C["Mở chế độ xem lọc<br/>trong tab phieu"]
+  C --> D{"Nhóm phiếu"}
+  D -->|"cho_duyet"| E["Chọn dòng, menu Duyệt<br/>hoặc Duyệt tất cả phiếu hợp lệ"]
+  D -->|"ma_la, raw_doi"| F["Từ chối kèm lý do, hoặc<br/>thêm vào hoc_sinh rồi Xử lý lại"]
+  D -->|"bo_nop_trung"| G["Menu Giữ phiếu này:<br/>đổi phiếu giữ, xác nhận"]
+  E --> H["Cập nhật nguoi_duyet và<br/>thoi_gian_duyet"]
   F --> H
   G --> H
-  H --> I{"Còn phiếu<br/>cho_duyet hoặc lỗi?"}
+  F --> NK1["nhat_ky: từ chối, lý do"]
+  G --> NK2["nhat_ky: hai raw_key, lý do"]
+  H --> I{"Còn cho_duyet,<br/>ma_la hoặc raw_doi?"}
   I -->|"Còn"| C
-  I -->|"Hết"| J["Admin bấm Chốt đợt"]
-  J --> K{"Hộp xác nhận hiện:<br/>số phiếu duyệt, từ chối,<br/>số CLB thiếu chỉ tiêu"}
-  K -->|"Huỷ"| B
-  K -->|"Đồng ý"| L["Khoá đợt: không nhận<br/>thêm và không sửa thêm"]
-  L --> M["Tạo tab xuất và tệp<br/>RAW_PHIEU.xlsx, CSV"]
-  M --> N["Tải về máy chạy kiosk"]
+  I -->|"Hết"| J["Admin chọn Chốt đợt"]
+  J --> K["Lô kiểm lại toàn bộ băm RAW"]
+  K --> K2{"Có raw_doi?"}
+  K2 -->|"Có"| C
+  K2 -->|"Không"| Q{"Hộp xác nhận: số phiếu duyệt,<br/>từ chối, CLB thiếu chỉ tiêu"}
+  Q -->|"Huỷ"| B
+  Q -->|"Đồng ý"| L["Khoá đợt, sao lưu một bản<br/>gắn nhãn, ghi nhat_ky"]
+  L --> M["Xuất tệp RAW_PHIEU mới lên Drive<br/>chỉ da_duyet và ban_giu = 1"]
+  M --> M2["Ghi nhat_ky: số phiếu, id tệp"]
+  M2 --> N["Tải về máy chạy kiosk"]
   N --> O["xu_li_raw.py ra<br/>SO_NHAP_CLB.xlsx"]
   O --> P(["Nạp vào kiosk, chạy RB-DA"])

@@ -1,56 +1,25 @@
 erDiagram
-  KY_DANG_KY ||--o{ PHIEU : "có"
-  HOC_SINH ||--o{ PHIEU : "nộp"
-  PHIEU ||--|| RAW : "bắt nguồn từ"
-  PHIEU ||--o{ NGUYEN_VONG : "gồm"
-  PHIEU ||--o{ BAI_THI : "gồm"
-  CLB ||--o{ NGUYEN_VONG : "được chọn"
-  CLB ||--o{ BAI_THI : "được thi"
-  PHIEU ||--o{ NHAT_KY : "được ghi"
-  KY_DANG_KY {
-    string ky_id PK
-    string ten
-    string doi_tuong
-    datetime mo
-    datetime dong
-    string trang_thai
-    string form_id
-  }
+  RAW ||--o| PHIEU : "tạo ra"
+  HOC_SINH |o--o{ PHIEU : "nộp"
+  PHIEU |o--o{ NHAT_KY : "được ghi"
   RAW {
-    string raw_id PK
-    string ky_id
-    int so_dong
     datetime thoi_gian
-    string noi_dung
-  }
-  HOC_SINH {
-    string student_id PK
-    string ho_ten
-    string lop
-    string email
+    string student_id "mã học sinh gõ"
+    string cac_cot_cau_hoi "một cột mỗi câu"
   }
   PHIEU {
-    string phieu_id PK
-    string raw_id FK
-    string ky_id FK
-    string student_id FK
-    string trang_thai_xu_ly
-    string trang_thai_duyet
+    string raw_key PK "thoi_gian, ma_hs, bam 8 ky tu"
+    string ma_hs FK "tuỳ chọn"
+    string trang_thai
+    string ly_do
     int ban_giu
     string nguoi_duyet
     datetime thoi_gian_duyet
   }
-  NGUYEN_VONG {
-    string phieu_id FK
-    string buoi
-    int hang
-    string club_id FK
-  }
-  BAI_THI {
-    string phieu_id FK
-    string club_id FK
-    string buoi
-    float diem
+  HOC_SINH {
+    string ma_hs PK
+    string ho_ten
+    string lop
   }
   CLB {
     string club_id PK
@@ -63,8 +32,10 @@ erDiagram
     datetime thoi_gian
     string nguoi
     string hanh_dong
-    string doi_tuong_id
-    string truoc
-    string sau
+    string doi_tuong "tuỳ chọn"
     string ly_do
+  }
+  CAU_HINH {
+    string khoa PK
+    string gia_tri
   }
