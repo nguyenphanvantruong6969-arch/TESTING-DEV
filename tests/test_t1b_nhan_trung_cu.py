@@ -5,6 +5,7 @@ Chỉ chặn cặp trùng MỚI so với cấu hình đang lưu. Dữ liệu là
 
 import json
 import os
+import re
 import sqlite3
 
 import cau_hinh_ws as ch
@@ -84,4 +85,7 @@ def test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet(tmp_path):
             == [[c.value for c in r] for r in b[ten].iter_rows()], ten
     huong = [r[0].value or "" for r in a["Hướng dẫn"].iter_rows()]
     assert any("Cột Lớp (tuỳ chọn)" in d for d in huong)
-    assert not any("—" in d and "em " in d for d in huong[:0])
+    # G3: quy tắc chữ giao diện cũng áp cho sheet Hướng dẫn: không gạch dài, không xưng "em/tôi/tớ"
+    for d in huong:
+        assert "—" not in d, d
+        assert not re.search(r"\b(em|tôi|tớ)\b", d, re.I), d

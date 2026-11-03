@@ -490,9 +490,9 @@ Cùng mục **Xuất dữ liệu**, đánh dấu thêm ô nào thì xuất thêm
 
 | Đang ở đâu | Làm gì |
 |---|---|
-| Thẻ **03**, đang mở một em | Bấm **Xuất CSV em này** (cạnh *Sửa lại từ đầu*). Em còn thay đổi chưa lưu thì phần mềm nhắc lưu trước |
-| Thẻ **02**, mục Xuất dữ liệu | Bấm **Chọn học sinh…** → phần mềm đưa xuống bảng *Danh sách xếp CLB* → đánh dấu các em → quay lên, ô **Hồ sơ học sinh đã chọn** đã tự bật → **Xuất các mục đã chọn** (cùng lúc với các mục khác) |
-| Thẻ **04**, danh sách học sinh | Đánh dấu (dòng tiêu đề chọn cả trang; số em đang đánh dấu hiện bên cạnh) → **Xuất CSV học sinh đã đánh dấu** |
+| Thẻ **04**, đang mở một em | Bấm **Xuất CSV em này** (cạnh *Sửa lại từ đầu*). Em còn thay đổi chưa lưu thì phần mềm nhắc lưu trước |
+| Thẻ **03**, mục Xuất dữ liệu | Bấm **Chọn học sinh…** → phần mềm đưa xuống bảng *Danh sách xếp CLB* → đánh dấu các em → quay lên, ô **Hồ sơ học sinh đã chọn** đã tự bật → **Xuất các mục đã chọn** (cùng lúc với các mục khác) |
+| Thẻ **05**, danh sách học sinh | Đánh dấu (dòng tiêu đề chọn cả trang; số em đang đánh dấu hiện bên cạnh) → **Xuất CSV học sinh đã đánh dấu** |
 
 Mỗi dòng trong tệp là một CLB em có dính tới: đã đăng ký thi chưa, điểm, nguyện vọng
 thứ mấy, số bốc thăm, và kết quả.
@@ -509,7 +509,7 @@ thứ mấy, số bốc thăm, và kết quả.
 
 Mỗi học sinh có thể có một **Lớp** (ví dụ `10H1A`). Lớp chỉ để xem, lọc, sắp và xuất; **không ảnh hưởng tới kết quả xếp**.
 
-- **Gán lớp:** thẻ **05 → Học sinh**, gõ lớp vào ô ở cột *Lớp* rồi rời ô (để trống là xoá lớp). Cùng thẻ có ô **lọc theo lớp** (*Tất cả*, từng lớp, *Chưa có lớp*) và ô **sắp theo lớp**. Thẻ **02** cũng có cột Lớp, ô lọc và ô sắp.
+- **Gán lớp:** thẻ **05 → Học sinh**, gõ lớp vào ô ở cột *Lớp* rồi rời ô (để trống là xoá lớp). Cùng thẻ có ô **lọc theo lớp** (*Tất cả*, từng lớp, *Chưa có lớp*) và ô **sắp theo lớp**. Thẻ **03 · Dữ liệu khác**, mục *Danh sách xếp CLB*, cũng có cột Lớp, ô lọc và ô sắp. Thẻ **02 · Kết quả** có cột Lớp ở cách xem *Theo mã học sinh* và có riêng cách xem *Theo lớp*.
 - **Thẻ 04 (nhập tại chỗ):** khi trường đã có ít nhất một lớp, mỗi em phải **chọn lớp** từ danh sách trước khi bấm Lưu (ô hiện sẵn lớp hiện tại của em). Trường chưa có lớp nào thì ô này ẩn.
 - **Gửi giáo viên chủ nhiệm:** ở thẻ **03**, bấm **Xuất theo lớp** (khoá khi chưa có kết quả). Ra một thư mục, mỗi lớp một tệp Excel; em chưa có lớp nằm trong `_chua_co_lop.xlsx`; dòng tô đỏ là em chưa có chỗ. Trong Sổ kết quả cũng có trang **Theo lớp** với nội dung tương tự.
 - **Xem ngay trên màn hình, không cần xuất tệp:** thẻ **02 · Kết quả** chỉ để xem, có hai hàng nút. Hàng trên chọn cách xem: *Theo lớp* (chọn một lớp để thấy từng em học CLB nào, cho giáo viên chủ nhiệm), *Theo CLB* (chọn một CLB để thấy ai học, cho người phụ trách CLB), *Theo mã học sinh* (tìm một em hoặc xem cả danh sách, mỗi buổi một cột theo thứ tự ngày trong tuần). Hàng dưới chọn cách sắp xếp: *Theo ngày trong tuần*, *Theo mã học sinh*, và *Theo lớp* (mục này chỉ có khi xem *Theo mã học sinh*). Phần mềm nhớ lựa chọn của lần trước. Dòng tô đỏ là em chưa có CLB nào, ô trống là buổi đó chưa có CLB. Thẻ này không có điểm hay số bốc thăm, và hiện *chưa có kết quả* khi chưa chạy sắp xếp.

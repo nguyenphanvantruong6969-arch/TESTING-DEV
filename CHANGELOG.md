@@ -6,6 +6,12 @@
 - **T1b — nhãn trùng cũ không chặn lưu:** `cau_hinh_ws.ghi_cau_hinh` chỉ ném `NhanTrung` khi cấu hình mới có cặp danh từ trùng nhãn mà cấu hình ĐANG LƯU chưa có. Workspace cũ đã trùng đổi tên / đổi luật được; thêm cặp trùng thứ hai vẫn bị chặn; sửa hết trùng thì qua. `chuan_hoa()` (kiểm trước khi dựng workspace) và cảnh báo nhập `so_nhap_canh_bao_nhan_trung` giữ nguyên.
 - **Test:** mới `tests/test_t1b_nhan_trung_cu.py` (6); sửa `tests/test_so_nhap.py::test_mau_trong_doc_duoc_va_dung_bo_cuc` (tiêu đề có Lớp).
 
+### T2 sửa vòng 2
+
+- **G1 (T2, tràn ngang):** `.main { min-width: 0 }` (cột `1fr` của lưới không còn nở theo bảng rộng, nên bảng chỉ cuộn ngang trong `.scroll-x`, trang thì không); ô CLB `min-width` 7em. Test mới `test_khong_tran_ngang_trang_voi_ten_clb_rat_dai` (độ rộng 600, 1024, 1280; tên CLB 60 ký tự; ba cách xem; `scrollWidth <= innerWidth`). Đã thử gỡ dòng sửa: test đỏ ở 600 và 1024.
+- **G2 (tài liệu):** `HUONG_DAN_SU_DUNG.md` bảng "xuất hồ sơ học sinh" đổi số thẻ (04, 03, 05) và đoạn lớp mô tả đúng: lọc và sắp theo lớp ở thẻ 03, cột Lớp và cách xem Theo lớp ở thẻ 02.
+- **G3 (chữ sheet Hướng dẫn):** bỏ dấu gạch dài và xưng "em" trong các dòng hướng dẫn của `so_nhap.py` (cả bản hằng số lẫn bản dựng theo cấu hình); sinh lại `mau_csv/SO_NHAP_CLB.xlsx`. Test kiểm mọi dòng hướng dẫn của sổ mẫu: không "—", không từ "em/tôi/tớ". Các sheet khác không đổi.
+
 ### T1/T2 sửa vòng 1 (tester: 2 lớn, 5 vừa, 3 nhỏ)
 
 - **F1 (T1b):** `cau_hinh_ws._cap_trung_day_du` liệt kê MỌI cặp danh từ cùng nhãn kèm ngôn ngữ (ba danh từ cùng nhãn cho ba cặp; `cac_cap_nhan_trung` giữ nguyên cho cảnh báo nhập). `ghi_cau_hinh` chỉ từ chối khi có cặp (ngôn ngữ, a, b) mới so với mốc; báo cặp mới đầu tiên theo thứ tự `DANH_TU`, vi trước en.

@@ -273,3 +273,21 @@ def test_so_it_so_nhieu_tieng_anh(mo):
     page.fill("#kqTimKiem", "HS1")
     page.wait_for_function("() => /^1 student$/i.test(document.getElementById('kqDem').textContent.trim())")
     assert not loi, loi
+
+
+@pytest.mark.parametrize("rong", [600, 1024, 1280])
+def test_khong_tran_ngang_trang_voi_ten_clb_rat_dai(mo, rong):
+    """G1: bảng rộng chỉ được cuộn ngang trong khung của nó, không bao giờ làm cả trang tràn ngang."""
+    page, api, loi = mo({"HS1": "10A1", "HS2": "10A1", "HS3": "10A1"}, chay=True, nhieu_buoi=True)
+    dai = "Câu lạc bộ có cái tên rất dài để thử tràn ngang " + "x" * 12      # 60 ký tự
+    assert len(dai) == 60
+    for ma, buoi in (("C2", "2"), ("C3", "3"), ("C10", "10")):
+        assert api.create_or_update_club(ma, dai + buoi, 1, 0, "", buoi=buoi)["ok"]
+    page.set_viewport_size({"width": rong, "height": 800})
+    for tang1 in ("lop", "clb", "ma"):
+        _mo_ket_qua(page, tang1)
+        page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+        page.wait_for_timeout(300)
+        so = page.evaluate("() => [document.documentElement.scrollWidth, window.innerWidth]")
+        assert so[0] <= so[1], (rong, tang1, so)
+    assert not loi, loi

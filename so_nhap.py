@@ -964,7 +964,7 @@ def tom_tat(du_lieu: dict) -> dict:
 CHO_CHEN_GHI_CHU_W = "\x00CHO_CHEN_GHI_CHU_W"
 
 _HUONG_DAN_CO_DAU = [
-    "SỔ NHẬP CLB — một tệp duy nhất để nạp vào phần mềm",
+    "SỔ NHẬP CLB: một tệp duy nhất để nạp vào phần mềm",
     "",
     "Bước 1. Sheet \"1. CLB\": mỗi câu lạc bộ một dòng.",
     "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
@@ -979,14 +979,14 @@ _HUONG_DAN_CO_DAU = [
     "Bước 3. Tiêu đề của sheet này có HAI hàng. Hàng 1 là các ô gộp \"Nguyện vọng 1\",",
     "        \"Nguyện vọng 2\"…; hàng 2 là tên các cột nằm dưới mỗi ô gộp: CLB, Điểm thi.",
     "        Dữ liệu bắt đầu từ hàng 3.",
-    "        Cột CLB: chọn tên CLB trong danh sách thả xuống, theo thứ tự em thích nhất",
+    "        Cột CLB: chọn tên CLB trong danh sách thả xuống, theo thứ tự thích nhất",
     "        trước. Không cần điền kín.",
-    "        Trường nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+    "        Trường nhiều buổi: cứ điền chung một danh sách, phần mềm tự chia",
     "        theo buổi của từng CLB.",
     "        Đừng chèn hay xoá cột trong một nhóm: phần mềm sẽ báo lỗi vì cột lệch nhóm.",
     "",
     "Bước 4. Cột Điểm thi nằm ngay bên phải cột CLB cùng nhóm.",
-    "        Có điểm = em đã thi CLB đó. Để trống = không thi.",
+    "        Có điểm = đã thi CLB đó. Để trống = không thi.",
     "        Thi rồi mà chưa có điểm: gõ chữ  thi  rồi chấm sau trong phần mềm.",
     CHO_CHEN_GHI_CHU_W,
     "",
@@ -997,7 +997,7 @@ _HUONG_DAN_CO_DAU = [
     "",
     "Sổ có lỗi (CLB trùng tên, NV ghi tên CLB không có, điểm không phải số…)",
     "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
-    "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+    "Nạp lại sổ đã sửa là cập nhật, không tạo trùng.",
     "Phần mềm vẫn đọc được sổ cũ chỉ có MỘT hàng tiêu đề (NV1, Điểm 1…).",
     "",
     "Ví dụ một dòng học sinh:",
@@ -1073,7 +1073,7 @@ def _huong_dan_co_dau(cfg=None) -> list:
     ten_cot_nv = d("slot", "s", "vi")
     ten_cot_diem = diem + (" thi" if diem == "Điểm" else "")
     ra = [
-        "SỔ NHẬP %s — một tệp duy nhất để nạp vào phần mềm" % slot_u,
+        "SỔ NHẬP %s: một tệp duy nhất để nạp vào phần mềm" % slot_u,
         "",
         "Bước 1. Sheet \"%s\": mỗi %s một dòng." % (clb, slot_l),
         "        Tên CLB và Chỉ tiêu là bắt buộc. Buổi chọn trong danh sách thả xuống",
@@ -1089,7 +1089,7 @@ def _huong_dan_co_dau(cfg=None) -> list:
         "        \"Nguyện vọng 2\"…; hàng 2 là tên các cột nằm dưới mỗi ô gộp. Dữ liệu bắt đầu từ hàng 3.",
         "        Cột %s: chọn tên %s trong danh sách thả xuống," % (d("slot", "s", "vi"), slot_l),
         "        theo thứ tự thích nhất trước. Không cần điền kín.",
-        "        Nhiều buổi: cứ điền chung một danh sách — phần mềm tự chia",
+        "        Nhiều buổi: cứ điền chung một danh sách, phần mềm tự chia",
         "        theo buổi của từng %s." % slot_l,
         "        Đừng chèn hay xoá cột trong một nhóm: phần mềm sẽ báo lỗi vì cột lệch nhóm.",
         "",
@@ -1118,11 +1118,11 @@ def _huong_dan_co_dau(cfg=None) -> list:
               "    không thi tuyển."]
         if n["wharton"]:
             ra += [
-                "        Cột %s: điểm em tự chia cho từng nguyện vọng." % TEN_COT_QUYET_TAM,
+                "        Cột %s: điểm tự chia cho từng nguyện vọng." % TEN_COT_QUYET_TAM,
                 "        Mỗi %s có HAI quỹ, mỗi quỹ đúng 100 điểm cho MỖI BUỔI:" % nguoi_l,
-                "        quỹ 1 chia cho các %s em có thi (có %s), chỉ dùng để phá hoà khi bằng %s;"
+                "        quỹ 1 chia cho các %s có thi (có %s), chỉ dùng để phá hoà khi bằng %s;"
                 % (slot_l, diem_l, diem_l),
-                "        quỹ 2 chia cho các %s em không thi, quyết định thứ tự giữa các %s không thi."
+                "        quỹ 2 chia cho các %s không thi, quyết định thứ tự giữa các %s không thi."
                 % (slot_l, nguoi_l),
                 "        Số nguyên không âm; ô trống tính là 0. Quỹ nào chỉ có một %s thì điền 100."
                 % slot_l,
@@ -1143,7 +1143,7 @@ def _huong_dan_co_dau(cfg=None) -> list:
         "",
         "Sổ có lỗi (%s trùng tên, NV ghi tên %s không có, %s không phải số…)" % (slot_l, slot_l, diem_l),
         "thì phần mềm KHÔNG nạp gì cả và chỉ rõ sheet, dòng cần sửa.",
-        "Nạp lại sổ đã sửa là cập nhật — không tạo trùng.",
+        "Nạp lại sổ đã sửa là cập nhật, không tạo trùng.",
         "",
         "Ví dụ một dòng:",
     ] + vd
