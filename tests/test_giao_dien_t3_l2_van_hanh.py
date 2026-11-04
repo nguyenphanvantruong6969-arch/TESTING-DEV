@@ -248,3 +248,24 @@ def test_phieu_chi_hien_lop_khi_da_co_lop_va_bam_doi_moi_sua(api, mo):
     page.click("#btnKioskLopSua")
     assert page.locator("#kioskLop").is_visible() and page.locator("#kioskLopChu").is_hidden()
     assert not loi
+
+
+# ---------------------------------------------------------------- T3-29
+def test_diem_quyet_tam_mac_dinh_chi_hien_ho_so_co_van_de_co_dem_va_xem_tat_ca(api, mo):
+    bat_wharton(api)
+    dung_clb(api, A=5, B=5)
+    dung_hs(api, "HS1", "HS2", tick={"HS2": ["A"]})
+    assert api.submit_preferences("HS1", ["A", "B"])["ok"]
+    assert api.submit_preferences("HS2", ["A", "B"])["ok"]
+    assert api.submit_wharton("HS1", {}, {"A": 50, "B": 50})["ok"]   # HS1 hợp lệ; HS2 thi A mà chưa chia điểm
+    page, loi = mo()
+    _mo_tab(page, "admin")
+    page.locator('#qlTabWh').click()
+    page.wait_for_selector("#whQlBody tr")
+    assert page.is_checked("#whLocChiLoi")
+    assert page.locator("#whQlBody tr").evaluate_all("rs => rs.map(r => r.dataset.studentId)") == ["HS2"]
+    assert page.inner_text("#whQlDem").startswith("1 ")
+    page.click("#btnWhXemTatCa")
+    page.wait_for_function("() => document.querySelectorAll('#whQlBody tr').length === 2")
+    assert not page.is_checked("#whLocChiLoi") and page.locator("#btnWhXemTatCa").is_hidden()
+    assert not loi

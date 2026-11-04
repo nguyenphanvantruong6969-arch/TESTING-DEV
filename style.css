@@ -3122,3 +3122,4 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 /* T3-33: lớp hiện dạng chữ trong phiếu; T3-32: hàng "học sinh mới" ngay dưới ô tìm. */
 .lop-hien { font-weight: 600; margin-right: 6px; }
 .search-row + .new-student-row { margin-top: 10px; }
+.wh-ql-dem { font-weight: 600; color: var(--gold-text); }

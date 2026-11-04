@@ -750,6 +750,10 @@ function veBangWh() {
   const d = whBoNho.bang;
   const body = el("whQlBody");
   clear(body);
+  /* T3-29: mac dinh chi hien ho so co van de; dem so ho so + nut "Xem tat ca" de bo loc. */
+  const chiLoi = el("whLocChiLoi").checked;
+  el("whQlDem").textContent = chiLoi && d ? t("wh_dem_can_xu_ly", { n: d.total }) : "";
+  el("btnWhXemTatCa").hidden = !chiLoi;
   if (!d || !d.rows.length) {
     el("whQlRong").hidden = false;
     el("whQlPhanTrang").hidden = true;
@@ -1014,6 +1018,11 @@ function initWhartonQuanLy() {
   initWhHangLoat();
   const veLaiBang = () => { whQl.trang = 1; loadWhBang(); };
   el("whQlTim").addEventListener("input", debounce(veLaiBang, 250));
+  el("btnWhXemTatCa").addEventListener("click", () => {
+    el("whLocChiLoi").checked = false;
+    whQl.trang = 1;
+    loadWhBang();
+  });
   ["whLocQuy", "whLocBuoi", "whLocClb", "whLocChiLoi"].forEach((id) => {
     el(id).addEventListener("change", veLaiBang);
   });

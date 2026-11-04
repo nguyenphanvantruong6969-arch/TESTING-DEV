@@ -13,25 +13,35 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - [x] L1 implemented, pushed (`0fd4981`), tester L1 reviewing
 - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
 
-## Current state (L2 in progress, impl session 2)
-- L2 DONE + committed + pushed: T3-14 (nhãn buổi qua i18n `buoi_ma_*`, class `cot-buoi-tieu-de`), T3-07 (bỏ hai ô Từ/đến), T3-02 (cảnh báo nhập gom
-  theo mã >5 dòng + nút "Xem 5 dòng đầu"; dòng chặn có nút `.health-di-toi` tới Điểm quyết tâm), T3-03 (bug thật: `.import-actions{display:flex}`
-  đè `hidden`; đã sửa), T3-04 (một nút `#btnValidate` trong khung Cảnh báo, "Kiểm tra lại dữ liệu"; `#btnHealthRecheck` bỏ),
-  T3-06 (`#runXong` dòng kết quả + "Chi tiết"/"Mở thư mục kết quả"; bỏ toast xanh khi chạy xong, tests đợi `#runXong:not([hidden])`),
-  T3-10 (`#view-pipeline[data-trang-thai]` trong|san_sang|xong; chỉ `#btnRun` là nút chính khi san_sang), T3-12 (chân thanh bên: `dbStatusLine`
-  chỉ hiện khi mất kết nối; `lastRunLine`/`cheDoHienThi` giữ nhưng `hidden` làm mốc đồng bộ; nút "Hoạt ảnh" trong menu ⋯ `#menuThanhBen`),
-  T3-15 (dòng workspace: Mở + menu ⋯, Xoá cuối đỏ, bỏ cột Loại khi một loại, ẩn mã thư mục).
-- Reusable component: `<details class="menu-khac"><summary>⋯</summary><div class="menu-khac-hop"><button class="menu-khac-muc">` + closer in js/00_nen.js
-  (button `data-giu-menu` keeps the menu open, used for two-step Xoá). Use it for T3-34. NOTE: Esc also closes the workspace overlay.
-- Tests added: tests/test_t3_l2_buoi.py, tests/test_giao_dien_t3_l2_van_hanh.py (+ cases appended to test_ws_giao_dien.py). Snapshot helper: scratchpad
-  `them_chu.py key vi en ...` appends intentional new default text to tests/du_lieu_ws/chu_ui_doi_co_y_t3.json; removed keys -> KHOA_UI_DA_BO in test_ws_nhan.py.
-- TODO (not started): T3-20, T3-21, T3-23, T3-24, T3-25, T3-28, T3-29, T3-32, T3-33, T3-34, T3-35; then soat-ma, CHANGELOG, TIEN_DO row T3-L2,
-  CLAUDE_CHI_TIET `tests/` row (+2 files: now 190 files; recount cases with `pytest --collect-only -q`), pull --rebase, push, IMPL DONE message.
-- Plans decided for tab 03 (see 03_ket_qua.js): T3-24 keep 3 KPI tiles in order da_xep, chua_co_cho, cho_trong; NV1 numbers already live in `#nvTieuDiem`
-  (nvPanel) -> delete the nv1 tile; put "Suất dự trữ bỏ phí {thua}/{tong}" in a new line inside duTruPanel, delete the duTru tile; update
-  tests/test_giao_dien_tom_tat_ket_qua.py (uses `_o_kpi` keys nvPanel/duTruPanel). T3-20: dsXepPanel is already collapsed at the bottom; rename its
-  title to "Chi tiết để kiểm tra" (no details wrapper: too many tests click `#dsXepPanel .panel-toggle`). T3-21: drop fillPanel, add a bar column + keep
-  `#fillSapXep` select in clbPanel head; many fill-row tests (test_giao_dien_tom_tat_ket_qua, bieu_do, lap_day) need rewriting.
+## Current state (L2 in progress, impl session 2; handoff written at ~200k)
+- L2 DONE, committed, pushed (tests green per group): T3-14, T3-07, T3-02, T3-03 (real bug: `.import-actions{display:flex}` overrode `hidden`),
+  T3-04, T3-06 (`#runXong`), T3-10 (`#view-pipeline[data-trang-thai]`), T3-12 (`#menuThanhBen` ⋯; `lastRunLine`/`cheDoHienThi` kept hidden as sync hooks),
+  T3-15 (Mở + ⋯ per workspace row), T3-24 (3 KPI tiles; NV1 numbers live in `#nvTieuDiem`, dự trữ line `#duTruTieuDiem`), T3-25, T3-20 (dsXepPanel retitled
+  "Chi tiết để kiểm tra", already collapsed at bottom; no details wrapper), T3-34 (`#menuHocSinh` ⋯ keeps "Xuất CSV học sinh này"), T3-35 (no raw club codes,
+  `.chua-luu` pill; the "Hai bước này không phụ thuộc nhau" sentence was already gone), T3-32 (new-student row under the search row + scrollIntoView to the
+  phiếu; NOT done: collapsing the result list after pick), T3-33 (`#kioskLopChu` + `#btnKioskLopSua` when the student already has a class), T3-29 (default
+  "Chỉ hồ sơ có vấn đề" checked + `#whQlDem` + `#btnWhXemTatCa`).
+- NOT DONE yet: T3-21, T3-23, T3-28. Then finish: soat-ma (`kiem_nhanh.py --co-so origin/main` + 4 tiers), CHANGELOG (T3-L2 entry listing items/files/tests),
+  TIEN_DO row `T3-L2`, `docs/ke_hoach/CLAUDE_CHI_TIET.md` tests row (+2 new files: test_t3_l2_buoi.py, test_giao_dien_t3_l2_van_hanh.py -> 190 files, recount
+  cases with `pytest --collect-only -q | tail -1`; `tests/test_a13_12_tai_lieu.py` currently RED until this is updated), `git pull --rebase`, push, `IMPL DONE L2`
+  to coord (items, skipped, invariants 3/4/5/6 n/a: display only).
+- T3-21 plan: delete `#fillPanel` from index.html and the KPI tile target `fillPanel` (tile "Chỗ còn trống" -> open `clbPanel` and `datCachSapXep("vang_nhat")`);
+  move `#fillSapXep` select (keep id + options + localStorage `rbda_sap_xep_lap_day`) into `#clbPanel` panel-head and make `veBangNhuCauCLB` honour it
+  (reuse `docCachSapXep`, `tiLeLap`, `nhanCanDeY`); add a bar column (div width = matched/capacity %) and a "Lưu ý" text column from `nhanCanDeY`; drop tooltip-only
+  info. Remove `veBieuDoLapDay`/`veDongLapDay` if unused and rewrite tests that use `.fill-row` (test_giao_dien_tom_tat_ket_qua.py 22 hits,
+  test_giao_dien_bieu_do.py 6, test_giao_dien_thu_gon_ket_qua.py 6 via MUC_KET_QUA list, test_giao_dien_phong_chu.py 2, test_giao_dien_diem_chuan.py 1).
+  Also drop `fillPanel` from `MUC_KET_QUA` in 03_ket_qua.js and the fill_* keys that become unused (add to KHOA_UI_DA_BO in test_ws_nhan.py if removed).
+- T3-23 plan (index.html `#xuatPanel`): default shows only `#btnXuatTuyChon` ("Xuất kết quả (Excel)") + `#btnXuatTheoLop`; put the other checkboxes
+  (xuatKemCsv, xuatDauVao, xuatThayDoi, xuatHocSinh + btnChonHocSinh) in `<details class="nang-cao">` "Tuỳ chọn khác"; shorten `xuat_hint_hoc_sinh` to one sentence
+  without card numbers; keep `.xuat-canh-bao` red warning visible. Tests: test_giao_dien_ux_xuat.py, test_giao_dien_xuat_du_lieu.py, test_export_ket_qua.py
+  (open the details first); changed text -> `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json` via scratchpad `them_chu.py`.
+- T3-28 plan (js/05_quan_ly.js ~lines 100-160 `admin_tai_buoi_title`, `admin_lich_tuan_title`): one table "Tải theo buổi", remove the "Lịch tuần" block,
+  show "{x} học sinh trên mỗi chỗ" with decimal comma instead of "2.3×"; tests `test_giao_dien_*lich*`, `grep -ln "lich-buoi\|admin_lich_tuan\|tai_buoi" tests/`.
+- Reusable component: `<details class="menu-khac"><summary>⋯</summary><div class="menu-khac-hop"><button class="menu-khac-muc">`; closer in js/00_nen.js
+  (`data-giu-menu` keeps it open for two-step confirms). Esc also closes the workspace overlay (do not use Esc in ws tests).
+- Test helpers: scratchpad `them_chu.py key vi en ...` appends intentional new default text to tests/du_lieu_ws/chu_ui_doi_co_y_t3.json (only for CHANGED
+  default strings; new keys need nothing); removed keys -> KHOA_UI_DA_BO in test_ws_nhan.py. Key names must not start with `kiosk_lop`/`lop_` etc. (test_giao_dien_a14_lop counts them).
+  Test env here needed `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python openpyxl pillow python-docx ruff pytest-cov playwright==1.63.0`.
 
 ## Test environment (read before running anything)
 - `python3 -m venv .venv && pip install` HANGS on the proxy here. Use the uv tool pytest: `pytest` (= /root/.local/bin/pytest,
