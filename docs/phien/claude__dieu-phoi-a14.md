@@ -17,9 +17,9 @@ A14 "class per student" (Lớp): each student has `students.class_id` used ONLY 
 - [x] PR #7 (claude/a14-chot-tai-lieu -> main): docs-only closing (TIEN_DO A14 = xong, handoff files, CHANGELOG); CI green on 804d205
 
 ## Current state (overwrite each handoff)
-- Done: A14 code is on main (b044c4c). PR #7 is OPEN, CI green (ruff, Linux full + real UI, Windows), mergeable clean, no reviews. Waiting only for Truong to review/merge.
+- Done: A14 code is on main (PR #6, b044c4c). PR #7 (docs closing) MERGED 2026-11-04 05:52Z. A14 is fully closed.
 - In progress: nothing. Sessions A (session_01VfPzNra1AUNjuEtEybZqXm) and B (session_01VfPzNuqgL1PDRUBydGUj7d) are idle; no pending work for them.
-- Watching: the old coordinator session is subscribed to PR #7. Check-in 1 (05:49Z 2026-11-04) found nothing new; check-in 2 is scheduled for ~09:50Z (trigger trig_015VMmDJCKp6jEQ8TRLJDMXc). A new session should re-subscribe to PR #7 if Truong wants it watched (subscribe_pr_activity owner nguyenphanvantruong6969-arch repo testing-dev pullNumber 7).
+- Watching: nothing. Auto-unsubscribed from PR #7 on merge; pending check-in trigger deleted.
 - Tests: nothing to run for this branch (docs only).
 
 ## Decisions and gotchas (keep short)
@@ -33,7 +33,7 @@ A14 "class per student" (Lớp): each student has `students.class_id` used ONLY 
 - Do not push handoff/coordination files directly to main; this file lives on its own branch (no PR needed).
 
 ## Next steps (ordered)
-1. Truong reviews/merges PR #7. If CI or a review needs work, fix within docs scope.
+1. (Done) PR #7 merged.
 2. Later items (not started, need registry codes): Google Form asks for class; skill xu-li-raw-forms carries Lớp to Sổ; skill sinh-du-lieu-clb simulated class option.
 3. Small risk: tests/test_a14_sua_sau_soat.py (`_csdl_cu_co_du_lieu`) and tests/test_a14_tu_vung_cohort.py still build old DBs with DROP COLUMN; green on CI now, may break on an older SQLite.
 4. Wrong `Claude-Session:` trailer in some of B's old commits: left as is (already on main).
@@ -46,3 +46,4 @@ A14 "class per student" (Lớp): each student has `students.class_id` used ONLY 
 |---|---|---|---|
 | 2026-11-02..04 | Opus | Coordinated A14: spec Q&A, prompts, parallel sessions A/B, cross-review, fix rounds, full-suite verification, PR #6 merged, PR #7 opened and green | handoff at ~400k tokens |
 | 2026-11-04 | Opus | PR #7 check-in 1: still green, clean, no reviews; check-in 2 scheduled | no new work; open a new session |
+| 2026-11-04 | Opus | PR #7 merged by Truong (05:52Z); unsubscribed, check-in deleted | A14 closed |
