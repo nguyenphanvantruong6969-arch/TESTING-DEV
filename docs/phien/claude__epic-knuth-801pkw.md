@@ -21,67 +21,57 @@ A14 part A + B). Truong's task file (2026-11-03), explicitly overriding the regi
 Algorithm, match_results, run_history, CSV column contract: untouched.
 
 ## Plan (written by Opus; ticked by Sonnet)
-T1a
-- [x] Find how `mau_csv/SO_NHAP_CLB.xlsx` is built (`mau_csv/tao_so_nhap.py`) vs the generated sample
-      (A14 adds "Lớp" after "Họ tên"). Give every student a SIMULATED class (fixed seed, plausible
-      names like 10A1, 11A2...), regenerate the xlsx, keep everything else byte-for-byte equal in meaning.
-- [x] Docs: `mau_csv/HUONG_DAN_SO_NHAP.md` (+ HUONG_DAN_SU_DUNG if it names a sample) say this file is
-      THE main sample. Fix tests that pin the old header/hash.
-T1b
-- [x] `cau_hinh_ws` / `api_workspace`: a save is rejected only when it introduces a duplicate pair
-      that the currently STORED config does not already have. Old duplicates pass (keep the existing
-      warning path). New duplicates still get `nhan_trung_danh_tu`. Test both directions.
-T2
-- [x] Sidebar: 01 Vận hành, 02 Kết quả, 03 Dữ liệu khác, then Nhập tại chỗ, Quản lý, Nhập điểm
-      (renumber). Remove tabs `members` and `theolop` as separate nav items.
-- [x] Kết quả tier 1 (segmented control): Theo lớp | Theo CLB | Theo mã học sinh.
-      Tier 2 (sort control): Theo ngày trong tuần | Theo mã học sinh | Theo lớp (the last one ONLY
-      when tier 1 = Theo mã học sinh). One picker (class / club) or search box per tier-1 view.
-      Remember last tier-1/tier-2 choice per machine (localStorage, try/catch). No scores, no lottery
-      numbers in Kết quả (it is for BGH, club heads, homeroom teachers).
-- [x] Dữ liệu khác = every remaining 02 section (summary, export, fill stats, coverage, preference
-      distribution, unplaced, reserve, cutoffs, lottery numbers, full match list...).
-- [x] i18n vi+en, text rules (no em dash, no "em/tôi/tớ" in UI descriptions), language switch re-render.
-- [x] Update/replace Chromium UI tests that click the old tabs; new tests for tiers.
-T4 (CON-4, design only, no code)
-- [x] Design proposal docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md + 5 diagrams in docs/he_sinh_thai/anh/ (rounds 1, 2, 3b done).
-- [ ] Truong reviews and answers open questions (section 14.2 of the doc), then T4-K2 (Apps Script) may start.
-Both
-- [x] Related tests green, ruff, soat-ma, CHANGELOG, TIEN_DO, push. Opus runs the FULL suite at the end.
+- [x] T1a sample Sổ with Lớp column, main sample (CON-1)
+- [x] T1b old duplicate labels do not block unrelated saves (CON-1)
+- [x] T2 tabs 02/06/07 merged into Kết quả (two tiers) + Dữ liệu khác (CON-1); full suite green at cebfa2c (3299 passed)
+- [x] T3 debloat study docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md (CON-3, tester NO BUGS at 0d28de0)
+- [x] T4-K3 skill reads multi-part CSV folder (7e64cc4, done by another session)
+- [x] T4-K1 optional `lop` column (CON-5, fff0f41 + fix 85d22ce, tester NO BUGS)
+- [ ] T4 design review round 5 (gate for K2): tester CON-6 reviewing commit 00372e0
+- [ ] T4-K2 Apps Script (xuLyLo, caiLaiTrigger, 15 menus, export in parts) by CON-5 after "GO K2"
+- [ ] Merge main, recount tests, full suite, push, open PR to main, watch CI until green
 
 ## Current state (overwrite each handoff)
-- This session (Sonnet, CON-4) wrote the T4 design: docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md plus anh/*.mmd/.svg/.png
-  (a_kien_truc is hand-written SVG built by a script, b1, b2, c, d, e are Mermaid). Pushed through commit ca9e161
-  ("T4 sửa vòng 3b"). "CON-4 FIXED round 3" was SENT to Opus session_01VfPzNvdGizkwxJ8cd64rmp. No code or tests touched.
-- Network was blocked for the teacher's reference site and all official quota pages: every quota number is tagged
-  TT-CXM (unverified, from search summaries) and every Google behaviour claim is GĐ-n (unverified assumption). Doc section 16 lists
-  hosts to allow and what to verify.
-- CON-1 work (T1a, T1b, T2, fix rounds 1 to 3) was finished earlier and reported (see Session log).
-- In progress: nothing. Waiting for Opus review of round 3.
+- Coordinator = Opus session session_01VfPzNvdGizkwxJ8cd64rmp (handing off now, context > 400k).
+- Child sessions (claude-code-remote, send_message to talk):
+  - CON-5 implementer session_01VfPzNtNTCRyPE34MDFqofZ: K1 done; WAITING for "GO K2" (its first prompt holds Truong's K2 spec).
+  - CON-6 tester session_01VfPzNsx2G7ePNkQy3Eg5A5: running JOB E = T4 design round 5 review of 00372e0; will report
+    "TESTER REPORT T4 round 5" to the OLD coordinator id. New coordinator: read it with list_events on that session.
+  - CON-7 design writer session_01VfPzNskNGxNkQtb4CTcC1X: did design round 4 (00372e0); use it for design fixes.
+  - CON-4, CON-2, CON-1, CON-3: retired (context full or done).
+- Design status (00372e0): §7.7 holds implementation conventions M1..M26 + N1..N15 decisions. Simulation: at c=100 ms per
+  response both targets FAIL (backlog drain 140 min > 2 h; peak day 64.3 min > 45); both hold when c <= ~64 ms; the doc says so
+  and gives the pilot decision rule (<=64 keep A; 64-200 mitigations §9.4; >200 option B).
 
 ## Decisions and gotchas (keep short)
-- T4 design core: Google Forms + one Sheets per cycle; tabs RAW (Forms' own, no script writes), hoc_sinh, clb, phieu (key =
-  Forms response ID in LAST column), nhat_ky, cau_hinh, dieu_khien (formulas). Batch reads Forms API, upsert by raw_key,
-  cursor moc_xu_ly moved last; 120 s cap checked before each block; rows with empty raw_key/trang_thai deleted at batch start.
-- Export is its own menu (not tied to Chốt đợt), CSV parts of 1,000 submissions, manifest.json, one complete export per day
-  unless phieu changed (phieu_phien_ban). Implementation conventions M1 to M26 are in doc section 7.7.
-- Repo changes: T4-K1 (lop column, fff0f41) and T4-K3 (doc_raw multi-part, 7e64cc4) are DONE; only T4-K2 (Apps Script) remains.
-- Doc text rules: Vietnamese, no em dash, no pronouns em/tôi/tớ. Diagram scripts live in the old session scratchpad (not in repo):
-  re-render from the .mmd/.svg sources if needed (Mermaid 10.9.1 from npm + Playwright; a_kien_truc.svg is the source of its PNG).
-- CON-1 notes: static sample mau_csv/SO_NHAP_CLB.xlsx is a blank template with only the Lớp column added; test_ws_nhan.py snapshot
-  tolerates exactly the intended string changes; do not run git stash while background tests run.
+- Truong approved T4-K1/K2 (TIEN_DO 3e9b0bc). K2 starts only after the design review passes (Truong's order).
+- Deviations from Truong's original K2 wording, to report to him: Từ chối sets ban_giu=0 and re-ranks (M5); a second full export
+  the same day is allowed if phieu changed (phieu_phien_ban, M20); Chốt đợt does not auto-export; 15 menus incl. "Huỷ xuất";
+  no ma_hs format check (membership only, N13); chốt requires API count = valid phieu, RAW mismatch only warns (N4).
+- Product bugs found by T3 (NOT fixed, ask Truong): B1 saving a club with blank optional fields wipes reserve seats, priority
+  group and session (js/05_quan_ly.js sends all 6 fields); B2 Run on an empty workspace locks seed 42; B3 no way to turn off
+  Điểm quyết tâm after creation.
+- Network blocks Google/Microsoft/Supabase docs and the teacher's netlify page: quotas stay TT-CXM; doc §16 lists what to verify.
+- Local test env: python3 -m venv .venv; pip install -r requirements-dev.txt; pip install playwright==1.63.0 (matches
+  /opt/pw-browsers); run with PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers; full suite ~23 min.
 
 ## Next steps (ordered)
-1. Read Opus messages (cross-session). If another T4 fix plan arrives, patch the doc by section (see 7.x numbering), re-render changed
-   diagrams, LOOK at each PNG, commit "T4 sửa vòng N", push, send "CON-4 FIXED round N" with per-item status.
-2. When the network is open: do doc section 16 (verify quota numbers and GĐ-n, then replace TT-CXM and GĐ tags with VERIFIED + URL).
-3. Do not start T4-K2 coding until Truong approves the open questions (doc section 14.2).
+1. Read CON-6's "TESTER REPORT T4 round 5" (list_events on its session). Blocking issues -> decide, send to CON-7, re-review.
+2. When it passes: send "GO K2" to CON-5 with: follow §7.7 + N decisions at the latest design commit; list deviations.
+3. CON-5 reports "CON-5 K2 DONE" -> CON-6 reviews code -> loop until NO BUGS. Report to Truong: files, new tests (cases),
+   soat-ma, uncertain points.
+4. PR: merge origin/main into the branch; conflicts in workspace.py, cau_hinh_ws.py, docs/ke_hoach/CLAUDE_CHI_TIET.md (T1/T2);
+   tests/test_a14_sua_sau_soat.py::test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien take main's version (B9, no DROP
+   COLUMN); recount test files and cases (collect-only; K1 wrote 3.319 uncounted). Full suite, soat-ma, push, open PR to main,
+   subscribe_pr_activity, fix CI until green.
+5. Ask Truong whether to fix product bugs B1-B3.
 
 ## Files touched
-- T4: docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md, docs/he_sinh_thai/anh/ (a_kien_truc.svg/.png, b1_nop_phieu, b2_xu_ly_lo, c_duyet_xuat,
-  d_erd, e_chuyen_doi as .mmd/.png), this file.
-- CON-1 rounds: tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json, tests/test_ws_so_nhap.py, CHANGELOG.md; earlier see CHANGELOG
-  sections "T1a, T1b", "T2", "T2 sửa vòng 1/2".
+- T1/T2: cau_hinh_ws.py, workspace.py, api_workspace.py, so_nhap.py, mau_csv/*, index.html, style.css, i18n.js, i18n_errors.py,
+  i18n_loi.js, js/01,03,04,05,06,075,07,08,09, README/HUONG_DAN_*, tests (see CHANGELOG T1a/T1b/T2 and rounds).
+- T3: docs/nghien_cuu/. T4 design: docs/he_sinh_thai/. K1: lop_hoc_sinh.py (new), rbda_priority_pipeline.py (re-import),
+  .claude/skills/xu-li-raw-forms/*, mau_forms_thi_clb/{tao_google_forms.py,TAO_GOOGLE_FORM.gs,DINH_DANG_RAW.md,dong_goi_skill.py},
+  tests/test_t4_k1_lop.py, tests/test_a14_lop_backend.py, tests/test_a14_tu_vung_cohort.py.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -94,3 +84,4 @@ Both
 | 2026-11-03 | Sonnet | Handoff at context limit, round 3 committed | tests still pending, report to Opus not sent |
 | 2026-11-03 | Sonnet | Final handoff: rounds 1-3 done and reported | nothing pending on this side |
 | 2026-11-04 | Sonnet | CON-4: T4 design doc and 5 diagrams, rounds 1, 2, 3b pushed (ca9e161); handoff at context limit | design only; quotas unverified (network blocked); waiting for Opus review |
+| 2026-11-04 | Opus | Coordinated T3 (closed), T4 design rounds 1-4, T4-K1 (closed); handoff at context limit | K2 waits on design round 5 (CON-6) |
