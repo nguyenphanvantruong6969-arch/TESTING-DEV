@@ -8,10 +8,10 @@ Implement T3 lots L0..L3 on this branch (spec = "Lot L<n>" in `docs/phien/claude
 
 ## Plan
 - [x] L0: B1/T3-26, B2/T3-01, B3/T3-42 (tests first, related tests, invariant 1, soat-ma, CHANGELOG + TIEN_DO, commit, push)
-- [ ] L1  - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
+- [x] L0 (+ fix1, fixci1)  - [x] L1 implemented, pending tester  - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
 
 ## Current state (overwrite each handoff)
-- L0 implemented and pushed (see commit `T3-L0: ...`); `IMPL DONE L0` sent to coord. Idle, waiting for next message.
+- L0 done and verified by tester. L1 implemented; see CHANGELOG T3-L1. Waiting for tester result or next GO.
 - Tests for L0: `tests/test_t3_l0_backend.py` (11), `tests/test_giao_dien_t3_l0.py` (6, Chromium).
 - Test env: system `pytest` (uv tool, /root/.local/bin/pytest) with playwright+openpyxl installed via
   `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python ...`. `python3 -m venv` + pip hung on the proxy; do not retry it.
@@ -22,10 +22,13 @@ Implement T3 lots L0..L3 on this branch (spec = "Lot L<n>" in `docs/phien/claude
   typing by hand sends `null` for blank optional fields.
 - B2: guard sits before backup in `_run_pipeline_da_khoa`; error `chua_co_du_lieu_de_chay`, returned via `_fail_co_buoc([], ...)`.
 - `stb_lock` always has one seeded row; assert on `is_locked`, not row count.
+- Frozen snapshot test `tests/test_ws_nhan.py` guards default text; intentional text changes go in `THAY_CHU_T3` / `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json` (regenerate with a script that diffs node output vs snapshot).
+- Every added test file: update the `tests/` row of `docs/ke_hoach/CLAUDE_CHI_TIET.md` (files + `pytest --collect-only -q`).
+- Seed input now lives in `<details id="nangCao">`; UI tests must open it (`page.evaluate("document.getElementById('nangCao').open = true")`) before filling.
 - Invariant 1 harness: `kiem_nhanh.kiem_trung_khit(new, old, seeds, 3)` with `old` = `git archive origin/main`; 20 seeds via direct call.
 
 ## Next steps (ordered)
-1. Wait for `GO L1` / `FIX L0`.
+1. Wait for `FIX L1` / `GO L2`.
 
 ## Files touched
 - api.py, api_quan_ly.py, i18n_errors.py, i18n_loi.js, i18n.js, index.html, style.css, js/02_van_hanh.js, js/05_quan_ly.js
@@ -35,3 +38,4 @@ Implement T3 lots L0..L3 on this branch (spec = "Lot L<n>" in `docs/phien/claude
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-04 | Sonnet (impl) | L0 implemented | |
+| 2026-11-04 | Sonnet (impl) | L0 fix1, fixci1; L1 implemented | |

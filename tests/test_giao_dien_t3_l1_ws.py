@@ -9,7 +9,7 @@ pytest.importorskip("playwright", reason="chưa cài playwright")
 from test_ws_giao_dien import mo_trang  # noqa: E402,F401
 
 
-def test_tieu_de_buoc_hop_tao_workspace_dung_hai_cham_khong_gach_dai(mo_trang):
+def test_tieu_de_buoc_hop_tao_workspace_dung_hai_cham_khong_gach_dai(mo_trang):  # noqa: F811
     page, _api, _goc, loi = mo_trang()
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()

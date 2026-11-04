@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L1 (ngoài sổ, Truong duyệt 04/11/2026): chữ và hiển thị nhỏ (nghiên cứu T3, lô 1)
+
+- **T3-05:** ô mã bốc thăm vào mục "Nâng cao" thu gọn (`<details id="nangCao">`, mặc định 42, mở tự động khi bấm "Bốc thăm lại"); bỏ `#seedLockHint`; `stb_locked_label` thành một dòng "Đã bốc thăm lúc {locked_at}. Muốn bốc thăm lại, bấm "Bốc thăm lại…"." (giờ dạng người đọc).
+- **T3-08:** bỏ ô "đã nộp nguyện vọng" (`#statPrefs`) khỏi dải số liệu; giờ chạy dạng `dd/mm/yyyy hh:mm` (`dinhDangGio` ở `js/00_nen.js`) ở chân thanh bên và bảng lịch sử; bỏ "số khởi tạo" khỏi `#lastRunLine`.
+- **T3-09:** thẻ Lịch sử sắp xếp chỉ hiện khi có từ 2 lần chạy (`capNhatTheLichSu`); không đụng `run_history`.
+- **T3-13:** bỏ dòng phụ "Reserve-Based DA"; tiêu đề trang và cửa sổ không còn "RB-DA" (`page_title`, `APP_TITLE`).
+- **T3-30:** tab con "Dữ liệu" đổi thành "Xoá dữ liệu" (en "Delete data").
+- **T3-36:** bảng tiến độ chấm bỏ cột mã CLB và thanh tiến độ; nút "Chấm" là nút phụ không mũi tên.
+- **T3-37/38/39:** tiêu đề bước hộp tạo workspace "Bước n/4: …"; tiêu đề cửa sổ và `aria-label` dùng " · " hoặc ": " thay gạch dài (`main.py`, `js/075_workspace.js`, `js/04_nhap_tai_cho.js`); khoảng số "(từ 1 đến 20)", "(từ 0 đến 20)".
+- **T3-40:** chữ dự phòng của `index.html` khớp catalog (62 chỗ); test mới `tests/test_t3_l1_chu_du_phong.py` canh từng phần tử `data-i18n`, placeholder và aria-label. Sửa kèm `wh_sua_rong` (đầu câu viết thường).
+- **T3-43:** chữ trong tệp Excel xuất (`api_xuat.py`, 51 chuỗi): bỏ gạch dài và đại từ "em", dùng `{person_l}` theo từ vựng workspace; hai chuỗi đếm của trang "Theo lớp" nay cũng qua `t.n` (trước đây lọt `em` cứng khi workspace đặt tên khác).
+- **Bảng 5.1-5.3 (trừ mục để lô sau):** tên thẻ "Xếp CLB" (`nav_pipeline`, `pipeline_title`), "Nhập nguyện vọng" (`nav_fallback`, `fallback_title`) và mọi chỗ nhắc tên thẻ (catalog, `i18n_errors.py`, `HUONG_DAN_SU_DUNG.md`); sáu mô tả `pipeline_desc`, `others_desc`, `admin_desc`, `scoring_desc`, `fallback_desc`, `import_hint`; nhãn "Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên"; "Số đơn và số chỗ", "Học sinh trên mỗi chỗ", "Chọn là nguyện vọng 1"; `xuat_hint_hoc_sinh`, `xuat_opt_kem_csv`; nút `ws_btn_*`. Lệch khỏi bảng có chủ ý: tiếng Việt giữ "tệp nén" và en "archive file" (test `test_giao_dien_tieng_viet_sach` cấm chữ zip); "Draw code" thay "Draw seed" (cấm từ kỹ thuật); `pipeline_desc`/`import_hint` viết "sổ nhập" thường, không "Sổ nhập CLB" (từ vựng workspace). Chưa làm ở lô này (để L2/L3): hai dòng cảnh báo gộp T3-02 (hàng 213, 214 của bảng 5.3), `nav_others`, `nav_admin`, `ql_tab_dc`, `kq_sx_ngay`, `kq_sap_nhan`.
+- **Khoá catalog bỏ:** `brand_sub`, `label_submitted_prefs`, `seed_locked_hint`, `seed_unlocked_for_redraw`; khoá mới `nang_cao`.
+- **Test mới:** `tests/test_t3_l1_chu.py` (4), `tests/test_t3_l1_chu_du_phong.py` (1), `tests/test_giao_dien_t3_l1.py` (7, Chromium), `tests/test_giao_dien_t3_l1_ws.py` (1, Chromium). **Test cũ sửa theo chữ mới:** `test_ws_nhan.py` (bảng ảnh chụp: `KHOA_UI_DA_BO`, `THAY_CHU_T3`, `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json`), `test_ws_nhan_giao_dien.py`, `test_giao_dien_khoa_hat_giong.py`, `test_giao_dien_chay.py`, `test_giao_dien_sua_loi_p1.py`, `test_giao_dien_xoa_du_lieu.py`, `test_giao_dien_quan_ly_tab_con.py`, `test_giao_dien_a13_10_diem_chuan.py`. Bản đồ mã: 188 tệp test, 3.396 ca.
+- **Bất biến 1:** `kiem_nhanh.py trung_khit` (3 bộ × 5 seed) ĐẠT so với `origin/main`; lô này không đổi thuật toán.
+
 ## 2026-11-04 — T3-L0 (ngoài sổ, Truong duyệt 04/11/2026): ba lỗi sản phẩm của nghiên cứu T3 (B1/T3-26, B2/T3-01, B3/T3-42)
 
 - **B1 / T3-26 — sửa CLB không còn xoá suất dự trữ, nhãn, buổi.** `api_quan_ly.py::create_or_update_club`: `reserve_capacity`, `reserve_group`, `buoi` mặc định `None` = "không gửi" — CLB đã có thì GIỮ giá trị đang lưu, CLB mới lấy 0 / không nhãn / không buổi; `name=None` giữ tên cũ; muốn xoá thật thì gửi 0 hoặc `""`. Kiểm suất dự trữ ≤ chỉ tiêu dùng giá trị hiệu lực (kể cả giá trị cũ). Lời gọi tường minh cũ (`("c","C",5,0,"")`) cho kết quả y như trước. Giao diện (`js/05_quan_ly.js`, `index.html`, `style.css`): sáu nhãn thường trực phía trên sáu ô (dùng lại khoá `th_*`); bấm một dòng bảng thì điền biểu mẫu từ dòng đó, khoá ô mã, nút Huỷ; khi đang sửa ô trống = xoá, gõ tay thì ô trống = không gửi (`null`).
