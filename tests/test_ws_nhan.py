@@ -57,6 +57,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
     "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
     "error_saving_wharton",
+    # T3-L0 (B2): chặn chạy xếp khi chưa có học sinh hoặc CLB.
+    "chua_co_du_lieu_de_chay",
     # A13.8: khoá điểm giữ nguyện vọng / ô tick; điểm chấm sai; điểm chuẩn xuất lỗi; phóng hàng loạt.
     "csv_wharton_khoa_giu_nguyen", "xuat_diem_chuan_loi",
     # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.

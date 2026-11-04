@@ -142,8 +142,9 @@ def test_mac_dinh_du_lieu_chua_co_diem_quyet_tam_bi_chan_va_thong_bao_chi_cach_g
     loi = next(e for e in kq["errors"] if e["code"] == "wharton_ho_so_chua_hop_le")
     for ngon in ("vi", "en"):
         chu = format_message(loi["code"], loi["params"], ngon).lower()
-        # chỉ cách khắc phục: điền điểm, hoặc tắt trong cấu hình workspace
-        assert ("điền" in chu and "tắt" in chu) if ngon == "vi" else ("fill in" in chu and "turn off" in chu)
+        # B3 (Truong, 04/11/2026): chỉ trỏ tới việc làm được, điền điểm hoặc "Phóng cho đủ 100"; không bảo tắt
+        assert ("điền" in chu and "phóng cho đủ 100" in chu and "tắt" not in chu) if ngon == "vi" \
+            else ("fill in" in chu and "scale to 100" in chu and "turn off" not in chu)
 
 
 def test_tat_ro_rang_thi_cung_du_lieu_chay_duoc(tmp_path):

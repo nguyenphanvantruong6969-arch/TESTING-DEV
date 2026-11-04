@@ -295,11 +295,13 @@ def test_C6_luat_xep_cua_none_giu_false():
 # ================================================================== D — thông báo lỗi
 
 def test_D1_thong_bao_chi_hai_cach_khac_phuc():
-    for ngon, can in (("vi", ("điền", "điểm quyết tâm", "tắt", "cấu hình")),
-                      ("en", ("fill in", "commitment points", "turn off", "settings"))):
+    # Quyết định B3 của Truong (04/11/2026): câu chỉ trỏ tới việc làm được (điền điểm / "Phóng cho đủ 100"), KHÔNG bảo tắt.
+    for ngon, can in (("vi", ("điền", "điểm quyết tâm", "phóng cho đủ 100")),
+                      ("en", ("fill in", "commitment points", "scale to 100"))):
         chu = format_message("wharton_ho_so_chua_hop_le", {"n": 3, "person_l": "em"}, ngon).lower()
         for tu in can:
             assert tu in chu, (ngon, tu, chu)
+        assert "tắt" not in chu and "turn off" not in chu, chu
 
 
 def test_D2_i18n_loi_js_khop_ban_sinh_lai():
@@ -399,7 +401,7 @@ def test_E3_bo_trong_diem_quyet_tam_phai_bao_loi_kem_cach_khac_phuc(api_ws, tmp_
     assert run["ok"] is False                       # không được thành công mà không báo gì
     loi = next(e for e in run["errors"] if e["code"] == "wharton_ho_so_chua_hop_le")
     chu = format_message(loi["code"], loi["params"], "vi").lower()
-    assert "điền" in chu and "tắt" in chu
+    assert "điền" in chu and "phóng cho đủ 100" in chu and "tắt" not in chu   # B3 (Truong, 04/11/2026)
 
 
 @pytest.mark.parametrize("seed", [1, 7, 42])
