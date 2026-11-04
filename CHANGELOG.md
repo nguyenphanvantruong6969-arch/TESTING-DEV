@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L2 fix3 (điều phối): test node chạy được trên Windows
+
+- `tests/test_t3_l2_buoi.py::test_loi_co_tham_so_buoi_hien_nhan_khong_hien_ma`: `subprocess.run(["node", ...])` đọc đầu ra bằng `encoding="utf-8"` (CI Windows đọc cp1252 nên gặp chữ Việt thì `stdout` là `None`).
+
 ## 2026-11-04 — T3-L3 (ngoài sổ, Truong duyệt 04/11/2026): tên thẻ, thẻ Kết quả gọn, tải bảng, Điểm chuẩn một nơi, chữ Sổ nhập (nghiên cứu T3, lô 3)
 
 Chỉ đổi hiển thị (thêm một API xuất đọc `match_results`); thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.

@@ -84,7 +84,7 @@ def test_loi_co_tham_so_buoi_hien_nhan_khong_hien_ma():
         "const msg = I.translateError({code:'health_oversubscribed_buoi', params:{buoi:'thu_2', n_seats:1, n_students:2, n_short:1}});"
         "console.log(msg);"
     )
-    kq = subprocess.run(["node", "-e", kich_ban], cwd=GOC, capture_output=True, text=True)
+    kq = subprocess.run(["node", "-e", kich_ban], cwd=GOC, capture_output=True, text=True, encoding="utf-8")
     if kq.returncode != 0:
         import pytest
         pytest.skip("node không chạy được i18n.js: " + kq.stderr[-200:])
