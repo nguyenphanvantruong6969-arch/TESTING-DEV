@@ -34,3 +34,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | T3-L1 (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | i18n.js, i18n_errors.py, i18n_loi.js, index.html, style.css, main.py, api_xuat.py, js/00_nen.js, js/01_khung.js, js/02_van_hanh.js, js/04_nhap_tai_cho.js, js/06_cham_diem.js, js/075_workspace.js, HUONG_DAN_SU_DUNG.md, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_t3_l1_chu.py, test_t3_l1_chu_du_phong.py, test_giao_dien_t3_l1.py, test_giao_dien_t3_l1_ws.py | Chữ và hiển thị nhỏ (T3-05, 08, 09, 13, 30, 36-40, 43, bảng 5.1-5.3). Chờ tester Sonnet soát |
 | T3-L2 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Bớt khối, gom nút |
 | T3-L3 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Các quyết định của Truong ngày 04/11/2026 |
+| CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026) | xong | 2026-11-04 | .github/workflows/tests.yml, CHANGELOG.md | (không) | Huỷ lượt CI cũ trên nhánh không phải main |

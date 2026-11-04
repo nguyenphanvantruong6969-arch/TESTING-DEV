@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-04 — CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026): huỷ lượt CI cũ khi có commit mới
+
+- **`.github/workflows/tests.yml`:** thêm `concurrency` (nhóm theo workflow + loại sự kiện + nhánh; `cancel-in-progress` trừ nhánh `main`). Workflow build `.exe` (chạy tay) không đổi.
+
 ## 2026-11-04 — T3-L1 (ngoài sổ, Truong duyệt 04/11/2026): chữ và hiển thị nhỏ (nghiên cứu T3, lô 1)
 
 - **T3-05:** ô mã bốc thăm vào mục "Nâng cao" thu gọn (`<details id="nangCao">`, mặc định 42, mở tự động khi bấm "Bốc thăm lại"); bỏ `#seedLockHint`; `stb_locked_label` thành một dòng "Đã bốc thăm lúc {locked_at}. Muốn bốc thăm lại, bấm "Bốc thăm lại…"." (giờ dạng người đọc).

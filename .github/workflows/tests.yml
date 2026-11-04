@@ -11,6 +11,14 @@ on:
 permissions:
   contents: read
 
+# Commit moi tren cung nhanh huy luot dang chay cua commit cu (khong ton
+# 40 phut cho ket qua ai cung bo qua). Tach theo loai su kien (push / PR) de
+# hai luot cua cung mot commit khong huy lan nhau. Nhanh main khong huy:
+# moi commit tren main deu can ket qua day du.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   lint:
     name: Lint (ruff)
