@@ -57,6 +57,8 @@ def mo(api):
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="admin"]').click()
         page.locator('#qlTabs [data-ql-tab="dc"]').click()
+        # T3-31: Điểm chuẩn là MỘT bảng; chi tiết (bảng + biểu đồ chấm) mở khi bấm "Xem chi tiết" ở một CLB.
+        page.locator("#adminDiemChuanBlock:not([hidden]) .dc-chi-tiet-nut").first.click()
         page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcChiTiet:not([hidden])")
         return page, loi
 
@@ -103,7 +105,7 @@ def test_chuoi_i18n_dc_khong_con_nhan_cu_khong_xung_ho():
     with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
         mat = f.read()
     cac = re.findall(r'^\s*(dc_[a-z0-9_]+):\s*"((?:[^"\\]|\\.)*)"', mat, flags=re.M)
-    assert len(cac) >= 60                                   # hai ngôn ngữ
+    assert len(cac) >= 50                                   # hai ngôn ngữ (T3-31 bỏ 3 mức + thanh 3 màu: 58 khoá)
     tang = [v for k, v in cac if k in ("dc_tang1", "dc_tang2")]
     assert sorted(tang) == sorted([
         "Xét điểm thi", "Xét điểm quyết tâm", "Exam-based", "Commitment points"])

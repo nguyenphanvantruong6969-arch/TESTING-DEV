@@ -52,5 +52,7 @@ def test_doi_ngon_ngu_khong_mat_xep_hang_dang_chon(mo):  # noqa: F811
     page.wait_for_function(
         "() => document.querySelector('#rankingList li button').textContent === 'remove'")
     assert page.locator("#rankingList li .hs-chip-hang").all_inner_texts() == truoc
-    assert page.locator("#rankingList li .ranking-ten").all_inner_texts() == ten
+    # T3-14: nhãn buổi đổi theo ngôn ngữ ("Thứ 5" -> "Thu"), nên so thứ tự CLB (hai từ đầu), không so nguyên chữ.
+    assert [x.split()[:2] for x in page.locator("#rankingList li .ranking-ten").all_inner_texts()] == \
+        [x.split()[:2] for x in ten]
     assert not loi, loi

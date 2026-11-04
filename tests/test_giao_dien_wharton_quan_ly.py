@@ -148,6 +148,7 @@ def test_wharton_tat_khong_co_khoi_va_the_quan_ly_con_du_khoi_cu(mo):
 
 def test_bang_hien_dung_diem_tong_va_tim_khong_dau_va_loc(mo):
     page, api, loi = mo()
+    page.wait_for_function("() => document.querySelectorAll('#whQlBody tr').length === 3")   # bảng vẽ bất đồng bộ
     assert page.locator("#whQlBody tr").count() == 3
     hs1 = _hang(page, "HS1")
     assert hs1.locator('.wh-ql-quy[data-buoi="thu_3"][data-quy="2"] .wh-ql-o[data-clb="B"]'

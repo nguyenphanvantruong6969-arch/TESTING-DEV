@@ -110,7 +110,8 @@ def test_bam_tieu_de_cot_sap_ma_tu_nhien_lop_tu_nhien_trong_cuoi_va_dao_chieu(mo
     _sx(page, 2)
     _thu_tu(page, ["HS1", "HS2", "HS3", "HS10", "HS9"])        # giảm dần; vẫn trống cuối
     page.locator('#kqTang1 [data-kq="clb"]').click()           # đổi cách xem: về sắp theo mã
-    page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length > 0")
+    # chờ tiêu đề mới (không chỉ các hàng cũ còn nằm đó): vẽ lại sau khi đổi cách xem là bất đồng bộ
+    page.wait_for_function("() => document.querySelectorAll('#kqDau th[aria-sort=\"ascending\"]').length === 1")
     assert page.locator('#kqDau th[aria-sort="ascending"]').count() == 1
     assert not loi, loi
 
