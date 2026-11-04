@@ -66,7 +66,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | GO L1 sent 13:43 UTC |
+| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 fixci1 pushed 75ed1e3; L1 local (3 commits) |
 | tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | NO BUGS at e8944b2; archived |
 | tester L1 | (create on IMPL DONE L1) | Sonnet | |
 
@@ -77,7 +77,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 - (none yet)
 
 ## Next steps (ordered)
-1. CI on PR #10: red -> "FIX CI L0" to impl. 2. On "IMPL DONE L1": create Sonnet tester with REVIEW L1 <base>..<head>.
+1. Watch CI on 75ed1e3 (L0 fixci1, test-only: old A13.13/stress/ws_nhan assertions aligned to Truong B2/B3). 2. On "IMPL DONE L1": create Sonnet tester with REVIEW L1 and ALSO 7f7a845..75ed1e3 (check assertions were aligned, not weakened).
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
