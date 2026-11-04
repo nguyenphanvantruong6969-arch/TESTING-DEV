@@ -318,9 +318,11 @@
 
       <div class="panel" id="xuatPanel">
         <div class="panel-head"><h2 data-i18n="xuat_title">Xuất dữ liệu</h2></div>
-        <div class="xuat-tuy-chon">
+        <p class="canh-bao-vang" id="xuatKetQuaKhoa" role="status" hidden data-i18n="xuat_khoa_dong">Chưa có kết quả xếp. Chạy xếp trước.</p>
+        <details class="nang-cao" id="xuatNangCao">
+          <summary data-i18n="xuat_tuy_chon_khac">Tuỳ chọn khác</summary>
+          <div class="xuat-tuy-chon">
           <label class="xuat-muc"><input type="checkbox" id="xuatKetQua" checked> <span data-i18n="xuat_opt_ket_qua">Kết quả sắp xếp: một tệp Excel (danh sách học sinh, từng CLB, học sinh chưa có chỗ, thống kê)</span></label>
-          <p class="canh-bao-vang" id="xuatKetQuaKhoa" role="status" hidden data-i18n="xuat_khoa_dong">Chưa có kết quả xếp. Chạy xếp trước.</p>
           <label class="xuat-muc xuat-muc-phu"><input type="checkbox" id="xuatKemCsv"> <span data-i18n="xuat_opt_kem_csv">Kèm các tệp CSV rời (dùng khi cần nạp sang phần mềm khác)</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatDauVao"> <span data-i18n="xuat_opt_dau_vao">Dữ liệu đầu vào hiện tại: một Sổ nhập CLB nạp lại được</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatThayDoi"> <span data-i18n="xuat_opt_thay_doi">Thay đổi so với lần chạy trước</span> <span class="xuat-dem" id="xuatThayDoiDem"></span></label>
@@ -329,13 +331,14 @@
             <button class="btn btn-ghost" id="btnChonHocSinh" type="button" data-i18n="btn_chon_hoc_sinh">Chọn học sinh…</button>
           </div>
         </div>
+          <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu trong bảng bên dưới.</p>
+        </details>
         <div class="search-row">
-          <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất các mục đã chọn</button>
+          <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất kết quả (Excel)</button>
           <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
         </div>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
-        <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu trong bảng bên dưới.</p>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm. Không gửi các tệp này cho giáo viên chấm điểm.</p>
       </div>
 
@@ -762,12 +765,6 @@
           </table>
         </div>
         <p class="hint-text" data-i18n="ti_le_choi_giai_thich">Tỉ lệ chọi tính theo số học sinh, không theo số nguyện vọng, vì mỗi học sinh chỉ nhận một chỗ mỗi buổi.</p>
-      </div>
-
-      <div class="panel" id="lichTuanPanel" hidden>
-        <div class="panel-head"><h2 data-i18n="admin_lich_tuan_title">Lịch tuần</h2></div>
-        <p class="hint-text" data-i18n="admin_lich_tuan_desc">Mỗi cột là một buổi. Thanh dưới mỗi CLB là mức lấp đầy của lần sắp xếp gần nhất.</p>
-        <div class="lich-tuan" id="lichTuan"></div>
       </div>
       </div>
 

@@ -397,7 +397,7 @@ thuật toán → ghi kết quả.
 ### Bước 5 — Xuất kết quả
 
 Ở thẻ **03 · Dữ liệu khác**, mục **Xuất dữ liệu** ở đầu trang: để nguyên ô *Kết quả
-sắp xếp* đã đánh dấu và bấm **Xuất các mục đã chọn**. Phần mềm ghi vào **thư mục
+sắp xếp* đã đánh dấu và bấm **Xuất kết quả (Excel)**. Phần mềm ghi vào **thư mục
 Tải xuống** (`Downloads`) của máy — đúng chỗ trình duyệt để tệp tải về, ai cũng
 biết tìm. Đường dẫn đầy đủ của từng tệp hiện ngay dưới nút, **không tự tắt**, kèm nút
 **Mở thư mục** mở thẳng thư mục chứa tệp.
@@ -491,7 +491,7 @@ Cùng mục **Xuất dữ liệu**, đánh dấu thêm ô nào thì xuất thêm
 | Đang ở đâu | Làm gì |
 |---|---|
 | Thẻ **04**, đang mở một em | Bấm **Xuất CSV em này** (cạnh *Sửa lại từ đầu*). Em còn thay đổi chưa lưu thì phần mềm nhắc lưu trước |
-| Thẻ **03**, mục Xuất dữ liệu | Bấm **Chọn học sinh…** → phần mềm đưa xuống bảng *Danh sách xếp CLB* → đánh dấu các em → quay lên, ô **Hồ sơ học sinh đã chọn** đã tự bật → **Xuất các mục đã chọn** (cùng lúc với các mục khác) |
+| Thẻ **03**, mục Xuất dữ liệu | Bấm **Chọn học sinh…** → phần mềm đưa xuống bảng *Danh sách xếp CLB* → đánh dấu các em → quay lên, ô **Hồ sơ học sinh đã chọn** đã tự bật → **Xuất kết quả (Excel)** (cùng lúc với các mục khác) |
 | Thẻ **05**, danh sách học sinh | Đánh dấu (dòng tiêu đề chọn cả trang; số em đang đánh dấu hiện bên cạnh) → **Xuất CSV học sinh đã đánh dấu** |
 
 Mỗi dòng trong tệp là một CLB em có dính tới: đã đăng ký thi chưa, điểm, nguyện vọng

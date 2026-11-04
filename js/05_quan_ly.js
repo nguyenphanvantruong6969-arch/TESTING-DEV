@@ -104,55 +104,9 @@ function loadTaiTheoBuoi() {
         `<td class="num">${esc(r.so_clb)}</td>` +
         `<td class="num">${esc(r.tong_cho)}</td>` +
         `<td class="num">${esc(r.so_hoc_sinh)}</td>` +
-        `<td class="num">${r.ti_le_choi === null ? "—" : esc(r.ti_le_choi) + "×"}</td>` +
+        `<td class="num">${r.ti_le_choi === null ? "—" : esc(String(r.ti_le_choi).replace(".", ","))}</td>` +
         `<td>${muc ? `<span class="chip-tai ${muc.lop}">${esc(muc.nhan)}</span>` : ""}</td>`;
       body.appendChild(tr);
-    });
-  });
-}
-
-function loadLichTuan() {
-  const panel = el("lichTuanPanel");
-  if (!panel) return;
-  Promise.all([
-    callApiDocChung("get_tai_theo_buoi"),
-    callApiDocChung("get_club_fill_stats"),
-  ]).then(([tai, fill]) => {
-    const box = el("lichTuan");
-    clear(box);
-    if (!tai.ok || tai.data.length < 2 || !fill.ok) {
-      panel.hidden = true;
-      return;
-    }
-    panel.hidden = false;
-
-    const theoBuoi = {};
-    fill.data.forEach((c) => {
-      (theoBuoi[c.buoi] = theoBuoi[c.buoi] || []).push(c);
-    });
-
-    tai.data.forEach((b) => {
-      const muc = mucTai(b.ti_le_choi);
-      const cot = document.createElement("div");
-      cot.className = "lich-cot";
-      cot.innerHTML =
-        `<div class="lich-dau ${muc && muc.lop === "is-qua-tai" ? "is-qua-tai" : ""}">` +
-        `<span class="lich-buoi">${esc(nhanBuoi(b.buoi))}</span>` +
-        `<span class="lich-phu">${esc(b.tong_cho)} · ${b.ti_le_choi === null ? "—" : esc(b.ti_le_choi) + "×"}</span>` +
-        `</div>`;
-      (theoBuoi[b.buoi] || []).forEach((c) => {
-        const phanTram = c.capacity > 0
-          ? Math.min(100, (c.matched / c.capacity) * 100)
-          : 0;
-        const o = document.createElement("div");
-        o.className = "lich-o";
-        o.innerHTML =
-          `<span class="lich-ten">${esc(c.name || c.club_id)}</span>` +
-          `<span class="lich-thanh"><span style="width:${phanTram}%"></span></span>`;
-        o.title = `${c.matched}/${c.capacity}`;
-        cot.appendChild(o);
-      });
-      box.appendChild(cot);
     });
   });
 }
@@ -411,7 +365,6 @@ function loadAdminTab(giuTrang) {
   loadReserveGroupOptions();
   loadBuoiOptions();
   loadTaiTheoBuoi();
-  loadLichTuan();
   if (!giuTrang) adminStudentPage = 1;
   callApi("get_last_run_info").then((res) => {
     adminCoKetQua = !!(res.ok && res.data);
@@ -484,7 +437,6 @@ function loadAdminClubs() {
 function lamMoiSauDoiClb() {
   loadBuoiOptions();
   loadTaiTheoBuoi();
-  loadLichTuan();
 }
 
 function loadReserveGroupOptions() {

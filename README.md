@@ -498,7 +498,7 @@ vẫn chạy đủ.
 
 ## Xuất kết quả cho nhà trường
 
-Nút **Xuất các mục đã chọn** (thẻ *03 Dữ liệu khác*, ô *Kết quả sắp xếp*) gọi
+Nút **Xuất kết quả (Excel)** (thẻ *03 Dữ liệu khác*, ô *Kết quả sắp xếp*) gọi
 `export_ket_qua` và ghi **một tệp Excel** `ket_qua_phan_bo.xlsx` vào thư mục
 Tải xuống. Sáu trang, theo thứ tự người đọc cần:
 

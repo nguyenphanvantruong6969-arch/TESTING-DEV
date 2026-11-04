@@ -91,7 +91,7 @@ MA_MOI_SAU_ANH_CHUP = {
 
 # Thay đổi CÓ CHỦ Ý sau ảnh chụp (T1/T2, Truong duyệt): đánh số lại thẻ (bảy thành sáu) làm đổi số thẻ
 # trong hai chuỗi, và năm khoá giao diện mồ côi của thẻ Kết quả cũ bị bỏ. Mọi chuỗi khác vẫn giống hệt.
-KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
+KHOA_UI_DA_BO = {"admin_lich_tuan_title", "admin_lich_tuan_desc", "results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
                  # T3-L1 (Truong duyệt 04/11/2026): bỏ dòng phụ tên thuật toán, ô "đã nộp nguyện vọng",
                  # và hai dòng chữ đơn về số khởi tạo (gộp vào một dòng `stb_locked_label`).
                  "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw",

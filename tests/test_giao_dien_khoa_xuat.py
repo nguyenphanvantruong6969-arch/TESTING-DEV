@@ -64,6 +64,7 @@ def mo(tmp_path, api):
 
 def _sang_ket_qua(page):
     page.locator('[data-tab="others"]').click()
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
     page.wait_for_selector("#xuatPanel")
     page.wait_for_timeout(300)
 

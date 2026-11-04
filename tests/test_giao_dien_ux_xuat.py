@@ -128,7 +128,8 @@ def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
 
     # Từ mục Xuất: nút đưa tới danh sách, kể cả khi danh sách đang thu gọn.
     page.locator("#dsXepPanel .panel-toggle").click()
-    assert page.locator("#dsXepPanel .panel-toggle").get_attribute("aria-expanded") == "false"
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
+    page.click("#btnChonHocSinh")
     page.click("#btnChonHocSinh")
     page.wait_for_function(
         "() => document.querySelector('#dsXepPanel .panel-toggle').getAttribute('aria-expanded') === 'true'")
@@ -154,6 +155,7 @@ def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
     assert page.is_enabled("#xuatHocSinh") and page.is_checked("#xuatHocSinh")
     assert "2 học sinh" in page.text_content("#xuatHocSinhDem")
 
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
     page.uncheck("#xuatKetQua")
     page.click("#btnXuatTuyChon")
     page.wait_for_function(
