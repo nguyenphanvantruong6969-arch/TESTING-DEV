@@ -37,10 +37,16 @@ def trang(api):
     loi = []
     page.on("pageerror", lambda e: loi.append(str(e)))
     page.goto(url)
-    page.wait_for_selector("#btnMotionToggle")
+    page.wait_for_selector("#btnMotionToggle", state="attached")
     yield page, loi
     br.close()
     pw.stop()
+
+
+def _bam_nut(page):
+    """T3-12: nút nằm trong menu ⋯ cạnh nút EN; mở menu rồi bấm."""
+    page.click("#menuThanhBen > summary")
+    page.click("#btnMotionToggle")
 
 
 def _khung_khi_re_chuot(page):
@@ -57,7 +63,7 @@ def test_mac_dinh_bat_hieu_ung(trang):
     page, loi = trang
     nut = page.locator("#btnMotionToggle")
     assert nut.get_attribute("aria-pressed") == "true"
-    assert nut.inner_text() == "Hiệu ứng: bật"
+    assert nut.text_content() == "Hoạt ảnh: bật"
     s = _khung_khi_re_chuot(page)
     assert s["transform"] != "none"
     assert s["shadow"] != "none"
@@ -66,21 +72,21 @@ def test_mac_dinh_bat_hieu_ung(trang):
 
 def test_tat_hieu_ung_va_nho_sau_khi_tai_lai(trang):
     page, loi = trang
-    page.click("#btnMotionToggle")
+    _bam_nut(page)
     nut = page.locator("#btnMotionToggle")
     assert nut.get_attribute("aria-pressed") == "false"
-    assert nut.inner_text() == "Hiệu ứng: tắt"
+    assert nut.text_content() == "Hoạt ảnh: tắt"
     s = _khung_khi_re_chuot(page)
     assert s["transform"] == "none"
     assert s["shadow"] == "none"
     assert s["transition"] == "0s"
 
     page.reload()
-    page.wait_for_selector("#btnMotionToggle")
+    page.wait_for_selector("#btnMotionToggle", state="attached")
     assert page.locator("html.tat-hieu-ung").count() == 1
     assert page.locator("#btnMotionToggle").get_attribute("aria-pressed") == "false"
 
-    page.click("#btnMotionToggle")
+    _bam_nut(page)
     assert page.locator("html.tat-hieu-ung").count() == 0
     assert loi == []
 
@@ -88,9 +94,9 @@ def test_tat_hieu_ung_va_nho_sau_khi_tai_lai(trang):
 def test_nhan_nut_doi_theo_ngon_ngu(trang):
     page, loi = trang
     page.click("#btnLangToggle")
-    assert page.locator("#btnMotionToggle").inner_text() == "Animations: on"
-    page.click("#btnMotionToggle")
-    assert page.locator("#btnMotionToggle").inner_text() == "Animations: off"
+    assert page.locator("#btnMotionToggle").text_content() == "Animations: on"
+    _bam_nut(page)
+    assert page.locator("#btnMotionToggle").text_content() == "Animations: off"
     page.click("#btnLangToggle")
-    assert page.locator("#btnMotionToggle").inner_text() == "Hiệu ứng: tắt"
+    assert page.locator("#btnMotionToggle").text_content() == "Hoạt ảnh: tắt"
     assert loi == []

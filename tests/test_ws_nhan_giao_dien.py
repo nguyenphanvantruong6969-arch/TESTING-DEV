@@ -76,7 +76,7 @@ def test_cong_ty_thay_tu_cua_minh_tren_man_hinh(mo_trang):
     assert _chu_the(page, "#statClubs + .strip-label") == "dự án"
     assert _chu_the(page, '[data-tab="scoring"]').endswith("Nhập điểm")
     mo_ta = _chu_the(page, "#view-pipeline .view-desc")
-    assert mo_ta == "Kiểm tra dữ liệu, bốc thăm, xếp nhân viên vào dự án và xuất kết quả."
+    assert mo_ta == "Nhập sổ nhập, bấm Chạy để xếp nhân viên vào dự án, rồi tải kết quả."
     assert "học sinh" not in page.locator("#view-pipeline").inner_text()
     assert not loi, loi
 
@@ -88,7 +88,7 @@ def test_cong_ty_sang_tieng_anh(mo_trang):
     _cho_chu(page, "#statStudents + .strip-label", "employees")
     assert _chu_the(page, "#statClubs + .strip-label") == "projects"
     mo_ta = _chu_the(page, "#view-pipeline .view-desc")
-    assert mo_ta == "Check the data, draw lottery numbers, place employees in projects, and export the results."
+    assert mo_ta == "Import the intake workbook, press Run to place employees in projects, then download the results."
     assert not loi, loi
 
 
@@ -106,9 +106,9 @@ def test_en_trong_roi_ve_vi_tren_man_hinh(mo_trang):
 
 def test_tieu_de_cua_so_la_ten_cho_xep_va_ten_workspace(mo_trang):
     page, api, loi = mo_trang()
-    page.wait_for_function("document.title === 'Dự án — Công ty ABC'", timeout=10000)
+    page.wait_for_function("document.title === 'Dự án · Công ty ABC'", timeout=10000)
     page.evaluate("window.I18N.setLang('en')")
-    page.wait_for_function("document.title === 'Project — Công ty ABC'", timeout=10000)
+    page.wait_for_function("document.title === 'Project · Công ty ABC'", timeout=10000)
     assert not loi, loi
 
 
@@ -125,16 +125,16 @@ def test_tieu_de_cua_so_goi_ve_backend(mo_trang):
     cua_so = CuaSo()
     api._set_window(cua_so)
     page.evaluate("window.I18N.setLang('en')")
-    page.wait_for_function("document.title === 'Project — Công ty ABC'", timeout=10000)
+    page.wait_for_function("document.title === 'Project · Công ty ABC'", timeout=10000)
     page.wait_for_timeout(300)
-    assert cua_so.tieu_de and cua_so.tieu_de[-1] == "Project — Công ty ABC"
+    assert cua_so.tieu_de and cua_so.tieu_de[-1] == "Project · Công ty ABC"
 
 
 def test_truong_hoc_mac_dinh_giu_nguyen_chu_va_tieu_de(mo_trang):
     page, api, loi = mo_trang(workspaces=(("Trường học", {}),))
     _cho_chu(page, "#statStudents + .strip-label", "học sinh")
     assert _chu_the(page, "#statClubs + .strip-label") == "CLB"
-    page.wait_for_function("document.title === 'Câu lạc bộ — Trường học'", timeout=10000)
+    page.wait_for_function("document.title === 'Câu lạc bộ · Trường học'", timeout=10000)
     assert not loi, loi
 
 
@@ -143,7 +143,7 @@ def test_chay_voi_duong_dan_csdl_rieng_giu_tieu_de_cu(mo_trang):
     # Nhãn của CSDL đó vẫn được áp (lấy từ get_workspace_state)…
     _cho_chu(page, "#statStudents + .strip-label", "nhân viên")
     # …nhưng tiêu đề trang không bị đụng tới: "keep today's behaviour exactly".
-    assert page.title() == "Sắp xếp Dự án · RB-DA"
+    assert page.title() == "Sắp xếp Dự án"
     assert not loi, loi
 
 
@@ -154,7 +154,7 @@ def test_doi_workspace_doi_chu(mo_trang):
     page.locator("#btnWorkspace").click()
     page.locator('button[data-slug="cong-ty-abc"][data-hanh-dong="mo"]').click()
     _cho_chu(page, "#statStudents + .strip-label", "nhân viên")
-    assert page.title() == "Dự án — Công ty ABC"
+    assert page.title() == "Dự án · Công ty ABC"
     page.locator("#btnWorkspace").click()
     page.locator('button[data-slug="truong-hoc"][data-hanh-dong="mo"]').click()
     _cho_chu(page, "#statStudents + .strip-label", "học sinh")

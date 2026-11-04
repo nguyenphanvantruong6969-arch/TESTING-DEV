@@ -408,8 +408,14 @@ def test_8_so_rong_ok_kem_canh_bao_va_chay_xep_khong_sap(api, clubs, hs, canh_ba
     nap = api.import_so_nhap(x)
     assert nap["ok"], nap["errors"]
     assert {e["code"] for e in nap["data"]["warnings"]} >= canh_bao_mong_doi
+    # T3-L0 (B2): sổ rỗng nạp được (kèm cảnh báo) nhưng CHẠY XẾP bị từ chối có chủ ý: không sập,
+    # không ghi run_history, không khoá bộ số bốc thăm.
     chay = api.run_pipeline(seed=1)
-    assert chay["ok"], chay["errors"]
+    assert chay["ok"] is False
+    assert [e["code"] for e in chay["errors"]] == ["chua_co_du_lieu_de_chay"]
+    with api._ket_noi_doc() as cur:
+        assert cur.execute("SELECT COUNT(*) FROM run_history").fetchone()[0] == 0
+        assert cur.execute("SELECT COALESCE(SUM(is_locked), 0) FROM stb_lock").fetchone()[0] == 0
 
 
 def test_8_so_day_du_khong_co_canh_bao_rong(api):

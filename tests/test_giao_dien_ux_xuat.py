@@ -105,6 +105,7 @@ def test_1_xuat_em_dang_mo_o_the_03_va_5_mo_thu_muc(trang):
     page, api, loi, mo = trang
     mo_the(page, "fallback")
     mo_hs_the_03(page, "HS03")
+    page.click("#menuHocSinh > summary")
     page.click("#btnXuatEmNay")
     page.wait_for_function(
         "() => document.getElementById('fallbackXuatFeedback').textContent.includes('Hồ sơ 1 học sinh')")
@@ -127,7 +128,8 @@ def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
 
     # Từ mục Xuất: nút đưa tới danh sách, kể cả khi danh sách đang thu gọn.
     page.locator("#dsXepPanel .panel-toggle").click()
-    assert page.locator("#dsXepPanel .panel-toggle").get_attribute("aria-expanded") == "false"
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
+    page.click("#btnChonHocSinh")
     page.click("#btnChonHocSinh")
     page.wait_for_function(
         "() => document.querySelector('#dsXepPanel .panel-toggle').getAttribute('aria-expanded') === 'true'")
@@ -153,6 +155,7 @@ def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
     assert page.is_enabled("#xuatHocSinh") and page.is_checked("#xuatHocSinh")
     assert "2 học sinh" in page.text_content("#xuatHocSinhDem")
 
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
     page.uncheck("#xuatKetQua")
     page.click("#btnXuatTuyChon")
     page.wait_for_function(
@@ -242,6 +245,7 @@ def test_7_thay_doi_chua_luu_khong_bi_mat_im_lang(trang):
     mo_the(page, "fallback")
     mo_hs_the_03(page, "HS03")
     page.locator('#testSelectionGrid .option-row[data-club-id="clb_a"]').click()
+    page.click("#menuHocSinh > summary")
     page.click("#btnXuatEmNay")
     toast_co(page, "Bấm Lưu trước")
     assert not os.path.exists(os.path.join(tai_ve(), "hoc_sinh_HS03.csv"))

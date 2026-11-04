@@ -1,4 +1,4 @@
-/* js/03_ket_qua.js — Thẻ 03 — Dữ liệu khác (phần còn lại của thẻ Kết quả cũ): các bảng, thu gọn mục,
+/* js/03_ket_qua.js — Thẻ 03 — Chi tiết và xuất tệp (phần còn lại của thẻ Kết quả cũ): các bảng, thu gọn mục,
    xuất tệp. Thẻ 02 "Kết quả" (chỉ xem) nằm ở js/09_the_xem.js.
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
@@ -22,7 +22,6 @@ function loadResultsTab() {
   loadPhanBoNguyenVong();
   loadEmChuaCoCho();
   loadSuatDuTru();
-  veDiemChuanKetQua();       // A13.4: mục đóng sẵn, hiện khi bật điểm quyết tâm và đã có kết quả
   /* Tieu de danh sach thanh vien la chu DONG (co ten cau lac bo), nen
      applyStaticText() khong dich duoc. Mo lai dung cai dang mo — giong
      het cach `openScoringClub` duoc goi lai o the 05. */
@@ -47,7 +46,7 @@ function loadResultsTab() {
       LỖI 3 ở đầu tests/test_giao_dien_chon_buoi.py. Đổi ngôn ngữ thì vẽ
       lại trong reapplyDynamicTextForLangChange(). */
 
-const MUC_KET_QUA = ["fillPanel", "clbPanel", "duTruPanel", "doPhuPanel",
+const MUC_KET_QUA = ["clbPanel", "duTruPanel", "doPhuPanel",
                      "nvPanel", "chuaCoChoPanel", "thamPanel",
                      "dsXepPanel"];
 
@@ -254,11 +253,9 @@ function loadTomTatKetQua() {
   if (!dai) return;
   Promise.all([
     callApi("get_em_chua_co_cho"),
-    callApi("get_phan_bo_nguyen_vong"),
     callApi("get_club_fill_stats"),
-    callApi("get_suat_du_tru"),
     callApi("get_last_run_info"),
-  ]).then(([cho, nv, lap, duTru, lanChay]) => {
+  ]).then(([cho, lap, lanChay]) => {
     const luoi = el("tomTatLuoi");
     clear(luoi);
     const tong = cho.ok ? cho.data.tong_hoc_sinh : 0;
@@ -276,17 +273,13 @@ function loadTomTatKetQua() {
       phu: t("kpi_da_xep_phu", { p: phanTramTron(daXep, tong) }),
     });
 
-    if (nv.ok && nv.data.tong_da_xep) {
-      const d = nv.data;
-      const dem = (h) => (d.phan_bo.find((x) => x.hang === h && !x.gop) || {}).so_em || 0;
-      const top3 = dem(1) + dem(2) + dem(3);
-      o.push({
-        muc: "nvPanel",
-        nhan: t("kpi_nv1"),
-        so: phanTramTron(dem(1), d.tong_da_xep) + "%",
-        phu: t("kpi_nv1_phu", { p: phanTramTron(top3, d.tong_da_xep) }),
-      });
-    }
+    o.push({
+      muc: "chuaCoChoPanel",
+      nhan: t("kpi_chua_co_cho"),
+      so: String(trangTay),
+      trangThai: trangTay > 0 ? "is-nguy" : "is-on",
+      phu: trangTay > 0 ? t("kpi_can_xu_ly") : t("kpi_on"),
+    });
 
     if (lap.ok && lap.data.length) {
       let tongCho = 0;
@@ -296,31 +289,11 @@ function loadTomTatKetQua() {
         trong += Math.max(0, (c.capacity || 0) - (c.matched || 0));
       });
       o.push({
-        muc: "fillPanel",
+        muc: "clbPanel",
         nhan: t("kpi_cho_trong"),
         so: String(trong),
         phu: t("kpi_cho_trong_phu", { n: tongCho }),
         sapXep: "vang_nhat",
-      });
-    }
-
-    o.push({
-      muc: "chuaCoChoPanel",
-      nhan: t("kpi_chua_co_cho"),
-      so: String(trangTay),
-      trangThai: trangTay > 0 ? "is-nguy" : "is-on",
-      phu: trangTay > 0 ? t("kpi_can_xu_ly") : t("kpi_on"),
-    });
-
-    if (duTru.ok && duTru.data.length) {
-      const thua = duTru.data.reduce((s, c) => s + (c.con_thua || 0), 0);
-      const tongDt = duTru.data.reduce((s, c) => s + (c.reserve_capacity || 0), 0);
-      o.push({
-        muc: "duTruPanel",
-        nhan: t("kpi_du_tru_thua"),
-        so: `${thua}/${tongDt}`,
-        trangThai: thua > 0 ? "is-canh" : "is-on",
-        phu: thua > 0 ? t("kpi_du_tru_thua_phu") : t("kpi_on"),
       });
     }
 
@@ -347,7 +320,7 @@ function loadTomTatKetQua() {
     const dong = el("tomTatLanChay");
     const r = lanChay.ok && lanChay.data;
     dong.textContent = r
-      ? t("tom_tat_lan_chay", { luc: r.run_at || "—", seed: r.seed ?? "—" })
+      ? t("tom_tat_lan_chay", { luc: r.run_at ? dinhDangGio(r.run_at) : "—" })
       : "";
   });
 }
@@ -374,25 +347,13 @@ function datCachSapXep(v) {
   } catch (e) { /* không ghi được thì thôi */ }
   const chon = el("fillSapXep");
   if (chon) chon.value = v;
-  veBieuDoLapDay();
+  veBangNhuCauCLB(duLieuLapDay);
 }
 
 function loadClubFillStats() {
   callApiDocChung("get_club_fill_stats").then((res) => {
-    if (!res.ok || !res.data.length) {
-      duLieuLapDay = [];
-      const box = el("clubFillList");
-      clear(box);
-      box.innerHTML = '<div class="empty-state"></div>';
-      box.firstChild.textContent = t("admin_club_empty");
-      veDemMuc("fillPanel", null, null);
-      veBangNhuCauCLB([]);
-      return;
-    }
-    duLieuLapDay = res.data;
-    veBieuDoLapDay();
-    veDemMuc("fillPanel", "dem_cau_lac_bo", res.data.length);
-    veBangNhuCauCLB(res.data);
+    duLieuLapDay = res.ok ? res.data : [];
+    veBangNhuCauCLB(duLieuLapDay);
   });
 }
 
@@ -420,71 +381,16 @@ function nhanCanDeY(c) {
   return null;
 }
 
-function veBieuDoLapDay() {
-  const box = el("clubFillList");
-  if (!box) return;
-  clear(box);
-  const ds = duLieuLapDay.slice();
-  if (!ds.length) return;
-
-  const cach = docCachSapXep();
-  const chon = el("fillSapXep");
-  if (chon) chon.value = cach;
-  const nhieuBuoi = new Set(ds.map((c) => c.buoi)).size > 1;
-
-  /* sort ổn định: hòa thì giữ thứ tự (buổi, mã) mà phần mềm trả về. */
-  if (cach === "day_nhat") ds.sort((a, b) => tiLeLap(b) - tiLeLap(a));
-  else if (cach === "vang_nhat") ds.sort((a, b) => tiLeLap(a) - tiLeLap(b));
-  else if (cach === "choi_cao") {
-    ds.sort((a, b) => (b.ti_le_choi ?? -1) - (a.ti_le_choi ?? -1));
-  }
-
-  const theoNhom = cach === "buoi" && nhieuBuoi;
-  let buoiTruoc = null;
-  ds.forEach((c) => {
-    if (theoNhom && c.buoi !== buoiTruoc) {
-      buoiTruoc = c.buoi;
-      const cung = ds.filter((x) => x.buoi === c.buoi);
-      const xep = cung.reduce((s, x) => s + (x.matched || 0), 0);
-      const cho = cung.reduce((s, x) => s + (x.capacity || 0), 0);
-      const dau = document.createElement("div");
-      dau.className = "fill-nhom";
-      dau.innerHTML =
-        `<span class="fill-nhom-ten">${esc(nhanBuoi(c.buoi))}</span>` +
-        `<span class="fill-nhom-so">${esc(t("fill_nhom_tong",
-          { xep: xep, cho: cho, p: phanTramTron(xep, cho) }))}</span>`;
-      box.appendChild(dau);
-    }
-    box.appendChild(veDongLapDay(c, nhieuBuoi && !theoNhom, nhieuBuoi));
-  });
-}
-
-function veDongLapDay(c, hienChipBuoi, nhieuBuoi) {
-  /* Hai đoạn LIỀN NHAU trong một máng flex, không chồng lên nhau: vàng
-     = số em VÀO BẰNG SUẤT DỰ TRỮ, xanh = số em vào chỉ tiêu chung. Cộng
-     lại đúng bằng tỉ lệ lấp đầy in bên phải, và khớp với cột "Diện
-     trúng tuyển" trong tệp xuất ra. (Đoạn vàng vẽ theo SỐ EM ĐÃ VÀO,
-     không phải chỉ tiêu dự trữ của CLB — xem tests/test_giao_dien_bieu_do.py.)
-
-     Khe 2px giữa hai đoạn là bóng đổ lõm màu nền, KHÔNG phải margin:
-     margin làm tổng bề rộng lệch khỏi tỉ lệ thật. */
+/* Ô thanh lấp đầy trong bảng "Theo từng CLB". Hai đoạn LIỀN NHAU trong
+   một máng flex: vàng = số em VÀO BẰNG SUẤT DỰ TRỮ, xanh = số em vào chỉ
+   tiêu chung; cộng lại đúng bằng tỉ lệ lấp đầy in bên cạnh. Bề rộng tính
+   từ SỐ GỐC, không làm tròn từng đoạn rồi cộng (tổng có thể vượt 100%). */
+function veOThanhLapDay(c) {
   const suc = c.capacity > 0 ? c.capacity : 0;
   const duTru = Math.min(c.matched_reserve || 0, c.matched);
   const chung = Math.max(0, c.matched - duTru);
-  /* Tính bề rộng từ SỐ GỐC. Làm tròn từng đoạn rồi cộng lại thì tổng có
-     thể vượt 100%. */
   const phanTram = (n) => (suc > 0 ? Math.min(100, (n / suc) * 100) : 0);
-  const ten = c.name || c.club_id;
-  const nhan = nhanCanDeY(c);
-  const coChoi = c.ti_le_choi !== null && c.ti_le_choi !== undefined;
-
-  const row = document.createElement("div");
-  row.className = "fill-row" + (nhan ? " " + nhan.lop : "");
-  row.tabIndex = 0;
-  row.dataset.clb = c.club_id;
-  row.innerHTML =
-    `<span class="fill-name" title="${esc(ten)}">${esc(ten)}</span>` +
-    `<span class="fill-track">` +
+  return `<span class="fill-track">` +
     (duTru > 0
       ? `<span class="fill-bar is-reserve" style="width:${phanTram(duTru)}%"></span>`
       : "") +
@@ -492,30 +398,7 @@ function veDongLapDay(c, hienChipBuoi, nhieuBuoi) {
       ? `<span class="fill-bar${duTru > 0 ? " is-sau" : ""}" style="width:${phanTram(chung)}%"></span>`
       : "") +
     `</span>` +
-    `<span class="fill-so"><span class="fill-count">${c.matched}/${c.capacity}</span>` +
-    `<span class="fill-pct">${esc(phanTramTron(c.matched, suc))}%</span></span>` +
-    `<span class="fill-meta">` +
-    (hienChipBuoi ? `<span class="fill-chip-buoi">${esc(nhanBuoi(c.buoi))}</span>` : "") +
-    (coChoi ? `<span class="fill-choi">${esc(t("fill_choi", { x: soThapPhan(c.ti_le_choi) }))}</span>` : "") +
-    (nhan ? `<span class="fill-tag ${nhan.lop}">${esc(nhan.chu)}</span>` : "") +
-    `</span>`;
-
-  ganTooltip(row, () => {
-    const dong = [];
-    if (nhieuBuoi) dong.push([t("th_buoi"), nhanBuoi(c.buoi)]);
-    dong.push([t("tt_da_xep"), `${c.matched}/${c.capacity} · ${phanTramTron(c.matched, suc)}%`]);
-    dong.push(["· " + t("legend_general"), String(chung)]);
-    if (c.reserve_capacity > 0 || duTru > 0) {
-      dong.push(["· " + t("legend_reserve"), `${duTru}/${c.reserve_capacity || 0}`]);
-    }
-    dong.push([t("legend_trong"), String(Math.max(0, suc - c.matched))]);
-    dong.push([t("th_so_dang_ky"), String(c.so_dang_ky ?? "—")]);
-    dong.push([t("th_dat_nv1"), String(c.so_dat_nv1 ?? "—")]);
-    dong.push([t("th_ti_le_choi"), coChoi ? soThapPhan(c.ti_le_choi) + "×" : "—"]);
-    if (nhan) dong.push([nhan.chu, "", "is-nhan " + nhan.lop]);
-    return { tieu_de: ten, dong: dong };
-  });
-  return row;
+    `<span class="fill-pct">${esc(phanTramTron(c.matched, suc))}%</span>`;
 }
 
 /* ---- Theo từng câu lạc bộ: nhu cầu + danh sách thành viên ----
@@ -532,6 +415,16 @@ function soThapPhan(x) {
 }
 
 function veBangNhuCauCLB(ds) {
+  ds = ds.slice();
+  const cach = docCachSapXep();
+  const chon = el("fillSapXep");
+  if (chon) chon.value = cach;
+  /* sort ổn định: hòa thì giữ thứ tự (buổi, mã) mà phần mềm trả về. */
+  if (cach === "day_nhat") ds.sort((a, b) => tiLeLap(b) - tiLeLap(a));
+  else if (cach === "vang_nhat") ds.sort((a, b) => tiLeLap(a) - tiLeLap(b));
+  else if (cach === "choi_cao") {
+    ds.sort((a, b) => (b.ti_le_choi ?? -1) - (a.ti_le_choi ?? -1));
+  }
   const panel = el("clbPanel");
   if (!panel) return;
   const body = el("clbBody");
@@ -554,17 +447,21 @@ function veBangNhuCauCLB(ds) {
   const nhieuBuoi = new Set(ds.map((c) => c.buoi)).size > 1;
 
   ds.forEach((c) => {
+    const nhan = nhanCanDeY(c);
     const tr = document.createElement("tr");
+    tr.dataset.clb = c.club_id;
     tr.innerHTML =
       `<td class="cot-buoi-clb">${esc(nhanBuoi(c.buoi))}</td>` +
       `<td>${esc(c.club_id)}</td>` +
-      `<td>${esc(c.name || c.club_id)}</td>` +
+      `<td class="clb-ten">${esc(c.name || c.club_id)}</td>` +
       `<td class="num">${esc(c.so_dang_ky)}</td>` +
       `<td class="num">${esc(c.so_dat_nv1)}</td>` +
-      `<td class="num">${esc(c.capacity)}</td>` +
-      `<td class="num">${esc(c.matched)}</td>` +
+      `<td class="num clb-chi-tieu">${esc(c.capacity)}</td>` +
+      `<td class="num clb-da-xep">${esc(c.matched)}</td>` +
+      `<td class="clb-lap">${veOThanhLapDay(c)}</td>` +
       `<td class="num">${esc(soThapPhan(c.ti_le_choi))}</td>` +
-      `<td></td>`;
+      `<td class="clb-luu-y">${nhan ? `<span class="fill-tag ${nhan.lop}">${esc(nhan.chu)}</span>` : ""}</td>` +
+      `<td class="clb-nut"></td>`;
     tr.querySelector(".cot-buoi-clb").hidden = !nhieuBuoi;
 
     const nut = document.createElement("button");
@@ -576,7 +473,7 @@ function veBangNhuCauCLB(ds) {
       if (clbDangMo === c.club_id) dongDanhSachCLB();
       else moDanhSachCLB(c.club_id);
     });
-    tr.lastElementChild.appendChild(nut);
+    tr.querySelector(".clb-nut").appendChild(nut);
     body.appendChild(tr);
   });
   document.querySelectorAll("#clbTable thead .cot-buoi-clb")
@@ -904,6 +801,13 @@ function loadSuatDuTru() {
     if (rong) rong.hidden = true;
     // Con so dang nhin la SUAT BI BO PHI, khong phai so cau lac bo.
     veDemMuc("duTruPanel", "dem_suat", tong_thua);
+    /* T3-24: o "Suat du tru bo phi" tu dau trang chuyen xuong day (chuyen, khong xoa). */
+    const dong = el("duTruTieuDiem");
+    if (dong) {
+      dong.textContent = t("du_tru_tieu_diem", {
+        thua: tong_thua, tong: ds.reduce((x, c) => x + (c.reserve_capacity || 0), 0),
+      });
+    }
   });
 }
 
@@ -1025,13 +929,9 @@ function initResultsHandlers() {
     el("btnChonTatCaBuoi").addEventListener("click", () => {
       buoiDangChon = new Set(dsBuoiCoThe);
       goThanhXacNhanNeuCo();
-      dongBoDaiVoiChip();
       veChonBuoi();
     });
   }
-  ["chonBuoiTu", "chonBuoiDen"].forEach((id) => {
-    if (el(id)) el(id).addEventListener("change", apDungDaiBuoi);
-  });
   if (el("thamSearch")) {
     el("thamSearch").addEventListener(
       "input",

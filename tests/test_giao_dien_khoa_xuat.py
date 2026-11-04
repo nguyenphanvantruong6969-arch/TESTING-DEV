@@ -64,6 +64,7 @@ def mo(tmp_path, api):
 
 def _sang_ket_qua(page):
     page.locator('[data-tab="others"]').click()
+    page.evaluate("document.getElementById('xuatNangCao').open = true")
     page.wait_for_selector("#xuatPanel")
     page.wait_for_timeout(300)
 
@@ -100,7 +101,7 @@ def test_chay_xep_thanh_cong_thi_mo_khoa_va_chon_san(mo):
     page.wait_for_function("() => document.getElementById('xuatKetQua').disabled")
     page.locator('[data-tab="pipeline"]').click()
     page.click("#btnRun")
-    page.wait_for_selector(".toast.is-success", timeout=20000)
+    page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
     _sang_ket_qua(page)
     page.wait_for_function("() => !document.getElementById('xuatKetQua').disabled")
     assert page.locator("#xuatKetQua").is_checked()

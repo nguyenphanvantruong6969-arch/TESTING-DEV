@@ -71,6 +71,12 @@ function el(id) {
   return document.getElementById(id);
 }
 
+/* Gio dang may "2026-11-03T03:18:45" -> "03/11/2026 03:18" (T3-08). Khong khop thi giu nguyen. */
+function dinhDangGio(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(String(s || ""));
+  return m ? m[3] + "/" + m[2] + "/" + m[1] + " " + m[4] + ":" + m[5] : String(s || "");
+}
+
 /* Mot cau loi hien cho nguoi dung tu danh sach loi cua backend. Truoc day
    cung mot bieu thuc `t(khoa, { errors: trErrs(x).join("; ") })` duoc
    viet lai o 14 cho. */
@@ -309,3 +315,16 @@ function debounce(fn, ms) {
     timer = setTimeout(() => fn(...args), ms);
   };
 }
+
+
+/* Menu "⋯" (<details class="menu-khac">): bam ra ngoai, bam mot muc hoac nhan Esc thi dong. */
+document.addEventListener("click", (ev) => {
+  document.querySelectorAll("details.menu-khac[open]").forEach((d) => {
+    const trongHop = ev.target.closest && ev.target.closest(".menu-khac-hop");
+    if (!d.contains(ev.target) || (trongHop && d.contains(trongHop) && ev.target.closest("button") && !ev.target.closest("[data-giu-menu]"))) d.open = false;
+  });
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Escape") return;
+  document.querySelectorAll("details.menu-khac[open]").forEach((d) => { d.open = false; });
+});

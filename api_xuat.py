@@ -209,7 +209,7 @@ class XuatKetQuaMixin:
         # Tep mang di hop phai tu noi duoc no con dung khong. Man hinh co dai
         # canh bao, nhung tep ra khoi phan mem thi chi con dong nay.
         if not co_ket_qua:
-            t.ghi_chu("Chưa chạy sắp xếp lần nào — các trang danh sách đang "
+            t.ghi_chu("Chưa chạy sắp xếp lần nào: các trang danh sách đang "
                       "trống. Hãy chạy sắp xếp rồi xuất lại.", CHU_CANH_BAO)
         elif ket_qua_cu:
             t.ghi_chu("CHÚ Ý: dữ liệu đã sửa sau lần chạy này, kết quả có thể "
@@ -222,8 +222,8 @@ class XuatKetQuaMixin:
 
         t.muc("SỐ LIỆU CHÍNH")
         t.dong("Số {person_l}", len(co_cho))
-        t.dong("Số em đã có {slot_l}", so_co)
-        t.dong("Số em chưa có chỗ", len(co_cho) - so_co)
+        t.dong("Số {person_l} đã có {slot_l}", so_co)
+        t.dong("Số {person_l} chưa có chỗ", len(co_cho) - so_co)
         if du["nhieu_buoi"]:
             t.dong("Số {session_l}", len(du["ds_buoi"]))
         if "clb" in bao:
@@ -236,20 +236,20 @@ class XuatKetQuaMixin:
             if dau[0] == "Nguyện vọng 1":
                 t.dong("Tỉ lệ chỗ là nguyện vọng 1 (%)", dau[2])
 
-        t.muc("CÁC TRANG TRONG TỆP NÀY — bấm tên trang để mở")
+        t.muc("CÁC TRANG TRONG TỆP NÀY: bấm tên trang để mở")
         mo_ta = {
             "Danh sách {person_l}": (
-                "Thời khoá biểu: mỗi em một dòng, mỗi {session_l} một cột."
+                "Thời khoá biểu: mỗi {person_l} một dòng, mỗi {session_l} một cột."
                 if du["nhieu_buoi"] else
-                "Mỗi em một dòng, kèm {slot_l} của em. Lọc được theo {slot_l}."),
+                "Mỗi {person_l} một dòng, kèm {slot_l} của {person_l}. Lọc được theo {slot_l}."),
             "Theo {slot_sl}": "Danh sách từng {slot_l} để phát cho giáo viên phụ "
                         "trách. In ra mỗi {slot_l} một trang.",
             "Theo {cohort_l}": "Danh sách từng {cohort_l} để gửi giáo viên chủ nhiệm. "
                                "Trang này không có {score_l} hay số bốc thăm, gửi được.",
-            "Chưa có chỗ": "Những em chưa vào {slot_l} nào — nhà trường cần xử lý tiếp.",
+            "Chưa có chỗ": "Những {person_l} chưa vào {slot_l} nào: nhà trường cần xử lý tiếp.",
             "Điểm chuẩn": "Điểm thấp nhất đã được nhận ở từng {slot_l}, tách theo cách xét "
                           "(điểm thi, điểm quyết tâm) và suất thường hay dự trữ. Chỉ dành cho nhà trường.",
-            "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu em được "
+            "Thống kê": "Số liệu để họp: {slot_l} nào đông, bao nhiêu {person_l} được "
                         "nguyện vọng 1, suất dự trữ dùng tới đâu.",
             "Dấu vết (kỹ thuật)": "Hạt giống và số bốc thăm để tính lại kết quả. "
                                   "Không cần đọc trang này để dùng kết quả.",
@@ -258,7 +258,7 @@ class XuatKetQuaMixin:
             t.lien_ket(du["ten_trang"][ten], mo_ta[ten])
 
         t.muc("LƯU Ý")
-        t.ghi_chu("Tệp có {score_l} chấm và số bốc thăm — không gửi cho giáo viên chấm {score_l}.")
+        t.ghi_chu("Tệp có {score_l} chấm và số bốc thăm: không gửi cho giáo viên chấm {score_l}.")
         t.ghi_chu("Đây là dữ liệu {person_l}. Cân nhắc trước khi gửi qua email "
                   "hay chép lên máy dùng chung.")
         t.xong(ngang=False, rong_co_dinh={1: 34, 2: 90})
@@ -267,14 +267,14 @@ class XuatKetQuaMixin:
         if du["nhieu_buoi"]:
             cot, dong = du["tkb_xlsx"]
             t.tieu_de("THỜI KHOÁ BIỂU {slot_u} CẢ TUẦN",
-                      "Mỗi em một dòng, mỗi {session_l} một cột. Bấm mũi tên ở dòng "
-                      "tiêu đề để lọc. Dòng tô đỏ: em chưa có {slot_l} nào.")
+                      "Mỗi {person_l} một dòng, mỗi {session_l} một cột. Bấm mũi tên ở dòng "
+                      "tiêu đề để lọc. Dòng tô đỏ: {person_l} chưa có {slot_l} nào.")
             i_chua = len(cot) - 1          # cot "So CLB"
         else:
             cot, dong = du["cot_tong"], du["dong_tong"]
             t.tieu_de("DANH SÁCH {person_u} VÀ {slot_u}",
-                      "Mỗi em một dòng. Bấm mũi tên ở dòng tiêu đề để lọc theo "
-                      "{slot_l}. Dòng tô đỏ: em chưa được xếp.")
+                      "Mỗi {person_l} một dòng. Bấm mũi tên ở dòng tiêu đề để lọc theo "
+                      "{slot_l}. Dòng tô đỏ: {person_l} chưa được xếp.")
             i_chua = cot.index("Mã {slot_sl}")
 
         def chua_co_cho(d):
@@ -282,13 +282,13 @@ class XuatKetQuaMixin:
 
         dau, _ = t.bang(cot, dong, to_do=chua_co_cho, khoa=True, loc=True,
                         rong="" if co_ket_qua else
-                        "(chưa có kết quả — hãy chạy sắp xếp trước)")
+                        "(chưa có kết quả, hãy chạy sắp xếp trước)")
         t.xong(lap_hang=dau)
 
     def _trang_theo_clb(self, t, du):
         t.tieu_de("DANH SÁCH TỪNG {slot_u}",
                   "Mỗi {slot_l} một khối. Khi in, mỗi {slot_l} sang một "
-                  "trang riêng — phát thẳng cho giáo viên phụ trách.")
+                  "trang riêng: phát thẳng cho giáo viên phụ trách.")
         cot = ["STT", "Mã {person_l}", "Họ tên", "{cohort}", "Nguyện vọng thứ",
                "Diện trúng tuyển", "Nhóm dự trữ"]
 
@@ -325,7 +325,7 @@ class XuatKetQuaMixin:
                  r["rank_in_student_pref"] or "",
                  self._nhan_dien(r["matched_tier"]), r["reserve_group"] or ""]
                 for i, r in enumerate(theo_clb.get(c["club_id"], []), 1)
-            ], rong="(chưa có em nào)")
+            ], rong="(chưa có {person_l} nào)")
             t.hang += 1
         t.xong(ngang=False)
 
@@ -359,12 +359,12 @@ class XuatKetQuaMixin:
         """MỘT khối lớp: dòng tên lớp + bảng. Em chưa có chỗ ở buổi nào cũng tô đỏ."""
         n_chua = sum(1 for d in dong if not any(d[2:]))
         phan = [t.n("Chưa có {cohort_l}") if lop is None else t.n("{cohort}: ") + str(lop),
-                "%d em" % len(dong)]
+                t.n("%d {person_l}" % len(dong))]
         if n_chua:
-            phan.append("%d em chưa có chỗ" % n_chua)
+            phan.append(t.n("%d {person_l} chưa có chỗ" % n_chua))
         t.khoi(" · ".join(phan), len(tl["cot"]))
         t.bang(tl["cot"], [[i] + d for i, d in enumerate(dong, 1)],
-               to_do=lambda d: not any(d[3:]), rong="(chưa có em nào)")
+               to_do=lambda d: not any(d[3:]), rong="(chưa có {person_l} nào)")
         t.hang += 1
 
     @staticmethod
@@ -380,7 +380,7 @@ class XuatKetQuaMixin:
     def _trang_theo_lop(self, t, du):
         t.tieu_de("DANH SÁCH TỪNG {cohort_u}",
                   "Mỗi {cohort_l} một khối, in mỗi {cohort_l} một trang để gửi giáo viên chủ "
-                  "nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+                  "nhiệm. Dòng tô đỏ: {person_l} chưa có {slot_l}.")
         self._dong_ket_qua_cu(t, du)
         tl = du["theo_lop"]
         for n, (lop, dong) in enumerate(tl["nhom"]):
@@ -403,7 +403,7 @@ class XuatKetQuaMixin:
             da_dung)
         t = Trang(ws, du.get("nhan"))
         t.tieu_de("DANH SÁCH {cohort_u}" + ("" if lop is None else " " + str(lop).upper()),
-                  "Gửi giáo viên chủ nhiệm. Dòng tô đỏ: em chưa có {slot_l}.")
+                  "Gửi giáo viên chủ nhiệm. Dòng tô đỏ: {person_l} chưa có {slot_l}.")
         self._dong_ket_qua_cu(t, du)
         self._khoi_theo_lop(t, tl, lop, dong)
         t.xong(ngang=len(tl["cot"]) > 7)
@@ -460,19 +460,105 @@ class XuatKetQuaMixin:
                 shutil.rmtree(thu_muc, ignore_errors=True)
             return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
+    # -----------------------------------------------------------------
+    # T3-19: "Tải bảng này (Excel)" ở thẻ 02 Kết quả. Xuất đúng bảng đang xem (một lớp, một
+    # CLB hoặc danh sách theo mã), cùng cột với màn hình. KHÔNG điểm thi, điểm quyết tâm,
+    # số bốc thăm hay diện trúng tuyển (như bản theo lớp).
+    # -----------------------------------------------------------------
+    def export_bang_dang_xem(self, kieu: str, gia_tri=None, output_path: str = ""):
+        """Xuất MỘT tệp .xlsx một trang cho bảng đang xem ở thẻ Kết quả.
+
+        `kieu`: "lop" (`gia_tri` = lớp, "" là chưa có lớp), "clb" (`gia_tri` = mã CLB) hoặc "ma"
+        (`gia_tri` = chữ đang tìm, rỗng là tất cả). Chỗ đặt theo `_duong_xuat` (không ghi đè).
+        Chưa có kết quả thì từ chối `xuat_chua_co_ket_qua`. Trả về {path, n_dong}."""
+        return self._khoa_xuat(self._export_bang_dang_xem_da_khoa, kieu, gia_tri, output_path)
+
+    def _export_bang_dang_xem_da_khoa(self, kieu, gia_tri, output_path):
+        from openpyxl import Workbook
+
+        from so_excel import Trang
+
+        path, da_tao = None, False
+        try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
+            if kieu not in ("lop", "clb", "ma"):
+                return _fail(err("error_exporting_excel", detail="kieu=%s" % kieu))
+            tieu_de_phu = "Chỉ có kết quả xếp. Dòng tô đỏ: {person_l} chưa có {slot_l}."
+            if kieu == "clb":
+                res = self.get_danh_sach_clb(str(gia_tri or ""))
+                if not res["ok"]:
+                    return res
+                d = res["data"]
+                ten = d["club_name"] or d["club_id"]
+                cot = ["Mã {person_l}", "Họ tên", "{cohort}"]
+                dong = [[m["student_id"], m["name"] or "", m["class_id"] or ""]
+                        for m in sorted(d["thanh_vien"], key=lambda m: str(m["student_id"]))]
+                tieu_de, to_do = "DANH SÁCH {slot_u} " + str(ten).upper(), None
+                ten_trang = str(ten)
+            else:
+                res = (self.get_thoi_khoa_bieu("", "" if gia_tri in (None, "") else str(gia_tri))
+                       if kieu == "lop"
+                       else self.get_thoi_khoa_bieu(str(gia_tri or "").strip()))
+                if not res["ok"]:
+                    return res
+                ds_buoi = res["data"]["ds_buoi"]
+                nhieu = len(ds_buoi) > 1
+                co_lop = kieu == "ma"
+                cot = (["Mã {person_l}", "Họ tên"] + (["{cohort}"] if co_lop else [])
+                       + (list(ds_buoi) if nhieu else ["{slot} được xếp"]))
+                dong = []
+                for em in res["data"]["hoc_sinh"]:
+                    o = []
+                    for b in ds_buoi:
+                        x = em["theo_buoi"].get(b)
+                        o.append((x.get("club_name") or x.get("club_id") or "")
+                                 if x and x.get("club_id") else "")
+                    dong.append([em["student_id"], em["name"] or ""]
+                                + ([em["class_id"] or ""] if co_lop else []) + o)
+                tl = 3 if co_lop else 2
+                to_do = lambda r: not any(r[tl:])  # noqa: E731
+                if kieu == "lop":
+                    tieu_de = ("DANH SÁCH {cohort_u} " + str(gia_tri).upper()) if gia_tri \
+                        else "DANH SÁCH {person_u} CHƯA CÓ {cohort_u}"
+                    ten_trang = str(gia_tri) if gia_tri else "Chưa có {cohort_l}"
+                else:
+                    tieu_de, ten_trang = "DANH SÁCH {person_u}", "Danh sách"
+            du = {"nhan": self._nhan_xuat()}
+            path = self._duong_xuat(output_path, self._ten_file_an_toan(
+                "bang_" + (str(gia_tri) if gia_tri else kieu), "bang") + ".xlsx", (".xlsx",))
+            wb = Workbook()
+            ws = wb.active
+            ws.title = self._ten_trang_hop_le(dien_nhan(ten_trang, du["nhan"]), set())
+            t = Trang(ws, du["nhan"])
+            t.tieu_de(tieu_de, tieu_de_phu)
+            du["ket_qua_cu"] = self._ket_qua_cu()
+            self._dong_ket_qua_cu(t, du)
+            t.bang(cot, dong, to_do=to_do, rong="(chưa có {person_l} nào)")
+            t.xong(ngang=len(cot) > 7)
+            wb.save(path)
+            da_tao = True
+            return _ok({"path": path, "n_dong": len(dong), "ket_qua_cu": du["ket_qua_cu"]})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            if path and not da_tao and os.path.exists(path):
+                os.remove(path)
+            return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
+
     def _trang_chua_co_cho(self, t, bao, co_ket_qua):
         from openpyxl.styles import Alignment
 
         so_em, cot, dong = bao.get("tt") or (0, [
             "Mã {person_l}", "Họ tên", "Số nguyện vọng đã khai",
             "Đã khai những {slot_l} (kèm tỉ lệ chọi)"], [])
-        t.tieu_de("{person_u} CHƯA CÓ {slot_u} NÀO — %d em" % so_em,
-                  "Nhà trường cần xếp tay hoặc liên hệ các em này. Cột cuối "
-                  "cho biết em đã khai những {slot_l} nào và chúng chọi đến đâu.")
+        t.tieu_de("{person_u} CHƯA CÓ {slot_u} NÀO: %d {person_l}" % so_em,
+                  "Nhà trường cần xếp tay hoặc liên hệ {person_pl} này. Cột cuối "
+                  "cho biết {person_l} đã khai những {slot_l} nào và chúng chọi đến đâu.")
         dau, cuoi = t.bang(
             cot, dong, khoa=True, loc=True,
-            rong="(không có em nào — mọi em đều có ít nhất một chỗ)"
-            if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)")
+            rong="(không có {person_l} nào, mọi {person_l} đều có ít nhất một chỗ)"
+            if co_ket_qua else "(chưa có kết quả, hãy chạy sắp xếp trước)")
         for h in range(dau + 1, cuoi + 1):
             t.ws.cell(row=h, column=len(cot)).alignment = Alignment(wrap_text=True)
         t.xong(lap_hang=dau, rong_co_dinh={len(cot): 70})
@@ -527,27 +613,27 @@ class XuatKetQuaMixin:
                            self._o_diem_chuan(r["tang1"]["thuong"], 1),
                            self._o_diem_chuan(r["tang1"]["du_tru"], 1)])
         dau, _ = t.bang(cot, dong, khoa=True, loc=True,
-                        rong="(không đọc được điểm chuẩn — xem dòng cảnh báo phía trên)" if loi_dc
-                        else ("" if co_ket_qua else "(chưa có kết quả — hãy chạy sắp xếp trước)"))
+                        rong="(không đọc được điểm chuẩn, xem dòng cảnh báo phía trên)" if loi_dc
+                        else ("" if co_ket_qua else "(chưa có kết quả, hãy chạy sắp xếp trước)"))
         t.xong(lap_hang=dau)
 
     def _trang_thong_ke(self, t, bao, du):
         t.tieu_de("THỐNG KÊ",
                   "Số liệu để họp: {slot_l} nào đông, {session_l} nào chật, bao "
-                  "nhiêu em được nguyện vọng 1, suất dự trữ dùng tới đâu.")
+                  "nhiêu {person_l} được nguyện vọng 1, suất dự trữ dùng tới đâu.")
         co_gi = False
         if "clb" in bao:
             _, cot, dong = bao["clb"]
             t.muc("TỪNG {slot_u}")
             # Cot "So em dang ky" KHONG cong don duoc — xem _bang_tong_hop.
-            t.ghi_chu('Cột "Số em đăng ký" không cộng dồn được: một em khai ba '
+            t.ghi_chu('Cột "Số {person_l} đăng ký" không cộng dồn được: một {person_l} khai ba '
                       '{slot_l} được đếm ở cả ba dòng.')
             t.bang(cot, dong)
             co_gi = True
 
         tai = self.get_tai_theo_buoi()
         if du["nhieu_buoi"] and tai.get("ok") and len(tai["data"]) > 1:
-            t.muc("TẢI TỪNG {session_u} — {session_l} nào chật, {session_l} nào rộng")
+            t.muc("TẢI TỪNG {session_u}: {session_l} nào chật, {session_l} nào rộng")
             t.bang(["{session}", "Số {slot_sl}", "Tổng chỗ", "Chỉ tiêu dự trữ",
                     "Số {person_l} khai nguyện vọng", "Tỉ lệ chọi"],
                    [[x.get("buoi"), x.get("so_clb"), x.get("tong_cho"),
@@ -558,18 +644,18 @@ class XuatKetQuaMixin:
         if dp.get("ok") and dp["data"]["tong_hoc_sinh"]:
             d = dp["data"]
             tong = d["tong_hoc_sinh"]
-            t.muc("ĐỘ PHỦ — bao nhiêu em được mấy {slot_l}")
-            t.bang(["Số {slot_l}", "Số em", "Tỉ lệ %"],
+            t.muc("ĐỘ PHỦ: bao nhiêu {person_l} được mấy {slot_l}")
+            t.bang(["Số {slot_l}", "Số {person_l}", "Tỉ lệ %"],
                    [[h["so_clb"], h["so_em"], round(100 * h["so_em"] / tong, 1)]
                     for h in d["phan_bo"]])
 
         if "nv" in bao:
             tong, cot, dong = bao["nv"]
-            t.muc("NGUYỆN VỌNG THỨ MẤY THÌ ĐƯỢC — trên %d chỗ đã xếp" % tong)
+            t.muc("NGUYỆN VỌNG THỨ MẤY THÌ ĐƯỢC: trên %d chỗ đã xếp" % tong)
             t.bang(cot, dong)
         if "dt" in bao:
             thua, cot, dong = bao["dt"]
-            t.muc("SUẤT DỰ TRỮ DÙNG TỚI ĐÂU — còn thừa %d suất" % thua)
+            t.muc("SUẤT DỰ TRỮ DÙNG TỚI ĐÂU: còn thừa %d suất" % thua)
             t.bang(cot, dong)
         if not co_gi:
             t.ghi_chu("(chưa có {slot_l} nào)")
@@ -587,7 +673,7 @@ class XuatKetQuaMixin:
         if du["tham"]:
             # Phan mem xao lai thu tu o moi buoi; bang nay la ham TAT DINH cua
             # bo so da khoa va hat giong — ai cung tinh lai duoc.
-            t.muc("SỐ BỐC THĂM TỪNG {session_u} — tính lại được từ bộ số đã khoá và hạt giống")
+            t.muc("SỐ BỐC THĂM TỪNG {session_u}: tính lại được từ bộ số đã khoá và hạt giống")
             t.bang(*du["tham"])
         t.xong()
 
@@ -628,7 +714,7 @@ class XuatKetQuaMixin:
         lap = self.get_club_fill_stats()
         if lap.get("ok"):
             ra["clb"] = (len(lap["data"]), [
-                "{session}", "Mã {slot_sl}", "Tên {slot_sl}", "Số em đăng ký",
+                "{session}", "Mã {slot_sl}", "Tên {slot_sl}", "Số {person_l} đăng ký",
                 "Đặt nguyện vọng 1", "Tỉ lệ chọi", "Đã xếp", "Sức chứa",
                 "Tỉ lệ lấp đầy" + (" %" if so else ""),
                 "Trong đó diện dự trữ", "Chỉ tiêu dự trữ"],
@@ -658,7 +744,7 @@ class XuatKetQuaMixin:
         if dt.get("ok") and dt["data"]:
             ra["dt"] = (sum(c["con_thua"] for c in dt["data"]), [
                 "{session}", "Mã {slot_sl}", "Tên {slot_sl}", "Nhãn dự trữ",
-                "Chỉ tiêu dự trữ", "Em thuộc nhóm có đăng ký",
+                "Chỉ tiêu dự trữ", "{person} thuộc nhóm có đăng ký",
                 "Đã dùng", "Còn thừa"],
                 [[c["buoi"], c["club_id"], c["name"], c["reserve_group"],
                   c["reserve_capacity"], c["nhom_dang_ky"], c["da_dung"],
@@ -732,7 +818,7 @@ class XuatKetQuaMixin:
         ra: list[list] = [[N("TỔNG HỢP KẾT QUẢ PHÂN BỔ {slot_u} (RB-DA)")]]
 
         # ---- 1. Dau vet lan chay ----
-        ra += phan("DẤU VẾT LẦN CHẠY — ba dòng đầu là thứ cần để tính lại")
+        ra += phan("DẤU VẾT LẦN CHẠY: ba dòng đầu là thứ cần để tính lại")
         ra.append(["Mục", "Giá trị"])
         ra += self._dong_dau_vet()
         ra.append(["Thời điểm xuất tệp này", _now()])
@@ -742,7 +828,7 @@ class XuatKetQuaMixin:
         if tt.get("ok") and tt["data"]["co_ket_qua"]:
             ra.append(["Kết quả còn khớp dữ liệu",
                        "CÓ" if not tt["data"]["ket_qua_cu"] else
-                       "KHÔNG — dữ liệu đã sửa sau lần chạy này, kết quả có "
+                       "KHÔNG: dữ liệu đã sửa sau lần chạy này, kết quả có "
                        "thể đã cũ. Hãy chạy lại rồi xuất lại."])
 
         # ---- 2. Do phu ----
@@ -750,13 +836,13 @@ class XuatKetQuaMixin:
         if dp.get("ok"):
             d = dp["data"]
             tong = d["tong_hoc_sinh"] or 0
-            ra += phan("ĐỘ PHỦ — bao nhiêu em được mấy {slot_l}")
-            ra.append(NL(["Số {slot_l} trong tuần", "Số em", "Tỉ lệ"]))
+            ra += phan("ĐỘ PHỦ: bao nhiêu {person_l} được mấy {slot_l}")
+            ra.append(NL(["Số {slot_l} trong tuần", "Số {person_l}", "Tỉ lệ"]))
             for h in d["phan_bo"]:
                 ra.append([h["so_clb"], h["so_em"],
                            _phan_tram_vn(h["so_em"], tong)])
             ra.append([N("Tổng số {person_l}"), tong, ""])
-            ra.append([N("Trung bình số {slot_l} mỗi em"),
+            ra.append([N("Trung bình số {slot_l} mỗi {person_l}"),
                        _so_vn(d["trung_binh_clb"]), ""])
 
         bang = self._bang_bao_cao(so=False)
@@ -768,15 +854,15 @@ class XuatKetQuaMixin:
         # choi phong len vo nghia — nen cau canh bao di ngay trong tieu de.
         if "clb" in bang:
             _, cot, dong = bang["clb"]
-            ra += phan("TỪNG {slot_u} — \"số em đăng ký\" KHÔNG cộng dồn "
-                       "được (một em khai ba {slot_l} được đếm ở cả ba dòng)")
+            ra += phan("TỪNG {slot_u}: \"số {person_l} đăng ký\" KHÔNG cộng dồn "
+                       "được (một {person_l} khai ba {slot_l} được đếm ở cả ba dòng)")
             ra.append(NL(cot))
             ra += dong
 
         # ---- 4. Tai tung buoi ----
         tai = self.get_tai_theo_buoi()
         if tai.get("ok") and len(tai["data"]) > 1:
-            ra += phan("TẢI TỪNG {session_u} — đọc để biết {session_l} nào chật, {session_l} nào rộng")
+            ra += phan("TẢI TỪNG {session_u}: đọc để biết {session_l} nào chật, {session_l} nào rộng")
             ra.append(NL(["{session}", "Số {slot_sl}", "Tổng chỗ", "Chỉ tiêu dự trữ",
                           "Số {person_l} khai nguyện vọng", "Tỉ lệ chọi"]))
             for t in tai["data"]:
@@ -795,7 +881,7 @@ class XuatKetQuaMixin:
         # phu — day la con so phan biet duoc chung.
         if "nv" in bang:
             tong, cot, dong = bang["nv"]
-            ra += phan("NGUYỆN VỌNG THỨ MẤY THÌ ĐƯỢC — trên %d chỗ đã xếp" % tong)
+            ra += phan("NGUYỆN VỌNG THỨ MẤY THÌ ĐƯỢC: trên %d chỗ đã xếp" % tong)
             ra.append(NL(cot))
             ra += dong
 
@@ -806,7 +892,7 @@ class XuatKetQuaMixin:
         # hay ha chi tieu du tru nam sau.
         if "dt" in bang:
             thua, cot, dong = bang["dt"]
-            ra += phan("SUẤT DỰ TRỮ DÙNG TỚI ĐÂU — còn thừa %d suất" % thua)
+            ra += phan("SUẤT DỰ TRỮ DÙNG TỚI ĐÂU: còn thừa %d suất" % thua)
             ra.append(NL(cot))
             ra += dong
 
@@ -817,12 +903,12 @@ class XuatKetQuaMixin:
         # phu thuoc vao em da khai may nguyen vong, vao CLB chat den dau.
         if "tt" in bang:
             so_em, cot, dong = bang["tt"]
-            ra += phan("{person_u} CHƯA CÓ {slot_u} NÀO — %d em" % so_em)
+            ra += phan("{person_u} CHƯA CÓ {slot_u} NÀO: %d {person_l}" % so_em)
             if dong:
                 ra.append(NL(cot))
                 ra += dong
             else:
-                ra.append(["(không có em nào — mọi em đều có ít nhất một chỗ)", ""])
+                ra.append(["(không có {person_l} nào, mọi {person_l} đều có ít nhất một chỗ)", ""])
 
         return ra
     def _chi_tiet_loi_xuat(self, e) -> str:
@@ -1076,7 +1162,7 @@ class XuatKetQuaMixin:
             dau = [["So sánh kết quả lúc", d["run_at_truoc"] or "",
                     "với kết quả lúc", d["run_at_moi"] or ""]]
             if ket_qua_cu:
-                dau.append(["CẢNH BÁO: dữ liệu đã sửa sau lần chạy gần nhất — "
+                dau.append(["CẢNH BÁO: dữ liệu đã sửa sau lần chạy gần nhất: "
                             "kết quả có thể đã cũ, hãy chạy lại."])
             _ghi_csv(path, [], dau + [[]] + [header] + dong)
             return _ok({"path": path, "n_thay_doi": len(dong),

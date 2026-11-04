@@ -124,6 +124,7 @@ def test_bo_tick_clb_da_cham_bao_da_xoa_diem_va_moi_the_khop(trang):
 def test_sua_lai_tu_dau_bao_so_diem_da_xoa(trang):
     page, api, loi = trang
     _mo_hoc_sinh(page, "ngo van", "HS01")
+    page.click("#menuHocSinh > summary")   # T3-34: nút nằm trong menu ⋯ (xác nhận hai bước giữ menu mở)
     nut = page.locator("#btnResetStudentEntry")
     nut.click()
     nut.click()      # xác nhận hai bước

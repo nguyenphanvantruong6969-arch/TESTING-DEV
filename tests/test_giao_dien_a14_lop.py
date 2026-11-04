@@ -210,7 +210,7 @@ def test_workspace_co_o_nhan_thu_sau_cohort(mo_trang):  # noqa: F811
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Công ty ABC")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     assert page.locator("#wzNhan_cohort_vi").input_value() == "Lớp"
     assert page.locator("#wzNhan_cohort_en").input_value() == "Class"
     page.fill("#wzNhan_cohort_vi", "Phòng ban")
@@ -224,15 +224,15 @@ TU_ANH_CAM = re.compile(r"\b(class|filter|export|sort|save|student|club|choose|a
 
 
 def test_chu_moi_vi_sach_tieng_anh_va_en_khong_dung_you():
-    """Đọc thẳng i18n.js: 26 khoá mới (thẻ Kết quả) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
+    """Đọc thẳng i18n.js: 25 khoá mới (thẻ Kết quả; T3-18 bỏ cột "Thứ tự" nên mất khoá th_stt) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
     with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
         nguon = f.read()
     mach = re.compile(r'^\s{6}((?:lop_|kiosk_lop|th_cohort|btn_xuat_theo_lop|xuat_theo_lop|'
                       r'xuat_kq_theo_lop|xuat_muc_theo_lop|aria_loc_lop|aria_sap_xep|toast_lop|'
                       r'ws_dt_cohort|th_stt|members_|theolop_|the_xem_)\w*): "(.*)",$', re.M)
     cap = mach.findall(nguon)
-    assert len(cap) == 52, len(cap)                  # 26 khoá × 2 ngôn ngữ
-    vi, en = cap[:26], cap[26:]
+    assert len(cap) == 50, len(cap)                  # 25 khoá × 2 ngôn ngữ
+    vi, en = cap[:25], cap[25:]
     assert [k for k, _ in vi] == [k for k, _ in en]
     for k, v in vi:
         assert not TU_ANH_CAM.search(re.sub(r"\{\w+\}", "", v)), (k, v)
@@ -285,9 +285,9 @@ def test_theo_clb_chon_clb_ra_bang_khong_diem(mo):
                            "&& document.getElementById('kqDem').textContent.includes('3/5')")
     assert page.locator("#kqDem").inner_text() == "Đã xếp 3/5 chỗ"
     assert [x.casefold() for x in page.locator("#kqDau th").all_inner_texts()] == [
-        "thứ tự", "mã học sinh", "họ tên", "lớp"]            # CSS viết hoa tiêu đề cột
+        "mã học sinh▲", "họ tên", "lớp"]            # T3-17/18: không cột "Thứ tự"; mũi tên ▲ = cột đang sắp
     hang = page.locator("#kqThan tr").all_inner_texts()
-    assert len(hang) == 3 and hang[0].split("\t")[:2] == ["1", "HS1"]
+    assert len(hang) == 3 and hang[0].split("\t")[0] == "HS1"
     assert not loi, loi
 
 
@@ -308,7 +308,7 @@ def test_theo_lop_mot_buoi_mot_cot_va_dong_do(mo):
     assert page.locator("#kqChonLop option").all_inner_texts() == ["10A1 (2)", "Chưa có lớp (1)"]
     page.wait_for_function("() => !document.getElementById('kqBang').hidden")
     assert [x.casefold() for x in page.locator("#kqDau th").all_inner_texts()] == [
-        "thứ tự", "mã học sinh", "họ tên", "câu lạc bộ"]
+        "mã học sinh▲", "họ tên", "câu lạc bộ"]
     assert page.locator("#kqThan tr").count() == 2
     assert page.locator("#kqDem").inner_text() == "2 học sinh · 0 chưa có chỗ"
     page.select_option("#kqChonLop", "")                       # Chưa có lớp
@@ -321,25 +321,29 @@ def test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do(mo):
     _mo_ket_qua(page, "lop")
     page.wait_for_function("() => !document.getElementById('kqBang').hidden")
     assert [x.casefold() for x in page.locator("#kqDau th").all_inner_texts()] == [
-        "thứ tự", "mã học sinh", "họ tên", "2", "3", "10"]            # theo thứ tự, không theo vần
+        "mã học sinh▲", "họ tên", "2", "3", "10"]            # theo thứ tự, không theo vần
     # Đọc từng ô bằng textContent: innerText của <tr> phụ thuộc bố cục (bảng chưa vẽ xong thì
     # không có dấu tab), từng làm test lỗi chập chờn trên CI Linux (IndexError).
     page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length === 3")
     tong = page.locator("#kqThan tr").evaluate_all(
         "rs => rs.map(r => Array.from(r.cells, c => c.textContent.trim()))")
-    assert len(tong) == 3 and all(len(r) == 6 for r in tong)
-    assert any("-" in r[3:] for r in tong)                                          # ô trống ghi -
+    assert len(tong) == 3 and all(len(r) == 5 for r in tong)
+    assert any("-" in r[2:] for r in tong)                                          # ô trống ghi -
     do = page.locator("#kqThan tr.dong-do").count()
     assert do == int(page.locator("#kqDem").inner_text().split("·")[1].strip().split()[0])
     assert not loi, loi
 
 
 def test_theo_lop_chua_co_lop_nao_hien_dong_nhac(mo):
+    """T3-16 (Truong chọn "gọn mạnh"): chưa có lớp thì nút "Theo lớp" ẩn và thẻ mở thẳng bảng có dữ liệu,
+    không còn ngõ cụt "Chưa có lớp nào". Trước đây test ép kq.tang1 = 'lop' bằng tay, nhưng người dùng
+    không tới được trạng thái đó và lần vẽ lại bất đồng bộ đặt lại 'ma' nên test chập chờn trên CI."""
     page, api, loi = mo({}, chay=True)
-    _mo_ket_qua(page, "lop")
-    page.wait_for_function("() => !document.getElementById('kqRong').hidden")
-    assert "Chưa có lớp nào" in page.locator("#kqRong").inner_text()
-    assert page.locator("#kqBang").is_hidden()
+    _mo_ket_qua(page, "ma")
+    assert page.locator('#kqTang1 [data-kq="lop"]').is_hidden()
+    page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+    assert page.locator("#kqBang tbody tr").count() > 0
+    assert "Chưa có lớp nào" not in page.locator("#view-results").inner_text()
     assert not loi, loi
 
 
@@ -429,8 +433,10 @@ def test_dong_nhac_chua_co_lop_goi_dung_ten_the_tren_thanh_ben(mo, ngon):
         page.locator("#btnLangToggle").click()
         page.wait_for_function("() => document.getElementById('btnLangToggle').textContent.trim() === 'VI'")
     page.evaluate("() => I18N.applyLabels({slot: {vi: 'Dự án', en: 'Project'}})")
-    _mo_ket_qua(page, "lop")
-    page.wait_for_function("() => !document.getElementById('kqRong').hidden")
+    _mo_ket_qua(page, "ma")
+    page.wait_for_function("() => !document.getElementById('kqBang').hidden")   # bảng "Theo mã" đã vẽ xong
+    # ép vào chế độ lớp (nút đã ẩn); lặp lại mỗi lần hỏi vì một lần vẽ "Theo mã" đến muộn có thể che dòng nhắc
+    page.wait_for_function("() => { kq.tang1 = 'lop'; veKetQua(); return !document.getElementById('kqRong').hidden; }")
     ten_the = page.locator('.nav-item[data-tab="admin"] [data-i18n="nav_admin"]').inner_text().strip()
     ten_muc = page.locator("#qlTabHs").inner_text().strip()
     chu = page.locator("#kqRong").inner_text()

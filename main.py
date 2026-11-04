@@ -22,7 +22,7 @@ from api import PipelineAPI
 from rbda_priority_pipeline import init_db
 from recovery import RecoveryAPI
 
-APP_TITLE = "Sắp xếp Câu lạc bộ — RB-DA"
+APP_TITLE = "Sắp xếp Câu lạc bộ"
 
 # QUAN TRỌNG khi đóng gói bằng PyInstaller: __file__ của main.py KHÔNG
 # trỏ tới thư mục chứa file .exe thật — nó trỏ vào thư mục tài nguyên
@@ -109,7 +109,7 @@ def _db_phuc_hoi_du_phong(db_cu: str) -> str:
 
 
 def tieu_de_cua_so(db_path: str, goc_ws) -> str:
-    """Tiêu đề cửa sổ lúc mở: "<tên danh từ chỗ xếp> — <tên workspace>".
+    """Tiêu đề cửa sổ lúc mở: "<tên danh từ chỗ xếp> · <tên workspace>".
 
     Chạy với đường dẫn CSDL riêng (không workspace) thì giữ APP_TITLE như trước.
     Giao diện đổi lại theo ngôn ngữ đang chọn và khi đổi workspace
@@ -119,7 +119,7 @@ def tieu_de_cua_so(db_path: str, goc_ws) -> str:
         return APP_TITLE
     try:
         cfg = cau_hinh_ws.doc_cau_hinh(db_path)
-        return "%s — %s" % (nhan_ws.nhan_ngon_ngu(cfg["labels"], "slot", "vi"),
+        return "%s · %s" % (nhan_ws.nhan_ngon_ngu(cfg["labels"], "slot", "vi"),
                             cfg["name"] or os.path.basename(os.path.dirname(db_path)))
     except Exception:
         return APP_TITLE
@@ -232,7 +232,7 @@ def main() -> None:
         db_phuc_hoi = getattr(e, "db_path", None) or (
             _db_phuc_hoi_du_phong(db_path) if len(sys.argv) <= 1 else db_path)
         _show_ui(
-            APP_TITLE + " — Phục hồi dữ liệu",
+            APP_TITLE + " · Phục hồi dữ liệu",
             "recovery.html",
             RecoveryAPI(db_phuc_hoi, f"{e}\n\n{traceback.format_exc()}"),
             width=900, height=700, min_size=(700, 560),

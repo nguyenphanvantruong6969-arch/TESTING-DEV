@@ -171,14 +171,14 @@ def main():
         # --- Điểm chuẩn + biểu đồ
         try:
             ql("dc")
-            page.wait_for_selector("#dcChonClb option", state="attached")
-            ds_opt = page.eval_on_selector_all("#dcChonClb option", "els => els.map(e => e.value)")
+            page.wait_for_selector("#dcQlTongQuan .dc-chi-tiet-nut", state="attached")      # T3-31: mở chi tiết bằng nút
+            ds_opt = page.eval_on_selector_all("#dcQlTongQuan .dc-chi-tiet-nut", "els => els.map(e => e.dataset.clubId)")
             kq["dc_so_clb_trong_hop_chon"] = len(ds_opt)
             idx = [0]
 
             def doi_clb():
                 idx[0] = (idx[0] + 1) % max(2, len(ds_opt))
-                page.select_option("#dcChonClb", ds_opt[idx[0]])
+                page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="%s"]' % ds_opt[idx[0]]).click()
             do["diem_chuan_chi_tiet_1_clb"] = do_ms(
                 page, doi_clb,
                 "() => !document.getElementById('dcChiTiet').hidden && "

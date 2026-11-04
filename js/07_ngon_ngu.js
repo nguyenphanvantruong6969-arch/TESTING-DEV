@@ -94,20 +94,7 @@ function reapplyDynamicTextForLangChange() {
      doi ngon ngu, dong neu dich danh buoi nao duoc giu nguyen bien mat
      hoac ket lai o tieng cu. */
   if (dsBuoiCoThe.length) {
-    /* Hai o "Tu/Den" cung phai dung lai. Nhan buoi thuong la chu THO do
-       truong dat nen khong doi theo ngon ngu — tru mot truong hop:
-       `nhanBuoi(BUOI_MAC_DINH)` tra ve `t("buoi_chua_chia")`, co dich.
-       Truong khai buoi cho mot so cau lac bo va bo trong o so khac (phan
-       mem chi CANH BAO chu khong chan) thi nhan do co mat trong bo chon,
-       va doi ngon ngu xong dai the noi "No session set" trong khi hai o
-       van noi "Chua chia buoi". Da do that: the doi, option khong.
-
-       `veChonBuoiDai()` goi `clear()` nen XOA luon gia tri dang chon —
-       phai chup truoc va tra lai sau. KHONG dung `dongBoDaiVoiChip()` o
-       day: ham do thoat som khi tap dang chon khong lien nhau, nen se bo
-       hai o lai o lua chon dau tien, tuc doi ngon ngu lai lam mat trang
-       thai nguoi dung vua dat. */
-    veLaiDaiGiuGiaTri();
+    /* T3-07: khong con hai o "Tu/Den"; chi con cac the buoi va dong nhac. */
     veChonBuoi();
   }
 
@@ -119,6 +106,7 @@ function reapplyDynamicTextForLangChange() {
 
   refreshSidebarStatus();
   if (lastRenderedSteps) renderSteps(lastRenderedSteps);
+  veRunXong();
   if (lastRenderedTopErrors) showLog(lastRenderedTopErrors);
 
   const tab = currentTabName();

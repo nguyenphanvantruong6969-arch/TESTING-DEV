@@ -30,7 +30,8 @@ def test_tao_xong_mo_loi_bam_tao_lai_khong_de_workspace_trung(mo_trang):  # noqa
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Công ty ABC")
-    for _ in range(3):
+    page.locator("#wzTuyChinh").click()                  # T3-11: mở tuỳ chỉnh để đi tới bước xem lại
+    for _ in range(2):
         page.locator("#wzTiep").click()
     page.locator("#wzTao").click()
     page.wait_for_function("() => document.querySelector('#toastStack').textContent.trim() !== ''")
@@ -50,7 +51,7 @@ def test_wizard_chan_nhan_bat_dau_bang_ky_tu_cong_thuc_o_buoc_2(mo_trang, o, chu
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "A")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.fill("#" + o, chu)
     page.locator("#wzTiep").click()
     assert page.locator("#wzLoi").is_visible()
@@ -64,7 +65,7 @@ def test_wizard_nhan_binh_thuong_van_di_tiep(mo_trang):  # noqa: F811
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "A")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.fill("#wzNhan_slot_vi", "Dự án 1-2")                 # dấu trừ ở GIỮA thì hợp lệ
     page.locator("#wzTiep").click()
     assert page.locator("#wzMaxChoices").is_visible()

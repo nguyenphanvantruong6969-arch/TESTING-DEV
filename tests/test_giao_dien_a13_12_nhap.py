@@ -119,6 +119,7 @@ def test_xoa_em_dang_mo_don_sach_trang_thai_buoc_3_va_moc(mo):  # noqa: F811
     page, api, loi = mo(du_lieu=_du_lieu_hai_em)
     _chon(page, "HS1")
     _cho_buoc_3(page)
+    page.click("#menuHocSinh > summary")   # T3-34: nút nằm trong menu ⋯ (xác nhận hai bước giữ menu mở)
     nut = page.locator("#btnDeleteStudent")
     nut.click()
     nut.click()

@@ -88,7 +88,7 @@ def test_chay_sap_xep_gap_csdl_ban_noi_dang_ban(trang):
 def test_o_canh_bao_du_lieu_va_tong_quan_noi_dang_ban(trang):
     page, api = trang
     with _khoa_csdl(api.db_path):
-        page.click("#btnHealthRecheck")
+        page.click("#btnValidate")
         page.wait_for_function(
             "document.querySelector('#healthSummary').textContent.includes('đang bận')",
             timeout=20000)

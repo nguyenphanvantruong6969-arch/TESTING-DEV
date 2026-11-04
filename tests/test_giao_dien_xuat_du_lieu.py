@@ -62,6 +62,7 @@ def trang(api_hai_lan_chay):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="others"]').click()
+        page.evaluate("document.getElementById('xuatNangCao').open = true")
         page.wait_for_selector("#resultsTableBody .chon-hs")
         yield page, api_hai_lan_chay, loi
         br.close()
@@ -227,6 +228,7 @@ def test_dai_ket_qua_cu_bat_khi_sua_tat_khi_chay_lai(trang):
     def mo_lai_ket_qua():
         page.locator('[data-tab="scoring"]').click()
         page.locator('[data-tab="others"]').click()
+        page.evaluate("document.getElementById('xuatNangCao').open = true")
         page.wait_for_timeout(500)
 
     assert page.is_hidden("#ketQuaCuBanner")

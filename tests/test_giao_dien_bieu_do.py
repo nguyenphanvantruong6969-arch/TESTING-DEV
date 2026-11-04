@@ -72,10 +72,10 @@ def bieu_do(api_da_chay):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="others"]').click()
-        page.wait_for_function("document.querySelectorAll('.fill-row').length === 3")
+        page.wait_for_function("document.querySelectorAll('#clbBody tr').length === 3")
         # Mọi mục ở thẻ Kết quả đóng sẵn — mở mục lấp đầy thì mới đo được
         # bề rộng thanh (mục đóng thì mọi thứ bên trong rộng 0 px).
-        page.click("#fillPanel .panel-toggle")
+        page.click("#clbPanel .panel-toggle")
         page.wait_for_timeout(300)
         yield _doc_cac_dong(page), loi
         br.close()
@@ -85,10 +85,10 @@ def _doc_cac_dong(page):
     """Trả về {tên CLB: {...}} với bề rộng ĐO ĐƯỢC, không phải CSS."""
     rows = page.evaluate("""() => {
       const ra = {};
-      for (const r of document.querySelectorAll('.fill-row')) {
+      for (const r of document.querySelectorAll('#clbBody tr')) {
         const track = r.querySelector('.fill-track');
-        ra[r.querySelector('.fill-name').textContent.trim()] = {
-          so: r.querySelector('.fill-count').textContent.trim(),
+        ra[r.querySelector('.clb-ten').textContent.trim()] = {
+          so: r.querySelector('.clb-da-xep').textContent.trim() + '/' + r.querySelector('.clb-chi-tieu').textContent.trim(),
           // clientWidth = HOP NOI DUNG. Cac doan an theo % cua hop noi
           // dung, con getBoundingClientRect() tra hop VIEN — lech dung
           // 2px vi mang co vien 1px moi ben. Doi chieu voi hop vien la

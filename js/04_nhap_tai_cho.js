@@ -93,6 +93,12 @@ function veOLopKiosk(lopHienTai) {
   el("kioskLopHang").hidden = !coLop;
   el("kioskLopNhac").hidden = true;
   if (coLop) napOChonLopKiosk(el("kioskLop"), lopHienTai || "");
+  /* T3-33: da co lop thi phieu chi HIEN lop (bam "Doi" moi sua); chua co lop thi hien o chon (bat buoc). */
+  const daCo = coLop && !!el("kioskLop").value;
+  el("kioskLop").hidden = daCo;
+  el("kioskLopChu").hidden = !daCo;
+  el("kioskLopChu").textContent = daCo ? el("kioskLop").value : "";
+  el("btnKioskLopSua").hidden = !daCo;
 }
 
 /* Lớp gửi kèm khi Lưu: null = ô ẩn (không có lớp nào) nên không đụng; undefined = BẮT BUỘC mà chưa chọn. */
@@ -215,6 +221,12 @@ function initFallbackHandlers() {
   el("btnFallbackNextPage").addEventListener("click", () => {
     fallbackStudentPage += 1;
     loadFallbackStudentList();
+  });
+  el("btnKioskLopSua").addEventListener("click", () => {
+    el("kioskLop").hidden = false;
+    el("kioskLopChu").hidden = true;
+    el("btnKioskLopSua").hidden = true;
+    el("kioskLop").focus();
   });
   el("kioskLop").addEventListener("change", () => {
     if (el("kioskLop").value) el("kioskLopNhac").hidden = true;
@@ -532,6 +544,9 @@ function selectFallbackStudent(studentId) {
     el("whartonFeedback").textContent = "";
     renderWhartonStep(stateRes.data);
     veDauChuaLuu();
+    /* T3-32: chon hoac tao xong thi cuon thang toi phieu, khoi tu cuon 900 px. */
+    const phieu = el("fallbackWorkArea");
+    if (phieu.scrollIntoView) phieu.scrollIntoView({ block: "start", behavior: "auto" });
   });
 }
 
@@ -745,7 +760,7 @@ function whartonVeKhung(goc, w, tuyChon) {
         o.className = "text-input text-input-sm wh-diem";
         o.dataset.quy = String(quy);
         o.dataset.clb = cid;
-        o.setAttribute("aria-label", tenClb(cid) + " — " + ten.textContent);
+        o.setAttribute("aria-label", tenClb(cid) + ": " + ten.textContent);
         o.setAttribute("aria-describedby", idKhung + "L");
         const daCo = cid in luu ? String(luu[cid]) : "";
         const khoa = !!w.tu_dien_mot_clb && motClb && (daCo === "" || daCo === String(w.ngan_sach));
@@ -837,7 +852,7 @@ function renderTestSelectionGrid(testedClubIds) {
     row.className = "option-row" + (testedClubIds.includes(c.club_id) ? " is-checked" : "");
     row.dataset.clubId = c.club_id;
     row.innerHTML = `<span class="option-hop" aria-hidden="true"></span>` +
-      `<span class="option-ten">${esc(c.name)}</span><span class="cb-club-id">${esc(c.club_id)}</span>`;
+      `<span class="option-ten">${esc(c.name)}</span><span class="cb-club-id">${esc(phuBuoiCLB(c))}</span>`;
     row.addEventListener("click", () => {
       /* Bo tick thi luon cho; chi CHAN khi dang bat them. */
       if (!row.classList.contains("is-checked")) {
@@ -866,6 +881,11 @@ function renderTestSelectionGrid(testedClubIds) {
   });
 }
 
+/* T3-35: ben phai moi CLB chi hien BUOI (khi co), khong bao gio hien ma tho kieu `clb_coking`. */
+function phuBuoiCLB(c) {
+  return c && c.buoi && c.buoi !== BUOI_MAC_DINH ? nhanBuoi(c.buoi) : "";
+}
+
 function renderRankingSourceGrid() {
   const grid = el("rankingSourceGrid");
   clear(grid);
@@ -876,7 +896,7 @@ function renderRankingSourceGrid() {
     /* Hien BUOI thay vi ma CLB khi truong dung nhieu buoi: o buoc nay
        hoc sinh dang quyet dinh "tuan minh kin chua", va buoi la thong
        tin giup quyet dinh — ma CLB thi khong. */
-    const phu = c.buoi && c.buoi !== BUOI_MAC_DINH ? nhanBuoi(c.buoi) : c.club_id;
+    const phu = phuBuoiCLB(c);
     row.innerHTML = `<span class="option-hang" aria-hidden="true"></span>` +
       `<span class="option-ten">${esc(c.name)}</span><span class="cb-club-id">${esc(phu)}</span>`;
     row.addEventListener("click", () => {
@@ -934,7 +954,7 @@ function renderRankingList() {
     label.textContent = club ? club.name : cid;
     const phu = document.createElement("span");
     phu.className = "hs-card-ma";
-    phu.textContent = club && club.buoi && club.buoi !== "__mac_dinh__" ? nhanBuoi(club.buoi) : cid;
+    phu.textContent = club ? phuBuoiCLB(club) : "";
     label.appendChild(document.createTextNode(" "));
     label.appendChild(phu);
     const removeBtn = document.createElement("button");

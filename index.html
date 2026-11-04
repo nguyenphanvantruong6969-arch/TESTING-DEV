@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n="page_title">Sắp xếp Câu lạc bộ · RB-DA</title>
+<title data-i18n="page_title">Sắp xếp Câu lạc bộ</title>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="shortcut icon" type="image/x-icon" href="logo.ico">
 <link rel="stylesheet" href="assets/fonts/fonts.css">
@@ -19,9 +19,14 @@
       <span class="brand-mark">RB</span>
       <div class="brand-text">
         <div class="brand-title" data-i18n="brand_title">Sắp xếp CLB</div>
-        <div class="brand-sub" data-i18n="brand_sub">Reserve-Based DA</div>
       </div>
       <button type="button" class="lang-toggle" id="btnLangToggle" data-i18n="lang_toggle_label">EN</button>
+      <details class="menu-khac menu-khac-nen-toi" id="menuThanhBen">
+        <summary class="lang-toggle" data-i18n-aria-label="menu_khac_aria" aria-label="Thêm tuỳ chọn">⋯</summary>
+        <div class="menu-khac-hop">
+          <button type="button" class="menu-khac-muc motion-toggle" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hoạt ảnh: bật</button>
+        </div>
+      </details>
     </div>
 
     <button type="button" class="ws-switcher" id="btnWorkspace" hidden aria-haspopup="dialog"
@@ -32,19 +37,19 @@
 
     <div class="nav-group">
       <button class="nav-item is-active" data-tab="pipeline">
-        <span class="nav-icon">01</span> <span data-i18n="nav_pipeline">Vận hành sắp xếp</span>
+        <span class="nav-icon">01</span> <span data-i18n="nav_pipeline">Xếp CLB</span>
       </button>
       <button class="nav-item" data-tab="results">
         <span class="nav-icon">02</span> <span data-i18n="nav_results">Kết quả</span>
       </button>
       <button class="nav-item" data-tab="others">
-        <span class="nav-icon">03</span> <span data-i18n="nav_others">Dữ liệu khác</span>
+        <span class="nav-icon">03</span> <span data-i18n="nav_others">Chi tiết và xuất tệp</span>
       </button>
       <button class="nav-item" data-tab="fallback">
-        <span class="nav-icon">04</span> <span data-i18n="nav_fallback">Nhập tại chỗ</span>
+        <span class="nav-icon">04</span> <span data-i18n="nav_fallback">Nhập nguyện vọng</span>
       </button>
       <button class="nav-item" data-tab="admin">
-        <span class="nav-icon">05</span> <span data-i18n="nav_admin">Quản lý CLB &amp; dự trữ</span>
+        <span class="nav-icon">05</span> <span data-i18n="nav_admin">Quản lý CLB</span>
       </button>
       <button class="nav-item" data-tab="scoring">
         <span class="nav-icon">06</span> <span data-i18n="nav_scoring">Nhập điểm</span>
@@ -52,10 +57,10 @@
     </div>
 
     <div class="sidebar-footer">
-      <button type="button" class="motion-toggle" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hiệu ứng: bật</button>
-      <div id="dbStatusLine" class="db-status" data-i18n="db_status_loading">Đang tải…</div>
-      <div id="lastRunLine" class="db-status db-status-sub"></div>
-      <div id="cheDoHienThi" class="db-status db-status-sub"></div>
+      <!-- T3-12: chỉ hiện khi mất kết nối; hai dòng dưới chỉ để ẩn (mốc đồng bộ cho chương trình và test). -->
+      <div id="dbStatusLine" class="db-status" data-i18n="db_status_loading" hidden>Đang tải…</div>
+      <div id="lastRunLine" class="db-status db-status-sub" hidden></div>
+      <div id="cheDoHienThi" class="db-status db-status-sub" hidden></div>
     </div>
   </nav>
 
@@ -67,8 +72,8 @@
     <!-- ---------- TAB 1: PIPELINE ---------- -->
     <section class="view is-active" id="view-pipeline">
       <header class="view-header">
-        <h1 data-i18n="pipeline_title">Vận hành sắp xếp</h1>
-        <p class="view-desc" data-i18n="pipeline_desc">Kiểm tra dữ liệu, bốc thăm, xếp học sinh vào CLB và xuất kết quả.</p>
+        <h1 data-i18n="pipeline_title">Xếp CLB</h1>
+        <p class="view-desc" data-i18n="pipeline_desc">Nhập sổ nhập, bấm Chạy để xếp học sinh vào CLB, rồi tải kết quả.</p>
       </header>
 
       <div class="status-strip" id="statusStrip">
@@ -76,19 +81,17 @@
         <div class="strip-div"></div>
         <div class="strip-item"><span class="strip-num" id="statClubs">—</span><span class="strip-label" data-i18n="label_clubs">CLB</span></div>
         <div class="strip-div"></div>
-        <div class="strip-item"><span class="strip-num" id="statPrefs">—</span><span class="strip-label" data-i18n="label_submitted_prefs">đã nộp nguyện vọng</span></div>
-        <div class="strip-div"></div>
         <div class="strip-item"><span class="strip-num" id="statMatched">—</span><span class="strip-label" data-i18n="label_matched">đã xếp CLB</span></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelNhap">
         <div class="panel-head">
           <h2 data-i18n="import_panel_title">Nhập dữ liệu</h2>
           <div class="panel-actions">
             <button class="btn btn-secondary" id="btnTaiSoMau" data-i18n="btn_tai_so_mau">Tải sổ nhập mẫu</button>
           </div>
         </div>
-        <p class="hint-text" data-i18n="import_hint">Toàn bộ dữ liệu nằm trong một tệp Excel duy nhất: Sổ nhập CLB. Chưa có sổ thì bấm "Tải sổ nhập mẫu", điền danh sách CLB và học sinh, lưu lại rồi kéo sổ vào ô bên dưới.</p>
+        <p class="hint-text" data-i18n="import_hint">Chưa có sổ nhập? Bấm "Tải sổ nhập mẫu", điền xong rồi kéo vào ô bên dưới.</p>
 
         <div class="drop-zone" id="dropZone" tabindex="0" role="button"
              aria-describedby="dropZoneHint">
@@ -108,11 +111,11 @@
         <div class="import-warnings" id="importWarnings" hidden></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelCanhBao">
         <div class="panel-head">
           <h2 data-i18n="health_panel_title">Cảnh báo dữ liệu</h2>
           <div class="panel-actions">
-            <button class="btn btn-ghost" id="btnHealthRecheck" data-i18n="btn_health_recheck">Kiểm tra lại</button>
+            <button class="btn btn-secondary" id="btnValidate" data-i18n="btn_validate">Kiểm tra lại dữ liệu</button>
           </div>
         </div>
         <p class="hint-text" data-i18n="health_panel_hint">Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.</p>
@@ -120,30 +123,33 @@
         <div id="healthList" class="health-list"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelBuoc">
         <div class="panel-head">
           <h2 data-i18n="steps_panel_title">Các bước xử lý</h2>
           <div class="panel-actions">
-            <label class="seed-input-wrap">
-              <span data-i18n="label_seed">Số khởi tạo bốc thăm</span>
-              <input type="number" id="seedInput" value="42" class="seed-input">
-            </label>
-            <button class="btn btn-secondary" id="btnValidate" data-i18n="btn_validate">Kiểm tra dữ liệu</button>
             <button class="btn btn-primary" id="btnRun" data-i18n="btn_run_pipeline">Chạy sắp xếp</button>
           </div>
         </div>
 
+        <div class="run-xong" id="runXong" hidden>
+          <span class="run-xong-chu" id="runXongChu"></span>
+          <button type="button" class="btn btn-secondary btn-nho" id="btnMoThuMucKq" hidden data-i18n="btn_mo_thu_muc_kq">Mở thư mục kết quả</button>
+          <button type="button" class="btn btn-ghost btn-nho" id="btnChiTietBuoc" data-i18n="btn_chi_tiet_buoc">Chi tiết</button>
+        </div>
+
         <div class="stb-lock-line" id="stbLockLine"></div>
-        <div class="seed-lock-hint" id="seedLockHint" hidden></div>
+        <details class="nang-cao" id="nangCao">
+          <summary data-i18n="nang_cao">Nâng cao</summary>
+          <label class="seed-input-wrap">
+            <span data-i18n="label_seed">Mã bốc thăm</span>
+            <input type="number" id="seedInput" value="42" class="seed-input">
+          </label>
+        </details>
 
         <div class="chon-buoi" id="chonBuoiBox" hidden>
           <div class="chon-buoi-dau">
             <span class="chon-buoi-nhan" data-i18n="chon_buoi_title">Buổi sẽ xếp</span>
             <div class="chon-buoi-dai">
-              <label for="chonBuoiTu" data-i18n="chon_buoi_tu">Từ</label>
-              <select id="chonBuoiTu" class="text-input"></select>
-              <label for="chonBuoiDen" data-i18n="chon_buoi_den">đến</label>
-              <select id="chonBuoiDen" class="text-input"></select>
               <button type="button" class="btn btn-ghost btn-nho" id="btnChonTatCaBuoi" data-i18n="chon_buoi_tat_ca">Chọn tất cả</button>
             </div>
           </div>
@@ -208,7 +214,7 @@
         <div class="log-box" id="logBox"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="historyPanel" hidden>
         <div class="panel-head">
           <h2 data-i18n="history_panel_title">Lịch sử sắp xếp</h2>
           <div class="panel-actions">
@@ -238,7 +244,7 @@
         <p class="view-desc" data-i18n="kq_desc">Xem {person_l} học {slot_sl} nào. Không có điểm hay số bốc thăm.</p>
       </header>
       <div class="canh-bao-vang canh-bao-hang" id="kqCuBanner" hidden>
-        <span data-i18n="ket_qua_cu_banner">Dữ liệu đã được sửa sau lần chạy gần nhất, nên kết quả bên dưới có thể đã cũ. Hãy chạy lại ở thẻ "Vận hành sắp xếp" trước khi xuất hoặc công bố.</span>
+        <span data-i18n="ket_qua_cu_banner">Dữ liệu đã được sửa sau lần chạy gần nhất, nên kết quả bên dưới có thể đã cũ. Hãy chạy lại ở thẻ "Xếp CLB" trước khi xuất hoặc công bố.</span>
       </div>
       <div class="panel">
         <div class="kq-chon-hang">
@@ -247,15 +253,9 @@
             <button type="button" class="kq-seg-nut" data-kq="clb" aria-pressed="false" data-i18n="kq_theo_clb">Theo {slot_sl}</button>
             <button type="button" class="kq-seg-nut" data-kq="ma" aria-pressed="false" data-i18n="kq_theo_ma">Theo mã {person_l}</button>
           </div>
+          <button type="button" class="btn btn-secondary kq-nut-tai" id="btnKqTaiBang" data-i18n="kq_tai_bang">Tải bảng này (Excel)</button>
         </div>
-        <div class="kq-chon-hang kq-chon-hang-phu">
-          <span class="kq-seg-nhan" data-i18n="kq_sap_nhan">Sắp xếp</span>
-          <div class="kq-seg kq-seg-nho" id="kqTang2" role="group" data-i18n-aria-label="kq_aria_tang2">
-            <button type="button" class="kq-seg-nut" data-sx="ngay" aria-pressed="false" data-i18n="kq_sx_ngay">Theo ngày trong tuần</button>
-            <button type="button" class="kq-seg-nut" data-sx="ma" aria-pressed="false" data-i18n="kq_sx_ma">Theo mã {person_l}</button>
-            <button type="button" class="kq-seg-nut" data-sx="lop" aria-pressed="false" id="kqSxLop" data-i18n="kq_sx_lop">Theo {cohort_l}</button>
-          </div>
-        </div>
+        <div id="kqXuatPhanHoi" class="save-feedback xuat-ket-qua" role="status"></div>
         <div class="search-row kq-chon-hang-phu" id="kqChonLopHang" hidden>
           <label class="lop-nhan" for="kqChonLop" data-i18n="kq_chon_lop">Chọn {cohort_l}</label>
           <select id="kqChonLop" class="text-input text-input-sm"></select>
@@ -282,8 +282,8 @@
     <section class="view" id="view-others">
       <header class="view-header view-header-hang">
         <div class="view-header-chu">
-          <h1 data-i18n="others_title">Dữ liệu khác</h1>
-          <p class="view-desc" data-i18n="others_desc">Học sinh đã được xếp vào CLB nào và mỗi CLB đã đủ chỗ chưa.</p>
+          <h1 data-i18n="others_title">Chi tiết và xuất tệp</h1>
+          <p class="view-desc" data-i18n="others_desc">Xuất tệp Excel và xem số liệu chi tiết của lần xếp.</p>
         </div>
         <!-- Nhãn nút này ĐỔI theo trạng thái nên là chữ ĐỘNG: js/*.js ghi,
              và reapplyDynamicTextForLangChange() vẽ lại khi đổi ngôn ngữ.
@@ -306,16 +306,18 @@
       <!-- Dai canh bao: du lieu da sua sau lan chay -> ket qua co the da cu.
            app.js bat/tat theo get_trang_thai_ket_qua. -->
       <div class="canh-bao-vang canh-bao-hang" id="ketQuaCuBanner" hidden>
-        <span data-i18n="ket_qua_cu_banner">Dữ liệu đã được sửa sau lần chạy gần nhất — kết quả bên dưới có thể đã cũ. Hãy chạy lại ở thẻ "Vận hành sắp xếp" trước khi xuất hoặc công bố.</span>
-        <button class="btn btn-secondary" id="btnDiToiChay" type="button" data-i18n="btn_di_toi_chay">Đi tới Vận hành sắp xếp</button>
+        <span data-i18n="ket_qua_cu_banner">Dữ liệu đã được sửa sau lần chạy gần nhất, nên kết quả bên dưới có thể đã cũ. Hãy chạy lại ở thẻ "Xếp CLB" trước khi xuất hoặc công bố.</span>
+        <button class="btn btn-secondary" id="btnDiToiChay" type="button" data-i18n="btn_di_toi_chay">Đi tới Xếp CLB</button>
       </div>
 
       <div class="panel" id="xuatPanel">
         <div class="panel-head"><h2 data-i18n="xuat_title">Xuất dữ liệu</h2></div>
-        <div class="xuat-tuy-chon">
+        <p class="canh-bao-vang" id="xuatKetQuaKhoa" role="status" hidden data-i18n="xuat_khoa_dong">Chưa có kết quả xếp. Chạy xếp trước.</p>
+        <details class="nang-cao" id="xuatNangCao">
+          <summary data-i18n="xuat_tuy_chon_khac">Tuỳ chọn khác</summary>
+          <div class="xuat-tuy-chon">
           <label class="xuat-muc"><input type="checkbox" id="xuatKetQua" checked> <span data-i18n="xuat_opt_ket_qua">Kết quả sắp xếp: một tệp Excel (danh sách học sinh, từng CLB, học sinh chưa có chỗ, thống kê)</span></label>
-          <p class="canh-bao-vang" id="xuatKetQuaKhoa" role="status" hidden data-i18n="xuat_khoa_dong">Chưa có kết quả xếp. Chạy xếp trước.</p>
-          <label class="xuat-muc xuat-muc-phu"><input type="checkbox" id="xuatKemCsv"> <span data-i18n="xuat_opt_kem_csv">Kèm các tệp CSV rời (chỉ cần khi đổ số liệu vào phần mềm khác)</span></label>
+          <label class="xuat-muc xuat-muc-phu"><input type="checkbox" id="xuatKemCsv"> <span data-i18n="xuat_opt_kem_csv">Kèm các tệp CSV rời (dùng khi cần nạp sang phần mềm khác)</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatDauVao"> <span data-i18n="xuat_opt_dau_vao">Dữ liệu đầu vào hiện tại: một Sổ nhập CLB nạp lại được</span></label>
           <label class="xuat-muc"><input type="checkbox" id="xuatThayDoi"> <span data-i18n="xuat_opt_thay_doi">Thay đổi so với lần chạy trước</span> <span class="xuat-dem" id="xuatThayDoiDem"></span></label>
           <div class="xuat-muc-hang">
@@ -323,37 +325,23 @@
             <button class="btn btn-ghost" id="btnChonHocSinh" type="button" data-i18n="btn_chon_hoc_sinh">Chọn học sinh…</button>
           </div>
         </div>
+          <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu trong bảng bên dưới.</p>
+        </details>
         <div class="search-row">
-          <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất các mục đã chọn</button>
+          <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất kết quả (Excel)</button>
           <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
         </div>
-        <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo {cohort_l}: mỗi {cohort_l} một tệp Excel, chỉ có kết quả xếp, không có điểm hay số bốc thăm — gửi được cho giáo viên chủ nhiệm.</p>
+        <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
-        <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 04 thì bấm "Xuất CSV em này" ngay tại đó.</p>
-        <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
+        <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm. Không gửi các tệp này cho giáo viên chấm điểm.</p>
       </div>
 
-      <!-- Điểm chuẩn (A13.4): chỉ hiện khi bật điểm quyết tâm và đã có kết quả. LUÔN đóng mỗi lần
-           vào thẻ; trạng thái mở KHÔNG được nhớ (khác các mục thu gọn bên dưới). js/05_quan_ly.js. -->
-      <div class="panel" id="dcKqPanel" hidden>
-        <div class="panel-head">
-          <h2 data-i18n="dc_title">Điểm chuẩn</h2>
-          <div class="panel-actions">
-            <button class="btn btn-secondary" id="btnDcKqMo" type="button" aria-expanded="false" aria-controls="dcKqBody" data-i18n="dc_xem">Xem điểm chuẩn</button>
-          </div>
-        </div>
-        <div class="panel-body" id="dcKqBody" hidden>
-          <p class="canh-bao-vang" id="dcKqCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
-          <div id="dcKqTongQuan"></div>
-        </div>
-      </div>
-
-      <div class="panel" id="fillPanel">
+      <div class="panel" id="clbPanel" hidden>
         <div class="panel-head">
           <div class="panel-head-trai">
-            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="fillPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="fill_panel_title">Mức lấp đầy của từng CLB</h2>
-            <span class="panel-dem" id="fillPanelDem"></span>
+            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="clbPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
+            <h2 data-i18n="clb_title">Theo từng câu lạc bộ</h2>
+            <span class="panel-dem" id="clbPanelDem"></span>
           </div>
           <div class="panel-actions">
             <label class="fill-sap-xep-nhan" for="fillSapXep" data-i18n="fill_sap_xep_nhan">Sắp xếp</label>
@@ -365,25 +353,6 @@
             </select>
           </div>
         </div>
-        <div class="panel-body" id="fillPanelBody">
-          <p class="hint-text" data-i18n="fill_hint">Rê chuột (hoặc dùng bàn phím di tới) một dòng để xem chi tiết. Nhãn bên phải chỉ ra CLB cần để ý.</p>
-          <div id="clubFillList" class="fill-list"></div>
-          <div class="fill-legend">
-            <span class="legend-swatch is-general"></span><span data-i18n="legend_general">Suất thường</span>
-            <span class="legend-swatch is-reserve"></span><span data-i18n="legend_reserve">Vào bằng suất dự trữ</span>
-            <span class="legend-swatch is-trong"></span><span data-i18n="legend_trong">Còn trống</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" id="clbPanel" hidden>
-        <div class="panel-head">
-          <div class="panel-head-trai">
-            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="clbPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="clb_title">Theo từng câu lạc bộ</h2>
-            <span class="panel-dem" id="clbPanelDem"></span>
-          </div>
-        </div>
         <div class="panel-body" id="clbPanelBody">
           <p class="hint-text" data-i18n="clb_desc">Không cộng dồn cột "Số học sinh đăng ký": một học sinh chọn ba CLB trong cùng buổi sẽ được đếm ở cả ba dòng, nhưng chỉ nhận được một chỗ.</p>
           <div class="scroll-x">
@@ -392,15 +361,22 @@
                 <th class="cot-buoi-clb" data-i18n="th_buoi">Buổi</th>
                 <th data-i18n="th_club_id">Mã CLB</th>
                 <th data-i18n="th_name_short">Tên</th>
-                <th class="num" data-i18n="th_so_dang_ky">Số học sinh đăng ký</th>
-                <th class="num" data-i18n="th_dat_nv1">Đặt nguyện vọng 1</th>
-                <th class="num" data-i18n="th_capacity">Tổng chỗ</th>
+                <th class="num" data-i18n="th_so_dang_ky">Số đăng ký</th>
+                <th class="num" data-i18n="th_dat_nv1">Chọn là nguyện vọng 1</th>
+                <th class="num" data-i18n="th_capacity">Chỉ tiêu</th>
                 <th class="num" data-i18n="th_da_xep">Đã xếp</th>
-                <th class="num" data-i18n="th_ti_le_choi">Tỉ lệ chọi</th>
+                <th data-i18n="th_muc_lap_day">Mức lấp đầy</th>
+                <th class="num" data-i18n="th_ti_le_choi">Học sinh trên mỗi chỗ</th>
+                <th data-i18n="th_luu_y">Lưu ý</th>
                 <th><span class="sr-only" data-i18n="th_muc"></span></th>
               </tr></thead>
               <tbody id="clbBody"></tbody>
             </table>
+          </div>
+          <div class="fill-legend">
+            <span class="legend-swatch is-general"></span><span data-i18n="legend_general">Suất thường</span>
+            <span class="legend-swatch is-reserve"></span><span data-i18n="legend_reserve">Vào bằng suất ưu tiên</span>
+            <span class="legend-swatch is-trong"></span><span data-i18n="legend_trong">Còn trống</span>
           </div>
           <div id="clbEmpty" class="empty-state" hidden data-i18n="clb_empty">Chưa có câu lạc bộ nào.</div>
           <div class="clb-ds" id="clbDsArea" hidden>
@@ -412,7 +388,7 @@
                   <th data-i18n="th_name">Họ tên</th>
                   <th data-i18n="th_pref_rank">Hạng nguyện vọng</th>
                   <th data-i18n="th_tier">Loại chỗ</th>
-                  <th data-i18n="th_reserve_group">Nhãn dự trữ</th>
+                  <th data-i18n="th_reserve_group">Nhóm ưu tiên</th>
                 </tr></thead>
                 <tbody id="clbDsBody"></tbody>
               </table>
@@ -425,19 +401,20 @@
         <div class="panel-head">
           <div class="panel-head-trai">
             <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="duTruPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="du_tru_title">Suất dự trữ đã dùng</h2>
+            <h2 data-i18n="du_tru_title">Suất ưu tiên đã dùng</h2>
             <span class="panel-dem" id="duTruPanelDem"></span>
           </div>
         </div>
         <div class="panel-body" id="duTruPanelBody">
-          <p class="hint-text" data-i18n="du_tru_desc">Suất dự trữ không ai dùng sẽ thành suất thường, và phần ưu tiên dành cho nhóm đó không còn tác dụng.</p>
+          <p class="bieu-do-tieu-diem" id="duTruTieuDiem"></p>
+          <p class="hint-text" data-i18n="du_tru_desc">Suất ưu tiên không ai dùng sẽ thành suất thường, và phần ưu tiên dành cho nhóm đó không còn tác dụng.</p>
           <div class="scroll-x">
             <table class="data-table" id="duTruTable">
               <thead><tr>
                 <th class="cot-buoi-clb" data-i18n="th_buoi">Buổi</th>
                 <th data-i18n="th_name_short">Tên</th>
-                <th data-i18n="th_reserve_group">Nhãn dự trữ</th>
-                <th class="num" data-i18n="th_reserve_capacity">Suất dự trữ</th>
+                <th data-i18n="th_reserve_group">Nhóm ưu tiên</th>
+                <th class="num" data-i18n="th_reserve_capacity">Suất ưu tiên</th>
                 <th class="num" data-i18n="th_nhom_dang_ky">Học sinh thuộc nhóm đã đăng ký</th>
                 <th class="num" data-i18n="th_da_dung">Đã dùng</th>
                 <th class="num" data-i18n="th_con_thua">Còn thừa</th>
@@ -445,7 +422,7 @@
               <tbody id="duTruBody"></tbody>
             </table>
           </div>
-          <div id="duTruEmpty" class="empty-state" hidden data-i18n="du_tru_khong_co">Chưa câu lạc bộ nào đặt suất dự trữ.</div>
+          <div id="duTruEmpty" class="empty-state" hidden data-i18n="du_tru_khong_co">Chưa câu lạc bộ nào đặt suất ưu tiên.</div>
         </div>
       </div>
 
@@ -544,7 +521,7 @@
         <div class="panel-head">
           <div class="panel-head-trai">
             <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="dsXepPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="results_list_title">Danh sách xếp CLB</h2>
+            <h2 data-i18n="results_list_title">Chi tiết để kiểm tra</h2>
             <span class="panel-dem" id="dsXepPanelDem"></span>
           </div>
           <div class="panel-actions">
@@ -561,7 +538,7 @@
           <!-- Chon hoc sinh de xuat ho so. Tap da chon SONG QUA o tim kiem:
                tim "An" chon 2 em, tim "Binh" chon them 1 -> xuat ca 3. -->
           <div class="search-row chon-hs-hang">
-            <label class="xuat-muc" id="hienCaEmChuaXepHang" hidden><input type="checkbox" id="hienCaEmChuaXep"> <span data-i18n="hien_ca_em_chua_xep">Hiện cả em chưa được xếp</span></label>
+            <label class="xuat-muc" id="hienCaEmChuaXepHang" hidden><input type="checkbox" id="hienCaEmChuaXep"> <span data-i18n="hien_ca_em_chua_xep">Hiện cả học sinh chưa được xếp</span></label>
             <span class="chon-hs-dem" id="hsDaChonDem"></span>
             <button class="btn btn-secondary" id="btnXuatHsDaChon" disabled data-i18n="btn_xuat_hs_da_chon">Xuất CSV học sinh đã chọn</button>
             <button class="btn btn-ghost" id="btnBoChonHs" disabled data-i18n="btn_bo_chon_hs">Bỏ chọn</button>
@@ -581,7 +558,7 @@
             </thead>
             <tbody id="resultsTableBody"></tbody>
           </table>
-          <div id="resultsEmptyState" class="empty-state" hidden data-i18n="results_empty_state">Chưa có kết quả. Hãy chạy sắp xếp ở thẻ "Vận hành sắp xếp" trước.</div>
+          <div id="resultsEmptyState" class="empty-state" hidden data-i18n="results_empty_state">Chưa có kết quả. Hãy chạy sắp xếp ở thẻ "Xếp CLB" trước.</div>
         </div>
       </div>
     </section>
@@ -589,8 +566,8 @@
     <!-- ---------- TAB 3: NHẬP TẠI CHỖ (KIOSK) ---------- -->
     <section class="view" id="view-fallback">
       <header class="view-header">
-        <h1 data-i18n="fallback_title">Nhập tại chỗ</h1>
-        <p class="view-desc" data-i18n="fallback_desc">Tìm hoặc tạo học sinh, rồi làm hai bước: chọn CLB dự thi và xếp hạng nguyện vọng. Hai bước này không phụ thuộc nhau.</p>
+        <h1 data-i18n="fallback_title">Nhập nguyện vọng</h1>
+        <p class="view-desc" data-i18n="fallback_desc">Tìm hoặc tạo học sinh, rồi chọn CLB dự thi và xếp hạng nguyện vọng.</p>
       </header>
 
       <div class="panel">
@@ -599,18 +576,17 @@
           <input type="text" id="studentSearchInput" class="text-input" data-i18n-placeholder="placeholder_fallback_search" placeholder="Nhập mã học sinh hoặc tên…">
           <button class="btn btn-secondary" id="btnStudentSearch" data-i18n="btn_search">Tìm</button>
         </div>
-        <div id="studentSearchResults" class="search-results"></div>
-        <div class="pagination-row" id="fallbackStudentPagination" hidden>
-          <button class="btn btn-ghost" id="btnFallbackPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
-          <span class="pagination-label" id="fallbackPaginationLabel">—</span>
-          <button class="btn btn-ghost" id="btnFallbackNextPage" data-i18n="btn_next_page">Sau ›</button>
-        </div>
-
         <div class="new-student-row">
           <input type="text" id="newStudentId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_new_student_id" placeholder="Mã học sinh mới">
           <input type="text" id="newStudentName" class="text-input" data-i18n-placeholder="placeholder_full_name" placeholder="Họ tên">
           <select id="newStudentLop" class="text-input text-input-sm" data-i18n-aria-label="kiosk_lop_nhan" hidden></select>
           <button class="btn btn-secondary" id="btnCreateStudent" data-i18n="btn_create_student">Tạo học sinh mới</button>
+        </div>
+        <div id="studentSearchResults" class="search-results"></div>
+        <div class="pagination-row" id="fallbackStudentPagination" hidden>
+          <button class="btn btn-ghost" id="btnFallbackPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
+          <span class="pagination-label" id="fallbackPaginationLabel">—</span>
+          <button class="btn btn-ghost" id="btnFallbackNextPage" data-i18n="btn_next_page">Sau ›</button>
         </div>
       </div>
 
@@ -618,9 +594,15 @@
         <div class="panel-head">
           <h2 id="currentStudentLabel">—</h2>
           <div class="panel-actions">
-            <button class="btn btn-ghost" id="btnXuatEmNay" data-i18n="btn_xuat_em_nay">Xuất CSV em này</button>
-            <button class="btn btn-ghost" id="btnResetStudentEntry" data-i18n="btn_reset_entry">Sửa lại từ đầu</button>
-            <button class="btn-icon-danger" id="btnDeleteStudent" data-i18n="btn_delete_student">Xoá học sinh</button>
+            <!-- T3-34: ba nút phụ gom vào menu ⋯; hai nút xác nhận hai bước giữ menu mở (data-giu-menu). -->
+            <details class="menu-khac" id="menuHocSinh">
+              <summary class="btn btn-ghost" data-i18n-aria-label="menu_khac_aria" aria-label="Thêm tuỳ chọn">⋯</summary>
+              <div class="menu-khac-hop">
+                <button type="button" class="menu-khac-muc" id="btnXuatEmNay" data-i18n="btn_xuat_em_nay">Xuất CSV học sinh này</button>
+                <button type="button" class="menu-khac-muc" id="btnResetStudentEntry" data-giu-menu="1" data-i18n="btn_reset_entry">Xoá toàn bộ phiếu của học sinh này</button>
+                <button type="button" class="menu-khac-muc nguy-hiem" id="btnDeleteStudent" data-giu-menu="1" data-i18n="btn_delete_student">Xoá học sinh</button>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -629,6 +611,8 @@
         <div class="lop-kiosk-hang" id="kioskLopHang" hidden>
           <label class="lop-nhan" for="kioskLop" data-i18n="kiosk_lop_nhan">{cohort}</label>
           <select id="kioskLop" class="text-input text-input-sm"></select>
+          <span class="lop-hien" id="kioskLopChu" hidden></span>
+          <button type="button" class="btn btn-ghost btn-nho" id="btnKioskLopSua" hidden data-i18n="phieu_doi_lop">Đổi</button>
           <span class="chua-luu" id="kioskLopChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
           <span class="chua-luu" id="kioskLopNhac" role="status" hidden data-i18n="kiosk_lop_nhac">Chọn {cohort_l} của {person_l} này trước khi lưu.</span>
         </div>
@@ -678,33 +662,40 @@
     <!-- ---------- TAB 4: QUẢN LÝ CLUB & DỰ TRỮ ---------- -->
     <section class="view" id="view-admin">
       <header class="view-header">
-        <h1 data-i18n="admin_title">Quản lý CLB &amp; dự trữ</h1>
-        <p class="view-desc" data-i18n="admin_desc">Thêm, sửa CLB và gán nhãn dự trữ cho học sinh. Trường tự quyết định ai được dự trữ. Phần mềm chỉ ghép học sinh và CLB có cùng nhãn.</p>
+        <h1 data-i18n="admin_title">Quản lý CLB</h1>
+        <p class="view-desc" data-i18n="admin_desc">Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.</p>
       </header>
 
       <!-- Tab con của thẻ Quản lý (A13.5). Hai tab điểm (wh, dc) chỉ hiện khi bật điểm quyết tâm:
            js/05_quan_ly.js (capNhatTabConQl) bỏ thuộc tính hidden khi khối tương ứng hiện. -->
       <div class="ql-tabs" id="qlTabs" role="tablist" data-i18n-aria-label="ql_tab_nhom_aria" aria-label="Các mục của thẻ Quản lý">
-        <button type="button" role="tab" class="ql-tab" id="qlTabClb" data-ql-tab="clb" aria-controls="qlPanelClb" aria-selected="true" tabindex="0" data-i18n="ql_tab_clb">CLB</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabClb" data-ql-tab="clb" aria-controls="qlPanelClb" aria-selected="true" tabindex="0" data-i18n="ql_tab_clb">Câu lạc bộ</button>
         <button type="button" role="tab" class="ql-tab" id="qlTabHs" data-ql-tab="hs" aria-controls="qlPanelHs" aria-selected="false" tabindex="-1" data-i18n="ql_tab_hs">Học sinh</button>
         <button type="button" role="tab" class="ql-tab" id="qlTabWh" data-ql-tab="wh" aria-controls="qlPanelWh" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_wh">Điểm quyết tâm</button>
         <button type="button" role="tab" class="ql-tab" id="qlTabDc" data-ql-tab="dc" aria-controls="qlPanelDc" aria-selected="false" tabindex="-1" hidden data-i18n="ql_tab_dc">Điểm chuẩn</button>
-        <button type="button" role="tab" class="ql-tab" id="qlTabDuLieu" data-ql-tab="du_lieu" aria-controls="qlPanelDuLieu" aria-selected="false" tabindex="-1" data-i18n="ql_tab_du_lieu">Dữ liệu</button>
+        <button type="button" role="tab" class="ql-tab" id="qlTabDuLieu" data-ql-tab="du_lieu" aria-controls="qlPanelDuLieu" aria-selected="false" tabindex="-1" data-i18n="ql_tab_du_lieu">Xoá dữ liệu</button>
       </div>
 
       <div role="tabpanel" id="qlPanelClb" data-ql-tab="clb" aria-labelledby="qlTabClb">
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_club_form_title">Thêm hoặc sửa CLB</h2></div>
-        <div class="admin-form-grid">
-          <input type="text" id="clubFormId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_club_id" placeholder="Mã CLB (ví dụ: clb_01)">
-          <input type="text" id="clubFormName" class="text-input" data-i18n-placeholder="placeholder_club_name" placeholder="Tên CLB">
-          <input type="number" id="clubFormCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_capacity" placeholder="Tổng chỗ" min="1">
-          <input type="number" id="clubFormReserveCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_capacity" placeholder="Suất dự trữ" min="0" value="0">
-          <input type="text" id="clubFormReserveGroup" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group" placeholder="Nhãn dự trữ (để trống nếu không có)" list="reserveGroupOptions">
+        <div class="admin-form-grid" id="clubForm">
+          <label class="club-field"><span class="club-field-label" data-i18n="th_club_id">Mã CLB</span>
+            <input type="text" id="clubFormId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_club_id" placeholder="Mã CLB (ví dụ: clb_01)"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_name_short">Tên</span>
+            <input type="text" id="clubFormName" class="text-input" data-i18n-placeholder="placeholder_club_name" placeholder="Tên CLB"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_capacity">Chỉ tiêu</span>
+            <input type="number" id="clubFormCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_capacity" placeholder="Chỉ tiêu" min="1"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_reserve_capacity">Suất ưu tiên</span>
+            <input type="number" id="clubFormReserveCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_capacity" placeholder="Suất ưu tiên" min="0"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_reserve_group">Nhóm ưu tiên</span>
+            <input type="text" id="clubFormReserveGroup" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group" placeholder="Nhóm ưu tiên (để trống nếu không có)" list="reserveGroupOptions"></label>
           <datalist id="reserveGroupOptions"></datalist>
-          <input type="text" id="clubFormBuoi" class="text-input" data-i18n-placeholder="placeholder_buoi" placeholder="Buổi sinh hoạt (ví dụ: thu_3)" list="buoiOptions">
+          <label class="club-field"><span class="club-field-label" data-i18n="th_buoi">Buổi</span>
+            <input type="text" id="clubFormBuoi" class="text-input" data-i18n-placeholder="placeholder_buoi" placeholder="Buổi sinh hoạt (ví dụ: thu_3)" list="buoiOptions"></label>
           <datalist id="buoiOptions"></datalist>
           <button class="btn btn-primary" id="btnSaveClub" data-i18n="btn_save_club">Lưu CLB</button>
+          <button class="btn" id="btnClubFormHuy" type="button" hidden data-i18n="btn_cancel">Huỷ</button>
         </div>
         <span class="save-feedback" role="status" aria-live="polite" id="clubFormFeedback"></span>
 
@@ -712,9 +703,9 @@
           <thead><tr>
             <th data-i18n="th_club_id">Mã CLB</th>
             <th data-i18n="th_name_short">Tên</th>
-            <th data-i18n="th_capacity">Tổng chỗ</th>
-            <th data-i18n="th_reserve_capacity">Suất dự trữ</th>
-            <th data-i18n="th_reserve_group">Nhãn dự trữ</th>
+            <th data-i18n="th_capacity">Chỉ tiêu</th>
+            <th data-i18n="th_reserve_capacity">Suất ưu tiên</th>
+            <th data-i18n="th_reserve_group">Nhóm ưu tiên</th>
             <th class="cot-buoi" data-i18n="th_buoi">Buổi</th>
             <th><span class="sr-only" data-i18n="th_thao_tac"></span></th>
           </tr></thead>
@@ -732,9 +723,9 @@
             <thead><tr>
               <th data-i18n="th_buoi">Buổi</th>
               <th class="num" data-i18n="th_so_clb">Số CLB</th>
-              <th class="num" data-i18n="th_tong_cho">Tổng chỗ</th>
+              <th class="num" data-i18n="th_tong_cho">Chỉ tiêu</th>
               <th class="num" data-i18n="th_em_muon_buoi">Học sinh chọn buổi này</th>
-              <th class="num" data-i18n="th_ti_le_choi">Tỉ lệ chọi</th>
+              <th class="num" data-i18n="th_ti_le_choi">Học sinh trên mỗi chỗ</th>
               <th><span class="sr-only" data-i18n="th_muc"></span></th>
             </tr></thead>
             <tbody id="taiBuoiBody"></tbody>
@@ -742,20 +733,14 @@
         </div>
         <p class="hint-text" data-i18n="ti_le_choi_giai_thich">Tỉ lệ chọi tính theo số học sinh, không theo số nguyện vọng, vì mỗi học sinh chỉ nhận một chỗ mỗi buổi.</p>
       </div>
-
-      <div class="panel" id="lichTuanPanel" hidden>
-        <div class="panel-head"><h2 data-i18n="admin_lich_tuan_title">Lịch tuần</h2></div>
-        <p class="hint-text" data-i18n="admin_lich_tuan_desc">Mỗi cột là một buổi. Thanh dưới mỗi CLB là mức lấp đầy của lần sắp xếp gần nhất.</p>
-        <div class="lich-tuan" id="lichTuan"></div>
-      </div>
       </div>
 
       <div role="tabpanel" id="qlPanelHs" data-ql-tab="hs" aria-labelledby="qlTabHs" hidden>
       <div class="panel">
-        <div class="panel-head"><h2 data-i18n="admin_reserve_assign_title">Gán nhãn dự trữ và xuất hồ sơ học sinh</h2></div>
+        <div class="panel-head"><h2 data-i18n="admin_reserve_assign_title">Gán nhóm ưu tiên và xuất hồ sơ học sinh</h2></div>
         <div class="search-row">
           <input type="text" id="adminStudentSearch" class="text-input" data-i18n-placeholder="placeholder_admin_student_search" placeholder="Tìm học sinh theo mã hoặc tên…">
-          <input type="text" id="bulkReserveGroupInput" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group_apply" placeholder="Nhãn dự trữ cần gán" list="reserveGroupOptions">
+          <input type="text" id="bulkReserveGroupInput" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group_apply" placeholder="Nhóm ưu tiên cần gán" list="reserveGroupOptions">
           <button class="btn btn-secondary" id="btnBulkAssign" data-i18n="btn_bulk_assign">Gán cho học sinh đã đánh dấu</button>
           <button class="btn btn-secondary" id="btnAdminXuatHs" data-i18n="btn_admin_xuat_hs">Xuất CSV học sinh đã đánh dấu</button>
           <span class="chon-hs-dem" id="adminDemDanhDau"></span>
@@ -771,18 +756,18 @@
           </select>
         </div>
         <div class="save-feedback xuat-ket-qua" id="adminXuatFeedback"></div>
-        <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
+        <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm. Không gửi các tệp này cho giáo viên chấm điểm.</p>
         <table class="data-table">
           <thead><tr>
             <th><input type="checkbox" id="adminChonTatCa" data-i18n-aria-label="aria_chon_tat_ca_trang"></th>
             <th data-i18n="th_student_id">Mã học sinh</th>
             <th data-i18n="th_name">Họ tên</th>
             <th data-i18n="th_cohort">{cohort}</th>
-            <th data-i18n="th_current_reserve_group">Nhãn dự trữ hiện tại</th>
+            <th data-i18n="th_current_reserve_group">Nhóm ưu tiên hiện tại</th>
           </tr></thead>
           <tbody id="adminStudentTableBody"></tbody>
         </table>
-        <div id="adminStudentEmptyState" class="empty-state" hidden data-i18n="admin_student_empty">Chưa có học sinh nào. Thêm ở thẻ "Nhập tại chỗ" hoặc nạp tệp từ Microsoft Forms.</div>
+        <div id="adminStudentEmptyState" class="empty-state" hidden data-i18n="admin_student_empty">Chưa có học sinh nào. Thêm ở thẻ "Nhập nguyện vọng" hoặc nạp tệp từ Microsoft Forms.</div>
         <div class="pagination-row" id="adminStudentPagination">
           <button class="btn btn-ghost" id="btnAdminPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
           <span class="pagination-label" id="adminPaginationLabel">—</span>
@@ -835,7 +820,7 @@
             <h3 id="whQlSuaTen"></h3>
             <button class="btn btn-ghost" id="btnWhDongSua" data-i18n="wh_sua_dong">Đóng</button>
           </div>
-          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở "Thao tác khác" để sửa.</p>
+          <p class="wh-khoa-ghi-chu" id="whQlSuaKhoa" role="status" hidden data-i18n="wh_sua_khoa">Điểm đang khoá nên chỉ xem được. Mở khoá ở mục Thao tác khác để sửa.</p>
           <p class="hint-text" id="whQlSuaRong" hidden data-i18n="wh_sua_rong">Học sinh này chưa có nguyện vọng nên chưa có gì để chia.</p>
           <div id="whQlSuaKhung"></div>
           <div class="search-row">
@@ -856,9 +841,11 @@
             </select></label>
           <label class="wh-ql-loc" id="whLocBuoiNhan"><span data-i18n="wh_loc_buoi">Buổi</span>
             <select id="whLocBuoi" class="text-input text-input-sm"></select></label>
-          <label class="wh-ql-loc"><span data-i18n="wh_loc_clb">CLB</span>
+          <label class="wh-ql-loc"><span data-i18n="wh_loc_clb">Câu lạc bộ</span>
             <select id="whLocClb" class="text-input text-input-sm"></select></label>
-          <label class="wh-ql-loc wh-ql-loc-tick"><input type="checkbox" id="whLocChiLoi"><span data-i18n="wh_loc_chi_loi">Chỉ hồ sơ có vấn đề</span></label>
+          <label class="wh-ql-loc wh-ql-loc-tick"><input type="checkbox" id="whLocChiLoi" checked><span data-i18n="wh_loc_chi_loi">Chỉ hồ sơ có vấn đề</span></label>
+          <span class="wh-ql-dem" id="whQlDem" role="status"></span>
+          <button type="button" class="btn btn-ghost btn-nho" id="btnWhXemTatCa" data-i18n="wh_xem_tat_ca">Xem tất cả</button>
         </div>
         <table class="data-table">
           <thead><tr>
@@ -929,15 +916,12 @@
             <button class="nut-i" id="btnDcThongTin" type="button" aria-expanded="false" aria-controls="dcThongTin" data-i18n-aria-label="dc_giai_thich" aria-label="Giải thích về điểm chuẩn">i</button>
           </div>
         </div>
-        <p class="hint-text" id="dcThongTin" hidden data-i18n="dc_mo_ta">Điểm thấp nhất đã được nhận ở từng câu lạc bộ.</p>
+        <p class="hint-text" id="dcThongTin" hidden data-i18n="dc_mo_ta">Điểm thấp nhất đã được nhận ở từng câu lạc bộ, tách theo hai cách xét (xét điểm thi và xét điểm quyết tâm) và theo suất thường hay suất ưu tiên. Xét điểm quyết tâm tính theo điểm quyết tâm. Xét điểm thi tính theo điểm thi, kèm điểm quyết tâm của người nhận cuối. CLB còn chỗ ghi 0 điểm. Chỉ dành cho quản trị.</p>
         <p class="canh-bao-vang" id="dcQlCu" role="status" hidden data-i18n="dc_cu">Dữ liệu đã đổi sau lần chạy gần nhất, nên điểm chuẩn có thể đã cũ. Hãy chạy lại để cập nhật.</p>
         <p class="hint-text" id="dcQlRong" hidden data-i18n="dc_chua_co_ket_qua">Chưa có kết quả. Hãy chạy sắp xếp trước.</p>
         <div id="dcQlTongQuan"></div>
-        <div class="dc-chon" id="dcChonHop" hidden>
-          <label for="dcChonClb" data-i18n="dc_chon_clb">Chọn câu lạc bộ để xem chi tiết</label>
-          <select id="dcChonClb" class="text-input"></select>
-        </div>
         <div id="dcChiTiet" hidden>
+          <div class="dc-chi-tiet-dau"><button type="button" class="btn btn-ghost" id="btnDcDong" data-i18n="dc_dong_chi_tiet">Đóng chi tiết</button></div>
           <div id="dcBang"></div>
           <figure class="dc-hinh" id="dcBieuDo"></figure>
           <p class="hint-text" id="dcKhongXet" hidden></p>
@@ -963,14 +947,13 @@
     <section class="view" id="view-scoring">
       <header class="view-header">
         <h1 data-i18n="scoring_title">Nhập điểm</h1>
-        <p class="view-desc" id="scoringDesc" data-i18n="scoring_desc">Chọn CLB để chấm. Danh sách chỉ có mã và họ tên, không có số bốc thăm hay thứ hạng nguyện vọng, để việc chấm điểm được khách quan.</p>
+        <p class="view-desc" id="scoringDesc" data-i18n="scoring_desc">Chọn CLB để chấm. Danh sách chỉ có mã và họ tên, để chấm khách quan.</p>
       </header>
 
       <div class="panel" id="scoringClubPanel">
         <div class="panel-head"><h2 data-i18n="scoring_overview_title">Tiến độ chấm của từng CLB</h2></div>
         <table class="data-table">
           <thead><tr>
-            <th data-i18n="th_club_id">Mã CLB</th>
             <th data-i18n="th_name_short">Tên</th>
             <th data-i18n="th_n_applicants">Đã đăng ký</th>
             <th data-i18n="th_n_scored">Đã chấm</th>

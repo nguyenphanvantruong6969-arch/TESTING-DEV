@@ -77,7 +77,11 @@ def mo(tmp_path, api):
         page.wait_for_selector("#btnResetAll", state="attached")
         if bat:
             page.locator('#qlTabs [data-ql-tab="wh"]').click()
-            page.wait_for_selector("#adminWhartonBlock:not([hidden]) #whQlBody tr")
+            page.wait_for_selector("#adminWhartonBlock:not([hidden]) #btnWhXemTatCa")
+            # T3-29: mặc định chỉ hiện hồ sơ có vấn đề; các test cũ muốn thấy cả bảng nên bỏ lọc.
+            page.locator("#btnWhXemTatCa").click()
+            page.wait_for_function("() => !document.getElementById('whLocChiLoi').checked")
+            page.wait_for_selector("#whQlBody tr")
         return page, a, loi
 
     yield _mo
@@ -144,6 +148,7 @@ def test_wharton_tat_khong_co_khoi_va_the_quan_ly_con_du_khoi_cu(mo):
 
 def test_bang_hien_dung_diem_tong_va_tim_khong_dau_va_loc(mo):
     page, api, loi = mo()
+    page.wait_for_function("() => document.querySelectorAll('#whQlBody tr').length === 3")   # bảng vẽ bất đồng bộ
     assert page.locator("#whQlBody tr").count() == 3
     hs1 = _hang(page, "HS1")
     assert hs1.locator('.wh-ql-quy[data-buoi="thu_3"][data-quy="2"] .wh-ql-o[data-clb="B"]'

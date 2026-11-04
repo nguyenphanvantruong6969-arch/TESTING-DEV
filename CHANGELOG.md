@@ -1,5 +1,87 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
+
+- `tests/test_giao_dien_a14_lop.py::test_theo_lop_chua_co_lop_nao_hien_dong_nhac`: bỏ đoạn ép `kq.tang1 = 'lop'` (người dùng không tới được từ T3-16, và lần vẽ lại bất đồng bộ làm test chập chờn trên CI); nay kiểm nút "Theo lớp" ẩn, bảng có dòng, không có ngõ cụt "Chưa có lớp nào". Dòng nhắc trong `js/03_ket_qua.js` thành đường mã chết, ghi ở mục "Cần Truong" của PR #10.
+
+## 2026-11-04 — T3-L2 fix3 (điều phối): test node chạy được trên Windows
+
+- `tests/test_t3_l2_buoi.py::test_loi_co_tham_so_buoi_hien_nhan_khong_hien_ma`: `subprocess.run(["node", ...])` đọc đầu ra bằng `encoding="utf-8"` (CI Windows đọc cp1252 nên gặp chữ Việt thì `stdout` là `None`).
+
+## 2026-11-04 — T3-L3 (ngoài sổ, Truong duyệt 04/11/2026): tên thẻ, thẻ Kết quả gọn, tải bảng, Điểm chuẩn một nơi, chữ Sổ nhập (nghiên cứu T3, lô 3)
+
+Chỉ đổi hiển thị (thêm một API xuất đọc `match_results`); thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.
+
+- **Tên thẻ:** 03 "Dữ liệu khác" thành "Chi tiết và xuất tệp" / "Details and export" (`nav_others`, `others_title`); 05 thành "Quản lý {slot_sl}" / "Manage {slot_pl}" (`nav_admin`, `admin_title`). Chữ báo lỗi nhắc tên thẻ 05 (`i18n_errors.py`) theo tên mới.
+- **T3-16/17/18 (`js/09_the_xem.js`, `index.html`, `style.css`):** nút "Theo lớp" chỉ hiện khi đã có lớp (chưa có lớp thì mở sẵn "Theo mã học sinh"); bỏ hàng sắp xếp `#kqTang2` (và khoá `kq_sap_nhan`, `kq_sx_*`, `kq_aria_tang2`), sắp bằng cách bấm tiêu đề cột (`.kq-sx-cot`, `aria-sort`; mã tự nhiên, lớp tự nhiên, còn lại theo vần tiếng Việt, ô trống luôn cuối); bỏ cột "Thứ tự" (`th_stt`), giữ dòng đếm. `localStorage` `rbda_ket_qua_xem_v1` không còn `tang2`.
+- **T3-19:** nút "Tải bảng này (Excel)" (`#btnKqTaiBang`) ở thẻ 02, API mới `export_bang_dang_xem(kieu, gia_tri, output_path)` (`api_xuat.py`): một tệp, một trang, đúng lớp / CLB / danh sách theo mã đang xem; không điểm, không số bốc thăm; không ghi đè; chưa có kết quả thì `xuat_chua_co_ket_qua`.
+- **T3-22:** Điểm chuẩn chỉ còn ở thẻ 05, tab "Điểm chuẩn" (`#qlTabDc`); bỏ thẻ và nút `#dcKqPanel` / `#btnDcKqMo` ở thẻ 03 (cùng `veDiemChuanKetQua`, `dongDiemChuanKq`, `initDiemChuanKetQua`, khoá `dc_xem`, `dc_an`).
+- **T3-31 (`js/05_quan_ly.js`):** Điểm chuẩn mặc định MỘT bảng bằng số (CLB, điểm thi chuẩn, điểm quyết tâm chuẩn, "N đơn · M chỗ") + nút "Xem chi tiết" từng CLB; biểu đồ chấm và bảng hai cách xét x hai mức chuyển vào chi tiết (đóng bằng "Đóng chi tiết"); bỏ thanh điểm, thanh xếp chồng ba màu, ba mức "Đủ chỗ / Đông / Rất đông", hộp chọn CLB và các khoá `dc_muc_*`, `dc_bar_*`, `dc_chu_giai_thanh`, `dc_muc_giai_thich`, `dc_thanh_nhan`, `dc_ti_le_nhan`, `dc_chon_clb`.
+- **T3-27:** chữ giao diện = chữ Sổ nhập ở mọi nơi trong `i18n.js`, `index.html`, `i18n_errors.py`: Chỉ tiêu (thay "Tổng chỗ"), Suất ưu tiên (thay "Suất dự trữ"), Nhóm ưu tiên (thay "Nhãn dự trữ"); tiếng Anh Quota / Priority seats / Priority group. Chỉ chữ hiển thị; không đổi mã, cột CSV hay tiêu đề cột trong tệp Excel xuất (`api_xuat.py`).
+- **T3-11 (`js/075_workspace.js`):** tạo workspace từ mẫu: bước 1 có nút "Tạo" ngay (2 cú bấm) và nút "Tuỳ chỉnh từ vựng và luật" (`#wzTuyChinh`, kiểm tên trước) mở bước 2 đến 4; thanh bước và bước "Xem lại" chỉ có khi tuỳ chỉnh; dòng "Thứ tự các nhóm" trống ẩn đi.
+- **Test mới:** `tests/test_t3_l3_backend.py` (7), `tests/test_giao_dien_t3_l3.py` (Chromium). **Test cũ sửa:** `test_giao_dien_t2_ket_qua.py` (viết lại ca tầng 2, sắp theo tiêu đề cột, không lớp), `test_giao_dien_diem_chuan.py`, `test_giao_dien_a13_10_diem_chuan.py` (một bảng, chi tiết mở theo yêu cầu, thẻ 03 không còn Điểm chuẩn), `test_i18n_khoa_dc_khong_chet.py`, `test_ws_nhan.py` (+ `chu_ui_doi_co_y_t3.json`: bảng thay chữ T3-27), `test_giao_dien_danh_sach_clb.py`, và các test đi qua trình hướng dẫn (`test_ws_giao_dien.py`, `test_giao_dien_a13_12_ws.py`, `test_giao_dien_a13_13_kiem_nhan.py`, `test_giao_dien_a14_lop.py`, `test_giao_dien_t3_l1_ws.py`, `test_ws_wharton_giao_dien.py`: bước 2 mở bằng "Tuỳ chỉnh").
+- **Sửa test sau CI (13 ca):** `test_giao_dien_a14_lop.py` (bỏ cột "Thứ tự", tiêu đề cột kèm ▲, 25 khoá i18n, dòng nhắc "chưa có lớp" ép bằng `kq.tang1`), `test_giao_dien_a13_10_nhan.py` (bấm "Xem chi tiết" trước khi chờ `#dcChiTiet`; ≥ 50 khoá `dc_*`), `test_giao_dien_a13_12_ngon_ngu.py` (so thứ tự CLB, nhãn buổi đổi theo ngôn ngữ), `test_giao_dien_t2_ket_qua.py` và `test_giao_dien_wharton_quan_ly.py` (chờ vẽ xong, hết chạy đua). Không đổi mã sản phẩm.
+- **Không làm (Truong):** T3-41 (ô trống "—" giữ nguyên), bỏ số 01 đến 06 ở thanh bên.
+
+## 2026-11-04 — T3-L2 fix2 (điều phối): test bảng lỗi theo nhãn buổi
+
+- `tests/test_giao_dien_bang_loi.py`: mẫu `health_thi_qua_tran_buoi` dùng buổi chữ tự đặt ("Buổi tối") thay cho mã `thu_2`, vì từ T3-L2 giao diện đổi mã buổi sang nhãn còn `format_message` giữ mã; phần đổi mã đã có test ở `tests/test_t3_l2_buoi.py`.
+
+## 2026-11-04 — T3-L2 (ngoài sổ, Truong duyệt 04/11/2026): bớt khối, gom nút (nghiên cứu T3, lô 2)
+
+Chỉ đổi hiển thị; thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.
+
+- **T3-14:** nhãn buổi (Thứ 2…) qua `i18n.js`, bảng JS phản chiếu `so_nhap.NHAN_BUOI` (đường a). **T3-07:** bỏ hai ô Từ/đến chọn buổi. **T3-02/03/04:** cảnh báo gọn + nút tới Điểm quyết tâm; ẩn nút khi chưa có tệp (sửa lỗi `.import-actions{display:flex}` đè `hidden`); một nút kiểm tra.
+- **T3-06/10/12/15:** dòng kết quả gọn; một nút chính theo trạng thái (`#view-pipeline[data-trang-thai]`); chân thanh bên + menu ⋯; dòng workspace "Mở" + ⋯.
+- **T3-20/24/25:** mục "Chi tiết để kiểm tra"; ba ô tóm tắt (số NV1 và suất dự trữ chuyển xuống mục chi tiết, không xoá); tiêu đề cột.
+- **T3-21:** bỏ thẻ "Mức lấp đầy của từng CLB" (`#fillPanel`); ô "Sắp xếp" (`#fillSapXep`, vẫn nhớ qua `rbda_sap_xep_lap_day`) chuyển lên thẻ "Theo từng câu lạc bộ"; bảng thêm cột thanh lấp đầy (hai đoạn dự trữ/chung, `veOThanhLapDay`) và cột "Lưu ý" (nhãn `nhanCanDeY` thành chữ, không còn chỉ hiện khi rê chuột); ô tóm tắt "Chỗ còn trống" mở thẻ này và đặt "Vắng nhất". Bỏ `veBieuDoLapDay`/`veDongLapDay`, CSS `.fill-row…`, khoá `fill_panel_title`, `fill_hint`, `fill_nhom_tong`, `fill_choi`; khoá mới `th_muc_lap_day`, `th_luu_y`.
+- **T3-23:** khung "Xuất dữ liệu" mặc định chỉ hai nút "Xuất kết quả (Excel)" (`btn_xuat_tuy_chon`) và "Xuất theo lớp"; các ô tích và "Chọn học sinh…" nằm trong `<details id="xuatNangCao">` "Tuỳ chọn khác" (`xuat_tuy_chon_khac`); giữ cảnh báo đỏ.
+- **T3-28:** một bảng "Tải theo buổi"; bỏ khối "Lịch tuần" (`loadLichTuan`, `admin_lich_tuan_*`, CSS `.lich-*`); tỉ lệ ghi "2,3" (dấu phẩy), không "2.3×".
+- **T3-29/32/33/34/35:** điểm quyết tâm mặc định "Chỉ hồ sơ có vấn đề"; hàng học sinh mới cạnh ô tìm + cuộn tới phiếu; lớp hiện dạng chữ; menu ⋯ ba nút phụ (giữ "Xuất CSV học sinh này"); bỏ mã thô, chấm "Chưa lưu" nổi hơn. Chưa làm: thu gọn danh sách kết quả sau khi chọn (T3-32).
+- **Test mới:** `tests/test_t3_l2_buoi.py` (5), `tests/test_giao_dien_t3_l2_van_hanh.py` (Chromium). **Test cũ sửa:** `test_giao_dien_tom_tat_ket_qua.py` (bỏ test chú thích rê chuột và nhóm theo buổi, thêm test cột thanh/Lưu ý), `test_giao_dien_bieu_do.py`, `test_giao_dien_phong_chu.py`, `test_giao_dien_thu_gon_ket_qua.py`, `test_giao_dien_diem_chuan.py` (đọc bảng CLB thay vì `.fill-row`), `test_giao_dien_khoa_xuat.py`, `test_giao_dien_ux_xuat.py`, `test_giao_dien_xuat_du_lieu.py` (mở "Tuỳ chọn khác"), `test_ws_nhan.py` + `du_lieu_ws/chu_ui_doi_co_y_t3.json`.
+- **Vòng sửa 1 (tester L2):** `btn_reset_entry` = "Xoá toàn bộ phiếu của {person_l} này" / "Clear this {person_l}'s whole entry" (khớp câu xác nhận); lỗi/cảnh báo có tham số `buoi` là mã (`thu_2`) nay hiện nhãn (`nhanHoaBuoi` trong `translateError`, `i18n.js`); dòng "Lần chạy gần nhất" ở thẻ 03 dùng `dinhDangGio` và bỏ số khởi tạo; cột "Thao tác" trống ở danh sách workspace thành `sr-only`; test `test_t3_l2_buoi.py` canh tập mã `MA_BUOI_CO_NHAN` khớp `so_nhap.NHAN_BUOI` và lỗi có `buoi` hiện nhãn. T3-32 phần "thu gọn danh sách sau khi chọn" vẫn bỏ: nhiều test UI cũ bấm thẻ khác sau khi chọn; cuộn tới phiếu đã có.
+- **Bất biến:** `kiem_nhanh.py` 7/7 ĐẠT, `trung_khit` (3 bộ × 5 seed) trùng khít so với `origin/main`.
+
+## 2026-11-04 — CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026): huỷ lượt CI cũ khi có commit mới
+
+- **`.github/workflows/tests.yml`:** thêm `concurrency` (nhóm theo workflow + loại sự kiện + nhánh; `cancel-in-progress` trừ nhánh `main`). Workflow build `.exe` (chạy tay) không đổi.
+
+## 2026-11-04 — T3-L1 (ngoài sổ, Truong duyệt 04/11/2026): chữ và hiển thị nhỏ (nghiên cứu T3, lô 1)
+
+- **T3-05:** ô mã bốc thăm vào mục "Nâng cao" thu gọn (`<details id="nangCao">`, mặc định 42, mở tự động khi bấm "Bốc thăm lại"); bỏ `#seedLockHint`; `stb_locked_label` thành một dòng "Đã bốc thăm lúc {locked_at}. Muốn bốc thăm lại, bấm "Bốc thăm lại…"." (giờ dạng người đọc).
+- **T3-08:** bỏ ô "đã nộp nguyện vọng" (`#statPrefs`) khỏi dải số liệu; giờ chạy dạng `dd/mm/yyyy hh:mm` (`dinhDangGio` ở `js/00_nen.js`) ở chân thanh bên và bảng lịch sử; bỏ "số khởi tạo" khỏi `#lastRunLine`.
+- **T3-09:** thẻ Lịch sử sắp xếp chỉ hiện khi có từ 2 lần chạy (`capNhatTheLichSu`); không đụng `run_history`.
+- **T3-13:** bỏ dòng phụ "Reserve-Based DA"; tiêu đề trang và cửa sổ không còn "RB-DA" (`page_title`, `APP_TITLE`).
+- **T3-30:** tab con "Dữ liệu" đổi thành "Xoá dữ liệu" (en "Delete data").
+- **T3-36:** bảng tiến độ chấm bỏ cột mã CLB và thanh tiến độ; nút "Chấm" là nút phụ không mũi tên.
+- **T3-37/38/39:** tiêu đề bước hộp tạo workspace "Bước n/4: …"; tiêu đề cửa sổ và `aria-label` dùng " · " hoặc ": " thay gạch dài (`main.py`, `js/075_workspace.js`, `js/04_nhap_tai_cho.js`); khoảng số "(từ 1 đến 20)", "(từ 0 đến 20)".
+- **T3-40:** chữ dự phòng của `index.html` khớp catalog (62 chỗ); test mới `tests/test_t3_l1_chu_du_phong.py` canh từng phần tử `data-i18n`, placeholder và aria-label. Sửa kèm `wh_sua_rong` (đầu câu viết thường).
+- **T3-43:** chữ trong tệp Excel xuất (`api_xuat.py`, 51 chuỗi): bỏ gạch dài và đại từ "em", dùng `{person_l}` theo từ vựng workspace; hai chuỗi đếm của trang "Theo lớp" nay cũng qua `t.n` (trước đây lọt `em` cứng khi workspace đặt tên khác).
+- **Bảng 5.1-5.3 (trừ mục để lô sau):** tên thẻ "Xếp CLB" (`nav_pipeline`, `pipeline_title`), "Nhập nguyện vọng" (`nav_fallback`, `fallback_title`) và mọi chỗ nhắc tên thẻ (catalog, `i18n_errors.py`, `HUONG_DAN_SU_DUNG.md`); sáu mô tả `pipeline_desc`, `others_desc`, `admin_desc`, `scoring_desc`, `fallback_desc`, `import_hint`; nhãn "Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên"; "Số đơn và số chỗ", "Học sinh trên mỗi chỗ", "Chọn là nguyện vọng 1"; `xuat_hint_hoc_sinh`, `xuat_opt_kem_csv`; nút `ws_btn_*`. Lệch khỏi bảng có chủ ý: tiếng Việt giữ "tệp nén" và en "archive file" (test `test_giao_dien_tieng_viet_sach` cấm chữ zip); "Draw code" thay "Draw seed" (cấm từ kỹ thuật); `pipeline_desc`/`import_hint` viết "sổ nhập" thường, không "Sổ nhập CLB" (từ vựng workspace). Chưa làm ở lô này (để L2/L3): hai dòng cảnh báo gộp T3-02 (hàng 213, 214 của bảng 5.3), `nav_others`, `nav_admin`, `ql_tab_dc`, `kq_sx_ngay`, `kq_sap_nhan`.
+- **T3-27 chia hai lô (tester L1, vòng 1):** L1 làm nhãn và placeholder của biểu mẫu CLB ở thẻ Quản lý (`th_capacity`, `th_reserve_capacity`, `th_reserve_group`, `placeholder_capacity`, `placeholder_reserve_capacity`, `placeholder_reserve_group`: Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên; en Quota / Priority seats / Priority group) và `admin_desc`. Phần còn lại của T3-27 (`th_tong_cho`, `admin_reserve_assign_title`, các chỗ khác nói "dự trữ") để L3.
+- **Vòng sửa 1 (tester L1):** test Excel cũ `test_so_excel_de_dung.py` đọc theo chữ mới ("Số học sinh đã có câu lạc bộ", "Số học sinh chưa có chỗ", "mọi học sinh đều"); `th_ti_le_choi` dùng chỗ giữ danh từ (`{person} trên mỗi chỗ`, en `{person_p} per place`).
+- **Khoá catalog bỏ:** `brand_sub`, `label_submitted_prefs`, `seed_locked_hint`, `seed_unlocked_for_redraw`; khoá mới `nang_cao`.
+- **Test mới:** `tests/test_t3_l1_chu.py` (4), `tests/test_t3_l1_chu_du_phong.py` (1), `tests/test_giao_dien_t3_l1.py` (7, Chromium), `tests/test_giao_dien_t3_l1_ws.py` (1, Chromium). **Test cũ sửa theo chữ mới:** `test_ws_nhan.py` (bảng ảnh chụp: `KHOA_UI_DA_BO`, `THAY_CHU_T3`, `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json`), `test_ws_nhan_giao_dien.py`, `test_giao_dien_khoa_hat_giong.py`, `test_giao_dien_chay.py`, `test_giao_dien_sua_loi_p1.py`, `test_giao_dien_xoa_du_lieu.py`, `test_giao_dien_quan_ly_tab_con.py`, `test_giao_dien_a13_10_diem_chuan.py`. Bản đồ mã: 188 tệp test, 3.396 ca.
+- **Bất biến 1:** `kiem_nhanh.py trung_khit` (3 bộ × 5 seed) ĐẠT so với `origin/main`; lô này không đổi thuật toán.
+
+## 2026-11-04 — T3-L0 (ngoài sổ, Truong duyệt 04/11/2026): ba lỗi sản phẩm của nghiên cứu T3 (B1/T3-26, B2/T3-01, B3/T3-42)
+
+- **B1 / T3-26 — sửa CLB không còn xoá suất dự trữ, nhãn, buổi.** `api_quan_ly.py::create_or_update_club`: `reserve_capacity`, `reserve_group`, `buoi` mặc định `None` = "không gửi" — CLB đã có thì GIỮ giá trị đang lưu, CLB mới lấy 0 / không nhãn / không buổi; `name=None` giữ tên cũ; muốn xoá thật thì gửi 0 hoặc `""`. Kiểm suất dự trữ ≤ chỉ tiêu dùng giá trị hiệu lực (kể cả giá trị cũ). Lời gọi tường minh cũ (`("c","C",5,0,"")`) cho kết quả y như trước. Giao diện (`js/05_quan_ly.js`, `index.html`, `style.css`): sáu nhãn thường trực phía trên sáu ô (dùng lại khoá `th_*`); bấm một dòng bảng thì điền biểu mẫu từ dòng đó, khoá ô mã, nút Huỷ; khi đang sửa ô trống = xoá, gõ tay thì ô trống = không gửi (`null`).
+- **B2 / T3-01 — chạy trên dữ liệu trống bị chặn.** `api.py::_run_pipeline_da_khoa`: bước 0, TRƯỚC sao lưu / khoá STB / mọi lần ghi, đếm học sinh và CLB; thiếu một trong hai thì trả `chua_co_du_lieu_de_chay` (không ghi `run_history`, không khoá seed). Giao diện (`js/02_van_hanh.js`): `khoa.thieuDuLieu` khoá nút "Chạy sắp xếp" kèm `title` lý do, ô Cảnh báo ghi "Chưa có dữ liệu để xếp…" thay cho dòng xanh.
+- **B3 / T3-42 — câu `wharton_ho_so_chua_hop_le`** chỉ việc làm được (thẻ 05, tab Điểm quyết tâm, "Phóng cho đủ 100 theo tỉ lệ"), không còn bảo tắt tính năng. Chỉ đổi chữ (vi + en), không thêm công tắc.
+- **Mã lỗi mới** `chua_co_du_lieu_de_chay` (`i18n_errors.py` vi+en, đã sinh lại `i18n_loi.js`); khoá UI mới `health_chua_co_du_lieu` (`i18n.js` vi+en).
+- **Sửa CI L0 (fixci1):** nghiệm thu A13.13 đổi chữ theo quyết định B3 của Truong (04/11/2026): `test_a13_13_kiem_nhan.py` (D1, E3) và `test_wharton_mac_dinh_bat.py` nay đòi câu chỉ trỏ tới việc làm được (điền điểm, "Phóng cho đủ 100"), KHÔNG còn đòi chữ "tắt"; `test_a13_9_stress.py::test_8_so_rong_...` nay đòi chạy xếp trên sổ rỗng bị từ chối `chua_co_du_lieu_de_chay` (không sập, không `run_history`, không khoá STB); mã mới thêm vào `MA_MOI_SAU_ANH_CHUP` của `test_ws_nhan.py`.
+- **Test mới:** `tests/test_t3_l0_backend.py` (11 ca), `tests/test_giao_dien_t3_l0.py` (7 ca, Chromium).
+- **Vòng sửa 1 (tester):** ô "Suất dự trữ" mặc định để TRỐNG (trước là "0" nên gõ tay lại mã cũ vẫn xoá suất dự trữ); câu B3 bản tiếng Việt dùng "mục Điểm quyết tâm" thay "tab" (test `test_giao_dien_tieng_viet_sach`).
+- **Bất biến 1:** cấu hình mặc định trùng khít `origin/main` — `kiem_nhanh.py trung_khit` (3 bộ × 5 seed) và `kiem_trung_khit` gọi trực tiếp với 20 seed (3 bộ × 20 seed).
+
+## 2026-11-04 — T3-HT (ngoài sổ, Truong duyệt 04/11/2026): hạ tầng tự động hoá T3 (điều phối + viết mã + soát)
+
+- **`.claude/hooks/handoff_khi_day_ngu_canh.py`:** đọc vai phiên từ `.claude/phien_vai.json` (không vào git): ngưỡng riêng (`nguong`; con 400k, điều phối 700k), tệp bàn giao theo vai (`docs/phien/<nhánh>__impl.md`, `__tester.md`), phiên con được nhắc `send_message` báo phiên điều phối; không có tệp vai thì giữ hành vi cũ. Lấy tên nhánh bằng `git branch --show-current`.
+- **Tài liệu:** `docs/phien/T3_GIAO_THUC.md` (giao thức, khuôn tin nhắn, bàn giao), `docs/phien/claude__gallant-mendel-uki8j2.md` (kế hoạch bốn lô T3-L0..L3 và quyết định của Truong).
+- **Test:** `tests/test_hook_ban_giao.py` (6 ca).
+- **Sửa CI:** `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã đếm lại: 184 tệp test, 3.384 ca (test `test_ban_do_ma_so_tep_test_la_so_that`). `tests/test_hook_ban_giao.py` giữ PATH hệ thống (CI Windows không tìm thấy git) và chỉ `git init` một lần mỗi thư mục.
+
 ## 2026-11-04 — sửa CI main 3c67776: test giao diện A14 chập chờn
 
 - `tests/test_giao_dien_a14_lop.py::test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do`: CI Linux (run 41803199666) báo `IndexError` ở `r.split("\t", 3)[3]` — `innerText` của `<tr>` chỉ có dấu tab khi bảng đã được vẽ bố cục. Nay chờ đủ 3 hàng rồi đọc từng ô bằng `textContent`, kiểm mỗi hàng 6 ô. Chỉ sửa test; máy cloud chạy cả tệp 3 lần đều 24/24 xanh.

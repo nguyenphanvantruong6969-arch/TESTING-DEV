@@ -10,7 +10,7 @@ import os
 import re
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TIEN_TO_DONG = ("dc_muc_",)
+TIEN_TO_DONG = ()      # T3-31 bỏ ba mức đông (`dc_muc_*`); chưa có khoá ghép tiền tố nào
 
 
 def _doc(p):
@@ -30,5 +30,5 @@ def test_khong_con_khoa_dc_chet():
 
 def test_tien_to_dong_that_su_duoc_ghep():
     ma = "".join(_doc(p) for p in glob.glob(os.path.join(BASE, "js", "*.js")))
-    for tt in TIEN_TO_DONG:
+    for tt in TIEN_TO_DONG:  # noqa: B007
         assert re.search(r"[\"'`]%s[\"'`]\s*\+|`%s\$\{" % (tt, tt), ma), tt

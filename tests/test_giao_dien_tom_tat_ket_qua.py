@@ -88,10 +88,10 @@ def _mo_trang(api):
     page.wait_for_selector("#dropZone")
     page.locator('[data-tab="others"]').click()
     page.wait_for_selector(".kpi-o")
-    page.wait_for_function("document.querySelectorAll('.fill-row').length > 0")
+    page.wait_for_function("document.querySelectorAll('#clbBody tr').length > 0")
     # Mọi mục ở thẻ Kết quả đóng sẵn: mở mục lấp đầy thì dòng mới hiện ra
     # để rê chuột và bấm Tab tới.
-    page.click("#fillPanel .panel-toggle")
+    page.click("#clbPanel .panel-toggle")
     page.wait_for_timeout(200)
     return pw, br, page, loi
 
@@ -118,7 +118,7 @@ def _o_kpi(page):
 
 def _ten_cac_dong(page):
     return page.eval_on_selector_all(
-        ".fill-row", "rs => rs.map(r => r.querySelector('.fill-name').textContent.trim())")
+        "#clbBody tr", "rs => rs.map(r => r.querySelector('.clb-ten').textContent.trim())")
 
 
 # ------------------------------------------------------------------ #
@@ -136,22 +136,24 @@ def test_o_tom_tat_khop_ham_doc(trang):
 
     lap = api.get_club_fill_stats()["data"]
     trong = sum(max(0, c["capacity"] - c["matched"]) for c in lap)
-    assert o["fillPanel"]["so"] == str(trong)
+    assert o["clbPanel"]["so"] == str(trong)
 
     assert o["chuaCoChoPanel"]["so"] == "1"
     assert "is-nguy" in o["chuaCoChoPanel"]["lop"]
     # Trạng thái không bao giờ chỉ là màu: phải có ký hiệu kèm chữ.
     assert o["chuaCoChoPanel"]["phu"].startswith("⚠")
 
+    # T3-24: chỉ còn ba ô (đã có, chưa có, chỗ trống), theo thứ tự đó.
+    assert list(o) == ["dsXepPanel", "chuaCoChoPanel", "clbPanel"]
+
+    # Hai ô đã chuyển xuống thẻ chi tiết: con số vẫn còn, nằm ở đầu từng mục.
     du_tru = api.get_suat_du_tru()["data"]
     thua = sum(c["con_thua"] for c in du_tru)
-    assert o["duTruPanel"]["so"] == "%d/%d" % (
-        thua, sum(c["reserve_capacity"] for c in du_tru))
-    assert "is-on" in o["duTruPanel"]["lop"] and thua == 0
-
+    assert thua == 0
+    assert "%d/%d" % (thua, sum(c["reserve_capacity"] for c in du_tru)) in page.text_content("#duTruTieuDiem")
     nv = api.get_phan_bo_nguyen_vong()["data"]
     assert nv["phan_bo"][0]["so_em"] == nv["tong_da_xep"]
-    assert o["nvPanel"]["so"] == "100%"
+    assert "100" in page.text_content("#nvTieuDiem")
     assert not loi, loi
 
 
@@ -178,7 +180,7 @@ def test_chua_chay_thi_khong_hien_tom_tat(api):
         page.goto(url)
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="others"]').click()
-        page.wait_for_selector(".fill-row", state="attached")
+        page.wait_for_selector("#clbBody tr", state="attached")
         page.wait_for_timeout(300)
         assert page.locator("#tomTatKetQua").is_hidden()
         br.close()
@@ -200,7 +202,7 @@ def test_sap_xep_vang_nhat_dua_clb_it_len_dau_va_duoc_nho(trang):
     moi = page.context.new_page()
     moi.goto(page.url_goc)
     moi.locator('[data-tab="others"]').click()
-    moi.wait_for_function("document.querySelectorAll('.fill-row').length > 0")
+    moi.wait_for_function("document.querySelectorAll('#clbBody tr').length > 0")
     assert moi.input_value("#fillSapXep") == "vang_nhat"
     assert _ten_cac_dong(moi)[0] == "CLB Ít"
     assert _ten_cac_dong(page)[0] == "CLB Ít"
@@ -209,7 +211,7 @@ def test_sap_xep_vang_nhat_dua_clb_it_len_dau_va_duoc_nho(trang):
 
 def test_bam_o_cho_trong_chuyen_sang_vang_nhat(trang):
     page, _, _ = trang
-    page.click('.kpi-o[data-muc="fillPanel"]')
+    page.click('.kpi-o[data-muc="clbPanel"]')
     assert page.input_value("#fillSapXep") == "vang_nhat"
     assert _ten_cac_dong(page)[0] == "CLB Ít"
 
@@ -217,22 +219,27 @@ def test_bam_o_cho_trong_chuyen_sang_vang_nhat(trang):
 def test_nhan_can_de_y_chi_o_clb_duoi_mot_nua(trang):
     page, _, _ = trang
     nhan = page.eval_on_selector_all(
-        ".fill-row",
+        "#clbBody tr",
         """rs => Object.fromEntries(rs.map(r => [
-             r.querySelector('.fill-name').textContent.trim(),
+             r.querySelector('.clb-ten').textContent.trim(),
              (r.querySelector('.fill-tag') || {}).textContent || '']))""")
     assert nhan["CLB Ít"].startswith("○")
     for ten in ("CLB Đầy", "CLB Nửa", "CLB Dự trữ"):
         assert nhan[ten] == "", (ten, nhan[ten])
 
 
-def test_mot_buoi_thi_khong_co_tieu_de_nhom(trang):
+def test_cot_luu_y_va_cot_thanh_lap_day_co_trong_bang(trang):
     page, _, _ = trang
-    assert page.locator(".fill-nhom").count() == 0
+    assert page.locator("#clbPanel th[data-i18n='th_muc_lap_day']").count() == 1
+    assert page.locator("#clubFillList").count() == 0
+    assert page.locator("#fillPanel").count() == 0
+    chu = page.eval_on_selector(
+        '#clbBody tr[data-clb="clb_it"] .clb-lap .fill-pct', "e => e.textContent.trim()")
+    assert chu.endswith("%")
 
 
 # ------------------------------------------------------------------ #
-# 3. CHÚ THÍCH NỔI
+# 3. THANH LẤP ĐẦY TRONG BẢNG (T3-21: không còn chú thích chỉ hiện khi rê chuột)
 # ------------------------------------------------------------------ #
 
 def _doc_tooltip(page):
@@ -248,36 +255,11 @@ def _doc_tooltip(page):
     }""")
 
 
-def test_re_chuot_hien_dung_so_cua_clb(trang):
-    page, loi, _ = trang
-    assert _doc_tooltip(page)["an"]
-    page.locator('.fill-row[data-clb="clb_dt"]').hover()
-    tt = _doc_tooltip(page)
-    assert not tt["an"]
-    assert tt["dau"] == "CLB Dự trữ"
-    assert tt["dong"]["Đã xếp"] == "2/2 · 100%"
-    assert tt["dong"]["· Suất thường"] == "1"
-    assert tt["dong"]["· Vào bằng suất dự trữ"] == "1/1"
-    assert tt["dong"]["Còn trống"] == "0"
-
-    page.mouse.move(5, 5)
-    assert _doc_tooltip(page)["an"]
-    assert not loi, loi
-
-
-def test_ban_phim_toi_dong_cung_hien_chu_thich(trang):
-    page, _, _ = trang
-    page.focus('.fill-row[data-clb="clb_it"]')
-    tt = _doc_tooltip(page)
-    assert not tt["an"] and tt["dau"] == "CLB Ít"
-    assert tt["dong"]["Còn trống"] == "3"
-
-
 def test_doan_du_tru_va_doan_chung_van_cong_dung_ti_le(trang):
     """Khe 2px giữa hai đoạn là bóng đổ, không được ăn vào bề rộng."""
     page, _, _ = trang
     r = page.evaluate("""() => {
-      const row = document.querySelector('.fill-row[data-clb="clb_dt"]');
+      const row = document.querySelector('#clbBody tr[data-clb="clb_dt"]');
       const track = row.querySelector('.fill-track');
       return { mang: track.clientWidth,
                tong: [...row.querySelectorAll('.fill-bar')]
@@ -293,8 +275,8 @@ def test_doi_ngon_ngu_thi_tom_tat_va_chu_thich_doi_theo(trang):
         "document.querySelector('#tomTatTieuDe').textContent === 'Run summary'")
     page.wait_for_function(
         "[...document.querySelectorAll('.kpi-nhan')].some(n => n.textContent === 'Students placed')")
-    page.locator('.fill-row[data-clb="clb_dt"]').hover()
-    assert "Placed" in _doc_tooltip(page)["dong"]
+    page.wait_for_function(
+        "document.querySelector('#clbPanel th[data-i18n=th_luu_y]').textContent === 'Note'")
     assert not loi, loi
 
 
@@ -302,7 +284,7 @@ def test_doi_ngon_ngu_thi_tom_tat_va_chu_thich_doi_theo(trang):
 # 4. NHIỀU BUỔI: NHÓM THEO BUỔI
 # ------------------------------------------------------------------ #
 
-def test_nhieu_buoi_thi_nhom_theo_buoi_co_tong_tung_buoi(api):
+def test_nhieu_buoi_thi_cot_buoi_hien_va_sap_xep_choi_cao(api):
     if CHROMIUM is None:
         pytest.skip("khong tim thay Chromium")
     for ten in ("NHIEUBUOI_01_danh_sach_CLB.csv",
@@ -315,25 +297,14 @@ def test_nhieu_buoi_thi_nhom_theo_buoi_co_tong_tung_buoi(api):
     pw, br, page, loi = _mo_trang(api)
     try:
         lap = api.get_club_fill_stats()["data"]
-        ds_buoi = sorted({c["buoi"] for c in lap})
-        assert page.locator(".fill-nhom").count() == len(ds_buoi)
+        assert page.locator("#clbBody tr").count() == len(lap)
+        assert page.locator("#clbTable thead th.cot-buoi-clb").is_visible()
 
-        tong = page.eval_on_selector_all(
-            ".fill-nhom-so", "ns => ns.map(n => n.textContent.trim())")
-        for b, chu in zip(ds_buoi, tong):
-            xep = sum(c["matched"] for c in lap if c["buoi"] == b)
-            cho = sum(c["capacity"] for c in lap if c["buoi"] == b)
-            assert chu.startswith("%d/%d" % (xep, cho)), (b, chu)
-
-        # Sắp theo cách khác thì bỏ nhóm, và mỗi dòng mang chip buổi.
         page.select_option("#fillSapXep", "choi_cao")
-        assert page.locator(".fill-nhom").count() == 0
-        assert page.locator(".fill-chip-buoi").count() == len(lap)
-        choi = [c["ti_le_choi"] for c in lap]
         assert page.eval_on_selector(
-            ".fill-row", "r => r.dataset.clb") == max(
+            "#clbBody tr", "r => r.dataset.clb") == max(
                 lap, key=lambda c: c["ti_le_choi"] or -1)["club_id"]
-        assert max(choi) > 0
+        assert max(c["ti_le_choi"] or 0 for c in lap) > 0
         assert not loi, loi
     finally:
         br.close()
@@ -381,8 +352,7 @@ def test_mot_thu_hang_thi_mot_cung_phu_kin_vong(trang):
     assert "is-h1" in d["cung"][0]["lop"]
     assert d["cung"][0]["dai"] == pytest.approx(d["chu_vi"], abs=0.01)
     assert d["giua"] == "100%"
-    o = _o_kpi(page)
-    assert d["giua"] == o["nvPanel"]["so"]
+    assert "100" in page.text_content("#nvTieuDiem")
     # Chú giải liệt kê MỌI thứ hạng, kể cả thứ hạng 0 chỗ không có cung.
     assert len(d["chu_giai"]) == 4
 

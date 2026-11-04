@@ -57,6 +57,8 @@ MA_MOI_SAU_ANH_CHUP = {
     "csv_wp_khong_hop_le", "csv_wp_khong_co_nguyen_vong", "csv_wp_bo_qua", "wharton_chua_bat",
     "wharton_ho_so_chua_hop_le", "health_wharton_chua_hop_le", "health_wharton_vang_thi",
     "error_saving_wharton",
+    # T3-L0 (B2): chặn chạy xếp khi chưa có học sinh hoặc CLB.
+    "chua_co_du_lieu_de_chay",
     # A13.8: khoá điểm giữ nguyện vọng / ô tick; điểm chấm sai; điểm chuẩn xuất lỗi; phóng hàng loạt.
     "csv_wharton_khoa_giu_nguyen", "xuat_diem_chuan_loi",
     # Vòng 3 (A13.3): khoá, mở khoá, xoá và quản lý điểm Wharton ở thẻ Quản lý.
@@ -89,7 +91,39 @@ MA_MOI_SAU_ANH_CHUP = {
 
 # Thay đổi CÓ CHỦ Ý sau ảnh chụp (T1/T2, Truong duyệt): đánh số lại thẻ (bảy thành sáu) làm đổi số thẻ
 # trong hai chuỗi, và năm khoá giao diện mồ côi của thẻ Kết quả cũ bị bỏ. Mọi chuỗi khác vẫn giống hệt.
-KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb"}
+KHOA_UI_DA_BO = {"fill_panel_title", "fill_hint", "fill_nhom_tong", "fill_choi", "admin_lich_tuan_title", "admin_lich_tuan_desc", "results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
+                 # T3-L1 (Truong duyệt 04/11/2026): bỏ dòng phụ tên thuật toán, ô "đã nộp nguyện vọng",
+                 # và hai dòng chữ đơn về số khởi tạo (gộp vào một dòng `stb_locked_label`).
+                 "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw",
+                 # T3-L2 (T3-07): bỏ hai ô "Từ/đến" ở bộ chọn buổi, chỉ giữ thẻ buổi và "Chọn tất cả".
+                 "chon_buoi_tu", "chon_buoi_den",
+                 # T3-L2 (T3-04): gộp hai nút kiểm tra thành một (`btn_validate`, đổi chữ).
+                 "btn_health_recheck"}
+
+# T3-L1 (Truong duyệt 04/11/2026): đổi chữ có chủ ý theo bảng 5.1-5.3 của nghiên cứu T3. Chuỗi cũ đổi theo
+# bảng thay chữ dưới đây; chuỗi viết lại hẳn nằm trong `chu_ui_doi_co_y_t3.json` (giá trị MỚI với mặc định
+# trường học). Mọi chuỗi khác vẫn giống hệt ảnh chụp.
+THAY_CHU_T3 = [("Nhập tại chỗ", "Nhập nguyện vọng"), ("Kiosk entry", "Enter preferences"),
+               ("Vận hành sắp xếp", "Xếp CLB"),
+               # T3-L3 (T3-27): chữ giao diện = chữ của Sổ nhập (Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên);
+               # tab 03 và 05 đổi tên (Truong duyệt 04/11/2026).
+               ("Quản lý CLB & dự trữ", "Quản lý CLB"), ("Clubs & reserves", "Manage clubs"),
+               ("Dữ liệu khác", "Chi tiết và xuất tệp"), ("Other data", "Details and export"),
+               ("Suất dự trữ", "Suất ưu tiên"), ("suất dự trữ", "suất ưu tiên"),
+               ("Gán nhãn dự trữ", "Gán nhóm ưu tiên"), ("Nhãn dự trữ", "Nhóm ưu tiên"),
+               ("nhãn dự trữ", "nhóm ưu tiên"), ("Tổng chỗ", "Chỉ tiêu"), ("tổng chỗ", "chỉ tiêu"),
+               ("Reserve seats", "Priority seats"), ("Reserve labels and", "Priority groups and"),
+               ("Current reserve label", "Current priority group"),
+               ("Reserve label to apply", "Priority group to apply"),
+               ("Admitted on a reserved seat", "Admitted on a priority seat"),
+               ("Soft reserved seats", "Soft priority seats"), ("Reserved places", "Priority places"),
+               ("regular or reserved places", "regular or priority places"),
+               ("and total seats.", "and quota."), ("reserves any seats", "has priority seats"),
+               ("reserve seat", "priority seat"), ("Reserve seat", "Priority seat"),
+               ("reserve label", "priority group"), ("Reserve capacity", "Priority seats"),
+               ("reserved seats", "priority seats"), ("Total seats must be", "Quota must be"),
+               ("than total seats", "than quota")]
+CHU_UI_MOI_T3 = os.path.join(GOC, "tests", "du_lieu_ws", "chu_ui_doi_co_y_t3.json")
 SUA_CO_Y = {
     ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],
     ("loi", "so_nhap_canh_bao_clb_ngoai_so"): [("thẻ 04", "thẻ 05"), ("tab 04", "tab 05")],
@@ -114,7 +148,22 @@ def _truoc_da_doi_ten_tham_so(chuoi, ma=None):
 @pytest.fixture(scope="module")
 def anh_chup():
     with open(ANH_CHUP, encoding="utf-8") as f:
-        return json.load(f)
+        d = json.load(f)
+    with open(CHU_UI_MOI_T3, encoding="utf-8") as f:
+        moi = json.load(f)["ui"]
+    for loai in ("loi", "ui"):
+        for lang in ("vi", "en"):
+            bang = d[loai][lang] if loai == "ui" else None
+            if loai == "ui":
+                for k, v in list(bang.items()):
+                    for cu, mo in THAY_CHU_T3:
+                        v = v.replace(cu, mo)
+                    bang[k] = moi[lang].get(k, v)
+            else:
+                for ma, v in d["loi"].items():
+                    for cu, mo in THAY_CHU_T3:
+                        v[lang] = v[lang].replace(cu, mo)
+    return d
 
 
 # ------------------------------------------------------------------ nhan_ws.py
@@ -325,7 +374,7 @@ def test_moi_chuoi_giao_dien_mac_dinh_giong_het_anh_chup(anh_chup):
 MAU_20 = [
     "brand_title", "nav_admin", "nav_scoring", "label_students", "label_clubs",
     "pipeline_desc", "admin_desc", "chua_co_cho_desc", "toast_run_success",
-    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "fill_hint",
+    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "fill_tag_khong_ai",
     "th_score", "th_student_id", "th_club_id", "xuat_opt_ket_qua",
     "scoring_desc", "toast_reset_done_removed", "page_title",
 ]
@@ -360,7 +409,7 @@ def test_giao_dien_cong_ty(anh_chup):
     assert ra["en"]["fallback_step0_title"] == "Find or create an employee"   # a -> an
     assert "học sinh" not in ra["vi"]["pipeline_desc"] and "CLB" not in ra["vi"]["pipeline_desc"]
     assert ra["vi"]["pipeline_desc"] == \
-        "Kiểm tra dữ liệu, bốc thăm, xếp nhân viên vào dự án và xuất kết quả."
+        "Nhập sổ nhập, bấm Chạy để xếp nhân viên vào dự án, rồi tải kết quả."
 
 
 @can_node

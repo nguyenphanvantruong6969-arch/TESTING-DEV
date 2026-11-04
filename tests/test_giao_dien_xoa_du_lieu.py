@@ -251,6 +251,7 @@ def test_the_van_hanh_sach_het_sau_khi_xoa_toan_bo(trang, tmp_path):
 
     # Chạy sắp xếp với số khởi tạo khác mặc định -> stepper ghi "Xong",
     # bốc thăm bị khoá và ô số khởi tạo bị khoá theo.
+    page.evaluate("document.getElementById('nangCao').open = true")
     page.fill("#seedInput", "7")
     page.locator("#btnRun").click()
     page.wait_for_function(
@@ -281,7 +282,7 @@ def test_the_van_hanh_sach_het_sau_khi_xoa_toan_bo(trang, tmp_path):
         "document.querySelector('#seedInput').readOnly === false", timeout=10000
     )
     # Bốn ô số ở đầu thẻ đều về 0.
-    for o in ("#statStudents", "#statClubs", "#statPrefs", "#statMatched"):
+    for o in ("#statStudents", "#statClubs", "#statMatched"):
         assert page.locator(o).inner_text() == "0", o
     assert page.locator("#importQueue .queue-row").count() == 0
     assert page.locator("#importWarnings").is_hidden()
@@ -292,7 +293,7 @@ def test_the_van_hanh_sach_het_sau_khi_xoa_toan_bo(trang, tmp_path):
     assert trang_thai and all(s == "" for s in trang_thai), trang_thai
     assert page.locator("#logPanel").is_hidden()
     assert page.input_value("#seedInput") == "42"
-    assert page.locator("#seedLockHint").is_hidden()
+    assert page.locator("#seedLockHint").count() == 0   # T3-05: bỏ dòng chữ đơn thứ hai
     assert page.locator("#runConfirmBar").count() == 0
     assert not loi, loi
 
