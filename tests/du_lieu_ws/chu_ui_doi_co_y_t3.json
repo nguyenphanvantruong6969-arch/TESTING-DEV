@@ -3,6 +3,7 @@
   "en": {
    "admin_desc": "Add or edit clubs, quotas and priority seats. A priority group only gets those seats in a club with the same label.",
    "btn_score_link": "Score",
+   "btn_validate": "Re-check data",
    "fallback_desc": "Find or create a student, then choose test clubs and rank preferences.",
    "import_hint": "No intake workbook yet? Press \"Download sample workbook\", fill it in, then drag it into the box below.",
    "label_seed": "Draw code",
@@ -29,6 +30,7 @@
   "vi": {
    "admin_desc": "Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.",
    "btn_score_link": "Chấm",
+   "btn_validate": "Kiểm tra lại dữ liệu",
    "fallback_desc": "Tìm hoặc tạo học sinh, rồi chọn CLB dự thi và xếp hạng nguyện vọng.",
    "import_hint": "Chưa có sổ nhập? Bấm \"Tải sổ nhập mẫu\", điền xong rồi kéo vào ô bên dưới.",
    "label_seed": "Mã bốc thăm",

@@ -1998,6 +1998,7 @@ html.tat-hieu-ung .status-strip:hover {
   border: 1px solid var(--gold);
   border-radius: var(--radius-sm);
 }
+.import-actions[hidden] { display: none; }   /* display:flex đè thuộc tính hidden (T3-03) */
 .import-actions {
   margin-top: 14px;
   display: flex;
@@ -3079,3 +3080,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .nang-cao { margin: 6px 0 2px; font-size: 13px; }
 .nang-cao > summary { cursor: pointer; color: var(--ink-soft, var(--ink)); }
 .nang-cao .seed-input-wrap { margin-top: 6px; }
+
+/* T3-02: cảnh báo cùng loại gom một dòng; nút nhảy tới chỗ sửa ở dòng chặn chạy. */
+.canh-bao-nhom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.canh-bao-dong { padding-left: 14px; color: var(--slate); }
+.health-di-toi { margin-left: auto; flex: none; }
