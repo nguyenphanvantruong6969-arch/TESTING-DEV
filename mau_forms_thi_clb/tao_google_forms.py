@@ -51,6 +51,8 @@ MAU = r"""/**
 
 // Để trống nếu biểu mẫu được tạo bằng chính dự án này sau khi có hàm chamTheoCLB.
 const LINK_BIEU_MAU = '';
+// Chỉ dùng khi bật cột Lớp mà script không gắn với bảng tính chứa tab hoc_sinh.
+const ID_BANG_HOC_SINH = '';
 
 const TIEU_DE = %(tieu_de)s;
 const DIEM_CAU = %(diem)d;
@@ -238,8 +240,17 @@ function chuanHoa_(s) {
  *                       cột) và trang Cảnh báo (phiếu bị bỏ và lý do)
  *   RAW_PHIEU.xlsx      mọi câu trả lời, đã chấm từng câu
  *   DAP_AN.xlsx         đáp án. Định dạng hai tệp này: DINH_DANG_RAW.md.
+ *
+ * Cột Lớp (tuỳ chọn, mặc định TẮT): chamTheoCLB(true), hoặc chạy chamTheoCLBCoLop
+ *   từ trình soạn thảo, thêm cột thứ 20 `lop` vào RAW_PHIEU, lấy từ tab "hoc_sinh"
+ *   (cột ma_hs và lop) lúc xuất. Biểu mẫu KHÔNG hỏi lớp. Tab nằm trong bảng tính
+ *   gắn với script, hoặc điền ID_BANG_HOC_SINH. Tắt thì kết quả y như cũ.
  */
-function chamTheoCLB() {
+function chamTheoCLBCoLop() { chamTheoCLB(true); }
+
+function chamTheoCLB(ghiLop) {
+  // Chỉ đúng `true` mới bật: trình kích hoạt và menu truyền đối tượng sự kiện, không được bật nhầm.
+  const lopCua = ghiLop === true ? docLopHocSinh_() : null;
   const form = moBieuMau_();
   const phieu = form.getResponses();
   const daCo = {};
@@ -411,7 +422,7 @@ function chamTheoCLB() {
   xuatExcel_(ss.getId(), thuMuc, 'BANG_DIEM.xlsx');
   taoSoNhap_(thuMuc, soClb, soHs);
 
-  taoTepNap_(thuMuc, 'RAW_PHIEU', raw);
+  taoTepNap_(thuMuc, 'RAW_PHIEU', lopCua ? themCotLop_(raw, lopCua) : raw);
   taoTepNap_(thuMuc, 'DAP_AN', bangDapAn_());
 
   Logger.log('Đã chấm ' + hocSinh.length + ' học sinh.');
@@ -427,6 +438,30 @@ function chamTheoCLB() {
 const COT_RAW = ['phieu_so', 'thoi_gian_nop', 'email', 'student_id', 'trang_thai_phieu',
   'ma_cau', 'loai_cau', 'buoi', 'club_id', 'cau_so', 'cau_hoi', 'tra_loi',
   'dap_an_dung', 'dung_sai', 'diem', 'diem_toi_da', 'diem_forms', 'duoc_tinh', 'ghi_chu'];
+
+// Cột tuỳ chọn thứ 20 `lop`, NGOÀI COT_RAW: lấy từ tab hoc_sinh theo mã học sinh của dòng.
+function docLopHocSinh_() {
+  const bang = ID_BANG_HOC_SINH ? SpreadsheetApp.openById(ID_BANG_HOC_SINH) : SpreadsheetApp.getActiveSpreadsheet();
+  const sh = bang ? bang.getSheetByName('hoc_sinh') : null;
+  if (!sh) throw new Error('Không thấy tab "hoc_sinh". Tạo tab này (cột ma_hs, lop) hoặc điền ID_BANG_HOC_SINH.');
+  const v = sh.getDataRange().getValues();
+  const td = v[0].map(function (x) { return String(x).trim(); });
+  const iMa = td.indexOf('ma_hs'), iLop = td.indexOf('lop');
+  if (iMa < 0 || iLop < 0) throw new Error('Tab "hoc_sinh" phải có cột ma_hs và lop.');
+  const lop = {};
+  v.slice(1).forEach(function (r) {
+    const ma = String(r[iMa]).trim();
+    if (ma && !lop.hasOwnProperty(ma)) lop[ma] = String(r[iLop]).trim();
+  });
+  return lop;
+}
+
+function themCotLop_(raw, lopCua) {
+  return raw.map(function (r, i) {
+    if (i === 0) return r.concat(['lop']);
+    return r.concat([lopCua.hasOwnProperty(r[3]) ? lopCua[r[3]] : '']);   // r[3] = student_id
+  });
+}
 
 function moTaCau_() {
   const M = {student_id: {loai: 'thong_tin'}, name: {loai: 'thong_tin'}};

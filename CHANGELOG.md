@@ -13,6 +13,17 @@ Cùng kiểu rủi ro với B9 (SQLite của CI báo "incomplete input"). Chỉ 
 - Dùng ở `tests/test_a14_tu_vung_cohort.py::test_di_tru_schema_them_cot_vao_csdl_cu_chay_lap_va_giu_du_lieu` và `tests/test_a14_sua_sau_soat.py::_csdl_cu_co_du_lieu`. Mọi assert giữ nguyên; 48 ca của hai tệp xanh.
 - Trên nhánh này `test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien` vẫn là bản trước B9; bản sửa B9 có ở `main`, giữ nguyên để gộp không xung đột.
 
+## 2026-11-04 — T4-K1 (ngoài sổ, Truong duyệt 03/11/2026): cột `lop` tuỳ chọn từ `hoc_sinh` tới cột Lớp của Sổ
+
+Thay đổi số 1 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md` (DEC-2: lớp lấy từ `hoc_sinh` lúc xuất, biểu mẫu KHÔNG hỏi lớp).
+
+- **`xu_li_raw.py`:** `COT_RAW` giữ 19 cột. RAW có cột `lop` (cột thứ 20) thì ghi vào cột Lớp của Sổ (`ghi_so_nhap(co_lop=True)`, A14), lấy lớp từ PHIẾU GIỮ, chuẩn hoá bằng `chuan_hoa_lop` của phần mềm (không viết hàm mới). Các phiếu của cùng một mã ghi lớp (khác rỗng) khác nhau thì thêm mục "lop_khac_giua_cac_phieu" vào `BAO_CAO_BAT_THUONG.md`. Không có cột `lop`: Sổ và báo cáo y như cũ.
+- **`TAO_GOOGLE_FORM.gs` và `tao_google_forms.py` (sinh giống hệt):** `chamTheoCLB(ghiLop)`, chỉ `ghiLop === true` mới bật (menu/trigger truyền đối tượng sự kiện không bật nhầm); mặc định TẮT thì RAW 19 cột như cũ. Bật thì thêm cột `lop` đọc từ tab `hoc_sinh` (`ma_hs`, `lop`); hàm mới `chamTheoCLBCoLop`, `docLopHocSinh_`, `themCotLop_`, hằng `ID_BANG_HOC_SINH`. Thiếu tab thì báo lỗi trước khi tạo thư mục. `COT_RAW` của `.gs` vẫn bằng của skill.
+- **Tài liệu:** `DINH_DANG_RAW.md` (cột tuỳ chọn thứ 20), `SKILL.md` của `xu-li-raw-forms` và `tao-google-form-clb`.
+- **Test mới:** `tests/test_t4_k1_lop.py` (10 ca): có `lop`; không có `lop` (Sổ bằng đúng cách cũ); `lop` rỗng; lớp khác nhau giữa các phiếu; phiếu giữ trống lớp; thư mục nhiều phần có `lop`; `.gs` mặc định tắt (kể cả khi truyền sự kiện), bật, thiếu tab `hoc_sinh`; `.gs` khớp `noi_dung()`. Ca ghim `COT_RAW` ở `test_skill_xu_li_raw.py` giữ xanh.
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 180 tệp test.
+- Không đụng kiosk, hợp đồng cột CSV, `match_results`.
+
 ## 2026-11-03 — T4-K3 (ngoài sổ, Truong duyệt 03/11/2026): skill `xu-li-raw-forms` đọc thư mục nhiều phần CSV
 
 Thay đổi số 3 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md`: đợt trên 1.000 phiếu được xuất thành nhiều phần `<tên>_p01.csv`, `_p02.csv`... nên skill phải ghép được.

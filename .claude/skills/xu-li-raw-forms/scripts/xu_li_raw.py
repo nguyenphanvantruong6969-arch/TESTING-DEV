@@ -35,6 +35,7 @@ sys.path.insert(0, DAY)
 
 import sinh_du_lieu as sdl  # noqa: E402  (soat, ghi_bo, TEN_SO, trần)
 import so_nhap  # noqa: E402  (sinh_du_lieu đã đặt sẵn đường tìm)
+from rbda_priority_pipeline import chuan_hoa_lop  # noqa: E402  (bộ chuẩn hoá lớp A14, không viết lại)
 
 COT_RAW = ["phieu_so", "thoi_gian_nop", "email", "student_id", "trang_thai_phieu",
            "ma_cau", "loai_cau", "buoi", "club_id", "cau_so", "cau_hoi", "tra_loi",
@@ -154,7 +155,7 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         "phieu_trung", "phieu_khong_ma", "ma_sai_dang", "email_hai_ma",
         "dap_an_forms_lech", "diem_raw_lech", "lam_khong_tick", "tick_khong_lam",
         "qua_tran", "thieu_xep_hang", "trung_hang", "bo_trong_top", "clb_nhieu_top", "bai_khong_hop_le",
-        "cau_la", "khong_dang_ky_buoi", "ghi_chu"))
+        "cau_la", "khong_dang_ky_buoi", "lop_khac_giua_cac_phieu", "ghi_chu"))
 
     # ---- đáp án và danh sách CLB theo đáp án
     khoa, diem_cau, thu_tu_clb, ten_clb, buoi_clb = {}, {}, [], {}, {}
@@ -187,10 +188,18 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         phieu.setdefault(so(r["phieu_so"]), []).append(r)
     phieu = OrderedDict(sorted(phieu.items()))
 
+    # ---- cột lop tuỳ chọn (T4-K1): có trong tiêu đề thì dòng raw có khoá "lop"
+    co_lop = any("lop" in r for r in raw)
+    lop_cua = {}      # sid -> {phiếu: lớp đã chuẩn hoá} (chỉ phiếu có lớp)
+
     # ---- chọn phiếu giữ: phiếu đầu của mỗi mã
     giu, dau_tien, email_ma = OrderedDict(), {}, {}
     for ps, rows in phieu.items():
         sid = next((r["student_id"] for r in rows if r["student_id"]), "")
+        if co_lop and sid:
+            lop = next((chuan_hoa_lop(r.get("lop")) for r in rows if chuan_hoa_lop(r.get("lop"))), None)
+            if lop:
+                lop_cua.setdefault(sid, {})[ps] = lop
         email = next((r["email"] for r in rows if r["email"]), "")
         if email and sid:
             email_ma.setdefault(email.lower(), set()).add(sid)
@@ -202,6 +211,10 @@ def xu_li(raw, dap_an=None, clb_truong=None):
             continue
         dau_tien[sid] = ps
         giu[ps] = (sid, rows)
+    for sid, theo_phieu in lop_cua.items():
+        if len(set(theo_phieu.values())) > 1:
+            bc["lop_khac_giua_cac_phieu"].append("%s: %s (lấy lớp của phiếu giữ %d)" % (
+                sid, "; ".join("phiếu %d ghi %s" % kv for kv in sorted(theo_phieu.items())), dau_tien[sid]))
     for e, ds in email_ma.items():
         if len(ds) > 1:
             bc["email_hai_ma"].append("%s dùng %d mã: %s" % (e, len(ds), ", ".join(sorted(ds))))
@@ -288,8 +301,11 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         for cid in sorted(tick - set(lam), key=lambda c: thu_tu.get(c, 99)):
             bc["tick_khong_lam"].append("%s: %s" % (sid, cid))
 
-        hs.append({"student_id": sid, "name": ten, "reserve_group": "",
-                   "nguyen_vong": nv, "diem": diem_hs})
+        em = {"student_id": sid, "name": ten, "reserve_group": "",
+              "nguyen_vong": nv, "diem": diem_hs}
+        if co_lop:
+            em["lop"] = lop_cua.get(sid, {}).get(ps, "")     # lớp của PHIẾU GIỮ
+        hs.append(em)
 
     for ma, n in sorted(lech_forms.items()):
         bc["dap_an_forms_lech"].append("%s: %d bài Forms chấm khác đáp án gốc" % (ma, n))
@@ -333,6 +349,7 @@ TIEU_DE_BC = OrderedDict([
     ("bai_khong_hop_le", "Bài thi không hợp lệ (bị bỏ)"),
     ("cau_la", "Câu hỏi lạ, không thuộc mẫu (biểu mẫu có thể bị sửa tay)"),
     ("khong_dang_ky_buoi", "Học sinh không đăng ký buổi nào"),
+    ("lop_khac_giua_cac_phieu", "Cùng một mã học sinh nhưng các phiếu ghi lớp khác nhau (lấy lớp của phiếu giữ)"),
     ("ghi_chu", "Ghi chú"),
 ])
 
@@ -398,6 +415,7 @@ def doc_clb_tu_so(duong):
 
 def chay(duong_raw, thu_muc_ra, duong_dap_an=None, duong_clb=None):
     td, raw = doc_raw(duong_raw)
+    td_raw = td
     _can_cot("RAW_PHIEU", td, COT_RAW)
     dap_an = None
     if duong_dap_an:
@@ -434,8 +452,13 @@ def chay(duong_raw, thu_muc_ra, duong_dap_an=None, duong_clb=None):
             c["capacity"] = ""
     # co_nhom=False: biểu mẫu không hỏi nhóm ưu tiên. Không có cột thì phần
     # mềm GIỮ nhóm đã gán; có cột mà trống thì phần mềm sẽ BỎ nhóm của em.
+    # T4-K1: RAW có cột `lop` (ngoài COT_RAW) thì sổ có cột Lớp; không có thì sổ y như cũ.
+    co_lop = "lop" in td_raw
+    if co_lop:
+        for st, h in zip(students, hs):      # thanh_so giữ nguyên thứ tự hs
+            st["class_id"] = h.get("lop") or ""
     so_nhap.ghi_so_nhap(os.path.join(thu_muc_ra, sdl.TEN_SO), clubs, students,
-                        co_nhom=False)
+                        co_nhom=False, co_lop=co_lop)
     with io.open(os.path.join(thu_muc_ra, "BAO_CAO_BAT_THUONG.md"), "w", encoding="utf-8") as f:
         f.write(viet_bao_cao(clb, hs, bc, clb_truong is not None))
     return clb, hs, bc

@@ -47,6 +47,10 @@ python .claude/skills/xu-li-raw-forms/scripts/xu_li_raw.py \
   phần, tiêu đề các phần khác nhau, có hai bộ xuất (tiền tố khác) trong cùng thư
   mục, hoặc một phiếu nằm ở hai phần. Khi đó xuất tiếp cho đủ, hoặc để mỗi bộ
   một thư mục, rồi chạy lại.
+- **Cột `lop` tuỳ chọn (T4-K1).** Nếu tiêu đề RAW có thêm cột `lop` (cột thứ 20, ngoài 19 cột của
+  `COT_RAW`; do `chamTheoCLB(true)` ghi từ tab `hoc_sinh`), script ghi nó vào cột **Lớp** của Sổ
+  (lớp của phiếu giữ, chuẩn hoá bằng `chuan_hoa_lop` của phần mềm). Một mã có các phiếu ghi lớp khác
+  nhau thì báo trong `BAO_CAO_BAT_THUONG.md`. Không có cột `lop` thì Sổ y như cũ, không có cột Lớp.
 - `--dap-an` nên có. Thiếu thì dùng cột `diem` có sẵn trong raw, không chấm lại.
 - `--clb` là danh sách CLB đã điền chỉ tiêu: một Sổ nhập CLB (đọc sheet
   `1. CLB`), hoặc tệp kiểu cũ có cột `club_id, name, capacity, reserve_capacity,

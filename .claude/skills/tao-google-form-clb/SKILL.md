@@ -88,6 +88,9 @@ chặn, nhưng phải nói lại với người dùng.
 - Chọn làm bài phải theo thứ tự trong danh sách: Google không nhớ em đã làm CLB
   nào, nên mỗi trang "tiếp theo" chỉ liệt kê CLB đứng sau.
 - Google chỉ cho một tổng điểm. Điểm từng CLB do hàm `chamTheoCLB` tách ra.
+- **Cột Lớp (tuỳ chọn, mặc định tắt).** Biểu mẫu không hỏi lớp. Muốn RAW có cột `lop`: tạo tab `hoc_sinh`
+  (cột `ma_hs`, `lop`) trong bảng tính gắn với script (hoặc điền `ID_BANG_HOC_SINH`), rồi chạy
+  `chamTheoCLBCoLop` thay cho `chamTheoCLB`. Skill `xu-li-raw-forms` ghi cột đó vào cột Lớp của Sổ.
 - Apps Script chạy tối đa 6 phút mỗi lần. Trên khoảng 400 câu hỏi thì nên chia
   thành hai biểu mẫu.
 
