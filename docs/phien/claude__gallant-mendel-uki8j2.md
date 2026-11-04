@@ -57,7 +57,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 ## Plan (coord writes; impl/tester tick)
 - [x] P0 protocol, role-aware Stop hook (`.claude/hooks/handoff_khi_day_ngu_canh.py`, tests/test_hook_ban_giao.py 6 cases)
 - [x] L0 impl (661bccb, fix1 e8944b2)  - [x] L0 tester NO BUGS  - [x] L0 PR nguyenphanvantruong6969-arch/TESTING-DEV#10
-- [ ] L1 impl  - [ ] L1 tester NO BUGS  - [ ] L1 PR
+- [x] L1 impl (0fd4981)  - [ ] L1 tester NO BUGS  - [ ] L1 PR
 - [ ] L2 impl  - [ ] L2 tester NO BUGS  - [ ] L2 PR
 - [ ] L3 impl  - [ ] L3 tester NO BUGS  - [ ] L3 PR
 - [ ] Final report to Truong (files, new tests, skipped items, screenshots)
@@ -66,9 +66,9 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 fixci1 pushed 75ed1e3; L1 local (3 commits) |
+| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L1 done 0fd4981; idle (near 400k: hand off before L2) |
 | tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | NO BUGS at e8944b2; archived |
-| tester L1 | (create on IMPL DONE L1) | Sonnet | |
+| tester L1 | session_01YVAytyqX3m4RorzT6ML4Qx | Sonnet | REVIEW L1 2947617..0fd4981 + L0 fixci1 sent 14:21 UTC |
 
 ## Current state (overwrite each handoff)
 - L0 done: PR #10 open (subscribed), awaiting Truong merge + CI. L1 sent to impl.
@@ -77,7 +77,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 - (none yet)
 
 ## Next steps (ordered)
-1. Watch CI on 75ed1e3 (L0 fixci1, test-only: old A13.13/stress/ws_nhan assertions aligned to Truong B2/B3). 2. On "IMPL DONE L1": create Sonnet tester with REVIEW L1 and ALSO 7f7a845..75ed1e3 (check assertions were aligned, not weakened).
+1. Wait for "TESTER REPORT L1 + L0fixci1". NO BUGS -> update PR #10 (title+body L0+L1), ask impl to hand off, create fresh impl (Sonnet) with GO L2.
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
