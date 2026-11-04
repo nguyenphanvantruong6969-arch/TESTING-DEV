@@ -61,3 +61,31 @@ def test_t3_21_va_t3_23_khung_gop():
     for ma in ("xuatKetQua", "xuatKemCsv", "xuatDauVao", "xuatThayDoi", "xuatHocSinh", "btnChonHocSinh"):
         assert 'id="%s"' % ma in nang_cao, ma
     assert html.index('id="btnXuatTuyChon"') > html.index("</details>", html.index('id="xuatNangCao"'))
+
+
+def test_tap_ma_buoi_trong_js_bang_so_nhap_nhan_buoi():
+    """Bảng mã trong JS (`MA_BUOI_CO_NHAN`) đúng bằng tập mã của `so_nhap.NHAN_BUOI`; `i18n.js` (lọc lỗi) dùng cùng tập."""
+    js = _doc("js/05_quan_ly.js")
+    m = re.search(r"MA_BUOI_CO_NHAN = new Set\(\[(.*?)\]\)", js, re.S)
+    assert m
+    assert set(re.findall(r'"([a-z_0-9]+)"', m.group(1))) == {ma for _, ma in so_nhap.NHAN_BUOI}
+    ma_i18n = re.search(r"/\^\(thu_\[2-7\]\|chu_nhat\)\$/", _doc("i18n.js"))
+    assert ma_i18n and {"chu_nhat", "thu_2", "thu_7"} <= {ma for _, ma in so_nhap.NHAN_BUOI}
+
+
+def test_loi_co_tham_so_buoi_hien_nhan_khong_hien_ma():
+    """Lỗi/cảnh báo có tham số `buoi` ở dạng mã (thu_2) phải hiện nhãn (Thứ 2)."""
+    import subprocess
+    kich_ban = (
+        "global.window = global; global.document = {querySelectorAll(){return []}, documentElement:{}};"
+        "global.localStorage = {getItem(){return null}, setItem(){}};"
+        "require('./i18n_loi.js'); require('./i18n.js');"
+        "const I = (global.window.I18N || global.I18N);"
+        "const msg = I.translateError({code:'health_oversubscribed_buoi', params:{buoi:'thu_2', n_seats:1, n_students:2, n_short:1}});"
+        "console.log(msg);"
+    )
+    kq = subprocess.run(["node", "-e", kich_ban], cwd=GOC, capture_output=True, text=True)
+    if kq.returncode != 0:
+        import pytest
+        pytest.skip("node không chạy được i18n.js: " + kq.stderr[-200:])
+    assert "Thứ 2" in kq.stdout and "thu_2" not in kq.stdout

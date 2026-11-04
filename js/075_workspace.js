@@ -195,7 +195,7 @@ function wsVeDanhSach() {
       wsEl("th", { text: t("ws_cot_ten") }),
       wsCoCotLoai ? wsEl("th", { text: t("ws_cot_loai") }) : null,
       wsEl("th", { text: t("ws_cot_sua") }),
-      wsEl("th", { text: t("th_thao_tac") })));
+      wsEl("th", null, wsEl("span", { class: "sr-only", text: t("th_thao_tac") }))));
     const tbody = wsEl("tbody");
     wsDanhSach.forEach((w) => {
       tbody.append(wsDongWorkspace(w));

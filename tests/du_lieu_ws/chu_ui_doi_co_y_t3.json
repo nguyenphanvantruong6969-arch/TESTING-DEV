@@ -2,7 +2,7 @@
  "ui": {
   "en": {
    "admin_desc": "Add or edit clubs, quotas and priority seats. A priority group only gets those seats in a club with the same label.",
-   "btn_reset_entry": "Start over",
+   "btn_reset_entry": "Clear this student's whole entry",
    "btn_score_link": "Score",
    "btn_validate": "Re-check data",
    "btn_xuat_tuy_chon": "Export results (Excel)",
@@ -26,6 +26,7 @@
    "th_reserve_capacity": "Priority seats",
    "th_reserve_group": "Priority group",
    "th_ti_le_choi": "Students per place",
+   "tom_tat_lan_chay": "Latest run: {luc}",
    "ws_btn_nhap_zip": "Restore from an archive file",
    "ws_btn_xuat": "Back up to an archive file",
    "ws_r_max_choices": "Most choices per round (1 to 20)",
@@ -34,7 +35,7 @@
   },
   "vi": {
    "admin_desc": "Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.",
-   "btn_reset_entry": "Xoá nguyện vọng của học sinh này",
+   "btn_reset_entry": "Xoá toàn bộ phiếu của học sinh này",
    "btn_score_link": "Chấm",
    "btn_validate": "Kiểm tra lại dữ liệu",
    "btn_xuat_tuy_chon": "Xuất kết quả (Excel)",
@@ -58,6 +59,7 @@
    "th_reserve_group": "Nhóm ưu tiên",
    "th_so_dang_ky": "Số đăng ký",
    "th_ti_le_choi": "Học sinh trên mỗi chỗ",
+   "tom_tat_lan_chay": "Lần chạy gần nhất: {luc}",
    "ws_btn_luu_mau": "Lưu làm mẫu",
    "ws_btn_nhap_zip": "Khôi phục từ tệp nén",
    "ws_btn_xuat": "Sao lưu ra tệp nén",

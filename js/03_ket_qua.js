@@ -321,7 +321,7 @@ function loadTomTatKetQua() {
     const dong = el("tomTatLanChay");
     const r = lanChay.ok && lanChay.data;
     dong.textContent = r
-      ? t("tom_tat_lan_chay", { luc: r.run_at || "—", seed: r.seed ?? "—" })
+      ? t("tom_tat_lan_chay", { luc: r.run_at ? dinhDangGio(r.run_at) : "—" })
       : "";
   });
 }

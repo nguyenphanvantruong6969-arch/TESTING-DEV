@@ -212,7 +212,7 @@ def test_nhap_tai_cho_hang_hoc_sinh_moi_nam_ngay_duoi_o_tim_va_menu_ba_cham(api,
     page.click("#menuHocSinh > summary")
     for ma in ("btnXuatEmNay", "btnResetStudentEntry", "btnDeleteStudent"):
         assert page.locator("#" + ma).is_visible(), ma
-    assert page.inner_text("#btnResetStudentEntry") == "Xoá nguyện vọng của học sinh này"
+    assert page.inner_text("#btnResetStudentEntry") == "Xoá toàn bộ phiếu của học sinh này"
     assert not loi
 
 

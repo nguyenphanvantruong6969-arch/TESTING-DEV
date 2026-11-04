@@ -167,7 +167,7 @@
       dem_suat: "{n} suất chưa dùng",
       dem_cho: "{n} chỗ đã xếp",
       tom_tat_title: "Tóm tắt lần xếp",
-      tom_tat_lan_chay: "Lần chạy gần nhất: {luc} · số khởi tạo {seed}",
+      tom_tat_lan_chay: "Lần chạy gần nhất: {luc}",
       kpi_da_xep: "{person} đã có chỗ",
       kpi_da_xep_phu: "{p}% {person_l}",
       kpi_nv1: "Được nguyện vọng 1",
@@ -289,7 +289,7 @@
       placeholder_new_student_id: "Mã {person_l} mới",
       placeholder_full_name: "Họ tên",
       btn_create_student: "Tạo {person_l} mới",
-      btn_reset_entry: "Xoá nguyện vọng của học sinh này",
+      btn_reset_entry: "Xoá toàn bộ phiếu của {person_l} này",
       confirm_reset_entry: "Bấm lần nữa để xoá hết, kể cả {score_l} đã chấm, và nhập lại",
       btn_delete_student: "Xoá {person_l}",
       confirm_delete_student: "Bấm lần nữa để xoá {person_l}",
@@ -882,7 +882,7 @@
       dem_suat: "{n} unused seats",
       dem_cho: "{n} placements",
       tom_tat_title: "Run summary",
-      tom_tat_lan_chay: "Latest run: {luc} · starting number {seed}",
+      tom_tat_lan_chay: "Latest run: {luc}",
       kpi_da_xep: "{person_p} placed",
       kpi_da_xep_phu: "{p}% of {person_pl}",
       kpi_nv1: "Got first choice",
@@ -1004,7 +1004,7 @@
       placeholder_new_student_id: "New {person_l} ID",
       placeholder_full_name: "Full name",
       btn_create_student: "Create new {person_l}",
-      btn_reset_entry: "Start over",
+      btn_reset_entry: "Clear this {person_l}'s whole entry",
       confirm_reset_entry: "Click again to clear everything, {score_pl} included, and start over",
       btn_delete_student: "Delete {person_l}",
       confirm_delete_student: "Click again to delete this {person_l}",
@@ -1585,13 +1585,24 @@
     return interpolate(template, params);
   }
 
+  /* T3-14: tham so `buoi` cua loi la ma (thu_2 ...); hien cho nguoi dung thi
+     thay bang nhan ("Thứ 2"). Ma khac (ten tu nhap) giu nguyen. */
+  function nhanHoaBuoi(params) {
+    if (!params || params.buoi === null || params.buoi === undefined) return params;
+    const doi = (b) => (typeof b === "string" && /^(thu_[2-7]|chu_nhat)$/.test(b)
+      ? t("buoi_ma_" + b) : b);
+    const moi = Object.assign({}, params);
+    moi.buoi = Array.isArray(params.buoi) ? params.buoi.map(doi) : doi(params.buoi);
+    return moi;
+  }
+
   function translateError(entry) {
     if (entry === null || entry === undefined) return "";
     if (typeof entry === "string") return entry;
     if (typeof entry === "object" && entry.code) {
       const table = ERROR_MESSAGES[entry.code];
       const template = table ? (table[currentLang] || table.vi) : entry.code;
-      return interpolate(template, entry.params);
+      return interpolate(template, nhanHoaBuoi(entry.params));
     }
     try {
       return JSON.stringify(entry);
