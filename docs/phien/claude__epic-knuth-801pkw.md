@@ -29,7 +29,8 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 - [x] T4-K1 optional `lop` column (CON-5, fff0f41 + fix 85d22ce, tester NO BUGS)
 - [ ] T4 design review round 5 (gate for K2): tester CON-6 reviewing commit 00372e0
 - [ ] T4-K2 Apps Script (xuLyLo, caiLaiTrigger, 15 menus, export in parts) by CON-5 after "GO K2"
-- [ ] Merge main, recount tests, full suite, push, open PR to main, watch CI until green
+- [x] Merge main (aac38df), recount 181 files / 3.360 cases, PR opened: nguyenphanvantruong6969-arch/TESTING-DEV#8
+- [ ] Full suite after merge (was running in Opus session) + CI green on PR #8; then T4-K2 as a follow-up
 
 ## Current state (overwrite each handoff)
 - Coordinator = Opus session session_01VfPzNvdGizkwxJ8cd64rmp (handing off now, context > 400k).
@@ -52,6 +53,11 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
   by M11). Non-blocking: §7.7 intro says round 3; §9.3 totals rounding; ketThucLo re-arms forever if RAW has hand-typed rows
   (say so); API < phieu has no exit (say "Từ chối that row" or V1 unsupported); no cau_hinh key for last API count.
 
+- PR #8 (claude/epic-knuth-801pkw -> main) opened 2026-11-04 WITHOUT T4-K2. Merge resolution: kept branch T1b
+  (all pairs, per language) + main's C1 rule (changing a duplicate pair to another shared label = new pair, key includes
+  label casefold); tests/test_a14_sua_sau_soat.py taken from main; mau_csv/tao_so_nhap.py = main's + cfg=chuan_hoa({});
+  SO_NHAP_CLB.xlsx regenerated. 241 related tests green after merge; full suite result not yet read.
+
 ## Decisions and gotchas (keep short)
 - Truong approved T4-K1/K2 (TIEN_DO 3e9b0bc). K2 starts only after the design review passes (Truong's order).
 - Deviations from Truong's original K2 wording, to report to him: Từ chối sets ban_giu=0 and re-ranks (M5); a second full export
@@ -65,11 +71,12 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
   /opt/pw-browsers); run with PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers; full suite ~23 min.
 
 ## Next steps (ordered)
+0. Check PR #8 CI (subscribe_pr_activity in the new session) and fix failures; run full suite locally if needed.
 1. Decide B1-B5 (see Current state), send to CON-7 to write into §7.7 (+ non-blocking items), then CON-6 quick re-check.
 2. When it passes: send "GO K2" to CON-5 with: follow §7.7 + N decisions at the latest design commit; list deviations.
 3. CON-5 reports "CON-5 K2 DONE" -> CON-6 reviews code -> loop until NO BUGS. Report to Truong: files, new tests (cases),
    soat-ma, uncertain points.
-4. PR: merge origin/main into the branch; conflicts in workspace.py, cau_hinh_ws.py, docs/ke_hoach/CLAUDE_CHI_TIET.md (T1/T2);
+4. (DONE except CI) PR: merge origin/main into the branch; conflicts in workspace.py, cau_hinh_ws.py, docs/ke_hoach/CLAUDE_CHI_TIET.md (T1/T2);
    tests/test_a14_sua_sau_soat.py::test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien take main's version (B9, no DROP
    COLUMN); recount test files and cases (collect-only; K1 wrote 3.319 uncounted). Full suite, soat-ma, push, open PR to main,
    subscribe_pr_activity, fix CI until green.
@@ -94,3 +101,4 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 | 2026-11-03 | Sonnet | Final handoff: rounds 1-3 done and reported | nothing pending on this side |
 | 2026-11-04 | Sonnet | CON-4: T4 design doc and 5 diagrams, rounds 1, 2, 3b pushed (ca9e161); handoff at context limit | design only; quotas unverified (network blocked); waiting for Opus review |
 | 2026-11-04 | Opus | Coordinated T3 (closed), T4 design rounds 1-4, T4-K1 (closed); handoff at context limit | K2 waits on design round 5 (CON-6) |
+| 2026-11-04 | Opus | Merged main, resolved 7 conflicts, opened PR #8 (no K2) | full suite + CI pending at handoff |
