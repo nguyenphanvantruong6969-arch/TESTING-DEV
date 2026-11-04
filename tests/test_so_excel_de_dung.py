@@ -163,8 +163,8 @@ def test_trang_huong_dan_co_so_lieu_chinh(api_thieu_cho):
     ws = openpyxl.load_workbook(api_thieu_cho.export_ket_qua("")["data"]["path"])["Hướng dẫn"]
     gia_tri = {r[0]: r[1] for r in ws.iter_rows(values_only=True) if r and r[0]}
     assert gia_tri["Số học sinh"] == 3
-    assert gia_tri["Số em đã có câu lạc bộ"] == 2
-    assert gia_tri["Số em chưa có chỗ"] == 1
+    assert gia_tri["Số học sinh đã có câu lạc bộ"] == 2
+    assert gia_tri["Số học sinh chưa có chỗ"] == 1
 
 
 def test_trang_huong_dan_canh_bao_khi_ket_qua_da_cu(api_thieu_cho):
@@ -262,7 +262,7 @@ def test_chua_co_cho_khi_moi_em_deu_co_cho_van_noi_ro(api):
     api.run_pipeline(seed=42)
     ws = openpyxl.load_workbook(api.export_ket_qua("")["data"]["path"])["Chưa có chỗ"]
     chu = " ".join(str(o) for r in ws.iter_rows(values_only=True) for o in r if o)
-    assert "mọi em đều" in chu.lower()
+    assert "mọi học sinh đều" in chu.lower()
 
 
 def test_thong_ke_giu_so_that(api_nhieu_buoi):
