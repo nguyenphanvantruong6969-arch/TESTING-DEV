@@ -189,9 +189,11 @@ function wsVeDanhSach() {
   if (!wsDanhSach.length) {
     hop.append(wsEl("p", { class: "ws-rong", text: t("ws_rong") }));
   } else {
+    /* T3-15: chi mot loai nganh thi bo cot "Loai" (khong co gi de phan biet). */
+    wsCoCotLoai = new Set(wsDanhSach.map((w) => w.industry)).size > 1;
     const thead = wsEl("thead", null, wsEl("tr", null,
       wsEl("th", { text: t("ws_cot_ten") }),
-      wsEl("th", { text: t("ws_cot_loai") }),
+      wsCoCotLoai ? wsEl("th", { text: t("ws_cot_loai") }) : null,
       wsEl("th", { text: t("ws_cot_sua") }),
       wsEl("th", { text: t("th_thao_tac") })));
     const tbody = wsEl("tbody");
@@ -219,23 +221,24 @@ function wsVeDanhSach() {
   if (tieuDe) tieuDe.focus();
 }
 
+let wsCoCotLoai = true;
+
 function wsDongWorkspace(w) {
-  const nutXoa = wsEl("button", { type: "button", class: "btn btn-ghost btn-nho ws-xoa",
+  const nutXoa = wsEl("button", { type: "button", class: "menu-khac-muc nguy-hiem ws-xoa", "data-giu-menu": "1",
     "data-i18n": "ws_btn_xoa", "data-slug": w.slug, text: t("ws_btn_xoa"),
     disabled: w.dang_mo, title: w.dang_mo ? t("ws_khong_xoa_dang_mo") : null });
   if (!w.dang_mo) {
     armTwoStepConfirm(nutXoa, () => t("ws_btn_xoa_xn"), () => wsXoa(w), 4000);
   }
   const hanhDong = (khoa, ham, lop) => wsEl("button", {
-    type: "button", class: "btn btn-ghost btn-nho " + (lop || ""),
+    type: "button", class: "menu-khac-muc " + (lop || ""),
     "data-slug": w.slug, "data-hanh-dong": khoa,
     text: t("ws_btn_" + khoa), onclick: ham });
   return wsEl("tr", { "data-slug": w.slug, class: w.dang_mo ? "ws-dang-mo" : null },
     wsEl("td", { class: "ws-ten" },
       wsEl("div", { class: "ws-ten-chinh", text: w.name }),
-      wsEl("div", { class: "ws-slug", text: w.slug }),
       w.dang_mo ? wsEl("span", { class: "ws-badge", text: t("ws_dang_mo_nhan") }) : null),
-    wsEl("td", { text: wsTenNganh(w.industry) }),
+    wsCoCotLoai ? wsEl("td", { text: wsTenNganh(w.industry) }) : null,
     wsEl("td", { class: "ws-sua", text: wsDinhDangNgay(w.modified) }),
     /* <td> phải giữ kiểu table-cell: đặt display:flex thẳng lên nó làm nền hàng và
        đường kẻ chỉ phủ một phần ô. Hộp flex nằm ở <div> bên trong. */
@@ -243,11 +246,15 @@ function wsDongWorkspace(w) {
       wsEl("button", { type: "button", class: "btn btn-secondary btn-nho",
         "data-slug": w.slug, "data-hanh-dong": "mo", text: t("ws_btn_mo"),
         disabled: w.dang_mo, onclick: () => wsMo(w) }),
-      hanhDong("doi_ten", () => wsBatSua(w, "doi_ten")),
-      hanhDong("nhan_ban", () => wsBatSua(w, "nhan_ban")),
-      hanhDong("luu_mau", () => wsBatSua(w, "luu_mau")),
-      hanhDong("xuat", () => wsXuat(w)),
-      nutXoa)));
+      /* T3-15: "Mo" + menu "..." chua phan con lai; "Xoa" dung cuoi, mau do. */
+      wsEl("details", { class: "menu-khac" },
+        wsEl("summary", { class: "btn btn-ghost btn-nho", "aria-label": t("menu_khac_aria"), text: "⋯" }),
+        wsEl("div", { class: "menu-khac-hop" },
+          hanhDong("doi_ten", () => wsBatSua(w, "doi_ten")),
+          hanhDong("nhan_ban", () => wsBatSua(w, "nhan_ban")),
+          hanhDong("luu_mau", () => wsBatSua(w, "luu_mau")),
+          hanhDong("xuat", () => wsXuat(w)),
+          nutXoa)))));
 }
 
 function wsBatSua(w, kieu) {
@@ -276,7 +283,7 @@ function wsDongSua(w) {
   luu.addEventListener("click", lam);
   o.addEventListener("keydown", (ev) => { if (ev.key === "Enter") lam(); });
   return wsEl("tr", { class: "ws-dong-sua" },
-    wsEl("td", { colspan: "4" }, wsEl("div", { class: "ws-sua-hop" },
+    wsEl("td", { colspan: wsCoCotLoai ? "4" : "3" }, wsEl("div", { class: "ws-sua-hop" },
       wsEl("span", { class: "ws-sua-nhan",
         text: t(kieu === "luu_mau" ? "ws_ten_mau" : "ws_ten_moi") }),
       o, kem, luu,

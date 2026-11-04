@@ -65,6 +65,13 @@ def _ten_o_dau(page):
     return page.locator("#wsTenHienTai").inner_text()
 
 
+def _bam_menu(page, slug, hanh_dong):
+    """T3-15: các hành động ngoài "Mở" nằm trong menu ⋯ của dòng; mở menu rồi bấm."""
+    page.locator('tr[data-slug="%s"] .menu-khac > summary' % slug).click()
+    page.locator('button[data-slug="%s"][data-hanh-dong="%s"]' % (slug, hanh_dong)).click()
+
+
+
 def _cho_ten(page, ten):
     page.wait_for_function(
         "n => document.querySelector('#wsTenHienTai').textContent === n", arg=ten, timeout=10000)
@@ -113,7 +120,7 @@ def test_tao_chuyen_sang_roi_chuyen_ve_thi_ten_o_dau_doi(mo_trang):
 def test_ten_o_dau_doi_theo_ten_sau_khi_doi_ten(mo_trang):
     page, api, goc, loi = mo_trang()
     page.locator("#btnWorkspace").click()
-    page.locator('button[data-slug="truong-hoc"][data-hanh-dong="doi_ten"]').click()
+    _bam_menu(page, "truong-hoc", "doi_ten")
     page.fill(".ws-sua-ten", "Năm học 2026")
     page.locator("#wsBtnLuuSua").click()
     _cho_ten(page, "Năm học 2026")
@@ -293,7 +300,10 @@ def test_wizard_quay_lai_giu_nguyen_chu_da_go(mo_trang):
 def test_xoa_hai_buoc_dua_vao_thung_rac(mo_trang):
     page, api, goc, loi = mo_trang(ten_ws=("Giữ", "Bỏ"))
     page.locator("#btnWorkspace").click()
+    page.locator('tr[data-slug="giu"] .menu-khac > summary').click()
     assert page.locator('button.ws-xoa[data-slug="giu"]').is_disabled()   # đang mở: không xoá
+    page.locator('tr[data-slug="giu"] .menu-khac > summary').click()      # đóng menu dòng này
+    page.locator('tr[data-slug="bo"] .menu-khac > summary').click()
     nut = page.locator('button.ws-xoa[data-slug="bo"]')
     nhan = nut.inner_text()
     nut.click()
@@ -310,12 +320,12 @@ def test_nhan_ban_va_xuat_nhap_zip(mo_trang):
     page, api, goc, loi = mo_trang()
     api.create_or_update_club("A", "CLB A", 3, 0, None)
     page.locator("#btnWorkspace").click()
-    page.locator('button[data-slug="truong-hoc"][data-hanh-dong="nhan_ban"]').click()
+    _bam_menu(page, "truong-hoc", "nhan_ban")
     page.fill(".ws-sua-ten", "Bản nhân")
     page.locator("#wsBtnLuuSua").click()
     page.wait_for_selector('tr[data-slug="ban-nhan"]')
 
-    page.locator('button[data-slug="ban-nhan"][data-hanh-dong="xuat"]').click()
+    _bam_menu(page, "ban-nhan", "xuat")
     page.wait_for_function(
         "document.querySelector('#toastStack').innerText.indexOf('.zip') !== -1", timeout=8000)
     duong = [f for f in os.listdir(api.thu_muc_xuat) if f.endswith(".zip")]
@@ -425,7 +435,7 @@ def test_cot_sua_lan_cuoi_theo_ngon_ngu(mo_trang):
 
 _JS_BANG = """() => [...document.querySelectorAll('#wsBang tbody tr[data-slug]')].map((tr) => {
   const o = tr.getBoundingClientRect();
-  const nut = [...tr.querySelectorAll('button[data-hanh-dong], button.ws-xoa')];
+  const nut = [...tr.querySelectorAll('button[data-hanh-dong="mo"], .menu-khac > summary')];
   const hanhDong = tr.querySelector('button[data-hanh-dong="mo"]').closest('td');
   return {
     slug: tr.dataset.slug,
@@ -451,9 +461,9 @@ def test_bang_workspace_o_hanh_dong_la_o_bang_that_va_sau_nut_cung_mot_dong(mo_t
     hang = page.evaluate(_JS_BANG)
     assert [h["slug"] for h in hang] == ["alpha", "beta"]
     for h in hang:
-        assert h["hienThi"] == ["table-cell"] * 4, h
+        assert h["hienThi"] == ["table-cell"] * 3, h                          # một loại ngành: bỏ cột Loại
         assert len(set(h["caoO"])) == 1 and h["caoO"][0] == h["caoHang"], h   # mọi ô cao bằng hàng
-        assert h["soNut"] == 6 and len(set(h["topNut"])) == 1, h              # sáu nút một dòng
+        assert h["soNut"] == 2 and len(set(h["topNut"])) == 1, h              # "Mở" và "⋯" một dòng
         assert "monospace" not in h["fontTen"], h                            # tên không dùng font mã
     mo = hang[0]
     assert mo["nenHanhDong"] == mo["nenTen"] != "rgba(0, 0, 0, 0)", mo       # nền phủ cả hàng
@@ -474,3 +484,20 @@ def test_cau_noi_trinh_duyet_khong_bao_dong_cua_so_khi_tai_lai_de_doi_workspace(
     assert html.index("if (window.__DANG_TAI_LAI) return;") < html.index("navigator.sendBeacon")
     assert "__DANG_TAI_LAI" in open(os.path.join(GOC, "js", "075_workspace.js"),
                                     encoding="utf-8").read()
+
+
+# ------------------------------------------------------------------ T3-15: Mở + menu ⋯
+
+def test_dong_workspace_chi_con_mo_va_menu_xoa_cuoi_do_va_an_ma_thu_muc(mo_trang):
+    page, _, _, loi = mo_trang(ten_ws=("Alpha", "Beta"))
+    page.locator("#btnWorkspace").click()
+    page.wait_for_selector('tr[data-slug="beta"]')
+    assert page.locator(".ws-slug").count() == 0                               # ẩn mã thư mục
+    assert page.locator("#wsBang th").count() == 3                             # cùng một loại ngành: bỏ cột Loại
+    hang = page.locator('tr[data-slug="beta"]')
+    assert hang.locator("button:visible").count() == 1                        # chỉ "Mở"; phần còn lại trong ⋯
+    hang.locator(".menu-khac > summary").click()
+    nhan = hang.locator(".menu-khac-hop button").evaluate_all("e => e.map(x => x.dataset.hanhDong || 'xoa')")
+    assert nhan == ["doi_ten", "nhan_ban", "luu_mau", "xuat", "xoa"]            # Xoá đứng cuối
+    assert hang.locator(".menu-khac-hop button.ws-xoa.nguy-hiem").count() == 1
+    assert not loi, loi

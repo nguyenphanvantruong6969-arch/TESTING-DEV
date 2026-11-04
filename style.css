@@ -2828,15 +2828,15 @@ tr.wh-ql-loi td + td { box-shadow: none; }
   outline: none;
 }
 
-.ws-bang-boc { overflow-x: auto; margin: 14px 0 4px; }
+.ws-bang-boc { margin: 14px 0 4px; }   /* T3-15: hop menu ⋯ tran ra ngoai bang nen khong cat */
 .ws-bang td { vertical-align: top; }
 .ws-ten-chinh { font-weight: 600; }
 .ws-slug { font-family: var(--font-mono); font-size: 11.5px; color: var(--slate); }
 .ws-sua { white-space: nowrap; font-family: var(--font-mono); font-size: 12px; }
 /* Ô hành động là table-cell thật; hộp flex nằm ở <div> bên trong. Đặt display:flex lên chính
    <td> thì nền hàng "Đang mở", đường kẻ và chiều cao ô đều lệch nhau. */
-.ws-cot-hanh-dong { min-width: 440px; }
-.ws-hanh-dong { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.ws-cot-hanh-dong { min-width: 150px; }
+.ws-hanh-dong { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
 /* Cột Tên là tên do người dùng đặt, không phải mã máy: bỏ font mã của .data-table. */
 .ws-bang td:first-child { font-family: var(--font-body); font-size: 13px; }
 /* Ô chọn và khung nhập trong trình hướng dẫn: không kế thừa font thì dùng font của hệ điều hành. */

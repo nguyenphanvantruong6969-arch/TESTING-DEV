@@ -321,7 +321,7 @@ function debounce(fn, ms) {
 document.addEventListener("click", (ev) => {
   document.querySelectorAll("details.menu-khac[open]").forEach((d) => {
     const trongHop = ev.target.closest && ev.target.closest(".menu-khac-hop");
-    if (!d.contains(ev.target) || (trongHop && d.contains(trongHop) && ev.target.closest("button"))) d.open = false;
+    if (!d.contains(ev.target) || (trongHop && d.contains(trongHop) && ev.target.closest("button") && !ev.target.closest("[data-giu-menu]"))) d.open = false;
   });
 });
 document.addEventListener("keydown", (ev) => {
