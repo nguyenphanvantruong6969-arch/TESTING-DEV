@@ -66,17 +66,17 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | (to create) | Sonnet | |
+| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 running (GO L0 sent 13:15 UTC) |
 | tester | (to create per lot: Opus L0, Sonnet L1+) | | |
 
 ## Current state (overwrite each handoff)
-- P0 done; L0 about to start. No PR open.
+- P0 done (639b4e7). L0 sent to impl. No PR open.
 
 ## Needs Truong
 - (none yet)
 
 ## Next steps (ordered)
-1. Create impl (Sonnet) with `GO L0`; create tester (Opus) when impl reports.
+1. Wait for "IMPL DONE L0"; then create tester (Opus) with `REVIEW L0 639b4e7..<head>`.
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
