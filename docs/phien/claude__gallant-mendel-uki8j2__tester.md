@@ -11,14 +11,14 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [x] L1 reviewed + fix1 re-check NO BUGS  - [x] L2 reviewed (1 bug + 5 notes reported)  - [ ] L3
 
 ## Current state (overwrite each handoff)
-- L2 fix1 (a8b4407..a1258c3) re-checked. Reported to coord ("TESTER REPORT L2 fix1"): 1 BUG, rest OK.
-  BUG: tests/test_giao_dien_bang_loi.py::test_trang_dich_dung_ma_loi_ca_hai_ngon_ngu[index.html|recovery.html] fail (2):
-  page now shows "Thứ 2" via nhanHoaBuoi but test compares with i18n_errors.format_message (raw `thu_2`). Impl did not run it.
-- OK: btn_reset_entry vi/en school ("học sinh") + company ("nhân viên"/"employee"), matches confirm text; tab-01 warnings map thu_2->Thứ 2/Mon,
-  list buoi too, unknown "Buổi tối" kept, caller params not mutated; tab 03 "Lần chạy gần nhất: 04/11/2026 16:12" (en "Latest run:"), no seed;
-  parity test present; ws chooser last th is sr-only (no visible header). Related tests 94 run: 92 pass, the 2 above fail.
-- T3-32 collapse skipped: acceptable as note (scroll-to-entry exists; old UI tests click other cards after select).
-- Screenshots replaced: docs/nghien_cuu/anh_t3/sau_L2/01, 04, 07.
+- L3 reviewed (7ac6beb..1d5a384): 43 related test files = 1006 passed, 3 skipped, 0 failed. Reported ("TESTER REPORT L3"): NO BLOCKING BUGS, 4 notes:
+  1 export "Tải bảng này" ignores the on-screen sort (file = backend order, HS1,HS10,HS2.. vs screen HS1,HS2,..HS10 / user's header sort);
+  2 "Theo lớp" hint (kq.tang1='lop' with no class) now unreachable by a user (hidden button + loadKetQuaTab forces 'ma'): dead path, tests force it;
+  3 removed i18n keys (dc_xem, dc_chon_clb, kq_sx_*, kq_sap_nhan, th_stt, dc_muc_*...) grep-verified unused; dc_/a14 count drop legit;
+  4 cosmetic: Điểm chuẩn overview "Xem chi tiết" wraps to 3 lines, detail legend is a plain bullet list.
+- Verified OK by hand: tab names, no Theo lớp/tier-2/Thứ tự without class, header sort asc/desc + empty last + reset on view change, export has no scores,
+  Điểm chuẩn only in Quản lý (tab 03 none), wizard one step + Tuỳ chỉnh -> step 2, "Hãy nhập tên." on empty name.
+- Screenshots: docs/nghien_cuu/anh_t3/sau_L3/ (01-06).
 
 ## Decisions and gotchas
 - Test env (new container): `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python -r requirements-dev.txt
@@ -30,7 +30,7 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - Quiet runs: `pytest -q -p no:cacheprovider --no-header -rN --tb=line <files> | tail -3`.
 
 ## Next steps (ordered)
-1. Wait for fix2 re-check (test_giao_dien_bang_loi) or `REVIEW L3` from coord. Screenshots go to docs/nghien_cuu/anh_t3/sau_L<n>/ (<=6).
+1. Wait for L3 fix re-check or `REVIEW L3` from coord. Screenshots go to docs/nghien_cuu/anh_t3/sau_L<n>/ (<=6).
 
 ## Files touched
 - docs/nghien_cuu/anh_t3/sau_L0/*.png, sau_L1/*.png, this file.
@@ -45,3 +45,4 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 | 2026-11-04 | Sonnet (tester) | L1 fix1 re-check NO BUGS; L2 review | L2: 1 bug + notes |
 | 2026-11-04 | Sonnet (tester) | Handoff at 200k | state above is current |
 | 2026-11-04 | Sonnet (tester) | L2 fix1 re-check, screenshots 01/04/07 | 1 bug: test_giao_dien_bang_loi x2 |
+| 2026-11-04 | Sonnet (tester) | L3 review, 6 screenshots | no blocking bugs, 4 notes |
