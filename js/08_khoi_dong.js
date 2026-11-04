@@ -41,5 +41,8 @@ function baoVaoOSucKhoe(cau) {
 choBackend("get_last_run_info", init, baoVaoOSucKhoe, (cau) => {
   baoVaoOSucKhoe(cau);
   const oDb = el("dbStatusLine");
-  if (oDb) oDb.textContent = t("backend_khong_ket_noi");
+  if (oDb) {
+    oDb.textContent = t("backend_khong_ket_noi");
+    oDb.hidden = false;
+  }
 });

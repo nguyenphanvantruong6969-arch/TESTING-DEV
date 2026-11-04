@@ -119,6 +119,16 @@ function loadHealthReport() {
   return hoi;
 }
 
+/* T3-10: moi luc dung MOT nut mau chinh. Chua co du lieu -> "Nhap du lieu" noi bat, hai khung kia lui
+   xuong; co du lieu chua chay -> "Chay sap xep"; da chay xong -> dong ket qua (T3-06), Chay tro thanh nut phu. */
+let trangThaiVanHanh = "trong";
+function datTrangThaiVanHanh(d) {
+  trangThaiVanHanh = (!d.n_students || !d.n_clubs) ? "trong" : (d.n_matched > 0 ? "xong" : "san_sang");
+  const v = el("view-pipeline");
+  if (v) v.dataset.trangThai = trangThaiVanHanh;
+  capNhatKhoaVanHanh();
+}
+
 function refreshDashboardStats() {
   callApi("get_dashboard_status").then((res) => {
     if (!res.ok) {
@@ -128,6 +138,7 @@ function refreshDashboardStats() {
     el("statStudents").textContent = res.data.n_students;
     el("statClubs").textContent = res.data.n_clubs;
     el("statMatched").textContent = res.data.n_matched;
+    datTrangThaiVanHanh(res.data);
     /* T3-01 (B2): chưa có học sinh hoặc chưa có CLB thì khoá nút Chạy kèm lý do (backend cũng chặn
        bằng `chua_co_du_lieu_de_chay`, nên đây chỉ là báo sớm cho người vận hành). */
     const trong = !res.data.n_students || !res.data.n_clubs;
@@ -281,7 +292,29 @@ function renderSteps(steps) {
   });
 }
 
+/* T3-06: chay xong thanh cong thi thu 6 buoc thanh mot dong ket qua; "Chi tiet" mo lai danh sach buoc.
+   Dang chay, co loi, hoan tac: giu nguyen danh sach buoc (bat bien 5). */
+let lastRunXong = null;   // {n_matched, n_total, rounds, path} sau lan chay thanh cong
+let chiTietBuocMo = false;
+
+function veRunXong() {
+  const hop = el("runXong");
+  if (!hop) return;
+  hop.hidden = !lastRunXong;
+  el("stepper").hidden = !!lastRunXong && !chiTietBuocMo;
+  if (!lastRunXong) return;
+  el("runXongChu").textContent = t("toast_run_success", {
+    n_matched: lastRunXong.n_matched, n_total: lastRunXong.n_total, rounds: lastRunXong.rounds,
+  });
+  el("btnMoThuMucKq").hidden = !lastRunXong.path;
+  el("btnChiTietBuoc").textContent = t(chiTietBuocMo ? "btn_an_chi_tiet_buoc" : "btn_chi_tiet_buoc");
+  el("btnChiTietBuoc").setAttribute("aria-expanded", chiTietBuocMo ? "true" : "false");
+}
+
 function resetSteps() {
+  lastRunXong = null;
+  chiTietBuocMo = false;
+  veRunXong();
   lastRenderedSteps = null;
   document.querySelectorAll('#stepper .step[data-dong="them"]').forEach((li) => li.remove());
   document.querySelectorAll("#stepper .step").forEach((li) => {
@@ -323,6 +356,9 @@ function capNhatKhoaVanHanh() {
   if (khoa.thieuDuLieu) btnRun.title = t("health_chua_co_du_lieu");
   else btnRun.removeAttribute("title");
   btnRun.textContent = khoa.dangChay ? t("btn_dang_chay") : t("btn_run_pipeline");
+  const nutChinh = trangThaiVanHanh === "san_sang" && !importQueue.length;
+  btnRun.classList.toggle("btn-primary", nutChinh);
+  btnRun.classList.toggle("btn-secondary", !nutChinh);
   el("stepper").setAttribute("aria-busy", khoa.dangChay ? "true" : "false");
   el("btnValidate").disabled = khoa.dangChay || khoa.dangKiemTra || khoa.dangNhap;
   el("btnImportAll").disabled = khoa.dangChay || khoa.dangNhap;
@@ -478,6 +514,10 @@ function initPipelineHandlers() {
   el("btnRun").addEventListener("click", () => {
     runPipelineFlow();
   });
+  el("btnChiTietBuoc").addEventListener("click", () => { chiTietBuocMo = !chiTietBuocMo; veRunXong(); });
+  el("btnMoThuMucKq").addEventListener("click", () => {
+    if (lastRunXong && lastRunXong.path) callApi("mo_thu_muc", lastRunXong.path);
+  });
 
   el("btnToggleHistory").addEventListener("click", () => {
     const table = el("historyTable");
@@ -600,7 +640,12 @@ function executeRun(seed, forceRedraw, chiBuoi) {
         showToast(thongBao + "\n" + t("toast_run_success_no_backup"), "warn",
           [saoLuuHong.detail]);
       } else {
-        showToast(thongBao, "success");
+        lastRunXong = {
+          n_matched: res.data.n_matched, n_total: res.data.n_total, rounds: res.data.rounds_run,
+          path: res.data.export_path || null,
+        };
+        chiTietBuocMo = false;
+        veRunXong();
       }
       showLog(null);
       seedDaSua = false;
@@ -887,6 +932,7 @@ function veHangDoi() {
   clear(box);
   box.hidden = importQueue.length === 0;
   actions.hidden = importQueue.length === 0;
+  capNhatKhoaVanHanh(); // T3-10: co tep cho nhap thi "Nhap so" la nut chinh
   if (!importQueue.length) return;
 
   const muc = importQueue[0];

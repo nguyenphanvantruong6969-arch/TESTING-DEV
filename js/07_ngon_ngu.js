@@ -106,6 +106,7 @@ function reapplyDynamicTextForLangChange() {
 
   refreshSidebarStatus();
   if (lastRenderedSteps) renderSteps(lastRenderedSteps);
+  veRunXong();
   if (lastRenderedTopErrors) showLog(lastRenderedTopErrors);
 
   const tab = currentTabName();

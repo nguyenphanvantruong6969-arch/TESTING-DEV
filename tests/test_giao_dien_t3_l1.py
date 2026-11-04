@@ -87,7 +87,7 @@ def test_dai_so_lieu_khong_con_o_da_nop_nguyen_vong_va_gio_dang_nguoi_doc(api, m
     assert page.locator("#statPrefs").count() == 0
     assert page.locator("#statusStrip .strip-item").count() == 3  # học sinh, CLB, đã xếp
     page.wait_for_function("document.querySelector('#lastRunLine').textContent.indexOf('Chạy gần nhất') !== -1")
-    dong = page.inner_text("#lastRunLine")
+    dong = page.text_content("#lastRunLine")
     assert re.search(r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}", dong) and "T" not in dong.split(":", 1)[1][:12]
     assert "khởi tạo" not in dong and "202" in dong
 

@@ -315,3 +315,16 @@ function debounce(fn, ms) {
     timer = setTimeout(() => fn(...args), ms);
   };
 }
+
+
+/* Menu "⋯" (<details class="menu-khac">): bam ra ngoai, bam mot muc hoac nhan Esc thi dong. */
+document.addEventListener("click", (ev) => {
+  document.querySelectorAll("details.menu-khac[open]").forEach((d) => {
+    const trongHop = ev.target.closest && ev.target.closest(".menu-khac-hop");
+    if (!d.contains(ev.target) || (trongHop && d.contains(trongHop) && ev.target.closest("button"))) d.open = false;
+  });
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key !== "Escape") return;
+  document.querySelectorAll("details.menu-khac[open]").forEach((d) => { d.open = false; });
+});

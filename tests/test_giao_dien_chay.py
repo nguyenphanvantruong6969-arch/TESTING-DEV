@@ -105,7 +105,7 @@ class TestKhongChayHaiLan:
         page.dblclick("#btnRun")
         page.wait_for_function(
             "!document.querySelector('#btnRun').disabled "
-            "&& document.querySelector('.toast.is-success')", timeout=20000)
+            "&& !document.querySelector('#runXong').hidden", timeout=20000)
         page.wait_for_timeout(500)
         assert _so_lan_chay(api) == 1, "một cú bấm đúp chạy sắp xếp hai lần"
         assert loi == [], loi
@@ -176,12 +176,13 @@ class TestThongBaoDocDuoc:
         page.wait_for_function("!document.querySelector('.toast.is-error')")
         assert loi == [], loi
 
-    def test_thong_bao_thanh_cong_van_tu_tat(self, api, mo_trang):
+    def test_chay_xong_hien_mot_dong_ket_qua_khong_toast_xanh_trung(self, api, mo_trang):
+        """T3-06: thành công thì khung bước thu thành một dòng, không có thông báo xanh lặp nội dung."""
         page, loi = mo_trang()
         page.evaluate("() => document.querySelector('#toastStack').innerHTML = ''")
         page.click("#btnRun")
-        page.wait_for_selector(".toast.is-success", timeout=20000)
-        page.wait_for_function("!document.querySelector('.toast')", timeout=12000)
+        page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
+        assert page.locator(".toast.is-success").count() == 0
         assert loi == [], loi
 
     def test_vung_thong_bao_duoc_doc_len(self, api, mo_trang):
@@ -277,7 +278,7 @@ class TestBuocSaoLuuVaHoanTac:
         # Chạy lại (không hỏng) thì dòng thêm phải biến mất.
         monkeypatch.undo()
         page.click("#btnRun")
-        page.wait_for_selector(".toast.is-success", timeout=20000)
+        page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
         assert page.locator('#stepper .step[data-step="rollback"]').count() == 0
         assert loi == [], loi
 
@@ -333,7 +334,7 @@ class TestHatGiong:
         page.evaluate("document.getElementById('nangCao').open = true")
         page.fill("#seedInput", "0")
         page.click("#btnRun")
-        page.wait_for_selector(".toast.is-success", timeout=20000)
+        page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
         assert api.get_last_run_info()["data"]["seed"] == 0, "0 bị đổi thành 42"
         assert loi == [], loi
 

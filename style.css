@@ -228,6 +228,28 @@ button, input {
   color: rgba(255,255,255,0.62);
 }
 
+/* ---- Menu "⋯" dùng chung (T3-12, T3-15, T3-34): <details> + hộp nút. ---- */
+.menu-khac { position: relative; flex-shrink: 0; }
+.menu-khac > summary { list-style: none; cursor: pointer; user-select: none; }
+.menu-khac > summary::-webkit-details-marker { display: none; }
+.menu-khac-hop {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 60;
+  min-width: 190px; display: flex; flex-direction: column; gap: 2px; padding: 6px;
+  background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--radius-sm);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+}
+.menu-khac-muc {
+  text-align: left; border: 0; background: transparent; color: var(--ink);
+  font: inherit; font-size: 13px; padding: 7px 10px; border-radius: var(--radius-sm); cursor: pointer;
+}
+.menu-khac-muc:hover { background: var(--paper-hover); }
+.menu-khac-muc.nguy-hiem { color: var(--rust-text); }
+.menu-khac-nen-toi .menu-khac-hop { background: #1c2430; border-color: rgba(255,255,255,0.2); }
+.menu-khac-nen-toi .menu-khac-muc, .menu-khac-nen-toi .motion-toggle {
+  color: rgba(255,255,255,0.85); margin: 0; width: 100%; border: 0;
+}
+.menu-khac-nen-toi .menu-khac-muc:hover { background: rgba(255,255,255,0.1); }
+
 .motion-toggle {
   display: block;
   width: 100%;
@@ -3085,3 +3107,11 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .canh-bao-nhom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .canh-bao-dong { padding-left: 14px; color: var(--slate); }
 .health-di-toi { margin-left: auto; flex: none; }
+
+/* T3-06 / T3-10: dòng kết quả sau khi chạy xong; khung lùi xuống khi chưa có dữ liệu. */
+.run-xong { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; margin-bottom: 12px;
+  border-radius: var(--radius-sm); background: var(--moss-soft); color: var(--ink); font-weight: 500; }
+.run-xong[hidden], #stepper[hidden] { display: none; }
+#view-pipeline[data-trang-thai="trong"] #panelCanhBao,
+#view-pipeline[data-trang-thai="trong"] #panelBuoc { opacity: 0.6; }
+#view-pipeline[data-trang-thai="trong"] #panelNhap { border-color: var(--gold); border-left: 4px solid var(--gold); }

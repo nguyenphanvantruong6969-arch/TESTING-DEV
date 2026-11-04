@@ -79,6 +79,8 @@ function refreshSidebarStatus() {
       line.textContent = t("never_run");
     }
   });
+  /* T3-12: "Da ket noi" la trang thai binh thuong nen khong hien; chi hien dong nay khi mat ket noi
+     (xem 08_khoi_dong.js). Van ghi chu de lan sau co loi thi doi ngon ngu van dung. */
   el("dbStatusLine").textContent = t("db_connected");
   /* Noi thang app dang ve cua so bang duong nao. Khong co dong nay thi
      phai mo Task Manager moi biet — va khi khong biet thi khong ai sua. */

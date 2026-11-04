@@ -21,6 +21,12 @@
         <div class="brand-title" data-i18n="brand_title">Sắp xếp CLB</div>
       </div>
       <button type="button" class="lang-toggle" id="btnLangToggle" data-i18n="lang_toggle_label">EN</button>
+      <details class="menu-khac menu-khac-nen-toi" id="menuThanhBen">
+        <summary class="lang-toggle" data-i18n-aria-label="menu_khac_aria" aria-label="Thêm tuỳ chọn">⋯</summary>
+        <div class="menu-khac-hop">
+          <button type="button" class="menu-khac-muc motion-toggle" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hoạt ảnh: bật</button>
+        </div>
+      </details>
     </div>
 
     <button type="button" class="ws-switcher" id="btnWorkspace" hidden aria-haspopup="dialog"
@@ -51,10 +57,10 @@
     </div>
 
     <div class="sidebar-footer">
-      <button type="button" class="motion-toggle" id="btnMotionToggle" aria-pressed="true" data-i18n-aria-label="aria_hieu_ung">Hiệu ứng: bật</button>
-      <div id="dbStatusLine" class="db-status" data-i18n="db_status_loading">Đang tải…</div>
-      <div id="lastRunLine" class="db-status db-status-sub"></div>
-      <div id="cheDoHienThi" class="db-status db-status-sub"></div>
+      <!-- T3-12: chỉ hiện khi mất kết nối; hai dòng dưới chỉ để ẩn (mốc đồng bộ cho chương trình và test). -->
+      <div id="dbStatusLine" class="db-status" data-i18n="db_status_loading" hidden>Đang tải…</div>
+      <div id="lastRunLine" class="db-status db-status-sub" hidden></div>
+      <div id="cheDoHienThi" class="db-status db-status-sub" hidden></div>
     </div>
   </nav>
 
@@ -78,7 +84,7 @@
         <div class="strip-item"><span class="strip-num" id="statMatched">—</span><span class="strip-label" data-i18n="label_matched">đã xếp CLB</span></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelNhap">
         <div class="panel-head">
           <h2 data-i18n="import_panel_title">Nhập dữ liệu</h2>
           <div class="panel-actions">
@@ -105,7 +111,7 @@
         <div class="import-warnings" id="importWarnings" hidden></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelCanhBao">
         <div class="panel-head">
           <h2 data-i18n="health_panel_title">Cảnh báo dữ liệu</h2>
           <div class="panel-actions">
@@ -117,12 +123,18 @@
         <div id="healthList" class="health-list"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panelBuoc">
         <div class="panel-head">
           <h2 data-i18n="steps_panel_title">Các bước xử lý</h2>
           <div class="panel-actions">
             <button class="btn btn-primary" id="btnRun" data-i18n="btn_run_pipeline">Chạy sắp xếp</button>
           </div>
+        </div>
+
+        <div class="run-xong" id="runXong" hidden>
+          <span class="run-xong-chu" id="runXongChu"></span>
+          <button type="button" class="btn btn-secondary btn-nho" id="btnMoThuMucKq" hidden data-i18n="btn_mo_thu_muc_kq">Mở thư mục kết quả</button>
+          <button type="button" class="btn btn-ghost btn-nho" id="btnChiTietBuoc" data-i18n="btn_chi_tiet_buoc">Chi tiết</button>
         </div>
 
         <div class="stb-lock-line" id="stbLockLine"></div>

@@ -121,3 +121,67 @@ def test_chi_con_mot_nut_kiem_tra_nam_trong_khung_canh_bao(api, mo):
     page.wait_for_selector(".toast.is-success, .toast.is-warn")  # cảnh báo nghiêm trọng về điểm thi -> toast vàng
     assert page.locator("#healthSummary").inner_text().strip() != ""
     assert not loi
+
+
+# ---------------------------------------------------------------- T3-06
+def test_chay_xong_thu_sau_buoc_thanh_mot_dong_va_chi_tiet_mo_lai(api, mo):
+    tat_wharton(api)
+    _du_lieu(api)
+    page, loi = mo()
+    page.click("#btnRun")
+    page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
+    chu = page.inner_text("#runXongChu")
+    assert "/6" in chu or "/" in chu and "6" in chu
+    assert page.locator("#stepper").is_hidden()
+    assert page.locator(".toast.is-success").count() == 0  # bỏ thông báo xanh trùng nội dung
+    page.click("#btnChiTietBuoc")
+    assert page.locator("#stepper").is_visible() and page.locator("#stepper .step").count() == 6
+    page.click("#btnChiTietBuoc")
+    assert page.locator("#stepper").is_hidden()
+    assert not loi
+
+
+def test_chay_lai_tra_ve_danh_sach_buoc_dang_chay_va_loi_giu_nguyen_buoc(api, mo):
+    tat_wharton(api)
+    _du_lieu(api)
+    page, loi = mo()
+    page.click("#btnRun")
+    page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
+    page.evaluate("() => { khoa.dangChay = true; resetSteps(); }")  # như lúc bắt đầu một lần chạy mới
+    assert page.locator("#runXong").is_hidden() and page.locator("#stepper").is_visible()
+    assert not loi
+
+
+# ---------------------------------------------------------------- T3-10
+def test_moi_luc_dung_mot_nut_mau_chinh(api, mo):
+    tat_wharton(api)
+    page, loi = mo()  # chưa có dữ liệu
+    page.wait_for_function("document.getElementById('view-pipeline').dataset.trangThai === 'trong'")
+    assert page.locator("#view-pipeline .btn-primary:visible").count() == 0
+    _du_lieu(api)
+    page.reload()
+    page.wait_for_function("document.getElementById('view-pipeline').dataset.trangThai === 'san_sang'")
+    assert page.locator("#view-pipeline .btn-primary:visible").count() == 1
+    assert page.locator("#btnRun.btn-primary").count() == 1
+    page.click("#btnRun")
+    page.wait_for_selector("#runXong:not([hidden])", timeout=20000)
+    page.wait_for_function("document.getElementById('view-pipeline').dataset.trangThai === 'xong'")
+    assert page.locator("#view-pipeline .btn-primary:visible").count() == 0
+    assert not loi
+
+
+# ---------------------------------------------------------------- T3-12
+def test_chan_thanh_ben_chi_hien_khi_mat_ket_noi_va_nut_hoat_anh_nam_trong_menu(api, mo):
+    tat_wharton(api)
+    page, loi = mo()
+    for ma in ("dbStatusLine", "lastRunLine", "cheDoHienThi"):
+        assert page.locator("#" + ma).is_hidden(), ma
+    assert page.locator("#btnMotionToggle").is_hidden()
+    page.click("#menuThanhBen > summary")
+    assert page.locator("#btnMotionToggle").is_visible()
+    assert page.inner_text("#btnMotionToggle") == "Hoạt ảnh: bật"
+    page.keyboard.press("Escape")
+    assert page.locator("#btnMotionToggle").is_hidden()
+    page.evaluate("() => { const o = document.getElementById('dbStatusLine'); o.textContent = t('backend_khong_ket_noi'); o.hidden = false; }")
+    assert page.locator("#dbStatusLine").is_visible()
+    assert not loi
