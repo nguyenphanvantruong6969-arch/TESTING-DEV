@@ -11,15 +11,14 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [x] L1 reviewed + fix1 re-check NO BUGS  - [x] L2 reviewed (1 bug + 5 notes reported)  - [ ] L3
 
 ## Current state (overwrite each handoff)
-- L2 reviewed (ad1481d..a8b4407): related tests 35 + 11 files = 548 passed, 0 failed. Findings sent to coord ("TESTER REPORT L2"):
-  1 bug: btn_reset_entry vi hardcodes "học sinh" (company workspace shows "Xoá nguyện vọng của học sinh này"); en still "Start over".
-  Notes: raw `thu_2` still in tab-01 warning texts (vi+en); tab 03 "Lần chạy gần nhất: 2026-11-04T15:58:33 · số khởi tạo 42" unformatted;
-  MA_BUOI_CO_NHAN set not parity-tested vs NHAN_BUOI; reserve segment of fill bar not asserted; ws chooser "THAO TÁC" header over empty column;
-  T3-32 collapse not done (known).
-- Verified OK: T3-24 numbers moved (#nvTieuDiem "66,7% ... 100% nằm trong 3 nguyện vọng đầu", #duTruTieuDiem "0/9"); T3-14 vi labels, unknown codes keep text;
-  T3-06 stepper visible on failed run, hidden after success, Chi tiết toggles; T3-23 details#xuatNangCao + red warning kept; T3-28 Lịch tuần gone;
-  T3-34 menu keeps "Xuất CSV nhân viên này"; company workspace renders (title, KPI, run line).
-- Screenshots: docs/nghien_cuu/anh_t3/sau_L2/ (01,03,04,05,06,07).
+- L2 fix1 (a8b4407..a1258c3) re-checked. Reported to coord ("TESTER REPORT L2 fix1"): 1 BUG, rest OK.
+  BUG: tests/test_giao_dien_bang_loi.py::test_trang_dich_dung_ma_loi_ca_hai_ngon_ngu[index.html|recovery.html] fail (2):
+  page now shows "Thứ 2" via nhanHoaBuoi but test compares with i18n_errors.format_message (raw `thu_2`). Impl did not run it.
+- OK: btn_reset_entry vi/en school ("học sinh") + company ("nhân viên"/"employee"), matches confirm text; tab-01 warnings map thu_2->Thứ 2/Mon,
+  list buoi too, unknown "Buổi tối" kept, caller params not mutated; tab 03 "Lần chạy gần nhất: 04/11/2026 16:12" (en "Latest run:"), no seed;
+  parity test present; ws chooser last th is sr-only (no visible header). Related tests 94 run: 92 pass, the 2 above fail.
+- T3-32 collapse skipped: acceptable as note (scroll-to-entry exists; old UI tests click other cards after select).
+- Screenshots replaced: docs/nghien_cuu/anh_t3/sau_L2/01, 04, 07.
 
 ## Decisions and gotchas
 - Test env (new container): `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python -r requirements-dev.txt
@@ -31,7 +30,7 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - Quiet runs: `pytest -q -p no:cacheprovider --no-header -rN --tb=line <files> | tail -3`.
 
 ## Next steps (ordered)
-1. Wait for `FIX L2` (re-check only: btn_reset_entry {person_l} vi/en, notes a-e) or `REVIEW L3` from coord. Screenshots go to docs/nghien_cuu/anh_t3/sau_L<n>/ (<=6).
+1. Wait for fix2 re-check (test_giao_dien_bang_loi) or `REVIEW L3` from coord. Screenshots go to docs/nghien_cuu/anh_t3/sau_L<n>/ (<=6).
 
 ## Files touched
 - docs/nghien_cuu/anh_t3/sau_L0/*.png, sau_L1/*.png, this file.
@@ -45,3 +44,4 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 | 2026-11-04 | Sonnet (tester) | L1 fix1 re-check | NO BUGS |
 | 2026-11-04 | Sonnet (tester) | L1 fix1 re-check NO BUGS; L2 review | L2: 1 bug + notes |
 | 2026-11-04 | Sonnet (tester) | Handoff at 200k | state above is current |
+| 2026-11-04 | Sonnet (tester) | L2 fix1 re-check, screenshots 01/04/07 | 1 bug: test_giao_dien_bang_loi x2 |
