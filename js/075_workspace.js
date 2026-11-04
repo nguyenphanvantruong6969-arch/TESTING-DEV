@@ -363,7 +363,7 @@ function wsNhapZip(oFile) {
 }
 
 /* ------------------------------------------------------------------ *
- * TRÌNH HƯỚNG DẪN TẠO WORKSPACE (4 bước)
+ * TRÌNH HƯỚNG DẪN TẠO WORKSPACE (T3-11: chọn mẫu thì tạo ngay ở bước 1; "Tuỳ chỉnh" mới mở bước 2 đến 4)
  * ------------------------------------------------------------------ */
 
 /* Điền sẵn MỌI bước từ một mẫu (giữ nguyên tên người dùng đã gõ). */
@@ -373,6 +373,7 @@ function wsWizardTuMau(mau, ten, buoc) {
   WS_DANH_TU.forEach((dt) => { labels[dt] = { vi: c.labels[dt].vi, en: c.labels[dt].en }; });
   return {
     buoc: buoc || 1,
+    tuyChinh: false,     // true = đã mở "Tuỳ chỉnh": hiện đủ bốn bước, có bước xem lại
     ten: ten || "",
     nganh: c.industry,
     mau: mau.slug,
@@ -541,15 +542,16 @@ function wsVeWizard() {
   const hop = el("wsHop");
   clear(hop);
   const tenBuoc = t("ws_wz_b" + w.buoc);
-  hop.append(
-    wsEl("h2", { id: "wsTieuDe", class: "ws-tieu-de", tabindex: "-1", text: t("ws_wz_title") }),
-    wsEl("ol", { class: "ws-buoc", "aria-label": t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) },
-      [1, 2, 3, 4].map((n) => wsEl("li", {
-        class: "ws-buoc-muc" + (n === w.buoc ? " is-hien-tai" : n < w.buoc ? " is-xong" : ""),
-        "aria-current": n === w.buoc ? "step" : null,
-        text: n + ". " + t("ws_wz_b" + n) }))),
-    wsEl("p", { class: "ws-buoc-ten", text: t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) + ": " + tenBuoc }),
-  );
+  hop.append(wsEl("h2", { id: "wsTieuDe", class: "ws-tieu-de", tabindex: "-1", text: t("ws_wz_title") }));
+  if (w.tuyChinh) {
+    hop.append(
+      wsEl("ol", { class: "ws-buoc", "aria-label": t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) },
+        [1, 2, 3, 4].map((n) => wsEl("li", {
+          class: "ws-buoc-muc" + (n === w.buoc ? " is-hien-tai" : n < w.buoc ? " is-xong" : ""),
+          "aria-current": n === w.buoc ? "step" : null,
+          text: n + ". " + t("ws_wz_b" + n) }))),
+      wsEl("p", { class: "ws-buoc-ten", text: t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) + ": " + tenBuoc }));
+  }
 
   const noiDung = wsEl("div", { class: "ws-wz-noi-dung", id: "wzNoiDung" });
   if (w.buoc === 1) wsBuoc1(noiDung);
@@ -558,15 +560,23 @@ function wsVeWizard() {
   else wsBuoc4(noiDung);
   hop.append(noiDung, wsEl("div", { class: "ws-loi", id: "wzLoi", role: "alert", hidden: true }));
 
+  const tao = () => wsEl("button", { type: "button", class: "btn btn-primary", id: "wzTao",
+    text: t("ws_btn_tao"), onclick: (ev) => khiBan(ev.currentTarget, wsTaoWorkspace) });
+  const huy = () => wsEl("button", { type: "button", class: "btn btn-ghost ws-dong", id: "wzHuy",
+    text: t("btn_cancel"), onclick: () => { wsWizard = null; wsVeDanhSach(); } });
+  if (!w.tuyChinh) {
+    hop.append(wsEl("div", { class: "ws-chan" }, tao(), huy()));
+    const tieuDe0 = el("wsTieuDe");
+    if (tieuDe0) tieuDe0.focus();
+    return;
+  }
   hop.append(wsEl("div", { class: "ws-chan" },
     w.buoc > 1 ? wsEl("button", { type: "button", class: "btn btn-secondary", id: "wzLui",
       text: t("ws_btn_quay_lai"), onclick: () => wsChuyenBuoc(w.buoc - 1) }) : null,
     w.buoc < WS_TONG_BUOC ? wsEl("button", { type: "button", class: "btn btn-primary", id: "wzTiep",
       text: t("ws_btn_tiep"), onclick: () => wsChuyenBuoc(w.buoc + 1) })
-      : wsEl("button", { type: "button", class: "btn btn-primary", id: "wzTao",
-          text: t("ws_btn_tao"), onclick: (ev) => khiBan(ev.currentTarget, wsTaoWorkspace) }),
-    wsEl("button", { type: "button", class: "btn btn-ghost ws-dong", id: "wzHuy",
-      text: t("btn_cancel"), onclick: () => { wsWizard = null; wsVeDanhSach(); } })));
+      : tao(),
+    huy()));
   const tieuDe = el("wsTieuDe");
   if (tieuDe) tieuDe.focus();
 }
@@ -582,11 +592,27 @@ function wsBuoc1(hop) {
       WS_NGANH.map((n) => [n, wsTenNganh(n)]))),
     wsTruong("wzMau", "ws_wz_mau", oMau, t("ws_wz_mau_hint")),
   );
+  /* T3-11: đã có mẫu điền sẵn cả ba bước sau, nên "Tạo" ngay; ai cần sửa từ vựng, luật thì mở "Tuỳ chỉnh". */
+  if (!w.tuyChinh) {
+    hop.append(wsEl("button", { type: "button", class: "btn btn-ghost ws-tuy-chinh", id: "wzTuyChinh",
+      text: t("ws_wz_tuy_chinh"), onclick: () => {
+        wsGomBuoc();
+        const loi = wsLoiBuoc(wsWizard, 1);      // như nút "Tiếp" cũ: tên phải có trước khi sang bước 2
+        if (loi.length) { wsHienLoiBuoc(loi); return; }
+        wsWizard.tuyChinh = true;
+        wsWizard.buoc = 2;
+        wsVeWizard();
+      } }));
+  }
   /* Chọn mẫu = điền lại CẢ BỐN BƯỚC; chỉ tên đang gõ được giữ. */
   oMau.addEventListener("change", (ev) => {
     wsGomBuoc();
     const mau = wsMau.find((m) => m.slug === ev.target.value);
-    if (mau) wsWizard = wsWizardTuMau(mau, wsWizard.ten, 1);
+    if (mau) {
+      const tuyChinh = wsWizard.tuyChinh;
+      wsWizard = wsWizardTuMau(mau, wsWizard.ten, 1);
+      wsWizard.tuyChinh = tuyChinh;
+    }
     wsVeWizard();
   });
 }
@@ -680,7 +706,7 @@ function wsBuoc4(hop) {
     hang(t("ws_r_tier_mode"), t(r.tier_mode === "strict" ? "ws_r_tm_strict" : "ws_r_tm_reserve"), "rvTierMode"),
     hang(t("ws_r_score_scope"), t(r.score_scope === "per_person" ? "ws_r_ss_per_person" : "ws_r_ss_per_slot"), "rvScoreScope"),
     hang(t("ws_r_wharton"), t(r.wharton ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvWharton"),
-    hang(t("ws_r_tiers"), r.tiers.length ? r.tiers.join(" › ") : "—", "rvTiers"),
+    ...(r.tiers.length ? [hang(t("ws_r_tiers"), r.tiers.join(" › "), "rvTiers")] : []),
   ];
   hop.append(
     wsEl("p", { class: "hint-text", text: t("ws_wz_xem_lai_hint") }),
@@ -699,6 +725,7 @@ function wsTaoWorkspace() {
     const loi = wsLoiBuoc(wsWizard, b);
     if (loi.length) {
       wsWizard.buoc = b;
+      if (b > 1) wsWizard.tuyChinh = true;     // lỗi ở bước 2 đến 3: phải mở tuỳ chỉnh mới sửa được
       wsVeWizard();
       wsHienLoiBuoc(loi);
       return Promise.resolve();

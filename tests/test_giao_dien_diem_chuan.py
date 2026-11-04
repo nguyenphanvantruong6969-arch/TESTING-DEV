@@ -75,9 +75,15 @@ def mo(tmp_path, api):
         pw.stop()
 
 
-def _cho_quan_ly(page):
+def _cho_quan_ly(page, clb="A"):
+    """Mở tab Điểm chuẩn rồi bấm "Xem chi tiết" của một CLB (T3-31: biểu đồ chấm nằm trong chi tiết)."""
     page.locator('#qlTabs [data-ql-tab="dc"]').click()
-    page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcChiTiet:not([hidden]) svg[data-bieu-do=chi-tiet]")
+    page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlTongQuan tbody tr")
+    assert page.locator("#dcChiTiet").is_hidden()          # mặc định chỉ có bảng
+    page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="%s"]' % clb).click()
+    page.wait_for_selector("#dcChiTiet:not([hidden])")
+    if clb == "A":
+        page.wait_for_selector("#dcChiTiet svg[data-bieu-do=chi-tiet]")
 
 
 # ------------------------------------------------------------------ (a), (b) khớp dữ liệu
@@ -120,15 +126,15 @@ def test_bieu_do_co_tieu_de_chu_giai_va_bang_chu_va_bang_tong_quan(mo):
     svg = page.locator("svg[data-bieu-do=chi-tiet]")
     assert svg.get_attribute("role") == "img"
     assert svg.locator("title").first.text_content().strip()
-    assert page.locator("#dcBieuDo .dc-chu-giai li").count() >= 3
+    assert page.locator("#dcBieuDo .dc-chu-giai li").count() >= 3        # chú giải của biểu đồ chấm (được/không/vạch)
     assert page.locator("#dcBieuDo table.dc-an-chu tbody tr").count() >= 2
     assert page.locator("#dcBieuDo figcaption").inner_text().strip()
-    # tổng quan: mỗi CLB một dòng, mỗi ô điểm chuẩn có thanh và tiêu đề; A đông hơn chỗ
+    # tổng quan (T3-31): MỘT bảng bằng số, mỗi CLB một dòng; không thanh, không chip mức đông, không chú giải
     hang = page.locator("#dcQlTongQuan tbody tr")
     assert hang.count() == 3
     a = page.locator('#dcQlTongQuan tr[data-club-id="A"]')
-    assert a.locator("svg.dc-thanh title").text_content().strip()
-    assert a.locator("svg.dc-ti-le").get_attribute("data-muc") == "vua"
+    assert a.locator("td").nth(3).inner_text().strip() == "8 đơn · 4 chỗ"
+    assert page.locator("#dcQlTongQuan svg, #dcQlTongQuan .dc-chip, #dcQlTongQuan .dc-chu-giai").count() == 0
     assert not loi, loi
 
 
@@ -151,6 +157,7 @@ def test_doi_ngon_ngu_thi_nhan_doi_theo(mo):
         " && document.querySelector('svg[data-bieu-do=chi-tiet] text.dc-chuan-nhan').textContent.includes('Cut-off 65')")
     assert "Accepted" in page.locator("#dcBieuDo .dc-chu-giai").inner_text()
     assert "Not accepted" in page.locator("#dcBieuDo .dc-chu-giai").inner_text()
+    assert page.locator("#dcQlTongQuan .dc-chi-tiet-nut").first.inner_text() == "Show details"
     assert page.locator("#adminDiemChuanBlock h2").inner_text() == "Cut-off points"
     chu = page.locator("#adminDiemChuanBlock").inner_text()
     assert not DAU_VIET.search(chu.replace("Em số", "")), chu
@@ -174,7 +181,7 @@ def test_khoi_quan_ly_dung_so_lieu_cua_api(mo):
     assert page.locator("#dcBang p").inner_text().strip() == "Đã nhận %d trên %d chỗ, có %d đơn." % (
         a["so_nhan"], a["suc_chua"], a["so_don"])
     # chọn CLB khác thì vẽ lại: C không ai xin
-    page.locator("#dcChonClb").select_option("C")
+    page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="C"]').click()
     page.wait_for_function("() => document.querySelector('#dcBieuDo').textContent.includes('Chưa có')")
     assert page.locator("svg[data-bieu-do=chi-tiet]").count() == 0
     assert not loi, loi
@@ -197,37 +204,27 @@ def test_chua_chay_khong_co_bieu_do_va_nhac_chay(mo):
     page, api, loi, _ = mo(chay=False)
     page.locator('#qlTabs [data-ql-tab="dc"]').click()
     page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlRong:not([hidden])")
-    assert page.locator("#dcChiTiet").is_hidden() and page.locator("#dcChonHop").is_hidden()
-    page.locator('[data-tab="others"]').click()
-    assert page.locator("#dcKqPanel").is_hidden()
+    assert page.locator("#dcChiTiet").is_hidden() and page.locator("#dcQlTongQuan").is_hidden()
     assert not loi, loi
 
 
-# ------------------------------------------------------------------ tab Kết quả: đóng sẵn, không nhớ
+# ------------------------------------------------------------------ T3-22: chỉ còn ở thẻ Quản lý
 
-def test_ket_qua_muc_dong_san_mo_duoc_vao_lai_thi_dong(mo):
+def test_t3_22_the_chi_tiet_va_xuat_tep_khong_con_diem_chuan(mo):
     page, api, loi, _ = mo(tab="others")
-    page.wait_for_selector("#dcKqPanel:not([hidden])")
-    assert page.locator("#dcKqBody").is_hidden()
-    assert page.locator("#btnDcKqMo").get_attribute("aria-expanded") == "false"
-    assert page.locator("#btnDcKqMo").inner_text() == "Xem điểm chuẩn"
-    page.locator("#btnDcKqMo").click()
-    page.wait_for_selector("#dcKqBody:not([hidden]) #dcKqTongQuan tbody tr")
-    assert page.locator("#dcKqTongQuan tbody tr").count() == 3
-    assert page.locator("#btnDcKqMo").inner_text() == "Ẩn điểm chuẩn"
-    # đổi ngôn ngữ không làm đóng
-    page.evaluate("window.I18N.setLang('en')")
-    page.wait_for_function("() => document.getElementById('btnDcKqMo').textContent === 'Hide cut-off points'")
-    assert page.locator("#dcKqBody").is_visible()
-    page.evaluate("window.I18N.setLang('vi')")
-    # rời thẻ rồi vào lại: đóng
-    page.locator('[data-tab="admin"]').click()
-    page.locator('[data-tab="others"]').click()
-    page.wait_for_selector("#dcKqPanel:not([hidden])")
-    assert page.locator("#dcKqBody").is_hidden()
-    assert page.locator("#btnDcKqMo").inner_text() == "Xem điểm chuẩn"
-    # không nhớ qua lần tải trang
-    assert not page.evaluate("() => Object.keys(window.localStorage).some(k => /chuan|dc_/i.test(k))")
+    page.wait_for_selector("#clbPanel")
+    assert page.locator("#dcKqPanel, #btnDcKqMo, #dcKqBody, #dcKqTongQuan").count() == 0
+    assert "Điểm chuẩn" not in page.locator("#view-others").inner_text()
+    assert page.locator('#qlTabs [data-ql-tab="dc"]').count() == 1       # lối vào duy nhất vẫn còn
+    assert not loi, loi
+
+
+def test_t3_31_dong_chi_tiet_va_ba_nut_xem_chi_tiet(mo):
+    page, api, loi, _ = mo()
+    _cho_quan_ly(page)
+    assert page.locator("#dcQlTongQuan .dc-chi-tiet-nut").count() == 3
+    page.locator("#btnDcDong").click()
+    assert page.locator("#dcChiTiet").is_hidden()
     assert not loi, loi
 
 
@@ -240,7 +237,6 @@ def test_tat_tinh_nang_hai_phan_khong_hien(mo):
     assert page.locator("#adminDiemChuanBlock").is_hidden()
     page.locator('[data-tab="others"]').click()
     page.wait_for_selector("#clbPanel")
-    assert page.locator("#dcKqPanel").is_hidden()
     assert not loi, loi
 
 
@@ -252,5 +248,5 @@ def test_kiosk_khong_co_diem_chuan(mo):
     chu = page.locator("#view-fallback").inner_text().lower()
     assert "chuẩn" not in chu and "cut-off" not in chu
     assert page.locator("#view-fallback .dc-svg, #view-fallback .dc-tq").count() == 0
-    assert page.locator("#view-fallback #adminDiemChuanBlock, #view-fallback #dcKqPanel").count() == 0
+    assert page.locator("#view-fallback #adminDiemChuanBlock").count() == 0
     assert not loi, loi

@@ -11,13 +11,21 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 ## Plan
 - [x] L0 (+ fix1, fixci1), tester NO BUGS
 - [x] L1 implemented, pushed (`0fd4981`), tester L1 reviewing
-- [ ] L2  - [ ] L3 (wait for `GO L<n>`)
+- [x] L2  - [x] L3 implemented (tester pending)
 
-## Current state (L2 + fix1 DONE, impl session 3)
-- L2 pushed (head a8b4407), tester round 1 found 6 items; fix1 pushed (head a1258c3): btn_reset_entry wording, `nhanHoaBuoi` in `translateError` (i18n.js),
-  `tom_tat_lan_chay` via `dinhDangGio` without seed, workspace "Thao tác" th sr-only, parity test for MA_BUOI_CO_NHAN. T3-32 "collapse list after pick" SKIPPED
-  (old UI tests click other cards after a pick). Reported `IMPL DONE L2 fix1` to coord. Dead `.fill-*` CSS removed; `#fillPanel` merged into `#clbPanel`.
-- Nothing in progress. L3 is for a fresh impl.
+## Current state (L3 DONE, impl session 4)
+- L3 implemented on top of 7ac6beb: tab 03/05 names, T3-16/17/18 (hide "Theo lớp" without classes, sort by column headers, no "Thứ tự"),
+  T3-19 (`export_bang_dang_xem` + `#btnKqTaiBang`), T3-22 (card removed from tab 03), T3-31 (one table + "Xem chi tiết"),
+  T3-27 (Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên in i18n.js, index.html, i18n_errors.py; Excel headers in api_xuat.py left as they were),
+  T3-11 (wizard: "Tạo" on step 1, `#wzTuyChinh` opens steps 2-4). CHANGELOG + TIEN_DO row T3-L3 written; tests row = 192 files / 3.433 cases.
+- NOT YET VERIFIED: the last related-UI batch (ui5) showed ~7 failures (F at positions 9,12,14-16,22,23 of: test_giao_dien_a14_lop, danh_sach_clb,
+  ux_xuat, tom_tat_ket_qua, t3_l0, t3_l1, t3_l2_van_hanh, a13_8_quan_ly, a13_13_kiem_nhan, ws_nhan_giao_dien, loi_chan_gon, sua_loi_p1, a13_12_tai_lieu, tieng_viet_sach).
+  Output file was in the old scratchpad; RE-RUN that file list (background + Monitor), fix pinned-text/old-id failures (likely tab labels "Dữ liệu khác", "Theo ngày trong tuần",
+  Tổng chỗ, #dcChonClb, #kqTang2, wizard #wzTiep at step 1), then push and send `IMPL DONE L3` (base 7ac6beb) to coord.
+- Already green: test_giao_dien_t3_l3, test_t3_l3_backend, wizard tests (ws_giao_dien, a13_12_ws, a13_13, ws_wharton, t3_l1_ws), Điểm chuẩn tests, t2_ket_qua, test_ws_nhan*, non-UI batch, soat-ma 7/7.
+- L3 gotchas: wizard tests now press `#wzTuyChinh` instead of the first `#wzTiep`; `tests/test_ws_nhan.py` has T3-27 text pairs in `THAY_CHU_T3`
+  plus 3 exact keys in `chu_ui_doi_co_y_t3.json` (tier_reserve vi/en, th_tong_cho en). Run `pytest` via the uv tool; first `uv pip install --python
+  /root/.local/share/uv/tools/pytest/bin/python openpyxl pillow python-docx ruff pytest-cov playwright==1.63.0` if modules are missing.
 
 ## Test environment (read before running anything)
 - `python3 -m venv .venv && pip install` HANGS on the proxy here. Use the uv tool pytest: `pytest` (= /root/.local/bin/pytest,
@@ -68,3 +76,4 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 | 2026-11-04 | Sonnet (impl 1) | L1 implemented (`0fd4981`), handoff written | tester L1 pending |
 | 2026-11-04 | Sonnet (impl 3) | L2 finished (T3-23, T3-28, T3-21, docs, soat-ma) | tester L2 pending |
 | 2026-11-04 | Sonnet (impl 3) | L2 fix1 (6 tester items, 5 done, T3-32 collapse skipped) | head a1258c3; handoff at 200k |
+| 2026-11-04 | Sonnet (impl 4) | L3 implemented (T3-11/16/17/18/19/22/27/31 + tab names) | tester L3 pending |

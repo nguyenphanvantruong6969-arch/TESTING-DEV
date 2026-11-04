@@ -79,8 +79,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "Couldn't load the list of unplaced {person_pl}. Try again."
   },
   "error_reading_reserve_usage": {
-    "vi": "Không tải được thống kê suất dự trữ. Hãy thử lại.",
-    "en": "Couldn't load the reserve seat summary. Try again."
+    "vi": "Không tải được thống kê suất ưu tiên. Hãy thử lại.",
+    "en": "Couldn't load the priority seat summary. Try again."
   },
   "error_reading_results": {
     "vi": "Không tải được kết quả. Hãy thử lại.",
@@ -107,8 +107,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "This file format isn't recognised. See the supported columns in mau_csv/HUONG_DAN_CSV.md."
   },
   "csv_club_row_invalid": {
-    "vi": "Dòng {line} bị bỏ qua vì {reason} không hợp lệ. Tổng chỗ phải lớn hơn 0 và suất dự trữ không được nhiều hơn tổng chỗ.",
-    "en": "Line {line} was skipped because {reason} isn't valid. Total seats must be above 0, and reserve seats can't be more than total seats."
+    "vi": "Dòng {line} bị bỏ qua vì {reason} không hợp lệ. Chỉ tiêu phải lớn hơn 0 và suất ưu tiên không được nhiều hơn chỉ tiêu.",
+    "en": "Line {line} was skipped because {reason} isn't valid. Quota must be above 0, and priority seats can't be more than quota."
   },
   "xlsx_read_failed": {
     "vi": "Không mở được tệp Excel này. Kiểm tra tệp có đúng định dạng .xlsx không, hoặc lưu lại tệp rồi thử lần nữa.",
@@ -127,8 +127,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "This version can't open Excel files. Save the file as CSV UTF-8 and import it again."
   },
   "csv_reserve_group_unknown": {
-    "vi": "Nhãn dự trữ {reserve_group} không khớp với {slot_l} nào, nên {n} {person_l} mang nhãn này sẽ không được xét suất dự trữ. Có thể nhãn đúng là {goi_y}.",
-    "en": "The reserve label {reserve_group} doesn't match any {slot_l}, so {n} {person_l}(s) with this label won't be considered for reserve seats. The intended label may be {goi_y}."
+    "vi": "Nhóm ưu tiên {reserve_group} không khớp với {slot_l} nào, nên {n} {person_l} mang nhãn này sẽ không được xét suất ưu tiên. Có thể nhãn đúng là {goi_y}.",
+    "en": "The priority group {reserve_group} doesn't match any {slot_l}, so {n} {person_l}(s) with this label won't be considered for priority seats. The intended label may be {goi_y}."
   },
   "csv_duplicate_student_rows": {
     "vi": "Mã {student_id} có ở {n} dòng trong tệp. Chỉ dòng cuối cùng được giữ.",
@@ -207,12 +207,12 @@ window.I18N_ERROR_MESSAGES = {
     "en": "Couldn't delete the {slot_l}. Try again."
   },
   "error_reading_reserve_groups": {
-    "vi": "Không tải được danh sách nhãn dự trữ. Hãy thử lại.",
-    "en": "Couldn't load the reserve labels. Try again."
+    "vi": "Không tải được danh sách nhóm ưu tiên. Hãy thử lại.",
+    "en": "Couldn't load the priority groups. Try again."
   },
   "error_assigning_reserve_group": {
-    "vi": "Không gán được nhãn dự trữ. Hãy thử lại.",
-    "en": "Couldn't assign the reserve label. Try again."
+    "vi": "Không gán được nhóm ưu tiên. Hãy thử lại.",
+    "en": "Couldn't assign the priority group. Try again."
   },
   "error_bulk_assigning": {
     "vi": "Không gán được nhãn cho các {person_l} đã chọn. Hãy thử lại.",
@@ -311,8 +311,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "A long-format file needs {person_la} code column and {slot_la} code column (named \"student_id\" and \"club_id\"). Columns found: {fieldnames}"
   },
   "capacity_must_be_positive": {
-    "vi": "Tổng chỗ phải lớn hơn 0.",
-    "en": "Total seats must be more than 0."
+    "vi": "Chỉ tiêu phải lớn hơn 0.",
+    "en": "Quota must be more than 0."
   },
   "no_data_to_run": {
     "vi": "Chưa có dữ liệu để sắp xếp. Cần ít nhất một {slot_l} và một {person_l}.",
@@ -351,12 +351,12 @@ window.I18N_ERROR_MESSAGES = {
     "en": "Row {line}: {person_l} {student_id} put {slot_l} {club_id} under {buoi_cot}, but the {slot_l} meets on {buoi_that}. This preference was skipped."
   },
   "reserve_capacity_negative": {
-    "vi": "Suất dự trữ không được là số âm",
-    "en": "Reserve capacity cannot be negative"
+    "vi": "Suất ưu tiên không được là số âm",
+    "en": "Priority seats cannot be negative"
   },
   "reserve_capacity_exceeds_capacity": {
-    "vi": "Suất dự trữ không được nhiều hơn tổng chỗ.",
-    "en": "Reserve seats can't be more than total seats."
+    "vi": "Suất ưu tiên không được nhiều hơn chỉ tiêu.",
+    "en": "Priority seats can't be more than quota."
   },
   "club_id_required": {
     "vi": "Hãy nhập mã {slot_sl}.",
@@ -475,16 +475,16 @@ window.I18N_ERROR_MESSAGES = {
     "en": "{person} {student_id} chose {slot_l} {club_id}, but that {slot_l} wasn't found."
   },
   "club_capacity_not_positive": {
-    "vi": "{slot_s} {club_id} có tổng chỗ bằng 0. Tổng chỗ phải lớn hơn 0.",
-    "en": "{slot} {club_id} has 0 seats. Total seats must be more than 0."
+    "vi": "{slot_s} {club_id} có chỉ tiêu bằng 0. Chỉ tiêu phải lớn hơn 0.",
+    "en": "{slot} {club_id} has 0 seats. Quota must be more than 0."
   },
   "club_reserve_negative": {
-    "vi": "{slot_s} {club_id} có số suất dự trữ âm. Số này phải từ 0 trở lên.",
-    "en": "{slot} {club_id} has a negative number of reserved seats. It must be 0 or more."
+    "vi": "{slot_s} {club_id} có số suất ưu tiên âm. Số này phải từ 0 trở lên.",
+    "en": "{slot} {club_id} has a negative number of priority seats. It must be 0 or more."
   },
   "club_reserve_exceeds_capacity": {
-    "vi": "{slot_s} {club_id} có suất dự trữ nhiều hơn tổng chỗ.",
-    "en": "{slot} {club_id} has more reserve seats than total seats."
+    "vi": "{slot_s} {club_id} có suất ưu tiên nhiều hơn chỉ tiêu.",
+    "en": "{slot} {club_id} has more priority seats than quota."
   },
   "applicants_unknown_club": {
     "vi": "Danh sách dự thi có {slot_sl} {club_id}, nhưng không tìm thấy {slot_sl} này.",
@@ -503,8 +503,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "{slot} {club_id} has {count} {person_l}(s) but only {capacity} seat(s)."
   },
   "club_over_reserve_capacity": {
-    "vi": "{slot_s} {club_id} có {count} {person_l} dùng suất dự trữ nhưng chỉ có {reserve_capacity} suất.",
-    "en": "{slot} {club_id} has {count} {person_l}(s) in reserve seats but only {reserve_capacity} reserve seat(s)."
+    "vi": "{slot_s} {club_id} có {count} {person_l} dùng suất ưu tiên nhưng chỉ có {reserve_capacity} suất.",
+    "en": "{slot} {club_id} has {count} {person_l}(s) in priority seats but only {reserve_capacity} priority seat(s)."
   },
   "blocking_pair": {
     "vi": "Có thể chưa công bằng: {person_l} {student_id} thích {slot_sl} {club_id} hơn {slot_sl} đang được xếp ({current_club}) và đủ điều kiện vào {club_id}. {slot_s} {club_id} hiện đã nhận {n_holders}/{capacity} chỗ.",
@@ -687,16 +687,16 @@ window.I18N_ERROR_MESSAGES = {
     "en": "{n} {score_l}(s) no longer have a matching test registration (the {person_l} withdrew after being scored). Allocation runs ignore these {score_pl}, and the {score} entry screen does not show them. To clean up: open that {person_l} in the \"Enter preferences\" tab and press \"Save test {slot_pl}\". For example: {sample}"
   },
   "health_thi_qua_tran_buoi": {
-    "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l} trong {session_l} {buoi}, thường do một {slot_l} vừa được chuyển sang {session_l} này ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi của {session_l} này rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
-    "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl} on {buoi}, usually because {slot_la} was just moved to this {session_l} in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some of this {session_l}'s test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}"
+    "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l} trong {session_l} {buoi}, thường do một {slot_l} vừa được chuyển sang {session_l} này ở màn Quản lý {slot_sl}. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi của {session_l} này rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
+    "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl} on {buoi}, usually because {slot_la} was just moved to this {session_l} in Manage {slot_pl}. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some of this {session_l}'s test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}"
   },
   "health_thi_qua_tran": {
-    "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l}, thường do danh sách {slot_l} vừa được sửa ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
-    "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl}, usually because the {slot_l} list was just edited in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}"
+    "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l}, thường do danh sách {slot_l} vừa được sửa ở màn Quản lý {slot_sl}. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
+    "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl}, usually because the {slot_l} list was just edited in Manage {slot_pl}. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}"
   },
   "health_vi_pham_clb_suc_chua_sai": {
-    "vi": "{n} {slot_l} có sức chứa không hợp lệ (sức chứa phải lớn hơn 0, suất dự trữ từ 0 tới sức chứa). Sửa ở màn Quản lý {slot_sl} & dự trữ. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
-    "en": "{n} {slot_l}(s) have invalid capacity (capacity must be above 0, reserve seats between 0 and capacity). Fix them in {slot_p} & reserves. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
+    "vi": "{n} {slot_l} có sức chứa không hợp lệ (sức chứa phải lớn hơn 0, suất ưu tiên từ 0 tới sức chứa). Sửa ở màn Quản lý {slot_sl}. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
+    "en": "{n} {slot_l}(s) have invalid capacity (capacity must be above 0, priority seats between 0 and capacity). Fix them in Manage {slot_pl}. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
   },
   "health_vi_pham_nguyen_vong_hang_sai": {
     "vi": "{n} nguyện vọng có thứ hạng nhỏ hơn 1. Nhập lại nguyện vọng của những {person_l} này. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
@@ -707,12 +707,12 @@ window.I18N_ERROR_MESSAGES = {
     "en": "{n} {score_l}(s) are negative. Fix them in the {score} entry tab. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
   },
   "health_vi_pham_mo_coi_hoc_sinh": {
-    "vi": "Bảng {bang} có dữ liệu của {n} mã {person_l} không còn tồn tại. Tạo lại {person_l} có mã đó, hoặc bấm \"Xoá toàn bộ {person_l} (giữ {slot_sl})\" ở màn Quản lý {slot_sl} & dự trữ. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
-    "en": "Table {bang} holds data for {n} {person_l} ID(s) that no longer exist. Recreate {person_la} with that ID, or click \"Delete all {person_pl} (keep {slot_pl})\" in {slot_p} & reserves. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
+    "vi": "Bảng {bang} có dữ liệu của {n} mã {person_l} không còn tồn tại. Tạo lại {person_l} có mã đó, hoặc bấm \"Xoá toàn bộ {person_l} (giữ {slot_sl})\" ở màn Quản lý {slot_sl}. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
+    "en": "Table {bang} holds data for {n} {person_l} ID(s) that no longer exist. Recreate {person_la} with that ID, or click \"Delete all {person_pl} (keep {slot_pl})\" in Manage {slot_pl}. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
   },
   "health_vi_pham_mo_coi_clb": {
-    "vi": "Bảng {bang} có dữ liệu của {n} mã {slot_l} không còn tồn tại. Tạo lại {slot_l} có mã đó ở màn Quản lý {slot_sl} & dự trữ. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
-    "en": "Table {bang} holds data for {n} {slot_l} ID(s) that no longer exist. Recreate {slot_la} with that ID in {slot_p} & reserves. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
+    "vi": "Bảng {bang} có dữ liệu của {n} mã {slot_l} không còn tồn tại. Tạo lại {slot_l} có mã đó ở màn Quản lý {slot_sl}. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",
+    "en": "Table {bang} holds data for {n} {slot_l} ID(s) that no longer exist. Recreate {slot_la} with that ID in Manage {slot_pl}. For example: {sample}. The software cannot switch on its bad-data protection for this database until this is fixed; after fixing, close and reopen the software to switch it on."
   },
   "health_person_score_none": {
     "vi": "Chưa {person_l} nào có {score_l}, trong khi {score_l} được chấm theo từng {person_l}. Nếu sắp xếp lúc này, mọi {person_l} chỉ được xét theo số bốc thăm.",
@@ -735,12 +735,12 @@ window.I18N_ERROR_MESSAGES = {
     "en": "{n} {person_l}(s) have no preferences, so none of them will be placed in {slot_la}. For example: {sample}"
   },
   "health_orphan_student_group": {
-    "vi": "Nhãn dự trữ \"{reserve_group}\" đang gán cho {n} {person_l} nhưng không {slot_sl} nào dùng nhãn này, có thể do gõ sai (ví dụ: {sample}). Các {person_l} này sẽ không được ưu tiên ở đâu. Sửa ở thẻ Quản lý: tìm {person_l}, đánh dấu, để trống ô nhãn rồi bấm \"Gán cho {person_l} đã đánh dấu\".",
-    "en": "The reserve label \"{reserve_group}\" is given to {n} {person_l}(s) but no {slot_l} uses it, which may be a typo (for example: {sample}). These {person_pl} won't get priority anywhere. To fix it on the Admin tab: find the {person_pl}, tick them, leave the label box empty, and click \"Assign to ticked {person_pl}\"."
+    "vi": "Nhóm ưu tiên \"{reserve_group}\" đang gán cho {n} {person_l} nhưng không {slot_sl} nào dùng nhãn này, có thể do gõ sai (ví dụ: {sample}). Các {person_l} này sẽ không được ưu tiên ở đâu. Sửa ở thẻ Quản lý: tìm {person_l}, đánh dấu, để trống ô nhãn rồi bấm \"Gán cho {person_l} đã đánh dấu\".",
+    "en": "The priority group \"{reserve_group}\" is given to {n} {person_l}(s) but no {slot_l} uses it, which may be a typo (for example: {sample}). These {person_pl} won't get priority anywhere. To fix it on the Admin tab: find the {person_pl}, tick them, leave the label box empty, and click \"Assign to ticked {person_pl}\"."
   },
   "health_club_reserve_no_group": {
-    "vi": "{slot_s} {club_id} có {reserve_capacity} suất dự trữ nhưng chưa có nhãn dự trữ, nên các suất này sẽ thành suất thường.",
-    "en": "{slot} {club_id} has {reserve_capacity} reserve seat(s) but no reserve label, so those seats will become regular seats."
+    "vi": "{slot_s} {club_id} có {reserve_capacity} suất ưu tiên nhưng chưa có nhóm ưu tiên, nên các suất này sẽ thành suất thường.",
+    "en": "{slot} {club_id} has {reserve_capacity} priority seat(s) but no priority group, so those seats will become regular seats."
   },
   "health_club_group_no_students": {
     "vi": "{slot_s} {club_id} để {reserve_capacity} suất cho nhãn \"{reserve_group}\", nhưng chưa {person_l} nào có nhãn này. Các suất đó sẽ bỏ trống.",
@@ -755,8 +755,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "There are {n_seats} seats in total but {n_students} {person_pl} submitted preferences. At least {n_short} {person_l}(s) won't get a seat."
   },
   "health_oversubscribed_chua_khai_buoi": {
-    "vi": "Các {slot_l} chưa khai {session_l} có tổng {n_seats} chỗ, trong khi {n_students} {person_l} xếp nguyện vọng vào các {slot_l} này. Ít nhất {n_short} {person_l} chắc chắn không có chỗ ở nhóm này. Các {slot_l} chưa khai {session_l} được xếp chung như một {session_l} riêng. Hãy khai {session_l} cho chúng ở màn Quản lý {slot_sl} & dự trữ, tăng sức chứa, hoặc chấp nhận.",
-    "en": "{slot_p} with no {session_l} set have {n_seats} seats in total, but {n_students} {person_l}(s) ranked these {slot_pl}. At least {n_short} {person_l}(s) will certainly get no seat among them. {slot_p} with no {session_l} set are matched together as one separate {session_l}. Set their {session_l} in {slot_p} & reserves, raise capacity, or accept it."
+    "vi": "Các {slot_l} chưa khai {session_l} có tổng {n_seats} chỗ, trong khi {n_students} {person_l} xếp nguyện vọng vào các {slot_l} này. Ít nhất {n_short} {person_l} chắc chắn không có chỗ ở nhóm này. Các {slot_l} chưa khai {session_l} được xếp chung như một {session_l} riêng. Hãy khai {session_l} cho chúng ở màn Quản lý {slot_sl}, tăng sức chứa, hoặc chấp nhận.",
+    "en": "{slot_p} with no {session_l} set have {n_seats} seats in total, but {n_students} {person_l}(s) ranked these {slot_pl}. At least {n_short} {person_l}(s) will certainly get no seat among them. {slot_p} with no {session_l} set are matched together as one separate {session_l}. Set their {session_l} in Manage {slot_pl}, raise capacity, or accept it."
   },
   "health_oversubscribed_buoi": {
     "vi": "{session} {buoi} có tổng {n_seats} chỗ, trong khi {n_students} {person_l} xếp nguyện vọng ở {session_l} này. Ít nhất {n_short} {person_l} chắc chắn không có {slot_l} nào trong {session_l} {buoi}. Chỗ trống ở {session_l} khác không bù được. Hãy tăng sức chứa, thêm {slot_l} cho {session_l} này, hoặc chấp nhận.",

@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L3 (ngoài sổ, Truong duyệt 04/11/2026): tên thẻ, thẻ Kết quả gọn, tải bảng, Điểm chuẩn một nơi, chữ Sổ nhập (nghiên cứu T3, lô 3)
+
+Chỉ đổi hiển thị (thêm một API xuất đọc `match_results`); thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.
+
+- **Tên thẻ:** 03 "Dữ liệu khác" thành "Chi tiết và xuất tệp" / "Details and export" (`nav_others`, `others_title`); 05 thành "Quản lý {slot_sl}" / "Manage {slot_pl}" (`nav_admin`, `admin_title`). Chữ báo lỗi nhắc tên thẻ 05 (`i18n_errors.py`) theo tên mới.
+- **T3-16/17/18 (`js/09_the_xem.js`, `index.html`, `style.css`):** nút "Theo lớp" chỉ hiện khi đã có lớp (chưa có lớp thì mở sẵn "Theo mã học sinh"); bỏ hàng sắp xếp `#kqTang2` (và khoá `kq_sap_nhan`, `kq_sx_*`, `kq_aria_tang2`), sắp bằng cách bấm tiêu đề cột (`.kq-sx-cot`, `aria-sort`; mã tự nhiên, lớp tự nhiên, còn lại theo vần tiếng Việt, ô trống luôn cuối); bỏ cột "Thứ tự" (`th_stt`), giữ dòng đếm. `localStorage` `rbda_ket_qua_xem_v1` không còn `tang2`.
+- **T3-19:** nút "Tải bảng này (Excel)" (`#btnKqTaiBang`) ở thẻ 02, API mới `export_bang_dang_xem(kieu, gia_tri, output_path)` (`api_xuat.py`): một tệp, một trang, đúng lớp / CLB / danh sách theo mã đang xem; không điểm, không số bốc thăm; không ghi đè; chưa có kết quả thì `xuat_chua_co_ket_qua`.
+- **T3-22:** Điểm chuẩn chỉ còn ở thẻ 05, tab "Điểm chuẩn" (`#qlTabDc`); bỏ thẻ và nút `#dcKqPanel` / `#btnDcKqMo` ở thẻ 03 (cùng `veDiemChuanKetQua`, `dongDiemChuanKq`, `initDiemChuanKetQua`, khoá `dc_xem`, `dc_an`).
+- **T3-31 (`js/05_quan_ly.js`):** Điểm chuẩn mặc định MỘT bảng bằng số (CLB, điểm thi chuẩn, điểm quyết tâm chuẩn, "N đơn · M chỗ") + nút "Xem chi tiết" từng CLB; biểu đồ chấm và bảng hai cách xét x hai mức chuyển vào chi tiết (đóng bằng "Đóng chi tiết"); bỏ thanh điểm, thanh xếp chồng ba màu, ba mức "Đủ chỗ / Đông / Rất đông", hộp chọn CLB và các khoá `dc_muc_*`, `dc_bar_*`, `dc_chu_giai_thanh`, `dc_muc_giai_thich`, `dc_thanh_nhan`, `dc_ti_le_nhan`, `dc_chon_clb`.
+- **T3-27:** chữ giao diện = chữ Sổ nhập ở mọi nơi trong `i18n.js`, `index.html`, `i18n_errors.py`: Chỉ tiêu (thay "Tổng chỗ"), Suất ưu tiên (thay "Suất dự trữ"), Nhóm ưu tiên (thay "Nhãn dự trữ"); tiếng Anh Quota / Priority seats / Priority group. Chỉ chữ hiển thị; không đổi mã, cột CSV hay tiêu đề cột trong tệp Excel xuất (`api_xuat.py`).
+- **T3-11 (`js/075_workspace.js`):** tạo workspace từ mẫu: bước 1 có nút "Tạo" ngay (2 cú bấm) và nút "Tuỳ chỉnh từ vựng và luật" (`#wzTuyChinh`, kiểm tên trước) mở bước 2 đến 4; thanh bước và bước "Xem lại" chỉ có khi tuỳ chỉnh; dòng "Thứ tự các nhóm" trống ẩn đi.
+- **Test mới:** `tests/test_t3_l3_backend.py` (7), `tests/test_giao_dien_t3_l3.py` (Chromium). **Test cũ sửa:** `test_giao_dien_t2_ket_qua.py` (viết lại ca tầng 2, sắp theo tiêu đề cột, không lớp), `test_giao_dien_diem_chuan.py`, `test_giao_dien_a13_10_diem_chuan.py` (một bảng, chi tiết mở theo yêu cầu, thẻ 03 không còn Điểm chuẩn), `test_i18n_khoa_dc_khong_chet.py`, `test_ws_nhan.py` (+ `chu_ui_doi_co_y_t3.json`: bảng thay chữ T3-27), `test_giao_dien_danh_sach_clb.py`, và các test đi qua trình hướng dẫn (`test_ws_giao_dien.py`, `test_giao_dien_a13_12_ws.py`, `test_giao_dien_a13_13_kiem_nhan.py`, `test_giao_dien_a14_lop.py`, `test_giao_dien_t3_l1_ws.py`, `test_ws_wharton_giao_dien.py`: bước 2 mở bằng "Tuỳ chỉnh").
+- **Không làm (Truong):** T3-41 (ô trống "—" giữ nguyên), bỏ số 01 đến 06 ở thanh bên.
+
 ## 2026-11-04 — T3-L2 fix2 (điều phối): test bảng lỗi theo nhãn buổi
 
 - `tests/test_giao_dien_bang_loi.py`: mẫu `health_thi_qua_tran_buoi` dùng buổi chữ tự đặt ("Buổi tối") thay cho mã `thu_2`, vì từ T3-L2 giao diện đổi mã buổi sang nhãn còn `format_message` giữ mã; phần đổi mã đã có test ở `tests/test_t3_l2_buoi.py`.

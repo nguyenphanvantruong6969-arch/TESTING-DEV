@@ -19,7 +19,7 @@ def _toi_buoc_luat(page):
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Kiểm nhận")
-    page.locator("#wzTiep").click()                     # -> bước 2 (nhãn)
+    page.locator("#wzTuyChinh").click()                 # -> bước 2 (nhãn)
     page.locator("#wzTiep").click()                     # -> bước 3 (luật)
     page.wait_for_selector("#wzWharton")
 

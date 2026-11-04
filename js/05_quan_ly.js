@@ -1,4 +1,4 @@
-/* js/05_quan_ly.js — Thẻ 05 — Quản lý CLB & dự trữ, cùng phần nhiều buổi dùng chung (chọn buổi,
+/* js/05_quan_ly.js — Thẻ 05 — Quản lý CLB, cùng phần nhiều buổi dùng chung (chọn buổi,
    lịch tuần, bảng tải, thời khoá biểu, độ phủ).
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
@@ -263,7 +263,7 @@ function loadSoBocTham(search) {
   });
 }
 
-/* ---- Độ phủ (thẻ Dữ liệu khác). Thời khoá biểu từng học sinh nằm ở thẻ Kết quả (js/09_the_xem.js). ---- */
+/* ---- Độ phủ (thẻ Chi tiết và xuất tệp). Thời khoá biểu từng học sinh nằm ở thẻ Kết quả (js/09_the_xem.js). ---- */
 
 function loadDoPhu() {
   const panel = el("doPhuPanel");
@@ -1400,7 +1400,7 @@ function initTabConQl() {
    ========================================================================== */
 
 const DC_NS = "http://www.w3.org/2000/svg";
-const dc = { rows: null, ct: null, chon: "", moKq: false };
+const dc = { rows: null, ct: null, chon: "" };
 let dcUid = 0;
 
 function dcSvg(ten, thuocTinh, cha) {
@@ -1442,88 +1442,10 @@ function dcChuGiai(goc, muc) {
   goc.appendChild(ul);
 }
 
-/* Mức cạnh tranh theo tỉ lệ đơn / chỗ: đến 1 là "thap", đến 2 là "vua", trên 2 là "cao". */
-function dcMucCanhTranh(tiLe) {
-  return tiLe <= 1 ? "thap" : (tiLe <= 2 ? "vua" : "cao");
-}
-
-/* Thang thanh điểm thi: 10 nếu mọi điểm chuẩn không quá 10, rồi 100, rồi bội của 10. */
-function dcThangThi(ds) {
-  let cao = 0;
-  ds.forEach((r) => {
-    const m = r.tang1.thuong || r.tang1.du_tru;
-    if (m && !m.con_cho) cao = Math.max(cao, m.diem_thi);
-  });
-  return cao <= 10 ? 10 : (cao <= 100 ? 100 : Math.ceil(cao / 10) * 10);
-}
-
-/* Một thanh điểm chuẩn trong ô của bảng tổng: nền xám, phần đầy xanh, kèm số bên phải. */
-function dcThanhDiem(o, tang, r, m, thang) {
-  const x = Math.max(0, Math.min(thang, m.con_cho ? 0 : (tang === 1 ? m.diem_thi : m.diem_quyet_tam)));
-  const W = 200, H = 14, rong = (x / thang) * W;
-  const chu = tang === 1 && !m.con_cho ? dcSo(m.diem_thi) : dcChuoiMuc(m, 2);
-  const cach = t(tang === 1 ? "dc_tang1" : "dc_tang2").toLowerCase();
-  const nhan = t("dc_thanh_nhan", { cach, ten: r.ten, x: tang === 1 ? dcChuoiMuc(m, 1) : chu });
-  const svg = dcSvg("svg", { class: "dc-thanh", viewBox: `0 0 ${W} ${H}`, role: "img",
-                             preserveAspectRatio: "none", "data-tang": tang });
-  dcSvg("title", {}, svg).textContent = nhan;
-  dcSvg("rect", { class: "dc-thanh-nen", x: 0, y: 0, width: W, height: H, rx: 4 }, svg);
-  if (rong >= 8) {
-    dcSvg("path", { class: "dc-thanh-do", "data-diem": x,
-                    d: `M0 0H${rong - 4}a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H0z` }, svg);
-  } else if (rong > 0) {
-    dcSvg("rect", { class: "dc-thanh-do", "data-diem": x, x: 0, y: 0, width: rong, height: H }, svg);
-  }
-  o.appendChild(svg);
-  const g = document.createElement("span");
-  g.className = "dc-gtri";
-  g.textContent = chu;
-  o.appendChild(g);
-}
-
-/* Ô "Đơn và chỗ": dòng trên là nhãn mức bằng chữ và "N đơn · M chỗ"; dòng dưới là thanh dùng chung
-   một thang cho mọi dòng (dài nhất = số lớn nhất giữa đơn và chỗ của cả bảng). Thanh gồm: đơn nằm
-   trong số chỗ (xám đậm), đơn vượt quá số chỗ (màu theo mức), chỗ còn trống (khung rỗng). */
-function dcThanhTiLe(o, r, toiDa) {
-  const tiLe = r.suc_chua > 0 ? r.so_don / r.suc_chua : (r.so_don > 0 ? 99 : 0);
-  const muc = dcMucCanhTranh(tiLe);
-  const tenMuc = t("dc_muc_" + muc);
-  const dong = document.createElement("div");
-  dong.className = "dc-don-dong";
-  const chip = document.createElement("span");
-  chip.className = "dc-chip";
-  chip.dataset.muc = muc;
-  chip.textContent = tenMuc;
-  dong.appendChild(chip);
-  const so = document.createElement("span");
-  so.className = "dc-don-so";
-  so.textContent = t("dc_don_chu", { don: r.so_don, cho: r.suc_chua });
-  dong.appendChild(so);
-  o.appendChild(dong);
-
-  const W = 140, H = 8;
-  const px = (n) => (n / toiDa) * W;
-  const trong = Math.min(r.so_don, r.suc_chua);
-  const vuot = Math.max(0, r.so_don - r.suc_chua);
-  const con = Math.max(0, r.suc_chua - r.so_don);
-  const svg = dcSvg("svg", { class: "dc-ti-le", viewBox: `0 0 ${W} ${H}`, role: "img",
-                             "data-muc": muc, "data-ti-le": Math.round(tiLe * 100) / 100,
-                             "data-trong": trong, "data-vuot": vuot, "data-con": con });
-  dcSvg("title", {}, svg).textContent = t("dc_ti_le_nhan", {
-    ten: r.ten, don: r.so_don, cho: r.suc_chua, x: dcSo(tiLe), muc: tenMuc });
-  const rong = (n) => (n > 0 ? Math.max(px(n), 2) : 0);
-  const wTrong = rong(trong), wVuot = rong(vuot), wCon = rong(con);
-  if (wTrong) dcSvg("rect", { class: "dc-ti-le-trong", x: 0, y: 0, width: wTrong, height: H, rx: 2 }, svg);
-  if (wVuot) dcSvg("rect", { class: "dc-ti-le-vuot", x: wTrong, y: 0, width: wVuot, height: H, rx: 2 }, svg);
-  if (wCon) dcSvg("rect", { class: "dc-ti-le-con", x: wTrong + 0.5, y: 0.5, width: Math.max(0, wCon - 1),
-                            height: H - 1, rx: 2 }, svg);
-  o.appendChild(svg);
-}
-
-/* (c) Bảng tổng quan. Mỗi dòng: tên CLB, hai cột điểm chuẩn riêng (xét điểm thi trên thang
-   của kỳ, xét điểm quyết tâm trên thang 0 đến 100), rồi đơn / chỗ kèm thanh tỉ lệ màu theo mức
-   cạnh tranh. Ô chưa có ai ở cách xét đó thì ghi "—". */
-function veTongQuanDiemChuan(goc, ds) {
+/* (c) Bảng tổng quan (T3-31): MỘT bảng, mỗi dòng một CLB: điểm thi chuẩn, điểm quyết tâm chuẩn, số đơn
+   trên số chỗ (bằng số) và nút "Xem chi tiết" (biểu đồ chấm của CLB đó). Ô chưa có ai ở cách xét
+   đó thì ghi "—". `chiTiet` = hàm gọi khi bấm nút (rỗng thì không có nút). */
+function veTongQuanDiemChuan(goc, ds, chiTiet) {
   clear(goc);
   if (!ds || !ds.length) {
     const p = document.createElement("p");
@@ -1533,8 +1455,6 @@ function veTongQuanDiemChuan(goc, ds) {
     return;
   }
   const nhieuBuoi = new Set(ds.map((r) => r.buoi)).size > 1;
-  const thangThi = dcThangThi(ds);
-  const toiDaDon = Math.max(1, ...ds.map((r) => Math.max(r.so_don, r.suc_chua)));
   const cuon = document.createElement("div");
   cuon.className = "scroll-x";
   const bang = document.createElement("table");
@@ -1544,31 +1464,30 @@ function veTongQuanDiemChuan(goc, ds) {
   cap.textContent = t("dc_tong_quan_tieu_de");
   bang.appendChild(cap);
   const dau = bang.createTHead().insertRow();
-  [["dc_cot_ten", "", ""], ["dc_tang1", "", "1"], ["dc_tang2", "", "2"], ["dc_cot_don", "", ""]]
-    .forEach(([khoa, lop, tang]) => {
+  [["dc_cot_ten", ""], ["dc_tang1", "1"], ["dc_tang2", "2"], ["dc_cot_don", ""]]
+    .forEach(([khoa, tang]) => {
       const th = document.createElement("th");
       th.scope = "col";
-      th.className = lop;
       if (tang) th.dataset.tang = tang;
       th.textContent = t(khoa);
       dau.appendChild(th);
     });
+  if (chiTiet) dau.appendChild(document.createElement("th")).className = "dc-cot-nut";
   const tb = bang.createTBody();
   ds.forEach((r) => {
     const tr = tb.insertRow();
     tr.dataset.clubId = r.club_id;
     const ten = tr.insertCell();
-    const tenTxt = document.createElement("span");
-    tenTxt.className = "dc-ten";
-    tenTxt.textContent = dcTenDong(r, nhieuBuoi);
-    ten.appendChild(tenTxt);
+    ten.className = "dc-ten";
+    ten.textContent = dcTenDong(r, nhieuBuoi);
 
-    [[1, r.tang1, thangThi], [2, r.tang2, 100]].forEach(([tang, muc, thang]) => {
+    [[1, r.tang1], [2, r.tang2]].forEach(([tang, muc]) => {
       const o = tr.insertCell();
       o.dataset.tang = tang;
+      o.className = "num";
       const m = muc.thuong || muc.du_tru;
       if (m) {
-        dcThanhDiem(o, tang, r, m, thang);
+        o.textContent = m.con_cho ? dcChuoiMuc(m, 2) : dcSo(tang === 1 ? m.diem_thi : m.diem_quyet_tam);
       } else {
         o.textContent = "—";
         o.title = t("dc_khong_ai");
@@ -1577,19 +1496,19 @@ function veTongQuanDiemChuan(goc, ds) {
 
     const d = tr.insertCell();
     d.className = "dc-don";
-    dcThanhTiLe(d, r, toiDaDon);
+    d.textContent = t("dc_don_chu", { don: r.so_don, cho: r.suc_chua });
+    if (chiTiet) {
+      const nut = document.createElement("button");
+      nut.type = "button";
+      nut.className = "btn btn-ghost dc-chi-tiet-nut";
+      nut.dataset.clubId = r.club_id;
+      nut.textContent = t("dc_xem_chi_tiet");
+      nut.addEventListener("click", () => chiTiet(r.club_id));
+      tr.insertCell().appendChild(nut);
+    }
   });
   cuon.appendChild(bang);
   goc.appendChild(cuon);
-  const ghi = document.createElement("p");
-  ghi.className = "hint-text";
-  ghi.textContent = t("dc_chu_giai_thanh", { thi: thangThi });
-  goc.appendChild(ghi);
-  dcChuGiai(goc, [["is-ti-trong", "dc_bar_trong"], ["is-ti-vuot", "dc_bar_vuot"], ["is-ti-con", "dc_bar_con"]]);
-  const giai = document.createElement("p");
-  giai.className = "hint-text";
-  giai.textContent = t("dc_muc_giai_thich");
-  goc.appendChild(giai);
 }
 
 /* Thang ngang 0 đến 100 dùng chung cho (a) và (b). */
@@ -1788,22 +1707,23 @@ function loadAdminDiemChuan() {
     dc.rows = res.data.rows;
     el("dcQlCu").hidden = !res.data.ket_qua_cu;
     el("dcQlRong").hidden = res.data.co_ket_qua;
-    el("dcChonHop").hidden = !res.data.co_ket_qua;
-    veTongQuanDiemChuan(el("dcQlTongQuan"), res.data.co_ket_qua ? dc.rows : []);
+    veTongQuanDiemChuan(el("dcQlTongQuan"), res.data.co_ket_qua ? dc.rows : [], moChiTietDiemChuan);
     el("dcQlTongQuan").hidden = !res.data.co_ket_qua;
-    const sel = el("dcChonClb");
-    const nhieu = res.data.nhieu_buoi;
-    clear(sel);
-    dc.rows.forEach((r) => {
-      const o = document.createElement("option");
-      o.value = r.club_id;
-      o.textContent = dcTenDong(r, nhieu);
-      sel.appendChild(o);
-    });
-    if (!dc.rows.some((r) => r.club_id === dc.chon)) dc.chon = dc.rows.length ? dc.rows[0].club_id : "";
-    sel.value = dc.chon;
-    return loadChiTietDiemChuan();
+    /* Chi tiết một CLB chỉ mở khi bấm "Xem chi tiết"; CLB đang xem không còn thì đóng. */
+    if (dc.chon && dc.rows.some((r) => r.club_id === dc.chon)) return loadChiTietDiemChuan();
+    dongChiTietDiemChuan();
+    return null;
   });
+}
+
+function moChiTietDiemChuan(clubId) {
+  dc.chon = clubId;
+  return loadChiTietDiemChuan();
+}
+
+function dongChiTietDiemChuan() {
+  dc.chon = "";
+  el("dcChiTiet").hidden = true;
 }
 
 function loadChiTietDiemChuan() {
@@ -1831,13 +1751,8 @@ function loadChiTietDiemChuan() {
 }
 
 function initDiemChuan() {
-  const chon = el("dcChonClb");
-  if (chon) {
-    chon.addEventListener("change", () => {
-      dc.chon = chon.value;
-      loadChiTietDiemChuan();
-    });
-  }
+  const dong = el("btnDcDong");
+  if (dong) dong.addEventListener("click", dongChiTietDiemChuan);
   const i = el("btnDcThongTin");
   if (i) {
     i.addEventListener("click", () => {
@@ -1845,60 +1760,5 @@ function initDiemChuan() {
       el("dcThongTin").hidden = !mo;
       i.setAttribute("aria-expanded", mo ? "true" : "false");
     });
-  }
-  initDiemChuanKetQua();
-}
-
-/* ---- Tab Kết quả: mục "Điểm chuẩn" LUÔN đóng mỗi lần vào thẻ ----
-   Khác các mục thu gọn khác (`MUC_KET_QUA`): trạng thái mở KHÔNG được ghi nhớ, vì bảng này có
-   điểm của người đã đặt và không nên hiện sẵn trên màn hình dùng chung. Rời thẻ là đóng ngay
-   (theo dõi lớp `is-active` của thẻ, nên đi bằng nút hay bằng mã đều đóng). Đổi ngôn ngữ không
-   đổi thẻ nên không đóng. */
-function dongDiemChuanKq() {
-  dc.moKq = false;
-  const than = el("dcKqBody");
-  const nut = el("btnDcKqMo");
-  if (!than || !nut) return;
-  than.hidden = true;
-  nut.setAttribute("aria-expanded", "false");
-  nut.textContent = t("dc_xem");
-  clear(el("dcKqTongQuan"));
-}
-
-function veDiemChuanKetQua() {
-  const panel = el("dcKqPanel");
-  if (!panel) return Promise.resolve(null);
-  return callApi("get_diem_chuan").then((res) => {
-    if (!res.ok || !res.data.co_ket_qua) {
-      panel.hidden = true;
-      dc.rowsKq = null;
-      dongDiemChuanKq();
-      return null;
-    }
-    panel.hidden = false;
-    dc.rowsKq = res.data.rows;
-    el("dcKqCu").hidden = !res.data.ket_qua_cu;
-    if (dc.moKq) veTongQuanDiemChuan(el("dcKqTongQuan"), dc.rowsKq);
-    el("btnDcKqMo").textContent = t(dc.moKq ? "dc_an" : "dc_xem");
-    return res.data;
-  });
-}
-
-function initDiemChuanKetQua() {
-  const nut = el("btnDcKqMo");
-  if (!nut) return;
-  nut.addEventListener("click", () => {
-    dc.moKq = !dc.moKq;
-    el("dcKqBody").hidden = !dc.moKq;
-    nut.setAttribute("aria-expanded", dc.moKq ? "true" : "false");
-    nut.textContent = t(dc.moKq ? "dc_an" : "dc_xem");
-    if (dc.moKq) veTongQuanDiemChuan(el("dcKqTongQuan"), dc.rowsKq || []);
-    else clear(el("dcKqTongQuan"));
-  });
-  const view = el("view-others");
-  if (view && window.MutationObserver) {
-    new MutationObserver(() => {
-      if (!view.classList.contains("is-active")) dongDiemChuanKq();
-    }).observe(view, { attributes: true, attributeFilter: ["class"] });
   }
 }

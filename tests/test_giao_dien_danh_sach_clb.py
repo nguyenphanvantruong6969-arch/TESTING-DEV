@@ -178,7 +178,7 @@ def test_danh_sach_thanh_vien_co_hang_nguyen_vong_va_dien(trang):
     page.click("#clbBody tr:first-child button")
     page.wait_for_selector("#clbDsArea:not([hidden])")
     dong = page.inner_text("#clbDsBody tr:first-child")
-    assert "Tổng quát" in dong or "Dự trữ" in dong, dong
+    assert "Tổng quát" in dong or "Ưu tiên" in dong, dong
 
 
 def test_doi_ngon_ngu_thi_tieu_de_danh_sach_cung_dich(trang):

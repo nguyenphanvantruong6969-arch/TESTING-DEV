@@ -36,7 +36,7 @@ rbda-kiosk/
                   pywebview không khởi động được (xem mục cùng tên bên dưới)
   i18n_errors.py -> catalog lỗi song ngữ (vi/en) dùng ở Python (xem "Song ngữ" bên dưới)
   index.html   -> 5 tab: Vận hành pipeline / Kết quả / Nhập dự phòng /
-                  Quản lý club & dự trữ / Chấm điểm (mù)
+                  Quản lý club / Chấm điểm (mù)
   recovery.html -> màn hình phục hồi độc lập, chỉ mở khi app.db hỏng/mất
   style.css    -> giao diện (token: giấy lạnh + ink + vàng đồng)
   i18n.js      -> catalog văn bản song ngữ (vi/en) + hàm dịch dùng ở JS
@@ -498,7 +498,7 @@ vẫn chạy đủ.
 
 ## Xuất kết quả cho nhà trường
 
-Nút **Xuất kết quả (Excel)** (thẻ *03 Dữ liệu khác*, ô *Kết quả sắp xếp*) gọi
+Nút **Xuất kết quả (Excel)** (thẻ *03 Chi tiết và xuất tệp*, ô *Kết quả sắp xếp*) gọi
 `export_ket_qua` và ghi **một tệp Excel** `ket_qua_phan_bo.xlsx` vào thư mục
 Tải xuống. Sáu trang, theo thứ tự người đọc cần:
 

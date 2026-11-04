@@ -1,6 +1,8 @@
 {
  "ui": {
   "en": {
+   "th_tong_cho": "Quota",
+   "tier_reserve": "Priority",
    "admin_desc": "Add or edit clubs, quotas and priority seats. A priority group only gets those seats in a club with the same label.",
    "btn_reset_entry": "Clear this student's whole entry",
    "btn_score_link": "Score",
@@ -34,6 +36,7 @@
    "xuat_hint_hoc_sinh": "Student profiles: press \"Choose students…\" and tick them in the table below."
   },
   "vi": {
+   "tier_reserve": "Ưu tiên",
    "admin_desc": "Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.",
    "btn_reset_entry": "Xoá toàn bộ phiếu của học sinh này",
    "btn_score_link": "Chấm",

@@ -1,8 +1,8 @@
 """A13.10, thiết kế lại màn Quản lý, Điểm chuẩn (Playwright + Chromium). Dữ liệu MÔ PHỎNG.
 
-  * bảng tổng: hai cột điểm chuẩn riêng, mỗi ô có thanh; không còn dòng chữ nhỏ dưới tên CLB;
-  * "Đơn / chỗ": thanh tỉ lệ nhỏ kèm số, màu theo mức cạnh tranh, không còn chấm đỏ;
-  * chi tiết một CLB: ĐÚNG MỘT biểu đồ SVG, vạch chuẩn ghi số, được / không được nhận phân biệt;
+  * bảng tổng (T3-31, L3): MỘT bảng bằng số, hai cột điểm chuẩn riêng, đơn và chỗ bằng số; không thanh, không
+    chip ba mức, không chú giải; không còn dòng chữ nhỏ dưới tên CLB;
+  * chi tiết một CLB (mở bằng "Xem chi tiết"): ĐÚNG MỘT biểu đồ SVG, vạch chuẩn ghi số, được / không được nhận phân biệt;
   * `prefers-reduced-motion` tắt hiệu ứng; `prefers-color-scheme: dark` đổi màu khối;
   * nhãn mới có mặt ở cả VI và EN.
 """
@@ -54,7 +54,9 @@ def mo(api):
         page.wait_for_selector("#dropZone")
         page.locator('[data-tab="admin"]').click()
         page.locator('#qlTabs [data-ql-tab="dc"]').click()
-        page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcChiTiet:not([hidden]) svg[data-bieu-do]")
+        page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlTongQuan tbody tr")
+        page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="A"]').click()
+        page.wait_for_selector("#dcChiTiet:not([hidden]) svg[data-bieu-do]")
         return page, loi
 
     yield _mo
@@ -65,21 +67,18 @@ def mo(api):
 
 # ------------------------------------------------------------------ bảng tổng
 
-def test_bang_co_hai_cot_diem_chuan_rieng_moi_o_co_thanh(mo):
+def test_bang_co_hai_cot_diem_chuan_rieng_bang_so_khong_thanh(mo):
     page, loi = mo()
     th = page.locator("#dcQlTongQuan thead th")
     chu = [x.strip() for x in th.all_inner_texts()]
-    assert [c.lower() for c in chu] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "số đơn và số chỗ"], chu
+    assert [c.lower() for c in chu[:4]] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "đơn và chỗ"], chu
     assert page.locator('#dcQlTongQuan th[data-tang="1"]').count() == 1
     assert page.locator('#dcQlTongQuan th[data-tang="2"]').count() == 1
     a = page.locator('#dcQlTongQuan tr[data-club-id="A"]')
-    # A không thi: ô điểm thi là "—", ô điểm quyết tâm có thanh dài đúng 65 trên thang 100
+    # A không thi: ô điểm thi là "—", ô điểm quyết tâm là số 65 (không còn thanh)
     assert a.locator('td[data-tang="1"]').inner_text().strip() == "—"
-    thanh = a.locator('td[data-tang="2"] svg.dc-thanh')
-    assert thanh.count() == 1 and thanh.get_attribute("data-tang") == "2"
-    assert float(thanh.locator("path.dc-thanh-do, rect.dc-thanh-do").get_attribute("data-diem")) == 65
-    assert a.locator('td[data-tang="2"] .dc-gtri').inner_text().strip() == "65"
-    assert thanh.locator("title").text_content().strip()
+    assert a.locator('td[data-tang="2"]').inner_text().strip() == "65"
+    assert page.locator("#dcQlTongQuan svg").count() == 0
     assert not loi, loi
 
 
@@ -91,36 +90,16 @@ def test_bang_khong_con_dong_chu_nho_duoi_ten_clb(mo):
     assert not loi, loi
 
 
-def test_don_va_cho_co_nhan_muc_bang_chu_so_ro_don_vi_va_thanh_chung_thang(mo):
+def test_don_va_cho_la_so_ro_don_vi_khong_chip_khong_muc_dong(mo):
     page, loi = mo()
     assert page.locator("#dcQlTongQuan .dc-nong").count() == 0
-    th = page.locator("#dcQlTongQuan thead th").nth(3).inner_text().strip().lower()
-    assert th == "số đơn và số chỗ", th
-    # A: 8 đơn cho 4 chỗ (gấp 2, "Đông"); B: 8 đơn cho 10 chỗ ("Đủ chỗ"); C: 0 đơn cho 3 chỗ
-    mong = {"A": ("Đông", "8 đơn · 4 chỗ", "vua", (4, 4, 0)),
-            "B": ("Đủ chỗ", "8 đơn · 10 chỗ", "thap", (8, 0, 2)),
-            "C": ("Đủ chỗ", "0 đơn · 3 chỗ", "thap", (0, 0, 3))}
-    mau = {}
-    for cid, (nhan, chu, muc, (trong, vuot, con)) in mong.items():
+    mong = {"A": "8 đơn · 4 chỗ", "B": "8 đơn · 10 chỗ", "C": "0 đơn · 3 chỗ"}
+    for cid, chu in mong.items():
         o = page.locator('#dcQlTongQuan tr[data-club-id="%s"] td.dc-don' % cid)
-        assert o.locator(".dc-chip").inner_text().strip() == nhan
-        assert o.locator(".dc-chip").get_attribute("data-muc") == muc
-        assert o.locator(".dc-don-so").inner_text().strip() == chu
-        svg = o.locator("svg.dc-ti-le")
-        assert svg.get_attribute("data-muc") == muc and svg.locator("title").text_content().strip()
-        assert tuple(int(svg.get_attribute("data-" + k)) for k in ("trong", "vuot", "con")) == (trong, vuot, con)
-        mau[cid] = o.locator(".dc-chip").evaluate("e => getComputedStyle(e).backgroundColor")
-    assert mau["A"] != mau["B"] and mau["B"] == mau["C"], mau          # mức khác nhau, màu khác nhau
-    # cùng một thang: đơn dài gấp đôi thì thanh dài gấp đôi (A: 8 đơn, B: 8 đơn, cùng tổng "trong + vuot")
-    dai = page.evaluate("""() => ['A','B'].map(c => [...document.querySelectorAll(
-        '#dcQlTongQuan tr[data-club-id="' + c + '"] svg.dc-ti-le rect.dc-ti-le-trong, '
-        + '#dcQlTongQuan tr[data-club-id="' + c + '"] svg.dc-ti-le rect.dc-ti-le-vuot')]
-        .reduce((t, r) => t + (+r.getAttribute('width')), 0))""")
-    assert dai[0] == pytest.approx(dai[1], abs=0.5), dai
-    # chú giải: ba phần của thanh và lời giải thích ba mức
-    assert page.locator("#dcQlTongQuan .dc-chu-giai li").count() == 3
+        assert o.inner_text().strip() == chu
+    assert page.locator("#dcQlTongQuan .dc-chip, #dcQlTongQuan .dc-chu-giai, #dcQlTongQuan .dc-don-so").count() == 0
     chu = page.locator("#dcQlTongQuan").inner_text()
-    assert "Đủ chỗ:" in chu and "Rất đông:" in chu
+    assert not re.search(r"Đủ chỗ|Rất đông|Đông:", chu), chu
     assert not loi, loi
 
 
@@ -168,7 +147,7 @@ def test_chi_tiet_chu_giai_gon_tieu_de_bang_chu_va_tooltip(mo):
 
 def test_chon_clb_khong_ai_xin_thi_khong_con_svg(mo):
     page, loi = mo()
-    page.locator("#dcChonClb").select_option("C")
+    page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="C"]').click()
     page.wait_for_function("() => document.querySelector('#dcChiTiet figure').textContent.includes('Chưa có')")
     assert page.locator("#dcChiTiet svg").count() == 0
     assert not loi, loi

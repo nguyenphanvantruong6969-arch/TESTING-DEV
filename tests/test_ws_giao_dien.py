@@ -81,7 +81,7 @@ def _tao_qua_wizard(page, ten, nganh="company", vi_nguoi=None, en_nguoi=None):
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", ten)
     page.select_option("#wzNganh", nganh)
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     if vi_nguoi:
         page.fill("#wzNhan_person_vi", vi_nguoi)
         page.fill("#wzNhan_person_en", en_nguoi or "")
@@ -169,12 +169,12 @@ def test_wizard_bat_loi_o_buoc_1_va_chi_di_tiep_khi_hop_le(mo_trang):
     page, _, _, loi = mo_trang()
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
-    page.locator("#wzTiep").click()                       # chưa gõ tên
+    page.locator("#wzTuyChinh").click()                       # chưa gõ tên
     assert page.locator("#wzLoi").is_visible()
     assert page.locator("#wzTen").is_visible()            # vẫn ở bước 1
 
     page.fill("#wzTen", "A")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     assert page.locator("#wzNhan_person_vi").is_visible()  # sang bước 2
     page.fill("#wzNhan_slot_vi", "")
     page.locator("#wzTiep").click()
@@ -213,7 +213,7 @@ def test_wizard_chon_mau_dien_san_ca_bon_buoc(mo_trang):
     page.select_option("#wzMau", label="Mẫu công ty")
     assert page.input_value("#wzTen") == "Chi nhánh"      # tên đã gõ được giữ
     assert page.input_value("#wzNganh") == "company"
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     assert page.input_value("#wzNhan_person_vi") == "Nhân viên"
     assert page.input_value("#wzNhan_person_en") == "Employee"
     page.locator("#wzTiep").click()
@@ -249,7 +249,7 @@ def test_wizard_chi_theo_nhom_giu_danh_sach_nhom_du_o_che_do_du_tru_mem(mo_trang
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Chỉ nhóm")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.locator("#wzTiep").click()
     page.select_option("#wzPriority", "tier")
     assert page.input_value("#wzTierMode") == "reserve"
@@ -270,7 +270,7 @@ def test_wizard_nhom_truoc_roi_diem_ma_du_tru_mem_thi_canh_bao_bo_thu_tu_nhom(mo
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Hai tầng")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.locator("#wzTiep").click()
     page.select_option("#wzPriority", "score+tier")
     assert page.locator("#wzTiers").is_disabled()          # dự trữ mềm: danh sách không dùng
@@ -284,7 +284,7 @@ def test_wizard_quay_lai_giu_nguyen_chu_da_go(mo_trang):
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Giữ tên")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.fill("#wzNhan_group_vi", "Cấp bậc")
     page.locator("#wzLui").click()
     assert page.input_value("#wzTen") == "Giữ tên"
@@ -374,8 +374,8 @@ def _chu_cac_buoc_wizard(page, den_buoc):
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Alpha")
     ra = [page.evaluate(_JS_CHU)]
-    for _ in range(den_buoc - 1):
-        page.locator("#wzTiep").click()
+    for b in range(den_buoc - 1):
+        page.locator("#wzTuyChinh" if b == 0 else "#wzTiep").click()      # T3-11: bước 2 mở bằng "Tuỳ chỉnh"
         ra.append(page.evaluate(_JS_CHU))
     return ra
 

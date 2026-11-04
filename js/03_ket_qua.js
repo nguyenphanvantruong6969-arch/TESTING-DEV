@@ -1,4 +1,4 @@
-/* js/03_ket_qua.js — Thẻ 03 — Dữ liệu khác (phần còn lại của thẻ Kết quả cũ): các bảng, thu gọn mục,
+/* js/03_ket_qua.js — Thẻ 03 — Chi tiết và xuất tệp (phần còn lại của thẻ Kết quả cũ): các bảng, thu gọn mục,
    xuất tệp. Thẻ 02 "Kết quả" (chỉ xem) nằm ở js/09_the_xem.js.
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
@@ -22,7 +22,6 @@ function loadResultsTab() {
   loadPhanBoNguyenVong();
   loadEmChuaCoCho();
   loadSuatDuTru();
-  veDiemChuanKetQua();       // A13.4: mục đóng sẵn, hiện khi bật điểm quyết tâm và đã có kết quả
   /* Tieu de danh sach thanh vien la chu DONG (co ten cau lac bo), nen
      applyStaticText() khong dich duoc. Mo lai dung cai dang mo — giong
      het cach `openScoringClub` duoc goi lai o the 05. */

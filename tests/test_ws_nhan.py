@@ -104,7 +104,25 @@ KHOA_UI_DA_BO = {"fill_panel_title", "fill_hint", "fill_nhom_tong", "fill_choi",
 # bảng thay chữ dưới đây; chuỗi viết lại hẳn nằm trong `chu_ui_doi_co_y_t3.json` (giá trị MỚI với mặc định
 # trường học). Mọi chuỗi khác vẫn giống hệt ảnh chụp.
 THAY_CHU_T3 = [("Nhập tại chỗ", "Nhập nguyện vọng"), ("Kiosk entry", "Enter preferences"),
-               ("Vận hành sắp xếp", "Xếp CLB")]
+               ("Vận hành sắp xếp", "Xếp CLB"),
+               # T3-L3 (T3-27): chữ giao diện = chữ của Sổ nhập (Chỉ tiêu / Suất ưu tiên / Nhóm ưu tiên);
+               # tab 03 và 05 đổi tên (Truong duyệt 04/11/2026).
+               ("Quản lý CLB & dự trữ", "Quản lý CLB"), ("Clubs & reserves", "Manage clubs"),
+               ("Dữ liệu khác", "Chi tiết và xuất tệp"), ("Other data", "Details and export"),
+               ("Suất dự trữ", "Suất ưu tiên"), ("suất dự trữ", "suất ưu tiên"),
+               ("Gán nhãn dự trữ", "Gán nhóm ưu tiên"), ("Nhãn dự trữ", "Nhóm ưu tiên"),
+               ("nhãn dự trữ", "nhóm ưu tiên"), ("Tổng chỗ", "Chỉ tiêu"), ("tổng chỗ", "chỉ tiêu"),
+               ("Reserve seats", "Priority seats"), ("Reserve labels and", "Priority groups and"),
+               ("Current reserve label", "Current priority group"),
+               ("Reserve label to apply", "Priority group to apply"),
+               ("Admitted on a reserved seat", "Admitted on a priority seat"),
+               ("Soft reserved seats", "Soft priority seats"), ("Reserved places", "Priority places"),
+               ("regular or reserved places", "regular or priority places"),
+               ("and total seats.", "and quota."), ("reserves any seats", "has priority seats"),
+               ("reserve seat", "priority seat"), ("Reserve seat", "Priority seat"),
+               ("reserve label", "priority group"), ("Reserve capacity", "Priority seats"),
+               ("reserved seats", "priority seats"), ("Total seats must be", "Quota must be"),
+               ("than total seats", "than quota")]
 CHU_UI_MOI_T3 = os.path.join(GOC, "tests", "du_lieu_ws", "chu_ui_doi_co_y_t3.json")
 SUA_CO_Y = {
     ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],

@@ -210,7 +210,7 @@ def test_workspace_co_o_nhan_thu_sau_cohort(mo_trang):  # noqa: F811
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Công ty ABC")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     assert page.locator("#wzNhan_cohort_vi").input_value() == "Lớp"
     assert page.locator("#wzNhan_cohort_en").input_value() == "Class"
     page.fill("#wzNhan_cohort_vi", "Phòng ban")

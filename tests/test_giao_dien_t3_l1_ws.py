@@ -13,12 +13,13 @@ def test_tieu_de_buoc_hop_tao_workspace_dung_hai_cham_khong_gach_dai(mo_trang): 
     page, _api, _goc, loi = mo_trang()
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
+    page.fill("#wzTen", "Thử bước")
+    page.locator("#wzTuyChinh").click()                  # T3-11: chỉ khi "Tuỳ chỉnh" mới có tiêu đề bước
     page.wait_for_selector(".ws-buoc-ten")
     for _ in range(3):
         chu = page.inner_text(".ws-buoc-ten")
         assert re.fullmatch(r"Bước \d/\d: .+", chu), chu
         assert "\u2014" not in chu
         if page.locator("#wzTiep").count() and page.locator("#wzTiep").is_visible():
-            page.fill("#wzTen", "Thử bước") if page.locator("#wzTen").is_visible() else None
             page.locator("#wzTiep").click()
     assert not loi

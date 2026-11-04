@@ -1,9 +1,9 @@
 # ruff: noqa: F811
 """T2 — thẻ 02 "Kết quả" hai tầng (Playwright + Chromium, qua `browser_host`; dữ liệu MÔ PHỎNG).
 
-Tầng 1: Theo lớp | Theo CLB | Theo mã học sinh. Tầng 2 (cách sắp): Theo ngày trong tuần | Theo mã học
-sinh | Theo lớp (mục cuối CHỈ khi tầng 1 = Theo mã học sinh). Nhớ lựa chọn theo máy. Không điểm,
-không số bốc thăm. Tái dùng fixture `mo` của test_giao_dien_a14_lop."""
+Tầng 1: Theo lớp | Theo CLB | Theo mã học sinh. T3-16/17/18 (L3): nút "Theo lớp" chỉ có khi đã có
+lớp; không còn hàng sắp xếp tầng 2 (bấm tiêu đề cột để sắp); không còn cột "Thứ tự". Nhớ lựa chọn
+theo máy. Không điểm, không số bốc thăm. Tái dùng fixture `mo` của test_giao_dien_a14_lop."""
 
 import json
 import re
@@ -24,20 +24,21 @@ def _mo_ket_qua(page, tang1=None):
         page.locator('#kqTang1 [data-kq="%s"]' % tang1).click()
 
 
-def _sx(page, kieu):
-    page.locator('#kqTang2 [data-sx="%s"]' % kieu).click()
+def _sx(page, cot):
+    """Bấm tiêu đề cột thứ `cot` (0 = mã) để sắp theo cột đó."""
+    page.locator('#kqDau .kq-sx-cot[data-cot="%d"]' % cot).click()
 
 
 def _ma_cot2(page):
-    """Cột 'Mã học sinh' (cột 2) của bảng, theo thứ tự đang hiện."""
-    return page.evaluate("() => Array.from(document.querySelectorAll('#kqThan tr')).map(r => r.children[1].textContent)")
+    """Cột 'Mã học sinh' (cột đầu) của bảng, theo thứ tự đang hiện."""
+    return page.evaluate("() => Array.from(document.querySelectorAll('#kqThan tr')).map(r => r.children[0].textContent)")
 
 
 def _thu_tu(page, mong):
     """Chờ bảng vẽ lại xong theo đúng thứ tự `mong` (việc vẽ lại là bất đồng bộ)."""
     page.wait_for_function(
         "(m) => JSON.stringify(Array.from(document.querySelectorAll('#kqThan tr'))"
-        ".map(r => r.children[1].textContent)) === JSON.stringify(m)", arg=mong)
+        ".map(r => r.children[0].textContent)) === JSON.stringify(m)", arg=mong)
     assert _ma_cot2(page) == mong
 
 
@@ -66,66 +67,79 @@ def test_tang1_ba_nut_mot_cho_bam_doi_khong_tai_lai_trang(mo):
     assert not loi, loi
 
 
-def test_tang2_theo_lop_chi_co_khi_tang1_la_theo_ma(mo):
+def test_khong_con_hang_tang2_va_cot_thu_tu_va_tieu_de_cot_la_nut(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True)
     _mo_ket_qua(page)
-    ds = lambda: [x.strip() for x in page.evaluate("""() => Array.from(document.querySelectorAll('#kqTang2 .kq-seg-nut'))
-        .filter(n => !n.hidden && n.offsetParent !== null).map(n => n.textContent)""")]  # noqa: E731
-    for tang1 in ("lop", "clb"):
+    assert page.locator("#kqTang2").count() == 0
+    for tang1 in ("lop", "clb", "ma"):
         page.locator('#kqTang1 [data-kq="%s"]' % tang1).click()
-        assert ds() == ["Theo ngày trong tuần", "Theo mã học sinh"], tang1
-    page.locator('#kqTang1 [data-kq="ma"]').click()
-    assert ds() == ["Theo ngày trong tuần", "Theo mã học sinh", "Theo lớp"]
+        page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+        dau, nut, tang = page.evaluate("""() => [Array.from(document.querySelectorAll('#kqDau th')).map(x => x.textContent.trim()),
+            document.querySelectorAll('#kqDau th .kq-sx-cot').length,
+            document.querySelectorAll('#kqDau th[aria-sort="ascending"]').length]""")
+        dau = [x.strip(" ▲▼") for x in dau]
+        assert dau[0] == "Mã học sinh" and "Thứ tự" not in dau, (tang1, dau)
+        assert nut == len(dau) and tang == 1, (tang1, nut, tang)      # mọi tiêu đề là nút; mặc định sắp theo mã
     assert not loi, loi
 
 
-def test_sap_theo_ma_la_sap_tu_nhien_va_theo_lop_la_tu_nhien_trong_cuoi(mo):
+def test_chua_co_lop_thi_an_nut_theo_lop_va_mo_bang_co_du_lieu(mo):
+    page, api, loi = mo({}, chay=True)                                   # đã chạy, không lớp nào
+    _mo_ket_qua(page)
+    _bang_san_sang(page, 3)
+    nhan = [x.strip() for x in page.evaluate("""() => Array.from(document.querySelectorAll('#kqTang1 .kq-seg-nut'))
+        .filter(n => n.offsetParent !== null).map(n => n.textContent)""")]
+    assert nhan == ["Theo CLB", "Theo mã học sinh"]
+    assert page.locator("#kqTang1 .is-on").get_attribute("data-kq") == "ma"
+    assert "Chưa có lớp nào" not in page.locator("#view-results").inner_text()
+    assert not loi, loi
+
+
+def test_bam_tieu_de_cot_sap_ma_tu_nhien_lop_tu_nhien_trong_cuoi_va_dao_chieu(mo):
     # HS1 10A10, HS2/HS3 10A2, HS10 10A1, HS9 chưa có lớp; năm em cùng vào CLB A (5 chỗ)
     page, api, loi = mo({"HS1": "10A10", "HS2": "10A2", "HS3": "10A2", "HS10": "10A1"},
                         chay=True, them=("HS9", "HS10"))
     _mo_ket_qua(page, "ma")
     _bang_san_sang(page, 5)
-    _sx(page, "ma")
-    _thu_tu(page, ["HS1", "HS2", "HS3", "HS9", "HS10"])        # tự nhiên: HS9 trước HS10
-    _sx(page, "lop")
+    _thu_tu(page, ["HS1", "HS2", "HS3", "HS9", "HS10"])        # mặc định theo mã, tự nhiên: HS9 trước HS10
+    _sx(page, 0)                                               # bấm lại cột mã: đảo chiều
+    _thu_tu(page, ["HS10", "HS9", "HS3", "HS2", "HS1"])
+    assert page.locator('#kqDau th[aria-sort="descending"]').count() == 1
+    _sx(page, 2)                                               # cột Lớp
     _thu_tu(page, ["HS10", "HS2", "HS3", "HS1", "HS9"])        # 10A1 < 10A2 < 10A10, trống cuối
-    page.locator('#kqTang1 [data-kq="clb"]').click()                    # sang Theo CLB: "lop" lùi về ngày
-    page.wait_for_function("() => document.querySelector('#kqTang2 .is-on')")
-    assert page.locator("#kqTang2 .is-on").get_attribute("data-sx") == "ngay"
+    _sx(page, 2)
+    _thu_tu(page, ["HS1", "HS2", "HS3", "HS10", "HS9"])        # giảm dần; vẫn trống cuối
+    page.locator('#kqTang1 [data-kq="clb"]').click()           # đổi cách xem: về sắp theo mã
+    page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length > 0")
+    assert page.locator('#kqDau th[aria-sort="ascending"]').count() == 1
     assert not loi, loi
 
 
-def test_sap_theo_ngay_trong_tuan_dung_thu_tu_buoi_dau_tien_co_clb(mo):
-    page, api, loi = mo({"HS1": "10A1", "HS2": "10A1", "HS3": "10A1"}, chay=True, nhieu_buoi=True)
-    d = api.get_thoi_khoa_bieu()["data"]
-
-    def khoa(em):
-        vi_tri = [i for i, b in enumerate(d["ds_buoi"]) if (em["theo_buoi"].get(b) or {}).get("club_id")]
-        return (vi_tri[0] if vi_tri else 99, em["student_id"])
-    mong_ngay = [e["student_id"] for e in sorted(d["hoc_sinh"], key=khoa)]
+def test_bam_tieu_de_cot_clb_sap_theo_ten_clb_o_trong_cuoi(mo):
+    page, api, loi = mo({"HS1": "10A1", "HS2": "10A1", "HS3": "10A1"}, chay=True)
     _mo_ket_qua(page, "ma")
     _bang_san_sang(page, 3)
-    _sx(page, "ngay")
-    _thu_tu(page, mong_ngay)
-    _sx(page, "ma")
-    _thu_tu(page, ["HS1", "HS2", "HS3"])
+    d = api.get_thoi_khoa_bieu()["data"]
+    ten = {e["student_id"]: ((e["theo_buoi"][d["ds_buoi"][0]] or {}).get("club_name") or "") for e in d["hoc_sinh"]}
+    mong = [k for k, _ in sorted(ten.items(), key=lambda kv: (kv[1] == "", kv[1], kv[0]))]
+    _sx(page, 3)                                               # cột CLB của bảng Theo mã (mã, tên, lớp, CLB)
+    _thu_tu(page, mong)
     assert not loi, loi
 
 
-def test_nho_hai_tang_theo_may_va_mo_lai_van_con(mo):
+def test_nho_cach_xem_theo_may_va_mo_lai_van_con(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True)
     url = page.url
     _mo_ket_qua(page, "ma")
-    _sx(page, "lop")
+    page.wait_for_function("() => document.querySelector('#kqTang1 .is-on').dataset.kq === 'ma'")
     luu = json.loads(page.evaluate("() => localStorage.getItem('%s')" % KHOA))
-    assert (luu["tang1"], luu["tang2"]) == ("ma", "lop")
+    assert luu["tang1"] == "ma" and "tang2" not in luu
     trang2 = page.context.new_page()           # cùng kho lưu trữ, như mở lại chương trình
     trang2.goto(url)
     trang2.wait_for_selector("#dropZone")
     trang2.locator('.nav-item[data-tab="results"]').click()
     trang2.wait_for_function("() => document.querySelector('#kqTang1 .is-on')")
     assert trang2.locator("#kqTang1 .is-on").get_attribute("data-kq") == "ma"
-    assert trang2.locator("#kqTang2 .is-on").get_attribute("data-sx") == "lop"
     assert not loi, loi
 
 
@@ -176,12 +190,9 @@ def test_trang_thai_rong_chua_chay_xep(mo):
     assert not loi, loi
 
 
-def test_trang_thai_rong_khong_co_lop_va_tim_khong_thay(mo):
+def test_trang_thai_rong_tim_khong_thay(mo):
     page, api, loi = mo({}, chay=True)                                   # đã chạy, không lớp nào
-    _mo_ket_qua(page, "lop")
-    page.wait_for_function("() => !document.getElementById('kqRong').hidden")
-    assert "Chưa có lớp nào" in page.locator("#kqRong").inner_text()
-    page.locator('#kqTang1 [data-kq="ma"]').click()                      # Theo mã vẫn xem được
+    _mo_ket_qua(page, "ma")
     _bang_san_sang(page, 3)
     page.fill("#kqTimKiem", "khongcoai")
     page.wait_for_function("() => !document.getElementById('kqRong').hidden")
@@ -192,7 +203,7 @@ def test_trang_thai_rong_khong_co_lop_va_tim_khong_thay(mo):
     assert not loi, loi
 
 
-def test_doi_ngon_ngu_ve_lai_ca_hai_tang_va_bang(mo):
+def test_doi_ngon_ngu_ve_lai_bang_va_giu_cach_xem(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True)
     _mo_ket_qua(page, "ma")
     _bang_san_sang(page, 3)
@@ -201,7 +212,7 @@ def test_doi_ngon_ngu_ve_lai_ca_hai_tang_va_bang(mo):
     page.wait_for_function("() => /student/i.test(document.getElementById('kqDem').textContent)")
     chu = page.locator("#view-results").inner_text()
     assert not re.search(r"\{\w+\}", chu), chu
-    assert re.search(r"By day of the week", chu) and re.search(r"By .*ID", chu), chu
+    assert re.search(r"By .*ID", chu) and "By day of the week" not in chu, chu
     assert page.locator("#kqTang1 .is-on").get_attribute("data-kq") == "ma"      # lựa chọn không mất
     assert not loi, loi
 
@@ -220,17 +231,11 @@ def test_ket_qua_khong_bao_gio_co_diem_hay_so_boc_tham(mo):
     assert not loi, loi
 
 
-def test_theo_clb_tang2_ngay_nhom_theo_buoi_con_ma_la_danh_sach_phang(mo):
+def test_theo_clb_o_chon_nhom_theo_buoi_theo_thu_tu_ngay(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True, nhieu_buoi=True)
     _mo_ket_qua(page, "clb")
-    page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length === 3")
-    _sx(page, "ngay")
     page.wait_for_function("() => document.querySelectorAll('#kqChonClb optgroup').length === 3")
     assert page.locator("#kqChonClb optgroup").evaluate_all("g => g.map(x => x.label)") == ["2", "3", "10"]
-    _sx(page, "ma")
-    page.wait_for_function("() => document.querySelectorAll('#kqChonClb optgroup').length === 0")
-    # danh sách phẳng theo vần tên: "CLB 10" đứng trước "CLB 2" (so vần), kèm buổi
-    assert page.locator("#kqChonClb option").all_inner_texts() == ["10 · CLB 10", "2 · CLB 2", "3 · CLB 3"]
     assert not loi, loi
 
 

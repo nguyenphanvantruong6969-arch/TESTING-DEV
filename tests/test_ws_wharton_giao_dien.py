@@ -61,7 +61,7 @@ def _toi_buoc_luat(page, ten="Đợt thử"):
     page.locator("#btnWorkspace").click()
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", ten)
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()                      # T3-11: bước 2 mở bằng "Tuỳ chỉnh"
     page.locator("#wzTiep").click()
     page.wait_for_selector("#wzPriority")
 
@@ -170,7 +170,7 @@ def test_chon_mau_da_bat_wharton_thi_dien_san(mo_trang):
     page.locator("#wsBtnMoi").click()
     page.fill("#wzTen", "Bản sao")
     page.select_option("#wzMau", label="Mẫu Wharton")
-    page.locator("#wzTiep").click()
+    page.locator("#wzTuyChinh").click()
     page.locator("#wzTiep").click()
     assert page.locator("#wzWharton").is_checked()
     assert not loi, loi

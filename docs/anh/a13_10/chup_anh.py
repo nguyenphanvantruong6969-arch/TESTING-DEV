@@ -46,7 +46,7 @@ def main():
         page.locator('[data-tab="admin"]').click()
         page.locator('#qlTabs [data-ql-tab="dc"]').click()
         page.wait_for_selector("#adminDiemChuanBlock:not([hidden]) #dcQlTongQuan table")
-        page.locator("#dcChonClb").select_option(chon)
+        page.locator('#dcQlTongQuan .dc-chi-tiet-nut[data-club-id="%s"]' % chon).click()      # T3-31
         page.wait_for_selector("#dcChiTiet:not([hidden]) svg")
         for ngon in ("vi", "en"):
             for che_do in ("sang", "toi"):

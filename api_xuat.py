@@ -460,6 +460,92 @@ class XuatKetQuaMixin:
                 shutil.rmtree(thu_muc, ignore_errors=True)
             return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
 
+    # -----------------------------------------------------------------
+    # T3-19: "Tải bảng này (Excel)" ở thẻ 02 Kết quả. Xuất đúng bảng đang xem (một lớp, một
+    # CLB hoặc danh sách theo mã), cùng cột với màn hình. KHÔNG điểm thi, điểm quyết tâm,
+    # số bốc thăm hay diện trúng tuyển (như bản theo lớp).
+    # -----------------------------------------------------------------
+    def export_bang_dang_xem(self, kieu: str, gia_tri=None, output_path: str = ""):
+        """Xuất MỘT tệp .xlsx một trang cho bảng đang xem ở thẻ Kết quả.
+
+        `kieu`: "lop" (`gia_tri` = lớp, "" là chưa có lớp), "clb" (`gia_tri` = mã CLB) hoặc "ma"
+        (`gia_tri` = chữ đang tìm, rỗng là tất cả). Chỗ đặt theo `_duong_xuat` (không ghi đè).
+        Chưa có kết quả thì từ chối `xuat_chua_co_ket_qua`. Trả về {path, n_dong}."""
+        return self._khoa_xuat(self._export_bang_dang_xem_da_khoa, kieu, gia_tri, output_path)
+
+    def _export_bang_dang_xem_da_khoa(self, kieu, gia_tri, output_path):
+        from openpyxl import Workbook
+
+        from so_excel import Trang
+
+        path, da_tao = None, False
+        try:
+            if self._chua_co_ket_qua():
+                return _fail(err("xuat_chua_co_ket_qua"))
+            if kieu not in ("lop", "clb", "ma"):
+                return _fail(err("error_exporting_excel", detail="kieu=%s" % kieu))
+            tieu_de_phu = "Chỉ có kết quả xếp. Dòng tô đỏ: {person_l} chưa có {slot_l}."
+            if kieu == "clb":
+                res = self.get_danh_sach_clb(str(gia_tri or ""))
+                if not res["ok"]:
+                    return res
+                d = res["data"]
+                ten = d["club_name"] or d["club_id"]
+                cot = ["Mã {person_l}", "Họ tên", "{cohort}"]
+                dong = [[m["student_id"], m["name"] or "", m["class_id"] or ""]
+                        for m in sorted(d["thanh_vien"], key=lambda m: str(m["student_id"]))]
+                tieu_de, to_do = "DANH SÁCH {slot_u} " + str(ten).upper(), None
+                ten_trang = str(ten)
+            else:
+                res = (self.get_thoi_khoa_bieu("", "" if gia_tri in (None, "") else str(gia_tri))
+                       if kieu == "lop"
+                       else self.get_thoi_khoa_bieu(str(gia_tri or "").strip()))
+                if not res["ok"]:
+                    return res
+                ds_buoi = res["data"]["ds_buoi"]
+                nhieu = len(ds_buoi) > 1
+                co_lop = kieu == "ma"
+                cot = (["Mã {person_l}", "Họ tên"] + (["{cohort}"] if co_lop else [])
+                       + (list(ds_buoi) if nhieu else ["{slot} được xếp"]))
+                dong = []
+                for em in res["data"]["hoc_sinh"]:
+                    o = []
+                    for b in ds_buoi:
+                        x = em["theo_buoi"].get(b)
+                        o.append((x.get("club_name") or x.get("club_id") or "")
+                                 if x and x.get("club_id") else "")
+                    dong.append([em["student_id"], em["name"] or ""]
+                                + ([em["class_id"] or ""] if co_lop else []) + o)
+                tl = 3 if co_lop else 2
+                to_do = lambda r: not any(r[tl:])  # noqa: E731
+                if kieu == "lop":
+                    tieu_de = ("DANH SÁCH {cohort_u} " + str(gia_tri).upper()) if gia_tri \
+                        else "DANH SÁCH {person_u} CHƯA CÓ {cohort_u}"
+                    ten_trang = str(gia_tri) if gia_tri else "Chưa có {cohort_l}"
+                else:
+                    tieu_de, ten_trang = "DANH SÁCH {person_u}", "Danh sách"
+            du = {"nhan": self._nhan_xuat()}
+            path = self._duong_xuat(output_path, self._ten_file_an_toan(
+                "bang_" + (str(gia_tri) if gia_tri else kieu), "bang") + ".xlsx", (".xlsx",))
+            wb = Workbook()
+            ws = wb.active
+            ws.title = self._ten_trang_hop_le(dien_nhan(ten_trang, du["nhan"]), set())
+            t = Trang(ws, du["nhan"])
+            t.tieu_de(tieu_de, tieu_de_phu)
+            du["ket_qua_cu"] = self._ket_qua_cu()
+            self._dong_ket_qua_cu(t, du)
+            t.bang(cot, dong, to_do=to_do, rong="(chưa có {person_l} nào)")
+            t.xong(ngang=len(cot) > 7)
+            wb.save(path)
+            da_tao = True
+            return _ok({"path": path, "n_dong": len(dong), "ket_qua_cu": du["ket_qua_cu"]})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            if path and not da_tao and os.path.exists(path):
+                os.remove(path)
+            return _fail(err("error_exporting_excel", detail=self._chi_tiet_loi_xuat(e)))
+
     def _trang_chua_co_cho(self, t, bao, co_ket_qua):
         from openpyxl.styles import Alignment
 
