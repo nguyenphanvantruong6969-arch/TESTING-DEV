@@ -1118,6 +1118,11 @@ html.tat-hieu-ung .status-strip:hover {
   font-size: 13px;
 }
 
+.data-table th.cot-buoi-tieu-de {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .data-table th {
   text-align: left;
   font-size: 11px;
@@ -2051,7 +2056,6 @@ html.tat-hieu-ung .status-strip:hover {
   color: var(--ink-soft);
 }
 
-.chon-buoi-dai select { padding: 5px 8px; font-size: 13.5px; }
 
 .btn-nho { padding: 5px 10px; font-size: 13px; }
 

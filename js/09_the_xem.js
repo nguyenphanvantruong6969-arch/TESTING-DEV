@@ -184,7 +184,7 @@ function veKetQua() {
 
 /* `cot` đầu (STT, mã, họ tên và lớp nếu có) không xuống dòng: tên CLB dài chỉ được làm ô CLB xuống dòng. */
 function kqVeBang(cot, hang, dem, soCotCoDinh) {
-  el("kqDau").innerHTML = cot.map((c, i) => `<th${i < soCotCoDinh ? ' class="kq-cd"' : ""}>${esc(c)}</th>`).join("");
+  el("kqDau").innerHTML = cot.map((c, i) => `<th class="${i < soCotCoDinh ? "kq-cd" : "cot-buoi-tieu-de"}">${esc(c)}</th>`).join("");
   const than = el("kqThan");
   clear(than);
   const manh = document.createDocumentFragment();

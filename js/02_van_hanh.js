@@ -329,7 +329,7 @@ function capNhatKhoaVanHanh() {
 
   // Doi pham vi buoi giua luc dang chay la vo nghia: pham vi da gui di roi.
   document.querySelectorAll(
-    "#seedInput, #chonBuoiChip .buoi-chip, #chonBuoiTu, #chonBuoiDen, #btnChonTatCaBuoi, #stbLockLine .redraw-toggle"
+    "#seedInput, #chonBuoiChip .buoi-chip, #btnChonTatCaBuoi, #stbLockLine .redraw-toggle"
   ).forEach((n) => { n.disabled = khoa.dangChay; });
 }
 

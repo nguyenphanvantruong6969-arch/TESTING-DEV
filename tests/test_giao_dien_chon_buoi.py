@@ -37,6 +37,7 @@ LỖI 5 — nhập xong, buổi mới không có thẻ nào.
 Máy nào không có playwright/Chromium thì bỏ qua cả tệp.
 """
 
+import re
 import io
 import os
 
@@ -87,6 +88,8 @@ def trang(api):
 
 
 def _the(page, nhan):
+    # T3-14: chip hiện nhãn ("Thứ 6"), không hiện mã thô ("thu_6").
+    nhan = re.sub(r"^thu_(\d)$", r"Thứ \1", nhan)
     return page.locator("#chonBuoiChip .buoi-chip", has_text=nhan).first
 
 
@@ -122,7 +125,7 @@ class TestThanhXacNhanKhongHuaSai:
         page.click("#btnRun")
         page.wait_for_selector("#runConfirmBar")
         cau = page.locator("#runConfirmBar span").inner_text()
-        assert "thu_2" in cau and "thu_6" not in cau, cau
+        assert "Thứ 2" in cau and "Thứ 6" not in cau, cau
         assert loi == []
 
 
@@ -146,7 +149,7 @@ class TestDoiNgonNguGiuDongNhac:
         page, loi, _api = trang
         _the(page, "thu_6").click()
         truoc = page.locator("#chonBuoiNhac").inner_text()
-        assert "thu_6" in truoc, truoc
+        assert "Thứ 6" in truoc, truoc
 
         page.locator("#btnLangToggle").click()
         page.wait_for_function("document.documentElement.lang === 'en'")
@@ -154,30 +157,23 @@ class TestDoiNgonNguGiuDongNhac:
 
         sau = page.locator("#chonBuoiNhac").inner_text()
         assert sau != truoc, "không đổi ngôn ngữ thì test này không canh được gì"
-        # Nhãn buổi là mã thô ở cả hai thứ tiếng; CÂU quanh nó mới đổi.
-        assert "thu_6" in sau, sau
+        # T3-14: nhãn buổi cũng đổi theo ngôn ngữ ("Thứ 6" -> "Fri").
+        assert "Fri" in sau, sau
         assert loi == []
 
 
-class TestDaiBuoiKhopVoiThe:
-    """Hai ô "Từ/Đến" phải nói đúng điều các thẻ đang nói.
+class TestKhongConHaiOTuDen:
+    """T3-07: bộ chọn buổi chỉ còn thẻ bấm và "Chọn tất cả"; hai hộp "Từ/đến" đã bỏ."""
 
-    `loadChonBuoi()` bật MỌI thẻ rồi dựng lại hai ô dải, mà một `<select>`
-    vừa dựng luôn dừng ở lựa chọn ĐẦU TIÊN. Nên lúc mới nạp, các thẻ nói
-    "cả tuần" trong khi hai ô nói "thứ Hai đến thứ Hai" — và điều sai lại
-    là điều HẸP hơn, tức là điều đáng sợ hơn nếu người vận hành tin nó.
-
-    ĐỐI CHỨNG NGƯỢC đã chạy thật: bỏ lời gọi `dongBoDaiVoiChip()` trong
-    `loadChonBuoi` → test này ĐỎ (ô "Đến" là thu_2 thay vì thu_6).
-    """
-
-    def test_luc_nap_hai_o_dai_phu_het_tuan(self, trang):
+    def test_khong_con_o_tu_den_con_the_va_chon_tat_ca(self, trang):
         page, loi, _api = trang
-        ds = page.eval_on_selector_all(
-            "#chonBuoiChip .buoi-chip", "els => els.map(e => e.textContent)")
-
-        assert page.input_value("#chonBuoiTu") == ds[0]
-        assert page.input_value("#chonBuoiDen") == ds[-1]
+        assert page.locator("#chonBuoiTu, #chonBuoiDen").count() == 0
+        assert page.locator("#chonBuoiChip .buoi-chip").count() >= 2
+        assert page.locator("#btnChonTatCaBuoi").is_visible()
+        _the(page, "thu_2").click()
+        assert "Thứ 2" not in _dang_chon(page)
+        page.click("#btnChonTatCaBuoi")
+        assert len(_dang_chon(page)) == page.locator("#chonBuoiChip .buoi-chip").count()
         assert loi == []
 
 
@@ -208,7 +204,7 @@ class TestNhapXongThiBoChonBuoiCapNhat:
             timeout=5000)
         nhan = page.eval_on_selector_all(
             "#chonBuoiChip .buoi-chip", "els => els.map(e => e.textContent)")
-        assert nhan[-1] == "thu_7", nhan
+        assert nhan[-1] == "Thứ 7", nhan
         assert loi == []
 
 
@@ -238,64 +234,23 @@ def trang_tron_buoi(api):
         br.close()
 
 
-class TestDoiNgonNguGiuHaiODai:
-    """Đổi ngôn ngữ phải dựng lại cả hai ô "Từ/Đến", và giữ nguyên lựa chọn.
-
-    `reapplyDynamicTextForLangChange` vẽ lại dải thẻ nhưng không gọi
-    `veChonBuoiDai()` — hàm đó chỉ có đúng một chỗ gọi là `loadChonBuoi`.
-    Phần lớn trường không thấy gì vì nhãn buổi là chữ thô, nhưng
-    `nhanBuoi("__mac_dinh__")` trả về chuỗi CÓ DỊCH.
-
-    Đo được trước khi sửa: sau khi chuyển sang tiếng Anh, dải thẻ nói
-    "No session set" trong khi hai ô vẫn nói "Chưa chia buổi".
-
-    ĐỐI CHỨNG NGƯỢC đã chạy thật: bỏ `veChonBuoiDai()` khỏi
-    `reapplyDynamicTextForLangChange` → `test_option_doi_theo_ngon_ngu` ĐỎ;
-    bỏ hai dòng trả lại giá trị → `test_gia_tri_dang_chon_con_nguyen` ĐỎ.
-    """
-
-    def _chup(self, page):
-        return {
-            "the": page.eval_on_selector_all(
-                "#chonBuoiChip .buoi-chip", "e => e.map(x => x.textContent)"),
-            "option": page.eval_on_selector_all(
-                "#chonBuoiTu option", "e => e.map(x => x.textContent)"),
-            "tu": page.input_value("#chonBuoiTu"),
-            "den": page.input_value("#chonBuoiDen"),
-        }
+class TestDoiNgonNguGiuTheBuoi:
+    """Đổi ngôn ngữ phải dựng lại nhãn thẻ buổi và giữ nguyên lựa chọn (nhãn buổi mã chuẩn đổi theo ngôn ngữ)."""
 
     def _doi_sang_tieng_anh(self, page):
         page.locator("#btnLangToggle").click()
         page.wait_for_function("document.documentElement.lang === 'en'")
         page.wait_for_timeout(300)
 
-    def test_option_doi_theo_ngon_ngu(self, trang_tron_buoi):
+    def test_the_doi_nhan_va_giu_lua_chon(self, trang_tron_buoi):
         page, loi = trang_tron_buoi
-        truoc = self._chup(page)
-        assert truoc["the"] == truoc["option"], truoc
-
+        truoc = page.eval_on_selector_all("#chonBuoiChip .buoi-chip", "e => e.map(x => x.textContent)")
+        _the(page, "thu_2").click()
+        dang_chon = _dang_chon(page)
         self._doi_sang_tieng_anh(page)
-        sau = self._chup(page)
-
-        assert sau["the"] != truoc["the"], "khong doi ngon ngu thi khong canh duoc gi"
-        assert sau["option"] == sau["the"], (
-            "hai o noi khac dai the: %r vs %r" % (sau["option"], sau["the"]))
-        assert loi == []
-
-    def test_gia_tri_dang_chon_con_nguyen(self, trang_tron_buoi):
-        """Dựng lại `<option>` sẽ xoá giá trị — phải chụp trước, trả lại sau."""
-        page, loi = trang_tron_buoi
-        page.select_option("#chonBuoiTu", "thu_2")
-        page.select_option("#chonBuoiDen", "thu_4")
-        page.wait_for_timeout(200)
-        truoc = self._chup(page)
-
-        self._doi_sang_tieng_anh(page)
-        sau = self._chup(page)
-
-        assert (sau["tu"], sau["den"]) == (truoc["tu"], truoc["den"]), (
-            "doi ngon ngu lam mat lua chon: %r -> %r"
-            % ((truoc["tu"], truoc["den"]), (sau["tu"], sau["den"])))
+        sau = page.eval_on_selector_all("#chonBuoiChip .buoi-chip", "e => e.map(x => x.textContent)")
+        assert sau != truoc, "khong doi ngon ngu thi khong canh duoc gi"
+        assert len(_dang_chon(page)) == len(dang_chon), (dang_chon, _dang_chon(page))
         assert loi == []
 
 
@@ -317,24 +272,24 @@ class TestChuyenTheGiuLuaChon:
         page, loi, _api = trang
         for nhan in ("thu_2", "thu_3", "thu_4", "thu_6"):
             _the(page, nhan).click()
-        assert _dang_chon(page) == ["thu_5"]
+        assert _dang_chon(page) == ["Thứ 5"]
 
         page.click('.nav-item[data-tab="others"]')
         page.click('.nav-item[data-tab="pipeline"]')
         page.wait_for_timeout(800)       # để loadChonBuoi kịp trả về
 
-        assert _dang_chon(page) == ["thu_5"], "chuyển thẻ làm mất lựa chọn buổi"
+        assert _dang_chon(page) == ["Thứ 5"], "chuyển thẻ làm mất lựa chọn buổi"
         page.click("#btnRun")
         page.wait_for_selector("#runConfirmBar")
         cau = page.locator("#runConfirmBar span").inner_text()
-        assert "thu_5" in cau and "thu_2" not in cau, cau
+        assert "Thứ 5" in cau and "Thứ 2" not in cau, cau
         assert loi == []
 
     def test_nhap_tep_van_chon_lai_het(self, trang, tmp_path):
         """Sau khi nhập tệp vẫn chọn lại cả tuần — hướng an toàn cũ giữ nguyên."""
         page, loi, _api = trang
         _the(page, "thu_6").click()
-        assert "thu_6" not in _dang_chon(page)
+        assert "Thứ 6" not in _dang_chon(page)
 
         tep = ghi_so(tmp_path, "clb_them.xlsx",
                      [clb("clb_them_t2", "CLB Them", buoi="thu_2")])

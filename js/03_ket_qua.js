@@ -1025,13 +1025,9 @@ function initResultsHandlers() {
     el("btnChonTatCaBuoi").addEventListener("click", () => {
       buoiDangChon = new Set(dsBuoiCoThe);
       goThanhXacNhanNeuCo();
-      dongBoDaiVoiChip();
       veChonBuoi();
     });
   }
-  ["chonBuoiTu", "chonBuoiDen"].forEach((id) => {
-    if (el(id)) el(id).addEventListener("change", apDungDaiBuoi);
-  });
   if (el("thamSearch")) {
     el("thamSearch").addEventListener(
       "input",

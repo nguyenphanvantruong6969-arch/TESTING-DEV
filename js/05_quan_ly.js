@@ -45,9 +45,12 @@ function clubBuoi(clubId) {
   return clubId in buoiCuaClb ? buoiCuaClb[clubId] : null;
 }
 
+const MA_BUOI_CO_NHAN = new Set(["thu_2", "thu_3", "thu_4", "thu_5", "thu_6", "thu_7", "chu_nhat"]);
 function nhanBuoi(buoi) {
   if (!buoi || buoi === BUOI_MAC_DINH) return t("buoi_chua_chia");
-  return buoi;
+  /* T3-14: ma buoi (thu_2 ... chu_nhat) -> nhan, bang phan chieu so_nhap.NHAN_BUOI
+     (test_t3_l2_buoi.py khang dinh hai bang bang nhau). Ma la giu nguyen chu da nhap. */
+  return MA_BUOI_CO_NHAN.has(buoi) ? t("buoi_ma_" + buoi) : buoi;
 }
 
 /* Ba mức tải, cùng ngưỡng dùng cho cả bảng lẫn lịch tuần.
@@ -192,8 +195,7 @@ function loadChonBuoi({ datLai = false } = {}) {
       && buoiDangChon.size > 0;
     dsBuoiCoThe = dsMoi;
     if (giuLuaChon) {
-      // Danh sach khong doi: ve lai nhung giu nguyen lua chon va hai o dai.
-      veLaiDaiGiuGiaTri();
+      // Danh sach khong doi: ve lai nhung giu nguyen lua chon.
       veChonBuoi();
       return;
     }
@@ -201,38 +203,7 @@ function loadChonBuoi({ datLai = false } = {}) {
        đúng hành vi cũ. Mặc định chọn một buổi là lặng lẽ đổi nghĩa của
        nút Chạy. Danh sách buổi vừa đổi thì đây cũng là hướng an toàn. */
     buoiDangChon = new Set(dsBuoiCoThe);
-    veChonBuoiDai();
-    /* Hai o "Tu/Den" vua duoc dung lai nen deu dang o buoi DAU TIEN, trong
-       khi moi the deu bat. Bo chon noi hai dieu khac nhau ve cung mot thu,
-       va o dieu sai lai hep hon dieu dung. */
-    dongBoDaiVoiChip();
     veChonBuoi();
-  });
-}
-
-/* Dung lai hai o "Tu/Den" ma KHONG doi gia tri dang chon: veChonBuoiDai()
-   goi clear() nen phai chup truoc va tra lai sau. */
-function veLaiDaiGiuGiaTri() {
-  const oTu = el("chonBuoiTu");
-  const oDen = el("chonBuoiDen");
-  const giuTu = oTu && oTu.value;
-  const giuDen = oDen && oDen.value;
-  veChonBuoiDai();
-  if (oTu && giuTu) oTu.value = giuTu;
-  if (oDen && giuDen) oDen.value = giuDen;
-}
-
-function veChonBuoiDai() {
-  ["chonBuoiTu", "chonBuoiDen"].forEach((id) => {
-    const sel = el(id);
-    if (!sel) return;
-    clear(sel);
-    dsBuoiCoThe.forEach((b) => {
-      const o = document.createElement("option");
-      o.value = b;
-      o.textContent = nhanBuoi(b);
-      sel.appendChild(o);
-    });
   });
 }
 
@@ -263,7 +234,6 @@ function veChonBuoi() {
       if (buoiDangChon.has(b)) buoiDangChon.delete(b);
       else buoiDangChon.add(b);
       goThanhXacNhanNeuCo();
-      dongBoDaiVoiChip();
       veChonBuoi();
     });
     box.appendChild(nut);
@@ -279,28 +249,6 @@ function veChonBuoi() {
       ? t("chon_buoi_nhac_giu").replace("{buoi}", duoc.map(nhanBuoi).join(", "))
       : t("chon_buoi_nhac_het");
   }
-}
-
-function dongBoDaiVoiChip() {
-  /* Dải chỉ có nghĩa khi tập đang chọn là một đoạn LIỀN NHAU. Rời rạc
-     thì để nguyên hai ô, đừng ép nó nói một điều không đúng. */
-  const chon = dsBuoiCoThe.filter((b) => buoiDangChon.has(b));
-  if (!chon.length) return;
-  const dau = dsBuoiCoThe.indexOf(chon[0]);
-  const cuoi = dsBuoiCoThe.indexOf(chon[chon.length - 1]);
-  if (cuoi - dau + 1 !== chon.length) return;
-  if (el("chonBuoiTu")) el("chonBuoiTu").value = chon[0];
-  if (el("chonBuoiDen")) el("chonBuoiDen").value = chon[chon.length - 1];
-}
-
-function apDungDaiBuoi() {
-  const tu = dsBuoiCoThe.indexOf(el("chonBuoiTu").value);
-  const den = dsBuoiCoThe.indexOf(el("chonBuoiDen").value);
-  if (tu < 0 || den < 0) return;
-  const [a, b] = tu <= den ? [tu, den] : [den, tu];
-  buoiDangChon = new Set(dsBuoiCoThe.slice(a, b + 1));
-  goThanhXacNhanNeuCo();
-  veChonBuoi();
 }
 
 /* Trả về null khi chọn HẾT: null là "chạy cả tuần" ở phía API, và đó
@@ -339,7 +287,7 @@ function loadSoBocTham(search) {
     clear(head);
     head.innerHTML =
       `<th>${esc(t("th_student_id"))}</th><th>${esc(t("th_name"))}</th>` +
-      d.ds_buoi.map((b) => `<th class="num">${esc(nhanBuoi(b))}</th>`).join("");
+      d.ds_buoi.map((b) => `<th class="num cot-buoi-tieu-de">${esc(nhanBuoi(b))}</th>`).join("");
 
     const body = el("thamBody");
     clear(body);

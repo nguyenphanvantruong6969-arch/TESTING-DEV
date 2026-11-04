@@ -110,7 +110,7 @@ def test_dat_nv1_khac_khong_o_moi_buoi_tren_man_hinh(trang):
     for o in _dong_clb(page):
         theo_buoi[o[0]] = theo_buoi.get(o[0], 0) + int(o[4])
 
-    assert set(theo_buoi) >= {"thu_5", "thu_6"}, theo_buoi
+    assert set(theo_buoi) >= {"Thứ 5", "Thứ 6"}, theo_buoi
     for b, n in theo_buoi.items():
         assert n > 0, "buoi %s hien 0 em dat nguyen vong 1" % b
 

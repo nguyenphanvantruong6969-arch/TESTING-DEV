@@ -94,7 +94,9 @@ MA_MOI_SAU_ANH_CHUP = {
 KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
                  # T3-L1 (Truong duyệt 04/11/2026): bỏ dòng phụ tên thuật toán, ô "đã nộp nguyện vọng",
                  # và hai dòng chữ đơn về số khởi tạo (gộp vào một dòng `stb_locked_label`).
-                 "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw"}
+                 "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw",
+                 # T3-L2 (T3-07): bỏ hai ô "Từ/đến" ở bộ chọn buổi, chỉ giữ thẻ buổi và "Chọn tất cả".
+                 "chon_buoi_tu", "chon_buoi_den"}
 
 # T3-L1 (Truong duyệt 04/11/2026): đổi chữ có chủ ý theo bảng 5.1-5.3 của nghiên cứu T3. Chuỗi cũ đổi theo
 # bảng thay chữ dưới đây; chuỗi viết lại hẳn nằm trong `chu_ui_doi_co_y_t3.json` (giá trị MỚI với mặc định
