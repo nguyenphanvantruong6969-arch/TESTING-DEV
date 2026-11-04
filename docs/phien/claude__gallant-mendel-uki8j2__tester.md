@@ -11,7 +11,7 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [x] L1 reviewed (2 failing tests found)  - [ ] L2  - [ ] L3
 
 ## Current state (overwrite each handoff)
-- L1 review done (2947617..0fd4981) + L0 fixci1 (7f7a845..75ed1e3): see report sent to coord ("TESTER REPORT L1 + L0fixci1").
+- L1 fix1 (74e4d26..4aa7ab4) re-checked: NO BUGS (170 passed in 14 files; th_ti_le_choi renders "Nhân viên trên mỗi chỗ"/"Employees per place" for company, "Học sinh/Students" for school; tab 05 placeholders = labels vi+en). Screenshot 06 replaced.
 - L0 fixci1: assertions ALIGNED to B2/B3 (D1/E3/wharton_mac_dinh_bat keep "điền"/"điểm quyết tâm"/"phóng cho đủ 100", drop only "tắt";
   stress test_8 now asserts refusal code, no run_history, no stb lock). Not weakened.
 - L1 related tests: 58 files, 1189 passed / 2 FAILED: tests/test_so_excel_de_dung.py (lines 166-167, 265) still pin the OLD Excel
@@ -40,3 +40,4 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 | 2026-11-04 | Opus (tester) | L0 review, invariant 1 re-check, 3 screenshots | 2 bugs (reserve default 0; 'tab' in vi text) |
 | 2026-11-04 | Opus (tester) | L0 fix1 re-check | NO BUGS |
 | 2026-11-04 | Sonnet (tester) | L1 + L0fixci1 review, 6 screenshots | 2 failing tests outside impl's set; 2 minor notes |
+| 2026-11-04 | Sonnet (tester) | L1 fix1 re-check | NO BUGS |
