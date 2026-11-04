@@ -66,8 +66,8 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 done 661bccb; idle |
-| tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | REVIEW L0 7e90e14..661bccb sent 13:27 UTC |
+| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | FIX L0 round 1 sent 13:38 UTC |
+| tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | report 1: 2 bugs (B1 hand-typed default 0; "tab" English word); idle |
 
 ## Current state (overwrite each handoff)
 - P0 done (639b4e7). L0 impl done 661bccb (17 new cases; inv 1 proven 3x20). L0 in review. No PR open.
@@ -76,7 +76,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 - (none yet)
 
 ## Next steps (ordered)
-1. Wait for "TESTER REPORT L0". NO BUGS -> open PR, notify, `GO L1` to impl. Bugs -> `FIX L0`.
+1. Wait for "IMPL DONE L0 fix1" -> tester re-checks only the fix. Round 1 of 3.
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
