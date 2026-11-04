@@ -13,11 +13,11 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - [x] L1 implemented, pushed (`0fd4981`), tester L1 reviewing
 - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
 
-## Current state (L2 DONE, impl session 3)
-- L2 complete and pushed: all items incl. T3-21 (fillPanel merged into `#clbPanel`: sort select, bar column `veOThanhLapDay`, "Lưu ý" column), T3-23
-  (`<details id="xuatNangCao">` holds all checkboxes + "Chọn học sinh…"; UI tests open it first), T3-28 (Lịch tuần removed, decimal comma).
-  NOT done: T3-32 "collapse result list after pick". soat-ma 7/7, CHANGELOG/TIEN_DO/CLAUDE_CHI_TIET (190 files / 3.412 cases) updated.
-- Waiting for tester L2 / `FIX L2`. L3 is done by a fresh impl.
+## Current state (L2 + fix1 DONE, impl session 3)
+- L2 pushed (head a8b4407), tester round 1 found 6 items; fix1 pushed (head a1258c3): btn_reset_entry wording, `nhanHoaBuoi` in `translateError` (i18n.js),
+  `tom_tat_lan_chay` via `dinhDangGio` without seed, workspace "Thao tác" th sr-only, parity test for MA_BUOI_CO_NHAN. T3-32 "collapse list after pick" SKIPPED
+  (old UI tests click other cards after a pick). Reported `IMPL DONE L2 fix1` to coord. Dead `.fill-*` CSS removed; `#fillPanel` merged into `#clbPanel`.
+- Nothing in progress. L3 is for a fresh impl.
 
 ## Test environment (read before running anything)
 - `python3 -m venv .venv && pip install` HANGS on the proxy here. Use the uv tool pytest: `pytest` (= /root/.local/bin/pytest,
@@ -51,8 +51,8 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - Each stop-hook nag about unpushed commits: do not push unverified work; commit locally, push after related tests are green.
 
 ## Next steps (ordered)
-1. If `FIX L2` arrives: fix, related tests (incl. `test_a13_12_tai_lieu.py`, `test_giao_dien_tieng_viet_sach.py`, `test_ws_nhan.py`), push, `IMPL DONE L2 fix<k>`.
-2. Otherwise nothing.
+1. If `FIX L2` round 2 arrives: fix, related tests by grep (+ `test_a13_12_tai_lieu.py`, `test_giao_dien_tieng_viet_sach.py`, `test_ws_nhan.py`), push, reply `IMPL DONE L2 fix2`.
+2. Otherwise nothing; L3 belongs to a fresh impl.
 
 ## Files touched (L0 + L1)
 - Backend: api.py (empty-run guard), api_quan_ly.py (`create_or_update_club` None = keep), api_xuat.py (Excel text), main.py (window title)
@@ -67,3 +67,4 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 | 2026-11-04 | Sonnet (impl 1) | L0 implemented, fix1, fixci1 | tester NO BUGS on L0 |
 | 2026-11-04 | Sonnet (impl 1) | L1 implemented (`0fd4981`), handoff written | tester L1 pending |
 | 2026-11-04 | Sonnet (impl 3) | L2 finished (T3-23, T3-28, T3-21, docs, soat-ma) | tester L2 pending |
+| 2026-11-04 | Sonnet (impl 3) | L2 fix1 (6 tester items, 5 done, T3-32 collapse skipped) | head a1258c3; handoff at 200k |
