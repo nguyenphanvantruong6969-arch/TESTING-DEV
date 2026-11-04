@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L4 (ngoài sổ, Truong duyệt 04/11/2026): thứ tự tệp "Tải bảng này", bỏ dòng nhắc chết, Điểm chuẩn gọn
+
+- Chỉ hiển thị / xuất theo màn hình; không đổi CSV, schema hay kết quả xếp.
+- `api_xuat.py::export_bang_dang_xem`: thêm tham số tuỳ chọn `thu_tu` (mã theo thứ tự đang hiện); hàng tệp đi theo thứ tự đó, mã lạ xếp cuối. Không truyền thì như cũ. `js/09_the_xem.js`: `kqThuTuMan()` gửi thứ tự sắp hiện tại của tiêu đề cột.
+- Bỏ nhánh "Chưa có lớp nào" của Theo lớp (`veKqTheoLop`) và khoá `theolop_khong_co_lop` (vi, en) trong `i18n.js`.
+- `style.css`: nút "Xem chi tiết" không xuống dòng; chú giải Điểm chuẩn thành hàng ngang có ô mẫu.
+- Test: `tests/test_t3_l3_backend.py::test_xuat_theo_thu_tu_man_hinh_thu_tu`, `tests/test_giao_dien_t3_l3.py` (`test_tai_bang_theo_thu_tu_dang_sap_tren_man_hinh`, `test_diem_chuan_nut_mot_dong_va_chu_giai_gon_trong_css`); `test_giao_dien_a14_lop.py` bỏ test dòng nhắc chết, đếm khoá 25→24.
+
 ## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
 
 - `tests/test_giao_dien_a14_lop.py::test_theo_lop_chua_co_lop_nao_hien_dong_nhac`: bỏ đoạn ép `kq.tang1 = 'lop'` (người dùng không tới được từ T3-16, và lần vẽ lại bất đồng bộ làm test chập chờn trên CI); nay kiểm nút "Theo lớp" ẩn, bảng có dòng, không có ngõ cụt "Chưa có lớp nào". Dòng nhắc trong `js/03_ket_qua.js` thành đường mã chết, ghi ở mục "Cần Truong" của PR #10.
