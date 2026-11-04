@@ -58,7 +58,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 - [x] P0 protocol, role-aware Stop hook (`.claude/hooks/handoff_khi_day_ngu_canh.py`, tests/test_hook_ban_giao.py 6 cases)
 - [x] L0 impl (661bccb, fix1 e8944b2)  - [x] L0 tester NO BUGS  - [x] L0 PR nguyenphanvantruong6969-arch/TESTING-DEV#10
 - [x] L1 impl (0fd4981, fix1 4aa7ab4)  - [x] L1 tester NO BUGS  - [x] L1 PR (#10 extended)
-- [ ] L2 impl  - [ ] L2 tester NO BUGS  - [ ] L2 PR
+- [x] L2 impl (a8b4407, fix1 a1258c3, fix2 test by coord)  - [x] L2 tester (fix1 ok; last bug = test expectation, fixed by coord)  - [x] L2 PR (#10 extended)
 - [ ] L3 impl  - [ ] L3 tester NO BUGS  - [ ] L3 PR
 - [ ] Final report to Truong (files, new tests, skipped items, screenshots)
 
@@ -72,8 +72,9 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | tester L1+ | session_01YVAytyqX3m4RorzT6ML4Qx | Sonnet | L1 NO BUGS at 4aa7ab4; reuse for L2 until 200k |
 
 ## Current state (overwrite each handoff)
-- L0 + L1 done, PR nguyenphanvantruong6969-arch/TESTING-DEV#10 extended to L0+L1 (CI-HUY concurrency added). L2 starting.
-- L1 notes: T3-27 split (tab 05 form labels+placeholders done in L1; th_tong_cho, admin_reserve_assign_title, rest -> L3).
+- L0+L1+L2 done on PR nguyenphanvantruong6969-arch/TESTING-DEV#10. L3 next (fresh impl). Tester session_01YVAyu1rg4LogYSucdcVTHZ (Sonnet) reused.
+- L2 notes: T3-32 list-collapse not done (breaks old UI tests; scroll-to-entry exists). Fill bar lost its reserve segment (T3-21; reserve per club still shown).
+- T3-27 split: tab 05 form done in L1; th_tong_cho, admin_reserve_assign_title and the rest -> L3.
 
 ## Needs Truong
 - (none yet)

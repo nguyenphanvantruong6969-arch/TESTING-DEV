@@ -24,7 +24,10 @@ from _trinh_duyet import CHROMIUM  # noqa: E402
 
 MAU = [
     ("hat_giong_da_khoa", {"cu": 42, "moi": 43}),
-    ("health_thi_qua_tran_buoi", {"n": 1, "buoi": "thu_2", "tran": 5,
+    # Buổi là chữ tự đặt (không phải mã thu_2): từ T3-L2 giao diện đổi mã buổi
+    # sang nhãn ("Thứ 2"/"Mon") còn format_message giữ mã; phần đổi mã có test
+    # riêng ở tests/test_t3_l2_buoi.py.
+    ("health_thi_qua_tran_buoi", {"n": 1, "buoi": "Buổi tối", "tran": 5,
                                   "sample": "HS1 (6)"}),
     ("health_vi_pham_mo_coi_clb", {"bang": "preferences", "n": 2,
                                    "sample": "a, b"}),

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L2 fix2 (điều phối): test bảng lỗi theo nhãn buổi
+
+- `tests/test_giao_dien_bang_loi.py`: mẫu `health_thi_qua_tran_buoi` dùng buổi chữ tự đặt ("Buổi tối") thay cho mã `thu_2`, vì từ T3-L2 giao diện đổi mã buổi sang nhãn còn `format_message` giữ mã; phần đổi mã đã có test ở `tests/test_t3_l2_buoi.py`.
+
 ## 2026-11-04 — T3-L2 (ngoài sổ, Truong duyệt 04/11/2026): bớt khối, gom nút (nghiên cứu T3, lô 2)
 
 Chỉ đổi hiển thị; thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.
