@@ -20,8 +20,9 @@
 ## Token rules (all roles)
 - Rules of 2026-11-04 (Truong): child threshold 200k; ONE FRESH impl session per lot (old impl writes its file and is
   archived after its lot passes); coordinator writes its branch file only at a handoff or at the end of a lot.
-- Tests always quiet: `pytest -q -p no:cacheprovider --no-header -rN --tb=line <files> 2>&1 | tail -3`; on failure re-run
-  only the failing node ids with `--tb=short | tail -40`. Never paste full pytest output into the context.
+- Tests always quiet: `pytest -q -p no:cacheprovider --no-header -rf --tb=no <files> 2>&1 | grep -E '^(FAILED|ERROR)|passed|failed' | tail -25`
+  (`-rf` prints the FAILED node ids; `-rN` hid them in L3, do not use it). Then re-run only the failing node ids with
+  `--tb=short | tail -40`. Never paste full pytest output into the context.
 - Coordinator ignores CI events whose head_sha is not the branch head (one-line note at most, no log reads).
 - Find T3 findings by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`. Never read the whole 68 KB study.
 - Locate code by function name with grep; read only the needed range.
