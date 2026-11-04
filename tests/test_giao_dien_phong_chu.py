@@ -86,8 +86,8 @@ def _mo(page, panel, cho):
 
 
 def test_ten_clb_o_bang_lap_day_dung_be_vietnam_pro(trang):
-    _mo(trang, "fillPanel", ".fill-name")
-    assert _phong(trang, ".fill-name").startswith('"Be Vietnam Pro"')
+    _mo(trang, "clbPanel", ".clb-ten")
+    assert _phong(trang, ".clb-ten").startswith('"Be Vietnam Pro"')
 
 
 def test_ten_hoc_sinh_o_danh_sach_xep_dung_be_vietnam_pro(trang):

@@ -961,6 +961,10 @@ html.tat-hieu-ung .status-strip:hover {
   box-shadow: inset 2px 0 0 var(--paper-raised);
 }
 
+.clb-lap { white-space: nowrap; min-width: 150px; }
+.clb-lap .fill-track { display: inline-flex; width: 90px; vertical-align: middle; margin-right: 8px; }
+.clb-luu-y { white-space: nowrap; }
+
 .fill-so {
   display: flex;
   align-items: baseline;

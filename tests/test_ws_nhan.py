@@ -91,7 +91,7 @@ MA_MOI_SAU_ANH_CHUP = {
 
 # Thay đổi CÓ CHỦ Ý sau ảnh chụp (T1/T2, Truong duyệt): đánh số lại thẻ (bảy thành sáu) làm đổi số thẻ
 # trong hai chuỗi, và năm khoá giao diện mồ côi của thẻ Kết quả cũ bị bỏ. Mọi chuỗi khác vẫn giống hệt.
-KHOA_UI_DA_BO = {"admin_lich_tuan_title", "admin_lich_tuan_desc", "results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
+KHOA_UI_DA_BO = {"fill_panel_title", "fill_hint", "fill_nhom_tong", "fill_choi", "admin_lich_tuan_title", "admin_lich_tuan_desc", "results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
                  # T3-L1 (Truong duyệt 04/11/2026): bỏ dòng phụ tên thuật toán, ô "đã nộp nguyện vọng",
                  # và hai dòng chữ đơn về số khởi tạo (gộp vào một dòng `stb_locked_label`).
                  "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw",
@@ -356,7 +356,7 @@ def test_moi_chuoi_giao_dien_mac_dinh_giong_het_anh_chup(anh_chup):
 MAU_20 = [
     "brand_title", "nav_admin", "nav_scoring", "label_students", "label_clubs",
     "pipeline_desc", "admin_desc", "chua_co_cho_desc", "toast_run_success",
-    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "fill_hint",
+    "feedback_scores_saved", "fallback_step1_hint", "buoi_chua_chia", "fill_tag_khong_ai",
     "th_score", "th_student_id", "th_club_id", "xuat_opt_ket_qua",
     "scoring_desc", "toast_reset_done_removed", "page_title",
 ]

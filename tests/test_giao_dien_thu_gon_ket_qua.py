@@ -53,7 +53,7 @@ def api(api):
     tat_wharton(api)
     return api
 
-NAM_MUC = ["fillPanel", "clbPanel", "duTruPanel", "doPhuPanel", "nvPanel",
+NAM_MUC = ["clbPanel", "duTruPanel", "doPhuPanel", "nvPanel",
            "chuaCoChoPanel", "thamPanel", "dsXepPanel"]     # T2: bảng thời khoá biểu đã chuyển sang thẻ Kết quả
 
 # Lần đầu mở: TẤT CẢ các mục đều đóng — xem MAC_DINH_DONG trong
@@ -292,15 +292,15 @@ def test_lua_chon_da_luu_duoc_ton_trong(trang):
     page, _, _, ctx, url = trang
     page.evaluate(
         "() => window.localStorage.setItem('%s',"
-        " JSON.stringify({fillPanel: true, doPhuPanel: true}))" % KHOA)
+        " JSON.stringify({clbPanel: true, doPhuPanel: true}))" % KHOA)
 
     trang_moi = ctx.new_page()
     _mo_the_ket_qua(trang_moi, url)
     trang_moi.wait_for_selector("#doPhuPanel:not([hidden])")
     tt = _trang_thai(trang_moi)
-    assert tt["fillPanel"] is True and tt["doPhuPanel"] is True
+    assert tt["clbPanel"] is True and tt["doPhuPanel"] is True
     for muc in NAM_MUC:
-        if muc not in ("fillPanel", "doPhuPanel"):
+        if muc not in ("clbPanel", "doPhuPanel"):
             assert tt[muc] is False, muc
 
 
@@ -317,7 +317,7 @@ def test_muc_dang_dong_van_noi_no_chua_bao_nhieu(trang):
     assert page.inner_text("#doPhuPanelDem").strip() == "%d học sinh" % tong
 
     n_clb = len(api.get_club_fill_stats()["data"])
-    assert page.inner_text("#fillPanelDem").strip() == "%d câu lạc bộ" % n_clb
+    assert page.inner_text("#clbPanelDem").strip() == "%d câu lạc bộ" % n_clb
 
 
 def test_khong_mot_loi_javascript_nao(trang):

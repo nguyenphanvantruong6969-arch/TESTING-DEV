@@ -357,12 +357,12 @@
         </div>
       </div>
 
-      <div class="panel" id="fillPanel">
+      <div class="panel" id="clbPanel" hidden>
         <div class="panel-head">
           <div class="panel-head-trai">
-            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="fillPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="fill_panel_title">Mức lấp đầy của từng CLB</h2>
-            <span class="panel-dem" id="fillPanelDem"></span>
+            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="clbPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
+            <h2 data-i18n="clb_title">Theo từng câu lạc bộ</h2>
+            <span class="panel-dem" id="clbPanelDem"></span>
           </div>
           <div class="panel-actions">
             <label class="fill-sap-xep-nhan" for="fillSapXep" data-i18n="fill_sap_xep_nhan">Sắp xếp</label>
@@ -372,25 +372,6 @@
               <option value="vang_nhat" data-i18n="fill_sap_xep_vang">Vắng nhất</option>
               <option value="choi_cao" data-i18n="fill_sap_xep_choi">Chọi cao nhất</option>
             </select>
-          </div>
-        </div>
-        <div class="panel-body" id="fillPanelBody">
-          <p class="hint-text" data-i18n="fill_hint">Rê chuột (hoặc dùng bàn phím di tới) một dòng để xem chi tiết. Nhãn bên phải chỉ ra CLB cần để ý.</p>
-          <div id="clubFillList" class="fill-list"></div>
-          <div class="fill-legend">
-            <span class="legend-swatch is-general"></span><span data-i18n="legend_general">Suất thường</span>
-            <span class="legend-swatch is-reserve"></span><span data-i18n="legend_reserve">Vào bằng suất dự trữ</span>
-            <span class="legend-swatch is-trong"></span><span data-i18n="legend_trong">Còn trống</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" id="clbPanel" hidden>
-        <div class="panel-head">
-          <div class="panel-head-trai">
-            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="clbPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="clb_title">Theo từng câu lạc bộ</h2>
-            <span class="panel-dem" id="clbPanelDem"></span>
           </div>
         </div>
         <div class="panel-body" id="clbPanelBody">
@@ -405,11 +386,18 @@
                 <th class="num" data-i18n="th_dat_nv1">Chọn là nguyện vọng 1</th>
                 <th class="num" data-i18n="th_capacity">Chỉ tiêu</th>
                 <th class="num" data-i18n="th_da_xep">Đã xếp</th>
+                <th data-i18n="th_muc_lap_day">Mức lấp đầy</th>
                 <th class="num" data-i18n="th_ti_le_choi">Học sinh trên mỗi chỗ</th>
+                <th data-i18n="th_luu_y">Lưu ý</th>
                 <th><span class="sr-only" data-i18n="th_muc"></span></th>
               </tr></thead>
               <tbody id="clbBody"></tbody>
             </table>
+          </div>
+          <div class="fill-legend">
+            <span class="legend-swatch is-general"></span><span data-i18n="legend_general">Suất thường</span>
+            <span class="legend-swatch is-reserve"></span><span data-i18n="legend_reserve">Vào bằng suất dự trữ</span>
+            <span class="legend-swatch is-trong"></span><span data-i18n="legend_trong">Còn trống</span>
           </div>
           <div id="clbEmpty" class="empty-state" hidden data-i18n="clb_empty">Chưa có câu lạc bộ nào.</div>
           <div class="clb-ds" id="clbDsArea" hidden>

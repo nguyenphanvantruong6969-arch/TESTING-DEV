@@ -239,7 +239,7 @@ def test_tat_tinh_nang_hai_phan_khong_hien(mo):
     page.wait_for_selector("#btnResetAll")
     assert page.locator("#adminDiemChuanBlock").is_hidden()
     page.locator('[data-tab="others"]').click()
-    page.wait_for_selector("#fillPanel")
+    page.wait_for_selector("#clbPanel")
     assert page.locator("#dcKqPanel").is_hidden()
     assert not loi, loi
 
