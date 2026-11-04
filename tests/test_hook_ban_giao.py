@@ -1,5 +1,6 @@
 """Hook Stop bàn giao theo vai (.claude/hooks/handoff_khi_day_ngu_canh.py), T3-HT."""
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -11,10 +12,13 @@ def _chay(tmp_path, tokens, vai=None, env_nguong=None):
     (tmp_path / ".claude").mkdir(exist_ok=True)
     if vai is not None:
         (tmp_path / ".claude" / "phien_vai.json").write_text(json.dumps(vai), encoding="utf-8")
-    subprocess.run(["git", "init", "-q", "-b", "claude/x"], cwd=tmp_path, check=True)
+    if not (tmp_path / ".git").exists():
+        subprocess.run(["git", "init", "-q", "-b", "claude/x"], cwd=tmp_path, check=True)
     tp = tmp_path / "t.jsonl"
     tp.write_text(json.dumps({"message": {"usage": {"input_tokens": tokens}}}) + "\n", encoding="utf-8")
-    env = {"CLAUDE_PROJECT_DIR": str(tmp_path), "PATH": "/usr/bin:/bin"}
+    # Giữ PATH của hệ thống (Windows cần nó để tìm git); bỏ HANDOFF_TOKENS của máy chạy test.
+    env = {k: v for k, v in os.environ.items() if k != "HANDOFF_TOKENS"}
+    env["CLAUDE_PROJECT_DIR"] = str(tmp_path)
     if env_nguong:
         env["HANDOFF_TOKENS"] = str(env_nguong)
     r = subprocess.run(

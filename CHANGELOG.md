@@ -15,7 +15,7 @@
 - **`.claude/hooks/handoff_khi_day_ngu_canh.py`:** đọc vai phiên từ `.claude/phien_vai.json` (không vào git): ngưỡng riêng (`nguong`; con 400k, điều phối 700k), tệp bàn giao theo vai (`docs/phien/<nhánh>__impl.md`, `__tester.md`), phiên con được nhắc `send_message` báo phiên điều phối; không có tệp vai thì giữ hành vi cũ. Lấy tên nhánh bằng `git branch --show-current`.
 - **Tài liệu:** `docs/phien/T3_GIAO_THUC.md` (giao thức, khuôn tin nhắn, bàn giao), `docs/phien/claude__gallant-mendel-uki8j2.md` (kế hoạch bốn lô T3-L0..L3 và quyết định của Truong).
 - **Test:** `tests/test_hook_ban_giao.py` (6 ca).
-- **Sửa CI:** `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã đếm lại: 184 tệp test, 3.384 ca (test `test_ban_do_ma_so_tep_test_la_so_that`).
+- **Sửa CI:** `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã đếm lại: 184 tệp test, 3.384 ca (test `test_ban_do_ma_so_tep_test_la_so_that`). `tests/test_hook_ban_giao.py` giữ PATH hệ thống (CI Windows không tìm thấy git) và chỉ `git init` một lần mỗi thư mục.
 
 ## 2026-11-04 — sửa CI main 3c67776: test giao diện A14 chập chờn
 
