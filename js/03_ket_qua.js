@@ -254,11 +254,9 @@ function loadTomTatKetQua() {
   if (!dai) return;
   Promise.all([
     callApi("get_em_chua_co_cho"),
-    callApi("get_phan_bo_nguyen_vong"),
     callApi("get_club_fill_stats"),
-    callApi("get_suat_du_tru"),
     callApi("get_last_run_info"),
-  ]).then(([cho, nv, lap, duTru, lanChay]) => {
+  ]).then(([cho, lap, lanChay]) => {
     const luoi = el("tomTatLuoi");
     clear(luoi);
     const tong = cho.ok ? cho.data.tong_hoc_sinh : 0;
@@ -276,17 +274,13 @@ function loadTomTatKetQua() {
       phu: t("kpi_da_xep_phu", { p: phanTramTron(daXep, tong) }),
     });
 
-    if (nv.ok && nv.data.tong_da_xep) {
-      const d = nv.data;
-      const dem = (h) => (d.phan_bo.find((x) => x.hang === h && !x.gop) || {}).so_em || 0;
-      const top3 = dem(1) + dem(2) + dem(3);
-      o.push({
-        muc: "nvPanel",
-        nhan: t("kpi_nv1"),
-        so: phanTramTron(dem(1), d.tong_da_xep) + "%",
-        phu: t("kpi_nv1_phu", { p: phanTramTron(top3, d.tong_da_xep) }),
-      });
-    }
+    o.push({
+      muc: "chuaCoChoPanel",
+      nhan: t("kpi_chua_co_cho"),
+      so: String(trangTay),
+      trangThai: trangTay > 0 ? "is-nguy" : "is-on",
+      phu: trangTay > 0 ? t("kpi_can_xu_ly") : t("kpi_on"),
+    });
 
     if (lap.ok && lap.data.length) {
       let tongCho = 0;
@@ -301,26 +295,6 @@ function loadTomTatKetQua() {
         so: String(trong),
         phu: t("kpi_cho_trong_phu", { n: tongCho }),
         sapXep: "vang_nhat",
-      });
-    }
-
-    o.push({
-      muc: "chuaCoChoPanel",
-      nhan: t("kpi_chua_co_cho"),
-      so: String(trangTay),
-      trangThai: trangTay > 0 ? "is-nguy" : "is-on",
-      phu: trangTay > 0 ? t("kpi_can_xu_ly") : t("kpi_on"),
-    });
-
-    if (duTru.ok && duTru.data.length) {
-      const thua = duTru.data.reduce((s, c) => s + (c.con_thua || 0), 0);
-      const tongDt = duTru.data.reduce((s, c) => s + (c.reserve_capacity || 0), 0);
-      o.push({
-        muc: "duTruPanel",
-        nhan: t("kpi_du_tru_thua"),
-        so: `${thua}/${tongDt}`,
-        trangThai: thua > 0 ? "is-canh" : "is-on",
-        phu: thua > 0 ? t("kpi_du_tru_thua_phu") : t("kpi_on"),
       });
     }
 
@@ -904,6 +878,13 @@ function loadSuatDuTru() {
     if (rong) rong.hidden = true;
     // Con so dang nhin la SUAT BI BO PHI, khong phai so cau lac bo.
     veDemMuc("duTruPanel", "dem_suat", tong_thua);
+    /* T3-24: o "Suat du tru bo phi" tu dau trang chuyen xuong day (chuyen, khong xoa). */
+    const dong = el("duTruTieuDiem");
+    if (dong) {
+      dong.textContent = t("du_tru_tieu_diem", {
+        thua: tong_thua, tong: ds.reduce((x, c) => x + (c.reserve_capacity || 0), 0),
+      });
+    }
   });
 }
 

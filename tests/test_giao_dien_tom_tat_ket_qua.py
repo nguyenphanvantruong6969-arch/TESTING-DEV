@@ -143,15 +143,17 @@ def test_o_tom_tat_khop_ham_doc(trang):
     # Trạng thái không bao giờ chỉ là màu: phải có ký hiệu kèm chữ.
     assert o["chuaCoChoPanel"]["phu"].startswith("⚠")
 
+    # T3-24: chỉ còn ba ô (đã có, chưa có, chỗ trống), theo thứ tự đó.
+    assert list(o) == ["dsXepPanel", "chuaCoChoPanel", "fillPanel"]
+
+    # Hai ô đã chuyển xuống thẻ chi tiết: con số vẫn còn, nằm ở đầu từng mục.
     du_tru = api.get_suat_du_tru()["data"]
     thua = sum(c["con_thua"] for c in du_tru)
-    assert o["duTruPanel"]["so"] == "%d/%d" % (
-        thua, sum(c["reserve_capacity"] for c in du_tru))
-    assert "is-on" in o["duTruPanel"]["lop"] and thua == 0
-
+    assert thua == 0
+    assert "%d/%d" % (thua, sum(c["reserve_capacity"] for c in du_tru)) in page.text_content("#duTruTieuDiem")
     nv = api.get_phan_bo_nguyen_vong()["data"]
     assert nv["phan_bo"][0]["so_em"] == nv["tong_da_xep"]
-    assert o["nvPanel"]["so"] == "100%"
+    assert "100" in page.text_content("#nvTieuDiem")
     assert not loi, loi
 
 
@@ -381,8 +383,7 @@ def test_mot_thu_hang_thi_mot_cung_phu_kin_vong(trang):
     assert "is-h1" in d["cung"][0]["lop"]
     assert d["cung"][0]["dai"] == pytest.approx(d["chu_vi"], abs=0.01)
     assert d["giua"] == "100%"
-    o = _o_kpi(page)
-    assert d["giua"] == o["nvPanel"]["so"]
+    assert "100" in page.text_content("#nvTieuDiem")
     # Chú giải liệt kê MỌI thứ hạng, kể cả thứ hạng 0 chỗ không có cung.
     assert len(d["chu_giai"]) == 4
 
