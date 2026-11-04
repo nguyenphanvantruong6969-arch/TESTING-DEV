@@ -1,4 +1,4 @@
-/* js/06_cham_diem.js — Thẻ 05 — Chấm điểm mù.
+/* js/06_cham_diem.js — Thẻ 06 — Nhập điểm (chấm mù).
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
    THƯỜNG (không phải ES module) nạp theo đúng thứ tự trong index.html và

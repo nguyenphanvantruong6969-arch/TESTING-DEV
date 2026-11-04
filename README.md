@@ -391,7 +391,7 @@ lưu).
 `openpyxl` là Python thuần, không cần .NET hay thư viện hệ thống — khác hẳn
 `pythonnet`, nên không kéo theo rủi ro đóng gói đã gặp với bản `.exe`.
 
-**Sổ mẫu:** `mau_csv/SO_NHAP_CLB.xlsx` (trống) và hai sổ ví dụ trong
+**Sổ mẫu chính:** `mau_csv/SO_NHAP_CLB.xlsx` (trống, có cột Lớp, giống sổ phần mềm tạo) và hai sổ ví dụ trong
 `mau_csv/vi_du_day_du/`, `mau_csv/vi_du_ca_tuan/`. Sinh lại bằng
 `./.venv/bin/python mau_csv/tao_so_nhap.py` sau khi sửa `so_nhap.py` hoặc các
 CSV ví dụ — có test bắt sổ và CSV không được lệch nhau.
@@ -498,7 +498,7 @@ vẫn chạy đủ.
 
 ## Xuất kết quả cho nhà trường
 
-Nút **Xuất các mục đã chọn** (thẻ *02 Kết quả*, ô *Kết quả sắp xếp*) gọi
+Nút **Xuất các mục đã chọn** (thẻ *03 Dữ liệu khác*, ô *Kết quả sắp xếp*) gọi
 `export_ket_qua` và ghi **một tệp Excel** `ket_qua_phan_bo.xlsx` vào thư mục
 Tải xuống. Sáu trang, theo thứ tự người đọc cần:
 

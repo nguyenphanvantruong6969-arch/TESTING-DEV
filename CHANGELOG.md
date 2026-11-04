@@ -1,5 +1,90 @@
 # CHANGELOG
 
+## 2026-11-04 — PR #8: sửa CI sau T4-K1 (Windows báo 4 lỗi ở 5a88060)
+
+- `test_a14_sua_sau_soat.py::test_a5_...` (DROP COLUMN): đã khỏi khi gộp main (lấy bản B9 của main).
+- **`docs/ke_hoach/tham_khao/_chung.py::nap_rb`:** từ T4-K1 `rbda_priority_pipeline` import `lop_hoc_sinh` theo tên; `_ten_can_nap` nạp `lop_hoc_sinh` (từ cùng thư mục hoặc cùng tệp .exe) trước mô-đun chính khi có, bản cũ không có thì bỏ như `nhan_ws`. `tests/test_tham_khao_verify_nhanh.py` chép thêm `lop_hoc_sinh.py` vào thư mục thử.
+- `tests/test_mau_forms_thi_clb.py::test_raw_google_khop_tai_lieu_dinh_dang`: kỳ vọng dòng ghi RAW_PHIEU theo `.gs` mới (cột `lop` tuỳ chọn, T4-K1).
+
+## 2026-11-03 — Z-SOAT-2 (ngoài sổ, Truong duyệt 03/11/2026): `soat-ma` tìm ruff trên PATH
+
+- **`.claude/skills/soat-ma/scripts/kiem_nhanh.py::kiem_ruff`:** trước chỉ chạy `python -m ruff`, nên máy cài ruff bằng pipx / uv (máy cloud) luôn báo KHÔNG ĐẠT "chưa cài ruff" dù mã sạch. Nay khi Python không có mô-đun ruff thì thử `ruff` trên PATH (`shutil.which`); không có ở đâu cả mới báo chưa cài. Máy đã có mô-đun ruff: không đổi.
+- **Test:** `tests/test_skill_soat_ma.py` thêm 2 ca (`test_ruff_chi_co_tren_path_van_chay`, `test_ruff_khong_co_o_dau_ca_thi_bao_chua_cai`); `_co_ruff` nhận cả ruff trên PATH nên ca cũ `test_ruff_dat_va_khong_dat` không còn bị bỏ qua trên máy đó. 47 ca xanh.
+
+## 2026-11-03 — A14-B10 (ngoài sổ, Truong duyệt 03/11/2026): bỏ `DROP COLUMN` ở hai test A14 còn lại
+
+Cùng kiểu rủi ro với B9 (SQLite của CI báo "incomplete input"). Chỉ sửa test, không đụng mã sản phẩm.
+
+- Hàm phụ trợ mới `_bo_cot(conn, bang, cot)` (trong từng tệp test): đọc schema thật bằng `PRAGMA table_info`, dựng lại bảng thiếu đúng một cột (giữ khoá chính và dữ liệu) bằng `CREATE TABLE` / `INSERT ... SELECT` / `RENAME`, cú pháp có ở mọi bản SQLite. Không chép cứng schema, nên tự theo khi bảng thêm cột về sau.
+- Dùng ở `tests/test_a14_tu_vung_cohort.py::test_di_tru_schema_them_cot_vao_csdl_cu_chay_lap_va_giu_du_lieu` và `tests/test_a14_sua_sau_soat.py::_csdl_cu_co_du_lieu`. Mọi assert giữ nguyên; 48 ca của hai tệp xanh.
+- Trên nhánh này `test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien` vẫn là bản trước B9; bản sửa B9 có ở `main`, giữ nguyên để gộp không xung đột.
+
+## 2026-11-04 — T4-K1 sửa vòng 1 (tester soát fff0f41)
+
+- **[Chặn] Gói skill chạy ngoài kho:** `chuan_hoa_lop` chuyển sang mô-đun gốc kho mới `lop_hoc_sinh.py` (chỉ thư viện chuẩn, hành vi y hệt). `rbda_priority_pipeline.py` nhập lại và giữ tên công khai, nên mọi nơi gọi cũ và test cũ không đổi. `xu_li_raw.py` nhập từ `lop_hoc_sinh`; `dong_goi_skill.py` đưa `lop_hoc_sinh.py` vào `xu-li-raw-forms.zip` (skill không mang mã thuật toán). PyInstaller: `rbda_priority_pipeline` nhập `lop_hoc_sinh` ở mức mô-đun nên phân tích tĩnh tự gom, không cần đổi `kiosk.spec`.
+- **Báo cáo lớp:** phiếu giữ không ghi lớp thì ghi rõ "phiếu giữ N không ghi lớp, phiếu M ghi X; Sổ để trống" (cả khi các phiếu khác nhau lẫn khi chỉ có một lớp ở phiếu khác); Sổ vẫn không mượn lớp. Tiêu đề mục đổi thành "Lớp không thống nhất giữa các phiếu của cùng một mã".
+- **`.gs` (hai bộ sinh vẫn trùng):** khớp mã `ma_hs` bằng cắt khoảng trắng và IN HOA ở cả hai phía (`maLop_`); đếm mã học sinh không có trong tab `hoc_sinh` (`maKhongCoLop_`), ghi một dòng vào trang Cảnh báo và Logger. Tài liệu: cột `ma_hs` định dạng văn bản `@`.
+- **Test:** `tests/test_t4_k1_lop.py` lên 12 ca (thêm: khớp mã chuẩn hoá và đếm mã không khớp ở `.gs`; gói zip chạy ngoài kho với cột `lop`; mở rộng ca phiếu giữ trống lớp).
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: thêm `lop_hoc_sinh.py` vào bản đồ mã.
+
+## 2026-11-04 — T4-K1 (ngoài sổ, Truong duyệt 03/11/2026): cột `lop` tuỳ chọn từ `hoc_sinh` tới cột Lớp của Sổ
+
+Thay đổi số 1 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md` (DEC-2: lớp lấy từ `hoc_sinh` lúc xuất, biểu mẫu KHÔNG hỏi lớp).
+
+- **`xu_li_raw.py`:** `COT_RAW` giữ 19 cột. RAW có cột `lop` (cột thứ 20) thì ghi vào cột Lớp của Sổ (`ghi_so_nhap(co_lop=True)`, A14), lấy lớp từ PHIẾU GIỮ, chuẩn hoá bằng `chuan_hoa_lop` của phần mềm (không viết hàm mới). Các phiếu của cùng một mã ghi lớp (khác rỗng) khác nhau thì thêm mục "lop_khac_giua_cac_phieu" vào `BAO_CAO_BAT_THUONG.md`. Không có cột `lop`: Sổ và báo cáo y như cũ.
+- **`TAO_GOOGLE_FORM.gs` và `tao_google_forms.py` (sinh giống hệt):** `chamTheoCLB(ghiLop)`, chỉ `ghiLop === true` mới bật (menu/trigger truyền đối tượng sự kiện không bật nhầm); mặc định TẮT thì RAW 19 cột như cũ. Bật thì thêm cột `lop` đọc từ tab `hoc_sinh` (`ma_hs`, `lop`); hàm mới `chamTheoCLBCoLop`, `docLopHocSinh_`, `themCotLop_`, hằng `ID_BANG_HOC_SINH`. Thiếu tab thì báo lỗi trước khi tạo thư mục. `COT_RAW` của `.gs` vẫn bằng của skill.
+- **Tài liệu:** `DINH_DANG_RAW.md` (cột tuỳ chọn thứ 20), `SKILL.md` của `xu-li-raw-forms` và `tao-google-form-clb`.
+- **Test mới:** `tests/test_t4_k1_lop.py` (10 ca lúc đầu, 12 sau vòng sửa 1): có `lop`; không có `lop` (Sổ bằng đúng cách cũ); `lop` rỗng; lớp khác nhau giữa các phiếu; phiếu giữ trống lớp; thư mục nhiều phần có `lop`; `.gs` mặc định tắt (kể cả khi truyền sự kiện), bật, thiếu tab `hoc_sinh`; `.gs` khớp `noi_dung()`. Ca ghim `COT_RAW` ở `test_skill_xu_li_raw.py` giữ xanh.
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 180 tệp test.
+- Không đụng kiosk, hợp đồng cột CSV, `match_results`.
+
+## 2026-11-03 — T4-K3 (ngoài sổ, Truong duyệt 03/11/2026): skill `xu-li-raw-forms` đọc thư mục nhiều phần CSV
+
+Thay đổi số 3 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md`: đợt trên 1.000 phiếu được xuất thành nhiều phần `<tên>_p01.csv`, `_p02.csv`... nên skill phải ghép được.
+
+- **`xu_li_raw.py`:** hàm mới `doc_raw(duong)`. Tệp đơn: y như `doc_bang` cũ. Thư mục: ghép các phần theo số phần (thứ tự tự nhiên), từ chối bằng `LoiDauVao` (không ghi tệp nào) khi không có phần, nhiều bộ xuất lẫn nhau, thiếu phần / số phần trùng, tiêu đề lệch, hoặc một `phieu_so` ở hai phần. `chay` gọi `doc_raw`; `--raw` nhận thư mục. `COT_RAW` không đổi.
+- **`SKILL.md`:** ghi cách dùng thư mục và các trường hợp bị từ chối.
+- **Test mới:** `tests/test_skill_xu_li_raw_nhieu_phan.py` (8 ca): thư mục 3 phần cho Sổ và báo cáo giống hệt một tệp; p2 trước p10; tệp đơn như cũ; năm ca từ chối. `tests/test_skill_xu_li_raw.py` (8 ca) giữ xanh.
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 179 tệp test (canh bởi `tests/test_a13_12_tai_lieu.py`).
+- Không đụng kiosk, hợp đồng cột CSV, `match_results`.
+
+## 2026-11-03 — T1a, T1b (nhánh `claude/epic-knuth-801pkw`; Truong duyệt, bỏ qua sổ đăng ký)
+
+- **T1a — sổ mẫu chính có cột Lớp:** `mau_csv/SO_NHAP_CLB.xlsx` là sổ TRỐNG (không có học sinh nào để gán lớp). Nó giờ có cột **Lớp** ngay sau **Họ tên**, giống hệt sổ phần mềm tạo (`tao_so_nhap_mau`, A14). `mau_csv/tao_so_nhap.py::tao_mau_trong` gọi `ghi_so_nhap(..., co_lop=True)`; tệp sinh lại bằng kịch bản, không sửa tay. `HUONG_DAN_SO_NHAP.md` ghi đây là sổ mẫu chính. Hai sổ ví dụ `vi_du_*` GIỮ NGUYÊN (khớp từng dòng với bộ ba CSV, mà CSV ví dụ không có lớp).
+- **T1b — nhãn trùng cũ không chặn lưu:** `cau_hinh_ws.ghi_cau_hinh` chỉ ném `NhanTrung` khi cấu hình mới có cặp danh từ trùng nhãn mà cấu hình ĐANG LƯU chưa có. Workspace cũ đã trùng đổi tên / đổi luật được; thêm cặp trùng thứ hai vẫn bị chặn; sửa hết trùng thì qua. `chuan_hoa()` (kiểm trước khi dựng workspace) và cảnh báo nhập `so_nhap_canh_bao_nhan_trung` giữ nguyên.
+- **Test:** mới `tests/test_t1b_nhan_trung_cu.py` (6); sửa `tests/test_so_nhap.py::test_mau_trong_doc_duoc_va_dung_bo_cuc` (tiêu đề có Lớp).
+
+### T2 sửa vòng 3
+
+- Ảnh chụp `tests/du_lieu_ws/so_nhap_truoc_khi_co_cfg.json` (bốn ca `test_mac_dinh_truong_hoc_cho_ra_dung_so_nhu_truoc`): sau vòng 2 (G3) chữ sheet "Hướng dẫn" đổi theo quy tắc chữ của chủ dự án. Đã so từng khoá: CHỈ năm ô `Hướng dẫn/o/A1, A16, A18, A23, A33` khác (hai ảnh `co_du_lieu` và `trong`, cả bốn cấu hình); mọi khoá khác trùng. Chỉ thay hai cây con `Hướng dẫn` bằng lập trình, giữ định dạng tệp; ghi chú ở `tests/test_ws_so_nhap.py`. Đã tìm ảnh chụp khác chứa chữ hướng dẫn: không còn tệp nào.
+
+### T2 sửa vòng 2
+
+- **G1 (T2, tràn ngang):** `.main { min-width: 0 }` (cột `1fr` của lưới không còn nở theo bảng rộng, nên bảng chỉ cuộn ngang trong `.scroll-x`, trang thì không); ô CLB `min-width` 7em. Test mới `test_khong_tran_ngang_trang_voi_ten_clb_rat_dai` (độ rộng 600, 1024, 1280; tên CLB 60 ký tự; ba cách xem; `scrollWidth <= innerWidth`). Đã thử gỡ dòng sửa: test đỏ ở 600 và 1024.
+- **G2 (tài liệu):** `HUONG_DAN_SU_DUNG.md` bảng "xuất hồ sơ học sinh" đổi số thẻ (04, 03, 05) và đoạn lớp mô tả đúng: lọc và sắp theo lớp ở thẻ 03, cột Lớp và cách xem Theo lớp ở thẻ 02.
+- **G3 (chữ sheet Hướng dẫn):** bỏ dấu gạch dài và xưng "em" trong các dòng hướng dẫn của `so_nhap.py` (cả bản hằng số lẫn bản dựng theo cấu hình); sinh lại `mau_csv/SO_NHAP_CLB.xlsx`. Test kiểm mọi dòng hướng dẫn của sổ mẫu: không "—", không từ "em/tôi/tớ". Các sheet khác không đổi. Sinh lại sáu sổ `du_lieu_test/SO_NHAP_DQT_*.xlsx` bằng `sinh_du_lieu_diem_quyet_tam.py` (test `test_sinh_lai_bang_script_ra_dung_noi_dung_o` đòi tệp khớp script).
+
+### T1/T2 sửa vòng 1 (tester: 2 lớn, 5 vừa, 3 nhỏ)
+
+- **F1 (T1b):** `cau_hinh_ws._cap_trung_day_du` liệt kê MỌI cặp danh từ cùng nhãn kèm ngôn ngữ (ba danh từ cùng nhãn cho ba cặp; `cac_cap_nhan_trung` giữ nguyên cho cảnh báo nhập). `ghi_cau_hinh` chỉ từ chối khi có cặp (ngôn ngữ, a, b) mới so với mốc; báo cặp mới đầu tiên theo thứ tự `DANH_TU`, vi trước en.
+- **F2 (T1b):** `ghi_cau_hinh(..., nhan_goc=None)` và `workspace.tao(..., nhan_goc=None)`; `nhan_ban` kiểm không nghiêm phần nhãn trùng và lấy nhãn nguồn làm mốc, cả hai chế độ `kem_du_lieu`: bản sao giữ nhãn trùng cũ, trùng mới vẫn bị chặn.
+- **F3 (T1b):** `luu_mau` kiểm nghiêm: workspace cũ trùng nhãn lưu mẫu thì lỗi `nhan_trung_danh_tu`, không ghi tệp.
+- **F4 (T1a):** sổ mẫu tĩnh dựng bằng cấu hình mặc định như phần mềm (`chuan_hoa({})`), nên MỌI ô của MỌI sheet (cả Hướng dẫn) trùng sổ phần mềm tạo; `huong_dan(co_lop=True)` thêm một dòng nói cột Lớp tuỳ chọn. README, TAI_LIEU_DU_LIEU, BAN_GIAO ghi đây là sổ mẫu chính có cột Lớp.
+- **F5:** số thẻ cũ sửa lại sau khi đánh số lại (`i18n.js`, `index.html`, `i18n_errors.py` và `i18n_loi.js` sinh lại, README, HUONG_DAN_CSV, HUONG_DAN_SO_NHAP, chú thích đầu các tệp js, `api_bao_cao.py`).
+- **F6:** bỏ khoá mồ côi `results_title`, `results_desc`, `tkb_title`, `tkb_desc`, `tkb_so_clb` (`tests/test_ws_nhan.py` đổi mẫu `tkb_desc` thành `kq_desc`).
+- **F7:** số ít / số nhiều ở bản tiếng Anh: `kq_dem_ma_nhieu`, `theolop_dem_nhieu` (số ít chỉ khi n = 1).
+- **F8 (T2):** *Theo CLB*: tầng 2 "Theo ngày trong tuần" chia ô chọn CLB thành nhóm theo buổi (thứ tự ngày), "Theo mã học sinh" là danh sách phẳng theo vần; bảng thành viên luôn theo mã. Cột STT, mã, họ tên, lớp không xuống dòng. Ô tìm ngắn hơn (`kq_tim_ph`). Nhớ cả lớp và CLB đã chọn trong khoá `rbda_ket_qua_xem_v1` (giá trị không còn tồn tại thì lùi về mục đầu).
+- **Test cũ sửa có chủ đích:** `tests/test_ws_nhan.py` (ảnh chụp chuỗi mặc định: bỏ năm khoá mồ côi khỏi phép so, cho phép đúng hai chuỗi đổi số thẻ; mẫu 20 chuỗi dùng `fill_hint`); `docs/ke_hoach/CLAUDE_CHI_TIET.md` (178 tệp, 3.299 ca).
+- **Test:** `tests/test_t1b_nhan_trung_cu.py` (thêm F1, F2, F3 và so mọi sheet sổ mẫu), `tests/test_giao_dien_t2_ket_qua.py` (thêm nhóm theo buổi, nhớ lớp / CLB, số ít số nhiều); `test_giao_dien_a14_lop.py` (khoá i18n 25 thành 26, tuỳ chọn CLB có nhóm).
+
+### T2 — gộp thẻ 02, 06, 07 thành "Kết quả" và "Dữ liệu khác" (bảy thẻ thành sáu)
+
+- **Thanh bên:** 01 Vận hành sắp xếp, 02 Kết quả (`results`), 03 Dữ liệu khác (`others`), 04 Nhập tại chỗ, 05 Quản lý CLB & dự trữ, 06 Nhập điểm. Bỏ thẻ `members` và `theolop`; `TAB_LOADERS` (`js/01_khung.js`), khởi động (`initKetQuaHandlers`) và vẽ lại khi đổi ngôn ngữ (`reapplyDynamicTextForLangChange`) theo tên mới.
+- **02 Kết quả** (`js/09_the_xem.js`, `view-results`, chỉ đọc, không điểm, không số bốc thăm): tầng 1 *Theo lớp | Theo CLB | Theo mã học sinh*; tầng 2 (cách sắp) *Theo ngày trong tuần | Theo mã học sinh | Theo lớp*, mục *Theo lớp* chỉ hiện khi tầng 1 là *Theo mã học sinh* (lựa chọn lưu ở tầng 2 mà không hợp lệ thì lùi về *Theo ngày trong tuần*, không ghi đè). Sắp theo ngày = vị trí buổi sớm nhất em có CLB (thứ tự `ds_buoi` do backend sắp theo ngày), sau đó theo mã; sắp theo mã là sắp tự nhiên (HS9 trước HS10); sắp theo lớp theo thứ tự `list_classes` (tự nhiên, lớp trống cuối). Nhớ hai tầng ở `localStorage` khoá `rbda_ket_qua_xem_v1` (try/catch). Giữ lớp và CLB đã chọn khi đổi cách xem hay rời thẻ. Dùng lại `get_thoi_khoa_bieu`, `get_danh_sach_clb`, `get_club_fill_stats`, `list_classes`, `get_trang_thai_ket_qua`; không thêm backend. Trạng thái rỗng: chưa chạy xếp, chưa có lớp nào, tìm không thấy.
+- **03 Dữ liệu khác** (`view-others`, hàm vẫn tên `loadResultsTab`): mọi mục còn lại của thẻ 02 cũ, giữ nguyên thu gọn. Bảng thời khoá biểu từng học sinh (`tkbPanel`, `loadThoiKhoaBieu`) chuyển sang 02 Kết quả, không giữ hai bản.
+- **Chữ:** khoá i18n mới `nav_others`, `others_*`, `kq_*` (vi và en); bỏ `nav_members`, `nav_theo_lop`, `members_title|desc|chon|chua_chon`, `theolop_title|desc|chon|chua_chon`. `style.css`: nút chọn hai tầng và `.main:has(#view-results.is-active)` để thẻ không co lại ở *Theo CLB*.
+- **Test mới:** `tests/test_giao_dien_t2_ket_qua.py` (11 ca Chromium: đổi tầng 1, tầng 2 và mục *Theo lớp*, sắp theo mã / lớp / ngày, nhớ sau khi mở lại, kho lưu trữ hỏng, giữ lựa chọn, trạng thái rỗng, đổi ngôn ngữ, không điểm và không số bốc thăm). **Test cũ sửa có chủ đích** (thay đổi đã duyệt): các tệp `tests/test_giao_dien_*` bấm `data-tab="results"` cho nội dung cũ nay bấm `others` và `#view-others`; `test_giao_dien_a14_lop.py` (hai thẻ xem cũ thành các ca của thẻ Kết quả, fixture `mo` thêm tham số `them` và ngữ cảnh trình duyệt dựng tường minh, số khoá i18n 35 thành 25); `test_giao_dien_thu_gon_ket_qua.py` (`tkbPanel` bỏ, chín mục thành tám, mục thay thế `doPhuPanel`); `test_giao_dien_a13_12_tkb.py` (ô tìm nay ở *Theo mã học sinh*).
+
 ## 2026-11-02 — A14 — phần A (nền, nhập, API): lớp của học sinh
 
 **Đã merge vào main qua PR #6 (b044c4c, 03/11/2026).**

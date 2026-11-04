@@ -22,7 +22,7 @@ function init() {
   initFallbackHandlers();
   initAdminHandlers();
   initScoringHandlers();
-  initTheXemHandlers();
+  initKetQuaHandlers();
   initWorkspace();   // nút đổi workspace ở thanh bên + màn chọn (js/075_workspace.js)
   loadPipelineTab(); // tab mặc định đang mở khi khởi động
 }

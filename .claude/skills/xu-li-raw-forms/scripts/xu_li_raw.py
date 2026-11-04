@@ -35,6 +35,7 @@ sys.path.insert(0, DAY)
 
 import sinh_du_lieu as sdl  # noqa: E402  (soat, ghi_bo, TEN_SO, trần)
 import so_nhap  # noqa: E402  (sinh_du_lieu đã đặt sẵn đường tìm)
+from lop_hoc_sinh import chuan_hoa_lop  # noqa: E402  (bộ chuẩn hoá lớp A14, gốc kho; không viết lại)
 
 COT_RAW = ["phieu_so", "thoi_gian_nop", "email", "student_id", "trang_thai_phieu",
            "ma_cau", "loai_cau", "buoi", "club_id", "cau_so", "cau_hoi", "tra_loi",
@@ -77,6 +78,53 @@ def doc_bang(duong):
     return tieu_de, [dict(zip(tieu_de, r + [""] * (len(tieu_de) - len(r)))) for r in dong[1:]]
 
 
+_PHAN = re.compile(r"^(.*)_p(\d+)\.(csv|xlsx)$", re.IGNORECASE)
+
+
+def doc_raw(duong):
+    """Đọc RAW: một tệp (.xlsx / .csv) như doc_bang, hoặc MỘT THƯ MỤC các phần
+    <tiền tố>_p01.csv, _p02.csv, ... do bước xuất theo phần tạo (T4-K3).
+
+    Ghép các phần theo số phần (p2 trước p10). Từ chối, không ghép bừa, khi:
+    không có phần nào; nhiều bộ xuất (tiền tố khác nhau) lẫn trong thư mục;
+    thiếu phần (số phần không liền từ 1); tiêu đề các phần khác nhau; một
+    phieu_so nằm ở hai phần.
+    """
+    if not os.path.isdir(duong):
+        return doc_bang(duong)
+    ten_tm = os.path.basename(os.path.normpath(duong))
+    phan = {}
+    for ten in os.listdir(duong):
+        m = _PHAN.match(ten)
+        if m:
+            phan.setdefault(m.group(1), []).append((int(m.group(2)), ten))
+    if not phan:
+        raise LoiDauVao("%s: thư mục không có phần nào dạng <tên>_p01.csv" % ten_tm)
+    if len(phan) > 1:
+        raise LoiDauVao("%s: có nhiều bộ xuất lẫn nhau (%s); để mỗi bộ một thư mục"
+                        % (ten_tm, ", ".join(sorted(phan))))
+    ds = sorted(next(iter(phan.values())))
+    so_phan = [k for k, _ in ds]
+    if so_phan != list(range(1, len(ds) + 1)):
+        thieu = sorted(set(range(1, max(so_phan) + 1)) - set(so_phan))
+        raise LoiDauVao("%s: thiếu phần %s hoặc số phần trùng; xuất tiếp cho đủ rồi chạy lại"
+                        % (ten_tm, ", ".join("p%02d" % k for k in thieu) or "?"))
+    tieu_de, tat_ca, noi_phieu = None, [], {}
+    for k, ten in ds:
+        td, dong = doc_bang(os.path.join(duong, ten))
+        if tieu_de is None:
+            tieu_de = td
+        elif td != tieu_de:
+            raise LoiDauVao("%s: tiêu đề của %s khác phần đầu" % (ten_tm, ten))
+        for r in dong:
+            ps = r.get("phieu_so", "")
+            if noi_phieu.setdefault(ps, k) != k:
+                raise LoiDauVao("%s: phiếu số %s nằm ở hai phần (p%02d và p%02d)"
+                                % (ten_tm, ps, noi_phieu[ps], k))
+        tat_ca.extend(dong)
+    return tieu_de, tat_ca
+
+
 def _can_cot(ten, tieu_de, can):
     thieu = [c for c in can if c not in tieu_de]
     if thieu:
@@ -107,7 +155,7 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         "phieu_trung", "phieu_khong_ma", "ma_sai_dang", "email_hai_ma",
         "dap_an_forms_lech", "diem_raw_lech", "lam_khong_tick", "tick_khong_lam",
         "qua_tran", "thieu_xep_hang", "trung_hang", "bo_trong_top", "clb_nhieu_top", "bai_khong_hop_le",
-        "cau_la", "khong_dang_ky_buoi", "ghi_chu"))
+        "cau_la", "khong_dang_ky_buoi", "lop_khac_giua_cac_phieu", "ghi_chu"))
 
     # ---- đáp án và danh sách CLB theo đáp án
     khoa, diem_cau, thu_tu_clb, ten_clb, buoi_clb = {}, {}, [], {}, {}
@@ -140,10 +188,18 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         phieu.setdefault(so(r["phieu_so"]), []).append(r)
     phieu = OrderedDict(sorted(phieu.items()))
 
+    # ---- cột lop tuỳ chọn (T4-K1): có trong tiêu đề thì dòng raw có khoá "lop"
+    co_lop = any("lop" in r for r in raw)
+    lop_cua = {}      # sid -> {phiếu: lớp đã chuẩn hoá} (chỉ phiếu có lớp)
+
     # ---- chọn phiếu giữ: phiếu đầu của mỗi mã
     giu, dau_tien, email_ma = OrderedDict(), {}, {}
     for ps, rows in phieu.items():
         sid = next((r["student_id"] for r in rows if r["student_id"]), "")
+        if co_lop and sid:
+            lop = next((chuan_hoa_lop(r.get("lop")) for r in rows if chuan_hoa_lop(r.get("lop"))), None)
+            if lop:
+                lop_cua.setdefault(sid, {})[ps] = lop
         email = next((r["email"] for r in rows if r["email"]), "")
         if email and sid:
             email_ma.setdefault(email.lower(), set()).add(sid)
@@ -155,6 +211,15 @@ def xu_li(raw, dap_an=None, clb_truong=None):
             continue
         dau_tien[sid] = ps
         giu[ps] = (sid, rows)
+    for sid, theo_phieu in lop_cua.items():
+        giu_ps = dau_tien[sid]
+        chi_tiet = "; ".join("phiếu %d ghi %s" % kv for kv in sorted(theo_phieu.items()))
+        if giu_ps not in theo_phieu:          # phiếu giữ không ghi lớp: KHÔNG mượn lớp phiếu khác
+            bc["lop_khac_giua_cac_phieu"].append(
+                "%s: phiếu giữ %d không ghi lớp, %s; Sổ để trống" % (sid, giu_ps, chi_tiet))
+        elif len(set(theo_phieu.values())) > 1:
+            bc["lop_khac_giua_cac_phieu"].append(
+                "%s: %s (lấy lớp của phiếu giữ %d)" % (sid, chi_tiet, giu_ps))
     for e, ds in email_ma.items():
         if len(ds) > 1:
             bc["email_hai_ma"].append("%s dùng %d mã: %s" % (e, len(ds), ", ".join(sorted(ds))))
@@ -241,8 +306,11 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         for cid in sorted(tick - set(lam), key=lambda c: thu_tu.get(c, 99)):
             bc["tick_khong_lam"].append("%s: %s" % (sid, cid))
 
-        hs.append({"student_id": sid, "name": ten, "reserve_group": "",
-                   "nguyen_vong": nv, "diem": diem_hs})
+        em = {"student_id": sid, "name": ten, "reserve_group": "",
+              "nguyen_vong": nv, "diem": diem_hs}
+        if co_lop:
+            em["lop"] = lop_cua.get(sid, {}).get(ps, "")     # lớp của PHIẾU GIỮ
+        hs.append(em)
 
     for ma, n in sorted(lech_forms.items()):
         bc["dap_an_forms_lech"].append("%s: %d bài Forms chấm khác đáp án gốc" % (ma, n))
@@ -286,6 +354,7 @@ TIEU_DE_BC = OrderedDict([
     ("bai_khong_hop_le", "Bài thi không hợp lệ (bị bỏ)"),
     ("cau_la", "Câu hỏi lạ, không thuộc mẫu (biểu mẫu có thể bị sửa tay)"),
     ("khong_dang_ky_buoi", "Học sinh không đăng ký buổi nào"),
+    ("lop_khac_giua_cac_phieu", "Lớp không thống nhất giữa các phiếu của cùng một mã (Sổ chỉ lấy lớp của phiếu giữ)"),
     ("ghi_chu", "Ghi chú"),
 ])
 
@@ -350,7 +419,8 @@ def doc_clb_tu_so(duong):
 
 
 def chay(duong_raw, thu_muc_ra, duong_dap_an=None, duong_clb=None):
-    td, raw = doc_bang(duong_raw)
+    td, raw = doc_raw(duong_raw)
+    td_raw = td
     _can_cot("RAW_PHIEU", td, COT_RAW)
     dap_an = None
     if duong_dap_an:
@@ -387,8 +457,13 @@ def chay(duong_raw, thu_muc_ra, duong_dap_an=None, duong_clb=None):
             c["capacity"] = ""
     # co_nhom=False: biểu mẫu không hỏi nhóm ưu tiên. Không có cột thì phần
     # mềm GIỮ nhóm đã gán; có cột mà trống thì phần mềm sẽ BỎ nhóm của em.
+    # T4-K1: RAW có cột `lop` (ngoài COT_RAW) thì sổ có cột Lớp; không có thì sổ y như cũ.
+    co_lop = "lop" in td_raw
+    if co_lop:
+        for st, h in zip(students, hs):      # thanh_so giữ nguyên thứ tự hs
+            st["class_id"] = h.get("lop") or ""
     so_nhap.ghi_so_nhap(os.path.join(thu_muc_ra, sdl.TEN_SO), clubs, students,
-                        co_nhom=False)
+                        co_nhom=False, co_lop=co_lop)
     with io.open(os.path.join(thu_muc_ra, "BAO_CAO_BAT_THUONG.md"), "w", encoding="utf-8") as f:
         f.write(viet_bao_cao(clb, hs, bc, clb_truong is not None))
     return clb, hs, bc
@@ -401,7 +476,7 @@ def main(argv=None):
         if hasattr(_luong, "reconfigure"):
             _luong.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    p.add_argument("--raw", required=True, help="RAW_PHIEU.xlsx (hoặc .csv)")
+    p.add_argument("--raw", required=True, help="RAW_PHIEU.xlsx (hoặc .csv), hoặc thư mục các phần _p01.csv, _p02.csv...")
     p.add_argument("--dap-an", help="DAP_AN.xlsx; có thì chấm lại theo đáp án gốc")
     p.add_argument("--clb", help="SO_NHAP_CLB.xlsx (sheet 1. CLB) hoặc danh sách CLB "
                                  "(.xlsx/.csv) đã điền chỉ tiêu")

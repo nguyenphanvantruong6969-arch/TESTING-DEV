@@ -392,7 +392,7 @@ Không phải chờ mở mục *Cảnh báo dữ liệu* mới thấy.
 
 > Nhóm dự trữ chính là cơ chế ưu tiên của RB-DA. Bỏ trống hết thì thuật toán
 > vẫn chạy trơn tru và **không báo lỗi gì** — chỉ là không em nào vào được
-> theo diện dự trữ. Kiểm tra lại ở màn hình *04 Quản lý club & dự trữ*.
+> theo diện dự trữ. Kiểm tra lại ở màn hình *05 Quản lý club & dự trữ*.
 
 ---
 

@@ -18,7 +18,7 @@ BẪY 2 — nhãn nút "Thu gọn tất cả" là chữ ĐỘNG.
     Con số ở tiêu đề mục cũng vậy.
 
 BẪY 3 — "đang đóng" không phải "chưa có dữ liệu".
-    `#doPhuPanel` / `#tkbPanel` / `#thamPanel` đã dùng thuộc tính `hidden`
+    `#doPhuPanel` / `#thamPanel` đã dùng thuộc tính `hidden`
     trên chính `.panel` để nói *chưa chạy nên chưa có gì*. Nếu thu gọn cũng
     mượn `hidden` trên cùng phần tử ấy thì "Mở rộng tất cả" sẽ lôi cả một
     mục rỗng ra giữa màn hình. Thu gọn chỉ chạm `.panel-body` bên trong.
@@ -54,7 +54,7 @@ def api(api):
     return api
 
 NAM_MUC = ["fillPanel", "clbPanel", "duTruPanel", "doPhuPanel", "nvPanel",
-           "chuaCoChoPanel", "tkbPanel", "thamPanel", "dsXepPanel"]
+           "chuaCoChoPanel", "thamPanel", "dsXepPanel"]     # T2: bảng thời khoá biểu đã chuyển sang thẻ Kết quả
 
 # Lần đầu mở: TẤT CẢ các mục đều đóng — xem MAC_DINH_DONG trong
 # js/03_ket_qua.js. Nhà trường chọn vậy (27/09): vừa mở thẻ mà "Tỉ lệ lấp
@@ -73,7 +73,7 @@ def _nap(api):
 
 def _mo_the_ket_qua(page, url):
     page.goto(url)
-    page.click('.nav-item[data-tab="results"]')
+    page.click('.nav-item[data-tab="others"]')
     page.wait_for_selector("#dsXepPanel .panel-toggle")
     return page
 
@@ -101,7 +101,7 @@ def trang(api):
     _nap(api)
     assert api.run_pipeline(seed=42)["ok"]
     pw, br, ctx, page, loi, url = _mo_trang(api)
-    page.wait_for_selector("#tkbPanel:not([hidden])")
+    page.wait_for_selector("#doPhuPanel:not([hidden])")
     yield page, loi, api, ctx, url
     br.close()
     pw.stop()
@@ -158,7 +158,7 @@ def test_ban_chup_mac_dinh_cu_khong_lam_muc_bung_ra_lai(trang):
         "{fillPanel: true, dsXepPanel: true, doPhuPanel: true}))")
     trang_moi = ctx.new_page()
     _mo_the_ket_qua(trang_moi, url)
-    trang_moi.wait_for_selector("#tkbPanel:not([hidden])")
+    trang_moi.wait_for_selector("#doPhuPanel:not([hidden])")
     assert all(not mo for mo in _trang_thai(trang_moi).values())
 
 
@@ -221,12 +221,12 @@ def test_mo_rong_tat_ca_khong_loi_muc_chua_co_du_lieu_ra(trang_chua_chay):
     """BẪY 3, mặt còn lại: chưa chạy phân bổ thì ba mục kia chưa có gì để
     nói. 'Mở rộng tất cả' không được biến chúng thành ba khung rỗng."""
     page, _, _ = trang_chua_chay
-    for muc in ("doPhuPanel", "tkbPanel", "thamPanel"):
+    for muc in ("doPhuPanel", "thamPanel"):
         assert page.eval_on_selector("#" + muc, "e => e.hidden") is True, muc
 
     page.click("#btnThuGonTatCa")          # đóng sẵn -> mở hết
 
-    for muc in ("doPhuPanel", "tkbPanel", "thamPanel"):
+    for muc in ("doPhuPanel", "thamPanel"):
         assert page.eval_on_selector("#" + muc, "e => e.hidden") is True, muc
 
 
@@ -240,9 +240,9 @@ def test_doi_ngon_ngu_giu_trang_thai_va_dich_ca_hai_nhan(trang):
     Đổi ngôn ngữ phải dịch nhãn nút chung (chữ động) và con số ở tiêu đề
     mục, mà KHÔNG được thổi bay lựa chọn đóng/mở người dùng vừa đặt."""
     page, _, _, _, _ = trang
-    page.click("#tkbPanel .panel-toggle")      # mở bảng thời khoá biểu
+    page.click("#doPhuPanel .panel-toggle")      # mở bảng thời khoá biểu
     truoc = _trang_thai(page)
-    assert truoc["tkbPanel"] is True and truoc["dsXepPanel"] is False
+    assert truoc["doPhuPanel"] is True and truoc["dsXepPanel"] is False
 
     page.click("#btnLangToggle")
     page.wait_for_function(
@@ -250,8 +250,8 @@ def test_doi_ngon_ngu_giu_trang_thai_va_dich_ca_hai_nhan(trang):
         ".textContent.trim() === 'Collapse all'")
 
     assert _trang_thai(page) == truoc, "doi ngon ngu lam mat trang thai"
-    assert page.query_selector("#tkbPanel .panel-toggle"), "nut mui ten bi xoa"
-    assert "students" in page.inner_text("#tkbPanelDem")
+    assert page.query_selector("#doPhuPanel .panel-toggle"), "nut mui ten bi xoa"
+    assert "students" in page.inner_text("#doPhuPanelDem")
 
 
 def test_ve_lai_du_lieu_khong_lam_mat_trang_thai(trang):
@@ -278,11 +278,11 @@ def test_mo_lai_phan_mem_van_giu_trang_thai(trang):
     luu = json.loads(page.evaluate(
         "() => window.localStorage.getItem('%s')" % KHOA))
     assert luu["dsXepPanel"] is False and luu["thamPanel"] is True, luu
-    assert luu["tkbPanel"] is False, luu
+    assert luu["doPhuPanel"] is False, luu
 
     trang_moi = ctx.new_page()
     _mo_the_ket_qua(trang_moi, url)
-    trang_moi.wait_for_selector("#tkbPanel:not([hidden])")
+    trang_moi.wait_for_selector("#doPhuPanel:not([hidden])")
     assert _trang_thai(trang_moi) == truoc
 
 
@@ -296,7 +296,7 @@ def test_lua_chon_da_luu_duoc_ton_trong(trang):
 
     trang_moi = ctx.new_page()
     _mo_the_ket_qua(trang_moi, url)
-    trang_moi.wait_for_selector("#tkbPanel:not([hidden])")
+    trang_moi.wait_for_selector("#doPhuPanel:not([hidden])")
     tt = _trang_thai(trang_moi)
     assert tt["fillPanel"] is True and tt["doPhuPanel"] is True
     for muc in NAM_MUC:
@@ -310,11 +310,11 @@ def test_lua_chon_da_luu_duoc_ton_trong(trang):
 
 def test_muc_dang_dong_van_noi_no_chua_bao_nhieu(trang):
     page, _, api, _, _ = trang
-    tong = len(api.get_thoi_khoa_bieu()["data"]["hoc_sinh"])
+    tong = api.get_do_phu()["data"]["tong_hoc_sinh"]
     assert tong > 0
 
-    assert _dang_mo(page, "tkbPanel") is False          # đóng sẵn
-    assert page.inner_text("#tkbPanelDem").strip() == "%d học sinh" % tong
+    assert _dang_mo(page, "doPhuPanel") is False          # đóng sẵn
+    assert page.inner_text("#doPhuPanelDem").strip() == "%d học sinh" % tong
 
     n_clb = len(api.get_club_fill_stats()["data"])
     assert page.inner_text("#fillPanelDem").strip() == "%d câu lạc bộ" % n_clb

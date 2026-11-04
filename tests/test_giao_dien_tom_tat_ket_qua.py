@@ -86,7 +86,7 @@ def _mo_trang(api):
     page.on("pageerror", lambda e: loi.append(str(e)))
     page.goto(url)
     page.wait_for_selector("#dropZone")
-    page.locator('[data-tab="results"]').click()
+    page.locator('[data-tab="others"]').click()
     page.wait_for_selector(".kpi-o")
     page.wait_for_function("document.querySelectorAll('.fill-row').length > 0")
     # Mọi mục ở thẻ Kết quả đóng sẵn: mở mục lấp đầy thì dòng mới hiện ra
@@ -177,7 +177,7 @@ def test_chua_chay_thi_khong_hien_tom_tat(api):
         page = br.new_page(bypass_csp=True)
         page.goto(url)
         page.wait_for_selector("#dropZone")
-        page.locator('[data-tab="results"]').click()
+        page.locator('[data-tab="others"]').click()
         page.wait_for_selector(".fill-row", state="attached")
         page.wait_for_timeout(300)
         assert page.locator("#tomTatKetQua").is_hidden()
@@ -199,7 +199,7 @@ def test_sap_xep_vang_nhat_dua_clb_it_len_dau_va_duoc_nho(trang):
     page.select_option("#fillSapXep", "vang_nhat")
     moi = page.context.new_page()
     moi.goto(page.url_goc)
-    moi.locator('[data-tab="results"]').click()
+    moi.locator('[data-tab="others"]').click()
     moi.wait_for_function("document.querySelectorAll('.fill-row').length > 0")
     assert moi.input_value("#fillSapXep") == "vang_nhat"
     assert _ten_cac_dong(moi)[0] == "CLB Ít"

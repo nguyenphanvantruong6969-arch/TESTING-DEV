@@ -309,7 +309,7 @@ class TestHatGiong:
         # Hạt giống khoá cùng bộ số bốc thăm: chỉ gõ được khi đã bật "Vẽ lại".
         page.click("#stbLockLine .redraw-toggle")
         page.fill("#seedInput", "7")
-        page.click('.nav-item[data-tab="results"]')
+        page.click('.nav-item[data-tab="others"]')
         page.click('.nav-item[data-tab="pipeline"]')
         page.wait_for_timeout(600)
         assert page.input_value("#seedInput") == "7"
@@ -409,7 +409,7 @@ class TestKhongLoChuoiKyThuat:
                     : goc[ten],
             });
         }""")
-        page.click('.nav-item[data-tab="results"]')
+        page.click('.nav-item[data-tab="others"]')
         page.click("#btnXuatTuyChon")   # "Kết quả sắp xếp" được chọn sẵn
         page.wait_for_selector(".toast.is-error")
         chu = page.locator(".toast.is-error").inner_text()

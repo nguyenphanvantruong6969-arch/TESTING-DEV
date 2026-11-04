@@ -1,0 +1,24 @@
+flowchart TD
+  A(["Phản hồi mới, ID chưa có ở phieu"]) --> P{"Mã học sinh"}
+  P -->|"Trống"| S1["bo_khong_ma, ban_giu = 0"]
+  P -->|"Không có trong hoc_sinh"| S2["ma_la, ban_giu = 0"]
+  P -->|"Hợp lệ"| D{"Mã đã có phiếu giữ<br/>(ban_giu = 1)?"}
+  D -->|"Chưa"| S4["Phiếu hợp lệ sớm nhất của mã:<br/>cho_duyet, ban_giu = 1<br/>(bất kể nhat_ky)"]
+  D -->|"Có"| D2{"So thoi_gian_nop (hoà theo raw_key):<br/>phiếu này sớm hơn phiếu giữ<br/>và không có ngoại lệ (a) hay (b)?"}
+  D2 -->|"Có"| S5["Phiếu này thành phiếu giữ:<br/>cho_duyet, ban_giu = 1.<br/>Phiếu giữ cũ: bo_nop_trung, ban_giu = 0"]
+  D2 -->|"Không"| S3["bo_nop_trung, ban_giu = 0"]
+  S1 --> BL
+  S2 --> BL
+  S3 --> BL
+  S4 --> BL
+  S5 --> BL
+  BL["Gom khối 100 hàng, NỐI vào sau getLastRow<br/>(không ghi đè), ghi các cột khác bằng setValues,<br/>rồi ghi cột raw_key (cột cuối)"] --> RV["Đọc lại khối vừa ghi:<br/>mỗi hàng có raw_key và trang_thai?"]
+  RV -->|"Thiếu"| ER["Khối chưa xong: không dời mốc,<br/>ghi nhat_ky loại lỗi"]
+  RV -->|"Đủ"| MC["Dời moc_xu_ly đến phản hồi<br/>cuối của khối đã kiểm"]
+  MC --> CAP{"Trước khối kế: đã dùng + max(khối trước,<br/>ước tính 100 x c) vượt 110 giây?"}
+  CAP -->|"Không vượt, còn phản hồi"| BL
+  CAP -->|"Hết phản hồi"| OK(["Xong lô"])
+  CAP -->|"Vượt"| PR(["Có tiến triển: dừng ở ranh giới khối,<br/>lô nhắm không quá 120 giây,<br/>lô sau đọc tiếp. Không phải lỗi"])
+  ER --> N{"3 lô liên tiếp lỗi?"}
+  N -->|"Có"| EM["Email báo lỗi cho admin"]
+  N -->|"Chưa"| RT(["Lần sau xoá hàng dở đầu lô<br/>và đọc lại từ mốc cũ"])

@@ -242,10 +242,12 @@ def _nguon_thuc(mod):
 _TEN = ("i18n_errors", "rbda_priority_pipeline")   # i18n_errors trước: mô-đun chính import nó theo tên
 
 
-def _ten_can_nap(co_nhan_ws):
+def _ten_can_nap(co_nhan_ws, co_lop=False):
     """Các mô-đun cần nạp, theo thứ tự nạp. Từ bản có workspace, `i18n_errors` import `nhan_ws`
-    (từ vựng của workspace), nên `nhan_ws` phải nạp TRƯỚC nó; bản build cũ không có thì bỏ."""
-    return (("nhan_ws",) if co_nhan_ws else ()) + _TEN
+    (từ vựng của workspace), nên `nhan_ws` phải nạp TRƯỚC nó; bản build cũ không có thì bỏ.
+    Từ T4-K1, `rbda_priority_pipeline` import `lop_hoc_sinh` (chuan_hoa_lop) theo tên, nên nó cũng
+    nạp trước; bản cũ không có tệp này thì bỏ."""
+    return (("nhan_ws",) if co_nhan_ws else ()) + (("lop_hoc_sinh",) if co_lop else ()) + _TEN
 
 
 def _nap_co_kiem(ao, nap, mo_ta, chuan_bi=None, thu_tu=_TEN):
@@ -291,7 +293,8 @@ def nap_rb(duong_dan):
         thu_muc = os.path.abspath(duong_dan)
         # Nạp thẳng <thu_muc>/<tên>.py (không import theo tên qua sys.path, không đụng cache bộ tìm).
         # Kiểm mô-đun chính trước: thư mục sai thì báo thiếu rbda_priority_pipeline, đúng như cách dùng ghi.
-        thu_tu = _ten_can_nap(os.path.isfile(os.path.join(thu_muc, "nhan_ws.py")))
+        thu_tu = _ten_can_nap(os.path.isfile(os.path.join(thu_muc, "nhan_ws.py")),
+                              os.path.isfile(os.path.join(thu_muc, "lop_hoc_sinh.py")))
         tep = {ten: _tep_nguon(thu_muc, ten) for ten in reversed(thu_tu)}
         # Mô-đun được import mô-đun nào trong _TEN: chỉ mô-đun nạp TRƯỚC nó (i18n_errors nạp trước nên không
         # được import rbda_priority_pipeline — lúc đó bản này chưa có, import theo tên sẽ lấy nhầm bản khác).
@@ -325,7 +328,8 @@ def nap_rb(duong_dan):
         trang_thai["pyz"], trang_thai["mods"] = _doc_pyz(duong_dan)
     except SystemExit:
         trang_thai.clear()
-    thu_tu = _ten_can_nap("nhan_ws" in trang_thai.get("mods", ()))
+    thu_tu = _ten_can_nap("nhan_ws" in trang_thai.get("mods", ()),
+                          "lop_hoc_sinh" in trang_thai.get("mods", ()))
     ao = {ten: os.path.join(os.path.abspath(duong_dan), ten + ".py") for ten in thu_tu}
 
     def nap(ten):

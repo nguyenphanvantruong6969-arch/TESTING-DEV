@@ -366,7 +366,7 @@ class BaoCaoMixin:
         phụ trách một bản.
 
         KHÔNG dùng `get_club_applicants_for_scoring` cho việc này —
-        hàm đó cố ý giấu thứ hạng nguyện vọng để chấm mù, và thẻ 05 phải
+        hàm đó cố ý giấu thứ hạng nguyện vọng để chấm mù, và thẻ 06 phải
         giữ nguyên là chấm mù.
         """
         try:

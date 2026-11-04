@@ -120,7 +120,7 @@ function wsCapNhatTieuDe() {
   callApi("dat_tieu_de_cua_so", tieuDe);
 }
 
-/* Nhãn VÀ luật của workspace vào giao diện: chữ (I18N), hai trần nhập liệu ở thẻ 03, và
+/* Nhãn VÀ luật của workspace vào giao diện: chữ (I18N), hai trần nhập liệu ở thẻ 04, và
    câu gợi ý "tối đa N" (không giới hạn thì dùng câu riêng). Lấy từ get_workspace_state
    nên chạy được cả khi mở bằng đường dẫn CSDL riêng. */
 function wsApDungCauHinh(cfg) {
@@ -307,7 +307,7 @@ function wsLuuSua(w, kieu, ten, kemDuLieu) {
  * HÀNH ĐỘNG TRÊN MỘT WORKSPACE
  * ------------------------------------------------------------------ */
 
-/* Chuyển workspace: thẻ 03 còn thay đổi chưa lưu thì bấm hai lần mới đi
+/* Chuyển workspace: thẻ 04 còn thay đổi chưa lưu thì bấm hai lần mới đi
    (cùng luật với đổi thẻ — xem roiDiNeuDuoc). */
 function wsMo(w) {
   const di = () => callApi("open_workspace", w.slug).then((res) => {

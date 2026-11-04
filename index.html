@@ -37,20 +37,17 @@
       <button class="nav-item" data-tab="results">
         <span class="nav-icon">02</span> <span data-i18n="nav_results">Kết quả</span>
       </button>
+      <button class="nav-item" data-tab="others">
+        <span class="nav-icon">03</span> <span data-i18n="nav_others">Dữ liệu khác</span>
+      </button>
       <button class="nav-item" data-tab="fallback">
-        <span class="nav-icon">03</span> <span data-i18n="nav_fallback">Nhập tại chỗ</span>
+        <span class="nav-icon">04</span> <span data-i18n="nav_fallback">Nhập tại chỗ</span>
       </button>
       <button class="nav-item" data-tab="admin">
-        <span class="nav-icon">04</span> <span data-i18n="nav_admin">Quản lý CLB &amp; dự trữ</span>
+        <span class="nav-icon">05</span> <span data-i18n="nav_admin">Quản lý CLB &amp; dự trữ</span>
       </button>
       <button class="nav-item" data-tab="scoring">
-        <span class="nav-icon">05</span> <span data-i18n="nav_scoring">Nhập điểm</span>
-      </button>
-      <button class="nav-item" data-tab="members">
-        <span class="nav-icon">06</span> <span data-i18n="nav_members">Thành viên {slot_sl}</span>
-      </button>
-      <button class="nav-item" data-tab="theolop">
-        <span class="nav-icon">07</span> <span data-i18n="nav_theo_lop">Theo {cohort_l}</span>
+        <span class="nav-icon">06</span> <span data-i18n="nav_scoring">Nhập điểm</span>
       </button>
     </div>
 
@@ -234,12 +231,59 @@
       </div>
     </section>
 
-    <!-- ---------- TAB 2: KẾT QUẢ ---------- -->
+    <!-- ---------- TAB 2: KẾT QUẢ (chỉ đọc; cho Ban giám hiệu, người phụ trách CLB, giáo viên chủ nhiệm) ---------- -->
     <section class="view" id="view-results">
+      <header class="view-header">
+        <h1 data-i18n="kq_title">Kết quả</h1>
+        <p class="view-desc" data-i18n="kq_desc">Xem {person_l} học {slot_sl} nào. Không có điểm hay số bốc thăm.</p>
+      </header>
+      <div class="canh-bao-vang canh-bao-hang" id="kqCuBanner" hidden>
+        <span data-i18n="ket_qua_cu_banner">Dữ liệu đã được sửa sau lần chạy gần nhất, nên kết quả bên dưới có thể đã cũ. Hãy chạy lại ở thẻ "Vận hành sắp xếp" trước khi xuất hoặc công bố.</span>
+      </div>
+      <div class="panel">
+        <div class="kq-chon-hang">
+          <div class="kq-seg" id="kqTang1" role="group" data-i18n-aria-label="kq_aria_tang1">
+            <button type="button" class="kq-seg-nut" data-kq="lop" aria-pressed="false" data-i18n="kq_theo_lop">Theo {cohort_l}</button>
+            <button type="button" class="kq-seg-nut" data-kq="clb" aria-pressed="false" data-i18n="kq_theo_clb">Theo {slot_sl}</button>
+            <button type="button" class="kq-seg-nut" data-kq="ma" aria-pressed="false" data-i18n="kq_theo_ma">Theo mã {person_l}</button>
+          </div>
+        </div>
+        <div class="kq-chon-hang kq-chon-hang-phu">
+          <span class="kq-seg-nhan" data-i18n="kq_sap_nhan">Sắp xếp</span>
+          <div class="kq-seg kq-seg-nho" id="kqTang2" role="group" data-i18n-aria-label="kq_aria_tang2">
+            <button type="button" class="kq-seg-nut" data-sx="ngay" aria-pressed="false" data-i18n="kq_sx_ngay">Theo ngày trong tuần</button>
+            <button type="button" class="kq-seg-nut" data-sx="ma" aria-pressed="false" data-i18n="kq_sx_ma">Theo mã {person_l}</button>
+            <button type="button" class="kq-seg-nut" data-sx="lop" aria-pressed="false" id="kqSxLop" data-i18n="kq_sx_lop">Theo {cohort_l}</button>
+          </div>
+        </div>
+        <div class="search-row kq-chon-hang-phu" id="kqChonLopHang" hidden>
+          <label class="lop-nhan" for="kqChonLop" data-i18n="kq_chon_lop">Chọn {cohort_l}</label>
+          <select id="kqChonLop" class="text-input text-input-sm"></select>
+        </div>
+        <div class="search-row kq-chon-hang-phu" id="kqChonClbHang" hidden>
+          <label class="lop-nhan" for="kqChonClb" data-i18n="kq_chon_clb">Chọn {slot_l}</label>
+          <select id="kqChonClb" class="text-input"></select>
+        </div>
+        <div class="search-row kq-chon-hang-phu" id="kqTimHang" hidden>
+          <input type="text" id="kqTimKiem" class="text-input" data-i18n-placeholder="kq_tim_ph" placeholder="Tìm mã hoặc tên">
+        </div>
+        <div id="kqRong" class="empty-state" hidden></div>
+        <div class="scroll-x">
+          <table class="data-table" id="kqBang" hidden>
+            <caption class="the-xem-dem" id="kqDem"></caption>
+            <thead><tr id="kqDau"></tr></thead>
+            <tbody id="kqThan"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- TAB 3: DỮ LIỆU KHÁC (phần còn lại của thẻ Kết quả cũ) ---------- -->
+    <section class="view" id="view-others">
       <header class="view-header view-header-hang">
         <div class="view-header-chu">
-          <h1 data-i18n="results_title">Kết quả</h1>
-          <p class="view-desc" data-i18n="results_desc">Học sinh đã được xếp vào CLB nào và mỗi CLB đã đủ chỗ chưa.</p>
+          <h1 data-i18n="others_title">Dữ liệu khác</h1>
+          <p class="view-desc" data-i18n="others_desc">Học sinh đã được xếp vào CLB nào và mỗi CLB đã đủ chỗ chưa.</p>
         </div>
         <!-- Nhãn nút này ĐỔI theo trạng thái nên là chữ ĐỘNG: js/*.js ghi,
              và reapplyDynamicTextForLangChange() vẽ lại khi đổi ngôn ngữ.
@@ -285,7 +329,7 @@
         </div>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo {cohort_l}: mỗi {cohort_l} một tệp Excel, chỉ có kết quả xếp, không có điểm hay số bốc thăm — gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
-        <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 03 thì bấm "Xuất CSV em này" ngay tại đó.</p>
+        <p class="hint-text" data-i18n="xuat_hint_hoc_sinh">Hồ sơ học sinh: bấm "Chọn học sinh…" rồi đánh dấu các em ở bảng bên dưới. Đang mở một em ở thẻ 04 thì bấm "Xuất CSV em này" ngay tại đó.</p>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm — không gửi cho giáo viên chấm điểm.</p>
       </div>
 
@@ -469,28 +513,6 @@
             </table>
           </div>
           <div id="chuaCoChoEmpty" class="empty-state" hidden data-i18n="chua_co_cho_khong_ai">Mọi học sinh đều có ít nhất một CLB.</div>
-        </div>
-      </div>
-
-      <div class="panel" id="tkbPanel" hidden>
-        <div class="panel-head">
-          <div class="panel-head-trai">
-            <button class="panel-toggle" type="button" aria-expanded="true" aria-controls="tkbPanelBody" data-i18n-aria-label="aria_thu_gon_muc"></button>
-            <h2 data-i18n="tkb_title">Thời khoá biểu tuần</h2>
-            <span class="panel-dem" id="tkbPanelDem"></span>
-          </div>
-          <div class="panel-actions">
-            <input type="text" id="tkbSearch" class="text-input" data-i18n-placeholder="placeholder_results_search" placeholder="Tìm theo mã hoặc tên học sinh…">
-          </div>
-        </div>
-        <div class="panel-body" id="tkbPanelBody">
-          <p class="hint-text" data-i18n="tkb_desc">Mỗi học sinh một dòng, mỗi buổi một ô. Ô trống là buổi đó chưa có CLB.</p>
-          <div class="scroll-x">
-            <table class="data-table" id="tkbTable">
-              <thead><tr id="tkbHead"></tr></thead>
-              <tbody id="tkbBody"></tbody>
-            </table>
-          </div>
         </div>
       </div>
 
@@ -934,51 +956,6 @@
           <button class="btn btn-danger" id="btnResetAll" data-i18n="btn_reset_all">Xoá toàn bộ dữ liệu (cả CLB)</button>
         </div>
       </div>
-      </div>
-    </section>
-
-    <!-- ---------- TAB 6: THÀNH VIÊN CLB (chỉ đọc; A14) ---------- -->
-    <section class="view" id="view-members">
-      <header class="view-header">
-        <h1 data-i18n="members_title">Thành viên {slot_sl}</h1>
-        <p class="view-desc" data-i18n="members_desc">Chọn một {slot_l} để xem ai được xếp vào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho người phụ trách {slot_l}.</p>
-      </header>
-      <div class="panel">
-        <div class="search-row">
-          <label class="lop-nhan" for="membersClub" data-i18n="members_chon">Chọn {slot_l}</label>
-          <select id="membersClub" class="text-input"></select>
-        </div>
-        <div id="membersEmpty" class="empty-state" hidden></div>
-        <table class="data-table" id="membersTable" hidden>
-          <caption class="the-xem-dem" id="membersDem"></caption>
-          <thead><tr>
-            <th data-i18n="th_stt">STT</th>
-            <th data-i18n="th_student_id">Mã học sinh</th>
-            <th data-i18n="th_name">Họ tên</th>
-            <th data-i18n="th_cohort">{cohort}</th>
-          </tr></thead>
-          <tbody id="membersTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ---------- TAB 7: THEO LỚP (chỉ đọc; A14) ---------- -->
-    <section class="view" id="view-theolop">
-      <header class="view-header">
-        <h1 data-i18n="theolop_title">Theo {cohort_l}</h1>
-        <p class="view-desc" data-i18n="theolop_desc">Chọn một {cohort_l} để xem từng {person_l} được xếp vào {slot_l} nào. Chỉ có kết quả xếp, không có điểm hay số bốc thăm — dành cho giáo viên chủ nhiệm.</p>
-      </header>
-      <div class="panel">
-        <div class="search-row">
-          <label class="lop-nhan" for="theoLopChon" data-i18n="theolop_chon">Chọn {cohort_l}</label>
-          <select id="theoLopChon" class="text-input text-input-sm"></select>
-        </div>
-        <div id="theoLopEmpty" class="empty-state" hidden></div>
-        <table class="data-table" id="theoLopTable" hidden>
-          <caption class="the-xem-dem" id="theoLopDem"></caption>
-          <thead><tr id="theoLopHead"></tr></thead>
-          <tbody id="theoLopBody"></tbody>
-        </table>
       </div>
     </section>
 

@@ -214,7 +214,7 @@ lúc cần `hidden` thì phải thêm luật `[hidden] { display: none; }` (xem 
   (trang `1. CLB`, trang `2. Học sinh`). Thay cho ba tệp nạp cũ theo góp ý của ban
   giám khảo; `tests/test_so_nhap.py` canh sổ và ba tệp cũ ra cùng một kết quả
 - `.claude/skills/sinh-du-lieu-clb/` — skill sinh và soát Sổ nhập CLB
-- `mau_csv/` — `SO_NHAP_CLB.xlsx` (sổ trống) + `HUONG_DAN_SO_NHAP.md` (hướng dẫn
+- `mau_csv/` — `SO_NHAP_CLB.xlsx` (sổ mẫu chính: trống, có cột Lớp) + `HUONG_DAN_SO_NHAP.md` (hướng dẫn
   người vận hành) + `tao_so_nhap.py` (sinh lại mọi sổ mẫu) + 8 file CSV định dạng
   nội bộ kèm `HUONG_DAN_CSV.md` + `vi_du_day_du/` (một trường hoàn chỉnh, 0 cảnh
   báo, có cả sổ lẫn ba CSV, kèm `GIAI_THICH.md`)

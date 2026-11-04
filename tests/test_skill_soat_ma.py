@@ -66,7 +66,36 @@ def dat(ket_qua):
 
 def _co_ruff():
     r = subprocess.run([sys.executable, "-m", "ruff", "--version"], capture_output=True)
-    return r.returncode == 0
+    return r.returncode == 0 or shutil.which("ruff") is not None
+
+
+def _gia_khong_co_mo_dun(monkeypatch):
+    """Giả máy không cài ruff vào Python (chạy `python -m ruff` báo No module named ruff)."""
+    that = subprocess.run
+
+    def chay(lenh, *a, **k):
+        if lenh[:3] == [sys.executable, "-m", "ruff"]:
+            return subprocess.CompletedProcess(lenh, 1, "", "No module named ruff")
+        return that(lenh, *a, **k)
+    monkeypatch.setattr(kn.subprocess, "run", chay)
+
+
+@pytest.mark.skipif(shutil.which("ruff") is None, reason="không có ruff trên PATH")
+def test_ruff_chi_co_tren_path_van_chay(tmp_path, monkeypatch):
+    # Máy cloud: ruff cài bằng pipx / uv vào PATH, không có trong Python đang chạy.
+    _gia_khong_co_mo_dun(monkeypatch)
+    ghi(tmp_path, "ok.py", "x = 1\nprint(x)\n")
+    assert dat(kn.kiem_ruff(str(tmp_path)))
+    ghi(tmp_path, "hong.py", "print(ten_chua_dinh_nghia)\n")
+    ok, chi_tiet = kn.kiem_ruff(str(tmp_path))
+    assert not ok and any("F821" in d or "ten_chua_dinh_nghia" in d for d in chi_tiet)
+
+
+def test_ruff_khong_co_o_dau_ca_thi_bao_chua_cai(tmp_path, monkeypatch):
+    _gia_khong_co_mo_dun(monkeypatch)
+    monkeypatch.setattr(kn.shutil, "which", lambda ten: None)
+    ok, chi_tiet = kn.kiem_ruff(str(tmp_path))
+    assert not ok and "chưa cài ruff" in chi_tiet[0]
 
 
 @pytest.mark.skipif(not _co_ruff(), reason="chưa cài ruff (requirements-dev.txt)")

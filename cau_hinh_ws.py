@@ -132,18 +132,20 @@ def cac_cap_nhan_trung(labels: dict) -> list:
     return ra
 
 
-def _khoa_cap_trung(labels: dict) -> set:
-    """{(ngôn ngữ, a, b, nhãn casefold)} — để so một cặp trùng với cặp trùng ĐÃ CÓ."""
-    ra = set()
+def _cap_trung_day_du(labels: dict) -> list:
+    """[(ngôn ngữ, a, b, nhãn)] — MỌI cặp danh từ cùng nhãn (a đứng trước b trong DANH_TU), vi và
+    en riêng. Khác `cac_cap_nhan_trung` (mỗi danh từ chỉ ghép với người giữ nhãn ĐẦU TIÊN): ba danh
+    từ cùng nhãn cho ba cặp. Dùng để so với cấu hình cũ khi lưu (T1b)."""
+    ra = []
     for ngon in ("vi", "en"):
-        thay: dict = {}
-        for dt in DANH_TU:
-            khoa = str((labels.get(dt) or {}).get(ngon) or "").strip().casefold()
-            if not khoa:
+        for i, a in enumerate(DANH_TU):
+            na = str((labels.get(a) or {}).get(ngon) or "").strip()
+            if not na:
                 continue
-            if khoa in thay:
-                ra.add((ngon, thay[khoa], dt, khoa))
-            thay.setdefault(khoa, dt)
+            for b in DANH_TU[i + 1:]:
+                nb = str((labels.get(b) or {}).get(ngon) or "").strip()
+                if nb and nb.casefold() == na.casefold():
+                    ra.append((ngon, a, b, nb))
     return ra
 
 
@@ -158,7 +160,7 @@ def _ghi_ro_wharton(cfg) -> bool:
         and "wharton" in cfg["rules"]
 
 
-def _chuan_hoa(cfg, kiem_trung: bool = True, cho_phep_trung_nhu: dict | None = None) -> dict:
+def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
     """Trộn `cfg` lên mặc định, kiểm, và trả bản ĐẦY ĐỦ đã chuẩn hoá.
 
     Ném ValueError với câu nói rõ trường nào sai. Không sửa `cfg` của người gọi.
@@ -210,17 +212,9 @@ def _chuan_hoa(cfg, kiem_trung: bool = True, cho_phep_trung_nhu: dict | None = N
         kq["labels"][dt] = {"vi": vi, "en": en or vi}
     # Hai danh từ cùng nhãn làm Sổ nhập đọc nhầm cột (A14). Chỉ chặn khi GHI / kiểm cấu hình mới;
     # cấu hình ĐÃ LƯU từ trước mà trùng vẫn đọc được (`doc_cau_hinh` truyền kiem_trung=False).
-    # Cặp trùng Y HỆT cấu hình `cho_phep_trung_nhu` (cấu hình đang lưu / nguồn nhân bản) thì để
-    # qua: người dùng không đổi nhãn, chỉ đổi tên workspace hay nhân bản. Cặp MỚI hoặc bị đổi
-    # thì vẫn từ chối.
     if kiem_trung:
-        cu = _khoa_cap_trung(cho_phep_trung_nhu["labels"]) if (
-            isinstance(cho_phep_trung_nhu, dict) and isinstance(
-                cho_phep_trung_nhu.get("labels"), dict)) else set()
-        moi = _khoa_cap_trung(kq["labels"])
-        if moi - cu:
-            trung = [t for t in cac_cap_nhan_trung(kq["labels"])
-                     if any((n, t[0], t[1], t[2].casefold()) in moi - cu for n in ("vi", "en"))]
+        trung = cac_cap_nhan_trung(kq["labels"])
+        if trung:
             raise NhanTrung(*trung[0])
 
     # --- luật ---
@@ -299,13 +293,14 @@ def tron_len(da_luu: dict, moi: dict) -> dict:
     return kq
 
 
-def chuan_hoa(cfg: dict, cho_phep_trung_nhu: dict | None = None) -> dict:
+def chuan_hoa(cfg: dict, kiem_trung: bool = True) -> dict:
     """Kiểm `cfg` (có thể thiếu khoá) và trả bản đầy đủ đã chuẩn hoá — không ghi gì.
 
     Cho nơi khác cần biết một cấu hình có hợp lệ không TRƯỚC khi làm việc tốn
     kém (vd dựng thư mục workspace). Ném ValueError như `ghi_cau_hinh`.
+    `kiem_trung=False`: bỏ riêng phép kiểm nhãn trùng (nhân bản workspace cũ, T1b).
     """
-    return _chuan_hoa(cfg, cho_phep_trung_nhu=cho_phep_trung_nhu)
+    return _chuan_hoa(cfg, kiem_trung=kiem_trung)
 
 
 def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
@@ -348,19 +343,30 @@ def doc_cau_hinh(db_path: str, nghiem: bool = False) -> dict:
         return mac_dinh
 
 
-def ghi_cau_hinh(db_path: str, cfg: dict, cho_phep_trung_nhu: dict | None = None) -> dict:
+def ghi_cau_hinh(db_path: str, cfg: dict, nhan_goc: dict | None = None) -> dict:
     """Kiểm rồi ghi cấu hình. Trả về bản đầy đủ đã chuẩn hoá và đã ghi.
 
     `cfg` có thể thiếu khoá (trộn lên mặc định). Ghi BẢN ĐẦY ĐỦ chứ không ghi
     phần thiếu: luật là thứ làm ra kết quả đã công bố, nên đổi mặc định trong
     mã sau này không được lặng lẽ đổi luật của một workspace đã tạo.
 
+    `nhan_goc`: nhãn (`labels`) dùng làm mốc so cặp trùng thay cho nhãn đang lưu (nhân bản workspace
+    cũ). None = so với nhãn đang lưu ở `db_path`.
+
     Raises:
         ValueError: `cfg` sai — chưa ghi gì.
     """
-    # Nhãn trùng: chỉ cặp trùng đã có trong cấu hình đang lưu (hoặc `cho_phep_trung_nhu`) được giữ.
-    day_du = _chuan_hoa(cfg, cho_phep_trung_nhu=(
-        cho_phep_trung_nhu if cho_phep_trung_nhu is not None else doc_cau_hinh(db_path)))
+    day_du = _chuan_hoa(cfg, kiem_trung=False)
+    # T1b: chỉ chặn cặp danh từ trùng nhãn MỚI so với cấu hình đang lưu. Workspace cũ đã trùng
+    # từ trước vẫn đổi tên / đổi luật được; sửa nhãn cho hết trùng thì đương nhiên qua.
+    goc = nhan_goc if nhan_goc is not None else doc_cau_hinh(db_path)["labels"]
+    # Khoá gồm cả nhãn (casefold): đổi một cặp trùng sang nhãn khác mà vẫn trùng là cặp MỚI (C1 trên main).
+    da_co = {(ngon, a, b, n.casefold()) for ngon, a, b, n in _cap_trung_day_du(goc)}
+    moi = [x for x in _cap_trung_day_du(day_du["labels"])
+           if (x[0], x[1], x[2], x[3].casefold()) not in da_co]
+    if moi:
+        moi.sort(key=lambda x: (DANH_TU.index(x[1]), DANH_TU.index(x[2]), x[0] != "vi"))
+        raise NhanTrung(moi[0][1], moi[0][2], moi[0][3])
     conn = connect_db(db_path)
     try:
         # Tự dựng bảng: workspace dựng từ CSDL cũ chưa qua init_db vẫn ghi được.

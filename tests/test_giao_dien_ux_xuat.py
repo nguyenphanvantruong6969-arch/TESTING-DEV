@@ -118,7 +118,7 @@ def test_1_xuat_em_dang_mo_o_the_03_va_5_mo_thu_muc(trang):
 
 def test_2_3_chon_ca_em_khong_duoc_xep_va_xuat_tu_muc_xuat(trang):
     page, api, loi, mo = trang
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#resultsTableBody .chon-hs")
     hien = lambda: set(page.eval_on_selector_all(
         "#resultsTableBody .chon-hs", "e => e.map(x => x.dataset.studentId)"))
@@ -182,7 +182,7 @@ def test_4_the_04_tieu_de_va_dem_danh_dau(trang):
 def test_6_dai_ket_qua_cu_co_nut_toi_cho_chay_lai(trang):
     page, api, loi, mo = trang
     api.submit_club_scores("clb_a", [{"student_id": "HS06", "score": 10}])
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#ketQuaCuBanner", state="visible")
     page.click("#btnDiToiChay")
     page.wait_for_selector("#view-pipeline.is-active")
@@ -213,7 +213,7 @@ def test_7_thay_doi_chua_luu_khong_bi_mat_im_lang(trang):
     assert "HS01" in page.text_content("#currentStudentLabel")
     # Bấm sang THẺ khác ngay sau đó KHÔNG được tính là xác nhận: xác nhận
     # phải là bấm lại đúng chỗ vừa bấm.
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_timeout(300)
     assert page.is_visible("#view-fallback")
     assert "HS01" in page.text_content("#currentStudentLabel")
@@ -235,8 +235,8 @@ def test_7_thay_doi_chua_luu_khong_bi_mat_im_lang(trang):
     page.locator('#rankingSourceGrid .option-row[data-club-id="clb_c"]').click()
     page.click("#btnSubmitPreferences")
     page.wait_for_function("() => document.getElementById('chuaLuuNv').hidden")
-    mo_the(page, "results")
-    page.wait_for_selector("#view-results.is-active")
+    mo_the(page, "others")
+    page.wait_for_selector("#view-others.is-active")
 
     # Xuất em đang có thay đổi chưa lưu -> nhắc lưu trước, không xuất.
     mo_the(page, "fallback")
@@ -250,7 +250,7 @@ def test_7_thay_doi_chua_luu_khong_bi_mat_im_lang(trang):
 
 def test_tieng_anh_du_nhan_moi(trang):
     page, api, loi, mo = trang
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#resultsTableBody .chon-hs")
     page.click("#btnLangToggle")
     page.wait_for_function(
@@ -266,7 +266,7 @@ def test_xoa_du_lieu_thi_tap_hoc_sinh_da_chon_duoc_don(trang):
     em đã bị xoá, nên lần xuất hồ sơ sau đó hỏng CẢ LÔ (`student_not_found`).
     Đường thật: chọn em -> Xoá toàn bộ học sinh ở thẻ 04 -> quay lại xuất."""
     page, api, loi, mo = trang
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#resultsTableBody .chon-hs")
     page.locator('#resultsTableBody .chon-hs[data-student-id="HS01"]').first.check()
     assert "1 học sinh" in page.text_content("#xuatHocSinhDem")
@@ -284,7 +284,7 @@ def test_xoa_du_lieu_thi_tap_hoc_sinh_da_chon_duoc_don(trang):
     api.create_student_if_missing("HS09", "Em mới")
     api.submit_preferences("HS09", ["clb_a"])
     api.run_pipeline(42)
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#resultsTableBody .chon-hs")
     assert page.text_content("#xuatHocSinhDem") == "(chưa chọn học sinh nào)"
     assert page.is_disabled("#xuatHocSinh") and page.is_disabled("#btnXuatHsDaChon")
@@ -301,7 +301,7 @@ def test_em_da_chon_bien_mat_thi_bo_khoi_tap_va_xuat_lai_duoc(trang):
     """Lưới an toàn: em biến mất bằng đường khác (không qua nút của giao diện).
     Lần xuất đầu nói rõ em nào đã bị bỏ; lần sau xuất được các em còn lại."""
     page, api, loi, mo = trang
-    mo_the(page, "results")
+    mo_the(page, "others")
     page.wait_for_selector("#resultsTableBody .chon-hs")
     page.locator('#resultsTableBody .chon-hs[data-student-id="HS01"]').first.check()
     page.locator('#resultsTableBody .chon-hs[data-student-id="HS02"]').first.check()

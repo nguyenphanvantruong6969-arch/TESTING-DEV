@@ -15,7 +15,7 @@ không còn tên cột tiếng Anh, không phải nhớ thứ tự nạp.
 | Cách | Khi nào |
 |---|---|
 | Bấm **Tải sổ nhập mẫu** ở màn hình **01 · Vận hành** | Cách nên dùng. Phần mềm đã có CLB thì sổ **điền sẵn** danh sách CLB, chỉ còn điền học sinh |
-| Mở `mau_csv/SO_NHAP_CLB.xlsx` | Sổ trống |
+| Mở `mau_csv/SO_NHAP_CLB.xlsx` | **Sổ mẫu chính**: sổ trống, giống hệt sổ phần mềm tạo ra (có cả cột **Lớp** sau **Họ tên**) |
 | Mở `mau_csv/vi_du_day_du/SO_NHAP_CLB_vi_du.xlsx` | Muốn xem một sổ đã điền đầy đủ (3 buổi, 9 CLB, 24 học sinh) |
 | Chạy skill `xu-li-raw-forms` trên kết quả Google Forms | Học sinh đăng ký qua biểu mẫu: skill ra thẳng sổ này |
 
@@ -62,7 +62,7 @@ xuống**, em thích nhất đứng trước. Không cần điền kín.
 | Ô Điểm | Nghĩa |
 |---|---|
 | Một số (`8,5` hoặc `8.5`) | Em đã thi CLB này, được chừng ấy điểm |
-| Chữ `thi` | Em đã thi nhưng chưa có điểm, sẽ chấm sau ở màn hình **05 · Chấm điểm** |
+| Chữ `thi` | Em đã thi nhưng chưa có điểm, sẽ chấm sau ở màn hình **06 · Nhập điểm** |
 | Trống | Em không thi CLB này |
 
 CLB không em nào có điểm là CLB **không tổ chức thi**.
@@ -159,13 +159,13 @@ sổ đó.
 
 Học sinh và CLB **không có** trong sổ thì không bị xoá; CLB như vậy được báo
 trước khi nạp (thường là CLB vừa đổi tên mà quên giữ Mã CLB). Muốn làm lại từ
-đầu: màn hình **04 · Quản lý** → Xoá dữ liệu.
+đầu: màn hình **05 · Quản lý** → Xoá dữ liệu.
 
 ---
 
 ## Lấy lại sổ từ phần mềm
 
-Màn hình **02 · Kết quả** → Xuất → **Dữ liệu đầu vào hiện tại** ghi ra một sổ
+Màn hình **03 · Dữ liệu khác** → Xuất → **Dữ liệu đầu vào hiện tại** ghi ra một sổ
 nhập đúng dữ liệu đang có, kể cả mọi chỗ sửa tay. Kéo sổ đó vào một máy khác là
 dựng lại y nguyên.
 

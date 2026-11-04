@@ -46,6 +46,7 @@ GOI = {
         (os.path.join(SKILLS, "xu-li-raw-forms", "scripts", "xu_li_raw.py"), "scripts/xu_li_raw.py"),
         (SDL, "scripts/sinh_du_lieu.py"),
         *SO_NHAP,
+        (os.path.join(GOC, "lop_hoc_sinh.py"), "scripts/lop_hoc_sinh.py"),   # chuan_hoa_lop (T4-K1)
         (os.path.join(MFT, "DINH_DANG_RAW.md"), "references/DINH_DANG_RAW.md"),
     ],
 }

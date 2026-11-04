@@ -178,14 +178,14 @@ def test_match_results_giong_het_khi_co_va_khong_co_lop(api_factory):
 
 
 def test_loi_phan_bo_khong_doc_class_id():
-    """Trong lõi chỉ được nhắc `class_id` ở schema, di_tru_schema và chuan_hoa_lop."""
+    """Trong lõi chỉ được nhắc `class_id` ở schema và di_tru_schema (chuan_hoa_lop đã sang lop_hoc_sinh.py, T4-K1)."""
     import re
     nguon = open(os.path.join(GOC, "rbda_priority_pipeline.py"), encoding="utf-8").read()
     dong = [i for i, d in enumerate(nguon.splitlines(), 1) if "class_id" in d]
     assert dong, "phải còn ở schema"
-    # mỗi dòng nhắc phải nằm trong DEFAULT_SCHEMA, di_tru_schema hoặc chuan_hoa_lop
+    # mỗi dòng nhắc phải nằm trong DEFAULT_SCHEMA hoặc di_tru_schema
     vung = []
-    for ten in ("di_tru_schema", "chuan_hoa_lop"):
+    for ten in ("di_tru_schema",):
         m = re.search(r"^def %s\(.*?(?=^\S)" % ten, nguon, re.S | re.M)
         a = nguon[:m.start()].count("\n") + 1
         vung.append((a, a + m.group(0).count("\n")))

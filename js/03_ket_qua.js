@@ -1,4 +1,5 @@
-/* js/03_ket_qua.js — Thẻ 02 — Kết quả: các bảng, thu gọn mục, xuất tệp.
+/* js/03_ket_qua.js — Thẻ 03 — Dữ liệu khác (phần còn lại của thẻ Kết quả cũ): các bảng, thu gọn mục,
+   xuất tệp. Thẻ 02 "Kết quả" (chỉ xem) nằm ở js/09_the_xem.js.
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
    THƯỜNG (không phải ES module) nạp theo đúng thứ tự trong index.html và
@@ -8,7 +9,7 @@
 "use strict";
 
 /* ------------------------------------------------------------------ *
- * 4. TAB 2 — KẾT QUẢ
+ * 4. TAB 3 — DỮ LIỆU KHÁC (view-others; hàm vẫn tên loadResultsTab)
  * ------------------------------------------------------------------ */
 
 function loadResultsTab() {
@@ -17,7 +18,6 @@ function loadResultsTab() {
   loadClubFillStats();
   loadMatchResults(el("resultsSearch") ? el("resultsSearch").value : "");
   loadDoPhu();
-  loadThoiKhoaBieu(el("tkbSearch") ? el("tkbSearch").value : "");
   loadSoBocTham(el("thamSearch") ? el("thamSearch").value : "");
   loadPhanBoNguyenVong();
   loadEmChuaCoCho();
@@ -48,7 +48,7 @@ function loadResultsTab() {
       lại trong reapplyDynamicTextForLangChange(). */
 
 const MUC_KET_QUA = ["fillPanel", "clbPanel", "duTruPanel", "doPhuPanel",
-                     "nvPanel", "chuaCoChoPanel", "tkbPanel", "thamPanel",
+                     "nvPanel", "chuaCoChoPanel", "thamPanel",
                      "dsXepPanel"];
 
 /* Lần đầu mở: TẤT CẢ các mục đều đóng, chỉ hiện tiêu đề kèm con số.
@@ -965,7 +965,7 @@ function loadMatchResults(search) {
     /* Cột "Buổi" chỉ có nghĩa khi trường dùng nhiều buổi. Một buổi mà
        vẫn hiện một cột toàn "Chưa chia buổi" là thêm việc đọc cho người
        dùng mà không thêm thông tin nào. */
-    document.querySelectorAll("#view-results .cot-buoi").forEach((o) => {
+    document.querySelectorAll("#view-others .cot-buoi").forEach((o) => {
       o.hidden = !nhieuBuoi;
     });
 
@@ -1021,12 +1021,6 @@ function initResultsHandlers() {
     "input",
     debounce((ev) => loadMatchResults(ev.target.value), 250)
   );
-  if (el("tkbSearch")) {
-    el("tkbSearch").addEventListener(
-      "input",
-      debounce((ev) => loadThoiKhoaBieu(ev.target.value), 250)
-    );
-  }
   if (el("btnChonTatCaBuoi")) {
     el("btnChonTatCaBuoi").addEventListener("click", () => {
       buoiDangChon = new Set(dsBuoiCoThe);
@@ -1223,7 +1217,7 @@ function chayXuat(dsMuc, oPhanHoi) {
       if (cu) dong.push(t("xuat_kq_cu"));
       veKetQuaXuat(o, dong, coLoi, duongMo);
       showToast(dong[0] || "", coLoi ? "error" : "success");
-      if (currentTabName() === "results") veXuatPanel();
+      if (currentTabName() === "others") veXuatPanel();
     });
 }
 

@@ -44,6 +44,13 @@ Có **tất cả** các phiếu, kể cả phiếu bị bỏ. Phiếu bị bỏ 
 So khớp đáp án: bỏ khoảng trắng hai đầu, gộp khoảng trắng liên tiếp, không phân
 biệt hoa thường.
 
+**Cột tuỳ chọn thứ 20, `lop` (T4-K1).** Mặc định `RAW_PHIEU` chỉ có 19 cột trên (đúng `COT_RAW`).
+Khi chạy `chamTheoCLB(true)` (hoặc hàm `chamTheoCLBCoLop`), hàm thêm cột `lop` **ở cuối**, lấy từ tab
+`hoc_sinh` (cột `ma_hs`, `lop`) của bảng tính theo mã học sinh của dòng; mã không có trong tab thì để
+trống (khớp sau khi cắt khoảng trắng và IN HOA ở cả hai phía; cột `ma_hs` của tab nên định dạng văn bản `@`, vì "001" lưu thành số 1 thì không khớp; số mã không khớp được báo ở trang Cảnh báo và Nhật ký). Biểu mẫu **không** hỏi lớp (DEC-2). Cột này nằm ngoài `COT_RAW`, nên thiếu nó thì skill chạy như cũ.
+Có nó thì skill ghi vào cột Lớp của Sổ nhập (lấy từ **phiếu giữ**, chuẩn hoá bằng `chuan_hoa_lop`) và
+ghi vào `BAO_CAO_BAT_THUONG.md` nếu các phiếu của cùng một mã ghi lớp khác nhau.
+
 ## 2. Loại câu và cách ghi câu trả lời
 
 | `loai_cau` | Câu hỏi | Số dòng mỗi phiếu | `tra_loi` |

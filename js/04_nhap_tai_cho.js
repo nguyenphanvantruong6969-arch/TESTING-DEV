@@ -1,4 +1,4 @@
-/* js/04_nhap_tai_cho.js — Thẻ 03 — Nhập tại chỗ (kiosk): chọn học sinh, tick thi, xếp nguyện vọng.
+/* js/04_nhap_tai_cho.js — Thẻ 04 — Nhập tại chỗ (kiosk): chọn học sinh, tick thi, xếp nguyện vọng.
 
    Một phần của giao diện chính, tách từ app.js cũ. Các tệp js/ là SCRIPT
    THƯỜNG (không phải ES module) nạp theo đúng thứ tự trong index.html và

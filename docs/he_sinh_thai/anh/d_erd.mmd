@@ -1,0 +1,44 @@
+erDiagram
+  RAW ||..o| PHIEU : "đối soát số dòng"
+  HOC_SINH |o--o{ PHIEU : "nộp"
+  PHIEU |o--o{ NHAT_KY : "được ghi"
+  RAW {
+    datetime thoi_gian
+    string student_id "mã học sinh gõ"
+    string email "tuỳ chọn"
+    string cac_cot_cau_hoi "một cột mỗi câu"
+  }
+  PHIEU {
+    string ma_hs FK "tuỳ chọn, chuẩn hoá"
+    datetime thoi_gian_nop "ISO 8601, xếp hạng"
+    string trang_thai
+    string ly_do
+    int ban_giu
+    string nguoi_duyet
+    datetime thoi_gian_duyet
+    string raw_key PK "ID phản hồi, cột cuối"
+  }
+  HOC_SINH {
+    string ma_hs PK
+    string ho_ten
+    string lop
+  }
+  CLB {
+    string club_id PK "bảng tra, không khoá ngoại"
+    string ten
+    string buoi
+    int chi_tieu
+  }
+  NHAT_KY {
+    string log_id PK
+    datetime thoi_gian
+    string nguoi
+    string hanh_dong
+    string doi_tuong "tuỳ chọn, raw_key hoặc ky"
+    string ma_hs "tuỳ chọn"
+    string ly_do
+  }
+  CAU_HINH {
+    string khoa PK "bảng tra, không khoá ngoại"
+    string gia_tri
+  }
