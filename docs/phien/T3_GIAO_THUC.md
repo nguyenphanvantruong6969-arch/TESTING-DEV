@@ -11,13 +11,18 @@
 | tester | Opus for L0, Sonnet for L1-L3 | reviews ONE lot diff, runs related tests, screenshots, writes verdict | edits product code (only screenshots + its handoff file) |
 
 ## Session start (every child)
-1. Write `.claude/phien_vai.json` (gitignored): `{"vai":"impl"|"tester","coord_id":"<coord id from brief>","nguong":400000}`.
+1. Write `.claude/phien_vai.json` (gitignored): `{"vai":"impl"|"tester","coord_id":"<coord id from brief>","nguong":200000}`.
    Coord writes `{"vai":"coord","nguong":700000}`.
 2. Read `CLAUDE.md`, this file, the branch file, and your own `docs/phien/claude__gallant-mendel-uki8j2__<vai>.md` if it exists.
 3. Test env: `python3 -m venv .venv && .venv/bin/pip install -q -r requirements-dev.txt`; UI tests need
    `.venv/bin/pip install -q playwright==1.63.0` and `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`.
 
 ## Token rules (all roles)
+- Rules of 2026-11-04 (Truong): child threshold 200k; ONE FRESH impl session per lot (old impl writes its file and is
+  archived after its lot passes); coordinator writes its branch file only at a handoff or at the end of a lot.
+- Tests always quiet: `pytest -q -p no:cacheprovider --no-header -rN --tb=line <files> 2>&1 | tail -3`; on failure re-run
+  only the failing node ids with `--tb=short | tail -40`. Never paste full pytest output into the context.
+- Coordinator ignores CI events whose head_sha is not the branch head (one-line note at most, no log reads).
 - Find T3 findings by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`. Never read the whole 68 KB study.
 - Locate code by function name with grep; read only the needed range.
 - Run only related tests (`-k`, single files). Full suite = CI only.
@@ -69,7 +74,7 @@ screenshots: docs/nghien_cuu/anh_t3/sau_L<n>/<files>
 HANDOFF <vai> <file> <sha>
 ```
 
-## Child handoff (at 400k, triggered by the Stop hook)
+## Child handoff (at 200k, triggered by the Stop hook)
 Child: write its `__<vai>.md` file, push, `send_message` coord `HANDOFF ...`, stop.
 Coord on receipt: `create_session` (same repo, `source_revision` = branch, same model as the role, `permission_mode` auto)
 with prompt: `You are <ROLE> for T3 on branch claude/gallant-mendel-uki8j2. Coordinator id: <coord id>. Read CLAUDE.md,

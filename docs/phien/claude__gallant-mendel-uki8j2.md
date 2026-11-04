@@ -14,7 +14,7 @@ Algorithm, `match_results`, `run_history`, STB, CSV column contract: untouched.
 - Scope L0->L3. One branch; one open PR at a time; stacking on an unmerged PR allowed; Truong merges.
 - Approval gate: end of each lot (PR + tester report + screenshots). CI red / review comments: impl fixes, max 3 rounds.
 - Blocked item (rule 7): skip, list under "Needs Truong", continue. Push notify: PR ready, every session handoff.
-- Thresholds: children 400k, coordinator 700k. Tester model: Opus for L0, Sonnet for L1-L3. Impl: Sonnet.
+- Thresholds: children 200k (changed 2026-11-04), coordinator 700k. Fresh impl per lot; quiet tests; coord file only at handoff/lot end. Tester model: Opus for L0, Sonnet for L1-L3. Impl: Sonnet.
 - Quality gate: related tests + soat-ma + tester diff review + screenshots; full suite only on CI.
   L0 additionally proves invariant 1 (3 datasets x 20 seeds identical match_results).
 - B1: fix both layers. B3: change the error text only (no toggle).
