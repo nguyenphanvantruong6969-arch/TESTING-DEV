@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-04 — PR #8: sửa CI sau T4-K1 (Windows báo 4 lỗi ở 5a88060)
+
+- `test_a14_sua_sau_soat.py::test_a5_...` (DROP COLUMN): đã khỏi khi gộp main (lấy bản B9 của main).
+- **`docs/ke_hoach/tham_khao/_chung.py::nap_rb`:** từ T4-K1 `rbda_priority_pipeline` import `lop_hoc_sinh` theo tên; `_ten_can_nap` nạp `lop_hoc_sinh` (từ cùng thư mục hoặc cùng tệp .exe) trước mô-đun chính khi có, bản cũ không có thì bỏ như `nhan_ws`. `tests/test_tham_khao_verify_nhanh.py` chép thêm `lop_hoc_sinh.py` vào thư mục thử.
+- `tests/test_mau_forms_thi_clb.py::test_raw_google_khop_tai_lieu_dinh_dang`: kỳ vọng dòng ghi RAW_PHIEU theo `.gs` mới (cột `lop` tuỳ chọn, T4-K1).
+
 ## 2026-11-03 — Z-SOAT-2 (ngoài sổ, Truong duyệt 03/11/2026): `soat-ma` tìm ruff trên PATH
 
 - **`.claude/skills/soat-ma/scripts/kiem_nhanh.py::kiem_ruff`:** trước chỉ chạy `python -m ruff`, nên máy cài ruff bằng pipx / uv (máy cloud) luôn báo KHÔNG ĐẠT "chưa cài ruff" dù mã sạch. Nay khi Python không có mô-đun ruff thì thử `ruff` trên PATH (`shutil.which`); không có ở đâu cả mới báo chưa cài. Máy đã có mô-đun ruff: không đổi.
