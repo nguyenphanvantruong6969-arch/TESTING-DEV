@@ -13,12 +13,25 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - [x] L1 implemented, pushed (`0fd4981`), tester L1 reviewing
 - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
 
-## Current state
-- L0 and L1 are pushed. Only open question: tester L1 verdict (a `FIX L1` would come back to this session, otherwise archived).
-- L1 not done on purpose (belongs to later lots): T3-02 merged-warning rows (5.3 rows "nhãn câu cảnh báo" and "câu chặn nghiêm trọng"),
-  `nav_others`/`others_title`, `nav_admin`/`admin_title`, `ql_tab_dc`, `kq_sx_ngay`, `kq_sap_nhan`, T3-27 wording.
-- Deliberate deviations from the study text (tests force them): vi "tệp nén" / en "archive file" (no "zip" allowed in displayed text),
-  en "Draw code" (no "seed"), `pipeline_desc`/`import_hint` use lowercase "sổ nhập" (company-vocabulary test forbids literal "CLB").
+## Current state (L2 in progress, impl session 2)
+- L2 DONE + committed + pushed: T3-14 (nhãn buổi qua i18n `buoi_ma_*`, class `cot-buoi-tieu-de`), T3-07 (bỏ hai ô Từ/đến), T3-02 (cảnh báo nhập gom
+  theo mã >5 dòng + nút "Xem 5 dòng đầu"; dòng chặn có nút `.health-di-toi` tới Điểm quyết tâm), T3-03 (bug thật: `.import-actions{display:flex}`
+  đè `hidden`; đã sửa), T3-04 (một nút `#btnValidate` trong khung Cảnh báo, "Kiểm tra lại dữ liệu"; `#btnHealthRecheck` bỏ),
+  T3-06 (`#runXong` dòng kết quả + "Chi tiết"/"Mở thư mục kết quả"; bỏ toast xanh khi chạy xong, tests đợi `#runXong:not([hidden])`),
+  T3-10 (`#view-pipeline[data-trang-thai]` trong|san_sang|xong; chỉ `#btnRun` là nút chính khi san_sang), T3-12 (chân thanh bên: `dbStatusLine`
+  chỉ hiện khi mất kết nối; `lastRunLine`/`cheDoHienThi` giữ nhưng `hidden` làm mốc đồng bộ; nút "Hoạt ảnh" trong menu ⋯ `#menuThanhBen`),
+  T3-15 (dòng workspace: Mở + menu ⋯, Xoá cuối đỏ, bỏ cột Loại khi một loại, ẩn mã thư mục).
+- Reusable component: `<details class="menu-khac"><summary>⋯</summary><div class="menu-khac-hop"><button class="menu-khac-muc">` + closer in js/00_nen.js
+  (button `data-giu-menu` keeps the menu open, used for two-step Xoá). Use it for T3-34. NOTE: Esc also closes the workspace overlay.
+- Tests added: tests/test_t3_l2_buoi.py, tests/test_giao_dien_t3_l2_van_hanh.py (+ cases appended to test_ws_giao_dien.py). Snapshot helper: scratchpad
+  `them_chu.py key vi en ...` appends intentional new default text to tests/du_lieu_ws/chu_ui_doi_co_y_t3.json; removed keys -> KHOA_UI_DA_BO in test_ws_nhan.py.
+- TODO (not started): T3-20, T3-21, T3-23, T3-24, T3-25, T3-28, T3-29, T3-32, T3-33, T3-34, T3-35; then soat-ma, CHANGELOG, TIEN_DO row T3-L2,
+  CLAUDE_CHI_TIET `tests/` row (+2 files: now 190 files; recount cases with `pytest --collect-only -q`), pull --rebase, push, IMPL DONE message.
+- Plans decided for tab 03 (see 03_ket_qua.js): T3-24 keep 3 KPI tiles in order da_xep, chua_co_cho, cho_trong; NV1 numbers already live in `#nvTieuDiem`
+  (nvPanel) -> delete the nv1 tile; put "Suất dự trữ bỏ phí {thua}/{tong}" in a new line inside duTruPanel, delete the duTru tile; update
+  tests/test_giao_dien_tom_tat_ket_qua.py (uses `_o_kpi` keys nvPanel/duTruPanel). T3-20: dsXepPanel is already collapsed at the bottom; rename its
+  title to "Chi tiết để kiểm tra" (no details wrapper: too many tests click `#dsXepPanel .panel-toggle`). T3-21: drop fillPanel, add a bar column + keep
+  `#fillSapXep` select in clbPanel head; many fill-row tests (test_giao_dien_tom_tat_ket_qua, bieu_do, lap_day) need rewriting.
 
 ## Test environment (read before running anything)
 - `python3 -m venv .venv && pip install` HANGS on the proxy here. Use the uv tool pytest: `pytest` (= /root/.local/bin/pytest,
