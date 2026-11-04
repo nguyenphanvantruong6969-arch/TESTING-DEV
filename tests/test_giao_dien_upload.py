@@ -87,8 +87,9 @@ def test_tha_so_hien_tom_tat_roi_nhap_vao_dung_bang(trang, api):
 def test_so_co_loi_liet_ke_tung_loi_va_khoa_nut_nhap(trang, api, tmp_path):
     wb = openpyxl.load_workbook(SO_VI_DU)
     # Sheet học sinh có hai hàng tiêu đề (A13.4): dữ liệu bắt đầu từ hàng 3.
-    wb[so_nhap.SHEET_HS]["D3"] = "CLB Không Có"
-    wb[so_nhap.SHEET_HS]["E4"] = "chín"
+    # A14: sổ ví dụ có cột Lớp sau Họ tên nên NV1 ở cột E (điểm ở F), không còn D (E).
+    wb[so_nhap.SHEET_HS]["E3"] = "CLB Không Có"
+    wb[so_nhap.SHEET_HS]["F4"] = "chín"
     hong = tmp_path / "so_loi.xlsx"
     wb.save(hong)
 

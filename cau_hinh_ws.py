@@ -360,8 +360,10 @@ def ghi_cau_hinh(db_path: str, cfg: dict, nhan_goc: dict | None = None) -> dict:
     # T1b: chỉ chặn cặp danh từ trùng nhãn MỚI so với cấu hình đang lưu. Workspace cũ đã trùng
     # từ trước vẫn đổi tên / đổi luật được; sửa nhãn cho hết trùng thì đương nhiên qua.
     goc = nhan_goc if nhan_goc is not None else doc_cau_hinh(db_path)["labels"]
-    da_co = {(ngon, a, b) for ngon, a, b, _ in _cap_trung_day_du(goc)}
-    moi = [x for x in _cap_trung_day_du(day_du["labels"]) if x[:3] not in da_co]
+    # Khoá gồm cả nhãn (casefold): đổi một cặp trùng sang nhãn khác mà vẫn trùng là cặp MỚI (C1 trên main).
+    da_co = {(ngon, a, b, n.casefold()) for ngon, a, b, n in _cap_trung_day_du(goc)}
+    moi = [x for x in _cap_trung_day_du(day_du["labels"])
+           if (x[0], x[1], x[2], x[3].casefold()) not in da_co]
     if moi:
         moi.sort(key=lambda x: (DANH_TU.index(x[1]), DANH_TU.index(x[2]), x[0] != "vi"))
         raise NhanTrung(moi[0][1], moi[0][2], moi[0][3])

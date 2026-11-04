@@ -17,22 +17,19 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 - [x] Invariant tests: match_results identical with/without class; no class_id in core; fingerprint unchanged; run_history untouched
 
 ## Current state
-- DONE (part A): base + CSV/So nhap import + So mau/export co_lop + APIs (list_students_admin, set_student_class,
-  list_classes, create_student_if_missing, submit_test_selection/submit_preferences class_id, get_student_entry_state,
-  get_match_results) + i18n errors + skill + docs/registry/CHANGELOG/TIEN_DO.
-- Coordinator contract: class_id is 3rd optional positional arg; must exist in list_classes else
-  `lop_khong_co_trong_danh_sach`, nothing written. api_bao_cao.py now owned by session B (do not edit).
-- Tests: tests/test_a14_*.py (51+2 cases) green; related (non-UI) run: 2022 pass, 8 old failures all fixed
-  (see CHANGELOG). soat-ma kiem_nhanh 7/7 PASS. UI/browser tests NOT run here (session B).
-- Post-review fixes A1-A6 done (tests/test_a14_sua_sau_soat.py, 26 cases); see CHANGELOG.
-- Open: static samples in mau_csv/ (SO_NHAP_CLB.xlsx etc.) were not regenerated with a Lop column.
+- MERGED via PR #6 (b044c4c, 03/11/2026; head branch claude/a14-giao-dien, which contains this branch up to c3cd884). CI green on Linux + Windows + ruff at 353d1c4.
+- Part A delivered: students.class_id + chuan_hoa_lop + `cohort` noun, CSV/So nhap import, class APIs, post-review fixes A1-A6 and C1/C2 (duplicate labels re-save/clone; static sample workbooks/CSVs with simulated classes via du_lieu_test/them_lop_vao_mau.py).
+- Nothing left on this branch; do not push to it. Doc closing is on branch claude/a14-chot-tai-lieu.
 
 ## Decisions and gotchas
 - Wharton default is ON: allocation tests without determination points need a LOCAL `api` fixture calling tests/_wharton.py::tat_wharton (no autouse).
 - JS mirrors of the noun list (i18n.js nounText, js/075_workspace.js WS_DANH_TU) belong to session B.
 
-## Next steps
-1. Step 2 as in Plan.
+## Next steps (deferred work)
+1. Google Form that asks for the class.
+2. xu-li-raw-forms carries the Lop column through.
+3. Skill sinh-du-lieu-clb: simulated-class option.
+4. Two tests still use `DROP COLUMN` (tests/test_a14_sua_sau_soat.py `_csdl_cu_co_du_lieu`; tests/test_a14_tu_vung_cohort.py): risky on old SQLite; build the old schema with CREATE TABLE instead (as done for test A5 in 353d1c4).
 
 ## Files touched
 - rbda_priority_pipeline.py, nhan_ws.py, cau_hinh_ws.py, tests (see git log), skill tao-workspace-tu-raw
@@ -42,4 +39,6 @@ Approved invariant-7 exception (Truong, 02/11/2026): OPTIONAL CSV column `class_
 |---|---|---|---|
 | 2026-11-02 | Sonnet | Step 1 base | |
 | 2026-11-02 | Sonnet | Step 2 import/API/docs, old-test fixes, soat-ma | final |
+| 2026-11-03 | Sonnet | C1 label re-save, C2 sample files with simulated classes | |
 | 2026-11-02 | Sonnet | Cross-review fixes A1-A6 | one commit per item (A2-A4 together) |
+| 2026-11-04 | Sonnet | Closed docs after PR #6 merge | branch claude/a14-chot-tai-lieu |

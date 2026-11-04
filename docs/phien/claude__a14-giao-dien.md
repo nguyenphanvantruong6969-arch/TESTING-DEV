@@ -20,9 +20,9 @@ Algorithm, match_results, run_history untouched.
 - [x] ruff, soat-ma (kiem_nhanh 7/7), CHANGELOG "A14 — phần B", TIEN_DO, HUONG_DAN_SU_DUNG, push (no PR)
 
 ## Current state (overwrite each handoff)
-- Done: export + UI + docs; merged A (latest); two read-only view tabs 06 (club members) and 07 (by class) in js/09_the_xem.js; language switch re-renders class dropdowns; export_theo_lop removes the half-made folder on failure.
-- Tests: new 14 + 7 + 17 green; 435 related old+new green (incl. test_ws_nhan after A added its 4 codes); kiem_nhanh 7/7.
-- Open: nothing known. Screenshots of both tabs are in the session scratchpad (not committed).
+- MERGED via PR #6 (b044c4c, 03/11/2026). CI green on Linux + Windows + ruff at 353d1c4.
+- Delivered: export (sheet "Theo lớp", export_theo_lop) + UI for the class + read-only tabs 06/07 + review fixes B1-B7.
+- Nothing left on this branch; doc closing is on branch claude/a14-chot-tai-lieu.
 
 ## Decisions and gotchas (keep short)
 - Name clash: api_xuat._khoa_lop_xuat (was _khoa_lop_tu_nhien, shadowed A's method on PipelineAPI).
@@ -30,8 +30,11 @@ Algorithm, match_results, run_history untouched.
 - export_theo_lop: absolute existing dir -> "x (2)" (own logic, _duong_xuat would reject an existing dir).
 - tkb_xlsx (Excel only) carries the Lớp column; du["tkb"] (CSV) unchanged.
 
-## Next steps (ordered)
-1. Wait for coordinator review; merge A again only if A pushes more.
+## Next steps (ordered; deferred work)
+1. Google Form that asks for the class.
+2. xu-li-raw-forms carries the Lop column through.
+3. Skill sinh-du-lieu-clb: simulated-class option.
+4. Two tests still use `DROP COLUMN` (tests/test_a14_sua_sau_soat.py `_csdl_cu_co_du_lieu`; tests/test_a14_tu_vung_cohort.py): risky on old SQLite.
 
 ## Files touched
 - api_xuat.py: Theo lớp sheet, export_theo_lop (ket_qua_cu, dọn thư mục dở, cắt tên tệp), cột Lớp
@@ -48,3 +51,4 @@ Algorithm, match_results, run_history untouched.
 | 2026-11-02 | Sonnet | merged A, fixed name clash + filter bug, soat-ma | final report sent |
 | 2026-11-02 | Sonnet | tabs 06/07, lang re-render, export cleanup, tests, soat-ma | final report sent |
 | 2026-11-02 | Sonnet | cross-review fixes B1-B7 (A merged last) | see CHANGELOG |
+| 2026-11-04 | Sonnet | Closed docs after PR #6 merge | by session A, branch claude/a14-chot-tai-lieu |

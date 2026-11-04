@@ -217,9 +217,9 @@ Phần mềm còn nhận nhiều cách viết khác và tự quy về một nhã
 Tệp mẫu: `mau_csv/07_chon_club_thi_nhieu_buoi.csv` · 351 B · 6 dòng dữ liệu
 
 ```csv
-student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2
-HS001,Nguyễn Văn An,,clb_nhiepanh,8.5,clb_robotics,9
-HS002,Trần Thị Bình,khoi_10,clb_nhiepanh,7,,
+student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2
+HS001,Nguyễn Văn An,,11A3,clb_nhiepanh,8.5,clb_robotics,9
+HS002,Trần Thị Bình,khoi_10,10A2,clb_nhiepanh,7,,
 ```
 
 **Cột dự thi không đổi gì** so với trường một buổi — phần mềm biết câu lạc bộ nào
@@ -236,9 +236,9 @@ tuỳ chọn:
 Tệp mẫu: `mau_csv/08_nguyen_vong_nhieu_buoi.csv` · 697 B · 6 dòng dữ liệu (có thêm cột `<buổi>_wp_<số>` = điểm quyết tâm MÔ PHỎNG, xem mục "Điểm quyết tâm")
 
 ```csv
-student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
-HS001,Nguyễn Văn An,,clb_nhiepanh,clb_covua,clb_robotics,clb_khoahoc,clb_bongro,
-HS002,Trần Thị Bình,khoi_10,clb_nhiepanh,,,,clb_lamvuon,clb_bongro
+student_id,name,reserve_group,class_id,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2
+HS001,Nguyễn Văn An,,11A3,clb_nhiepanh,clb_covua,clb_robotics,clb_khoahoc,clb_bongro,
+HS002,Trần Thị Bình,khoi_10,10A2,clb_nhiepanh,,,,clb_lamvuon,clb_bongro
 ```
 
 | Cột | Bắt buộc | Quy tắc |
@@ -989,8 +989,8 @@ Mọi con số dưới đây **đo lại từ tệp thật** khi viết tài li�
 | `04_nguyen_vong_dang_dai.csv` | 397 B | 10 | `student_id,name,club_id,rank` |
 | `05_danh_sach_club.csv` | 239 B | 5 | `club_id,name,capacity,reserve_capacity,reserve_group` |
 | `06_danh_sach_club_nhieu_buoi.csv` | 309 B | 6 | `club_id,name,capacity,reserve_capacity,reserve_group,buoi` |
-| `07_chon_club_thi_nhieu_buoi.csv` | 351 B | 6 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2` |
-| `08_nguyen_vong_nhieu_buoi.csv` | 697 B | 6 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
+| `07_chon_club_thi_nhieu_buoi.csv` | 390 B | 6 | `student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2` |
+| `08_nguyen_vong_nhieu_buoi.csv` | 736 B | 6 | `student_id,name,reserve_group,class_id,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
 
 Giao diện **không** nhận các tệp trên nữa: nó chỉ nhận **Sổ nhập CLB**, một tệp
 Excel hai trang (định nghĩa: `so_nhap.py`, hướng dẫn: `mau_csv/HUONG_DAN_SO_NHAP.md`).
@@ -1023,8 +1023,8 @@ bộ · 45 chỗ · 24 học sinh · 33 ô điểm.** Suất dự trữ: 5 chỗ
 | Tệp | Kích thước | Dòng | Header |
 |---|---|---|---|
 | `01_danh_sach_CLB.csv` | 434 B | 9 | `club_id,name,capacity,reserve_capacity,reserve_group,buoi` |
-| `02_chon_CLB_muon_thi.csv` | 1 439 B | 24 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2,test_club_3,score_3` |
-| `03_xep_hang_nguyen_vong.csv` | 2 548 B | 24 | `student_id,name,reserve_group,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
+| `02_chon_CLB_muon_thi.csv` | 1 568 B | 24 | `student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2,test_club_3,score_3` |
+| `03_xep_hang_nguyen_vong.csv` | 2 677 B | 24 | `student_id,name,reserve_group,class_id,thu_2_pref_1,thu_2_pref_2,thu_4_pref_1,thu_4_pref_2,thu_6_pref_1,thu_6_pref_2,thu_2_wp_1,thu_2_wp_2,thu_4_wp_1,thu_4_wp_2,thu_6_wp_1,thu_6_wp_2` |
 
 Buổi: `thu_2` `thu_4` `thu_6`. Điểm ghi bằng **dấu phẩy thập phân trong ngoặc kép**
 (`"9,5"`) — đúng cách Excel bản tiếng Việt lưu.
@@ -1173,8 +1173,8 @@ dùng `random`** — mọi giá trị viết thẳng trong hai bảng `CLB` và 
 | Tệp | Kích thước | Dòng | Header |
 |---|---|---|---|
 | `VIDU_01_danh_sach_CLB.csv` | 195 B | 4 | `club_id,name,capacity,reserve_capacity,reserve_group` |
-| `VIDU_02_chon_CLB_muon_thi.csv` | 619 B | 10 | `student_id,name,reserve_group,test_club_1,score_1,test_club_2,score_2` |
-| `VIDU_03_xep_hang_nguyen_vong.csv` | 585 B | 10 | `student_id,name,reserve_group,pref_1,pref_2,wp_1,wp_2` |
+| `VIDU_02_chon_CLB_muon_thi.csv` | 678 B | 10 | `student_id,name,reserve_group,class_id,test_club_1,score_1,test_club_2,score_2` |
+| `VIDU_03_xep_hang_nguyen_vong.csv` | 644 B | 10 | `student_id,name,reserve_group,class_id,pref_1,pref_2,wp_1,wp_2` |
 
 Có cả bản `.xlsx`: 6 396 B · 6 729 B · 6 486 B.
 

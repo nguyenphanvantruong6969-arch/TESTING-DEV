@@ -238,29 +238,12 @@ def test_a4_ma_loi_moi_co_trong_messages():
 
 # ------------------------------------------------------------------ A5
 
-def _bo_cot(conn, bang, cot):
-    """Dựng lại `bang` thiếu cột `cot`, giữ dữ liệu, KHÔNG dùng `ALTER TABLE ... DROP COLUMN`.
-
-    Đọc schema thật bằng PRAGMA nên tự theo khi bảng thêm cột; chỉ dùng cú pháp có ở mọi bản
-    SQLite (DROP COLUMN cần 3.35 trở lên và từng làm CI báo "incomplete input", xem B9).
-    """
-    cac = [r for r in conn.execute("PRAGMA table_info(%s)" % bang) if r[1] != cot]
-    pk = [r[1] for r in sorted(cac, key=lambda r: r[5]) if r[5]]
-    dinh_nghia = ['"%s" %s' % (r[1], r[2]) for r in cac]
-    if pk:
-        dinh_nghia.append("PRIMARY KEY (%s)" % ", ".join('"%s"' % c for c in pk))
-    ten = ", ".join('"%s"' % r[1] for r in cac)
-    conn.execute("CREATE TABLE _tam_%s (%s)" % (bang, ", ".join(dinh_nghia)))
-    conn.execute("INSERT INTO _tam_%s (%s) SELECT %s FROM %s" % (bang, ten, ten, bang))
-    conn.execute("DROP TABLE %s" % bang)
-    conn.execute("ALTER TABLE _tam_%s RENAME TO %s" % (bang, bang))
-
 def _csdl_cu_co_du_lieu(tmp_path):
     db = str(tmp_path / "cu.db")
     rp.init_db(db)
     conn = sqlite3.connect(db)
     conn.execute("INSERT INTO students (student_id, name) VALUES ('S1', 'An')")
-    _bo_cot(conn, "students", "class_id")
+    conn.execute("ALTER TABLE students DROP COLUMN class_id")
     conn.commit()
     conn.close()
     return db
@@ -291,10 +274,19 @@ def test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien(tmp_path):
     db = str(tmp_path / "cu2.db")
     rp.init_db(db)
     conn = sqlite3.connect(db)
+    # Dựng bảng CŨ bằng CREATE TABLE tường minh, KHÔNG dùng `ALTER TABLE ... DROP COLUMN`: bản
+    # SQLite cũ ở CI viết lại hỏng câu CREATE khi bỏ liên tiếp hai cột đứng cạnh dòng có chú
+    # thích `--` ("incomplete input"). Kết quả giống hệt: students thiếu diem_ca_nhan và
+    # class_id, clubs thiếu buoi; bảng đang rỗng nên bỏ rồi dựng lại không mất gì.
+    conn.execute("PRAGMA foreign_keys = OFF")
+    conn.execute("DROP TABLE students")
+    conn.execute("CREATE TABLE students (student_id TEXT PRIMARY KEY, name TEXT, "
+                 "stb_number INTEGER, reserve_group TEXT)")
+    conn.execute("DROP TABLE clubs")
+    conn.execute("CREATE TABLE clubs (club_id TEXT PRIMARY KEY, name TEXT, "
+                 "capacity INTEGER NOT NULL CHECK (capacity > 0), "
+                 "reserve_capacity INTEGER NOT NULL DEFAULT 0, reserve_group TEXT)")
     conn.execute("INSERT INTO students (student_id, name) VALUES ('S1', 'An')")
-    conn.execute("ALTER TABLE students DROP COLUMN class_id")
-    conn.execute("ALTER TABLE students DROP COLUMN diem_ca_nhan")
-    conn.execute("ALTER TABLE clubs DROP COLUMN buoi")
     conn.commit()
     conn.close()
     da_lam = rp.di_tru_schema(db)
@@ -304,5 +296,79 @@ def test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien(tmp_path):
     cu = [b for b in baks if "buoi" not in [r[1] for r in sqlite3.connect(b).execute(
         "PRAGMA table_info(clubs)")]]
     assert len(cu) == 1                                   # đúng một bản chụp TRƯỚC khi sửa gì
+    chup = sqlite3.connect(cu[0])                         # và bản chụp có DỮ LIỆU, không phải tệp rỗng
+    try:
+        assert chup.execute("SELECT student_id FROM students").fetchall() == [("S1",)]
+    finally:
+        chup.close()
     assert rp.di_tru_schema(db) == []                     # lặp lại: không làm gì, không sao lưu thêm
     assert len(glob.glob(db + ".bak-*")) == len(baks)
+
+
+# ------------------------------------------------------------------ C1 (ghi lại cấu hình trùng đã lưu)
+
+def _ws_trung(tmp_path):
+    """Workspace có cấu hình ĐÃ LƯU với nhãn trùng (group = cohort = "Lớp")."""
+    goc = str(tmp_path / "goc")
+    os.makedirs(goc, exist_ok=True)
+    slug = ws.tao(goc, "Cũ", {})
+    _luu_tho(ws.duong_dan_db(goc, slug), TRUNG)
+    return goc, slug
+
+
+def test_c1_doi_ten_workspace_co_nhan_trung_van_duoc_va_giu_nhan(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    ws.doi_ten(goc, slug, "Tên mới")
+    cfg = ch.doc_cau_hinh(ws.duong_dan_db(goc, slug))
+    assert cfg["name"] == "Tên mới"
+    assert cfg["labels"]["group"]["vi"] == cfg["labels"]["cohort"]["vi"] == "Lớp"
+
+
+def test_c1_api_cap_nhat_phan_khac_khong_dung_nhan_van_duoc(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config({"name": "Đổi tên"}, slug)
+    assert kq["ok"], kq
+    assert kq["data"]["config"]["labels"]["group"]["vi"] == "Lớp"
+
+
+def test_c1_nhan_ban_giu_nguyen_cau_hinh_trung_ca_co_va_khong_kem_du_lieu(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    for kem in (False, True):
+        moi = ws.nhan_ban(goc, slug, "Bản sao %s" % kem, kem)
+        cfg = ch.doc_cau_hinh(ws.duong_dan_db(goc, moi))
+        assert cfg["labels"]["group"]["vi"] == cfg["labels"]["cohort"]["vi"] == "Lớp"
+
+
+def test_c1_van_tu_choi_khi_lan_luu_nay_tao_hoac_doi_cap_trung(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    # tạo cặp trùng MỚI (person ↔ score) trên nền cấu hình đã trùng
+    kq = api.update_workspace_config(
+        {"labels": {"person": {"vi": "Điểm", "en": "Pupil"}}}, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    # ĐỔI cặp trùng sang nhãn khác mà vẫn trùng
+    kq = api.update_workspace_config({"labels": {
+        "group": {"vi": "Phòng", "en": "Dept"}, "cohort": {"vi": "Phòng", "en": "Team"}}}, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    # cấu hình lưu không bị đổi sau hai lần từ chối
+    assert ch.doc_cau_hinh(ws.duong_dan_db(goc, slug))["labels"]["group"]["vi"] == "Lớp"
+
+
+def test_c1_sua_cho_het_trung_thi_luu_duoc(tmp_path):
+    goc, slug = _ws_trung(tmp_path)
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config(
+        {"labels": {"group": {"vi": "Nhóm ưu tiên", "en": "Priority group"}}}, slug)
+    assert kq["ok"], kq
+
+
+def test_c1_cau_hinh_hop_le_dat_nhan_trung_van_bi_tu_choi(tmp_path):
+    goc = str(tmp_path / "goc")
+    os.makedirs(goc)
+    slug = ws.tao(goc, "Sạch", {})
+    api = PipelineAPI(ws.duong_dan_db(goc, slug), thu_muc_goc_ws=goc)
+    kq = api.update_workspace_config(TRUNG, slug)
+    assert not kq["ok"] and kq["errors"][0]["code"] == "nhan_trung_danh_tu"
+    with pytest.raises(ch.NhanTrung):
+        ws.tao(goc, "Mới", TRUNG)

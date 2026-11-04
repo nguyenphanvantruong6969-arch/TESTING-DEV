@@ -14,7 +14,7 @@
 | `i18n_errors.py` → `tao_i18n_js.py` → `i18n_loi.js` | Thông báo lỗi song ngữ, **một nguồn** | `err`, `phan_hoi_ok`, `phan_hoi_loi` |
 | `browser_host.py`, `recovery.py`, `chan_doan.py`, `main.py` | Máy chủ dự phòng 127.0.0.1, phục hồi, log, điểm vào | |
 | `index.html`, `js/00…08_*.js`, `i18n.js`, `style.css` | Giao diện; gọi backend qua `window.pywebview.api.*`, trả `{ok, data, errors}` | |
-| `tests/` | 180 tệp `test_*.py`, 3.319 ca (3.299 ở lần đếm `pytest --collect-only` 03/11/2026 sau T1/T2 vòng sửa 1, cộng 8 ca của T4-K3 và 12 ca của T4-K1; chưa đếm lại) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
+| `tests/` | 181 tệp `test_*.py`, 3.360 ca (`pytest --collect-only`, 04/11/2026, sau khi gộp main vào nhánh claude/epic-knuth-801pkw) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
 | `du_lieu_test/`, `mau_csv/`, `docs/`, `BAN_GIAO.md` | Bộ dữ liệu mô phỏng, script đo, mẫu nhập, tài liệu cơ chế, nhật ký 25 lỗi đã sửa | |
 
 ## 12 ngành đích (mã dùng trong mọi tệp)

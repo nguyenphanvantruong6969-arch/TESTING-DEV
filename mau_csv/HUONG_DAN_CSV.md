@@ -74,6 +74,7 @@ Phần mềm nhận ra dạng rộng khi thấy cột tên bắt đầu bằng `
 | `student_id` | ✅ | Mã học sinh. Là **khoá chính** — phải duy nhất, không đổi giữa hai file. |
 | `name` | Không | Họ tên. Chỉ dùng khi **tạo mới** học sinh; học sinh đã có tên thì không bị ghi đè. |
 | `reserve_group` | Không | **Nhóm dự trữ của học sinh** (vd `chinh_sach`). Xem mục 4. |
+| `class_id` | Không | **Lớp của học sinh** (vd `10A1`), đặt ngay sau `reserve_group`. Chỉ để hiển thị / sắp / lọc / xuất, **không ảnh hưởng kết quả xếp**; tự cắt khoảng trắng thừa và viết HOA. Có giá trị = ghi đè lớp cũ; để trống hoặc không có cột = giữ nguyên. Các bộ mẫu trong kho có lớp **MÔ PHỎNG**. |
 | `test_club_1`, `test_club_2`, … | ✅ ít nhất một | `club_id` của club muốn dự tuyển. **Ô trống được bỏ qua**, không cần điền kín. |
 | `score_1`, `score_2`, … | Không | **Điểm chấm** cho club cùng **số thứ tự**. Xem mục 3.6. |
 
@@ -110,6 +111,7 @@ HS002,Tran Thi Binh,clb_tienganh,6.5
 | `student_id` | ✅ | Mã học sinh. |
 | `name` | Không | Họ tên. |
 | `reserve_group` | Không | **Nhóm dự trữ của học sinh** (vd `chinh_sach`). Xem mục 4. |
+| `class_id` | Không | **Lớp của học sinh** (vd `10A1`), đặt ngay sau `reserve_group`. Chỉ để hiển thị / sắp / lọc / xuất, **không ảnh hưởng kết quả xếp**; tự cắt khoảng trắng thừa và viết HOA. Có giá trị = ghi đè lớp cũ; để trống hoặc không có cột = giữ nguyên. Các bộ mẫu trong kho có lớp **MÔ PHỎNG**. |
 | `pref_1`, `pref_2`, … `pref_10` | ✅ ít nhất một | **Thứ tự cột chính là thứ tự nguyện vọng.** `pref_1` = nguyện vọng 1. |
 
 ```csv
