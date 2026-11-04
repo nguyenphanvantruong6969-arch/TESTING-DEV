@@ -57,7 +57,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 ## Plan (coord writes; impl/tester tick)
 - [x] P0 protocol, role-aware Stop hook (`.claude/hooks/handoff_khi_day_ngu_canh.py`, tests/test_hook_ban_giao.py 6 cases)
 - [x] L0 impl (661bccb, fix1 e8944b2)  - [x] L0 tester NO BUGS  - [x] L0 PR nguyenphanvantruong6969-arch/TESTING-DEV#10
-- [x] L1 impl (0fd4981)  - [ ] L1 tester NO BUGS  - [ ] L1 PR
+- [x] L1 impl (0fd4981, fix1 4aa7ab4)  - [x] L1 tester NO BUGS  - [x] L1 PR (#10 extended)
 - [ ] L2 impl  - [ ] L2 tester NO BUGS  - [ ] L2 PR
 - [ ] L3 impl  - [ ] L3 tester NO BUGS  - [ ] L3 PR
 - [ ] Final report to Truong (files, new tests, skipped items, screenshots)
@@ -66,18 +66,20 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L1 done 0fd4981; idle (near 400k: hand off before L2) |
+| impl L0-L1 | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | done; archived (handoff file __impl.md) |
+| impl L2 | (creating) | Sonnet | |
 | tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | NO BUGS at e8944b2; archived |
-| tester L1 | session_01YVAytyqX3m4RorzT6ML4Qx | Sonnet | REVIEW L1 2947617..0fd4981 + L0 fixci1 sent 14:21 UTC |
+| tester L1+ | session_01YVAytyqX3m4RorzT6ML4Qx | Sonnet | L1 NO BUGS at 4aa7ab4; reuse for L2 until 200k |
 
 ## Current state (overwrite each handoff)
-- L0 done: PR #10 open (subscribed), awaiting Truong merge + CI. L1 sent to impl.
+- L0 + L1 done, PR nguyenphanvantruong6969-arch/TESTING-DEV#10 extended to L0+L1 (CI-HUY concurrency added). L2 starting.
+- L1 notes: T3-27 split (tab 05 form labels+placeholders done in L1; th_tong_cho, admin_reserve_assign_title, rest -> L3).
 
 ## Needs Truong
 - (none yet)
 
 ## Next steps (ordered)
-1. Wait for "TESTER REPORT L1 + L0fixci1". NO BUGS -> update PR #10 (title+body L0+L1), ask impl to hand off, create fresh impl (Sonnet) with GO L2.
+1. Fresh impl (Sonnet) GO L2; tester L1+ reviews L2. 2. Then fresh impl GO L3.
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
