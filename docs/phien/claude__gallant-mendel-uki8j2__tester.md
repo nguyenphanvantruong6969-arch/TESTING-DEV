@@ -8,26 +8,19 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 
 ## Plan
 - [x] L0 review 7e90e14..661bccb -> 2 BUGS (see Current state)
-- [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [ ] L1  - [ ] L2  - [ ] L3
+- [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [x] L1 reviewed (2 failing tests found)  - [ ] L2  - [ ] L3
 
 ## Current state (overwrite each handoff)
-- L0 fix1 (e8944b2) re-checked: NO BUGS. Both bugs below fixed; repro now keeps reserve 4; new club blank reserve -> 0;
-  edit-mode blank -> 0 (explicit clear). 6 files (vi-clean, L0 x2, i18n_sync, danh_sach_clb, a13_8): 53 passed.
-- L0 first review verdict was 2 BUGS:
-  1. js/05_quan_ly.js `initAdminHandlers` (btnSaveClub handler, `reserveCapacity` line) + index.html `clubFormReserveCapacity value="0"`
-     + `datLaiFormClb` resets it to "0": in hand-typed mode the reserve field is never blank, so retyping an existing club id,
-     name and capacity sends explicit 0 and wipes reserve_capacity (4 -> 0). Group and session are kept. The impl UI test
-     `test_go_tay_lai_ma_cu_...` hides it by clearing the field first (`page.fill(..., "")`).
-  2. i18n_errors.py:602 (+ i18n_loi.js) B3 vi text says "tab Điểm quyết tâm": English word `tab` is banned by
-     tests/test_giao_dien_tieng_viet_sach.py::test_khong_con_tu_tieng_anh_trong_chu_hien_thi (2 params fail; pass at 7e90e14).
-- Related tests: 26 files, 653 passed / 2 failed (bug 2). L0 own tests 17 passed.
-- Everything else OK: B1 backend (None keeps, ""/0 clears, capacity vs stored reserve checked, Sổ nhập path untouched,
-  round-trip of imported reserve_group/buoi unchanged), B2 (0 students / 0 clubs / both: no run_history row, stb_lock unchanged,
-  no .bak file, steps=[]; normal data still runs; UI disables Run with reason and re-enables after data + tab reload),
-  B3 text, i18n_loi.js regenerates byte-identical, no unrelated file changes.
-- Invariant 1 re-checked independently: own script, 3 datasets x seeds 1..20, wharton off AND default-on, 2 runs each,
-  compared match_results + stb numbers + run_history count + stb_lock vs `git archive origin/main`: 60/60 identical both modes.
-- Screenshots: docs/nghien_cuu/anh_t3/sau_L0/ (01 empty workspace tab 01, 03 tab 05 form labels, 04 row-click prefill).
+- L1 review done (2947617..0fd4981) + L0 fixci1 (7f7a845..75ed1e3): see report sent to coord ("TESTER REPORT L1 + L0fixci1").
+- L0 fixci1: assertions ALIGNED to B2/B3 (D1/E3/wharton_mac_dinh_bat keep "điền"/"điểm quyết tâm"/"phóng cho đủ 100", drop only "tắt";
+  stress test_8 now asserts refusal code, no run_history, no stb lock). Not weakened.
+- L1 related tests: 58 files, 1189 passed / 2 FAILED: tests/test_so_excel_de_dung.py (lines 166-167, 265) still pin the OLD Excel
+  text ("Số em đã có câu lạc bộ", "mọi em đều") after T3-43 changed api_xuat.py. Pass at 2947617.
+- Other L1 findings: th_ti_le_choi vi hardcodes "Học sinh" (not {person}); T3-27 partly applied (labels/admin_desc new, placeholders
+  placeholder_capacity/_reserve_capacity/_reserve_group + th_tong_cho + admin_reserve_assign_title still old wording).
+- Verified OK: excluded keys untouched; index.html fallback == catalog (test is leaf-wide); seed input in details#nangCao works vi+en
+  (seed 7 locks, readOnly after lock, redraw sets open); history panel hidden at 1 run; Excel exports scanned: no em dash / "em" / "{".
+- Screenshots: docs/nghien_cuu/anh_t3/sau_L1/ (01-06).
 
 ## Decisions and gotchas
 - Test env (new container): `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python -r requirements-dev.txt
@@ -36,13 +29,14 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - Probe scripts live in the session scratchpad only (not committed).
 
 ## Next steps (ordered)
-1. Wait for `REVIEW L1 ...` from coord.
+1. Wait for `FIX L1` re-check request or `REVIEW L2 ...` from coord.
 
 ## Files touched
-- docs/nghien_cuu/anh_t3/sau_L0/*.png, this file.
+- docs/nghien_cuu/anh_t3/sau_L0/*.png, sau_L1/*.png, this file.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-04 | Opus (tester) | L0 review, invariant 1 re-check, 3 screenshots | 2 bugs (reserve default 0; 'tab' in vi text) |
 | 2026-11-04 | Opus (tester) | L0 fix1 re-check | NO BUGS |
+| 2026-11-04 | Sonnet (tester) | L1 + L0fixci1 review, 6 screenshots | 2 failing tests outside impl's set; 2 minor notes |
