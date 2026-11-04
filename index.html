@@ -695,16 +695,23 @@
       <div role="tabpanel" id="qlPanelClb" data-ql-tab="clb" aria-labelledby="qlTabClb">
       <div class="panel">
         <div class="panel-head"><h2 data-i18n="admin_club_form_title">Thêm hoặc sửa CLB</h2></div>
-        <div class="admin-form-grid">
-          <input type="text" id="clubFormId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_club_id" placeholder="Mã CLB (ví dụ: clb_01)">
-          <input type="text" id="clubFormName" class="text-input" data-i18n-placeholder="placeholder_club_name" placeholder="Tên CLB">
-          <input type="number" id="clubFormCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_capacity" placeholder="Tổng chỗ" min="1">
-          <input type="number" id="clubFormReserveCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_capacity" placeholder="Suất dự trữ" min="0" value="0">
-          <input type="text" id="clubFormReserveGroup" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group" placeholder="Nhãn dự trữ (để trống nếu không có)" list="reserveGroupOptions">
+        <div class="admin-form-grid" id="clubForm">
+          <label class="club-field"><span class="club-field-label" data-i18n="th_club_id">Mã CLB</span>
+            <input type="text" id="clubFormId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_club_id" placeholder="Mã CLB (ví dụ: clb_01)"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_name_short">Tên</span>
+            <input type="text" id="clubFormName" class="text-input" data-i18n-placeholder="placeholder_club_name" placeholder="Tên CLB"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_capacity">Tổng chỗ</span>
+            <input type="number" id="clubFormCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_capacity" placeholder="Tổng chỗ" min="1"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_reserve_capacity">Suất dự trữ</span>
+            <input type="number" id="clubFormReserveCapacity" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_capacity" placeholder="Suất dự trữ" min="0" value="0"></label>
+          <label class="club-field"><span class="club-field-label" data-i18n="th_reserve_group">Nhãn dự trữ</span>
+            <input type="text" id="clubFormReserveGroup" class="text-input text-input-sm" data-i18n-placeholder="placeholder_reserve_group" placeholder="Nhãn dự trữ (để trống nếu không có)" list="reserveGroupOptions"></label>
           <datalist id="reserveGroupOptions"></datalist>
-          <input type="text" id="clubFormBuoi" class="text-input" data-i18n-placeholder="placeholder_buoi" placeholder="Buổi sinh hoạt (ví dụ: thu_3)" list="buoiOptions">
+          <label class="club-field"><span class="club-field-label" data-i18n="th_buoi">Buổi</span>
+            <input type="text" id="clubFormBuoi" class="text-input" data-i18n-placeholder="placeholder_buoi" placeholder="Buổi sinh hoạt (ví dụ: thu_3)" list="buoiOptions"></label>
           <datalist id="buoiOptions"></datalist>
           <button class="btn btn-primary" id="btnSaveClub" data-i18n="btn_save_club">Lưu CLB</button>
+          <button class="btn" id="btnClubFormHuy" type="button" hidden data-i18n="btn_cancel">Huỷ</button>
         </div>
         <span class="save-feedback" role="status" aria-live="polite" id="clubFormFeedback"></span>
 

@@ -1545,8 +1545,15 @@ html.tat-hieu-ung .status-strip:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
+  align-items: flex-end;
 }
+
+/* Nhãn thường trực phía trên mỗi ô của biểu mẫu CLB (T3-26): chữ gợi ý biến mất khi ô có giá trị. */
+.club-field { display: flex; flex-direction: column; gap: 4px; }
+.club-field-label { font-size: 12px; color: var(--ink-soft, var(--ink)); }
+.club-field .text-input[readonly] { background: var(--paper-2, rgba(0,0,0,0.04)); cursor: not-allowed; }
+#adminClubTableBody tr[data-club-id] { cursor: pointer; }
+#adminClubTableBody tr.is-editing { outline: 2px solid var(--gold); outline-offset: -2px; }
 
 .admin-row-checkbox {
   cursor: pointer;

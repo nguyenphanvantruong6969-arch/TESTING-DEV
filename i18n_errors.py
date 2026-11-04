@@ -599,8 +599,12 @@ MESSAGES = {
         "en": "Commitment points aren't turned on for this workspace.",
     },
     "wharton_ho_so_chua_hop_le": {
-        "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy điền đủ điểm quyết tâm cho những {person_l} này rồi chạy lại, hoặc tắt \"Dùng điểm quyết tâm\" trong cấu hình không gian làm việc nếu không dùng tính năng này.",
-        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fill in their commitment points and run again, or turn off \"Use commitment points\" in the workspace settings if this feature is not used.",
+        "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên chưa chạy xếp. Hãy điền đủ điểm quyết tâm cho những {person_l} này rồi chạy lại: mở thẻ 05 (Quản lý), tab Điểm quyết tâm, sửa điểm của từng {person_l} hoặc bấm \"Phóng cho đủ 100 theo tỉ lệ\".",
+        "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fill in their commitment points and run again: open card 05 (Manage), then the Commitment points tab, and edit each {person_l}'s points or click \"Scale to 100 by ratio\".",
+    },
+    "chua_co_du_lieu_de_chay": {
+        "vi": "Chưa có {person_l} hoặc chưa có {slot_l} nào, nên chưa chạy xếp. Hãy nhập dữ liệu ở thẻ 01 (Vận hành sắp xếp) trước: Sổ nhập CLB hoặc các tệp CSV.",
+        "en": "There are no {person_l}(s) or no {slot_l}(s) yet, so the allocation hasn't run. Import the data in card 01 (Allocation) first: the intake workbook or the CSV files.",
     },
     "health_wharton_chua_hop_le": {
         "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",

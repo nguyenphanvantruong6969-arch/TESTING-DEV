@@ -71,6 +71,10 @@ function loadHealthReport() {
     }
 
     const d = res.data;
+    if (khoa.thieuDuLieu) { /* T3-01: dữ liệu trống thì KHÔNG báo xanh "đã sẵn sàng" */
+      hienChuaCoDuLieu();
+      return;
+    }
     if (!d.n_warnings) {
       summary.className = "health-summary is-clean";
       summary.textContent = t("health_clean");
@@ -116,7 +120,23 @@ function refreshDashboardStats() {
     el("statClubs").textContent = res.data.n_clubs;
     el("statPrefs").textContent = res.data.n_students_with_preferences;
     el("statMatched").textContent = res.data.n_matched;
+    /* T3-01 (B2): chưa có học sinh hoặc chưa có CLB thì khoá nút Chạy kèm lý do (backend cũng chặn
+       bằng `chua_co_du_lieu_de_chay`, nên đây chỉ là báo sớm cho người vận hành). */
+    const trong = !res.data.n_students || !res.data.n_clubs;
+    const doi = trong !== khoa.thieuDuLieu;
+    khoa.thieuDuLieu = trong;
+    capNhatKhoaVanHanh();
+    const summary = el("healthSummary");
+    if (trong && summary.classList.contains("is-clean")) hienChuaCoDuLieu();
+    else if (!trong && doi && summary.classList.contains("is-empty")) loadHealthReport();
   });
+}
+
+function hienChuaCoDuLieu() {
+  const summary = el("healthSummary");
+  clear(el("healthList"));
+  summary.className = "health-summary is-warn is-empty";
+  summary.textContent = t("health_chua_co_du_lieu");
 }
 
 function refreshStbLockLine() {
@@ -294,13 +314,16 @@ const khoa = {
   dangKiemTra: false,   // check_data_integrity dang chay
   dangNhap: false,      // dang nhap tep
   dangXuat: false,      // mot lan xuat (chayXuat) dang chay
+  thieuDuLieu: false,   // 0 hoc sinh hoac 0 CLB: khong co gi de xep (T3-01)
 };
 
 function capNhatKhoaVanHanh() {
   const coThanhXacNhan = !!el("runConfirmBar");
   const btnRun = el("btnRun");
   btnRun.disabled = khoa.dangChay || khoa.dangHoiChay || coThanhXacNhan
-    || khoa.dangNhap || khoa.dangKiemTra;
+    || khoa.dangNhap || khoa.dangKiemTra || khoa.thieuDuLieu;
+  if (khoa.thieuDuLieu) btnRun.title = t("health_chua_co_du_lieu");
+  else btnRun.removeAttribute("title");
   btnRun.textContent = khoa.dangChay ? t("btn_dang_chay") : t("btn_run_pipeline");
   el("stepper").setAttribute("aria-busy", khoa.dangChay ? "true" : "false");
   el("btnValidate").disabled = khoa.dangChay || khoa.dangKiemTra || khoa.dangNhap;

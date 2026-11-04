@@ -971,6 +971,16 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
         steps_log = []
         conn = None
         try:
+            # ---------------- Bước 0 · CHẶN CHẠY TRÊN DỮ LIỆU TRỐNG (T3-01, B2) ----------------
+            # Không có học sinh hoặc không có CLB thì không có gì để xếp: chạy vẫn ghi một dòng
+            # run_history và KHOÁ bộ số bốc thăm (seed 42), làm các lần chạy sau với seed khác bị
+            # từ chối. Chặn TRƯỚC sao lưu, khoá STB và mọi lần ghi — chỉ đọc hai con số đếm.
+            with self._ket_noi_doc() as cur:
+                n_hs = cur.execute("SELECT COUNT(*) FROM students").fetchone()[0]
+                n_clb = cur.execute("SELECT COUNT(*) FROM clubs").fetchone()[0]
+            if not n_hs or not n_clb:
+                return _fail_co_buoc(steps_log, [err("chua_co_du_lieu_de_chay")])
+
             # ---------------- Bước 1/6 · SAO LƯU ----------------
             # Sao lưu hỏng KHÔNG chặn việc chạy — mất bản sao còn hơn
             # mất luôn khả năng phân bổ. Chỉ ghi cảnh báo vào nhật ký.

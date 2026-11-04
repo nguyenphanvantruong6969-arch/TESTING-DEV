@@ -30,7 +30,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | A14-B10 (ngoài sổ, Truong duyệt) | xong | 2026-11-03 | tests/test_a14_tu_vung_cohort.py, tests/test_a14_sua_sau_soat.py, CHANGELOG.md | (không có tệp mới; hàm phụ trợ `_bo_cot`) | Bỏ `DROP COLUMN` ở hai test A14 còn lại, cùng rủi ro với B9 |
 | Z-SOAT-2 (ngoài sổ, Truong duyệt) | xong | 2026-11-03 | .claude/skills/soat-ma/scripts/kiem_nhanh.py, tests/test_skill_soat_ma.py, CHANGELOG.md | 2 ca mới trong tests/test_skill_soat_ma.py | `kiem_ruff` tìm ruff trên PATH khi Python không có mô-đun ruff |
 | T3-HT (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | .claude/hooks/handoff_khi_day_ngu_canh.py, .gitignore, docs/phien/T3_GIAO_THUC.md, docs/phien/claude__gallant-mendel-uki8j2.md, CHANGELOG.md | tests/test_hook_ban_giao.py (6 ca) | Hạ tầng chuỗi tự động T3 |
-| T3-L0 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Lỗi B1, B2, B3 của nghiên cứu T3 |
+| T3-L0 (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | api.py, api_quan_ly.py, i18n_errors.py, i18n_loi.js, i18n.js, index.html, style.css, js/02_van_hanh.js, js/05_quan_ly.js, CHANGELOG.md | tests/test_t3_l0_backend.py (11 ca), tests/test_giao_dien_t3_l0.py (6 ca) | Lỗi B1 (sửa CLB mất dữ liệu), B2 (chạy trên dữ liệu trống), B3 (câu lỗi điểm quyết tâm). Chờ tester Opus soát |
 | T3-L1 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Chữ và hiển thị nhỏ |
 | T3-L2 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Bớt khối, gom nút |
 | T3-L3 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Các quyết định của Truong ngày 04/11/2026 |

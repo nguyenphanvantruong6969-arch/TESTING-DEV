@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L0 (ngoài sổ, Truong duyệt 04/11/2026): ba lỗi sản phẩm của nghiên cứu T3 (B1/T3-26, B2/T3-01, B3/T3-42)
+
+- **B1 / T3-26 — sửa CLB không còn xoá suất dự trữ, nhãn, buổi.** `api_quan_ly.py::create_or_update_club`: `reserve_capacity`, `reserve_group`, `buoi` mặc định `None` = "không gửi" — CLB đã có thì GIỮ giá trị đang lưu, CLB mới lấy 0 / không nhãn / không buổi; `name=None` giữ tên cũ; muốn xoá thật thì gửi 0 hoặc `""`. Kiểm suất dự trữ ≤ chỉ tiêu dùng giá trị hiệu lực (kể cả giá trị cũ). Lời gọi tường minh cũ (`("c","C",5,0,"")`) cho kết quả y như trước. Giao diện (`js/05_quan_ly.js`, `index.html`, `style.css`): sáu nhãn thường trực phía trên sáu ô (dùng lại khoá `th_*`); bấm một dòng bảng thì điền biểu mẫu từ dòng đó, khoá ô mã, nút Huỷ; khi đang sửa ô trống = xoá, gõ tay thì ô trống = không gửi (`null`).
+- **B2 / T3-01 — chạy trên dữ liệu trống bị chặn.** `api.py::_run_pipeline_da_khoa`: bước 0, TRƯỚC sao lưu / khoá STB / mọi lần ghi, đếm học sinh và CLB; thiếu một trong hai thì trả `chua_co_du_lieu_de_chay` (không ghi `run_history`, không khoá seed). Giao diện (`js/02_van_hanh.js`): `khoa.thieuDuLieu` khoá nút "Chạy sắp xếp" kèm `title` lý do, ô Cảnh báo ghi "Chưa có dữ liệu để xếp…" thay cho dòng xanh.
+- **B3 / T3-42 — câu `wharton_ho_so_chua_hop_le`** chỉ việc làm được (thẻ 05, tab Điểm quyết tâm, "Phóng cho đủ 100 theo tỉ lệ"), không còn bảo tắt tính năng. Chỉ đổi chữ (vi + en), không thêm công tắc.
+- **Mã lỗi mới** `chua_co_du_lieu_de_chay` (`i18n_errors.py` vi+en, đã sinh lại `i18n_loi.js`); khoá UI mới `health_chua_co_du_lieu` (`i18n.js` vi+en).
+- **Test mới:** `tests/test_t3_l0_backend.py` (11 ca), `tests/test_giao_dien_t3_l0.py` (6 ca, Chromium).
+- **Bất biến 1:** cấu hình mặc định trùng khít `origin/main` — `kiem_nhanh.py trung_khit` (3 bộ × 5 seed) và `kiem_trung_khit` gọi trực tiếp với 20 seed (3 bộ × 20 seed).
+
 ## 2026-11-04 — T3-HT (ngoài sổ, Truong duyệt 04/11/2026): hạ tầng tự động hoá T3 (điều phối + viết mã + soát)
 
 - **`.claude/hooks/handoff_khi_day_ngu_canh.py`:** đọc vai phiên từ `.claude/phien_vai.json` (không vào git): ngưỡng riêng (`nguong`; con 400k, điều phối 700k), tệp bàn giao theo vai (`docs/phien/<nhánh>__impl.md`, `__tester.md`), phiên con được nhắc `send_message` báo phiên điều phối; không có tệp vai thì giữ hành vi cũ. Lấy tên nhánh bằng `git branch --show-current`.

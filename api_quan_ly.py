@@ -178,7 +178,7 @@ class QuanLyMixin:
 
     def create_or_update_club(
         self, club_id: str, name: str, capacity: int,
-        reserve_capacity: int = 0, reserve_group: str = "", buoi: str = "",
+        reserve_capacity=None, reserve_group=None, buoi=None,
     ):
         """
         Tạo mới hoặc cập nhật 1 club (UPSERT theo club_id).
@@ -187,33 +187,62 @@ class QuanLyMixin:
         buoi: buổi sinh hoạt (vd 'thu_3'). Để trống nếu trường chỉ tổ
         chức một buổi — khi đó mọi CLB thuộc cùng một buổi mặc định và
         phần mềm chạy y hệt bản không có tính năng nhiều buổi.
+
+        CẬP NHẬT KHÔNG XOÁ TRƯỜNG KHÔNG GỬI (T3-26, B1). `reserve_capacity`,
+        `reserve_group`, `buoi` mặc định là None = "không gửi": CLB đã có thì
+        GIỮ giá trị đang lưu, CLB mới thì lấy 0 / không nhãn / không buổi. Muốn
+        xoá thật, gửi giá trị rõ ràng (0 hoặc chuỗi rỗng ""). `name` = None cũng
+        giữ tên cũ. Trước đây mặc định là 0 / "" nên sửa chỉ tiêu bằng một lời
+        gọi thiếu tham số lặng lẽ xoá suất dự trữ, nhãn dự trữ và buổi.
         """
         try:
             capacity = int(capacity)
-            reserve_capacity = int(reserve_capacity)
-            loi = loi_suc_chua(capacity, reserve_capacity)
-            if loi:
-                if loi == "capacity_not_positive":
-                    return _fail(err("capacity_must_be_positive"))
-                if loi == "reserve_negative":
-                    return _fail(err("reserve_capacity_negative"))
-                return _fail(err("reserve_capacity_exceeds_capacity"))
             # None (loi goi thieu tham so) truoc day nem AttributeError.
             club_id = (club_id or "").strip()
-            name = (name or "").strip()
+            if reserve_capacity is not None:
+                reserve_capacity = int(reserve_capacity)
+                loi = loi_suc_chua(capacity, reserve_capacity)
+                if loi:
+                    return _fail(self._loi_suc_chua(loi))
+            elif capacity <= 0:
+                return _fail(err("capacity_must_be_positive"))
             if not club_id:
                 return _fail(err("club_id_required"))
-
-            reserve_group_value = self.chuan_hoa_nhom_du_tru(reserve_group) or None
-            buoi_value = self.chuan_hoa_buoi(buoi) or None
+            name = None if name is None else name.strip()
 
             with self._ket_noi_ghi() as cur:
-                buoi_value = self._khop_buoi_da_co(cur, buoi_value, buoi)
+                cu = cur.execute(
+                    "SELECT name, reserve_capacity, reserve_group, buoi FROM clubs "
+                    "WHERE club_id = ?", (club_id,)).fetchone()
+                if reserve_capacity is None:
+                    reserve_capacity = int(cu[1] or 0) if cu else 0
+                    loi = loi_suc_chua(capacity, reserve_capacity)
+                    if loi:
+                        return _fail(self._loi_suc_chua(loi))
+                if name is None:
+                    name = cu[0] if cu else ""
+                if reserve_group is None:
+                    reserve_group_value = cu[2] if cu else None
+                else:
+                    reserve_group_value = self.chuan_hoa_nhom_du_tru(reserve_group) or None
+                if buoi is None:
+                    buoi_value = cu[3] if cu else None
+                else:
+                    buoi_value = self._khop_buoi_da_co(
+                        cur, self.chuan_hoa_buoi(buoi) or None, buoi)
                 self._ghi_clb(cur, club_id, name, capacity, reserve_capacity,
                               reserve_group_value, buoi_value)
             return _ok({"club_id": club_id, "action": "upserted"})
         except Exception as e:
             return _fail(err("error_saving_club", detail=str(e)))
+
+    @staticmethod
+    def _loi_suc_chua(loi):
+        if loi == "capacity_not_positive":
+            return err("capacity_must_be_positive")
+        if loi == "reserve_negative":
+            return err("reserve_capacity_negative")
+        return err("reserve_capacity_exceeds_capacity")
 
     def delete_club(self, club_id: str):
         """

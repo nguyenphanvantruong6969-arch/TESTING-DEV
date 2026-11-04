@@ -494,6 +494,11 @@ function loadAdminClubs() {
     });
     res.data.forEach((c) => {
       const tr = document.createElement("tr");
+      tr.dataset.clubId = c.club_id;
+      tr.addEventListener("click", (ev) => {
+        if (ev.target.closest("button")) return;
+        suaClbTuDong(c, tr);
+      });
       tr.innerHTML =
         `<td>${esc(c.club_id)}</td><td>${esc(c.name)}</td><td>${esc(c.capacity)}</td>` +
         `<td>${esc(c.reserve_capacity)}</td><td>${esc(c.reserve_group || "—")}</td>` +
@@ -1157,27 +1162,60 @@ function initWhartonQuanLy() {
   });
 }
 
+/* Sửa CLB (T3-26, B1). Bấm một dòng của bảng thì điền biểu mẫu từ dòng đó và khoá ô mã; lúc này một
+   ô để trống nghĩa là "xoá giá trị" nên gửi "" / 0. Không bấm dòng (gõ tay) thì ô trống = KHÔNG GỬI
+   (null): CLB đã có giữ giá trị đang lưu, CLB mới lấy mặc định — gõ lại đúng mã một CLB cũ không còn
+   lặng lẽ xoá suất dự trữ, nhãn và buổi. */
+let clbDangSua = false;
+
+function datLaiFormClb() {
+  clbDangSua = false;
+  el("clubFormId").value = "";
+  el("clubFormId").readOnly = false;
+  if (el("clubFormBuoi")) el("clubFormBuoi").value = "";
+  el("clubFormName").value = "";
+  el("clubFormCapacity").value = "";
+  el("clubFormReserveCapacity").value = "0";
+  el("clubFormReserveGroup").value = "";
+  el("btnClubFormHuy").hidden = true;
+  document.querySelectorAll("#adminClubTableBody tr.is-editing").forEach((r) => r.classList.remove("is-editing"));
+}
+
+function suaClbTuDong(c, tr) {
+  clbDangSua = true;
+  el("clubFormId").value = c.club_id;
+  el("clubFormId").readOnly = true;
+  el("clubFormName").value = c.name || "";
+  el("clubFormCapacity").value = c.capacity;
+  el("clubFormReserveCapacity").value = c.reserve_capacity || 0;
+  el("clubFormReserveGroup").value = c.reserve_group || "";
+  if (el("clubFormBuoi")) el("clubFormBuoi").value = c.buoi || "";
+  el("btnClubFormHuy").hidden = false;
+  document.querySelectorAll("#adminClubTableBody tr.is-editing").forEach((r) => r.classList.remove("is-editing"));
+  tr.classList.add("is-editing");
+  el("clubFormName").focus();
+}
+
 function initAdminHandlers() {
+  el("btnClubFormHuy").addEventListener("click", datLaiFormClb);
   el("btnSaveClub").addEventListener("click", () => {
     const id = el("clubFormId").value.trim();
     const name = el("clubFormName").value.trim();
     const capacity = el("clubFormCapacity").value;
-    const reserveCapacity = el("clubFormReserveCapacity").value || 0;
-    const reserveGroup = el("clubFormReserveGroup").value.trim();
-    const buoi = el("clubFormBuoi") ? el("clubFormBuoi").value.trim() : "";
-    if (!id || !name || !capacity) {
+    const rcRaw = el("clubFormReserveCapacity").value;
+    const reserveCapacity = clbDangSua ? (rcRaw || 0) : (rcRaw === "" ? null : rcRaw);
+    const rgRaw = el("clubFormReserveGroup").value.trim();
+    const reserveGroup = clbDangSua || rgRaw ? rgRaw : null;
+    const buoiRaw = el("clubFormBuoi") ? el("clubFormBuoi").value.trim() : "";
+    const buoi = clbDangSua || buoiRaw ? buoiRaw : null;
+    if (!id || (!name && !clbDangSua) || !capacity) {
       feedback(el("clubFormFeedback"), t("feedback_club_form_required"), true);
       return;
     }
-    khiBan(el("btnSaveClub"), () => callApi("create_or_update_club", id, name, capacity, reserveCapacity, reserveGroup, buoi)).then((res) => {
+    khiBan(el("btnSaveClub"), () => callApi("create_or_update_club", id, name || null, capacity, reserveCapacity, reserveGroup, buoi)).then((res) => {
       if (res.ok) {
         feedback(el("clubFormFeedback"), t("feedback_club_saved", { club_id: id }), false);
-        el("clubFormId").value = "";
-        if (el("clubFormBuoi")) el("clubFormBuoi").value = "";
-        el("clubFormName").value = "";
-        el("clubFormCapacity").value = "";
-        el("clubFormReserveCapacity").value = "0";
-        el("clubFormReserveGroup").value = "";
+        datLaiFormClb();
         loadAdminClubs();
         loadReserveGroupOptions();
         lamMoiSauDoiClb();
