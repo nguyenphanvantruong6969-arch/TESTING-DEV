@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
+
+- `tests/test_giao_dien_a14_lop.py::test_theo_lop_chua_co_lop_nao_hien_dong_nhac`: bỏ đoạn ép `kq.tang1 = 'lop'` (người dùng không tới được từ T3-16, và lần vẽ lại bất đồng bộ làm test chập chờn trên CI); nay kiểm nút "Theo lớp" ẩn, bảng có dòng, không có ngõ cụt "Chưa có lớp nào". Dòng nhắc trong `js/03_ket_qua.js` thành đường mã chết, ghi ở mục "Cần Truong" của PR #10.
+
 ## 2026-11-04 — T3-L2 fix3 (điều phối): test node chạy được trên Windows
 
 - `tests/test_t3_l2_buoi.py::test_loi_co_tham_so_buoi_hien_nhan_khong_hien_ma`: `subprocess.run(["node", ...])` đọc đầu ra bằng `encoding="utf-8"` (CI Windows đọc cp1252 nên gặp chữ Việt thì `stdout` là `None`).

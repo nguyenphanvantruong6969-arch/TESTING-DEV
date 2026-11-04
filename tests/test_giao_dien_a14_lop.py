@@ -335,15 +335,15 @@ def test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do(mo):
 
 
 def test_theo_lop_chua_co_lop_nao_hien_dong_nhac(mo):
-    """T3-16: chưa có lớp thì nút "Theo lớp" ẩn; dòng nhắc chỉ còn khi ép vào chế độ lớp."""
+    """T3-16 (Truong chọn "gọn mạnh"): chưa có lớp thì nút "Theo lớp" ẩn và thẻ mở thẳng bảng có dữ liệu,
+    không còn ngõ cụt "Chưa có lớp nào". Trước đây test ép kq.tang1 = 'lop' bằng tay, nhưng người dùng
+    không tới được trạng thái đó và lần vẽ lại bất đồng bộ đặt lại 'ma' nên test chập chờn trên CI."""
     page, api, loi = mo({}, chay=True)
     _mo_ket_qua(page, "ma")
     assert page.locator('#kqTang1 [data-kq="lop"]').is_hidden()
-    page.wait_for_function("() => !document.getElementById('kqBang').hidden")   # bảng "Theo mã" đã vẽ xong
-    page.evaluate("() => { kq.tang1 = 'lop'; veKetQua(); }")
-    page.wait_for_function("() => !document.getElementById('kqRong').hidden")
-    assert "Chưa có lớp nào" in page.locator("#kqRong").inner_text()
-    assert page.locator("#kqBang").is_hidden()
+    page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+    assert page.locator("#kqBang tbody tr").count() > 0
+    assert "Chưa có lớp nào" not in page.locator("#view-results").inner_text()
     assert not loi, loi
 
 
