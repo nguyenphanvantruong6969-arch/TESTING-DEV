@@ -105,6 +105,7 @@ def test_1_xuat_em_dang_mo_o_the_03_va_5_mo_thu_muc(trang):
     page, api, loi, mo = trang
     mo_the(page, "fallback")
     mo_hs_the_03(page, "HS03")
+    page.click("#menuHocSinh > summary")
     page.click("#btnXuatEmNay")
     page.wait_for_function(
         "() => document.getElementById('fallbackXuatFeedback').textContent.includes('Hồ sơ 1 học sinh')")
@@ -242,6 +243,7 @@ def test_7_thay_doi_chua_luu_khong_bi_mat_im_lang(trang):
     mo_the(page, "fallback")
     mo_hs_the_03(page, "HS03")
     page.locator('#testSelectionGrid .option-row[data-club-id="clb_a"]').click()
+    page.click("#menuHocSinh > summary")
     page.click("#btnXuatEmNay")
     toast_co(page, "Bấm Lưu trước")
     assert not os.path.exists(os.path.join(tai_ve(), "hoc_sinh_HS03.csv"))

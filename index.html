@@ -606,18 +606,17 @@
           <input type="text" id="studentSearchInput" class="text-input" data-i18n-placeholder="placeholder_fallback_search" placeholder="Nhập mã học sinh hoặc tên…">
           <button class="btn btn-secondary" id="btnStudentSearch" data-i18n="btn_search">Tìm</button>
         </div>
-        <div id="studentSearchResults" class="search-results"></div>
-        <div class="pagination-row" id="fallbackStudentPagination" hidden>
-          <button class="btn btn-ghost" id="btnFallbackPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
-          <span class="pagination-label" id="fallbackPaginationLabel">—</span>
-          <button class="btn btn-ghost" id="btnFallbackNextPage" data-i18n="btn_next_page">Sau ›</button>
-        </div>
-
         <div class="new-student-row">
           <input type="text" id="newStudentId" class="text-input text-input-sm" data-i18n-placeholder="placeholder_new_student_id" placeholder="Mã học sinh mới">
           <input type="text" id="newStudentName" class="text-input" data-i18n-placeholder="placeholder_full_name" placeholder="Họ tên">
           <select id="newStudentLop" class="text-input text-input-sm" data-i18n-aria-label="kiosk_lop_nhan" hidden></select>
           <button class="btn btn-secondary" id="btnCreateStudent" data-i18n="btn_create_student">Tạo học sinh mới</button>
+        </div>
+        <div id="studentSearchResults" class="search-results"></div>
+        <div class="pagination-row" id="fallbackStudentPagination" hidden>
+          <button class="btn btn-ghost" id="btnFallbackPrevPage" data-i18n="btn_prev_page">‹ Trước</button>
+          <span class="pagination-label" id="fallbackPaginationLabel">—</span>
+          <button class="btn btn-ghost" id="btnFallbackNextPage" data-i18n="btn_next_page">Sau ›</button>
         </div>
       </div>
 
@@ -625,9 +624,15 @@
         <div class="panel-head">
           <h2 id="currentStudentLabel">—</h2>
           <div class="panel-actions">
-            <button class="btn btn-ghost" id="btnXuatEmNay" data-i18n="btn_xuat_em_nay">Xuất CSV học sinh này</button>
-            <button class="btn btn-ghost" id="btnResetStudentEntry" data-i18n="btn_reset_entry">Sửa lại từ đầu</button>
-            <button class="btn-icon-danger" id="btnDeleteStudent" data-i18n="btn_delete_student">Xoá học sinh</button>
+            <!-- T3-34: ba nút phụ gom vào menu ⋯; hai nút xác nhận hai bước giữ menu mở (data-giu-menu). -->
+            <details class="menu-khac" id="menuHocSinh">
+              <summary class="btn btn-ghost" data-i18n-aria-label="menu_khac_aria" aria-label="Thêm tuỳ chọn">⋯</summary>
+              <div class="menu-khac-hop">
+                <button type="button" class="menu-khac-muc" id="btnXuatEmNay" data-i18n="btn_xuat_em_nay">Xuất CSV học sinh này</button>
+                <button type="button" class="menu-khac-muc" id="btnResetStudentEntry" data-giu-menu="1" data-i18n="btn_reset_entry">Xoá nguyện vọng của học sinh này</button>
+                <button type="button" class="menu-khac-muc nguy-hiem" id="btnDeleteStudent" data-giu-menu="1" data-i18n="btn_delete_student">Xoá học sinh</button>
+              </div>
+            </details>
           </div>
         </div>
 
@@ -636,6 +641,8 @@
         <div class="lop-kiosk-hang" id="kioskLopHang" hidden>
           <label class="lop-nhan" for="kioskLop" data-i18n="kiosk_lop_nhan">{cohort}</label>
           <select id="kioskLop" class="text-input text-input-sm"></select>
+          <span class="lop-hien" id="kioskLopChu" hidden></span>
+          <button type="button" class="btn btn-ghost btn-nho" id="btnKioskLopSua" hidden data-i18n="phieu_doi_lop">Đổi</button>
           <span class="chua-luu" id="kioskLopChuaLuu" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
           <span class="chua-luu" id="kioskLopNhac" role="status" hidden data-i18n="kiosk_lop_nhac">Chọn {cohort_l} của {person_l} này trước khi lưu.</span>
         </div>

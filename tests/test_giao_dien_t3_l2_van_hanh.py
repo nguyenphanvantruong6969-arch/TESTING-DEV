@@ -185,3 +185,66 @@ def test_chan_thanh_ben_chi_hien_khi_mat_ket_noi_va_nut_hoat_anh_nam_trong_menu(
     page.evaluate("() => { const o = document.getElementById('dbStatusLine'); o.textContent = t('backend_khong_ket_noi'); o.hidden = false; }")
     assert page.locator("#dbStatusLine").is_visible()
     assert not loi
+
+
+# ---------------------------------------------------------------- tab 04 (T3-32..T3-35)
+def _mo_tab(page, ten):
+    page.locator('[data-tab="%s"]' % ten).click()
+
+
+def test_nhap_tai_cho_hang_hoc_sinh_moi_nam_ngay_duoi_o_tim_va_menu_ba_cham(api, mo):
+    tat_wharton(api)
+    _du_lieu(api, 3)
+    page, loi = mo()
+    _mo_tab(page, "fallback")
+    page.wait_for_selector("#studentSearchInput")
+    y_tim = page.locator("#studentSearchInput").bounding_box()["y"]
+    y_moi = page.locator("#newStudentId").bounding_box()["y"]
+    assert 0 < y_moi - y_tim < 120, (y_tim, y_moi)       # T3-32: cùng cụm với ô tìm, không nằm dưới danh sách
+    page.fill("#newStudentId", "HS99")
+    page.fill("#newStudentName", "Em Mới")
+    page.click("#btnCreateStudent")
+    page.wait_for_selector("#fallbackWorkArea:not([hidden])")
+    # cuộn tới phiếu: đầu phiếu nằm trong khung nhìn
+    assert page.evaluate("() => document.getElementById('fallbackWorkArea').getBoundingClientRect().top < window.innerHeight")
+    # T3-34: ba nút phụ nằm trong menu ⋯
+    assert page.locator("#btnDeleteStudent").is_hidden()
+    page.click("#menuHocSinh > summary")
+    for ma in ("btnXuatEmNay", "btnResetStudentEntry", "btnDeleteStudent"):
+        assert page.locator("#" + ma).is_visible(), ma
+    assert page.inner_text("#btnResetStudentEntry") == "Xoá nguyện vọng của học sinh này"
+    assert not loi
+
+
+def test_nhap_tai_cho_khong_in_ma_tho_clb_va_khong_con_cau_hai_buoc(api, mo):
+    tat_wharton(api)
+    _du_lieu(api, 2)
+    page, loi = mo()
+    _mo_tab(page, "fallback")
+    page.fill("#studentSearchInput", "HS01")
+    page.click("#btnStudentSearch")
+    page.locator("#studentSearchResults .hs-card").first.click()
+    page.wait_for_selector("#testSelectionGrid .option-row")
+    for sel in ("#testSelectionGrid", "#rankingSourceGrid"):
+        assert "clb_a" not in page.inner_text(sel), sel       # T3-35: bỏ mã thô
+    assert "không phụ thuộc nhau" not in page.inner_text("#view-fallback")
+    assert not loi
+
+
+def test_phieu_chi_hien_lop_khi_da_co_lop_va_bam_doi_moi_sua(api, mo):
+    tat_wharton(api)
+    api.create_or_update_club("clb_a", "CLB A", 3)
+    for sid, lop in (("HS01", "10A1"), ("HS02", "10A2")):
+        api.create_student_if_missing(sid, "Học sinh " + sid[2:])
+        assert api.set_student_class(sid, lop)["ok"]
+    page, loi = mo()
+    _mo_tab(page, "fallback")
+    page.fill("#studentSearchInput", "HS01")
+    page.click("#btnStudentSearch")
+    page.locator("#studentSearchResults .hs-card").first.click()
+    page.wait_for_selector("#kioskLopChu:not([hidden])")
+    assert page.inner_text("#kioskLopChu") == "10A1"
+    assert page.locator("#kioskLop").is_hidden()              # T3-33: chọn lớp một lần ở hàng tạo
+    page.click("#btnKioskLopSua")
+    assert page.locator("#kioskLop").is_visible() and page.locator("#kioskLopChu").is_hidden()
+    assert not loi

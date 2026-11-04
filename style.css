@@ -2611,9 +2611,12 @@ html.tat-hieu-ung .status-strip:hover {
 /* "Chưa lưu" cạnh nút Lưu ở thẻ 03: đủ nổi để thấy, không làm như báo lỗi. */
 .chua-luu {
   margin-left: 10px;
-  font-size: 12.5px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--gold-text);
+  background: var(--gold-soft);
+  padding: 2px 9px;
+  border-radius: 999px;
 }
 
 /* `display:flex` ở trên thắng thuộc tính `hidden` của trình duyệt — phải nói
@@ -3115,3 +3118,7 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 #view-pipeline[data-trang-thai="trong"] #panelCanhBao,
 #view-pipeline[data-trang-thai="trong"] #panelBuoc { opacity: 0.6; }
 #view-pipeline[data-trang-thai="trong"] #panelNhap { border-color: var(--gold); border-left: 4px solid var(--gold); }
+
+/* T3-33: lớp hiện dạng chữ trong phiếu; T3-32: hàng "học sinh mới" ngay dưới ô tìm. */
+.lop-hien { font-weight: 600; margin-right: 6px; }
+.search-row + .new-student-row { margin-top: 10px; }
