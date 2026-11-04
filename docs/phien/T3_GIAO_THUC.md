@@ -21,6 +21,8 @@
 - Find T3 findings by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`. Never read the whole 68 KB study.
 - Locate code by function name with grep; read only the needed range.
 - Run only related tests (`-k`, single files). Full suite = CI only.
+- Related tests = the lot's own tests PLUS every tests/ file that greps for any identifier you changed (function names,
+  error codes, i18n keys, element ids). Lesson from L0: 7 CI failures were outside a hand-picked related set.
 - New test file -> update the `tests/` row in `docs/ke_hoach/CLAUDE_CHI_TIET.md` (file count + `pytest --collect-only -q` count);
   always include `tests/test_a13_12_tai_lieu.py` and `tests/test_giao_dien_tieng_viet_sach.py` in related tests.
 - Messages between sessions use the fixed formats below, <= 15 lines, no pasted diffs or logs (give file:line or sha).
