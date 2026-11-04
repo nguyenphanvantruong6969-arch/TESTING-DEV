@@ -879,59 +879,6 @@ html.tat-hieu-ung .status-strip:hover {
 
 /* ============================= RESULTS: FILL BARS ============================= */
 
-.fill-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Tiêu đề nhóm theo buổi (chỉ khi trường có nhiều buổi và sắp theo buổi). */
-.fill-nhom {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 12px 0 2px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--hairline);
-}
-.fill-nhom:first-child { margin-top: 0; }
-.fill-nhom-ten {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--ink);
-}
-.fill-nhom-so {
-  font-size: 12px;
-  color: var(--slate);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Cả dòng là vùng rê chuột — to hơn nhiều so với thanh 10px. */
-.fill-row {
-  display: grid;
-  grid-template-columns: minmax(140px, 220px) minmax(120px, 1fr) 92px minmax(150px, auto);
-  align-items: center;
-  gap: 12px;
-  padding: 5px 8px;
-  margin: 0 -8px;
-  border-radius: var(--radius-sm);
-  outline: none;
-}
-.fill-row:hover,
-.fill-row:focus-visible { background: var(--paper); }
-.fill-row:focus-visible { box-shadow: inset 0 0 0 2px var(--chart-general); }
-
-.fill-name {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* display:flex, khong phai block. Con cua flex container TU DONG bi ep
    thanh block, nen khong doan nao co the roi lai vao trang thai inline —
    ma inline thi width bi bo qua va thanh ve ra 0 px. Chon flex la de
@@ -965,48 +912,11 @@ html.tat-hieu-ung .status-strip:hover {
 .clb-lap .fill-track { display: inline-flex; width: 90px; vertical-align: middle; margin-right: 8px; }
 .clb-luu-y { white-space: nowrap; }
 
-.fill-so {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 8px;
-  font-variant-numeric: tabular-nums;
-}
-
-.fill-count {
-  font-family: var(--font-body);
-  font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: var(--ink);
-  text-align: right;
-}
-
 .fill-pct {
   font-size: 11.5px;
   color: var(--slate);
   min-width: 38px;
   text-align: right;
-}
-
-.fill-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-}
-
-.fill-choi {
-  color: var(--slate);
-  font-variant-numeric: tabular-nums;
-}
-
-.fill-chip-buoi {
-  padding: 1px 8px;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  color: var(--ink-soft);
-  background: var(--paper);
 }
 
 /* Nhãn cần-để-ý: chữ luôn mang ký hiệu (⚠ ▲ ○), màu chỉ là lớp thứ hai. */
@@ -1018,13 +928,6 @@ html.tat-hieu-ung .status-strip:hover {
 }
 .fill-tag.is-nguy      { background: var(--rust-soft); color: var(--rust); }
 .fill-tag.is-thong-tin { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--hairline); }
-
-@media (max-width: 900px) {
-  .fill-row {
-    grid-template-columns: minmax(100px, 1fr) 2fr auto;
-  }
-  .fill-meta { grid-column: 1 / -1; }
-}
 
 /* ============================= RESULTS: KPI STRIP ============================= */
 

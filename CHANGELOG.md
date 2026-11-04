@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-L2 (ngoài sổ, Truong duyệt 04/11/2026): bớt khối, gom nút (nghiên cứu T3, lô 2)
+
+Chỉ đổi hiển thị; thuật toán, `match_results`, `run_history`, STB, hợp đồng cột CSV không đụng tới.
+
+- **T3-14:** nhãn buổi (Thứ 2…) qua `i18n.js`, bảng JS phản chiếu `so_nhap.NHAN_BUOI` (đường a). **T3-07:** bỏ hai ô Từ/đến chọn buổi. **T3-02/03/04:** cảnh báo gọn + nút tới Điểm quyết tâm; ẩn nút khi chưa có tệp (sửa lỗi `.import-actions{display:flex}` đè `hidden`); một nút kiểm tra.
+- **T3-06/10/12/15:** dòng kết quả gọn; một nút chính theo trạng thái (`#view-pipeline[data-trang-thai]`); chân thanh bên + menu ⋯; dòng workspace "Mở" + ⋯.
+- **T3-20/24/25:** mục "Chi tiết để kiểm tra"; ba ô tóm tắt (số NV1 và suất dự trữ chuyển xuống mục chi tiết, không xoá); tiêu đề cột.
+- **T3-21:** bỏ thẻ "Mức lấp đầy của từng CLB" (`#fillPanel`); ô "Sắp xếp" (`#fillSapXep`, vẫn nhớ qua `rbda_sap_xep_lap_day`) chuyển lên thẻ "Theo từng câu lạc bộ"; bảng thêm cột thanh lấp đầy (hai đoạn dự trữ/chung, `veOThanhLapDay`) và cột "Lưu ý" (nhãn `nhanCanDeY` thành chữ, không còn chỉ hiện khi rê chuột); ô tóm tắt "Chỗ còn trống" mở thẻ này và đặt "Vắng nhất". Bỏ `veBieuDoLapDay`/`veDongLapDay`, CSS `.fill-row…`, khoá `fill_panel_title`, `fill_hint`, `fill_nhom_tong`, `fill_choi`; khoá mới `th_muc_lap_day`, `th_luu_y`.
+- **T3-23:** khung "Xuất dữ liệu" mặc định chỉ hai nút "Xuất kết quả (Excel)" (`btn_xuat_tuy_chon`) và "Xuất theo lớp"; các ô tích và "Chọn học sinh…" nằm trong `<details id="xuatNangCao">` "Tuỳ chọn khác" (`xuat_tuy_chon_khac`); giữ cảnh báo đỏ.
+- **T3-28:** một bảng "Tải theo buổi"; bỏ khối "Lịch tuần" (`loadLichTuan`, `admin_lich_tuan_*`, CSS `.lich-*`); tỉ lệ ghi "2,3" (dấu phẩy), không "2.3×".
+- **T3-29/32/33/34/35:** điểm quyết tâm mặc định "Chỉ hồ sơ có vấn đề"; hàng học sinh mới cạnh ô tìm + cuộn tới phiếu; lớp hiện dạng chữ; menu ⋯ ba nút phụ (giữ "Xuất CSV học sinh này"); bỏ mã thô, chấm "Chưa lưu" nổi hơn. Chưa làm: thu gọn danh sách kết quả sau khi chọn (T3-32).
+- **Test mới:** `tests/test_t3_l2_buoi.py` (5), `tests/test_giao_dien_t3_l2_van_hanh.py` (Chromium). **Test cũ sửa:** `test_giao_dien_tom_tat_ket_qua.py` (bỏ test chú thích rê chuột và nhóm theo buổi, thêm test cột thanh/Lưu ý), `test_giao_dien_bieu_do.py`, `test_giao_dien_phong_chu.py`, `test_giao_dien_thu_gon_ket_qua.py`, `test_giao_dien_diem_chuan.py` (đọc bảng CLB thay vì `.fill-row`), `test_giao_dien_khoa_xuat.py`, `test_giao_dien_ux_xuat.py`, `test_giao_dien_xuat_du_lieu.py` (mở "Tuỳ chọn khác"), `test_ws_nhan.py` + `du_lieu_ws/chu_ui_doi_co_y_t3.json`.
+- **Bất biến:** `kiem_nhanh.py` 7/7 ĐẠT, `trung_khit` (3 bộ × 5 seed) trùng khít so với `origin/main`.
+
 ## 2026-11-04 — CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026): huỷ lượt CI cũ khi có commit mới
 
 - **`.github/workflows/tests.yml`:** thêm `concurrency` (nhóm theo workflow + loại sự kiện + nhánh; `cancel-in-progress` trừ nhánh `main`). Workflow build `.exe` (chạy tay) không đổi.

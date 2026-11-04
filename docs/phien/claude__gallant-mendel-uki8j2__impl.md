@@ -13,35 +13,11 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - [x] L1 implemented, pushed (`0fd4981`), tester L1 reviewing
 - [ ] L2  - [ ] L3 (wait for `GO L<n>`)
 
-## Current state (L2 in progress, impl session 2; handoff written at ~200k)
-- L2 DONE, committed, pushed (tests green per group): T3-14, T3-07, T3-02, T3-03 (real bug: `.import-actions{display:flex}` overrode `hidden`),
-  T3-04, T3-06 (`#runXong`), T3-10 (`#view-pipeline[data-trang-thai]`), T3-12 (`#menuThanhBen` ⋯; `lastRunLine`/`cheDoHienThi` kept hidden as sync hooks),
-  T3-15 (Mở + ⋯ per workspace row), T3-24 (3 KPI tiles; NV1 numbers live in `#nvTieuDiem`, dự trữ line `#duTruTieuDiem`), T3-25, T3-20 (dsXepPanel retitled
-  "Chi tiết để kiểm tra", already collapsed at bottom; no details wrapper), T3-34 (`#menuHocSinh` ⋯ keeps "Xuất CSV học sinh này"), T3-35 (no raw club codes,
-  `.chua-luu` pill; the "Hai bước này không phụ thuộc nhau" sentence was already gone), T3-32 (new-student row under the search row + scrollIntoView to the
-  phiếu; NOT done: collapsing the result list after pick), T3-33 (`#kioskLopChu` + `#btnKioskLopSua` when the student already has a class), T3-29 (default
-  "Chỉ hồ sơ có vấn đề" checked + `#whQlDem` + `#btnWhXemTatCa`).
-- NOT DONE yet: T3-21, T3-23, T3-28. Then finish: soat-ma (`kiem_nhanh.py --co-so origin/main` + 4 tiers), CHANGELOG (T3-L2 entry listing items/files/tests),
-  TIEN_DO row `T3-L2`, `docs/ke_hoach/CLAUDE_CHI_TIET.md` tests row (+2 new files: test_t3_l2_buoi.py, test_giao_dien_t3_l2_van_hanh.py -> 190 files, recount
-  cases with `pytest --collect-only -q | tail -1`; `tests/test_a13_12_tai_lieu.py` currently RED until this is updated), `git pull --rebase`, push, `IMPL DONE L2`
-  to coord (items, skipped, invariants 3/4/5/6 n/a: display only).
-- T3-21 plan: delete `#fillPanel` from index.html and the KPI tile target `fillPanel` (tile "Chỗ còn trống" -> open `clbPanel` and `datCachSapXep("vang_nhat")`);
-  move `#fillSapXep` select (keep id + options + localStorage `rbda_sap_xep_lap_day`) into `#clbPanel` panel-head and make `veBangNhuCauCLB` honour it
-  (reuse `docCachSapXep`, `tiLeLap`, `nhanCanDeY`); add a bar column (div width = matched/capacity %) and a "Lưu ý" text column from `nhanCanDeY`; drop tooltip-only
-  info. Remove `veBieuDoLapDay`/`veDongLapDay` if unused and rewrite tests that use `.fill-row` (test_giao_dien_tom_tat_ket_qua.py 22 hits,
-  test_giao_dien_bieu_do.py 6, test_giao_dien_thu_gon_ket_qua.py 6 via MUC_KET_QUA list, test_giao_dien_phong_chu.py 2, test_giao_dien_diem_chuan.py 1).
-  Also drop `fillPanel` from `MUC_KET_QUA` in 03_ket_qua.js and the fill_* keys that become unused (add to KHOA_UI_DA_BO in test_ws_nhan.py if removed).
-- T3-23 plan (index.html `#xuatPanel`): default shows only `#btnXuatTuyChon` ("Xuất kết quả (Excel)") + `#btnXuatTheoLop`; put the other checkboxes
-  (xuatKemCsv, xuatDauVao, xuatThayDoi, xuatHocSinh + btnChonHocSinh) in `<details class="nang-cao">` "Tuỳ chọn khác"; shorten `xuat_hint_hoc_sinh` to one sentence
-  without card numbers; keep `.xuat-canh-bao` red warning visible. Tests: test_giao_dien_ux_xuat.py, test_giao_dien_xuat_du_lieu.py, test_export_ket_qua.py
-  (open the details first); changed text -> `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json` via scratchpad `them_chu.py`.
-- T3-28 plan (js/05_quan_ly.js ~lines 100-160 `admin_tai_buoi_title`, `admin_lich_tuan_title`): one table "Tải theo buổi", remove the "Lịch tuần" block,
-  show "{x} học sinh trên mỗi chỗ" with decimal comma instead of "2.3×"; tests `test_giao_dien_*lich*`, `grep -ln "lich-buoi\|admin_lich_tuan\|tai_buoi" tests/`.
-- Reusable component: `<details class="menu-khac"><summary>⋯</summary><div class="menu-khac-hop"><button class="menu-khac-muc">`; closer in js/00_nen.js
-  (`data-giu-menu` keeps it open for two-step confirms). Esc also closes the workspace overlay (do not use Esc in ws tests).
-- Test helpers: scratchpad `them_chu.py key vi en ...` appends intentional new default text to tests/du_lieu_ws/chu_ui_doi_co_y_t3.json (only for CHANGED
-  default strings; new keys need nothing); removed keys -> KHOA_UI_DA_BO in test_ws_nhan.py. Key names must not start with `kiosk_lop`/`lop_` etc. (test_giao_dien_a14_lop counts them).
-  Test env here needed `uv pip install --python /root/.local/share/uv/tools/pytest/bin/python openpyxl pillow python-docx ruff pytest-cov playwright==1.63.0`.
+## Current state (L2 DONE, impl session 3)
+- L2 complete and pushed: all items incl. T3-21 (fillPanel merged into `#clbPanel`: sort select, bar column `veOThanhLapDay`, "Lưu ý" column), T3-23
+  (`<details id="xuatNangCao">` holds all checkboxes + "Chọn học sinh…"; UI tests open it first), T3-28 (Lịch tuần removed, decimal comma).
+  NOT done: T3-32 "collapse result list after pick". soat-ma 7/7, CHANGELOG/TIEN_DO/CLAUDE_CHI_TIET (190 files / 3.412 cases) updated.
+- Waiting for tester L2 / `FIX L2`. L3 is done by a fresh impl.
 
 ## Test environment (read before running anything)
 - `python3 -m venv .venv && pip install` HANGS on the proxy here. Use the uv tool pytest: `pytest` (= /root/.local/bin/pytest,
@@ -75,8 +51,8 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 - Each stop-hook nag about unpushed commits: do not push unverified work; commit locally, push after related tests are green.
 
 ## Next steps (ordered)
-1. If `FIX L1` arrives: fix, related tests (include `test_giao_dien_tieng_viet_sach.py`, `test_i18n_sync.py`, `test_ws_nhan.py`, `test_a13_12_tai_lieu.py`), push, reply `IMPL DONE L1 fix<k>`.
-2. Otherwise nothing: the next lot is done by a fresh impl.
+1. If `FIX L2` arrives: fix, related tests (incl. `test_a13_12_tai_lieu.py`, `test_giao_dien_tieng_viet_sach.py`, `test_ws_nhan.py`), push, `IMPL DONE L2 fix<k>`.
+2. Otherwise nothing.
 
 ## Files touched (L0 + L1)
 - Backend: api.py (empty-run guard), api_quan_ly.py (`create_or_update_club` None = keep), api_xuat.py (Excel text), main.py (window title)
@@ -90,3 +66,4 @@ study rows by id: `grep -n "^| T3-26 " docs/nghien_cuu/T3_DEBLOAT_GIAO_DIEN.md`)
 |---|---|---|---|
 | 2026-11-04 | Sonnet (impl 1) | L0 implemented, fix1, fixci1 | tester NO BUGS on L0 |
 | 2026-11-04 | Sonnet (impl 1) | L1 implemented (`0fd4981`), handoff written | tester L1 pending |
+| 2026-11-04 | Sonnet (impl 3) | L2 finished (T3-23, T3-28, T3-21, docs, soat-ma) | tester L2 pending |
