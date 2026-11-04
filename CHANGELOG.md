@@ -2,6 +2,8 @@
 
 ## 2026-11-02 — A14 — phần A (nền, nhập, API): lớp của học sinh
 
+**Đã merge vào main qua PR #6 (b044c4c, 03/11/2026).**
+
 Mỗi học sinh có thể có "lớp" (vd 10H1A) CHỈ để hiển thị, sắp, lọc, xuất cho giáo viên chủ nhiệm. Thuật toán phân bổ KHÔNG đọc lớp. Phần B (xuất + giao diện) ở nhánh `claude/a14-giao-dien`.
 
 **NGOẠI LỆ BẤT BIẾN 7 (Truong duyệt 02/11/2026).** Hợp đồng cột CSV đổi có chủ đích: cột TUỲ CHỌN `class_id` ngay sau `reserve_group` trong CSV nguyện vọng và CSV chọn thi; Sổ nhập thêm cột "Lớp" (nhãn `cohort`) ngay sau "Họ tên". Không có cột / ô trống thì giữ lớp cũ; lần ghi sau cùng thắng. Không lớp nào thì `thanh_csv` và Sổ xuất ra giống từng byte như cũ.
