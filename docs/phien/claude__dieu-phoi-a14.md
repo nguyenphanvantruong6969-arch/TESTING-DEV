@@ -19,7 +19,7 @@ A14 "class per student" (Lớp): each student has `students.class_id` used ONLY 
 ## Current state (overwrite each handoff)
 - Done: A14 code is on main (b044c4c). PR #7 is OPEN, CI green (ruff, Linux full + real UI, Windows), mergeable clean, no reviews. Waiting only for Truong to review/merge.
 - In progress: nothing. Sessions A (session_01VfPzNra1AUNjuEtEybZqXm) and B (session_01VfPzNuqgL1PDRUBydGUj7d) are idle; no pending work for them.
-- Watching: the old coordinator session was subscribed to PR #7 and had a one-shot check-in scheduled (trigger trig_01JSWreCPpEtJc4XUNckceGb, ~05:49Z 2026-11-04). A new session should re-subscribe to PR #7 if Truong wants it watched (subscribe_pr_activity owner nguyenphanvantruong6969-arch repo testing-dev pullNumber 7).
+- Watching: the old coordinator session is subscribed to PR #7. Check-in 1 (05:49Z 2026-11-04) found nothing new; check-in 2 is scheduled for ~09:50Z (trigger trig_015VMmDJCKp6jEQ8TRLJDMXc). A new session should re-subscribe to PR #7 if Truong wants it watched (subscribe_pr_activity owner nguyenphanvantruong6969-arch repo testing-dev pullNumber 7).
 - Tests: nothing to run for this branch (docs only).
 
 ## Decisions and gotchas (keep short)
@@ -45,3 +45,4 @@ A14 "class per student" (Lớp): each student has `students.class_id` used ONLY 
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-02..04 | Opus | Coordinated A14: spec Q&A, prompts, parallel sessions A/B, cross-review, fix rounds, full-suite verification, PR #6 merged, PR #7 opened and green | handoff at ~400k tokens |
+| 2026-11-04 | Opus | PR #7 check-in 1: still green, clean, no reviews; check-in 2 scheduled | no new work; open a new session |
