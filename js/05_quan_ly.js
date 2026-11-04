@@ -1175,7 +1175,7 @@ function datLaiFormClb() {
   if (el("clubFormBuoi")) el("clubFormBuoi").value = "";
   el("clubFormName").value = "";
   el("clubFormCapacity").value = "";
-  el("clubFormReserveCapacity").value = "0";
+  el("clubFormReserveCapacity").value = "";
   el("clubFormReserveGroup").value = "";
   el("btnClubFormHuy").hidden = true;
   document.querySelectorAll("#adminClubTableBody tr.is-editing").forEach((r) => r.classList.remove("is-editing"));

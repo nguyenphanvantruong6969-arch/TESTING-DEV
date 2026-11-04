@@ -92,6 +92,19 @@ def test_go_tay_lai_ma_cu_chi_dien_ba_o_khong_xoa_ba_truong_con_lai(api, mo):
     assert not loi
 
 
+def test_go_tay_ma_cu_de_nguyen_o_suat_du_tru_mac_dinh_khong_xoa(api, mo):
+    api.create_or_update_club("clb_k", "CLB K", 10, 4, "chinh_sach", "thu_2")
+    page, loi = mo()
+    _vao_ql(page)
+    page.fill("#clubFormId", "clb_k")
+    page.fill("#clubFormName", "CLB K")
+    page.fill("#clubFormCapacity", "20")  # KHÔNG đụng ô suất dự trữ, nhãn, buổi
+    page.click("#btnSaveClub")
+    page.wait_for_function("document.querySelector('#clubFormId').value === ''")
+    assert _clb(api, "clb_k") == ("CLB K", 20, 4, "chinh_sach", "thu_2")
+    assert not loi
+
+
 def test_dong_dang_sua_xoa_nhan_co_chu_y_la_xoa_that(api, mo):
     api.create_or_update_club("clb_k", "CLB K", 10, 4, "chinh_sach", "thu_2")
     page, _ = mo()

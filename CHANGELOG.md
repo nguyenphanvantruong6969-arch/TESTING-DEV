@@ -6,7 +6,8 @@
 - **B2 / T3-01 — chạy trên dữ liệu trống bị chặn.** `api.py::_run_pipeline_da_khoa`: bước 0, TRƯỚC sao lưu / khoá STB / mọi lần ghi, đếm học sinh và CLB; thiếu một trong hai thì trả `chua_co_du_lieu_de_chay` (không ghi `run_history`, không khoá seed). Giao diện (`js/02_van_hanh.js`): `khoa.thieuDuLieu` khoá nút "Chạy sắp xếp" kèm `title` lý do, ô Cảnh báo ghi "Chưa có dữ liệu để xếp…" thay cho dòng xanh.
 - **B3 / T3-42 — câu `wharton_ho_so_chua_hop_le`** chỉ việc làm được (thẻ 05, tab Điểm quyết tâm, "Phóng cho đủ 100 theo tỉ lệ"), không còn bảo tắt tính năng. Chỉ đổi chữ (vi + en), không thêm công tắc.
 - **Mã lỗi mới** `chua_co_du_lieu_de_chay` (`i18n_errors.py` vi+en, đã sinh lại `i18n_loi.js`); khoá UI mới `health_chua_co_du_lieu` (`i18n.js` vi+en).
-- **Test mới:** `tests/test_t3_l0_backend.py` (11 ca), `tests/test_giao_dien_t3_l0.py` (6 ca, Chromium).
+- **Test mới:** `tests/test_t3_l0_backend.py` (11 ca), `tests/test_giao_dien_t3_l0.py` (7 ca, Chromium).
+- **Vòng sửa 1 (tester):** ô "Suất dự trữ" mặc định để TRỐNG (trước là "0" nên gõ tay lại mã cũ vẫn xoá suất dự trữ); câu B3 bản tiếng Việt dùng "mục Điểm quyết tâm" thay "tab" (test `test_giao_dien_tieng_viet_sach`).
 - **Bất biến 1:** cấu hình mặc định trùng khít `origin/main` — `kiem_nhanh.py trung_khit` (3 bộ × 5 seed) và `kiem_trung_khit` gọi trực tiếp với 20 seed (3 bộ × 20 seed).
 
 ## 2026-11-04 — T3-HT (ngoài sổ, Truong duyệt 04/11/2026): hạ tầng tự động hoá T3 (điều phối + viết mã + soát)
