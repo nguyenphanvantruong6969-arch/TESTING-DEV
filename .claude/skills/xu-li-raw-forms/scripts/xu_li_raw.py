@@ -35,7 +35,7 @@ sys.path.insert(0, DAY)
 
 import sinh_du_lieu as sdl  # noqa: E402  (soat, ghi_bo, TEN_SO, trần)
 import so_nhap  # noqa: E402  (sinh_du_lieu đã đặt sẵn đường tìm)
-from rbda_priority_pipeline import chuan_hoa_lop  # noqa: E402  (bộ chuẩn hoá lớp A14, không viết lại)
+from lop_hoc_sinh import chuan_hoa_lop  # noqa: E402  (bộ chuẩn hoá lớp A14, gốc kho; không viết lại)
 
 COT_RAW = ["phieu_so", "thoi_gian_nop", "email", "student_id", "trang_thai_phieu",
            "ma_cau", "loai_cau", "buoi", "club_id", "cau_so", "cau_hoi", "tra_loi",
@@ -212,9 +212,14 @@ def xu_li(raw, dap_an=None, clb_truong=None):
         dau_tien[sid] = ps
         giu[ps] = (sid, rows)
     for sid, theo_phieu in lop_cua.items():
-        if len(set(theo_phieu.values())) > 1:
-            bc["lop_khac_giua_cac_phieu"].append("%s: %s (lấy lớp của phiếu giữ %d)" % (
-                sid, "; ".join("phiếu %d ghi %s" % kv for kv in sorted(theo_phieu.items())), dau_tien[sid]))
+        giu_ps = dau_tien[sid]
+        chi_tiet = "; ".join("phiếu %d ghi %s" % kv for kv in sorted(theo_phieu.items()))
+        if giu_ps not in theo_phieu:          # phiếu giữ không ghi lớp: KHÔNG mượn lớp phiếu khác
+            bc["lop_khac_giua_cac_phieu"].append(
+                "%s: phiếu giữ %d không ghi lớp, %s; Sổ để trống" % (sid, giu_ps, chi_tiet))
+        elif len(set(theo_phieu.values())) > 1:
+            bc["lop_khac_giua_cac_phieu"].append(
+                "%s: %s (lấy lớp của phiếu giữ %d)" % (sid, chi_tiet, giu_ps))
     for e, ds in email_ma.items():
         if len(ds) > 1:
             bc["email_hai_ma"].append("%s dùng %d mã: %s" % (e, len(ds), ", ".join(sorted(ds))))
@@ -349,7 +354,7 @@ TIEU_DE_BC = OrderedDict([
     ("bai_khong_hop_le", "Bài thi không hợp lệ (bị bỏ)"),
     ("cau_la", "Câu hỏi lạ, không thuộc mẫu (biểu mẫu có thể bị sửa tay)"),
     ("khong_dang_ky_buoi", "Học sinh không đăng ký buổi nào"),
-    ("lop_khac_giua_cac_phieu", "Cùng một mã học sinh nhưng các phiếu ghi lớp khác nhau (lấy lớp của phiếu giữ)"),
+    ("lop_khac_giua_cac_phieu", "Lớp không thống nhất giữa các phiếu của cùng một mã (Sổ chỉ lấy lớp của phiếu giữ)"),
     ("ghi_chu", "Ghi chú"),
 ])
 

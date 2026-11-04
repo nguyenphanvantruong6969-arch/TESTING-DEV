@@ -92,7 +92,7 @@ def test_khong_co_cot_lop_so_y_nhu_cu(tmp_path, xr, de):
         a = [[o.value for o in r] for r in cu[ten].iter_rows()]
         b = [[o.value for o in r] for r in moi[ten].iter_rows()]
         assert a == b, ten
-    assert "các phiếu ghi lớp khác nhau" not in (ra / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
+    assert "Lớp không thống nhất giữa các phiếu" not in (ra / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
 
 
 def test_lop_rong_van_ghi_cot_nhung_o_trong(tmp_path, xr, de):
@@ -105,12 +105,12 @@ def test_lop_khac_nhau_giua_cac_phieu_lay_phieu_giu_va_bao(tmp_path, xr, de):
     ra = _chay(xr, de, tmp_path, [("HS001", "10A1"), ("HS002", "11A2"), ("HS001", "11A9")])
     assert _lop_theo_ma(ra) == {"HS001": "10A1", "HS002": "11A2"}
     bc = (ra / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
-    assert "các phiếu ghi lớp khác nhau" in bc
+    assert "Lớp không thống nhất giữa các phiếu" in bc
     assert "HS001: phiếu 1 ghi 10A1; phiếu 3 ghi 11A9" in bc
     # Cùng lớp (chỉ khác hoa thường / khoảng trắng) thì KHÔNG báo.
     (tmp_path / "b").mkdir()
     ra2 = _chay(xr, de, tmp_path / "b", [("HS001", "10A1"), ("HS001", " 10a1")])
-    assert "các phiếu ghi lớp khác nhau" not in (ra2 / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
+    assert "Lớp không thống nhất giữa các phiếu" not in (ra2 / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
 
 
 def test_lop_o_phieu_giu_trong_thi_khong_lay_lop_phieu_bo(tmp_path, xr, de):
@@ -118,6 +118,12 @@ def test_lop_o_phieu_giu_trong_thi_khong_lay_lop_phieu_bo(tmp_path, xr, de):
     chỉ một lớp khác rỗng nên không có gì để so."""
     ra = _chay(xr, de, tmp_path, [("HS001", ""), ("HS001", "11A9")])
     assert _lop_theo_ma(ra) == {"HS001": None}
+    bc = (ra / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
+    assert "HS001: phiếu giữ 1 không ghi lớp, phiếu 2 ghi 11A9; Sổ để trống" in bc
+    # Cả hai phiếu đều không ghi lớp: không có gì để báo.
+    (tmp_path / "c").mkdir()
+    ra2 = _chay(xr, de, tmp_path / "c", [("HS001", ""), ("HS001", "")])
+    assert "Lớp không thống nhất" not in (ra2 / "BAO_CAO_BAT_THUONG.md").read_text(encoding="utf-8")
 
 
 def test_thu_muc_nhieu_phan_co_cot_lop(tmp_path, xr, de):
@@ -154,7 +160,9 @@ def test_gs_cot_raw_van_19_va_noi_dung_trung_tep_gs():
 
 
 KICH_BAN_LOP = r"""
-const hs=[['ma_hs','ho_ten','lop'],['HS1','An','10a1 '],['HS2','Bình','11A2']];
+const hs=process.env.TAB==='lech'
+  ? [['ma_hs','ho_ten','lop'],[' hs1 ','An','10a1 '],[7,'Cường','12A3']]      // HS2 vắng mặt trong tab
+  : [['ma_hs','ho_ten','lop'],['HS1','An','10a1 '],['HS2','Bình','11A2']];
 const tab={getDataRange:()=>({getValues:()=>hs})};
 if (process.env.KHONG_TAB) { global.SpreadsheetApp.getActiveSpreadsheet=()=>({getSheetByName:()=>null}); }
 else { global.SpreadsheetApp.getActiveSpreadsheet=()=>({getSheetByName:n=>n==='hoc_sinh'?tab:null}); }
@@ -162,16 +170,17 @@ global.__goi = process.env.GOI;
 try { if (process.env.GOI==='bat') chamTheoCLB(true); else if (process.env.GOI==='menu') chamTheoCLB({event:1}); else if (process.env.GOI==='coLop') chamTheoCLBCoLop(); else chamTheoCLB(); }
 catch (e) { console.log('LOI', e.message); process.exit(0); }
 const raw=by('RAW_PHIEU');
+console.log('CB', JSON.stringify(by('Cảnh báo').slice(1).map(r=>r[2])));
 console.log('RAW', JSON.stringify({tieu: raw[0], n: raw.length, dong: raw.slice(1).map(r=>[r[3], r[r.length-1], r.length])}));
 """
 
 
-def _chay_gs(tmp_path, goi, khong_tab=False):
+def _chay_gs(tmp_path, goi, khong_tab=False, tab=""):
     js = tmp_path / "cham.js"
     kich_ban = CHAM.replace("chamTheoCLB();\nconst by=", "const by=").split("console.log('HS'")[0] + KICH_BAN_LOP
     js.write_text(kich_ban, encoding="utf-8")
     gs = os.path.join(GOC, "mau_forms_thi_clb", "TAO_GOOGLE_FORM.gs")
-    env = dict(os.environ, GOI=goi, **({"KHONG_TAB": "1"} if khong_tab else {}))
+    env = dict(os.environ, GOI=goi, TAB=tab, **({"KHONG_TAB": "1"} if khong_tab else {}))
     return subprocess.run(["node", str(js), gs, str(tmp_path / "x.json")], capture_output=True,
                           text=True, encoding="utf-8", check=True, env=env).stdout
 
@@ -206,3 +215,40 @@ def _cot_raw():
 def test_gs_bat_ma_thieu_tab_hoc_sinh_thi_bao_loi_khong_xuat(tmp_path):
     out = _chay_gs(tmp_path, "bat", khong_tab=True)
     assert "LOI" in out and "hoc_sinh" in out and "RAW " not in out
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="cần Node.js để chạy bản giả lập FormApp")
+def test_gs_khop_ma_sau_khi_chuan_hoa_hai_phia_va_dem_ma_khong_khop(tmp_path):
+    out = _chay_gs(tmp_path, "bat", tab="lech")
+    raw = _raw_gs(out)
+    # " hs1 " trong tab (chữ thường, thừa khoảng trắng) vẫn khớp HS1; HS2 vắng mặt thì lop để trống.
+    assert {d[0]: d[1] for d in raw["dong"]} == {"HS1": "10a1", "HS2": ""}
+    canh_bao = json.loads(next(l for l in out.splitlines() if l.startswith("CB ")).split(" ", 1)[1])
+    assert any("1 mã học sinh không có trong tab hoc_sinh" in c and "HS2" in c for c in canh_bao), canh_bao
+    # Khớp hết thì không có cảnh báo đó.
+    canh_bao2 = json.loads(next(l for l in _chay_gs(tmp_path, "bat").splitlines() if l.startswith("CB ")).split(" ", 1)[1])
+    assert not any("không có trong tab hoc_sinh" in c for c in canh_bao2)
+
+
+def test_zip_skill_chay_ngoai_kho_voi_cot_lop(tmp_path, xr, de):
+    """Gói xu-li-raw-forms.zip giải ra ngoài kho vẫn đọc cột lop (chuan_hoa_lop đi kèm, không cần mã thuật toán)."""
+    import subprocess
+    import sys
+    import zipfile
+    sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
+    import dong_goi_skill
+    z = [p for p in dong_goi_skill.dong_goi(str(tmp_path / "zip")) if p.endswith("xu-li-raw-forms.zip")][0]
+    ngoai = tmp_path / "ngoai"
+    with zipfile.ZipFile(z) as f:
+        f.extractall(str(ngoai))
+    assert not (ngoai / "xu-li-raw-forms" / "scripts" / "rbda_priority_pipeline.py").exists()
+    _raw(xr, de, [("HS001", " 10a1 "), ("HS002", "11A2")], str(tmp_path / "RAW_PHIEU.xlsx"))
+    ghi_dap_an(de, str(tmp_path / "DAP_AN.xlsx"))
+    ghi_clb(de, str(tmp_path / "01.xlsx"))
+    ra = tmp_path / "ra"
+    kb = str(ngoai / "xu-li-raw-forms" / "scripts" / "xu_li_raw.py")
+    r = subprocess.run([sys.executable, "-I", kb, "--raw", str(tmp_path / "RAW_PHIEU.xlsx"),
+                        "--dap-an", str(tmp_path / "DAP_AN.xlsx"), "--clb", str(tmp_path / "01.xlsx"),
+                        "--ra", str(ra)], cwd=str(ngoai), capture_output=True, text=True, encoding="utf-8")
+    assert r.returncode == 0, r.stderr
+    assert _lop_theo_ma(ra) == {"HS001": "10A1", "HS002": "11A2"}

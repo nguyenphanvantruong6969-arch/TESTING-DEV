@@ -13,6 +13,14 @@ Cùng kiểu rủi ro với B9 (SQLite của CI báo "incomplete input"). Chỉ 
 - Dùng ở `tests/test_a14_tu_vung_cohort.py::test_di_tru_schema_them_cot_vao_csdl_cu_chay_lap_va_giu_du_lieu` và `tests/test_a14_sua_sau_soat.py::_csdl_cu_co_du_lieu`. Mọi assert giữ nguyên; 48 ca của hai tệp xanh.
 - Trên nhánh này `test_a5_sao_luu_dung_mot_lan_truoc_buoc_di_tru_dau_tien` vẫn là bản trước B9; bản sửa B9 có ở `main`, giữ nguyên để gộp không xung đột.
 
+## 2026-11-04 — T4-K1 sửa vòng 1 (tester soát fff0f41)
+
+- **[Chặn] Gói skill chạy ngoài kho:** `chuan_hoa_lop` chuyển sang mô-đun gốc kho mới `lop_hoc_sinh.py` (chỉ thư viện chuẩn, hành vi y hệt). `rbda_priority_pipeline.py` nhập lại và giữ tên công khai, nên mọi nơi gọi cũ và test cũ không đổi. `xu_li_raw.py` nhập từ `lop_hoc_sinh`; `dong_goi_skill.py` đưa `lop_hoc_sinh.py` vào `xu-li-raw-forms.zip` (skill không mang mã thuật toán). PyInstaller: `rbda_priority_pipeline` nhập `lop_hoc_sinh` ở mức mô-đun nên phân tích tĩnh tự gom, không cần đổi `kiosk.spec`.
+- **Báo cáo lớp:** phiếu giữ không ghi lớp thì ghi rõ "phiếu giữ N không ghi lớp, phiếu M ghi X; Sổ để trống" (cả khi các phiếu khác nhau lẫn khi chỉ có một lớp ở phiếu khác); Sổ vẫn không mượn lớp. Tiêu đề mục đổi thành "Lớp không thống nhất giữa các phiếu của cùng một mã".
+- **`.gs` (hai bộ sinh vẫn trùng):** khớp mã `ma_hs` bằng cắt khoảng trắng và IN HOA ở cả hai phía (`maLop_`); đếm mã học sinh không có trong tab `hoc_sinh` (`maKhongCoLop_`), ghi một dòng vào trang Cảnh báo và Logger. Tài liệu: cột `ma_hs` định dạng văn bản `@`.
+- **Test:** `tests/test_t4_k1_lop.py` lên 12 ca (thêm: khớp mã chuẩn hoá và đếm mã không khớp ở `.gs`; gói zip chạy ngoài kho với cột `lop`; mở rộng ca phiếu giữ trống lớp).
+- `docs/ke_hoach/CLAUDE_CHI_TIET.md`: thêm `lop_hoc_sinh.py` vào bản đồ mã.
+
 ## 2026-11-04 — T4-K1 (ngoài sổ, Truong duyệt 03/11/2026): cột `lop` tuỳ chọn từ `hoc_sinh` tới cột Lớp của Sổ
 
 Thay đổi số 1 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md` (DEC-2: lớp lấy từ `hoc_sinh` lúc xuất, biểu mẫu KHÔNG hỏi lớp).
@@ -20,7 +28,7 @@ Thay đổi số 1 ở mục 11.2 của `docs/he_sinh_thai/T4_MO_HINH_HE_SINH_TH
 - **`xu_li_raw.py`:** `COT_RAW` giữ 19 cột. RAW có cột `lop` (cột thứ 20) thì ghi vào cột Lớp của Sổ (`ghi_so_nhap(co_lop=True)`, A14), lấy lớp từ PHIẾU GIỮ, chuẩn hoá bằng `chuan_hoa_lop` của phần mềm (không viết hàm mới). Các phiếu của cùng một mã ghi lớp (khác rỗng) khác nhau thì thêm mục "lop_khac_giua_cac_phieu" vào `BAO_CAO_BAT_THUONG.md`. Không có cột `lop`: Sổ và báo cáo y như cũ.
 - **`TAO_GOOGLE_FORM.gs` và `tao_google_forms.py` (sinh giống hệt):** `chamTheoCLB(ghiLop)`, chỉ `ghiLop === true` mới bật (menu/trigger truyền đối tượng sự kiện không bật nhầm); mặc định TẮT thì RAW 19 cột như cũ. Bật thì thêm cột `lop` đọc từ tab `hoc_sinh` (`ma_hs`, `lop`); hàm mới `chamTheoCLBCoLop`, `docLopHocSinh_`, `themCotLop_`, hằng `ID_BANG_HOC_SINH`. Thiếu tab thì báo lỗi trước khi tạo thư mục. `COT_RAW` của `.gs` vẫn bằng của skill.
 - **Tài liệu:** `DINH_DANG_RAW.md` (cột tuỳ chọn thứ 20), `SKILL.md` của `xu-li-raw-forms` và `tao-google-form-clb`.
-- **Test mới:** `tests/test_t4_k1_lop.py` (10 ca): có `lop`; không có `lop` (Sổ bằng đúng cách cũ); `lop` rỗng; lớp khác nhau giữa các phiếu; phiếu giữ trống lớp; thư mục nhiều phần có `lop`; `.gs` mặc định tắt (kể cả khi truyền sự kiện), bật, thiếu tab `hoc_sinh`; `.gs` khớp `noi_dung()`. Ca ghim `COT_RAW` ở `test_skill_xu_li_raw.py` giữ xanh.
+- **Test mới:** `tests/test_t4_k1_lop.py` (10 ca lúc đầu, 12 sau vòng sửa 1): có `lop`; không có `lop` (Sổ bằng đúng cách cũ); `lop` rỗng; lớp khác nhau giữa các phiếu; phiếu giữ trống lớp; thư mục nhiều phần có `lop`; `.gs` mặc định tắt (kể cả khi truyền sự kiện), bật, thiếu tab `hoc_sinh`; `.gs` khớp `noi_dung()`. Ca ghim `COT_RAW` ở `test_skill_xu_li_raw.py` giữ xanh.
 - `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 180 tệp test.
 - Không đụng kiosk, hợp đồng cột CSV, `match_results`.
 

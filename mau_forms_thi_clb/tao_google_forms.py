@@ -362,6 +362,15 @@ function chamTheoCLB(ghiLop) {
     ghiRaw_(raw, META, i + 1, r, sid, trangThai, xuLi, cacCau);
   });
 
+  if (lopCua) {
+    const thieuLop = maKhongCoLop_(raw, lopCua);
+    if (thieuLop.length) {
+      const nd = thieuLop.length + ' mã học sinh không có trong tab hoc_sinh nên cột lop để trống (kiểm cột ma_hs có định dạng văn bản @ không): ' + thieuLop.slice(0, 10).join(', ') + (thieuLop.length > 10 ? ', ...' : '');
+      canhBao.push(['', '', nd]);
+      Logger.log('CẢNH BÁO: ' + nd);
+    }
+  }
+
   const luc = Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd HH-mm');
   const thuMuc = DriveApp.createFolder('Kết quả CLB ' + luc);
   const ss = SpreadsheetApp.create('BANG_DIEM ' + luc);
@@ -450,17 +459,32 @@ function docLopHocSinh_() {
   if (iMa < 0 || iLop < 0) throw new Error('Tab "hoc_sinh" phải có cột ma_hs và lop.');
   const lop = {};
   v.slice(1).forEach(function (r) {
-    const ma = String(r[iMa]).trim();
+    const ma = maLop_(r[iMa]);
     if (ma && !lop.hasOwnProperty(ma)) lop[ma] = String(r[iLop]).trim();
   });
   return lop;
 }
 
+// Khoá so khớp mã: cắt khoảng trắng và IN HOA ở CẢ HAI phía (tab hoc_sinh và student_id của phiếu).
+// Cột ma_hs trong tab hoc_sinh nên định dạng văn bản (@): "001" lưu thành số 1 thì không khớp.
+function maLop_(x) { return String(x === null || x === undefined ? '' : x).trim().toUpperCase(); }
+
 function themCotLop_(raw, lopCua) {
   return raw.map(function (r, i) {
     if (i === 0) return r.concat(['lop']);
-    return r.concat([lopCua.hasOwnProperty(r[3]) ? lopCua[r[3]] : '']);   // r[3] = student_id
+    const k = maLop_(r[3]);                                               // r[3] = student_id
+    return r.concat([lopCua.hasOwnProperty(k) ? lopCua[k] : '']);
   });
+}
+
+// Các mã học sinh (khác rỗng, không lặp) của raw mà tab hoc_sinh không có.
+function maKhongCoLop_(raw, lopCua) {
+  const thieu = {};
+  raw.slice(1).forEach(function (r) {
+    const k = maLop_(r[3]);
+    if (k && !lopCua.hasOwnProperty(k)) thieu[k] = true;
+  });
+  return Object.keys(thieu);
 }
 
 function moTaCau_() {
