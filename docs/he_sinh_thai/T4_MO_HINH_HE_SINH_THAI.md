@@ -1,6 +1,6 @@
-# T4. Mô hình hệ sinh thái thu thập và quản lý dữ liệu (bản đề xuất để duyệt, sửa vòng 2)
+# T4. Mô hình hệ sinh thái thu thập và quản lý dữ liệu (bản đề xuất để duyệt, sửa vòng 3)
 
-Trạng thái: ĐỀ XUẤT, chưa triển khai, chờ Truong duyệt. Soạn 03/11/2026, sửa vòng 1 và vòng 2 cùng ngày.
+Trạng thái: ĐỀ XUẤT, chưa triển khai, chờ Truong duyệt. Soạn 03/11/2026, sửa vòng 1, 2 và 3.
 Phạm vi: thu thập đăng ký và thi tuyển CLB, quản lý, duyệt, xuất sang kiosk RB-DA.
 
 > **Hai hạn chế (đọc trước).**
@@ -96,6 +96,7 @@ Vai trò: Submitter (học sinh, giáo viên) và Administrator (1 đến 2 ngư
 | GĐ-14 | `form.getResponses(mốc thời gian)` trả các phản hồi sau mốc, đủ để đọc từng phần | Đọc toàn bộ rồi lọc (chậm hơn, xem mục 9.4) |
 | GĐ-15 | Tốc độ đọc phản hồi qua API: khoảng 20 đến 100 mili giây mỗi phản hồi (giả định để tính thông lượng) | Mục 9.4 tính lại; quá 200 mili giây thì dùng phương án B ở mục 11.1 |
 | GĐ-16 | `ScriptApp` tạo và xoá được trigger theo chu kỳ 10 phút và trigger một lần đặt giờ | Admin đặt trigger bằng tay theo hướng dẫn |
+| GĐ-17 | Trigger một lần đặt giờ (`.at()`) có thể chạy trễ so với giờ đặt | Đã tính: `xuLyLo` tự kiểm cửa sổ (M16), `ketThucLo` tự đặt lại nếu còn tồn |
 
 ---
 
@@ -118,11 +119,11 @@ Vai trò: Submitter (học sinh, giáo viên) và Administrator (1 đến 2 ngư
 | 1. Tạo và quản lý biểu mẫu | Google Forms sinh bằng `TAO_GOOGLE_FORM.gs` (đã có) | |
 | 1. Nhiều đối tượng, nhiều đợt | Mỗi (đợt, đối tượng) một Sheets, đặt tên `<năm>_<đợt>_<đối tượng>` trong một thư mục Drive; thông số đợt nằm ở `cau_hinh`. Không có sổ đăng ký đợt riêng | Tránh kho thứ hai |
 | 1. Loại trường | Chữ, số, email, thả xuống, nhiều lựa chọn (GĐ-4); tải tệp hoãn sang sau V1 (GĐ-9) | |
-| 1. Mở, đóng biểu mẫu | Hai trigger theo giờ đã đặt trong `cau_hinh` gọi hàm đóng nhận phản hồi (GĐ-6) | |
+| 1. Mở, đóng biểu mẫu | Trigger `moForm` (đặt giờ mở, kiểm tuỳ chọn sửa phản hồi đã tắt) và `dongForm` (đặt giờ đóng, gọi hàm đóng nhận phản hồi) theo `cau_hinh` (GĐ-6) | Mục 7.6 |
 | 1. Kiểm tra đầu vào | Kiểm tra ở biểu mẫu (GĐ-8) và ở lô (mục 8) | |
 | 1. Hạn chế trùng | Giữ phiếu có dấu thời gian sớm nhất của mỗi mã (`ban_giu`), phiếu sau là `bo_nop_trung` | Khớp luật skill |
 | 2. Kho trung tâm, tìm, lọc, sửa | Một Sheets mỗi đợt; lọc bằng chế độ xem lọc; sửa chỉ ở `phieu` (trạng thái, lý do, `ban_giu`) | Không sửa câu trả lời |
-| 2. Xuất Excel và CSV | Menu "Xuất": tệp RAW_PHIEU trên Drive (xlsx hoặc CSV); tải `phieu` bằng chức năng tải của Sheets | |
+| 2. Xuất Excel và CSV | Menu "Xuất" và "Xuất tiếp" (riêng, không tự chạy sau chốt): bộ tệp RAW_PHIEU CSV theo phần trên Drive; tải `phieu` bằng chức năng tải của Sheets | Mục 11.3 |
 | 3. Bảng điều khiển, trạng thái | Tab `dieu_khien` (công thức) và menu tuỳ biến, mục 6.3 | |
 | 3. Duyệt, từ chối, sửa | Menu duyệt hàng loạt, từ chối kèm lý do, đổi phiếu giữ | Mục 7.4 |
 | 3. Phân quyền | Hai vai trò: Submitter, Administrator | Mục 6.2 |
@@ -155,9 +156,9 @@ Một Google Sheets mỗi (đợt, đối tượng). Một cơ sở dữ liệu 
 | `RAW` (tab phản hồi do Forms nối vào) | `thoi_gian`, `email` (tuỳ chọn, chỉ khi biểu mẫu thu email, GĐ-9), các cột câu hỏi (cột `student_id` là mã học sinh học sinh tự gõ) | Không có cột khoá | Bản **đọc được của Google**, dạng rộng, một dòng mỗi phiếu. **Lô không đọc nội dung từ đây**; chỉ dùng số dòng để đối soát (mục 7.3). Không script nào ghi vào (GĐ-3). Quy tắc: không sắp xếp hay lọc tại chỗ, dùng chế độ xem lọc |
 | `hoc_sinh` | `ma_hs`, `ho_ten`, `lop` | PK `ma_hs` | Admin nhập danh sách lớp. Dữ liệu thật của học sinh, không đưa vào kho mã. Ánh xạ `ma_hs` sang `student_id` khi xuất |
 | `clb` | `club_id`, `ten`, `buoi`, `chi_tieu` | PK `club_id` | Bảng tra riêng, không khoá ngoại tới `phieu`. Chỉ tiêu do nhà trường lập, dùng khi nạp Sổ nhập |
-| `phieu` (tab duy nhất đã xử lý) | `raw_key`, `ma_hs`, `trang_thai`, `ly_do`, `ban_giu`, `nguoi_duyet`, `thoi_gian_duyet` | PK `raw_key` | Một dòng mỗi phản hồi. `raw_key` là **ID phản hồi của Forms** (GĐ-13). `ma_hs` là mã hiện hành (có thể do admin gán lại, mục 7.4), tuỳ chọn trỏ tới `hoc_sinh` (`ma_la` thì không khớp). Không sắp xếp tại chỗ, dùng chế độ xem lọc |
-| `nhat_ky` | `log_id`, `thoi_gian`, `nguoi`, `hanh_dong`, `doi_tuong`, `ly_do` | PK `log_id` | Chỉ thêm dòng. `doi_tuong` tuỳ chọn: `raw_key`, `ma_hs` hoặc `ky`. Ghi lỗi lô, quyết định quan trọng (từ chối, đổi phiếu giữ, gán lại mã, chốt đợt), lần xuất |
-| `cau_hinh` | `khoa`, `gia_tri` | PK `khoa` | Thông số đợt (`ky_id`, `ten`, `doi_tuong`, `mo`, `dong`, `form_id`, `trang_thai_ky`), con trỏ `moc_xu_ly` (dấu thời gian cuối đã xử lý), cờ `ghi_do`, địa chỉ email, giờ cài trigger gần nhất. Là bảng tra riêng, không khoá ngoại |
+| `phieu` (tab duy nhất đã xử lý) | `ma_hs`, `thoi_gian_nop`, `trang_thai`, `ly_do`, `ban_giu`, `nguoi_duyet`, `thoi_gian_duyet`, `raw_key` (**cột cuối cùng**, M18) | PK `raw_key` | Một dòng mỗi phản hồi. `raw_key` là **ID phản hồi của Forms** (GĐ-13). `thoi_gian_nop` là dấu thời gian phản hồi, ISO 8601; **xếp hạng nhóm dùng `thoi_gian_nop`, hoà thì theo `raw_key`**. `ma_hs` là mã hiện hành (có thể do admin gán lại, mục 7.4), chuẩn hoá theo M9, tuỳ chọn trỏ tới `hoc_sinh` (`ma_la` thì không khớp). Không sắp xếp tại chỗ, dùng chế độ xem lọc |
+| `nhat_ky` | `log_id`, `thoi_gian`, `nguoi`, `hanh_dong`, `doi_tuong`, `ma_hs`, `ly_do` | PK `log_id` | Chỉ thêm dòng. `doi_tuong` tuỳ chọn: `raw_key` hoặc `ky`; `ma_hs` tuỳ chọn (M10). Ghi lỗi lô, quyết định quan trọng (từ chối, giữ phiếu, gán lại mã, chốt đợt, mở lại đợt), lần xuất |
+| `cau_hinh` | `khoa`, `gia_tri` | PK `khoa` | Thông số và trạng thái chạy của đợt; danh sách đầy đủ các khoá ở mục 7.7, M15. Là bảng tra riêng, không khoá ngoại |
 | `dieu_khien` | Công thức | không | Chỉ là hiển thị, không lưu dữ liệu |
 
 `raw_key` = **ID phản hồi của Forms** (GĐ-13), một chuỗi duy nhất cho mỗi phản hồi, do Google cấp, đọc qua API. Không dùng số dòng, dấu thời gian hay băm nội dung. Hai phản hồi nộp cùng một giây vẫn có hai ID khác nhau nên không đè nhau (GĐ-7). Nếu GĐ-13 sai thì quay lại phương án dùng băm nội dung (mục 11.1).
@@ -168,12 +169,14 @@ Trạng thái `phieu.trang_thai`:
 |---|---|---|
 | `cho_duyet` | Hợp lệ, chờ admin | Không |
 | `da_duyet` | Admin đã duyệt | Có, nếu `ban_giu = 1` |
-| `tu_choi` | Admin từ chối, có lý do | Không |
+| `tu_choi` | Admin từ chối, có lý do; `ban_giu = 0` và nhóm được xếp hạng lại (M5) | Không |
 | `bo_nop_trung` | Mã đã có phiếu giữ, đây là phiếu sau (`ban_giu = 0`) | Không |
 | `ma_la` | Mã không có trong `hoc_sinh` (khác `bo_khong_ma`) | Không, đến khi admin xử lý |
 | `bo_khong_ma` | Không có mã học sinh | Không |
 
 `ban_giu` = 1 cho phiếu được giữ của mỗi `ma_hs`, 0 cho phiếu còn lại.
+
+`raw_key` là cột cuối của `phieu` (M18): lô ghi các cột khác bằng một lệnh `setValues`, rồi mới ghi cột `raw_key`, nên hàng chưa có `raw_key` chắc chắn là hàng chưa ghi xong. `thoi_gian_nop` lưu dạng ISO 8601.
 
 ### 6.2 Vai trò và bảo mật
 
@@ -203,8 +206,9 @@ Tối thiểu bắt buộc: số lượng theo trạng thái, đối soát, tìn
 | Xử lý một phiếu lỗi (`ma_la`) | 3: chọn dòng, menu "Từ chối" (nhập lý do) hoặc menu "Gán lại mã" (nhập mã đúng). Cách khác cho `ma_la`: thêm học sinh vào `hoc_sinh` rồi bấm "Xử lý lại phiếu mã lạ" |
 | Sửa một mã hợp lệ nhưng nhập nhầm (mã của người khác) | 3: chọn dòng, menu "Gán lại mã", nhập mã đúng và lý do |
 | Đổi phiếu giữ cho một học sinh | 3: chọn phiếu muốn giữ, menu "Giữ phiếu này", xác nhận |
+| Chạy lô ngay (khi đối soát thấy còn phản hồi chờ) | 1: menu "Chạy lô ngay" (cùng khoá với lô tự động) |
 | Chốt đợt | 2: menu "Chốt đợt", xác nhận |
-| Xuất | 1: menu "Xuất RAW_PHIEU" (tự chạy sau khi chốt) |
+| Xuất | 2: menu "Xuất", xác nhận. **Độc lập với Chốt đợt**, không tự chạy sau chốt (M23); lần xuất đầy đủ thứ hai trong cùng ngày bị từ chối nếu `phieu` không đổi (M20) |
 | Xem lỗi | 1: bấm liên kết trong email, mở `nhat_ky` |
 
 **Thao tác hàng loạt**: duyệt, từ chối kèm một lý do chung cho nhiều dòng, tải danh sách.
@@ -230,25 +234,28 @@ Sơ đồ b2 (phân loại và ghi một khối):
 - **Nguồn đọc là API của Forms, khoá là ID phản hồi.** Lô đọc `form.getResponses(mốc)` với mốc = `moc_xu_ly` trừ 1 phút (GĐ-14). Khoảng gối 1 phút bảo đảm không sót phản hồi nộp cùng giây hay sát mốc. Phản hồi có ID đã nằm ở `phieu` (hàng hợp lệ) thì bỏ qua. Nhờ đó hai phản hồi nộp **cùng một giây** đều được xử lý, vì ID khác nhau (GĐ-7).
 - **Khoá**: `LockService` khoá script, một lô tại một thời điểm.
 - **Mốc xử lý** `moc_xu_ly` = dấu thời gian lớn nhất trong các phản hồi đã ghi xong và kiểm xong. Mốc chỉ dời **sau cùng**.
-- **Hàng hợp lệ** của `phieu` là hàng có cả `raw_key` và `trang_thai` khác trống. Lô ghi từng khối ≤ 500 dòng; **cột `raw_key` đặt cuối hàng và mỗi hàng ghi `raw_key` sau các cột khác**. Sau mỗi khối, lô **đọc lại** khối vừa ghi và kiểm từng hàng có đủ `raw_key` và `trang_thai`.
-- **Ghi dở hoặc bị ngắt ở phút thứ 6** (GĐ-10): hàng thiếu `raw_key` hoặc `trang_thai` được coi là **chưa ghi**. Khối kế tiếp luôn bắt đầu ngay sau hàng hợp lệ cuối cùng liên tục, nên ghi đè lên các hàng dở. Phản hồi tương ứng sẽ được đọc lại vì mốc chưa dời qua nó, rồi ghi lại. Không có hàng trùng vì khoá là ID phản hồi.
-- **Trần thời gian lô**: 2 phút. Chạm trần **không phải lỗi**: lô dừng ở ranh giới khối, dời mốc đến phản hồi cuối cùng đã ghi và kiểm xong, ghi một dòng "có tiến triển" và thoát; lô sau đọc tiếp. Chỉ ghi dở hoặc lỗi API mới là lỗi.
-- Kết quả đọc lại không khớp (hàng thiếu khoá hoặc trạng thái) thì lô coi như khối đó chưa xong: không dời mốc, ghi `nhat_ky` loại lỗi.
+- **Hàng hợp lệ** của `phieu` là hàng có cả `raw_key` và `trang_thai` khác trống.
+- **Đầu lô: dọn hàng dở.** Việc đầu tiên sau khi lấy khoá là **xoá mọi hàng `phieu` có `raw_key` trống hoặc `trang_thai` trống**, từ dưới lên. Sau đó lô chỉ **nối thêm** hàng mới vào sau `getLastRow()`; **không bao giờ ghi đè** hàng đang có.
+- **Ghi khối.** Mỗi khối ≤ 500 hàng: ghi các cột khác bằng một `setValues`, rồi ghi cột `raw_key` (M18). Sau mỗi khối, lô **đọc lại** khối vừa ghi và kiểm từng hàng có đủ `raw_key` và `trang_thai`.
+- **Ghi dở hoặc bị ngắt ở phút thứ 6** (GĐ-10): hàng thiếu `raw_key` hoặc `trang_thai` được coi là **chưa ghi** và bị xoá ở đầu lô kế tiếp. Phản hồi tương ứng được đọc lại vì mốc chưa dời qua nó, rồi nối vào cuối. Không có hàng trùng vì khoá là ID phản hồi.
+- **Trần thời gian lô: 120 giây, kiểm trước mỗi khối.** Trước khi bắt đầu một khối, lô dừng nếu `thời gian đã dùng + thời gian của khối trước > 120 giây`; với khối đầu, thời gian khối trước được giả định là 500 hàng nhân 100 mili giây, tức 50 giây (GĐ-15). Nhờ vậy một lô không bao giờ vượt 120 giây. Dừng do chạm trần **không phải lỗi**: lô dời mốc đến phản hồi cuối cùng đã ghi và kiểm xong, ghi một dòng "có tiến triển" và thoát; lô sau đọc tiếp.
+- Kết quả đọc lại không khớp (hàng thiếu khoá hoặc trạng thái) thì khối đó chưa xong: không dời mốc, ghi `nhat_ky` loại lỗi.
 
 ### 7.3 Phát hiện lệch: một lớp duy nhất, đối soát số lượng
 
-- V1 **bắt buộc** tắt "cho phép sửa phản hồi" (GĐ-5): hàm mở đợt kiểm `form.canEditResponse()` và từ chối mở nếu đang bật; lô hằng ngày kiểm lại và gửi email nếu ai đó bật lên. Lý do: đối soát số lượng không thấy phản hồi bị sửa nội dung. Nếu sau này cần cho sửa, phải thêm lại một lớp phát hiện nội dung (thời điểm sửa cuối của phản hồi, hoặc băm). Vì lô đọc qua API và khoá là ID, việc sắp xếp, chèn hay xoá dòng ở tab RAW **không ảnh hưởng** đến lô. Quy tắc vận hành vẫn là: không sắp xếp hay lọc tại chỗ ở RAW và `phieu`, dùng chế độ xem lọc.
-- Lớp phát hiện duy nhất: **đối soát số lượng**. Mỗi lô so số dòng RAW (rẻ) với số hàng hợp lệ của `phieu`; lệch quá số phản hồi đang chờ (lô chưa kịp xử lý) thì ô đối soát chuyển đỏ và có email. Trước khi chốt đợt, đối soát đầy đủ ba nguồn: số dòng RAW, số phản hồi đếm qua API (đọc theo khối, chạy tiếp được) và số hàng hợp lệ của `phieu`.
+- V1 **bắt buộc** tắt "cho phép sửa phản hồi" (GĐ-5): hàm `moForm` kiểm `form.canEditResponse()` và từ chối mở nếu đang bật; `hangNgay` kiểm lại và, nếu ai đó bật lên, gửi email và chặn lô (chi tiết ở mục 7.7, M1). Lý do: đối soát số lượng không thấy phản hồi bị sửa nội dung. Nếu sau này cần cho sửa, phải thêm lại một lớp phát hiện nội dung (thời điểm sửa cuối của phản hồi, hoặc băm). Vì lô đọc qua API và khoá là ID, việc sắp xếp, chèn hay xoá dòng ở tab RAW **không ảnh hưởng** đến lô. Quy tắc vận hành vẫn là: không sắp xếp hay lọc tại chỗ ở RAW và `phieu`, dùng chế độ xem lọc.
+- Lớp phát hiện duy nhất: **đối soát số lượng**. Mỗi lô so số dòng RAW (rẻ) với số hàng hợp lệ của `phieu`; lệch quá số phản hồi đang chờ (lô chưa kịp xử lý) thì ô đối soát chuyển đỏ và có email. Trước khi chốt đợt, đối soát đầy đủ ba nguồn: số dòng RAW, số phản hồi đếm qua API (đọc theo khối, chạy tiếp được) và số hàng hợp lệ của `phieu`; **cả ba phải bằng nhau** (mục 7.7, M2 và M3).
 - Nếu số RAW nhỏ hơn số `phieu`: có người xoá dòng ở RAW. Không mất phiếu vì dữ liệu gốc ở Forms; ghi `nhat_ky` và cảnh báo.
 - Không còn trạng thái `raw_doi`, không còn băm nội dung và không còn kiểm băm toàn bộ trước chốt.
 
 ### 7.4 Bỏ trùng, đổi phiếu giữ, gán lại mã
 
 - **Luật: "đầu" = sớm nhất theo dấu thời gian phản hồi**, khớp luật của skill (giữ phiếu đầu của mỗi mã). Hai phản hồi cùng giây: xếp theo ID phản hồi (cố định, có thể đổi bằng "Giữ phiếu này").
-- Khi lô ghi một dòng **mới** có `ma_hs` hợp lệ: nếu mã đã có dòng `ban_giu = 1` thì dòng mới là `bo_nop_trung`, `ban_giu = 0`; chưa có thì `cho_duyet`, `ban_giu = 1`.
-- **Đánh giá lại** (khi một dòng `ma_la` được xử lý lại thành mã hợp lệ, hoặc khi "Gán lại mã" cho ra mã hợp lệ): lô xếp hạng lại nhóm của `ma_hs` đó theo dấu thời gian, phản hồi sớm nhất thắng, **trừ** hai trường hợp admin quyết định thắng: (a) nhóm có ghi nhận đổi phiếu giữ trong `nhat_ky`; (b) phiếu đang giữ đã `da_duyet`. Trong hai trường hợp này dòng sớm hơn đến muộn được đặt `bo_nop_trung` kèm `ly_do` "có phiếu sớm hơn, admin xem lại", và admin có thể đổi bằng "Giữ phiếu này".
-- **Học sinh nộp lại để sửa câu trả lời**: phiếu sau mặc định là `bo_nop_trung`. Admin dùng menu "Giữ phiếu này" (3 bước): phiếu chọn thành `ban_giu = 1`, `cho_duyet`; phiếu giữ trước thành `ban_giu = 0`, `bo_nop_trung`; ghi `nhat_ky` (ai, lúc nào, hai `raw_key`, lý do). Đã xuất rồi thì xuất lại: mỗi lần xuất là một bộ tệp mới có giờ trong tên, không ghi đè; kiosk dùng bộ mới nhất.
-- **Mã nhập nhầm** (hai trường hợp: mã không có trong danh sách, hoặc mã hợp lệ nhưng là mã của người khác): admin dùng menu **"Gán lại mã"** (3 bước: chọn dòng, nhập mã đúng, nhập lý do). Hệ thống kiểm mã mới có trong `hoc_sinh`, cập nhật `phieu.ma_hs`, ghi `nhat_ky` (mã cũ, mã mới, lý do), rồi đánh giá lại nhóm như trên. **Câu trả lời không bị đụng.** Khi xuất, mã đã gán lại được ghi vào cột `student_id` và dòng `[student_id]` của `RAW_PHIEU`; mã học sinh tự gõ ban đầu vẫn còn ở RAW, API và `nhat_ky`.
+- **Một quy tắc duy nhất (M11).** Khi một dòng hợp lệ mới đến, hoặc một dòng được đánh giá lại: nếu nó **sớm hơn** dòng đang giữ của `ma_hs` và **không** áp dụng ngoại lệ (a) hoặc (b) thì nó trở thành dòng giữ (`cho_duyet`, `ban_giu = 1`) và dòng giữ cũ thành `bo_nop_trung`, `ban_giu = 0` (xếp hạng lại); ngược lại nó là `bo_nop_trung`, `ban_giu = 0`. Sớm hơn tính theo `thoi_gian_nop`, hoà theo `raw_key`. Mã chưa có dòng giữ thì dòng đầu tiên là dòng giữ.
+- **Hai ngoại lệ, admin quyết định thắng:** (a) `nhat_ky` có một dòng với `hanh_dong` thuộc {`giu_phieu`, `gan_lai_ma`, `tu_choi`} cho `ma_hs` đó (M10); (b) dòng đang giữ đã `da_duyet`. Khi ngoại lệ áp dụng, dòng sớm hơn đến muộn nhận `bo_nop_trung` kèm `ly_do` "có phiếu sớm hơn, admin xem lại", và admin có thể đổi bằng "Giữ phiếu này".
+- **Từ chối** (M5): đặt `ban_giu = 0` và xếp hạng lại nhóm, dòng hợp lệ sớm nhất kế tiếp thành dòng giữ (`cho_duyet`), nên một phiếu nộp lại có thể được giữ.
+- **Học sinh nộp lại để sửa câu trả lời**: phiếu sau mặc định là `bo_nop_trung`. Admin dùng menu "Giữ phiếu này" (3 bước, quy ước ở M7). Đã xuất rồi thì xuất lại: mỗi lần xuất là một thư mục mới có giờ trong tên, không ghi đè; kiosk dùng bộ mới nhất.
+- **Mã nhập nhầm** (mã không có trong danh sách, hoặc mã hợp lệ nhưng là mã của người khác): admin dùng menu **"Gán lại mã"** (3 bước, quy ước ở M8). **Câu trả lời không bị đụng.** Khi xuất, mã đã gán lại được ghi vào cột `student_id` của mọi dòng của phiếu (M13); mã học sinh tự gõ ban đầu vẫn còn ở RAW, API và `nhat_ky`.
 - **Hậu quả của mã hợp lệ nhập nhầm** nếu không ai phát hiện: phiếu được tính cho học sinh khác; phiếu thật của người đó, nếu nộp sau, trở thành `bo_nop_trung`. **Tín hiệu phát hiện** (tuỳ chọn, khi biểu mẫu thu email, GĐ-9): số email có nhiều hơn một mã học sinh, hiện trên `dieu_khien`; báo cáo của skill cũng bắt "một email nhiều mã".
 - **Khớp với luật "giữ phiếu đầu" của skill.** Hai ngoại lệ (a), (b) ở trên có thể giữ một phiếu **không** phải phiếu sớm nhất. Điều này không làm lệch kết quả, vì xuất lọc theo danh sách ID đã duyệt (`ban_giu = 1`) **trước** khi bỏ trùng (mục 11): mỗi mã chỉ còn đúng một phiếu, nên `chamTheoCLB` và `xu_li_raw.py` không còn gì để chọn. Điều kiện: bộ lọc ID phải chạy trước bước bỏ trùng; cần một test với nhóm có phiếu sớm hơn bị `bo_nop_trung` do admin giữ phiếu muộn, kiểm tệp xuất chứa đúng phiếu muộn.
 - Báo cáo của skill sẽ **ít phiếu trùng hơn trước**, vì xuất đã lọc sẵn. Nơi chứa các bất thường nay là tab `phieu`; báo cáo của skill vẫn bắt các lỗi khác (đáp án lệch, thiếu xếp hạng).
@@ -260,19 +267,82 @@ Sơ đồ b2 (phân loại và ghi một khối):
 
 ### 7.6 Vòng đời trigger
 
-Một hàm thiết lập và một nút menu **"Cài lại trigger"** (`caiLaiTrigger`), chạy **idempotent** (xoá hết trigger của script rồi tạo lại theo `cau_hinh`):
+Sáu hàm xử lý trigger, danh sách cố định: `xuLyLo` (lô, mỗi 10 phút), `hangNgay` (sao lưu, cảnh báo), `moForm`, `dongForm`, `ketThucLo` (ba trigger một lần) và `xuatTiep` (nối tiếp xuất).
+
+Một hàm thiết lập và một nút menu **"Cài lại trigger"** (`caiLaiTrigger`), chạy **idempotent**: xoá **chỉ** các trigger có hàm xử lý thuộc `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo` (**không bao giờ** đụng `xuatTiep`), rồi tạo lại theo `cau_hinh`. **Từ chối chạy** khi `cau_hinh.xuat_dang_chay` đang đặt.
 
 | Thời điểm hiện tại so với đợt | Trigger được tạo |
 |---|---|
-| Trước giờ mở | trigger một lần "mở" (đặt giờ mở) và trigger một lần "đóng" (đặt giờ đóng cộng 2 giờ) |
-| Trong cửa sổ (mở đến đóng cộng 2 giờ) | trigger lô mỗi 10 phút, trigger hằng ngày (sao lưu và cảnh báo lô ngừng), trigger "đóng" |
-| Sau đóng, trước chốt | chỉ trigger hằng ngày (sao lưu) |
-| Sau chốt | không có trigger nào |
+| Trước giờ mở | `moForm` tại `mo`; `dongForm` tại `dong`; `ketThucLo` tại `dong` cộng 2 giờ |
+| Từ giờ mở đến giờ đóng | `xuLyLo` mỗi 10 phút, `hangNgay`, `dongForm`, `ketThucLo` |
+| Sau giờ đóng, trước `ketThucLo` | `xuLyLo`, `hangNgay`, `ketThucLo` |
+| Sau `ketThucLo`, trước chốt | chỉ `hangNgay` |
+| Sau chốt | không tạo gì (M25); `xuatTiep` chỉ có khi đang xuất |
 
-- Trigger "mở" tạo trigger lô và trigger hằng ngày; trigger "đóng" xoá trigger lô và **chỉ** nó (trigger hằng ngày giữ đến khi chốt đợt, để sao lưu quyết định duyệt). Hành động **Chốt đợt** xoá trigger hằng ngày.
-- `caiLaiTrigger` được gọi khi tạo đợt và **mỗi khi admin đổi cửa sổ mở, đóng trong `cau_hinh`** (admin bấm nút; `dieu_khien` hiện cảnh báo khi cửa sổ trong `cau_hinh` khác cửa sổ đã cài lần gần nhất).
-- Cảnh báo "lô ngừng chạy hơn một giờ" **chỉ hiện trong cửa sổ chạy lô**; ngoài cửa sổ không có cảnh báo.
-- Số trigger tối đa cùng lúc: lô, hằng ngày, mở, đóng và một trigger nối tiếp xuất (mục 11.3) là 5, thấp hơn trần 20 mỗi người mỗi script (TT-CXM).
+- `moForm`: kiểm `form.canEditResponse()` (từ chối mở nếu đang bật, M1), mở nhận phản hồi, tạo `xuLyLo` và `hangNgay`.
+- `dongForm`: gọi `setAcceptingResponses(false)` (GĐ-6). **Không** xoá `xuLyLo`: lô còn phải xử lý phần tồn.
+- `ketThucLo` (đóng cộng 2 giờ): xoá trigger `xuLyLo` **chỉ khi phần tồn bằng 0** (số phản hồi chờ, M2). Còn tồn thì tự đặt lại **cộng 1 giờ** và ghi `nhat_ky`.
+- `hangNgay` giữ đến khi chốt đợt, để sao lưu quyết định duyệt. **Chốt đợt** xoá `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo`, không đụng `xuatTiep` (M23).
+- `caiLaiTrigger` được gọi khi tạo đợt và **mỗi khi admin đổi cửa sổ mở, đóng trong `cau_hinh`**. `dieu_khien` hiện cảnh báo khi cửa sổ trong `cau_hinh` khác cửa sổ đã cài lần gần nhất.
+- Hai lớp bảo vệ cửa sổ (M16): trigger lô chỉ tồn tại trong cửa sổ, **và** `xuLyLo` tự kiểm `cau_hinh` rồi thoát nếu `trang_thai_ky` là `chot` hoặc chưa tới giờ mở. Cần cả hai vì trigger một lần có thể chạy trễ (GĐ-17).
+- Cảnh báo "lô ngừng chạy hơn một giờ" **chỉ hiện trong cửa sổ chạy lô** (M17).
+- Nút menu **"Chạy lô ngay"**: chạy `xuLyLo` một lần, dùng cùng khoá; **Chốt đợt** đề nghị chạy khi đối soát thấy còn phản hồi chờ.
+- Số trigger tối đa cùng lúc: `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo` và một `xuatTiep` là 6, thấp hơn trần 20 mỗi người mỗi script (TT-CXM; nếu trần chỉ còn 10 vẫn đủ).
+
+### 7.7 Quy ước cài đặt cho T4-K2
+
+Các quy ước này chốt ở vòng sửa 3 làm căn cứ viết mã cho T4-K2. Trích dẫn "M<số>" ở các mục trước trỏ về đây.
+
+1. **M1. Tuỳ chọn sửa phản hồi.** `form.canEditResponse()` được kiểm trong `moForm` (đang bật thì từ chối mở) và trong `hangNgay`. Nếu `hangNgay` thấy đang bật: gửi email, ghi `nhat_ky`, đặt `cau_hinh.sua_phan_hoi_bat = 1`; `xuLyLo` thoát ngay trong khi cờ này còn đặt. Cờ được xoá khi `hangNgay` hoặc "Cài lại trigger" thấy tuỳ chọn đã tắt lại (đề xuất).
+2. **M2. Đếm.** Số phản hồi chờ xử lý (`pending`) = số phản hồi đếm qua API trừ số hàng hợp lệ của `phieu`. Số dòng RAW = `getLastRow()` trừ 1. RAW khác API thì **cảnh báo**; số hàng hợp lệ của `phieu` lớn hơn API thì **lỗi**.
+3. **M3. Đối soát khi chốt.** Phải có RAW = API = số hàng hợp lệ của `phieu`, **chính xác bằng nhau**. RAW nhỏ hơn `phieu` thì **chặn chốt**. Đọc theo khối 2.000, tiến độ ghi ở `cau_hinh.doi_soat_tien_do` nên chạy tiếp được.
+4. **M4. Cảnh báo.** Mỗi loại cảnh báo gửi **một lần mỗi đợt**; cờ đã gửi ở `cau_hinh.canh_bao_da_gui` (JSON).
+5. **M5. Từ chối.** Đặt `ban_giu = 0` và xếp hạng lại nhóm: dòng hợp lệ sớm nhất kế tiếp thành `ban_giu = 1`, `cho_duyet`, để phiếu nộp lại có thể được giữ.
+6. **M6. Duyệt.** Chỉ tác động hàng có `cho_duyet` và `ban_giu = 1`, trong **mọi vùng chọn** (`getActiveRangeList`) ở tab `phieu`, bỏ qua hàng bị ẩn bởi bộ lọc. Hàng khác bị bỏ qua và đếm trong thông báo toast; vùng chọn ngoài tab `phieu` thì toast lỗi. "Duyệt tất cả" = mọi hàng `cho_duyet` và `ban_giu = 1`.
+7. **M7. Giữ phiếu này.** Dòng nguồn phải có `ma_hs` hợp lệ và ở trạng thái `cho_duyet`, `bo_nop_trung` hoặc `tu_choi` (`ma_la`, `bo_khong_ma` thì dùng "Gán lại mã" trước). Dòng mới được giữ: `ban_giu = 1`, `cho_duyet`, xoá `nguoi_duyet` và `thoi_gian_duyet`. Dòng giữ cũ: `ban_giu = 0`, `bo_nop_trung`, xoá duyệt trên hàng (lịch sử còn ở `nhat_ky`, `hanh_dong = giu_phieu`). Nhóm chưa có dòng giữ thì chỉ đặt dòng được chọn.
+8. **M8. Gán lại mã.** Dùng được ở mọi trạng thái; `da_duyet` quay về `cho_duyet`. Xếp hạng lại **cả nhóm `ma_hs` cũ lẫn nhóm `ma_hs` mới** theo M11. Ghi `nhat_ky` (`hanh_dong = gan_lai_ma`, mã cũ, mã mới, lý do).
+9. **M9. Chuẩn hoá mã.** `ma_hs` = cắt khoảng trắng hai đầu rồi chữ hoa; cột `ma_hs` định dạng văn bản (`@`) để không mất số 0 đầu. Kiểm dạng dùng cùng mẫu với kiểm `ma_sai_dang` của skill, tức hàm cục bộ `dang` trong `xu_li` của `xu_li_raw.py` (chữ thành `A`, số thành `9`, so với dạng phổ biến). Việc dùng mẫu này cho mã học sinh của trường là GĐ-8.
+10. **M10. `nhat_ky.ma_hs`.** `nhat_ky` có cột `ma_hs`. Ngoại lệ (a) của mục 7.4 = có dòng `nhat_ky` với `hanh_dong` thuộc {`giu_phieu`, `gan_lai_ma`, `tu_choi`} cho `ma_hs` đó.
+11. **M11. Quy tắc giữ phiếu duy nhất.** Như mục 7.4: dòng hợp lệ mới (hoặc được đánh giá lại) sớm hơn dòng đang giữ và không có ngoại lệ (a) hay (b) thì thành dòng giữ, ngược lại `bo_nop_trung`. Sớm hơn theo `thoi_gian_nop`, hoà theo `raw_key`.
+12. **M12. Người duyệt và khoá.** `nguoi_duyet` = email người dùng đang hoạt động, rỗng thì `khong_ro`. Mọi hành động menu và `xuLyLo` dùng chung `LockService.getScriptLock().tryLock(30000)`; bận thì toast "Đang xử lý lô, thử lại sau".
+13. **M13. Thứ tự xuất.** (1) Chụp danh sách hàng `da_duyet` với `ban_giu = 1` (gồm `raw_key`, `ma_hs` cuối cùng, `thoi_gian_nop`). (2) Lấy phản hồi theo ID. (3) Ghi đè cột `student_id` (mọi dòng của phiếu) bằng `phieu.ma_hs`. (4) Chạy bỏ trùng của `chamTheoCLB`. (5) Ghi các phần. Hai hàng đã duyệt cùng `ma_hs` thì **xuất dừng và báo lỗi** (có test).
+14. **M14. Mốc xử lý.** `moc_xu_ly` là ISO 8601 UTC có mili giây. Lô đọc `getResponses(moc trừ 60 giây)` và coi như "lớn hơn hoặc bằng" (GĐ-14). Mốc rỗng thì đọc từ đầu.
+15. **M15. Khoá của `cau_hinh`.**
+
+| Khoá | Ý nghĩa |
+|---|---|
+| `ky_id`, `ten`, `doi_tuong`, `form_id` | Thông tin đợt |
+| `mo`, `dong` | Giờ mở và đóng, ISO với múi giờ +07:00 |
+| `trang_thai_ky` | `mo`, `dong` hoặc `chot` |
+| `moc_xu_ly` | Mốc xử lý (M14) |
+| `lo_loi_lien_tiep` | Số lô lỗi liên tiếp; về 0 khi một lô thành công |
+| `lo_ok_cuoi` | Giờ lần chạy thành công gần nhất, cập nhật cả khi lô nhàn |
+| `email_loi_cuoi` | Giờ email lỗi gần nhất (trần một email mỗi giờ) |
+| `sua_phan_hoi_bat` | Cờ M1 |
+| `canh_bao_da_gui` | JSON cờ M4 |
+| `doi_soat_tien_do` | Tiến độ đối soát M3 |
+| `phieu_phien_ban` | Bộ đếm, tăng một sau **mỗi hành động làm đổi `phieu`** (lô ghi, duyệt, từ chối, giữ phiếu, gán lại mã, xử lý lại, mở lại đợt) |
+| `xuat_dang_chay` | Đặt khi đang xuất |
+| `xuat_phan_xong` | Số phần đã xong của lần xuất hiện tại |
+| `xuat_day_du_cuoi` | Ngày (Asia/Ho_Chi_Minh) và `phieu_phien_ban` của lần xuất đầy đủ gần nhất |
+| `ID_BANG_HOC_SINH` | Chỉ khi danh sách lớp nằm ở tệp khác |
+| `ghi_do` | Cờ tuỳ chọn ở đợt thử |
+| `cai_trigger_luc`, `cua_so_da_cai` | Giờ và cửa sổ của lần "Cài lại trigger" gần nhất |
+
+   `appsscript.json` đặt `timeZone` là `Asia/Ho_Chi_Minh`.
+16. **M16. Cửa sổ lô, hai lớp.** Trigger lô chỉ tồn tại trong cửa sổ **và** `xuLyLo` kiểm cửa sổ rồi thoát nếu ngoài cửa sổ (mục 7.6).
+17. **M17. Bộ đếm.** `lo_loi_lien_tiep` về 0 khi thành công; `email_loi_cuoi` giữ trần một email mỗi giờ; `lo_ok_cuoi` cập nhật ở **mọi** lần chạy thành công kể cả lô nhàn; "ngừng quá 1 giờ" = bây giờ trừ `lo_ok_cuoi` lớn hơn 1 giờ, chỉ xét trong cửa sổ.
+18. **M18. Cột cuối.** `raw_key` là cột **cuối cùng** của `phieu`; ghi các cột khác bằng một `setValues`, rồi ghi cột `raw_key`.
+19. **M19. Bản chụp xuất.** Danh sách chụp ở M13 ghi thành `manifest.json` trong thư mục xuất (danh sách `raw_key` theo thứ tự `thoi_gian_nop`, `raw_key`). Mỗi phần lấy **1.000 mục liên tiếp** của manifest. Trong khi `xuat_dang_chay` đang đặt, **mọi menu làm đổi `phieu` bị từ chối**.
+20. **M20. Ngày và lần xuất đầy đủ.** "Ngày" là ngày lịch theo Asia/Ho_Chi_Minh. Một lần xuất **đầy đủ** là khi mọi phần đã ghi xong; xuất lỗi hoặc bị huỷ **không tính**. Menu: "Xuất" (mới) và "Xuất tiếp" (chạy tiếp). **Lần xuất đầy đủ thứ hai trong cùng một ngày bị từ chối, TRỪ KHI `phieu` đã đổi từ lần xuất đầy đủ gần nhất** (so `phieu_phien_ban` với giá trị ở `xuat_day_du_cuoi`); thông báo từ chối nêu rõ lý do.
+21. **M21. Thư mục xuất.** `RAW_PHIEU_<ky>_<yyyyMMdd-HHmm>/` trong thư mục Drive của đợt; các phần `RAW_PHIEU_p01.csv`, `RAW_PHIEU_p02.csv`, ...; `DAP_AN.xlsx` **cùng thư mục** (skill nhận bằng `--dap-an <thư mục>/DAP_AN.xlsx`; `doc_raw` chỉ gom tệp có dạng `<tên>_p<số>.csv` hoặc `.xlsx`, nên `DAP_AN.xlsx` không gây lỗi). Định dạng CSV ở mục 11.3.
+22. **M22. Nối tiếp xuất.** `xuatTiep` xoá trigger nối tiếp của chính nó ngay khi bắt đầu. Phần lỗi thử lại tối đa 3 lần, cách nhau 5 phút, rồi gửi email và dừng (chạy tiếp được bằng "Xuất tiếp"). "Xuất tiếp" từ chối nếu đã có trigger nối tiếp.
+23. **M23. Chốt đợt.** Bị từ chối nếu còn bất kỳ hàng `cho_duyet` với `ban_giu = 1`, hàng `ma_la`, hoặc đối soát lệch. Khi được: đóng form, xoá các trigger `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo` (không đụng `xuatTiep`), đặt `trang_thai_ky = chot`, tạo sao lưu gắn nhãn chốt. **Không tự xuất.** Sau chốt, mọi menu làm đổi `phieu` bị từ chối, trừ **"Mở lại đợt"** (ghi `nhat_ky`, `trang_thai_ky` về `dong`).
+24. **M24. Sao lưu.** Tên `<ky>_saoluu_<yyyyMMdd-HHmm>`; giữ 7 bản mới nhất, bản gắn nhãn chốt **không tính** vào 7. Sau chốt không còn sao lưu hằng ngày.
+25. **M25. Sau chốt.** `caiLaiTrigger` không tạo gì. Trigger một lần `.at()` có thể chạy trễ (GĐ-17); M16 đã chặn lô chạy ngoài cửa sổ.
+26. **M26. Xử lý lại phiếu mã lạ.** Duyệt các hàng `ma_la` và `bo_khong_ma` theo `thoi_gian_nop` và áp dụng mục 7.4.
+
+Menu đầy đủ của K2: Duyệt, Duyệt tất cả, Từ chối, Giữ phiếu này, Gán lại mã, Xử lý lại phiếu mã lạ, Chạy lô ngay, Cài lại trigger, Mở đợt, Chốt đợt, Mở lại đợt, Xuất, Xuất tiếp, Sao lưu ngay.
 
 ---
 
@@ -289,7 +359,7 @@ Một hàm thiết lập và một nút menu **"Cài lại trigger"** (`caiLaiTr
 | Vượt hạn mức tự động hoá | Ngân sách mục 9.3 và theo dõi trên trang Executions |
 | Đồng bộ lỗi | Chạy lại an toàn (mục 7.2); email sau 3 lô liên tiếp lỗi |
 | Nhất quán | Mỗi lô: ghi `phieu`, đọc lại kiểm, ghi `nhat_ky` nếu có lỗi, rồi dời mốc |
-| Sao lưu và khôi phục | Mặc định: một trigger hằng ngày chép toàn bộ Sheets sang thư mục Drive riêng, **giữ 7 bản**; thêm một bản gắn nhãn khi **chốt đợt** và nút "Sao lưu ngay". Giữ 14 bản hay sao lưu mỗi giờ: tuỳ chọn, hoãn (mục 13.2) |
+| Sao lưu và khôi phục | Mặc định: một trigger hằng ngày chép toàn bộ Sheets sang thư mục Drive riêng, **giữ 7 bản mới nhất** (tên `<ky>_saoluu_<yyyyMMdd-HHmm>`, bản gắn nhãn chốt không tính vào 7); thêm một bản gắn nhãn khi **chốt đợt** và nút "Sao lưu ngay". Giữ 14 bản hay sao lưu mỗi giờ: tuỳ chọn, hoãn (mục 13.2) |
 | Chỉnh nhầm tab RAW hoặc `phieu` | Hoàn nguyên từ lịch sử phiên bản (GĐ-11) hoặc bản sao lưu. Dựng lại `phieu` từ Forms: xoá `phieu`, đặt lại `moc_xu_ly`, chạy lô lại (mất quyết định duyệt đến lần sao lưu gần nhất) |
 
 Xử lý nặng làm theo **lô**, không theo từng phiếu.
@@ -345,7 +415,7 @@ Tệp xuất dạng dài là tệp **riêng**, không tính vào Sheets của đ
 
 Quy tắc: ngân sách thiết kế **ngày thường** không quá **một phần ba** hạn mức thấp nhất nghe được (TT-CXM). **Ngoại lệ có chủ đích:** ngày đỉnh và ngày xuất được phép tới **một nửa** (45 phút nếu hạn mức là 90). Lý do: hai loại ngày này hiếm (vài ngày mỗi đợt) và vượt hạn mức chỉ làm chậm, không mất phiếu (dữ liệu gốc ở Forms). Đổi lại, biên an toàn của hai ngày này chỉ còn 2 lần thay vì 3 lần.
 
-Trigger (mục 7.6): lô mỗi 10 phút, hằng ngày, mở, đóng, và một trigger nối tiếp xuất; tối đa 5 cùng lúc (so với trần 20, TT-CXM).
+Trigger (mục 7.6): `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo` và một `xuatTiep`; tối đa 6 cùng lúc (so với trần 20, TT-CXM).
 
 Ngày xấu nhất cho việc nhận phiếu: biểu mẫu mở cả 24 giờ, đỉnh nằm **trong** giờ mở (không cộng chồng):
 
@@ -357,21 +427,21 @@ Ngày xấu nhất cho việc nhận phiếu: biểu mẫu mở cả 24 giờ, �
 | Mở, đóng đợt | 2 lần nhân khoảng 10 giây (giả định) | 0,3 |
 | **Tổng** | | **khoảng 24,6** |
 
-Biến thể: **ngày đỉnh có 12 lô bận** (mục 9.4): 12 nhân 2 phút là 24,0 cộng 132 lô nhàn nhân 3 giây là 6,6 cộng 1,5 cộng 0,3 là **khoảng 32,4 phút**. Vượt mức 30 phút của quy tắc một phần ba nhưng dưới 45 phút (một nửa hạn mức 90 phút nếu số đó đúng, TT-CXM), nên vẫn có biên.
+Biến thể: **ngày đỉnh có 15 lô bận** (mục 9.4, ở 100 mili giây mỗi phản hồi): 15 nhân 2 phút là 30,0 cộng 129 lô nhàn nhân 3 giây là 6,5 cộng 1,5 cộng 0,3 là **khoảng 38,3 phút**. Vượt mức 30 phút của quy tắc một phần ba nhưng dưới 45 phút (một nửa hạn mức 90 phút nếu số đó đúng, TT-CXM). Biên đã mỏng: nếu hạn mức thật là 45 phút thì mức dùng là 85%.
 
-Ngày xuất (mục 11.3), lô đã ngừng: 10 phần xuất, mỗi phần giả định 200 giây là khoảng 33,3 phút, cộng sao lưu 1,5 là **khoảng 34,8 phút**, dưới 45 phút. Quy tắc: **tối đa một lần xuất đầy đủ mỗi ngày**; xuất lần hai trong cùng ngày có thể vượt hạn mức. Nút "Xuất" kiểm `cau_hinh` và chặn lần xuất đầy đủ thứ hai trong ngày (admin vẫn xuất tiếp được phần dở).
+Ngày xuất (mục 11.3): 10 phần xuất, mỗi phần giả định 200 giây là khoảng 33,3 phút. **Sau chốt không còn sao lưu hằng ngày** (M24), nên tổng là **khoảng 33,3 phút**; nếu xuất **trước** chốt thì còn sao lưu 1,5 phút, tổng **khoảng 34,8 phút**. Cả hai dưới 45 phút. Quy tắc: lần xuất đầy đủ thứ hai trong cùng ngày bị từ chối **trừ khi `phieu` đã đổi** từ lần xuất đầy đủ gần nhất (M20); khi `phieu` đã đổi, lần xuất thứ hai trong ngày có thể vượt hạn mức và admin được cảnh báo trong hộp xác nhận.
 
 | Hạn mức (số trong tóm tắt, TT-CXM) | Mức dùng thiết kế | Nếu hạn mức thật bằng một nửa |
 |---|---|---|
-| Trigger 90 phút mỗi ngày | 24,6 phút (ngày thường), 32,4 (ngày đỉnh), 34,8 (ngày xuất) | Nửa là 45 phút: còn dư ở cả ba |
+| Trigger 90 phút mỗi ngày | 24,6 phút (ngày thường), 38,3 (ngày đỉnh), 33,3 đến 34,8 (ngày xuất) | Nửa là 45 phút: còn dư ở cả ba, ngày đỉnh còn mỏng |
 | 6 phút mỗi lần chạy | Trần lô 2 phút; phần xuất giả định 200 giây | Nửa là 3 phút: lô đủ, phần xuất **không đủ** nếu mỗi phần cần 200 giây; khi đó giảm cỡ phần xuống 500 phiếu |
-| 20 trigger mỗi người mỗi script | Tối đa 5 | Nửa là 10: dư |
+| 20 trigger mỗi người mỗi script | Tối đa 6 | Nửa là 10: dư |
 | Trần ô 10 triệu | 3,0 triệu điển hình, 5,4 triệu xấu nhất | Nửa là 5 triệu: điển hình dư, xấu nhất không đủ, nên có quy tắc 340 câu ở 9.2 |
 | Thực thi đồng thời | Một lô, khoá script | Không phụ thuộc |
 
-**Nếu hạn mức mỗi lần chạy chỉ còn 3 phút** (phần xuất 1.000 phiếu không vừa), cỡ phần giảm còn 500 phiếu, thành 20 phần cho 10.000 phiếu. Thời gian xuất tính lại: 20 nhân (50 đến 100 giây cộng 60 giây chờ) là **khoảng 37 đến 53 phút**. Mức xấu **vượt** mục tiêu 45 phút của mục 9.4, và phút trigger ngày xuất là 20 nhân 100 giây, khoảng 33,3 phút, cộng 1,5 là khoảng 34,8 phút (không đổi, vì thời gian chờ không tính vào trigger). Hệ quả: mục tiêu 45 phút chỉ giữ khi hạn mức mỗi lần chạy là 6 phút; nếu là 3 phút thì mục tiêu thành **không quá 55 phút**, hoặc rút thời gian chờ giữa hai phần xuống khoảng 30 giây (20 nhân 130 giây, khoảng 43 phút). Chọn khi đã đo.
+**Nếu hạn mức mỗi lần chạy chỉ còn 3 phút** (phần xuất 1.000 phiếu không vừa), cỡ phần giảm còn 500 phiếu, thành 20 phần cho 10.000 phiếu. Thời gian xuất tính lại: 20 nhân (50 đến 100 giây cộng 60 giây chờ) là **khoảng 37 đến 53 phút**. Mức xấu **vượt** mục tiêu 45 phút của mục 9.4, và phút trigger ngày xuất là 20 nhân 100 giây, khoảng 33,3 phút (không đổi, vì thời gian chờ không tính vào trigger; cộng 1,5 phút sao lưu nếu xuất trước chốt). Hệ quả: mục tiêu 45 phút chỉ giữ khi hạn mức mỗi lần chạy là 6 phút; nếu là 3 phút thì mục tiêu thành **không quá 55 phút**, hoặc rút thời gian chờ giữa hai phần xuống khoảng 30 giây (20 nhân 130 giây, khoảng 43 phút). Chọn khi đã đo.
 
-Các giả định 3 giây, 90 giây, 200 giây, 8 và 12 lô bận phải đo ở đợt thử (mục 12).
+Các giả định 3 giây, 90 giây, 200 giây, 8 và 15 lô bận phải đo ở đợt thử (mục 12).
 
 ### 9.4 Thông lượng của lô và của xuất (ước tính, đo ở đợt thử)
 
@@ -385,7 +455,15 @@ Tất cả các con số trong mục này là **giả định cần đo** (GĐ-1
 | 40 mili giây | 3.000 phản hồi |
 | 100 mili giây | 1.200 phản hồi |
 
-Dòng vào lúc đỉnh: 300 phản hồi mỗi phút nhân chu kỳ 10 phút là **3.000** phản hồi mỗi chu kỳ. Chi phí mỗi phản hồi từ 40 mili giây trở xuống thì sức chứa đủ dòng vào; **từ 100 mili giây thì không đủ**, và dồn ứ tăng 1.800 phản hồi mỗi chu kỳ trong lúc đỉnh. Ví dụ đỉnh kéo dài 30 phút (3 chu kỳ) tạo dồn ứ 5.400; sau đỉnh dòng vào giả định 20 phản hồi mỗi phút (200 mỗi chu kỳ), lô xả net 1.000 mỗi chu kỳ, nên dồn ứ hết sau khoảng 5,4 chu kỳ, tức khoảng **54 phút**. **Không mất phiếu**: phản hồi nằm ở Forms, lô chỉ chậm. Hệ quả: mục tiêu độ trễ 15 phút chỉ áp dụng ngoài giờ đỉnh; trong đỉnh và đến 2 giờ sau, mục tiêu là xả hết dồn ứ trong 2 giờ. Tổng 13.000 phản hồi ở 100 mili giây cần khoảng 11 lô bận, khớp biến thể 12 lô bận ở mục 9.3.
+**Chi phí cố định mỗi lô (giả định, GĐ-15).** Mỗi lô còn (1) đọc lại các phản hồi trong khoảng gối 1 phút (lúc đỉnh tối đa 300 phản hồi, tốn cỡ chi phí đọc `c`, nên 6 giây ở 20 mili giây và 30 giây ở 100 mili giây) và (2) đọc cột `raw_key` của `phieu` (tới 13.000 ô trong một lần `getValues`, giả định 1 đến 3 giây). Thời gian dùng được cho phản hồi mới khoảng 120 giây trừ phần gối trừ 3 giây:
+
+| Chi phí mỗi phản hồi | Sức chứa một lô (không tính gối) | Sức chứa sau trừ gối và đọc khoá |
+|---|---|---|
+| 20 mili giây | 6.000 phản hồi | khoảng 5.550 |
+| 40 mili giây | 3.000 phản hồi | khoảng 2.625 |
+| 100 mili giây | 1.200 phản hồi | khoảng 870 |
+
+Dòng vào lúc đỉnh: 300 phản hồi mỗi phút nhân chu kỳ 10 phút là **3.000** phản hồi mỗi chu kỳ. Ở 20 mili giây sức chứa đủ; **từ 40 mili giây thì sát hoặc thiếu** (2.625 so với 3.000), và ở 100 mili giây dồn ứ tăng khoảng 2.130 phản hồi mỗi chu kỳ trong lúc đỉnh. Ví dụ đỉnh 30 phút (3 chu kỳ) tạo dồn ứ khoảng 6.400; sau đỉnh dòng vào giả định 20 phản hồi mỗi phút (200 mỗi chu kỳ), lô xả ròng khoảng 670 mỗi chu kỳ, nên dồn ứ hết sau khoảng 9,5 chu kỳ, tức khoảng **95 phút**, trong mục tiêu 2 giờ. **Không mất phiếu**: phản hồi nằm ở Forms, lô chỉ chậm. Hệ quả: mục tiêu độ trễ 15 phút chỉ áp dụng ngoài giờ đỉnh; trong đỉnh và đến 2 giờ sau, mục tiêu là xả hết dồn ứ trong 2 giờ. Tổng 13.000 phản hồi ở 100 mili giây cần khoảng 15 lô bận, khớp biến thể 15 lô bận ở mục 9.3.
 
 Biện pháp nếu đo ra chậm hơn: (1) nâng trần lô lên 4 phút (còn dưới 6 phút nhưng mất biên 2 lần, chỉ làm khi đã đo); (2) rút chu kỳ xuống 5 phút trong cửa sổ đỉnh; (3) nếu chi phí mỗi phản hồi vượt 200 mili giây (sức chứa dưới 600) thì dùng phương án B ở mục 11.1, đọc tab RAW dạng rộng bằng `getValues` theo khối, nhanh hơn nhiều nhưng cần băm nội dung làm khoá.
 
@@ -415,7 +493,7 @@ Hợp đồng cột kiosk (CLAUDE.md, bất biến 7): `club_id, student_id, tes
 
 Đầu ra V1: bộ tệp `RAW_PHIEU` (CSV theo phần) trên Drive, `DAP_AN.xlsx` sẵn có, rồi `xu_li_raw.py` ra `SO_NHAP_CLB.xlsx`. Phiếu `tu_choi`, `bo_nop_trung`, `ma_la`, `bo_khong_ma` không vào tệp xuất. Mỗi lần xuất là bộ tệp mới có giờ trong tên và ghi vào `nhat_ky` (số phần, số phiếu, id tệp).
 
-Lọc: danh sách phiếu xuất là `trang_thai = da_duyet` và `ban_giu = 1`, khoá bằng ID phản hồi (`raw_key`). Việc dựng dòng, chấm và cột `diem_forms` dùng lại mã của `chamTheoCLB` (hiện đọc `form.getResponses()` và tự bỏ trùng giữ phiếu đầu); cần tham số "chỉ lấy các phản hồi có ID trong danh sách đã duyệt", áp dụng **trước** khi bỏ trùng, và tham số "ghi cột `lop`" mặc định tắt. Chưa đọc kỹ `chamTheoCLB` ở T4, cần xem trước khi triển khai có tái dùng được hay phải tách hàm.
+Lọc: danh sách phiếu xuất là `trang_thai = da_duyet` và `ban_giu = 1`, khoá bằng ID phản hồi (`raw_key`). Việc dựng dòng, chấm và cột `diem_forms` dùng lại mã của `chamTheoCLB` (hiện đọc `form.getResponses()` và tự bỏ trùng giữ phiếu đầu); cần tham số "chỉ lấy các phản hồi có ID trong danh sách đã duyệt", áp dụng **trước** khi bỏ trùng, và tham số "ghi cột `lop`" mặc định tắt. T4-K1 đã thêm tham số `ghiLop` (mặc định tắt) và hàm `chamTheoCLBCoLop`; bộ lọc theo ID và thứ tự xuất ở M13 thuộc T4-K2.
 
 ### 11.1 DEC-1 (cho Truong chọn): nguồn đọc của lô và của xuất
 
@@ -428,21 +506,25 @@ Lọc: danh sách phiếu xuất là `trang_thai = da_duyet` và `ban_giu = 1`, 
 
 ### 11.2 Thay đổi cần trong kho (để Truong duyệt trước khi triển khai)
 
-Cần đăng ký thành mục trong sổ (quy tắc làm việc 1 của CLAUDE.md), không làm trước khi được duyệt.
+Trạng thái: **#1 đã làm (T4-K1, fff0f41)** và **#3 đã làm (T4-K3, 7e64cc4)**. Chỉ còn **#2 (T4-K2)**.
 
 | # | Thay đổi | Tệp chạm | Ghi chú |
 |---|---|---|---|
-| 1 | **Lớp.** `lop` là cột tuỳ chọn **ngoài `COT_RAW`**: `COT_RAW` (`xu_li_raw.py` dòng 39, 19 cột) **không đổi**. Hàm `_can_cot` (định nghĩa dòng 80, gọi trong `chay` khoảng dòng 354) chỉ kiểm cột thiếu so với `COT_RAW` nên một cột thừa `lop` không làm lỗi. `xu_li_raw.py` đọc thêm cột `lop` nếu có trong tiêu đề và ghi vào cột Lớp của Sổ; thiếu cột thì hành vi **như cũ**. `chamTheoCLB` chỉ ghi cột `lop` khi được yêu cầu (tham số mặc định tắt), nên `COT_RAW` của `.gs` vẫn đúng bằng `COT_RAW` của skill | `mau_forms_thi_clb/DINH_DANG_RAW.md` (ghi cột tuỳ chọn thứ 20), `.claude/skills/xu-li-raw-forms/scripts/xu_li_raw.py` và `SKILL.md`, `tests/test_skill_xu_li_raw.py` (thêm test cho `lop`; đoạn dòng 256 đến 257 ghim `COT_RAW` của skill với `.gs` **phải giữ xanh**), `CHANGELOG.md` | Không đụng hợp đồng CSV của kiosk, vì Sổ đã có cột Lớp (A14). Cần đồng bộ tài liệu, skill và test cùng lúc |
-| 2 | Hàm Apps Script mới: lô (`xuLyLo`), `caiLaiTrigger`, menu quản trị (duyệt, từ chối, giữ phiếu này, gán lại mã, chốt đợt, sao lưu ngay), xuất theo danh sách duyệt theo phần, ghi mã đã gán lại vào cột `student_id` và dòng `[student_id]`. Thêm vào khuôn `tao_google_forms.py` và `TAO_GOOGLE_FORM.gs` | `mau_forms_thi_clb/tao_google_forms.py`, `TAO_GOOGLE_FORM.gs`, `.claude/skills/tao-google-form-clb/`, `tests/test_skill_tao_google_form.py` | Skill nói `mau` rồi `tao` phải ra tệp giống hệt `TAO_GOOGLE_FORM.gs`: cập nhật cả hai cùng lúc |
-| 3 | `xu_li_raw.py` nhận **một thư mục các phần CSV** cùng tiêu đề (hoặc nhiều `--raw`) và ghép lại | `xu_li_raw.py`, test | **Bắt buộc** khi một đợt có hơn 1.000 phiếu (xuất thành nhiều phần). Đợt tới 1.000 phiếu chỉ một phần, không cần |
+| 1 | **ĐÃ LÀM (T4-K1, fff0f41).** Lớp: `lop` là cột tuỳ chọn **ngoài `COT_RAW`**; `COT_RAW` không đổi; `_can_cot` trong `xu_li_raw.py` chỉ kiểm cột thiếu so với `COT_RAW` nên cột thừa `lop` không làm lỗi; hàm `chay` đọc thêm `lop` nếu có và ghi vào cột Lớp của Sổ, thiếu cột thì hành vi như cũ. `chamTheoCLB(ghiLop)` mặc định tắt và `chamTheoCLBCoLop` ghi cột `lop` khi được yêu cầu, nên `COT_RAW` của `.gs` vẫn đúng bằng `COT_RAW` của skill | `DINH_DANG_RAW.md`, `xu_li_raw.py`, `SKILL.md`, `tests/test_t4_k1_lop.py`, `CHANGELOG.md` | Không đụng hợp đồng CSV của kiosk (Sổ đã có cột Lớp, A14) |
+| 2 | **CÒN LẠI (T4-K2).** Hàm Apps Script mới: `xuLyLo`, `hangNgay`, `moForm`, `dongForm`, `ketThucLo`, `xuatTiep`, `caiLaiTrigger`, xuất theo danh sách duyệt theo phần, ghi mã đã gán lại vào cột `student_id`, và menu đầy đủ: Duyệt, Duyệt tất cả, Từ chối, Giữ phiếu này, Gán lại mã, Xử lý lại phiếu mã lạ, Chạy lô ngay, Cài lại trigger, Mở đợt, Chốt đợt, Mở lại đợt, Xuất, Xuất tiếp, Sao lưu ngay. Quy ước chi tiết ở mục 7.7. Thêm vào khuôn `tao_google_forms.py` và `TAO_GOOGLE_FORM.gs` | `mau_forms_thi_clb/tao_google_forms.py`, `TAO_GOOGLE_FORM.gs`, `.claude/skills/tao-google-form-clb/`, `tests/test_skill_tao_google_form.py` | Skill nói `mau` rồi `tao` phải ra tệp giống hệt `TAO_GOOGLE_FORM.gs`: cập nhật cả hai cùng lúc |
+| 3 | **ĐÃ LÀM (T4-K3, 7e64cc4).** `xu_li_raw.py` nhận **một thư mục các phần CSV** qua hàm `doc_raw`, ghép theo số phần | `xu_li_raw.py`, `SKILL.md`, test | Bắt buộc khi một đợt có hơn 1.000 phiếu |
 
 **Khuyến nghị cho Lớp (DEC-2):** lấy `lop` từ `hoc_sinh` lúc xuất (thay đổi số 1), **không** thêm câu hỏi "Lớp" vào biểu mẫu. Lý do: không thêm trường cho học sinh gõ nên không lệch mã, một nguồn duy nhất, và `ma_la` đã chặn mã không có trong danh sách. Phương án còn lại (thêm câu hỏi "Lớp" bắt buộc) cần thêm một cột ở RAW, dễ gõ sai, và vẫn phải sửa `DINH_DANG_RAW.md` và skill như thay đổi số 1.
 
 ### 11.3 Xuất khối lượng lớn: theo phần, chạy tiếp được
 
-Xuất chạy thành **các phần ≤ 1.000 phiếu**, mỗi phần là một tệp CSV (`RAW_PHIEU_<ky>_<giờ>_p01.csv`, `p02`, ...) ghi bằng `DriveApp`, không dựng bảng tạm. Khi admin bấm "Xuất", phần 1 chạy ngay; xong phần nào thì tạo **trigger nối tiếp** chạy phần kế sau khoảng 1 phút và tự xoá. Trạng thái xuất (phần đã xong) nằm ở `cau_hinh`, nên bị ngắt thì bấm "Xuất tiếp" hoặc để trigger chạy lại. Mục tiêu: không quá 45 phút cho 10.000 phiếu (mục 9.4). Đợt tới 1.000 phiếu chỉ một phần.
+Xuất chạy thành **các phần ≤ 1.000 phiếu**, mỗi phần là một tệp CSV ghi bằng `DriveApp`, không dựng bảng tạm. **Xuất là menu riêng** ("Xuất" và "Xuất tiếp"), không tự chạy sau Chốt đợt (M23). Khi admin bấm "Xuất", hàm chụp danh sách và tạo `manifest.json` (M19), rồi ghi phần 1; xong phần nào thì tạo **trigger nối tiếp** `xuatTiep` chạy phần kế sau khoảng 1 phút (M22). Trạng thái (`xuat_dang_chay`, `xuat_phan_xong`) nằm ở `cau_hinh`. Mục tiêu: không quá 45 phút cho 10.000 phiếu (mục 9.4). Đợt tới 1.000 phiếu chỉ một phần. Quy tắc một lần xuất đầy đủ mỗi ngày: M20. Thư mục xuất và `DAP_AN.xlsx`: M21.
 
-**Ràng buộc với skill `xu-li-raw-forms` (đã cài ở T4-K3, `doc_raw`):** mọi phần của một lần xuất nằm chung **một thư mục**, cùng tiền tố và cùng tiêu đề cột; số phần liền từ `p01`; `phieu_so` đánh số **liên tục qua các phần** (phần 2 tiếp số của phần 1, không đánh lại từ 1), và mọi dòng của một phiếu nằm trong **cùng một phần** (không cắt ngang phiếu). Vi phạm điều nào thì skill dừng và không ghi tệp nào. Mỗi lần xuất lại tạo thư mục mới, không ghi lẫn vào thư mục cũ.
+**Định dạng tệp:** CSV mã hoá **UTF-8 có BOM**, phân cách dấu phẩy, trích dẫn theo **RFC 4180** (ô chứa dấu phẩy, nháy kép hoặc xuống dòng được bao bằng nháy kép, nháy kép đôi lên).
+
+**Phần skill đã kiểm (`doc_raw`, T4-K3):** `doc_raw` dừng và không ghi tệp nào khi (1) thư mục không có phần nào dạng `<tên>_p01.csv`; (2) có nhiều bộ xuất với tiền tố khác nhau trong cùng thư mục; (3) thiếu phần hoặc số phần trùng (số phần phải liền từ 1); (4) tiêu đề của một phần khác phần đầu; (5) một `phieu_so` nằm ở hai phần.
+
+**Phần bên xuất phải bảo đảm (kiểm bằng test ở T4-K2, `doc_raw` không kiểm):** `phieu_so` **liên tục** qua các phần (phần 2 tiếp số của phần 1, không đánh lại từ 1); **cả phiếu nằm trong một phần** (không cắt ngang một phiếu); thứ tự dòng theo `manifest.json`. Mỗi lần xuất tạo thư mục mới, không ghi lẫn vào thư mục cũ.
 
 ---
 
@@ -471,10 +553,10 @@ Kiểm đỉnh tải: 100 đến 300 phiếu trong một phút bằng nhiều ng
 - Biểu mẫu sinh bằng `TAO_GOOGLE_FORM.gs` (đã có); **bắt buộc** tắt sửa phản hồi, hàm mở đợt kiểm và từ chối nếu đang bật (GĐ-5); không sửa biểu mẫu sau khi mở.
 - Một Sheets mỗi (đợt, đối tượng) với `RAW`, `hoc_sinh`, `clb`, `phieu`, `nhat_ky`, `cau_hinh`, `dieu_khien`. **Quy tắc kích cỡ: không quá khoảng 340 câu hỏi mỗi biểu mẫu** (mục 9.2), vượt thì chia hai biểu mẫu.
 - Lô: đọc qua API theo mốc gối 1 phút, khoá, upsert theo ID phản hồi, cột khoá ghi cuối và đọc lại kiểm, kiểm mã, bỏ trùng giữ phiếu sớm nhất, đối soát số lượng. Nút "Cài lại trigger" (mục 7.6).
-- Menu quản trị: duyệt hàng loạt, từ chối kèm lý do, giữ phiếu này, **gán lại mã**, chốt đợt có xác nhận, "Sao lưu ngay".
-- Xuất RAW_PHIEU theo phần ≤ 1.000 phiếu lên Drive (19 cột, cột `lop` tuỳ chọn), nối `xu-li-raw-forms`.
+- Menu quản trị đầy đủ (mục 11.2, thay đổi số 2): Duyệt, Duyệt tất cả, Từ chối, Giữ phiếu này, Gán lại mã, Xử lý lại phiếu mã lạ, Chạy lô ngay, Cài lại trigger, Mở đợt, Chốt đợt (có xác nhận), Mở lại đợt, Xuất, Xuất tiếp, Sao lưu ngay.
+- Xuất RAW_PHIEU theo phần ≤ 1.000 phiếu lên Drive (menu riêng "Xuất" và "Xuất tiếp", không tự chạy sau chốt; 19 cột, cột `lop` tuỳ chọn), nối `xu-li-raw-forms`.
 - Sao lưu hằng ngày (giữ 7 bản) cộng một bản khi chốt; email lỗi và cảnh báo lô ngừng trong cửa sổ.
-- Thay đổi kho số 1, 2 và 3 (mục 11.2), sau khi Truong duyệt.
+- Thay đổi kho (mục 11.2): số 1 **đã làm (T4-K1)**, số 3 **đã làm (T4-K3)**, chỉ còn số 2 (T4-K2).
 - Một đợt thử đo các chỉ số ở mục 12.
 
 ### 13.2 Để sau (kèm lý do)
@@ -535,7 +617,7 @@ Kiểm đỉnh tải: 100 đến 300 phiếu trong một phút bằng nhiều ng
 10. Trường có Microsoft 365 giáo dục không? (Chỉ để khẳng định việc loại Phương án 2.)
 11. **DEC-1**: lô và xuất đọc qua API Forms (A, khuyến nghị) hay đọc tab RAW kèm băm (B, phương án lui khi API quá chậm)?
 12. **DEC-2**: Lớp lấy từ `hoc_sinh` lúc xuất (khuyến nghị) hay thêm câu hỏi "Lớp" vào biểu mẫu?
-13. Duyệt đăng ký hai thay đổi kho ở mục 11.2 (số 1 và 2) thành mục trong sổ?
+13. Thay đổi kho ở mục 11.2: số 1 (T4-K1) và số 3 (T4-K3) đã làm; chỉ còn số 2 (T4-K2), theo quy ước ở mục 7.7.
 
 ---
 

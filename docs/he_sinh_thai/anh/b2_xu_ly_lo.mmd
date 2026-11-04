@@ -9,13 +9,13 @@ flowchart TD
   S2 --> BL
   S3 --> BL
   S4 --> BL
-  BL["Gom thành khối tối đa 500 hàng,<br/>ghi vào phieu, cột raw_key ghi cuối"] --> RV["Đọc lại khối vừa ghi:<br/>mỗi hàng có raw_key và trang_thai?"]
+  BL["Gom khối tối đa 500 hàng, NỐI vào sau getLastRow<br/>(không ghi đè), ghi các cột khác bằng setValues,<br/>rồi ghi cột raw_key (cột cuối)"] --> RV["Đọc lại khối vừa ghi:<br/>mỗi hàng có raw_key và trang_thai?"]
   RV -->|"Thiếu"| ER["Khối chưa xong: không dời mốc,<br/>ghi nhat_ky loại lỗi"]
   RV -->|"Đủ"| MC["Dời moc_xu_ly đến phản hồi<br/>cuối của khối đã kiểm"]
-  MC --> CAP{"Chạm trần 2 phút?"}
-  CAP -->|"Chưa, còn phản hồi"| BL
-  CAP -->|"Chưa, hết phản hồi"| OK(["Xong lô"])
-  CAP -->|"Rồi"| PR(["Có tiến triển: dừng ở ranh giới khối,<br/>lô sau đọc tiếp. Không phải lỗi"])
+  MC --> CAP{"Trước khối kế: thời gian đã dùng<br/>cộng thời gian khối trước<br/>vượt 120 giây?"}
+  CAP -->|"Không, còn phản hồi"| BL
+  CAP -->|"Không, hết phản hồi"| OK(["Xong lô"])
+  CAP -->|"Vượt"| PR(["Có tiến triển: dừng ở ranh giới khối,<br/>lô sau đọc tiếp. Không phải lỗi"])
   ER --> N{"3 lô liên tiếp lỗi?"}
   N -->|"Có"| EM["Email báo lỗi cho admin"]
-  N -->|"Chưa"| RT(["Lần sau ghi đè hàng dở<br/>và đọc lại từ mốc cũ"])
+  N -->|"Chưa"| RT(["Lần sau xoá hàng dở đầu lô<br/>và đọc lại từ mốc cũ"])
