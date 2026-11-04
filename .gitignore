@@ -100,3 +100,6 @@ phien_ban_goi.txt
 
 # Anh chup so do/mo phong cua tao_bao_cao_docx.py (san pham dung, khong luu)
 bao_cao_hinh/
+
+# Vai cua phien tu dong (hook ban giao doc), rieng tung container
+.claude/phien_vai.json

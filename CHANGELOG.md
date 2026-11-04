@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-04 — T3-HT (ngoài sổ, Truong duyệt 04/11/2026): hạ tầng tự động hoá T3 (điều phối + viết mã + soát)
+
+- **`.claude/hooks/handoff_khi_day_ngu_canh.py`:** đọc vai phiên từ `.claude/phien_vai.json` (không vào git): ngưỡng riêng (`nguong`; con 400k, điều phối 700k), tệp bàn giao theo vai (`docs/phien/<nhánh>__impl.md`, `__tester.md`), phiên con được nhắc `send_message` báo phiên điều phối; không có tệp vai thì giữ hành vi cũ. Lấy tên nhánh bằng `git branch --show-current`.
+- **Tài liệu:** `docs/phien/T3_GIAO_THUC.md` (giao thức, khuôn tin nhắn, bàn giao), `docs/phien/claude__gallant-mendel-uki8j2.md` (kế hoạch bốn lô T3-L0..L3 và quyết định của Truong).
+- **Test:** `tests/test_hook_ban_giao.py` (6 ca).
+
 ## 2026-11-04 — sửa CI main 3c67776: test giao diện A14 chập chờn
 
 - `tests/test_giao_dien_a14_lop.py::test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do`: CI Linux (run 41803199666) báo `IndexError` ở `r.split("\t", 3)[3]` — `innerText` của `<tr>` chỉ có dấu tab khi bảng đã được vẽ bố cục. Nay chờ đủ 3 hàng rồi đọc từng ô bằng `textContent`, kiểm mỗi hàng 6 ô. Chỉ sửa test; máy cloud chạy cả tệp 3 lần đều 24/24 xanh.
