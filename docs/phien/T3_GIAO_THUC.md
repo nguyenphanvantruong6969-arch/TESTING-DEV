@@ -33,6 +33,14 @@
 - Messages between sessions use the fixed formats below, <= 15 lines, no pasted diffs or logs (give file:line or sha).
 - Coord reads child transcripts only with `list_events(kinds=["assistant","result"], limit<=20)` when a message is missing.
 
+## Test tiers (Truong, 2026-11-04)
+| Tier | Runs | When |
+|---|---|---|
+| child machine (impl) | related backend tests + ONLY the UI tests touching the screens just changed (chosen by grepping changed names) | every edit |
+| tester | the lot's related tests + a few manual Playwright actions + screenshots | every lot |
+| CI | full suite incl. UI | every push (old runs auto-cancelled, non-main branches) |
+Do not run all `test_giao_dien_*` locally; CI does that.
+
 ## Work loop per lot (L0 -> L1 -> L2 -> L3)
 1. coord -> impl: `GO L<n>` (lot spec = branch file section "Lot L<n>").
 2. impl: per item: failing test -> minimal fix -> related tests -> next item. Then `soat-ma` (`kiem_nhanh.py` + 4 tiers),
