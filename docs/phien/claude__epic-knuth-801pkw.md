@@ -42,6 +42,15 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 - Design status (00372e0): §7.7 holds implementation conventions M1..M26 + N1..N15 decisions. Simulation: at c=100 ms per
   response both targets FAIL (backlog drain 140 min > 2 h; peak day 64.3 min > 45); both hold when c <= ~64 ms; the doc says so
   and gives the pilot decision rule (<=64 keep A; 64-200 mitigations §9.4; >200 option B).
+- ROUND 5 RESULT (arrived after handoff, 07:19): CON-6 verified N1..N15 and reproduced the simulation (matches; peak-day
+  totals off by 0.1-0.3 min rounding). NOT passed only because of 5 blocking ambiguities, one line each needed in §7.7:
+  B1 Từ chối: which states it applies to, ban_giu after, which rows are candidates for re-rank (suggest: any state; ban_giu 0;
+  candidates = valid ma_hs rows not tu_choi). B2 normal-batch red alert (suggest: red if RAW < valid phieu, or RAW > phieu after a
+  batch that ended "no more responses"). B3 runtime c for the stop rule (suggest: measured from the previous block, default
+  100 ms stored in cau_hinh). B4 Gán lại mã: new code must exist in hoc_sinh (refuse otherwise); M9 normalisation on both sides.
+  B5 swap-kept-row write order (suggest: demote old row first, then promote; batch start repairs groups with 0 or >1 ban_giu=1
+  by M11). Non-blocking: §7.7 intro says round 3; §9.3 totals rounding; ketThucLo re-arms forever if RAW has hand-typed rows
+  (say so); API < phieu has no exit (say "Từ chối that row" or V1 unsupported); no cau_hinh key for last API count.
 
 ## Decisions and gotchas (keep short)
 - Truong approved T4-K1/K2 (TIEN_DO 3e9b0bc). K2 starts only after the design review passes (Truong's order).
@@ -56,7 +65,7 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
   /opt/pw-browsers); run with PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers; full suite ~23 min.
 
 ## Next steps (ordered)
-1. Read CON-6's "TESTER REPORT T4 round 5" (list_events on its session). Blocking issues -> decide, send to CON-7, re-review.
+1. Decide B1-B5 (see Current state), send to CON-7 to write into §7.7 (+ non-blocking items), then CON-6 quick re-check.
 2. When it passes: send "GO K2" to CON-5 with: follow §7.7 + N decisions at the latest design commit; list deviations.
 3. CON-5 reports "CON-5 K2 DONE" -> CON-6 reviews code -> loop until NO BUGS. Report to Truong: files, new tests (cases),
    soat-ma, uncertain points.
