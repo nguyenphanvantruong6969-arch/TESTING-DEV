@@ -5,9 +5,11 @@ flowchart TD
   V1 -->|"Sai"| E1["Học sinh sửa và gửi lại"]
   V1 -->|"Đúng"| W["Forms lưu phản hồi, cấp ID<br/>và ghi một dòng vào tab RAW"]
   W --> T["Trigger lô, mỗi 10 phút"]
-  T --> G{"xuLyLo kiểm cau_hinh:<br/>trang_thai_ky khác chot<br/>và đã tới giờ mở?"}
+  T --> G{"xuLyLo kiểm cau_hinh:<br/>trang_thai_ky không phải chot hay chua_mo<br/>và đã tới giờ mở?"}
   G -->|"Không"| X1(["Thoát ngay"])
-  G -->|"Có"| L{"Lấy khoá LockService"}
+  G -->|"Có"| FL{"Cờ sua_phan_hoi_bat = 1?<br/>(M1)"}
+  FL -->|"Có"| X2(["Thoát, không cập nhật lo_ok_cuoi,<br/>không báo lô ngừng"])
+  FL -->|"Không"| L{"Lấy khoá LockService"}
   L -->|"Không được"| R1["Ghi nhat_ky,<br/>thử lại lần trigger sau"]
   L -->|"Được"| CL["Xoá mọi hàng phieu thiếu raw_key<br/>hoặc trang_thai, từ dưới lên"]
   CL --> RD["Đọc phản hồi qua API từ<br/>moc_xu_ly trừ 1 phút"]

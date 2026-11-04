@@ -2,7 +2,7 @@ flowchart TD
   A(["Admin mở bảng điều khiển"]) --> B["Xem số lượng theo trạng thái,<br/>đối soát RAW, API và phieu, tình trạng lô"]
   B --> C["Mở chế độ xem lọc<br/>trong tab phieu"]
   C --> D{"Nhóm phiếu"}
-  D -->|"cho_duyet, ban_giu = 1"| E["Chọn dòng, menu Duyệt<br/>hoặc Duyệt tất cả"]
+  D -->|"cho_duyet, ban_giu = 1"| E["Chọn dòng, menu Duyệt hoặc Duyệt tất cả;<br/>hộp xác nhận nêu số dòng đúng"]
   D -->|"cho_duyet cần loại"| TC["Menu Từ chối kèm lý do:<br/>ban_giu = 0, xếp hạng lại nhóm"]
   D -->|"ma_la, bo_khong_ma"| F["Gán lại mã đúng, hoặc từ chối,<br/>hoặc thêm vào hoc_sinh rồi Xử lý lại"]
   D -->|"bo_nop_trung hoặc mã nhầm"| G["Giữ phiếu này (đổi phiếu giữ)<br/>hoặc Gán lại mã, xác nhận"]
@@ -13,16 +13,23 @@ flowchart TD
   H --> I{"Còn cho_duyet (ban_giu = 1)<br/>hoặc ma_la?"}
   I -->|"Còn"| C
   I -->|"Hết"| J["Admin chọn Chốt đợt"]
-  J --> K["Đối soát: RAW = API = hàng hợp lệ của phieu<br/>(khối 2.000, chạy tiếp được)"]
-  K --> K2{"Còn phản hồi chờ<br/>hoặc số lượng lệch?"}
-  K2 -->|"Còn chờ"| RUN["Menu Chạy lô ngay"]
+  J --> K["Đếm API theo khối 2.000<br/>(tối đa 240 giây mỗi lần bấm, chạy tiếp được)"]
+  K --> K2{"Số đếm API so với<br/>số hàng hợp lệ của phieu"}
+  K2 -->|"API lớn hơn phieu: còn phản hồi chờ"| RUN["Menu Chạy lô ngay"]
   RUN --> K
-  K2 -->|"RAW nhỏ hơn phieu"| B
-  K2 -->|"Bằng nhau"| Q{"Hộp xác nhận: số phiếu duyệt, từ chối,<br/>(tuỳ chọn) CLB thiếu chỉ tiêu"}
+  K2 -->|"API nhỏ hơn phieu: lỗi, chặn chốt"| B
+  K2 -->|"API bằng phieu"| K3{"Số dòng RAW<br/>so với API"}
+  K3 -->|"Bằng"| Q{"Hộp xác nhận: số phiếu duyệt, từ chối,<br/>(tuỳ chọn) CLB thiếu chỉ tiêu"}
+  K3 -->|"RAW nhỏ hơn API"| W1["Cảnh báo: hộp xác nhận nêu chênh lệch<br/>(chỉ cảnh báo, không chặn)"]
+  K3 -->|"RAW lớn hơn API"| W1
+  W1 --> Q
   Q -->|"Huỷ"| B
-  Q -->|"Đồng ý"| L["Đóng form, xoá các trigger lô, hằng ngày, mở, đóng,<br/>trang_thai_ky = chot, sao lưu gắn nhãn chốt, ghi nhat_ky"]
+  Q -->|"Đồng ý"| L0["Nếu RAW lệch: ghi nhat_ky chot_raw_lech"]
+  L0 --> L["Đóng form, xoá 5 trigger: xuLyLo, hangNgay,<br/>moForm, dongForm, ketThucLo;<br/>trang_thai_ky = chot, sao lưu gắn nhãn chốt, ghi nhat_ky"]
   L --> M0["Admin chọn menu Xuất<br/>(riêng, không tự chạy sau chốt)"]
-  M0 --> M1{"Đã xuất đầy đủ hôm nay<br/>và phieu không đổi?"}
+  M0 --> M4{"Đang xuất dở<br/>(xuat_dang_chay)?"}
+  M4 -->|"Có"| M5["Từ chối: dùng Xuất tiếp<br/>hoặc Huỷ xuất"]
+  M4 -->|"Không"| M1{"Đã xuất đầy đủ hôm nay<br/>và phieu không đổi?"}
   M1 -->|"Có"| M3["Từ chối, nêu lý do"]
   M1 -->|"Không"| M["Chụp danh sách và manifest.json,<br/>xuất theo phần 1.000 phiếu,<br/>trigger nối tiếp xuatTiep"]
   M --> M2["Ghi nhat_ky: số phần, số phiếu, id thư mục"]
