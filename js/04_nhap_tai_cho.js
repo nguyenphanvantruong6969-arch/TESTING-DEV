@@ -745,7 +745,7 @@ function whartonVeKhung(goc, w, tuyChon) {
         o.className = "text-input text-input-sm wh-diem";
         o.dataset.quy = String(quy);
         o.dataset.clb = cid;
-        o.setAttribute("aria-label", tenClb(cid) + " — " + ten.textContent);
+        o.setAttribute("aria-label", tenClb(cid) + ": " + ten.textContent);
         o.setAttribute("aria-describedby", idKhung + "L");
         const daCo = cid in luu ? String(luu[cid]) : "";
         const khoa = !!w.tu_dien_mot_clb && motClb && (daCo === "" || daCo === String(w.ngan_sach));

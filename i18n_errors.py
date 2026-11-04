@@ -603,8 +603,8 @@ MESSAGES = {
         "en": "{n} {person_l}(s) have a commitment points profile that isn't valid yet, so the allocation hasn't run. Fill in their commitment points and run again: open card 05 (Manage), then the Commitment points tab, and edit each {person_l}'s points or click \"Scale to 100 by ratio\".",
     },
     "chua_co_du_lieu_de_chay": {
-        "vi": "Chưa có {person_l} hoặc chưa có {slot_l} nào, nên chưa chạy xếp. Hãy nhập dữ liệu ở thẻ 01 (Vận hành sắp xếp) trước: Sổ nhập CLB hoặc các tệp CSV.",
-        "en": "There are no {person_l}(s) or no {slot_l}(s) yet, so the allocation hasn't run. Import the data in card 01 (Allocation) first: the intake workbook or the CSV files.",
+        "vi": "Chưa có {person_l} hoặc chưa có {slot_l} nào, nên chưa chạy xếp. Hãy nhập dữ liệu ở thẻ Xếp {slot_sl} trước: Sổ nhập CLB hoặc các tệp CSV.",
+        "en": "There are no {person_l}(s) or no {slot_l}(s) yet, so the allocation hasn't run. Import the data in the Run allocation tab first: the intake workbook or the CSV files.",
     },
     "health_wharton_chua_hop_le": {
         "vi": "{n} {person_l} có hồ sơ điểm quyết tâm chưa hợp lệ, nên lần chạy xếp sẽ bị chặn cho tới khi sửa xong.",
@@ -728,16 +728,16 @@ MESSAGES = {
         "en": "{n} test sign-up(s) won't count because the {person_l} tested for {slot_la} but didn't list it as a preference. For example: {sample}",
     },
     "health_diem_khong_dang_ky_thi": {
-        "vi": "{n} {score_l} chấm không còn ô đăng ký thi đi kèm ({person_l} đã bỏ đăng ký sau khi được chấm). Lần chạy sắp xếp bỏ qua các {score_l} này, và màn hình Nhập {score_l} không hiện chúng. Để dọn: mở {person_l} đó ở thẻ \"Nhập tại chỗ\" và bấm \"Lưu {slot_sl} dự thi\". Ví dụ: {sample}",
-        "en": "{n} {score_l}(s) no longer have a matching test registration (the {person_l} withdrew after being scored). Allocation runs ignore these {score_pl}, and the {score} entry screen does not show them. To clean up: open that {person_l} in the \"Kiosk entry\" tab and press \"Save test {slot_pl}\". For example: {sample}",
+        "vi": "{n} {score_l} chấm không còn ô đăng ký thi đi kèm ({person_l} đã bỏ đăng ký sau khi được chấm). Lần chạy sắp xếp bỏ qua các {score_l} này, và màn hình Nhập {score_l} không hiện chúng. Để dọn: mở {person_l} đó ở thẻ \"Nhập nguyện vọng\" và bấm \"Lưu {slot_sl} dự thi\". Ví dụ: {sample}",
+        "en": "{n} {score_l}(s) no longer have a matching test registration (the {person_l} withdrew after being scored). Allocation runs ignore these {score_pl}, and the {score} entry screen does not show them. To clean up: open that {person_l} in the \"Enter preferences\" tab and press \"Save test {slot_pl}\". For example: {sample}",
     },
     "health_thi_qua_tran_buoi": {
-        "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l} trong {session_l} {buoi}, thường do một {slot_l} vừa được chuyển sang {session_l} này ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập tại chỗ: mở {person_l} đó, bỏ bớt {slot_sl} dự thi của {session_l} này rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
-        "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl} on {buoi}, usually because {slot_la} was just moved to this {session_l} in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Kiosk entry tab: open the {person_l}, untick some of this {session_l}'s test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}",
+        "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l} trong {session_l} {buoi}, thường do một {slot_l} vừa được chuyển sang {session_l} này ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi của {session_l} này rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
+        "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl} on {buoi}, usually because {slot_la} was just moved to this {session_l} in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some of this {session_l}'s test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}",
     },
     "health_thi_qua_tran": {
-        "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l}, thường do danh sách {slot_l} vừa được sửa ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập tại chỗ: mở {person_l} đó, bỏ bớt {slot_sl} dự thi rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
-        "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl}, usually because the {slot_l} list was just edited in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Kiosk entry tab: open the {person_l}, untick some test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}",
+        "vi": "{n} {person_l} đăng ký thi quá {tran} {slot_l}, thường do danh sách {slot_l} vừa được sửa ở màn Quản lý {slot_sl} & dự trữ. Thi thêm {slot_l} là được xét ưu tiên ở thêm chỗ, không công bằng với {person_l} khác. Sửa ở màn Nhập nguyện vọng: mở {person_l} đó, bỏ bớt {slot_sl} dự thi rồi lưu. Ví dụ (số {slot_l} đang thi): {sample}",
+        "en": "{n} {person_l}(s) are signed up to test for more than {tran} {slot_pl}, usually because the {slot_l} list was just edited in {slot_p} & reserves. Testing for extra {slot_pl} gives them priority in more places, which is unfair to others. Fix it in the Enter preferences tab: open the {person_l}, untick some test {slot_pl} and save. For example ({slot_pl} being tested for): {sample}",
     },
     "health_vi_pham_clb_suc_chua_sai": {
         "vi": "{n} {slot_l} có sức chứa không hợp lệ (sức chứa phải lớn hơn 0, suất dự trữ từ 0 tới sức chứa). Sửa ở màn Quản lý {slot_sl} & dự trữ. Ví dụ: {sample}. Phần mềm chưa bật được lớp chặn dữ liệu hỏng cho tệp dữ liệu này; sửa xong thì đóng và mở lại phần mềm để bật.",

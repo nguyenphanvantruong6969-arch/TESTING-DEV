@@ -91,7 +91,17 @@ MA_MOI_SAU_ANH_CHUP = {
 
 # Thay đổi CÓ CHỦ Ý sau ảnh chụp (T1/T2, Truong duyệt): đánh số lại thẻ (bảy thành sáu) làm đổi số thẻ
 # trong hai chuỗi, và năm khoá giao diện mồ côi của thẻ Kết quả cũ bị bỏ. Mọi chuỗi khác vẫn giống hệt.
-KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb"}
+KHOA_UI_DA_BO = {"results_title", "results_desc", "tkb_title", "tkb_desc", "tkb_so_clb",
+                 # T3-L1 (Truong duyệt 04/11/2026): bỏ dòng phụ tên thuật toán, ô "đã nộp nguyện vọng",
+                 # và hai dòng chữ đơn về số khởi tạo (gộp vào một dòng `stb_locked_label`).
+                 "brand_sub", "label_submitted_prefs", "seed_locked_hint", "seed_unlocked_for_redraw"}
+
+# T3-L1 (Truong duyệt 04/11/2026): đổi chữ có chủ ý theo bảng 5.1-5.3 của nghiên cứu T3. Chuỗi cũ đổi theo
+# bảng thay chữ dưới đây; chuỗi viết lại hẳn nằm trong `chu_ui_doi_co_y_t3.json` (giá trị MỚI với mặc định
+# trường học). Mọi chuỗi khác vẫn giống hệt ảnh chụp.
+THAY_CHU_T3 = [("Nhập tại chỗ", "Nhập nguyện vọng"), ("Kiosk entry", "Enter preferences"),
+               ("Vận hành sắp xếp", "Xếp CLB")]
+CHU_UI_MOI_T3 = os.path.join(GOC, "tests", "du_lieu_ws", "chu_ui_doi_co_y_t3.json")
 SUA_CO_Y = {
     ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],
     ("loi", "so_nhap_canh_bao_clb_ngoai_so"): [("thẻ 04", "thẻ 05"), ("tab 04", "tab 05")],
@@ -116,7 +126,22 @@ def _truoc_da_doi_ten_tham_so(chuoi, ma=None):
 @pytest.fixture(scope="module")
 def anh_chup():
     with open(ANH_CHUP, encoding="utf-8") as f:
-        return json.load(f)
+        d = json.load(f)
+    with open(CHU_UI_MOI_T3, encoding="utf-8") as f:
+        moi = json.load(f)["ui"]
+    for loai in ("loi", "ui"):
+        for lang in ("vi", "en"):
+            bang = d[loai][lang] if loai == "ui" else None
+            if loai == "ui":
+                for k, v in list(bang.items()):
+                    for cu, mo in THAY_CHU_T3:
+                        v = v.replace(cu, mo)
+                    bang[k] = moi[lang].get(k, v)
+            else:
+                for ma, v in d["loi"].items():
+                    for cu, mo in THAY_CHU_T3:
+                        v[lang] = v[lang].replace(cu, mo)
+    return d
 
 
 # ------------------------------------------------------------------ nhan_ws.py
@@ -362,7 +387,7 @@ def test_giao_dien_cong_ty(anh_chup):
     assert ra["en"]["fallback_step0_title"] == "Find or create an employee"   # a -> an
     assert "học sinh" not in ra["vi"]["pipeline_desc"] and "CLB" not in ra["vi"]["pipeline_desc"]
     assert ra["vi"]["pipeline_desc"] == \
-        "Kiểm tra dữ liệu, bốc thăm, xếp nhân viên vào dự án và xuất kết quả."
+        "Nhập sổ nhập, bấm Chạy để xếp nhân viên vào dự án, rồi tải kết quả."
 
 
 @can_node

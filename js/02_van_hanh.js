@@ -118,7 +118,6 @@ function refreshDashboardStats() {
     }
     el("statStudents").textContent = res.data.n_students;
     el("statClubs").textContent = res.data.n_clubs;
-    el("statPrefs").textContent = res.data.n_students_with_preferences;
     el("statMatched").textContent = res.data.n_matched;
     /* T3-01 (B2): chưa có học sinh hoặc chưa có CLB thì khoá nút Chạy kèm lý do (backend cũng chặn
        bằng `chua_co_du_lieu_de_chay`, nên đây chỉ là báo sớm cho người vận hành). */
@@ -153,7 +152,7 @@ function refreshStbLockLine() {
     line.appendChild(dot);
     const label = document.createElement("span");
     label.textContent = res.data.is_locked
-      ? t("stb_locked_label", { locked_at: res.data.locked_at })
+      ? t("stb_locked_label", { locked_at: dinhDangGio(res.data.locked_at) })
       : t("stb_unlocked_label");
     line.appendChild(label);
 
@@ -214,23 +213,13 @@ let seedKhoa = null;
 
 function capNhatOHatGiong() {
   const o = el("seedInput");
-  const goiY = el("seedLockHint");
   if (!o) return;
   const dangKhoa = seedKhoa !== null && !forceRedrawArmed;
   if (dangKhoa) o.value = seedKhoa;
   o.readOnly = dangKhoa;
-  o.title = dangKhoa ? t("seed_locked_hint", { seed: seedKhoa }) : "";
-  if (goiY) {
-    if (seedKhoa === null) {
-      goiY.hidden = true;
-      goiY.textContent = "";
-    } else {
-      goiY.hidden = false;
-      goiY.textContent = forceRedrawArmed
-        ? t("seed_unlocked_for_redraw")
-        : t("seed_locked_hint", { seed: seedKhoa });
-    }
-  }
+  o.title = "";
+  /* Bốc thăm lại thì ô mã phải thấy được để nhập mã mới: mở mục Nâng cao. */
+  if (forceRedrawArmed && el("nangCao")) el("nangCao").open = true;
 }
 
 /* Mot cua duy nhat bat/tat che do ve lai: loi nhac ghim, hen gio 20 giay
@@ -629,6 +618,16 @@ function nhanBuoiDaChay(gia_tri) {
   return ds.map(nhanBuoi).join(", ");
 }
 
+/* T3-09: thẻ Lịch sử chỉ hiện khi đã có từ hai lần chạy; một lần thì thân bảng rỗng, chỉ thừa tiêu đề. */
+function capNhatTheLichSu() {
+  callApi("get_run_history", 2).then((res) => {
+    const the = el("historyPanel");
+    if (!the) return;
+    the.hidden = !(res.ok && res.data.length >= 2);
+    if (!the.hidden && !el("historyTable").hidden) loadRunHistory();
+  });
+}
+
 function loadRunHistory() {
   callApi("get_run_history", 20).then((res) => {
     const body = el("historyTableBody");
@@ -645,7 +644,7 @@ function loadRunHistory() {
     res.data.forEach((r) => {
       const tr = document.createElement("tr");
       tr.innerHTML =
-        `<td>${esc(r.run_id)}</td><td>${esc(r.run_at)}</td><td>${esc(r.seed)}</td>` +
+        `<td>${esc(r.run_id)}</td><td>${esc(dinhDangGio(r.run_at))}</td><td>${esc(r.seed)}</td>` +
         `<td>${esc(r.rounds_run)}</td><td>${esc(r.n_matched)}</td><td>${esc(r.n_total)}</td>` +
         `<td>${esc(nhanBuoiDaChay(r.buoi_da_chay))}</td>` +
         `<td>${r.stb_redrawn ? esc(t("yes")) : esc(t("no"))}</td>`;

@@ -1,0 +1,51 @@
+{
+ "ui": {
+  "en": {
+   "admin_desc": "Add or edit clubs, quotas and priority seats. A priority group only gets those seats in a club with the same label.",
+   "btn_score_link": "Score",
+   "fallback_desc": "Find or create a student, then choose test clubs and rank preferences.",
+   "import_hint": "No intake workbook yet? Press \"Download sample workbook\", fill it in, then drag it into the box below.",
+   "label_seed": "Draw seed",
+   "last_run_line": "Last run: {run_at} ({n_matched}/{n_total} placed)",
+   "nav_pipeline": "Run allocation",
+   "page_title": "Club Allocation",
+   "pipeline_desc": "Import the intake workbook, press Run to place students in clubs, then download the results.",
+   "pipeline_title": "Run allocation",
+   "scoring_desc": "Choose a club to score. The list shows only IDs and names, so scoring stays objective.",
+   "stb_locked_label": "Lottery drawn at {locked_at}. To draw again, click \"Redraw lottery…\".",
+   "th_capacity": "Quota",
+   "th_reserve_capacity": "Priority seats",
+   "th_reserve_group": "Priority group",
+   "th_ti_le_choi": "Applicants per place",
+   "ws_btn_nhap_zip": "Restore from ZIP",
+   "ws_btn_xuat": "Back up to ZIP",
+   "ws_r_max_choices": "Most choices per round (1 to 20)",
+   "ws_r_max_tests": "Most tested places per round (0 to 20)",
+   "xuat_hint_hoc_sinh": "Student profiles: press \"Choose students…\" and tick them in the table below."
+  },
+  "vi": {
+   "admin_desc": "Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.",
+   "btn_score_link": "Chấm",
+   "fallback_desc": "Tìm hoặc tạo học sinh, rồi chọn CLB dự thi và xếp hạng nguyện vọng.",
+   "import_hint": "Chưa có sổ nhập? Bấm \"Tải sổ nhập mẫu\", điền xong rồi kéo vào ô bên dưới.",
+   "label_seed": "Mã bốc thăm",
+   "last_run_line": "Chạy gần nhất: {run_at} (xếp được {n_matched}/{n_total})",
+   "page_title": "Sắp xếp Câu lạc bộ",
+   "pipeline_desc": "Nhập sổ nhập, bấm Chạy để xếp học sinh vào CLB, rồi tải kết quả.",
+   "scoring_desc": "Chọn CLB để chấm. Danh sách chỉ có mã và họ tên, để chấm khách quan.",
+   "stb_locked_label": "Đã bốc thăm lúc {locked_at}. Muốn bốc thăm lại, bấm \"Bốc thăm lại…\".",
+   "th_capacity": "Chỉ tiêu",
+   "th_dat_nv1": "Chọn là nguyện vọng 1",
+   "th_reserve_capacity": "Suất ưu tiên",
+   "th_reserve_group": "Nhóm ưu tiên",
+   "th_ti_le_choi": "Học sinh trên mỗi chỗ",
+   "ws_btn_luu_mau": "Lưu làm mẫu",
+   "ws_btn_nhap_zip": "Khôi phục từ tệp nén",
+   "ws_btn_xuat": "Sao lưu ra tệp nén",
+   "ws_r_max_choices": "Số lựa chọn tối đa mỗi đợt (từ 1 đến 20)",
+   "ws_r_max_tests": "Số mục dự thi tối đa mỗi đợt (từ 0 đến 20)",
+   "xuat_hint_hoc_sinh": "Hồ sơ học sinh: bấm \"Chọn học sinh…\" rồi đánh dấu trong bảng bên dưới.",
+   "xuat_opt_kem_csv": "Kèm các tệp CSV rời (dùng khi cần nạp sang phần mềm khác)"
+  }
+ }
+}

@@ -3070,3 +3070,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .log-hang-cuoi { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .log-tom-tat { font-weight: 600; }
 .wh-hang-loat { margin: 12px 0 18px; }
+
+/* Mục Nâng cao ở thẻ chạy (T3-05): ô mã bốc thăm thu gọn, mặc định 42. */
+.nang-cao { margin: 6px 0 2px; font-size: 13px; }
+.nang-cao > summary { cursor: pointer; color: var(--ink-soft, var(--ink)); }
+.nang-cao .seed-input-wrap { margin-top: 6px; }

@@ -65,12 +65,12 @@ function doiThe(tabName) {
  * ------------------------------------------------------------------ */
 
 function refreshSidebarStatus() {
+  capNhatTheLichSu();
   callApi("get_last_run_info").then((res) => {
     const line = el("lastRunLine");
     if (res.ok && res.data) {
       line.textContent = t("last_run_line", {
-        run_at: res.data.run_at,
-        seed: res.data.seed,
+        run_at: dinhDangGio(res.data.run_at),
         n_matched: res.data.n_matched,
         n_total: res.data.n_total,
       });

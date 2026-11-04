@@ -84,17 +84,14 @@ function loadScoringOverview() {
     }
     emptyState.hidden = true;
     withApplicants.forEach((c) => {
-      const pct = c.n_applicants > 0 ? Math.round((c.n_scored / c.n_applicants) * 100) : 0;
       const tr = document.createElement("tr");
       const tdProgress = document.createElement("td");
-      tdProgress.innerHTML =
-        `<span class="scoring-progress-bar"><span class="scoring-progress-fill" style="width:${pct}%"></span></span>` +
-        `${c.n_scored}/${c.n_applicants}`;
-      tr.innerHTML = `<td>${esc(c.club_id)}</td><td>${esc(c.name)}</td><td>${esc(c.n_applicants)}</td>`;
+      tdProgress.textContent = `${c.n_scored}/${c.n_applicants}`;
+      tr.innerHTML = `<td>${esc(c.name)}</td><td>${esc(c.n_applicants)}</td>`;
       tr.appendChild(tdProgress);
       const tdAction = document.createElement("td");
       const btn = document.createElement("button");
-      btn.className = "btn-row-link";
+      btn.className = "btn btn-secondary btn-row-link";
       btn.textContent = t("btn_score_link");
       btn.addEventListener("click", () => openScoringClub(c.club_id));
       tdAction.appendChild(btn);

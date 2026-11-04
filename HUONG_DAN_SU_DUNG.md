@@ -96,10 +96,10 @@ Trên cùng là **năm thẻ**:
 
 | Thẻ | Dùng để |
 |---|---|
-| **01 · Vận hành sắp xếp** | Nạp tệp, xem cảnh báo, chạy sắp xếp, xuất kết quả |
+| **01 · Xếp CLB** | Nạp tệp, xem cảnh báo, chạy sắp xếp, xuất kết quả |
 | **02 · Kết quả** | Xem ai vào CLB nào: theo lớp, theo CLB hoặc theo mã học sinh. Không có điểm hay số bốc thăm |
 | **03 · Dữ liệu khác** | Tóm tắt, xuất tệp, mức lấp đầy, nguyện vọng, số bốc thăm, danh sách đầy đủ |
-| **04 · Nhập tại chỗ** | Gõ tay cho em không nộp được qua biểu mẫu |
+| **04 · Nhập nguyện vọng** | Gõ tay cho em không nộp được qua biểu mẫu |
 | **05 · Quản lý CLB & dự trữ** | Thêm/sửa CLB, gán diện ưu tiên, xoá dữ liệu |
 | **06 · Nhập điểm** | Giáo viên nhập điểm vòng thi (chấm mù) |
 
@@ -112,7 +112,7 @@ mấy. Người chấm không biết cho điểm này thì ai được lợi.
 ## 5. Sổ nhập CLB — từng cột nghĩa là gì
 
 Mọi dữ liệu nằm trong **một tệp Excel**: Sổ nhập CLB. Lấy sổ bằng nút **Tải sổ
-nhập mẫu** ở thẻ **01 · Vận hành sắp xếp** — phần mềm đã có CLB thì sổ điền sẵn
+nhập mẫu** ở thẻ **01 · Xếp CLB** — phần mềm đã có CLB thì sổ điền sẵn
 danh sách CLB. Sổ có hai trang để điền và một trang **Hướng dẫn**. Hướng dẫn
 một trang đầy đủ: `mau_csv/HUONG_DAN_SO_NHAP.md`.
 
@@ -259,7 +259,7 @@ cứu **1,2 tới 79,0 em trên 200**, tuỳ mức chật.
 
 ### Chỉ xếp một buổi, hoặc một dải buổi
 
-Thẻ **Vận hành sắp xếp**, khối **Buổi sẽ xếp** ngay trên các bước xử lý. Mặc
+Thẻ **Xếp CLB**, khối **Buổi sẽ xếp** ngay trên các bước xử lý. Mặc
 định chọn hết — bấm Chạy mà không để ý khối này thì kết quả y như trước.
 
 Hai cách chọn, cùng sửa một tập:
@@ -340,7 +340,7 @@ biểu tuần (dán bảng được). Ai cần thêm mỗi buổi một tệp `.
 
 ### Bước 1 — Nạp Sổ nhập CLB
 
-Thẻ **01 · Vận hành sắp xếp**. Kéo sổ thả vào ô kéo-thả, hoặc bấm vào ô đó để
+Thẻ **01 · Xếp CLB**. Kéo sổ thả vào ô kéo-thả, hoặc bấm vào ô đó để
 chọn tệp.
 
 Phần mềm **đọc thử, chưa ghi gì**, rồi hiện một dòng tóm tắt — với bộ ví dụ:
@@ -403,7 +403,7 @@ biết tìm. Đường dẫn đầy đủ của từng tệp hiện ngay dưới
 **Mở thư mục** mở thẳng thư mục chứa tệp.
 
 Có dải vàng *"Dữ liệu đã được sửa sau lần chạy gần nhất"* ở đầu thẻ thì **chạy lại
-trước khi xuất** (nút **Đi tới Vận hành sắp xếp** ngay trên dải) — kết quả đang xem được tính từ dữ liệu cũ. Tệp tổng hợp cũng ghi
+trước khi xuất** (nút **Đi tới Xếp CLB** ngay trên dải) — kết quả đang xem được tính từ dữ liệu cũ. Tệp tổng hợp cũng ghi
 điều này ở dòng *"Kết quả còn khớp dữ liệu"*, để tệp đã mang đi rồi vẫn tự nói được.
 
 > **Xuất nhiều lần không ghi đè lần trước.** Đã có `ket_qua_phan_bo.xlsx` thì lần
@@ -656,7 +656,7 @@ không chọn** — nếu có, nó đã tự quyết thay các em.
 
 Dùng khi học sinh không nộp được qua biểu mẫu.
 
-Thẻ **04 · Nhập tại chỗ**. Ba bước tách biệt, không ảnh hưởng lẫn nhau:
+Thẻ **04 · Nhập nguyện vọng**. Ba bước tách biệt, không ảnh hưởng lẫn nhau:
 
 1. **Tìm hoặc tạo học sinh** — gõ mã hoặc tên. Gõ có dấu hay không dấu, hoa hay
    thường đều được: `binh`, `BÌNH`, `Bình` cùng ra "Lê Thị Bình". Chưa có thì bấm
@@ -1025,7 +1025,7 @@ riêng cho từng chỗ. Chọn "Chỉ theo nhóm" hoặc "Mỗi người một 
 
 ### Học sinh chia điểm ở kiosk
 
-Tab **Nhập tại chỗ** → chọn học sinh → **Bước 3. Điểm quyết tâm**. Mỗi buổi có hai khung (CLB đã thi, CLB không
+Tab **Nhập nguyện vọng** → chọn học sinh → **Bước 3. Điểm quyết tâm**. Mỗi buổi có hai khung (CLB đã thi, CLB không
 thi); mỗi CLB một ô số và bộ đếm **Đã dùng X / 100**. Bấm **Lưu điểm quyết tâm**; chưa đủ 100 thì phần mềm báo còn
 thiếu bao nhiêu ở quỹ nào và không lưu.
 

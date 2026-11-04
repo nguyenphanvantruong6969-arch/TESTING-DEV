@@ -109,12 +109,12 @@ function initWorkspace() {
   });
 }
 
-/* Tiêu đề cửa sổ: "<tên danh từ chỗ xếp> — <tên workspace>". Trình duyệt dự phòng lấy
+/* Tiêu đề cửa sổ: "<tên danh từ chỗ xếp> · <tên workspace>". Trình duyệt dự phòng lấy
    từ document.title; cửa sổ gốc pywebview thì phải nhờ backend đổi (dat_tieu_de_cua_so).
    Chạy với đường dẫn CSDL riêng thì giữ tiêu đề cũ, không đụng gì. */
 function wsCapNhatTieuDe() {
   if (!wsTrangThai || !wsTrangThai.enabled) return;
-  const tieuDe = window.I18N.nounText("slot", "", window.I18N.getLang()) + " — " +
+  const tieuDe = window.I18N.nounText("slot", "", window.I18N.getLang()) + " · " +
     (wsTrangThai.name || wsTrangThai.slug || "");
   document.title = tieuDe;
   callApi("dat_tieu_de_cua_so", tieuDe);
@@ -541,7 +541,7 @@ function wsVeWizard() {
         class: "ws-buoc-muc" + (n === w.buoc ? " is-hien-tai" : n < w.buoc ? " is-xong" : ""),
         "aria-current": n === w.buoc ? "step" : null,
         text: n + ". " + t("ws_wz_b" + n) }))),
-    wsEl("p", { class: "ws-buoc-ten", text: t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) + " — " + tenBuoc }),
+    wsEl("p", { class: "ws-buoc-ten", text: t("ws_wz_buoc", { n: w.buoc, tong: WS_TONG_BUOC }) + ": " + tenBuoc }),
   );
 
   const noiDung = wsEl("div", { class: "ws-wz-noi-dung", id: "wzNoiDung" });
@@ -599,11 +599,11 @@ function wsBuoc2(hop) {
         wsEl("div", { class: "ws-dt-mo-ta", text: t("ws_dt_" + dt + "_mo_ta") })),
       wsEl("input", { type: "text", class: "text-input wz-nhan", "data-noun": dt, "data-ngon": "vi",
         id: "wzNhan_" + dt + "_vi", value: w.labels[dt].vi, maxlength: "40",
-        "aria-label": t("ws_dt_" + dt) + " — " + t("ws_wz_vi") }),
+        "aria-label": t("ws_dt_" + dt) + ": " + t("ws_wz_vi") }),
       wsEl("input", { type: "text", class: "text-input wz-nhan", "data-noun": dt, "data-ngon": "en",
         id: "wzNhan_" + dt + "_en", value: w.labels[dt].en, maxlength: "40",
         placeholder: t("ws_wz_en_ph"),
-        "aria-label": t("ws_dt_" + dt) + " — " + t("ws_wz_en") }));
+        "aria-label": t("ws_dt_" + dt) + ": " + t("ws_wz_en") }));
   });
   hop.append(luoi);
 }
