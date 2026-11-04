@@ -56,7 +56,9 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 - PR #8 (claude/epic-knuth-801pkw -> main) opened 2026-11-04 WITHOUT T4-K2. Merge resolution: kept branch T1b
   (all pairs, per language) + main's C1 rule (changing a duplicate pair to another shared label = new pair, key includes
   label casefold); tests/test_a14_sua_sau_soat.py taken from main; mau_csv/tao_so_nhap.py = main's + cfg=chuan_hoa({});
-  SO_NHAP_CLB.xlsx regenerated. 241 related tests green after merge; full suite result not yet read.
+  SO_NHAP_CLB.xlsx regenerated. 241 related tests green after merge.
+- CI fix baac5d0: Windows CI on 5a88060 failed 4 tests; test_a5 fixed by the merge; nap_rb (docs/ke_hoach/tham_khao/_chung.py)
+  now loads lop_hoc_sinh before rbda_priority_pipeline; test_mau_forms_thi_clb expects the new RAW_PHIEU line. CI re-running.
 
 ## Decisions and gotchas (keep short)
 - Truong approved T4-K1/K2 (TIEN_DO 3e9b0bc). K2 starts only after the design review passes (Truong's order).
@@ -102,3 +104,4 @@ Algorithm, match_results, run_history, CSV column contract: untouched.
 | 2026-11-04 | Sonnet | CON-4: T4 design doc and 5 diagrams, rounds 1, 2, 3b pushed (ca9e161); handoff at context limit | design only; quotas unverified (network blocked); waiting for Opus review |
 | 2026-11-04 | Opus | Coordinated T3 (closed), T4 design rounds 1-4, T4-K1 (closed); handoff at context limit | K2 waits on design round 5 (CON-6) |
 | 2026-11-04 | Opus | Merged main, resolved 7 conflicts, opened PR #8 (no K2) | full suite + CI pending at handoff |
+| 2026-11-04 | Opus | Fixed PR #8 CI failures from T4-K1 (baac5d0) | CI on baac5d0 pending at handoff |
