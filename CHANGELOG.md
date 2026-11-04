@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-04 — sửa CI main 3c67776: test giao diện A14 chập chờn
+
+- `tests/test_giao_dien_a14_lop.py::test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do`: CI Linux (run 41803199666) báo `IndexError` ở `r.split("\t", 3)[3]` — `innerText` của `<tr>` chỉ có dấu tab khi bảng đã được vẽ bố cục. Nay chờ đủ 3 hàng rồi đọc từng ô bằng `textContent`, kiểm mỗi hàng 6 ô. Chỉ sửa test; máy cloud chạy cả tệp 3 lần đều 24/24 xanh.
+
 ## 2026-11-04 — PR #8: sửa CI sau T4-K1 (Windows báo 4 lỗi ở 5a88060)
 
 - `test_a14_sua_sau_soat.py::test_a5_...` (DROP COLUMN): đã khỏi khi gộp main (lấy bản B9 của main).

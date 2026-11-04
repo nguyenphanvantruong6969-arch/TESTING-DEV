@@ -322,8 +322,13 @@ def test_theo_lop_nhieu_buoi_cot_theo_ngay_o_trong_va_dong_do(mo):
     page.wait_for_function("() => !document.getElementById('kqBang').hidden")
     assert [x.casefold() for x in page.locator("#kqDau th").all_inner_texts()] == [
         "thứ tự", "mã học sinh", "họ tên", "2", "3", "10"]            # theo thứ tự, không theo vần
-    tong = page.locator("#kqThan tr").all_inner_texts()
-    assert len(tong) == 3 and any("-" in r.split("\t", 3)[3] for r in tong)          # ô trống ghi -
+    # Đọc từng ô bằng textContent: innerText của <tr> phụ thuộc bố cục (bảng chưa vẽ xong thì
+    # không có dấu tab), từng làm test lỗi chập chờn trên CI Linux (IndexError).
+    page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length === 3")
+    tong = page.locator("#kqThan tr").evaluate_all(
+        "rs => rs.map(r => Array.from(r.cells, c => c.textContent.trim()))")
+    assert len(tong) == 3 and all(len(r) == 6 for r in tong)
+    assert any("-" in r[3:] for r in tong)                                          # ô trống ghi -
     do = page.locator("#kqThan tr.dong-do").count()
     assert do == int(page.locator("#kqDem").inner_text().split("·")[1].strip().split()[0])
     assert not loi, loi
