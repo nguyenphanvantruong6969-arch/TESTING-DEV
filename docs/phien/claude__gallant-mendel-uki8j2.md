@@ -56,7 +56,7 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 
 ## Plan (coord writes; impl/tester tick)
 - [x] P0 protocol, role-aware Stop hook (`.claude/hooks/handoff_khi_day_ngu_canh.py`, tests/test_hook_ban_giao.py 6 cases)
-- [ ] L0 impl  - [ ] L0 tester NO BUGS  - [ ] L0 PR
+- [x] L0 impl (661bccb)  - [ ] L0 tester NO BUGS  - [ ] L0 PR
 - [ ] L1 impl  - [ ] L1 tester NO BUGS  - [ ] L1 PR
 - [ ] L2 impl  - [ ] L2 tester NO BUGS  - [ ] L2 PR
 - [ ] L3 impl  - [ ] L3 tester NO BUGS  - [ ] L3 PR
@@ -66,17 +66,17 @@ Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-
 | Role | Session id | Model | Status |
 |---|---|---|---|
 | coord | session_01YVAyu1tdPE9AURCeJXaN5S | Opus | active |
-| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 running (GO L0 sent 13:15 UTC) |
-| tester | (to create per lot: Opus L0, Sonnet L1+) | | |
+| impl | session_01YVAytzNrwmcsLv5pa3nYSD | Sonnet | L0 done 661bccb; idle |
+| tester L0 | session_01YVAyu2crsL4UeEuzPors7z | Opus | REVIEW L0 7e90e14..661bccb sent 13:27 UTC |
 
 ## Current state (overwrite each handoff)
-- P0 done (639b4e7). L0 sent to impl. No PR open.
+- P0 done (639b4e7). L0 impl done 661bccb (17 new cases; inv 1 proven 3x20). L0 in review. No PR open.
 
 ## Needs Truong
 - (none yet)
 
 ## Next steps (ordered)
-1. Wait for "IMPL DONE L0"; then create tester (Opus) with `REVIEW L0 639b4e7..<head>`.
+1. Wait for "TESTER REPORT L0". NO BUGS -> open PR, notify, `GO L1` to impl. Bugs -> `FIX L0`.
 
 ## Files touched
 - .claude/hooks/handoff_khi_day_ngu_canh.py: role file `.claude/phien_vai.json`, per-role threshold and message
