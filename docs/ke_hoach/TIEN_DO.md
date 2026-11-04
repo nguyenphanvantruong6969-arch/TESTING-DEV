@@ -36,3 +36,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | T3-L3 (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | i18n.js, i18n_errors.py, index.html, style.css, api_xuat.py, js/05_quan_ly.js, js/075_workspace.js, js/09_the_xem.js, HUONG_DAN_SU_DUNG.md, README.md, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_t3_l3_backend.py, test_giao_dien_t3_l3.py | Tên thẻ 03/05, thẻ Kết quả gọn (T3-16/17/18), tải bảng (T3-19), Điểm chuẩn một nơi và một bảng (T3-22/31), chữ Sổ nhập (T3-27), tạo workspace từ mẫu (T3-11). Chờ tester soát |
 | T3-L3 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Các quyết định của Truong ngày 04/11/2026 |
 | CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026) | xong | 2026-11-04 | .github/workflows/tests.yml, CHANGELOG.md | (không) | Huỷ lượt CI cũ trên nhánh không phải main |
+| T3-L4 (ngoài sổ, Truong duyệt 04/11/2026) | đang | 2026-11-04 | | | Thứ tự tệp "Tải bảng này", bỏ dòng nhắc chết "Chưa có lớp nào", Điểm chuẩn gọn |
