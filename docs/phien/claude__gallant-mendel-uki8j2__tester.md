@@ -8,10 +8,12 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 
 ## Plan
 - [x] L0 review 7e90e14..661bccb -> 2 BUGS (see Current state)
-- [ ] L0 re-check fix  - [ ] L1  - [ ] L2  - [ ] L3
+- [x] L0 re-check fix1 9151962..e8944b2 -> NO BUGS  - [ ] L1  - [ ] L2  - [ ] L3
 
 ## Current state (overwrite each handoff)
-- L0 reviewed. Verdict: 2 BUGS.
+- L0 fix1 (e8944b2) re-checked: NO BUGS. Both bugs below fixed; repro now keeps reserve 4; new club blank reserve -> 0;
+  edit-mode blank -> 0 (explicit clear). 6 files (vi-clean, L0 x2, i18n_sync, danh_sach_clb, a13_8): 53 passed.
+- L0 first review verdict was 2 BUGS:
   1. js/05_quan_ly.js `initAdminHandlers` (btnSaveClub handler, `reserveCapacity` line) + index.html `clubFormReserveCapacity value="0"`
      + `datLaiFormClb` resets it to "0": in hand-typed mode the reserve field is never blank, so retyping an existing club id,
      name and capacity sends explicit 0 and wipes reserve_capacity (4 -> 0). Group and session are kept. The impl UI test
@@ -34,7 +36,7 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 - Probe scripts live in the session scratchpad only (not committed).
 
 ## Next steps (ordered)
-1. Wait for `REVIEW L0 fix<k>` or `REVIEW L1 ...` from coord.
+1. Wait for `REVIEW L1 ...` from coord.
 
 ## Files touched
 - docs/nghien_cuu/anh_t3/sau_L0/*.png, this file.
@@ -43,3 +45,4 @@ Review each T3 lot diff (L0..L3), run related tests, take <= 6 screenshots per l
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-04 | Opus (tester) | L0 review, invariant 1 re-check, 3 screenshots | 2 bugs (reserve default 0; 'tab' in vi text) |
+| 2026-11-04 | Opus (tester) | L0 fix1 re-check | NO BUGS |
