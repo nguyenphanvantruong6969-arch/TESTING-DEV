@@ -308,6 +308,7 @@ class TestHatGiong:
         page.wait_for_function("document.querySelector('#seedInput').value === '2026'")
         # Hạt giống khoá cùng bộ số bốc thăm: chỉ gõ được khi đã bật "Vẽ lại".
         page.click("#stbLockLine .redraw-toggle")
+        page.evaluate("document.getElementById('nangCao').open = true")
         page.fill("#seedInput", "7")
         page.click('.nav-item[data-tab="others"]')
         page.click('.nav-item[data-tab="pipeline"]')
@@ -318,6 +319,7 @@ class TestHatGiong:
     @pytest.mark.parametrize("go", ["", "1.5"])
     def test_hat_giong_khong_hop_le_thi_khong_chay(self, api, mo_trang, go):
         page, loi = mo_trang()
+        page.evaluate("document.getElementById('nangCao').open = true")
         page.fill("#seedInput", go)
         page.click("#btnRun")
         page.wait_for_selector(".toast.is-error")
@@ -328,6 +330,7 @@ class TestHatGiong:
 
     def test_hat_giong_0_duoc_dung_that(self, api, mo_trang):
         page, loi = mo_trang()
+        page.evaluate("document.getElementById('nangCao').open = true")
         page.fill("#seedInput", "0")
         page.click("#btnRun")
         page.wait_for_selector(".toast.is-success", timeout=20000)

@@ -118,6 +118,7 @@ def test_doi_ngon_ngu_ve_lai_tab_nhap_tai_cho(trang):
 
 def test_seed_0_duoc_gui_dung_la_0(trang):
     page, loi, api = trang
+    page.evaluate("document.getElementById('nangCao').open = true")
     page.locator("#seedInput").fill("0")
     page.locator("#btnRun").click()
     xac_nhan = page.locator("#runConfirmBar button.btn-primary")

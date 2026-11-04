@@ -67,7 +67,8 @@ def test_chua_khoa_thi_o_hat_giong_sua_tu_do(api_co_du_lieu):
     try:
         o = page.locator("#seedInput")
         assert o.get_attribute("readonly") is None
-        assert page.locator("#seedLockHint").is_hidden()
+        assert page.locator("#seedLockHint").count() == 0   # T3-05: bỏ dòng chữ đơn thứ hai
+        page.evaluate("document.getElementById('nangCao').open = true")
         o.fill("7")
         assert o.input_value() == "7"
         assert loi == []
@@ -84,11 +85,12 @@ def test_da_khoa_thi_o_hat_giong_chi_doc_va_hien_hat_giong_da_khoa(api_co_du_lie
         page.wait_for_function(
             "document.getElementById('seedInput').readOnly === true")
         assert o.input_value() == "13"
-        goi_y = page.locator("#seedLockHint")
-        assert goi_y.is_visible()
-        assert "13" in goi_y.inner_text()
-        assert "Bốc thăm lại" in goi_y.inner_text()
+        # T3-05: một dòng duy nhất ở `#stbLockLine`, không còn `#seedLockHint`.
+        dong = page.locator("#stbLockLine").inner_text()
+        assert "Đã bốc thăm lúc" in dong and "Bốc thăm lại" in dong
+        assert page.locator("#seedLockHint").count() == 0
         # Gõ vào ô chỉ đọc không đổi được giá trị.
+        page.evaluate("document.getElementById('nangCao').open = true")
         o.press_sequentially("9")
         assert o.input_value() == "13"
         assert loi == []
@@ -113,7 +115,7 @@ def test_bam_ve_lai_thi_mo_o_va_ve_xong_thi_khoa_o_hat_giong_moi(api_co_du_lieu)
             "document.getElementById('seedInput').readOnly === true"
             " && document.getElementById('seedInput').value === '21'")
         assert api_co_du_lieu.get_stb_lock_status()["data"]["seed"] == 21
-        assert "21" in page.locator("#seedLockHint").inner_text()
+        assert page.input_value("#seedInput") == "21"
         assert loi == []
     finally:
         br.close()
@@ -128,9 +130,10 @@ def test_doi_ngon_ngu_thi_dong_giai_thich_doi_theo(api_co_du_lieu):
             "document.getElementById('seedInput').readOnly === true")
         page.locator("#btnLangToggle").click()
         page.wait_for_function(
-            "document.getElementById('seedLockHint').innerText"
+            "document.getElementById('stbLockLine').innerText"
             ".indexOf('Redraw lottery') !== -1")
-        assert "13" in page.locator("#seedLockHint").inner_text()
+        assert "Lottery drawn at" in page.locator("#stbLockLine").inner_text()
+        assert page.input_value("#seedInput") == "13"
         assert loi == []
     finally:
         br.close()

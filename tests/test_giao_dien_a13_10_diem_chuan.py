@@ -69,7 +69,7 @@ def test_bang_co_hai_cot_diem_chuan_rieng_moi_o_co_thanh(mo):
     page, loi = mo()
     th = page.locator("#dcQlTongQuan thead th")
     chu = [x.strip() for x in th.all_inner_texts()]
-    assert [c.lower() for c in chu] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "đơn và chỗ"], chu
+    assert [c.lower() for c in chu] == ["clb", "xét điểm thi", "xét điểm quyết tâm", "số đơn và số chỗ"], chu
     assert page.locator('#dcQlTongQuan th[data-tang="1"]').count() == 1
     assert page.locator('#dcQlTongQuan th[data-tang="2"]').count() == 1
     a = page.locator('#dcQlTongQuan tr[data-club-id="A"]')
@@ -95,7 +95,7 @@ def test_don_va_cho_co_nhan_muc_bang_chu_so_ro_don_vi_va_thanh_chung_thang(mo):
     page, loi = mo()
     assert page.locator("#dcQlTongQuan .dc-nong").count() == 0
     th = page.locator("#dcQlTongQuan thead th").nth(3).inner_text().strip().lower()
-    assert th == "đơn và chỗ", th
+    assert th == "số đơn và số chỗ", th
     # A: 8 đơn cho 4 chỗ (gấp 2, "Đông"); B: 8 đơn cho 10 chỗ ("Đủ chỗ"); C: 0 đơn cho 3 chỗ
     mong = {"A": ("Đông", "8 đơn · 4 chỗ", "vua", (4, 4, 0)),
             "B": ("Đủ chỗ", "8 đơn · 10 chỗ", "thap", (8, 0, 2)),

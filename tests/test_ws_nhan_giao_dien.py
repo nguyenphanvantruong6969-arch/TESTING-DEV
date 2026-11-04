@@ -76,7 +76,7 @@ def test_cong_ty_thay_tu_cua_minh_tren_man_hinh(mo_trang):
     assert _chu_the(page, "#statClubs + .strip-label") == "dự án"
     assert _chu_the(page, '[data-tab="scoring"]').endswith("Nhập điểm")
     mo_ta = _chu_the(page, "#view-pipeline .view-desc")
-    assert mo_ta == "Kiểm tra dữ liệu, bốc thăm, xếp nhân viên vào dự án và xuất kết quả."
+    assert mo_ta == "Nhập sổ nhập, bấm Chạy để xếp nhân viên vào dự án, rồi tải kết quả."
     assert "học sinh" not in page.locator("#view-pipeline").inner_text()
     assert not loi, loi
 
@@ -88,7 +88,7 @@ def test_cong_ty_sang_tieng_anh(mo_trang):
     _cho_chu(page, "#statStudents + .strip-label", "employees")
     assert _chu_the(page, "#statClubs + .strip-label") == "projects"
     mo_ta = _chu_the(page, "#view-pipeline .view-desc")
-    assert mo_ta == "Check the data, draw lottery numbers, place employees in projects, and export the results."
+    assert mo_ta == "Import the intake workbook, press Run to place employees in projects, then download the results."
     assert not loi, loi
 
 
