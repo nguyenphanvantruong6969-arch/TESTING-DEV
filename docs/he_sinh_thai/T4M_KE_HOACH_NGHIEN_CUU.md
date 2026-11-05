@@ -113,9 +113,10 @@ Cột "Cách": **TL** = đọc tài liệu chính thức (giao phiên nghiên c�
 | NC-24 | "Công cụ của ta dựng giúp" trên Microsoft: có API chính thức để **tạo** Microsoft Form từ đề (Graph) không? Nếu không: phương án nhập đề (Forms "Quick import" từ Word/PDF, sao chép mẫu `Duplicate`, Power Automate) và giới hạn | Kiến trúc của skill sinh bài thi bản Microsoft (tương đương `tao-google-form-clb`) | TL | learn.microsoft.com: Microsoft Graph API reference (Forms); support.microsoft.com: Quick import, share as template | Kết luận có nguồn; một phương án được chọn kèm lý do |
 | NC-25 | Ghép điểm vào nguyện vọng: học sinh chọn CLB thi (tối đa 5 mỗi buổi) ở đâu (app ECA hay Forms), mỗi CLB một bài hay một bài nhiều phần; khoá theo email chữ thường; bài làm không tick, tick không làm, phiếu trùng xử lý theo luật của `xu-li-raw-forms` | Đặc tả bộ chuyển đổi điểm → cột `score_k` | TL + IT | `xu-li-raw-forms` (luật soát hiện có); NC-23 | Đặc tả 1 trang + test dựng trước |
 | NC-26 | Công bằng và bảo mật bài thi: thi ở đâu (lớp, nhà), giám sát, lộ đề giữa các buổi, xử lý em vắng thi (điểm = trống, xếp như Tầng 2 hay xếp cuối) | Luật nghiệp vụ của Tầng 1 ở trường này; ghi vào workspace | IT (giáo viên ECA) | (nội bộ trường) | Giáo viên ECA xác nhận luật |
+| NC-27 | Bài thi ngay trong Power Apps: đề ở SharePoint List, câu trả lời thô ở list riêng, chấm ngoại tuyến hay bằng flow; giữ kín đáp án khi học sinh có quyền trên nguồn dữ liệu | So với NC-23 để chọn đường thu điểm | TL + TH | learn.microsoft.com: share-app (quyền nguồn dữ liệu); SharePoint item-level permissions | So sánh có nhãn, khuyến nghị |
 | NC-22 | Bộ chuyển đổi chạy ở đâu: Python trên máy IT (đã có kiosk) hay Office Scripts trong Excel Online (không cần cài) | Kiến trúc ô E | TL + TH | learn.microsoft.com: Office Scripts limits | Khuyến nghị có lý do |
 
-Ưu tiên: **NC-01, NC-02, NC-03, NC-08, NC-16** chặn mọi việc khác; làm trước. NC-23, NC-24 làm bằng prompt P5 (mục 8); NC-25, NC-26 hỏi ở GĐ2.
+Ưu tiên: **NC-01, NC-02, NC-03, NC-08, NC-16** chặn mọi việc khác; làm trước. NC-23, NC-24, NC-27 làm bằng prompt P5 (xong 05/11/2026: `T4M_KET_QUA_TAI_LIEU.md` mục 7); NC-25, NC-26 hỏi ở GĐ2.
 
 ---
 

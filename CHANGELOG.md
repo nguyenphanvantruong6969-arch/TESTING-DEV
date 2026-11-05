@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-05 — T4M-NC P5: đường thu điểm thi trên Microsoft (NC-23, 24, 27)
+
+Chỉ tài liệu. `T4M_KET_QUA_TAI_LIEU.md` mục 7 (mới): Forms Quiz (điểm, cài đặt, giới hạn 200 câu / 400 biểu mẫu, cột xuất Excel), connector Forms chỉ đọc và không có trong Power Apps, không có API được hỗ trợ để tạo biểu mẫu, Quick Import không mang đáp án; bài thi trong Power Apps và rủi ro lộ đáp án; phát hiện `mau_forms_thi_clb/` đã có sẵn đường Forms Quiz; bảng so sánh, khuyến nghị tạm V1 Forms Quiz; đặc tả ghép điểm NC-25; mã mục đề xuất T4M-Q1 đến Q3. `T4M_KE_HOACH_NGHIEN_CUU.md`: thêm NC-27. `T4M_PHIEU_PHONG_VAN.md`: thêm ECA-9 đến 11, IT-14.
+
 ## 2026-11-05 — T4M-NC GĐ3 (tài liệu): hướng dẫn thử môi trường Microsoft + bộ sinh tệp xuất Lists giả
 
 `docs/he_sinh_thai/T4M_HUONG_DAN_THU.md` (mới): hai người đọc (Truong nếu có môi trường thử; bản một trang cho IT = dự phòng B); kho SharePoint List, mô hình RỘNG (một dòng mỗi em mỗi ngày, `NV1..NV3`), mô hình dài ghi là phương án bị loại kèm lý do; màn Top 3, màn gói tiếng Nhật, flow xuất CSV và flow gửi Excel theo lớp (không ghi từng dòng, NC-13); bảng pass/fail/lý do; mục Premium kèm phương án chuẩn; thời gian đều là ước lượng mô phỏng. `du_lieu_test/sinh_xuat_lists_gia.py` (mới): chỉ thư viện chuẩn, `random.Random(seed)`, mặc định 1.500 em × 5 ngày = 7.500 dòng, UTF-8 có BOM, email giả (có chữ hoa), có ngày trống và dòng gói tiếng Nhật. `tests/test_sinh_xuat_lists_gia.py` (mới, 7 test, viết trước): tái lập theo seed, số dòng, BOM, không trùng NV, cột khớp tài liệu, email, dòng đặc biệt. Không đổi mã sản phẩm, hợp đồng CSV hay bất biến nào. Dữ liệu hoàn toàn mô phỏng.

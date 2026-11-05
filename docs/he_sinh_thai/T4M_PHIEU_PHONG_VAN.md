@@ -103,6 +103,24 @@ Trả lời: ______________________________________________________________
 *Bối cảnh:* để xếp lịch thử với dữ liệu thật.
 Trả lời: ______________________________________________________________
 
+### B2. Thi tuyển (quyết định 05/11/2026: trường theo RB-DA)
+
+**ECA-9. [NC-25]** CLB nào sẽ thi? Học sinh chọn CLB thi (tối đa 5 mỗi buổi) ở app ECA hay ngay trong biểu mẫu thi?
+*Bối cảnh:* đề xuất dùng Microsoft Forms Quiz (kho đã có công cụ dựng đề và chấm lại); ghép điểm qua email trường.
+Trả lời: ______________________________________________________________
+
+**ECA-10. [NC-26]** Thi ở đâu, có giám sát không? Mỗi buổi một đề hay dùng chung (lộ đề)? Có thể dùng chế độ Take a Test (máy Windows) không?
+*Bối cảnh:* Forms có hẹn giờ, một lần nộp, Take a Test; bài làm ở nhà thì khó công bằng.
+Trả lời: ______________________________________________________________
+
+**ECA-11. [NC-26]** Em vắng thi xếp thế nào: sau mọi em có điểm, hay như CLB không thi? Thang điểm bao nhiêu? Ai giữ đề và đáp án?
+*Bối cảnh:* hoà điểm phân bằng bốc thăm STB; đáp án phải giữ kín đến hết đợt.
+Trả lời: ______________________________________________________________
+
+**IT-14. [NC-23]** Tenant có hạn chế Microsoft Forms không (tắt chia sẻ ngoài, tắt Quick Import, chặn Take a Test)? Giáo viên tạo được Forms dạng Quiz bằng tài khoản trường chứ?
+*Bối cảnh:* mỗi người tối đa 400 biểu mẫu tính cả thùng rác; tệp Quick Import phải nằm trên máy, tối đa 10 MB.
+Trả lời: ______________________________________________________________
+
 ## Sau buổi gặp
 - [ ] **Mốc C2** (mục 5 của kế hoạch): có sơ đồ cột của kho dữ liệu **hoặc** tệp mẫu đã ẩn danh; có câu trả lời IT-5 (NC-16).
 - [ ] Dự phòng áp dụng: [ ] không cần · [ ] **A** (IT chậm quá 1 tuần: gửi lại 5 câu CHẶN IT-1 đến IT-5) · [ ] **B** (không có quyền tạo app hay flow thử: bỏ GĐ3, dùng bản vẽ màn hình, tệp Excel giả, hướng dẫn 1 trang cho IT).

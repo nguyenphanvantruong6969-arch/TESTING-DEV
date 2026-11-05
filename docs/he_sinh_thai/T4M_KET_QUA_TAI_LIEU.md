@@ -177,3 +177,70 @@ Nhận xét vận hành: khu admin không có bước đăng nhập (theo nội 
 - support.microsoft.com/sharepoint/lists/data-and-lists/export-to-excel-from-sharepoint-or-lists
 - Trang tham khảo của giáo viên (NC-19), địa chỉ ở T4 mục 2.2
 - TT-CXM: tóm tắt tìm kiếm về SDS Classic, "Export to CSV with schema", giới hạn Forms Ranking (Microsoft Q&A, diễn đàn cộng đồng)
+
+---
+
+## 7. Đường thu điểm thi trên Microsoft (P5: NC-23 đến NC-27, đọc 05/11/2026)
+
+Bối cảnh: Truong quyết 05/11/2026 trường đổi quy trình theo RB-DA, có thi tuyển (Tầng 1); bài thi do giáo viên ra, công cụ của dự án dựng giúp. Mục này chỉ là tài liệu vận hành và đề xuất thiết kế, chưa có thử nào (TH).
+
+### 7.0 Phát hiện lớn nhất: kho ĐÃ có đường Microsoft Forms
+`mau_forms_thi_clb/` (đọc mã 05/11/2026) đã làm gần hết việc "công cụ của ta dựng bài thi":
+- `de_thi.json` là nguồn duy nhất (buổi, CLB, chỉ tiêu, đề, đáp án); `tao_mau_forms.py` sinh `NHAP_FORMS_THI_CLB.docx` để **Quick Import**, `CAI_DAT_FORMS.md` (những gì Quick Import không mang: Ranking, rẽ nhánh, đáp án, điểm, cài đặt) và `MAU_XUAT_TU_FORMS.xlsx` (tệp xuất giả).
+- `chuyen_forms_sang_phan_mem.py` đọc tệp Excel Forms xuất ra → `SO_NHAP_CLB.xlsx` + `BANG_DIEM.xlsx`; **chấm lại từ `de_thi.json`**, không tin cột "Points" của Forms, chỉ đem ra đối chiếu (lệch là đáp án trên Forms đã sai).
+- `CAI_DAT_FORMS.md` mục 5 đã đặt: chỉ người trong tổ chức, **One response per person BẬT**, **Show results automatically TẮT**, Shuffle questions TẮT (giữ rẽ nhánh), Start/End date.
+- Thiết kế cũ: MỘT biểu mẫu làm cả nguyện vọng (Ranking) lẫn thi; định danh là ô "Mã HS" học sinh tự gõ.
+
+**Hai chỗ lệch với trường này:** (1) nguyện vọng ở trường nằm trong app Power Apps (ECA), không ở Forms, nên Forms chỉ còn phần **chọn CLB thi + làm bài**; (2) định danh nên là cột **Email** Forms tự ghi khi "Only people in my organization" + "Record name" bật, đưa về chữ thường, để ghép với dòng (em, buổi) của list, thay vì mã HS tự gõ.
+
+### 7.1 NC-23. Microsoft Forms dạng Quiz
+- Điểm: "Add a number in the **Points** text box to assign a point value for a correct answer". Câu Choice: tick **Correct Answer**, có thể nhiều đáp án đúng. Câu Text: "you can add one or more correct answers" (đoạn trích tìm kiếm của trang hỗ trợ: TT-CXM). Điểm từng phần (partial credit): không có trong tài liệu, nguồn cộng đồng mâu thuẫn → coi như **không có** (GĐ). Nguồn: support.microsoft.com/forms/create-a-quiz-with-microsoft-forms. ĐXM.
+- Cài đặt (ĐXM, support.microsoft.com/office/adjust-your-form-or-quiz-settings-in-microsoft-forms-…): "Only people in my organization can respond" (có cho Office 365 Education) kèm **Record name** và **One response per person**; "Specific people in my organization" tới 100 tên, trong đó tới 20 nhóm; **Start date / End date**; **Set time duration** (hết giờ tự nộp); Shuffle questions (không dùng được khi có nhiều phần); **Show results automatically** mặc định BẬT, phải tắt; Practice mode; mở bằng ứng dụng **Take a Test** (môi trường thi khoá máy).
+- Giới hạn (ĐXM, support.microsoft.com/forms/form-question-response-and-character-limits-in-microsoft-forms): **200 câu mỗi biểu mẫu**; 5.000.000 phản hồi; **400 biểu mẫu mỗi người, tính cả thùng rác**; câu hỏi 4.000 ký tự, mỗi lựa chọn 1.000 ký tự. Hệ quả: một biểu mẫu chung cho mọi đề chỉ chứa được khoảng **(200 − câu chọn CLB) ÷ số câu mỗi đề** đề; 20 CLB thi × 5 câu = 100 câu là vừa; nhiều hơn thì tách theo buổi.
+- Xuất (ĐXM, support.microsoft.com/forms/check-and-share-your-quiz-results): Responses → **Open in Excel**; 5 cột đầu: ID, giờ bắt đầu, giờ xong, **Name, Email**; sau đó **Total points, Quiz feedback, Grade posted time**, các câu, rồi điểm và nhận xét từng câu. Học sinh chỉ thấy điểm sau **Post scores**. Có báo cáo cộng đồng về cột Total points trống trên Excel Online (TT-CXM) → không phụ thuộc cột này (đúng như bộ chuyển đổi hiện có).
+- Giao bài qua **Teams Assignments**: quiz lưu thành biểu mẫu nhóm (giới hạn 200 biểu mẫu nhóm), có thẻ Grades; có báo cáo lệch điểm Forms ↔ Teams (TT-CXM). Không cần cho V1.
+- Connector Microsoft Forms (ĐXM, learn.microsoft.com/connectors/microsoftforms, cập nhật 06/10/2025): **Standard** trong Power Automate; **"Power Apps: Not available"**; chỉ có trigger "When a new response is submitted" và hai hành động **đọc** (Get form details, Get response details); **không có hành động tạo biểu mẫu hay câu hỏi**; 300 lệnh mỗi 60 giây.
+
+### 7.2 NC-24. Công cụ có tự tạo biểu mẫu được không
+- Trang tổng quan Microsoft Graph v1.0 (ms.date 16/07/2024) **không liệt kê** tài nguyên Forms (ĐXM, nhưng trang tổng quan không đủ để chứng minh không có). Nhân viên và MVP trên Microsoft Q&A, TechCommunity (2023 đến 03/2026): **không có API được hỗ trợ để tạo** biểu mẫu; điểm cuối `/formsapi` là không chính thức (TT-CXM). Kết luận: **không xây trên API tạo biểu mẫu**.
+- **Quick Import** (ĐXM, support.microsoft.com/forms/convert-a-word-or-pdf-form-or-quiz-to-microsoft-forms): Word/PDF **từ ổ máy**, không từ SharePoint/OneDrive; tối đa **10 MB**; chuyển tiêu đề, phụ đề, câu nhiều lựa chọn và câu văn bản; câu ghép cặp và nhiều chỗ trống thành câu văn bản; công thức phức tạp không hỗ trợ; tiếng Anh chuyển chính xác hơn; **đáp án không được nhập**: giáo viên tick sau khi soát.
+- **Share as a template → Get a link to duplicate** (ĐXM, trang hỗ trợ cũ hơn): chép nội dung, không chép phản hồi. Dùng để giữ một biểu mẫu mẫu đã cài đặt sẵn và nhân ra cho mỗi đợt.
+- **Hệ quả:** "công cụ của ta dựng giúp" trên Forms = sinh `.docx` Quick Import + danh sách việc tay (đáp án, điểm, cài đặt) + bộ chuyển đổi chấm lại. Đây đúng là cái `mau_forms_thi_clb/` đã làm. Phần tay còn lại: tick đáp án cho mọi câu (ví dụ 50 câu), đặt rẽ nhánh nếu một biểu mẫu chung.
+
+### 7.3 NC-27 (mới). Bài thi ngay trong Power Apps
+- Quyền dữ liệu (ĐXM, share-app, ms.date 17/09/2026): "you must also manage permissions for the data source or sources on which the app is based". Tức là học sinh dùng app phải có quyền trên list app đọc; suy ra (GĐ) **list nào app đọc thì học sinh đọc được cả ngoài app**. Vì vậy **đáp án không được nằm trong list học sinh đọc được**, và app không tự chấm ở máy học sinh.
+- Cách giữ kín (GĐ, cần TH): list câu trả lời đặt Item-level permissions "Read items that were created by the user" (nguồn cộng đồng; người có Design/Full Control vẫn thấy hết: TT-CXM); chấm **ngoại tuyến bằng Python** với đáp án IT giữ (như bộ chuyển đổi hiện có); hoặc flow chạy bằng kết nối cố định ("Use this connection" cho run-only users) chấm trên máy chủ. Hành vi khi app gọi flow chưa có trang chính thức xác nhận (TT-CXM) → TH.
+- Đưa đề vào: "Create a list based on a spreadsheet" (bảng Excel, đến 5.000 dòng theo trang hỗ trợ: TT-CXM) hoặc flow SharePoint chuẩn. Công cụ sinh tệp Excel đề từ `de_thi.json` → **tự động hoá trọn** phần dựng đề (khác Forms).
+- Phải tự lập trình: hẹn giờ, xáo câu, chống làm lại, chế độ khoá máy (Forms có sẵn Take a Test). Cần người sửa app và môi trường (NC-02).
+
+### 7.4 So sánh và khuyến nghị tạm (GĐ, Truong và IT quyết)
+
+| Tiêu chí | Microsoft Forms Quiz | Bài thi trong Power Apps |
+|---|---|---|
+| Có sẵn trong kho | Gần đủ (`mau_forms_thi_clb/`) | Chưa có gì |
+| Giấy phép | M365, không cần Premium | M365 (SharePoint), không cần Premium nếu không dùng connector Premium |
+| Công cụ tự dựng đề | Một phần (Quick Import; đáp án tick tay) | Trọn (ghi list từ Excel) |
+| Giữ kín đáp án | Forms giữ; tắt Show results | Phải thiết kế quyền, chấm ngoài máy học sinh |
+| Hẹn giờ, khoá máy, một lần nộp | Có sẵn | Tự làm |
+| Ghép với nguyện vọng | Qua Email chữ thường (hai tệp) | Cùng kho, cùng khoá |
+| Cần môi trường / sửa app | Không | Có (NC-02) |
+| Rủi ro | 200 câu, 400 biểu mẫu mỗi người; tick tay sai đáp án (bộ chuyển đổi bắt được nhờ chấm lại) | Công sửa app; lộ đáp án nếu đặt quyền sai |
+
+**Khuyến nghị tạm: V1 dùng Microsoft Forms Quiz**, chỉnh `mau_forms_thi_clb/` cho trường này; **V2 cân nhắc Power Apps** khi IT đã cấp môi trường và muốn một app duy nhất. Lý do: dùng lại mã đã có test, không chặn bởi NC-02, công cụ có sẵn hẹn giờ và một lần nộp, giữ kín đáp án không cần thiết kế quyền.
+
+### 7.5 NC-25. Ghép điểm vào `score_k` (đặc tả đề xuất)
+1. Chọn CLB thi (tối đa 5 mỗi buổi, `TRAN_CLB_THI_MOI_BUOI`): **HỎI-ECA** đặt ở app ECA (cột trên dòng em-buổi) hay ở câu đầu của Forms. Khuyến nghị: trong Forms, cạnh bài thi, để app ECA chỉ sửa phần Top 3.
+2. Khoá ghép: cột **Email** của Forms (không dùng ô gõ tay), `lower().strip()`, khớp email trên dòng list.
+3. Luật soát dùng lại của `xu-li-raw-forms` / bộ chuyển đổi: phiếu trùng giữ phiếu đầu; thi mà không có nguyện vọng CLB đó thì bỏ điểm và báo; nguyện vọng có CLB thi mà không làm bài thì để trống điểm (hệ quả do NC-26 quyết); email không có trong list thì báo.
+4. Đầu ra: cột Điểm của Sổ nhập (`score_k`, `<buoi>_test_club_k`), **hợp đồng CSV không đổi** (bất biến 7). Không có bài thi nào thì kết quả trùng khít như hiện nay (bất biến 1).
+
+### 7.6 NC-26. Luật nghiệp vụ cần giáo viên ECA quyết
+Thi ở đâu, có giám sát không (Take a Test cần máy Windows); một đề dùng cho mọi buổi hay mỗi buổi một đề (lộ đề); em vắng thi xếp thế nào (điểm trống = sau mọi em có điểm, hay như Tầng 2); thang điểm và hoà điểm (hoà thì STB, bất biến 3); ai giữ `de_thi.json` và đáp án.
+
+### 7.7 Mã mục đề xuất (cho phiên Sonnet sau khi Truong duyệt)
+- **T4M-Q1** Bộ chuyển đổi chế độ "chỉ thi": Forms không có câu nguyện vọng; khoá là cột Email (chữ thường); ghép với tệp xuất list (`du_lieu_test/sinh_xuat_lists_gia.py`). *kiem_nhan:* test dựng trước với tệp giả: email hoa/thường ghép đúng; phiếu trùng giữ phiếu đầu; email lạ bị báo; không có bài thi thì Sổ nhập trùng khít bản không điểm.
+- **T4M-Q2** `tao_mau_forms.py` thêm chế độ "chỉ thi" (bỏ câu Ranking và mã HS, giữ đề, cài đặt "Record name" + Email); kiểm số câu ≤ 200 và tách theo buổi khi vượt. *kiem_nhan:* test đếm câu, test tách, `.docx` sinh lại giống hệt khi `de_thi.json` không đổi.
+- **T4M-Q3** Ghi chú vận hành 1 trang cho giáo viên (Quick Import, tick đáp án, Settings bắt buộc, Post scores không cần cho kiosk). *kiem_nhan:* đối chiếu đủ các mục 7.1 có nhãn ĐXM.
+- Thư viện: `python-docx` đã có trong `requirements-dev.txt`; không cần thư viện mới.
+
+Nguồn mục 7 (đọc 05/11/2026): support.microsoft.com/forms/create-a-quiz-with-microsoft-forms; /office/adjust-your-form-or-quiz-settings-in-microsoft-forms-f255a4ba-e03c-4e12-b880-f7e8b62e0665; /forms/form-question-response-and-character-limits-in-microsoft-forms; /forms/check-and-share-your-quiz-results; /forms/convert-a-word-or-pdf-form-or-quiz-to-microsoft-forms; /office/share-a-form-or-quiz-as-a-template-82ea9d8a-260a-47a0-afdb-497f3d746e3f; /education/assignments/assign-quizzes-to-students-through-microsoft-teams; learn.microsoft.com/connectors/microsoftforms; learn.microsoft.com/graph/api/overview; learn.microsoft.com/power-apps/maker/canvas-apps/share-app; TT-CXM: Microsoft Q&A về Graph Forms API, item-level permissions, run-only users; support.microsoft.com/sharepoint/lists/data-and-lists/create-a-list-based-on-a-spreadsheet (đoạn trích).
