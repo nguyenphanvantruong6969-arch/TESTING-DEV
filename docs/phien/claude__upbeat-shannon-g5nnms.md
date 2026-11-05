@@ -24,20 +24,19 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [ ] GĐ3 run: Truong (or IT) runs the sandbox checklist, only if NC-02 allows
 - [x] Before GĐ4: P4 kiosk import contract -> §3 of T4M_KET_QUA_TAI_LIEU.md
 - [x] Quiz path: prompt P5 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md §7 + NC-25/26 Qs in interview sheet (05/11)
-- [ ] T4M-Q1..Q3 (Sonnet; Truong APPROVED 05/11/2026, separate session): quiz-only Forms converter keyed on lowercase Email; quiz-only mode
+- [x] T4M-Q1..Q3 (Sonnet, done 05/11/2026; Truong APPROVED 05/11/2026, separate session): quiz-only Forms converter keyed on lowercase Email; quiz-only mode
       in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
-- Done: plan + prompts; CLAUDE.md slimmed to English (Z-CLAUDE-GON, Truong approved); GĐ1 + P4 results in
-  `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md`; T4-K2 marked PAUSED in TIEN_DO (Truong decided 05/11/2026).
-- Done (Sonnet, 05/11/2026): GĐ3 doc = `T4M_HUONG_DAN_THU.md` (Truong path + 1-page IT variant, pass/fail table, Premium table) + `du_lieu_test/sinh_xuat_lists_gia.py` (fake wide-model Lists export, 7,500 rows) + `tests/test_sinh_xuat_lists_gia.py` (7 tests, written first).
-- Done (Opus, 05/11): P5 quiz path = results §7. KEY: mau_forms_thi_clb/ already implements Microsoft Forms
-  quiz (Quick Import docx from de_thi.json, offline re-grading, converter to Sổ nhập). Recommend V1 Forms Quiz (quiz-only
-  mode, Email key), V2 maybe Power Apps quiz. No supported API creates Forms (TT-CXM). Truong approved Q1..Q3 (05/11); handed to a new Sonnet session.
-- In progress: none. Nobody has run the guide yet; all canvas formulas are labelled GĐ (untested).
-- Tests: docs only; kiem_nhanh.py before push.
-- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> plan fallback B; PowerSchool->M365 path unknown.
+- Done earlier: research plan + prompts; GĐ1 + P4 results (`T4M_KET_QUA_TAI_LIEU.md`); interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path (results §7).
+- Done (Sonnet, 05/11/2026): T4M-Q1..Q3, tests first (`tests/test_t4m_chi_thi.py`, 27 tests).
+  Q1 `chuyen_forms_sang_phan_mem.py --chi-thi --lists X.csv` (Email lower().strip() joins Lists; first response kept; unknown email, score without preference reported).
+  Q2 `tao_mau_forms.py --chi-thi [--ra]` (no Ranking, no typed ID/name; Record name + One response per person; split by day above 200; docx byte-identical).
+  Q3 `mau_forms_thi_clb/GHI_CHU_GIAO_VIEN.md`. Default mode unchanged. kiem_nhanh 7/7, ruff clean, related tests pass.
+- Deviation to confirm with Truong: typed name question dropped too (Forms records Name); Lists column names fixed (Email, Thu, NV1.., HoTen) and club codes in Lists must equal club_id in de_thi.json.
+- Not done: nobody has run it against a real Forms export or a real Lists export (no sandbox yet). Awaiting push + Truong review.
+- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> plan fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
 
 ## Decisions and gotchas (keep short)
 - Japanese club = multi-day bundle (e.g. 3A Mon+Wed+Thu), level assigned by school (eligibility, not priority),
@@ -72,6 +71,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: GĐ1 + P4 results
 - docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md: GĐ2 interview sheet
 - docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, du_lieu_test/sinh_xuat_lists_gia.py, tests/test_sinh_xuat_lists_gia.py: GĐ3 doc
+- mau_forms_thi_clb/{chuyen_forms_sang_phan_mem,bieu_mau,tao_mau_forms}.py, GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx, README.md; tests/test_t4m_chi_thi.py: T4M-Q1..Q3
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -84,3 +84,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-05 | Opus | Truong decided: school adopts RB-DA with entrance quizzes (Tầng 1); added NC-23..26 + prompt P5 | Sonnet P3 session told |
 | 2026-11-05 | Opus | P5 research (Forms Quiz, Graph, Quick Import, Power Apps quiz); found mau_forms_thi_clb already covers Forms quiz; results §7; interview sheet +4 Qs | Proposed T4M-Q1..Q3 |
 | 2026-11-05 | Opus | Truong approved T4M-Q1..Q3; opened Sonnet session for them | Order Q1 -> Q2 -> Q3 |
+| 2026-11-05 | Sonnet | T4M-Q1..Q3 done: quiz-only converter, quiz-only form generator, teacher note; tests first (27), mutation check found missing 200-boundary case, fixed | No subagent; default mode unchanged; kiem_nhanh 7/7 |

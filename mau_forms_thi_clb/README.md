@@ -39,6 +39,24 @@ thi chỉ xuất hiện trong câu nguyện vọng. Tổng cộng: **26 phần, 
 | `MO_PHONG_FORMS.html` | Bản mô phỏng tương tác: mở bằng trình duyệt để thử luồng rẽ nhánh, chấm điểm và xuất tệp trước khi dựng trên Forms |
 | `bieu_mau.py` | Phần dùng chung: tên câu hỏi, bố cục, chấm bài |
 
+## 0. Chế độ "chỉ thi" (T4M-Q1..Q3): nguyện vọng ở ứng dụng đăng ký, Forms chỉ có bài thi
+
+Dùng khi nguyện vọng đã nằm ở nơi khác (ví dụ ứng dụng Power Apps + SharePoint List của trường). Biểu mẫu
+**không có câu Ranking và không có ô gõ mã HS**; khoá là cột **Email** Forms tự ghi (bật *Record name* và
+*Only people in my organization*), đổi về chữ thường rồi ghép với tệp CSV xuất từ List (mô hình rộng:
+cột `Email`, `Thu`, `NV1..NVn`, tuỳ chọn `HoTen`; mã CLB trong List phải là `club_id` của `de_thi.json`).
+
+```bash
+python mau_forms_thi_clb/tao_mau_forms.py --chi-thi            # CAI_DAT_FORMS_CHI_THI.md + NHAP_FORMS_CHI_THI.docx
+python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py KET_QUA_FORMS.xlsx --chi-thi --lists DANH_SACH.csv --ra ./nap
+```
+
+Vượt 200 câu thì sinh `NHAP_FORMS_CHI_THI_1.docx`, `_2.docx`… (tách theo buổi) và truyền nhiều tệp `.xlsx`
+cho bộ chuyển đổi. Sinh lại từ `de_thi.json` không đổi cho ra tệp giống hệt từng byte. Phiếu trùng giữ phiếu
+đầu; email lạ bị báo và bỏ; thi CLB không có trong nguyện vọng thì bỏ điểm và báo; không có bài thi nào thì
+Sổ nhập chỉ có nguyện vọng, không điểm. Ghi chú một trang cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.
+Chế độ mặc định (mục 1 trở xuống) không đổi.
+
 ## 1. Dựng biểu mẫu (khoảng 30–40 phút)
 
 1. Mở **forms.office.com** bằng tài khoản trường → **Quick import** → chọn

@@ -27,6 +27,9 @@ DE_THI_MAC_DINH = os.path.join(THU_MUC, "de_thi.json")
 # là dựng sẵn cái bẫy: học sinh điền hợp lệ theo Forms mà phần mềm không nhập.
 TRAN_CLB_MOI_BUOI = 10
 TRAN_THI_MOI_BUOI = 5
+# Trần của Microsoft Forms: 200 câu mỗi biểu mẫu (support.microsoft.com, đọc 05/11/2026;
+# T4M_KET_QUA_TAI_LIEU.md mục 7.1). Chế độ "chỉ thi" tách theo buổi khi vượt.
+TRAN_CAU_MOI_BIEU_MAU = 200
 
 CO = "Có, em làm bài thi ngay bây giờ"
 KHONG = "Không"
@@ -141,7 +144,13 @@ def cau_xep_hang(de, ma_buoi):
             % (ma_buoi, ten_buoi(de, ma_buoi)))
 
 
-def cau_cong_thi(de, clb):
+def cau_cong_thi(de, clb, chi_thi=False):
+    if chi_thi:
+        # Chế độ chỉ thi: nguyện vọng nằm ở ứng dụng đăng ký, không ở biểu mẫu này.
+        return ("[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
+                "câu lạc bộ này ở nguyện vọng %s trong ứng dụng đăng ký."
+                % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
+                   ten_buoi(de, clb["buoi"])))
     return ("[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
             "câu lạc bộ này ở câu nguyện vọng %s."
             % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
@@ -165,30 +174,37 @@ def ma_trong_lua_chon(chu):
     return m.group(1) if m else None
 
 
-def cac_phan(de):
+def cac_phan(de, chi_thi=False, buoi=None):
     """Bố cục biểu mẫu: [(tên phần, [(tiêu đề câu, loại, lựa chọn, bắt buộc)])].
 
     Loại: 'text', 'ranking', 'choice'. Thứ tự phần CHÍNH LÀ luồng mặc định
     của Forms: làm xong đề thi CLB X thì tự sang câu cổng của CLB kế tiếp,
     nên chỉ đáp án "Không" của câu cổng là cần rẽ nhánh.
+
+    chi_thi=True (T4M-Q2): biểu mẫu chỉ có bài thi. Không có ô gõ mã HS/họ tên
+    (Forms tự ghi Name + Email khi bật "Record name") và không có câu Ranking
+    (nguyện vọng nằm ở ứng dụng đăng ký). buoi: chỉ các buổi này (None = tất cả).
     """
-    phan = [("Thông tin học sinh", [
+    phan = [] if chi_thi else [("Thông tin học sinh", [
         (cau_ma_hoc_sinh(), "text", [], True),
         (cau_ho_ten(), "text", [], True),
     ])]
     for b in de["buoi"]:
+        if buoi is not None and b["ma"] not in buoi:
+            continue
         o_buoi = clb_cua_buoi(de, b["ma"])
-        # Ranking KHÔNG bắt buộc: bỏ trống = em bận buổi đó. Đặt bắt buộc
-        # là ép em khai một buổi em không rảnh (BO_CAU_HOI_FORMS.md mục 4).
-        phan.append(("%s · Nguyện vọng" % b["ten"], [
-            (cau_xep_hang(de, b["ma"]), "ranking",
-             [lua_chon_clb(c) for c in o_buoi], False),
-        ]))
+        if not chi_thi:
+            # Ranking KHÔNG bắt buộc: bỏ trống = em bận buổi đó. Đặt bắt buộc
+            # là ép em khai một buổi em không rảnh (BO_CAU_HOI_FORMS.md mục 4).
+            phan.append(("%s · Nguyện vọng" % b["ten"], [
+                (cau_xep_hang(de, b["ma"]), "ranking",
+                 [lua_chon_clb(c) for c in o_buoi], False),
+            ]))
         for clb in o_buoi:
             if not clb["de_thi"]:
                 continue
             phan.append(("%s · Dự thi %s" % (b["ten"], clb["name"]), [
-                (cau_cong_thi(de, clb), "choice", [CO, KHONG], True),
+                (cau_cong_thi(de, clb, chi_thi), "choice", [CO, KHONG], True),
             ]))
             phan.append(("%s · Đề thi %s" % (b["ten"], clb["name"]), [
                 (cau_de_thi(clb, i), "choice", cau["lua_chon"], True)
@@ -197,11 +213,47 @@ def cac_phan(de):
     return phan
 
 
-def re_nhanh(de):
+def dem_cau(de, chi_thi=False, buoi=None):
+    """Tổng số câu hỏi của biểu mẫu (Forms tính cả câu cổng và câu thông tin)."""
+    return sum(len(c) for _, c in cac_phan(de, chi_thi, buoi))
+
+
+def chia_theo_buoi(de, chi_thi=False, tran=TRAN_CAU_MOI_BIEU_MAU):
+    """Chia các buổi thành các biểu mẫu, mỗi biểu mẫu <= `tran` câu.
+
+    Giữ thứ tự buổi trong de_thi.json, xếp tham lam từ đầu. Trả [[mã buổi, ...], ...];
+    vừa một biểu mẫu thì chỉ có một nhóm. Một buổi một mình đã vượt trần, hoặc không
+    CLB nào có đề, thì ném LoiDeThi (không có cách chia theo buổi).
+    """
+    co_dinh = dem_cau(de, chi_thi, buoi=[])
+    nhom, hien, tong = [], [], co_dinh
+    for b in de["buoi"]:
+        n = dem_cau(de, chi_thi, [b["ma"]]) - co_dinh
+        if n == 0:
+            continue                      # buổi không CLB nào thi: không có gì để đưa lên biểu mẫu
+        if co_dinh + n > tran:
+            raise LoiDeThi("buổi %s một mình đã có %d câu, vượt trần %d câu của một biểu mẫu "
+                           "Forms — giảm số CLB thi hoặc số câu của buổi này"
+                           % (b["ma"], co_dinh + n, tran))
+        if hien and tong + n > tran:
+            nhom.append(hien)
+            hien, tong = [], co_dinh
+        hien.append(b["ma"])
+        tong += n
+    if hien:
+        nhom.append(hien)
+    if not nhom:
+        raise LoiDeThi("không CLB nào có đề thi — không có gì để dựng biểu mẫu")
+    return nhom
+
+
+def re_nhanh(de, chi_thi=False, buoi=None):
     """[(câu cổng, đáp án 'Không' đi tới đâu)] — đúng những gì phải cài tay."""
-    ten_phan = [p[0] for p in cac_phan(de)]
+    ten_phan = [p[0] for p in cac_phan(de, chi_thi, buoi)]
     kq = []
     for clb in clb_co_thi(de):
+        if buoi is not None and clb["buoi"] not in buoi:
+            continue
         de_phan = "%s · Đề thi %s" % (ten_buoi(de, clb["buoi"]), clb["name"])
         i = ten_phan.index(de_phan)
         toi = ten_phan[i + 1] if i + 1 < len(ten_phan) else "End of the form"

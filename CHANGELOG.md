@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-11-05 — T4M-Q1, T4M-Q2, T4M-Q3 (Truong duyệt 05/11/2026): chế độ "chỉ thi" của mẫu Microsoft Forms
+
+Thêm chế độ mới; chế độ mặc định giữ nguyên (`CAI_DAT_FORMS.md` sinh lại giống hệt tệp trong kho, test cũ 25/25 đạt). Không đụng lõi thuật toán, backend, giao diện, hợp đồng CSV hay bất biến nào; `kiem_nhanh.py` 7/7 ĐẠT (gồm `trung_khit` 15 ca). Dữ liệu thử đều MÔ PHỎNG.
+- **Q1** `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `--chi-thi --lists DANH_SACH.csv` (nhận nhiều tệp `.xlsx` khi biểu mẫu tách theo buổi). Hàm mới `doc_lists`, `phan_tich_chi_thi`, `chuyen_chi_thi`. Khoá là cột Email Forms (`lower().strip()`) ghép với cột Email của tệp xuất List (mô hình rộng, `Thu`, `NV1..NVn`, `HoTen`). Phiếu trùng giữ phiếu ĐẦU; email lạ báo và bỏ; thi CLB mà List không có nguyện vọng CLB đó thì bỏ điểm (vẫn có trong `BANG_DIEM.xlsx`) và báo; không có bài thi thì Sổ nhập chỉ có nguyện vọng, không điểm. Tách nhẹ hàm dùng chung `_doc_cot`, `_ap_tran_thi` (hành vi chế độ cũ không đổi).
+- **Q2** `bieu_mau.py`: `cac_phan/re_nhanh(..., chi_thi, buoi)`, `dem_cau`, `chia_theo_buoi`, `TRAN_CAU_MOI_BIEU_MAU = 200`, `cau_cong_thi(..., chi_thi)`. `tao_mau_forms.py --chi-thi [--ra]`: bỏ Ranking và ô gõ mã HS/họ tên (Forms tự ghi Name + Email), settings "Record name" + "One response per person"; tách theo buổi khi tổng câu vượt 200; `.docx` giống hệt từng byte khi `de_thi.json` không đổi (giờ zip và thuộc tính tài liệu cố định). Sinh `CAI_DAT_FORMS_CHI_THI.md`, `NHAP_FORMS_CHI_THI.docx` (60 câu, một biểu mẫu cho `de_thi.json` hiện tại).
+- **Q3** `mau_forms_thi_clb/GHI_CHU_GIAO_VIEN.md` (một trang): Quick Import, tick đáp án + điểm, Settings bắt buộc, giới hạn 200 câu / 400 biểu mẫu, Post scores không cần cho kiosk; khớp mục 7.1 của `T4M_KET_QUA_TAI_LIEU.md`. `README.md` của mẫu thêm mục 0.
+- Test mới (viết trước): `tests/test_t4m_chi_thi.py` (27 ca). Thử gây hỏng 4 chỗ (bỏ hạ chữ thường email, bỏ giữ phiếu đầu, đổi ranh giới 200, bỏ dedupe List): ban đầu ranh giới 200 sống sót, đã thêm ca biên đúng 200 câu rồi đỏ đúng.
+- Lệch nhỏ so với đặc tả cần Truong biết: bỏ cả ô gõ họ tên (không chỉ mã HS) vì Forms ghi Name tự động; tên cột List cố định (`Email`, `Thu`, `NV1..`, `HoTen`) và mã CLB trong List phải là `club_id` của `de_thi.json`.
+
 ## 2026-11-05 — T4M-NC P5: đường thu điểm thi trên Microsoft (NC-23, 24, 27)
 
 Chỉ tài liệu. `T4M_KET_QUA_TAI_LIEU.md` mục 7 (mới): Forms Quiz (điểm, cài đặt, giới hạn 200 câu / 400 biểu mẫu, cột xuất Excel), connector Forms chỉ đọc và không có trong Power Apps, không có API được hỗ trợ để tạo biểu mẫu, Quick Import không mang đáp án; bài thi trong Power Apps và rủi ro lộ đáp án; phát hiện `mau_forms_thi_clb/` đã có sẵn đường Forms Quiz; bảng so sánh, khuyến nghị tạm V1 Forms Quiz; đặc tả ghép điểm NC-25; mã mục đề xuất T4M-Q1 đến Q3. `T4M_KE_HOACH_NGHIEN_CUU.md`: thêm NC-27. `T4M_PHIEU_PHONG_VAN.md`: thêm ECA-9 đến 11, IT-14.
