@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-05 — T4M-NC (ngoài sổ, Truong yêu cầu 05/11/2026): kế hoạch nghiên cứu hệ sinh thái Microsoft của trường
+
+Chỉ tài liệu; không đổi mã, test, hợp đồng CSV hay bất biến nào.
+
+- `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (mới): hồ sơ hệ thống đăng ký ECA của trường (Power Apps, M365 A3/A5, PowerSchool; Truong trả lời, chưa kiểm với IT), gói tiếng Nhật nhiều buổi và hướng xếp hai pha, 22 câu nghiên cứu NC-01 đến NC-22, quy tắc bằng chứng (ĐXM / TT-CXM / GĐ / HỎI-IT / TH), lộ trình 5 giai đoạn kèm hai kế hoạch dự phòng, bộ câu hỏi phỏng vấn IT và giáo viên ECA, mẫu ma trận quyết định, bốn prompt P1 đến P4.
+- `docs/phien/claude__upbeat-shannon-g5nnms.md` (mới): tệp bàn giao của nhánh.
+- T4-K2 (Google) chưa được đánh dấu tạm dừng: chờ Truong quyết.
+
 ## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
 
 - `tests/test_giao_dien_a14_lop.py::test_theo_lop_chua_co_lop_nao_hien_dong_nhac`: bỏ đoạn ép `kq.tang1 = 'lop'` (người dùng không tới được từ T3-16, và lần vẽ lại bất đồng bộ làm test chập chờn trên CI); nay kiểm nút "Theo lớp" ẩn, bảng có dòng, không có ngõ cụt "Chưa có lớp nào". Dòng nhắc trong `js/03_ket_qua.js` thành đường mã chết, ghi ở mục "Cần Truong" của PR #10.
