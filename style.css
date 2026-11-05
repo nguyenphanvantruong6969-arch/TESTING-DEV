@@ -2805,34 +2805,6 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 @media (prefers-reduced-motion: no-preference) {
   .dc-svg .dc-cham { animation: dc-hien 0.35s var(--ease-out) both; }
 }
-/* Chế độ tối: chỉ khối Điểm chuẩn tự đổi sang nền tối (ứng dụng chưa có giao diện tối chung).
-   Bảng màu tối nằm ở các biến `--dcd-*`, rồi gán lại các biến chung NGAY trên khối nên mọi hình con
-   (bảng, thanh, chấm, chữ) theo cùng. Gán qua `var()` để test độ tương phản của `:root` (đọc mã
-   màu thẳng trong tệp) không nhầm màu tối với màu sáng. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) #adminDiemChuanBlock {
-    --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-    --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-    --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-    --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-    --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-    --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-    --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-    --rust-text: var(--dcd-do-chu);
-    background: var(--dcd-nen); color: var(--ink);
-  }
-}
-:root[data-theme="dark"] #adminDiemChuanBlock {
-  --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-  --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-  --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-  --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-  --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-  --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-  --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-  --rust-text: var(--dcd-do-chu);
-  background: var(--dcd-nen); color: var(--ink);
-}
 .dc-an-chu { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .dc-bang-hai-tang { margin-top: 14px; max-width: 640px; }
 .dc-bang-hai-tang caption { text-align: left; font-size: 13.5px; font-weight: 600; padding-bottom: 6px; }

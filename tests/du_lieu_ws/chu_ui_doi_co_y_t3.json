@@ -33,7 +33,8 @@
    "ws_btn_xuat": "Back up to an archive file",
    "ws_r_max_choices": "Most choices per round (1 to 20)",
    "ws_r_max_tests": "Most tested places per round (0 to 20)",
-   "xuat_hint_hoc_sinh": "Student profiles: press \"Choose students…\" and tick them in the table below."
+   "xuat_hint_hoc_sinh": "Student profiles: press \"Choose students…\" and tick them in the table below.",
+   "nav_admin": "Manage"
   },
   "vi": {
    "tier_reserve": "Ưu tiên",
@@ -69,7 +70,8 @@
    "ws_r_max_choices": "Số lựa chọn tối đa mỗi đợt (từ 1 đến 20)",
    "ws_r_max_tests": "Số mục dự thi tối đa mỗi đợt (từ 0 đến 20)",
    "xuat_hint_hoc_sinh": "Hồ sơ học sinh: bấm \"Chọn học sinh…\" rồi đánh dấu trong bảng bên dưới.",
-   "xuat_opt_kem_csv": "Kèm các tệp CSV rời (dùng khi cần nạp sang phần mềm khác)"
+   "xuat_opt_kem_csv": "Kèm các tệp CSV rời (dùng khi cần nạp sang phần mềm khác)",
+   "nav_admin": "Quản lý"
   }
  }
 }

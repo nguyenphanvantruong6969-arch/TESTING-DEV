@@ -3,7 +3,7 @@
   * bảng tổng (T3-31, L3): MỘT bảng bằng số, hai cột điểm chuẩn riêng, đơn và chỗ bằng số; không thanh, không
     chip ba mức, không chú giải; không còn dòng chữ nhỏ dưới tên CLB;
   * chi tiết một CLB (mở bằng "Xem chi tiết"): ĐÚNG MỘT biểu đồ SVG, vạch chuẩn ghi số, được / không được nhận phân biệt;
-  * `prefers-reduced-motion` tắt hiệu ứng; `prefers-color-scheme: dark` đổi màu khối;
+  * `prefers-reduced-motion` tắt hiệu ứng; khối cùng nền với các thẻ khác ở cả chế độ tối;
   * nhãn mới có mặt ở cả VI và EN.
 """
 
@@ -165,24 +165,13 @@ def test_reduced_motion_tat_hieu_ung_con_binh_thuong_thi_co(mo):
     assert not loi, loi
 
 
-def test_che_do_toi_doi_mau_khoi_va_giu_chu_doc_duoc(mo):
+def test_khoi_diem_chuan_cung_nen_voi_cac_the_khac_ca_khi_he_dieu_hanh_dung_che_do_toi(mo):
     page, loi = mo()
-
-    def sang(c):
-        r, g, b = [int(x) for x in re.findall(r"\d+", c)[:3]]
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b
-    lay = """() => { const s = getComputedStyle(document.querySelector('#adminDiemChuanBlock'));
-        return [s.backgroundColor, s.color]; }"""
-    page.emulate_media(color_scheme="light")
-    nen_sang, _ = page.evaluate(lay)
-    assert sang(nen_sang) > 200, nen_sang
-    page.emulate_media(color_scheme="dark")
-    nen_toi, chu_toi = page.evaluate(lay)
-    assert sang(nen_toi) < 90 and sang(chu_toi) > 160, (nen_toi, chu_toi)
-    # chấm "được nhận" và vạch chuẩn vẫn tương phản với nền tối
-    mau = page.evaluate("""() => [getComputedStyle(document.querySelector('svg[data-bieu-do=chi-tiet] circle.dc-cham-duoc')).fill,
-        getComputedStyle(document.querySelector('svg[data-bieu-do=chi-tiet] line.dc-chuan-vach')).stroke]""")
-    assert all(sang(m) > 110 for m in mau), mau
+    lay = """() => getComputedStyle(document.querySelector('#adminDiemChuanBlock')).backgroundColor"""
+    khac = """() => getComputedStyle(document.querySelector('#view-admin .panel:not(#adminDiemChuanBlock)')).backgroundColor"""
+    for che_do in ("light", "dark"):
+        page.emulate_media(color_scheme=che_do)
+        assert page.evaluate(lay) == page.evaluate(khac), che_do
     assert not loi, loi
 
 

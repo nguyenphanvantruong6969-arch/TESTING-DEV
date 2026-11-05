@@ -48,7 +48,7 @@ def _ma_trong_tep(duong):
 def test_ten_the_03_va_05_vi_va_en(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True)
     nhan = lambda tab: page.locator('.nav-item[data-tab="%s"]' % tab).inner_text()  # noqa: E731
-    assert "Chi tiết và xuất tệp" in nhan("others") and "Quản lý CLB" in nhan("admin")
+    assert "Chi tiết và xuất tệp" in nhan("others") and nhan("admin").split()[-1] == "Quản lý"
     assert "dự trữ" not in nhan("admin")
     page.locator('.nav-item[data-tab="admin"]').click()
     assert page.locator("#view-admin h1").inner_text() == "Quản lý CLB"
@@ -56,7 +56,7 @@ def test_ten_the_03_va_05_vi_va_en(mo):
     assert page.locator("#view-others h1").inner_text() == "Chi tiết và xuất tệp"
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("() => /Details and export/.test(document.querySelector('#view-others h1').textContent)")
-    assert "Manage clubs" in page.locator('.nav-item[data-tab="admin"]').inner_text()
+    assert page.locator('.nav-item[data-tab="admin"]').inner_text().split()[-1] == "Manage"
     assert not loi, loi
 
 
