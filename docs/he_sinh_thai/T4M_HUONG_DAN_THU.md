@@ -62,6 +62,8 @@ Bảng cột (đây là hợp đồng của bộ sinh; test `tests/test_sinh_xua
 
 Quan hệ dòng: 1.500 em × 5 ngày = **7.500 dòng**. Ngày không chọn gì vẫn có dòng, với `NV1..NV3` rỗng (hợp lệ: buổi để trống, mục 3 của `T4M_KET_QUA_TAI_LIEU.md`).
 
+**Điểm thi không nằm trong tệp này.** Câu lạc bộ có thi tuyển xếp theo Tầng 1 (điểm thi, rồi STB), câu lạc bộ không thi xếp theo Tầng 2 (STB). Bộ sinh này chỉ giả lập phần đăng ký nguyện vọng và gói; **điểm thi và danh sách CLB mỗi em chọn thi (tối đa 5 mỗi ngày) đến từ một tệp xuất bài thi riêng** (việc khác, prompt P5, không thuộc hướng dẫn này). Bộ chuyển đổi sau này sẽ ghép hai nguồn theo email đã hạ chữ thường.
+
 Tệp xuất thật từ Lists sẽ có thêm các cột hệ thống (`ID`, `Title`, `Modified`, …) và thứ tự cột có thể khác. Bộ chuyển đổi phải đọc **theo tên cột** và bỏ qua cột thừa.
 
 **Bảng CLB và gói đi kèm (tạo tay, nhỏ):**
