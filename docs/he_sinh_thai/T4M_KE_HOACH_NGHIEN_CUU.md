@@ -33,7 +33,7 @@ Quan hệ với T4: `T4_MO_HINH_HE_SINH_THAI.md` thiết kế trên Google vì g
 | Cơ chế | App **không chặn sĩ số**; chỉ tiêu có nhưng linh hoạt; đăng ký mở vài ngày; admin **khoá sau hạn**; việc chia lớp quá đông nhiều khả năng làm tay | Truong |
 | Định danh | Email trường; PowerSchool **tự đồng bộ** vào app (cơ chế chưa rõ, có thể là SDS) | Truong |
 | Quy mô | 500 đến 1.500 học sinh mỗi đợt; dưới 10 lớp mỗi buổi; mỗi cơ sở xếp riêng | Truong |
-| Ưu tiên | Không xét điểm: mọi em thuộc Tầng 2 (chỉ STB) | Truong |
+| Ưu tiên | Hiện **chưa** xét điểm. **Quyết định 05/11/2026 (Truong):** trường đổi quy trình theo RB-DA; CLB có thi tuyển dùng Tầng 1 (−điểm rồi STB), CLB không thi dùng Tầng 2 (STB). Bài thi do giáo viên CLB ra, **công cụ của dự án dựng giúp** (bản Microsoft của `tao-google-form-clb` / `xu-li-raw-forms`) | Truong |
 | Buổi | Thứ 2 đến Thứ 6, buổi nào cũng tuỳ chọn | Truong |
 | Gói | **Tiếng Nhật là gói nhiều buổi** (ví dụ 3A: Thứ 2, 4, 5); nhiều cấp độ, **trường chỉ định cấp** cho từng em; **cam kết cả năm** | Truong |
 | Thay đổi | Có đăng ký muộn, xin đổi lớp, rút hoặc chuyển trường | Truong |
@@ -45,6 +45,7 @@ Quan hệ với T4: `T4_MO_HINH_HE_SINH_THAI.md` thiết kế trên Google vì g
 Hệ quả thuật toán đã chốt về nguyên tắc (chi tiết thiết kế ở T4M_MICROSOFT.md sau này):
 - Gói nhiều buổi phá điều kiện "các buổi độc lập" (`KE_HOACH_NHIEU_BUOI.md`, mục 2). Đề xuất **xếp hai pha**: pha 1 các gói (mỗi em tối đa một gói; cấp độ là điều kiện tham gia, không phải ưu tiên), khoá ngày, rồi pha 2 từng ngày như hiện nay. Bảo đảm chỉ đúng **trong từng pha**; phải ghi "không bảo đảm ổn định toàn tuần khi có gói" (bất biến 8).
 - Em tiếng Nhật cam kết cả năm: kỳ sau trừ thẳng vào chỉ tiêu, không xếp lại; chỉ đổi chỉ tiêu, không đụng hàm ưu tiên (bất biến 2).
+- Thi tuyển (quyết định 05/11/2026): điểm là đầu vào hợp lệ của `compute_club_priority` (không phải thứ hạng nguyện vọng, không phải kết quả đợt trước: bất biến 2 an toàn). Hợp đồng CSV giữ nguyên `test_club_k`, `score_k`, `<buoi>_test_club_k` (bất biến 7; kiosk và Sổ nhập đã có cột Điểm). Trần chọn thi: `TRAN_CLB_THI_MOI_BUOI = 5`. Việc mới là **đường thu điểm phía Microsoft** (NC-23 đến NC-26).
 
 ---
 
@@ -108,9 +109,13 @@ Cột "Cách": **TL** = đọc tài liệu chính thức (giao phiên nghiên c�
 | NC-19 | Trang tham khảo của giáo viên (`magenta-crepe-416060.netlify.app/dang-ky-clb`): checklist 10 điểm ở T4 mục 2.2 | Có gì đáng giữ cho giao diện | TL (mở trang) | trang đó | Bảng 10 điểm điền xong |
 | NC-20 | Nhiều cơ sở: một app chung lọc theo cơ sở hay nhiều app; xuất tách theo cơ sở được không | Mỗi cơ sở một workspace kiosk | IT | (nội bộ trường) | Mô tả hiện trạng |
 | NC-21 | Quản lý phiên bản app khi sửa: xuất app ra tệp (`.msapp`, solution), Power Platform CLI (`pac canvas unpack`), lịch sử phiên bản trong Power Apps; khôi phục khi sửa hỏng | Sửa app an toàn, quay lại được | TL | learn.microsoft.com: Power Platform CLI canvas; app version history | Quy trình sửa an toàn 1 trang |
+| NC-23 | Microsoft Forms dạng Quiz: tự chấm những loại câu nào, điểm từng câu, giới hạn số câu và số phản hồi, chỉ người trong tổ chức và ghi email tự động, chặn nộp nhiều lần, hẹn giờ mở/đóng, xuất Excel ra cột gì (Total points, từng câu) | Thu điểm bằng Forms Quiz được không; định dạng tệp điểm cho bộ chuyển đổi | TL + TH | support.microsoft.com: Microsoft Forms quiz, settings, limits; export responses to Excel | Bảng khả năng và giới hạn có nguồn; một tệp xuất thử |
+| NC-24 | "Công cụ của ta dựng giúp" trên Microsoft: có API chính thức để **tạo** Microsoft Form từ đề (Graph) không? Nếu không: phương án nhập đề (Forms "Quick import" từ Word/PDF, sao chép mẫu `Duplicate`, Power Automate) và giới hạn | Kiến trúc của skill sinh bài thi bản Microsoft (tương đương `tao-google-form-clb`) | TL | learn.microsoft.com: Microsoft Graph API reference (Forms); support.microsoft.com: Quick import, share as template | Kết luận có nguồn; một phương án được chọn kèm lý do |
+| NC-25 | Ghép điểm vào nguyện vọng: học sinh chọn CLB thi (tối đa 5 mỗi buổi) ở đâu (app ECA hay Forms), mỗi CLB một bài hay một bài nhiều phần; khoá theo email chữ thường; bài làm không tick, tick không làm, phiếu trùng xử lý theo luật của `xu-li-raw-forms` | Đặc tả bộ chuyển đổi điểm → cột `score_k` | TL + IT | `xu-li-raw-forms` (luật soát hiện có); NC-23 | Đặc tả 1 trang + test dựng trước |
+| NC-26 | Công bằng và bảo mật bài thi: thi ở đâu (lớp, nhà), giám sát, lộ đề giữa các buổi, xử lý em vắng thi (điểm = trống, xếp như Tầng 2 hay xếp cuối) | Luật nghiệp vụ của Tầng 1 ở trường này; ghi vào workspace | IT (giáo viên ECA) | (nội bộ trường) | Giáo viên ECA xác nhận luật |
 | NC-22 | Bộ chuyển đổi chạy ở đâu: Python trên máy IT (đã có kiosk) hay Office Scripts trong Excel Online (không cần cài) | Kiến trúc ô E | TL + TH | learn.microsoft.com: Office Scripts limits | Khuyến nghị có lý do |
 
-Ưu tiên: **NC-01, NC-02, NC-03, NC-08, NC-16** chặn mọi việc khác; làm trước.
+Ưu tiên: **NC-01, NC-02, NC-03, NC-08, NC-16** chặn mọi việc khác; làm trước. NC-23, NC-24 làm bằng prompt P5 (mục 8); NC-25, NC-26 hỏi ở GĐ2.
 
 ---
 
@@ -266,4 +271,23 @@ api_nhap.py, so_nhap.py, rbda_priority_pipeline.py, lop_hoc_sinh.py.
 3. student_id constraints: length, characters, is an email accepted, case sensitivity.
 4. Multi-session: session labels, <buoi>_pref_k, is an empty session valid.
 5. Limits an adapter must respect: max preferences, clubs, sessions.
+```
+
+### P5. Đường thu điểm thi trên Microsoft (Opus, cần mạng) — thêm 05/11/2026
+
+Lý do: Truong quyết 05/11/2026 trường đổi quy trình theo RB-DA, có thi tuyển; bài thi do giáo viên ra, công cụ của dự án dựng giúp.
+
+```
+T4M-NC, quiz path. Follow §8.0 of docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md.
+Read: that file §1 (row "Ưu tiên" and the bullets under it), §3 rows NC-23..26, §4;
+.claude/skills/tao-google-form-clb/SKILL.md and .claude/skills/xu-li-raw-forms/SKILL.md (headings first, then
+only the parts about form structure, grading, export columns and anomaly rules).
+Task: answer NC-23 and NC-24 from original Microsoft pages (labels per §4; never claim an API exists without the
+reference page). Then design, without code: (a) how the Microsoft version of tao-google-form-clb builds a
+teacher quiz (chosen path from NC-24 with reasons and limits); (b) the export -> score_k mapping for NC-25,
+reusing the xu-li-raw-forms anomaly rules, emails lowercased; (c) the business rules NC-26 must settle,
+as questions for the ECA teacher. The kiosk CSV contract does not change (invariant 7).
+Output: new section §7 "Đường thu điểm" in docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md; add NC-25/26 questions
+to docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md (ECA block); proposed item codes with kiem_nhan for a later Sonnet
+session. Report: what Truong must decide.
 ```

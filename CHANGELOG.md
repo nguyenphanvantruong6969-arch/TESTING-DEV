@@ -4,6 +4,10 @@
 
 `docs/he_sinh_thai/T4M_HUONG_DAN_THU.md` (mới): hai người đọc (Truong nếu có môi trường thử; bản một trang cho IT = dự phòng B); kho SharePoint List, mô hình RỘNG (một dòng mỗi em mỗi ngày, `NV1..NV3`), mô hình dài ghi là phương án bị loại kèm lý do; màn Top 3, màn gói tiếng Nhật, flow xuất CSV và flow gửi Excel theo lớp (không ghi từng dòng, NC-13); bảng pass/fail/lý do; mục Premium kèm phương án chuẩn; thời gian đều là ước lượng mô phỏng. `du_lieu_test/sinh_xuat_lists_gia.py` (mới): chỉ thư viện chuẩn, `random.Random(seed)`, mặc định 1.500 em × 5 ngày = 7.500 dòng, UTF-8 có BOM, email giả (có chữ hoa), có ngày trống và dòng gói tiếng Nhật. `tests/test_sinh_xuat_lists_gia.py` (mới, 7 test, viết trước): tái lập theo seed, số dòng, BOM, không trùng NV, cột khớp tài liệu, email, dòng đặc biệt. Không đổi mã sản phẩm, hợp đồng CSV hay bất biến nào. Dữ liệu hoàn toàn mô phỏng.
 
+## 2026-11-05 — T4M-NC: quyết định thi tuyển theo RB-DA (Truong), thêm NC-23 đến NC-26 và prompt P5
+
+Chỉ tài liệu. `T4M_KE_HOACH_NGHIEN_CUU.md`: dòng "Ưu tiên" mục 1 ghi quyết định 05/11/2026 (trường đổi quy trình theo RB-DA; CLB có thi dùng Tầng 1, bài thi do giáo viên ra, công cụ của dự án dựng giúp); hệ quả với bất biến 2 và 7; bốn câu mới NC-23 (Forms Quiz), NC-24 (tạo form bằng công cụ), NC-25 (ghép điểm vào `score_k`), NC-26 (luật công bằng của bài thi); prompt P5. Tệp bàn giao cập nhật.
+
 ## 2026-11-05 — T4M-NC chuẩn bị GĐ2: phiếu phỏng vấn in mang theo
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md` (mới): gộp mục 6 của kế hoạch với mục 4 và cột "Còn hỏi IT" của kết quả GĐ1; 5 câu CHẶN cho IT (NC-01, 02, 03, 08, 16), 8 câu IT khác, 8 câu cho giáo viên ECA, mỗi câu có bối cảnh một dòng và chỗ ghi trả lời; nhắc riêng tư; checklist sau buổi gặp (mốc C2, dự phòng A/B). Kế hoạch bàn giao: P3 sửa sang mô hình kho rộng (một dòng mỗi em mỗi buổi) và hai người đọc (Truong hoặc IT).
