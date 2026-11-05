@@ -465,15 +465,17 @@ class XuatKetQuaMixin:
     # CLB hoặc danh sách theo mã), cùng cột với màn hình. KHÔNG điểm thi, điểm quyết tâm,
     # số bốc thăm hay diện trúng tuyển (như bản theo lớp).
     # -----------------------------------------------------------------
-    def export_bang_dang_xem(self, kieu: str, gia_tri=None, output_path: str = ""):
+    def export_bang_dang_xem(self, kieu: str, gia_tri=None, output_path: str = "", thu_tu=None):
         """Xuất MỘT tệp .xlsx một trang cho bảng đang xem ở thẻ Kết quả.
 
         `kieu`: "lop" (`gia_tri` = lớp, "" là chưa có lớp), "clb" (`gia_tri` = mã CLB) hoặc "ma"
         (`gia_tri` = chữ đang tìm, rỗng là tất cả). Chỗ đặt theo `_duong_xuat` (không ghi đè).
+        `thu_tu` (tuỳ chọn): danh sách mã theo thứ tự đang hiện trên màn hình; hàng tệp đi theo thứ tự đó
+        (mã không có trong danh sách xếp cuối, giữ thứ tự cũ). Chỉ đổi thứ tự hàng, không đổi cột.
         Chưa có kết quả thì từ chối `xuat_chua_co_ket_qua`. Trả về {path, n_dong}."""
-        return self._khoa_xuat(self._export_bang_dang_xem_da_khoa, kieu, gia_tri, output_path)
+        return self._khoa_xuat(self._export_bang_dang_xem_da_khoa, kieu, gia_tri, output_path, thu_tu)
 
-    def _export_bang_dang_xem_da_khoa(self, kieu, gia_tri, output_path):
+    def _export_bang_dang_xem_da_khoa(self, kieu, gia_tri, output_path, thu_tu=None):
         from openpyxl import Workbook
 
         from so_excel import Trang
@@ -524,6 +526,11 @@ class XuatKetQuaMixin:
                     ten_trang = str(gia_tri) if gia_tri else "Chưa có {cohort_l}"
                 else:
                     tieu_de, ten_trang = "DANH SÁCH {person_u}", "Danh sách"
+            if isinstance(thu_tu, (list, tuple)) and thu_tu:
+                vt = {}
+                for i, m in enumerate(thu_tu):
+                    vt.setdefault(str(m), i)
+                dong.sort(key=lambda r: vt.get(str(r[0]), len(vt)))      # ổn định: mã lạ giữ thứ tự cũ
             du = {"nhan": self._nhan_xuat()}
             path = self._duong_xuat(output_path, self._ten_file_an_toan(
                 "bang_" + (str(gia_tri) if gia_tri else kieu), "bang") + ".xlsx", (".xlsx",))

@@ -54,12 +54,23 @@ Keep everything in study section 7 ("Những thứ KHÔNG nên bỏ").
 ## Lot L3: Truong's decisions above
 Tab 03 rename; T3-16/17/18 strong; T3-19; T3-22 (remove from tab 03); T3-27; T3-11; T3-31; tab 05 label "Quản lý CLB".
 
+## Lot L4 (Truong 2026-11-04, after PR #10 merged; budget: cheap, one impl, no separate tester, CI is the gate)
+1. T3-19 export order: "Tải bảng này" file rows follow the on-screen order (current header sort, default natural code order
+   HS1, HS2 ... HS10), same columns, still no scores or draw numbers. Test: export after a header sort -> same order as screen.
+2. Dead hint: remove the unreachable "Chưa có lớp nào" Theo-lớp path in js/03_ket_qua.js (+ unused i18n keys if any, index.html
+   fallback, test_ws_nhan json) since T3-16 hides "Theo lớp" when no class. Keep the no-class behaviour test.
+3. Cosmetic Điểm chuẩn: "Xem chi tiết" stays on one line (nowrap / narrower label); detail legend as a compact inline legend
+   instead of a plain bullet list.
+Not in L4: T3-32 collapse, fill-bar reserve segment.
+
 ## Plan (coord writes; impl/tester tick)
 - [x] P0 protocol, role-aware Stop hook (`.claude/hooks/handoff_khi_day_ngu_canh.py`, tests/test_hook_ban_giao.py 6 cases)
 - [x] L0 impl (661bccb, fix1 e8944b2)  - [x] L0 tester NO BUGS  - [x] L0 PR nguyenphanvantruong6969-arch/TESTING-DEV#10
 - [x] L1 impl (0fd4981, fix1 4aa7ab4)  - [x] L1 tester NO BUGS  - [x] L1 PR (#10 extended)
 - [x] L2 impl (a8b4407, fix1 a1258c3, fix2 test by coord)  - [x] L2 tester (fix1 ok; last bug = test expectation, fixed by coord)  - [x] L2 PR (#10 extended)
 - [x] L3 impl (ad4f227 + test fixes 1d5a384)  - [x] L3 tester NO BLOCKING BUGS (cfd617a)  - [x] L3 PR (#10 extended)
+- [x] L0-L3 merged (PR #10)
+- [ ] L4 impl + CI green + PR
 - [ ] Final report to Truong (files, new tests, skipped items, screenshots)
 
 ## Sessions (overwrite on every change)

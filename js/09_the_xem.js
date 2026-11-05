@@ -210,6 +210,14 @@ function kqVeBang(cot, hang, dem, soCotCoDinh, cotLop) {
   el("kqBang").hidden = false;
 }
 
+/* Mã theo đúng thứ tự đang hiện trên màn hình (cùng cột/chiều sắp với kqVeBang): gửi cho tệp xuất (T3-L4). */
+function kqThuTuMan() {
+  const b = kq.bang;
+  if (!b) return [];
+  const dang = kq.sapCot === null || kq.sapCot >= b.cot.length ? 0 : kq.sapCot;
+  return kqSapHang(b.hang, dang, b.cotLop, kq.sapGiam).map((h) => h.student_id);
+}
+
 /* Bấm tiêu đề cột: cột mới sắp tăng dần; cùng cột thì đảo chiều. Vẽ lại từ bảng đã có, không gọi API. */
 function kqBamCot(i) {
   if (!kq.bang) return;
@@ -242,11 +250,7 @@ function kqCotLich(dsBuoi, coLop) {
 }
 
 function veKqTheoLop() {
-  if (!kq.nLop) {
-    kqBaoRong("theolop_khong_co_lop", { the: t("nav_admin"), muc: t("ql_tab_hs") });
-    return Promise.resolve();
-  }
-  if (kq.lop === null) { el("kqBang").hidden = true; return Promise.resolve(); }
+  if (!kq.nLop || kq.lop === null) { el("kqBang").hidden = true; return Promise.resolve(); }
   return callApiMoiNhat("kq", "get_thoi_khoa_bieu", "", kq.lop).then((res) => {
     if (!res.ok) { el("kqBang").hidden = true; showErrorToast(res.errors); return; }
     const dsBuoi = res.data.ds_buoi;
@@ -299,7 +303,7 @@ function initKetQuaHandlers() {
   el("kqTimKiem").addEventListener("input", debounce(() => veKetQua(), 250));
   el("btnKqTaiBang").addEventListener("click", () => {
     const gia = kq.tang1 === "lop" ? kq.lop : kq.tang1 === "clb" ? kq.clb : (el("kqTimKiem").value || "").trim();
-    chayXuat([["xuat_muc_bang_xem", "export_bang_dang_xem", [kq.tang1, gia, ""],
+    chayXuat([["xuat_muc_bang_xem", "export_bang_dang_xem", [kq.tang1, gia, "", kqThuTuMan()],
       (d) => t("kq_tai_bang_xong", { n: d.n_dong, path: d.path })]], el("kqXuatPhanHoi"));
   });
   kqDongBoDieuKhien();
