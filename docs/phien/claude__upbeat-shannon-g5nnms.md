@@ -16,8 +16,12 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] Write research plan + prompts (T4M_KE_HOACH_NGHIEN_CUU.md)
 - [ ] GĐ0: Truong emails IT / ECA teacher, tries make.powerapps.com (NC-02)
 - [x] GĐ1: run prompt P1 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md (05/11/2026, done in this session)
-- [ ] GĐ2: Truong interviews IT + ECA teacher (plan §6), gets anonymised export sample
-- [ ] GĐ3: prompt P3 (Sonnet) -> T4M_HUONG_DAN_THU.md; Truong runs sandbox tests (only if NC-02 allows)
+- [ ] GĐ2 prep: printable interview sheet T4M_PHIEU_PHONG_VAN.md (plan §6 + results §4, blocking Qs first) (Sonnet)
+- [ ] GĐ2: Truong interviews IT + ECA teacher (use T4M_PHIEU_PHONG_VAN.md), gets anonymised export sample
+- [ ] GĐ3 doc: prompt P3 (Sonnet) -> T4M_HUONG_DAN_THU.md + fake Lists-export generator in du_lieu_test/ with test.
+      Amended by Opus: wide store model (one row per student x day, NV1..NV3), SharePoint List only, two readers
+      (Truong if sandbox; IT 1-page variant = fallback B), no row-by-row write-back in V1 (export_theo_lop instead).
+- [ ] GĐ3 run: Truong (or IT) runs the sandbox checklist, only if NC-02 allows
 - [x] Before GĐ4: P4 kiosk import contract -> §3 of T4M_KET_QUA_TAI_LIEU.md
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
