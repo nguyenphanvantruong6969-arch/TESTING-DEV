@@ -7,6 +7,7 @@ Chỉ tài liệu; không đổi mã, test, hợp đồng CSV hay bất biến n
 - `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (mới): hồ sơ hệ thống đăng ký ECA của trường (Power Apps, M365 A3/A5, PowerSchool; Truong trả lời, chưa kiểm với IT), gói tiếng Nhật nhiều buổi và hướng xếp hai pha, 22 câu nghiên cứu NC-01 đến NC-22, quy tắc bằng chứng (ĐXM / TT-CXM / GĐ / HỎI-IT / TH), lộ trình 5 giai đoạn kèm hai kế hoạch dự phòng, bộ câu hỏi phỏng vấn IT và giáo viên ECA, mẫu ma trận quyết định, bốn prompt P1 đến P4.
 - `docs/phien/claude__upbeat-shannon-g5nnms.md` (mới): tệp bàn giao của nhánh.
 - T4-K2 (Google) chưa được đánh dấu tạm dừng: chờ Truong quyết.
+- Gọn prompt (cùng ngày): luật chung gom một chỗ (mục 8.0, C1 đến C4) thay vì lặp ở từng prompt; prompt viết tiếng Anh; mỗi prompt chỉ đọc đúng mục cần; mục 4 bỏ phần trùng `CLAUDE.md`; báo cáo cuối có trần độ dài. Nội dung yêu cầu giữ nguyên.
 
 ## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
 

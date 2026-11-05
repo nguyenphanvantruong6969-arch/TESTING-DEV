@@ -114,19 +114,15 @@ Cột "Cách": **TL** = đọc tài liệu chính thức (giao phiên nghiên c�
 
 ---
 
-## 4. Phương pháp và quy tắc bằng chứng
+## 4. Quy tắc bằng chứng
 
-1. **Nhãn bằng chứng** cho mọi khẳng định trong kết quả:
-   - **ĐXM** = đã xác minh: đã mở trang gốc, ghi địa chỉ, ngày đọc, và trích ngắn hoặc tóm tắt đúng câu liên quan.
-   - **TT-CXM** = chỉ thấy trong tóm tắt kết quả tìm kiếm, chưa mở trang gốc (cùng nghĩa như T4).
-   - **GĐ** = giả định chưa kiểm.
-   - **HỎI-IT** = chỉ trường trả lời được.
-   - **TH** = đã thử trong môi trường thử, ghi ngày và cách thử.
-2. Giới hạn và giá **đổi theo thời gian**: ghi ngày đọc; trang nói "có thể thay đổi" thì ghi lại.
-3. **Không đụng app thật của trường.** Mọi thử nghiệm làm trên môi trường thử, list giả, dữ liệu giả.
-4. **Không đưa dữ liệu thật vào kho mã**: không tên, email, mã học sinh thật; tệp mẫu từ IT phải ẩn danh (giữ tên cột, thay giá trị). Không đưa `tenantId`, đường dẫn app hay tên người vào tài liệu trong kho.
-5. **Liêm chính học thuật:** mọi số đo ở giai đoạn thử là dữ liệu mô phỏng. Nhận xét, diễn giải, kết luận cho báo cáo đề tài do Truong tự viết; tài liệu này và các tệp kết quả chỉ là tài liệu vận hành.
-6. **Không subagent** (quy tắc 10 của `CLAUDE.md`).
+Áp dụng cùng `CLAUDE.md` (liêm chính học thuật, không subagent); dưới đây chỉ là phần riêng của T4M.
+
+1. Mọi khẳng định mang một nhãn: **ĐXM** (đã mở trang gốc: địa chỉ, ngày đọc, trích ngắn), **TT-CXM** (chỉ thấy trong tóm tắt tìm kiếm), **GĐ** (giả định chưa kiểm), **HỎI-IT** (chỉ trường trả lời được), **TH** (đã thử ở môi trường thử: ngày, cách thử).
+2. Giới hạn và giá đổi theo thời gian: luôn ghi ngày đọc.
+3. Chỉ thử trên môi trường thử với dữ liệu giả; không đụng app thật.
+4. Không đưa vào kho: tên, email, mã học sinh thật, `tenantId`, đường dẫn app, tên người. Tệp mẫu từ IT phải ẩn danh (giữ tên cột, thay giá trị).
+5. Văn bản pháp lý về dữ liệu cá nhân: chỉ nêu ở mức khái niệm, ghi "nhà trường tự xác định".
 
 ---
 
@@ -193,81 +189,81 @@ Mỗi ô có đúng một khuyến nghị, kèm câu NC làm căn cứ.
 
 ## 8. Prompt cho các phiên
 
-Dán nguyên văn vào một phiên mới trên nhánh `claude/upbeat-shannon-g5nnms` (hoặc nhánh Truong chỉ định). Mỗi phiên đọc `CLAUDE.md`, rồi `docs/phien/claude__upbeat-shannon-g5nnms.md`, rồi tài liệu này.
+Dán nguyên văn vào phiên mới trên nhánh `claude/upbeat-shannon-g5nnms`. Prompt viết tiếng Anh cho rẻ token (như tệp `docs/phien/`); phiên vẫn trả lời Truong bằng tiếng Việt. Luật chung nằm **một chỗ** ở 8.0; mỗi prompt chỉ ghi phần riêng.
 
-### P1. Nghiên cứu tài liệu (phiên Opus, cần mạng) — GĐ1
+### 8.0 Luật chung (mọi prompt trỏ về đây)
 
-```
-Vai trò: phiên nghiên cứu cho mục T4M-NC (ngoài sổ, Truong yêu cầu 05/11/2026). Trả lời bằng tiếng Việt.
+- **C1 Đọc:** `CLAUDE.md` → `docs/phien/claude__upbeat-shannon-g5nnms.md` → CHỈ các mục prompt liệt kê. Không đọc cả tệp khi đã có số mục.
+- **C2 Bằng chứng:** nhãn và quy tắc ở mục 4. Trang không mở được: TT-CXM kèm lý do, không bịa.
+- **C3 Phạm vi:** chỉ tài liệu, trừ khi prompt nói khác; không sửa `T4_MO_HINH_HE_SINH_THAI.md`. Trả lời Truong bằng tiếng Việt.
+- **C4 Kết thúc:** cập nhật "Current state" và "Session log" của tệp bàn giao; một mục `CHANGELOG.md`; dòng T4M-NC trong `docs/ke_hoach/TIEN_DO.md`; chạy `python .claude/skills/soat-ma/scripts/kiem_nhanh.py`; commit, push. Báo cáo cuối không quá 10 dòng.
 
-Đọc theo thứ tự: CLAUDE.md; docs/phien/claude__upbeat-shannon-g5nnms.md; docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md (toàn bộ); docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md chỉ mục 2.2, 9.1, 15, 16.
-
-Việc: trả lời mọi câu NC có cột "Cách" chứa TL ở mục 3 (NC-02 phần tài liệu, 03, 04, 05, 08, 09, 11, 12, 13, 14, 15, 18, 19, 21, 22). Với mỗi câu:
-1. Mở trang GỐC (learn.microsoft.com, support.microsoft.com, support.powerschool.com, trang của nhà cung cấp). Tóm tắt kết quả tìm kiếm không đủ: chỉ được ghi nhãn TT-CXM.
-2. Ghi: kết luận một câu; số liệu và điều kiện áp dụng (giấy phép nào, ngày hiệu lực); địa chỉ trang; ngày đọc; trích ngắn đúng câu liên quan; nhãn (ĐXM / TT-CXM / GĐ / HỎI-IT) theo mục 4.
-3. Nêu hệ quả cho ô kiến trúc (mục 2) và điều còn phải hỏi IT.
-Trang không mở được thì ghi lý do và nhãn TT-CXM; không bịa nội dung.
-
-Đầu ra: tạo docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md với (a) bảng tổng hợp một dòng mỗi câu NC; (b) một mục chi tiết mỗi câu; (c) danh sách câu hỏi mới cho IT; (d) danh sách nguồn. Điền trước những ô của ma trận mục 7 mà tài liệu đủ để điền, đánh dấu ô còn chờ IT.
-
-Ràng buộc: không sửa mã, không sửa T4_MO_HINH_HE_SINH_THAI.md; không subagent; không đưa dữ liệu thật của trường, tenantId, đường dẫn app vào kho. Đây là tài liệu vận hành: không viết nhận xét hay kết luận cho báo cáo đề tài. Văn bản pháp lý về dữ liệu cá nhân chỉ nêu ở mức khái niệm và ghi "nhà trường tự xác định".
-
-Kết thúc: cập nhật mục "Current state" và "Session log" của docs/phien/claude__upbeat-shannon-g5nnms.md (tiếng Anh), thêm một mục CHANGELOG.md, đánh dấu tiến độ T4M-NC trong docs/ke_hoach/TIEN_DO.md, chạy python .claude/skills/soat-ma/scripts/kiem_nhanh.py, commit và push lên nhánh. Báo Truong: số câu đã ĐXM, câu còn TT-CXM, ba phát hiện ảnh hưởng thiết kế nhiều nhất.
-```
-
-### P2. Tổng hợp và thiết kế (phiên Opus) — GĐ4
+### P1. Đọc tài liệu (Opus, cần mạng) — GĐ1
 
 ```
-Vai trò: phiên thiết kế cho T4M (Microsoft). Trả lời bằng tiếng Việt.
-
-Đầu vào (đọc theo thứ tự): CLAUDE.md; docs/phien/claude__upbeat-shannon-g5nnms.md; docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md; docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md; tóm tắt phỏng vấn đã ẩn danh Truong dán vào chat; tệp xuất mẫu đã ẩn danh nếu có (Truong cho đường dẫn; KHÔNG commit tệp đó nếu còn dữ liệu thật). Chỉ khi cần: docs/KE_HOACH_NHIEU_BUOI.md mục 2 và 5; docs/ke_hoach/SO_DANG_KY_33_MUC.md mục A3; T4_MO_HINH_HE_SINH_THAI.md mục 7 và 11.
-
-Việc: viết docs/he_sinh_thai/T4M_MICROSOFT.md gồm:
-1. Tóm tắt điều hành 10 dòng.
-2. Kiến trúc (sơ đồ chữ hoặc mermaid) theo tám ô A đến H của mục 2; mỗi ô chọn một ứng dụng, có câu NC làm căn cứ.
-3. Ma trận quyết định mục 7 điền đủ.
-4. Mô hình dữ liệu của kho (cột, khoá, một dòng là gì) và định dạng tệp xuất mà bộ chuyển đổi đọc; ánh xạ sang Sổ nhập và hợp đồng cột kiosk (bất biến 7: KHÔNG đổi hợp đồng; student_id là email thì nêu rõ có cần kiểm gì).
-5. Thiết kế pha gói (pha 1: gói, mỗi em tối đa một gói, cấp độ là điều kiện tham gia; khoá ngày; pha 2: từng ngày), ghi rõ "bảo đảm trong từng pha, không bảo đảm ổn định toàn tuần khi có gói" (bất biến 8), cách giữ trùng khít khi không có gói (bất biến 1, quy tắc 3), cách giữ chỗ em cam kết cả năm mà không đụng hàm ưu tiên (bất biến 2), em đến muộn theo bất biến 3.
-6. Luồng thay đổi theo thời gian (NC-17).
-7. Rủi ro, câu hỏi còn mở, lộ trình theo giai đoạn (bộ chuyển đổi, thu thứ hạng, tự động hoá) kèm ước lượng ghi rõ là ước lượng.
-8. Danh sách mã mục đề xuất (ví dụ T4M-K1 bộ chuyển đổi, T4M-K2 pha gói), mỗi mục có trường kiem_nhan để viết test trước.
-9. Khuyến nghị về T4-K2 (Google): dừng hẳn, hay giữ cho ngành khác; Truong quyết.
-
-Ràng buộc: chỉ tài liệu, không viết mã; không subagent; không dữ liệu thật; số liệu thử là mô phỏng; không viết nhận xét hay kết luận đề tài thay Truong. Dừng và hỏi Truong nếu một bất biến xung đột với thiết kế.
-
-Kết thúc: cập nhật Plan và Current state trong docs/phien/claude__upbeat-shannon-g5nnms.md, CHANGELOG.md, TIEN_DO.md; chạy kiem_nhanh.py; commit, push. Báo Truong các quyết định cần duyệt.
+T4M-NC, phase GĐ1. Follow §8.0 of docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md.
+Read: that file §2–4; docs/he_sinh_thai/T4_MO_HINH_HE_SINH_THAI.md §2.2 (NC-19 checklist), §9.1, §16 only.
+Task: answer every NC whose "Cách" contains TL. Per NC: open the original page; record a one-sentence
+conclusion, figures with their conditions (licence, effective date), URL, read date, short quote, label,
+impact on the §2 cell, follow-up question for IT.
+Output docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: summary table (one row per NC), one section per NC,
+new IT questions, sources. Pre-fill the §7 matrix cells that documentation alone settles.
+Report: count of ĐXM vs TT-CXM; the 3 findings that change the design most.
 ```
 
-### P3. Hướng dẫn dựng môi trường thử (phiên Sonnet) — GĐ3
+### P2. Tổng hợp và thiết kế (Opus) — GĐ4
 
 ```
-Vai trò: phiên viết hướng dẫn thực hành cho mục T4M-NC, giai đoạn 3. Trả lời bằng tiếng Việt.
-
-Đọc: CLAUDE.md; docs/phien/claude__upbeat-shannon-g5nnms.md; docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md mục 3 và 5; docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md (NC-02, 04, 05, 06, 09, 11, 22).
-
-Việc: viết docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, hướng dẫn từng bước cho người KHÔNG chuyên (Truong hoặc IT) dựng trong MÔI TRƯỜNG THỬ, không đụng app thật:
-1. Một SharePoint List giả (hoặc Dataverse for Teams nếu NC-03 cho phép) theo mô hình dài: một dòng một nguyện vọng (email giả, cơ sở, khối, buổi, hạng, club_id), cộng bảng gói tiếng Nhật và bảng cấp độ giả.
-2. Một script Python sinh 1.500 em giả (đặt trong du_lieu_test/ hoặc thư mục tạm; không cần thư viện mới; seed cố định) để dán vào list.
-3. Màn canvas Top 3 mỗi buổi: chặn chọn trùng, buổi trống hợp lệ, ghi bằng Patch có IfError; màn gói: chỉ hiện cho em đúng cấp, chiếm ba ngày, tối đa một gói.
-4. Flow Power Automate xuất CSV UTF-8 có BOM vào thư viện; flow ghi kết quả về list.
-5. Bảng kiểm: mỗi bước "đạt / không đạt / lý do", và các phép đo thời gian (ghi là mô phỏng).
-Mỗi bước có ảnh chụp cần chụp lại để làm bằng chứng (Truong tự chụp). Chỗ phụ thuộc giấy phép Premium thì ghi rõ và cho đường thay thế bằng connector chuẩn.
-
-Ràng buộc: không subagent; không dữ liệu thật; không tạo PR. Kết thúc: cập nhật tệp bàn giao nhánh, CHANGELOG.md, TIEN_DO.md; chạy kiem_nhanh.py; commit, push.
+T4M, phase GĐ4. Follow §8.0 of docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md.
+Read: that file §1–7; docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md; the anonymised interview summary and the
+P4 answer that Truong pastes; the sample export only via the path Truong gives (never commit real data).
+On demand only: docs/KE_HOACH_NHIEU_BUOI.md §2 and §5; docs/ke_hoach/SO_DANG_KY_33_MUC.md item A3;
+T4_MO_HINH_HE_SINH_THAI.md §7.4 and §11.
+Write docs/he_sinh_thai/T4M_MICROSOFT.md:
+1. Executive summary, at most 10 lines.
+2. Architecture for cells A–H (§2): one app per cell, citing the NC that justifies it.
+3. The §7 matrix, fully filled.
+4. Store data model (columns, key, what one row is), export format, mapping to Sổ nhập. Invariant 7: the
+   kiosk CSV contract does not change; state what must be checked when student_id is an email.
+5. Bundle phase: phase 1 bundles (max one bundle per student; level = eligibility, not priority), lock those
+   days, phase 2 per day. Label "bảo đảm trong từng pha, không bảo đảm ổn định toàn tuần khi có gói" (inv. 8).
+   No bundles ⇒ byte-identical results (inv. 1). Year-committed seats only reduce quota (inv. 2).
+   Late arrivals per inv. 3.
+6. Change flows: late, swap, withdraw (NC-17).
+7. Risks, open questions, phased roadmap; label every estimate as an estimate.
+8. Proposed item codes, each with a kiem_nhan field so tests can be written first.
+9. Recommendation on T4-K2 (Google); Truong decides.
+If an invariant conflicts with the design: stop and ask Truong.
+Report: the decisions Truong must approve.
 ```
 
-### P4. Tóm tắt hợp đồng nhập của kiosk (phiên Haiku, chỉ đọc) — trước GĐ4
+### P3. Hướng dẫn môi trường thử (Sonnet) — GĐ3
 
 ```
-Vai trò: phiên chỉ đọc (Haiku, quy tắc 11): KHÔNG sửa tệp, trả lời trong chat bằng tiếng Việt.
+T4M-NC, phase GĐ3. Follow §8.0 of docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md.
+Read: that file §3 rows NC-02, 04, 05, 06, 09, 11, 22 and §5; the same NC sections of
+docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md.
+Write docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, step by step for a non-expert, sandbox only:
+1. Fake list, long model (one row per preference: fake email, campus, grade, day, rank, club_id), plus bundle
+   and level tables. Dataverse for Teams only if NC-03 allows it.
+2. Python generator for 1,500 fake students: fixed seed, standard library only, under du_lieu_test/, with a
+   small test (CLAUDE.md rule 2).
+3. Canvas screens: Top 3 per day (no duplicates, empty day valid, Patch + IfError); bundle (shown only for the
+   student's level, takes its days, max one bundle).
+4. Flows: export CSV UTF-8 with BOM to a library; write results back to the list.
+5. Checklist per step: pass / fail / reason; timings labelled as simulated; screenshots Truong should take.
+Mark every Premium dependency and give a standard-connector alternative.
+```
 
-Đọc CLAUDE.md, rồi tìm theo TÊN HÀM (không đọc cả tệp) trong api_nhap.py, so_nhap.py, rbda_priority_pipeline.py, lop_hoc_sinh.py.
+### P4. Hợp đồng nhập của kiosk (Haiku, chỉ đọc) — trước GĐ4
 
-Trả lời ngắn, có dẫn tên hàm:
-1. Kiosk nhập dữ liệu Microsoft Forms bằng những hàm nào, đọc cột nào, chấp nhận .csv / .xlsx nào, mã hoá nào.
-2. Sổ nhập (SO_NHAP_CLB.xlsx) có những sheet và cột nào; cột nào bắt buộc; cột Lớp được đọc ở đâu.
-3. student_id có ràng buộc định dạng không (độ dài, ký tự, có nhận email không, phân biệt hoa thường không).
-4. Chế độ nhiều buổi đọc nhãn buổi và <buoi>_pref_k thế nào; buổi để trống có hợp lệ không.
-5. Bất kỳ giới hạn nào (số nguyện vọng tối đa, số CLB, số buổi) mà bộ chuyển đổi Power Apps sang Sổ nhập phải tôn trọng.
-Truong sẽ dán câu trả lời vào phiên P2.
+```
+Read-only (CLAUDE.md rule 11): edit nothing, skip §8.0 C4. Answer in Vietnamese in chat, at most 40 lines,
+citing function names. Locate code by function name with grep; do not read whole files:
+api_nhap.py, so_nhap.py, rbda_priority_pipeline.py, lop_hoc_sinh.py.
+1. Microsoft Forms import: which functions, columns, accepted formats and encodings.
+2. Sổ nhập: sheets and columns, which are required, where the Lớp column is read.
+3. student_id constraints: length, characters, is an email accepted, case sensitivity.
+4. Multi-session: session labels, <buoi>_pref_k, is an empty session valid.
+5. Limits an adapter must respect: max preferences, clubs, sessions.
 ```
