@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-05 — T4M-NC chuẩn bị GĐ2: phiếu phỏng vấn in mang theo
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md` (mới): gộp mục 6 của kế hoạch với mục 4 và cột "Còn hỏi IT" của kết quả GĐ1; 5 câu CHẶN cho IT (NC-01, 02, 03, 08, 16), 8 câu IT khác, 8 câu cho giáo viên ECA, mỗi câu có bối cảnh một dòng và chỗ ghi trả lời; nhắc riêng tư; checklist sau buổi gặp (mốc C2, dự phòng A/B). Kế hoạch bàn giao: P3 sửa sang mô hình kho rộng (một dòng mỗi em mỗi buổi) và hai người đọc (Truong hoặc IT).
+
 ## 2026-11-05 — T4M-NC GĐ1 + P4: kết quả đọc tài liệu Microsoft / PowerSchool, hợp đồng nhập của kiosk
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md` (mới): 16 câu NC loại tài liệu, nhãn ĐXM / TT-CXM / GĐ / HỎI-IT, nguồn và ngày đọc; P4 tóm tắt hợp đồng nhập (`api_nhap.py`, `so_nhap.py`); câu mới cho IT; ma trận quyết định điền trước. Phát hiện chính: Dataverse for Teams và Developer Plan ngừng tạo mới từ 15/11/2026; PowerSchool không có trong danh sách OneRoster của SDS; hồ sơ Low của Power Automate (6.000 yêu cầu/người/ngày) nên V1 không ghi kết quả về app từng dòng; Sổ nhập không biểu diễn được CLB nhiều buổi. `TIEN_DO.md`: T4-K2 tạm dừng (Truong quyết 05/11/2026).
