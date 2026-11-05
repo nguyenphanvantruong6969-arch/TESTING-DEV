@@ -429,7 +429,7 @@
       toast_reset_done_removed: "Đã xoá {slot_sl} dự thi, nguyện vọng và {m} {score_l} đã chấm. Có thể nhập lại.",
       toast_student_deleted: "Đã xoá {person_l} {student_id}.",
 
-      admin_title: "Quản lý {slot_sl}",
+      admin_title: "Quản lý",
       admin_desc: "Thêm hoặc sửa {slot_sl}, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của {person_l} chỉ được hưởng suất khi cùng nhãn với {slot_sl}.",
       admin_club_form_title: "Thêm hoặc sửa {slot_sl}",
       placeholder_club_id: "Mã {slot_sl} (ví dụ: clb_01)",
@@ -1131,7 +1131,7 @@
       toast_reset_done_removed: "Cleared test {slot_pl}, preferences and {m} {score_l}(s). Ready to re-enter.",
       toast_student_deleted: "Deleted {person_l} {student_id}.",
 
-      admin_title: "Manage {slot_pl}",
+      admin_title: "Manage",
       admin_desc: "Add or edit {slot_pl}, quotas and priority seats. A priority group only gets those seats in a {slot_l} with the same label.",
       admin_club_form_title: "Add or edit {slot_la}",
       placeholder_club_id: "{slot} ID (e.g. club_01)",

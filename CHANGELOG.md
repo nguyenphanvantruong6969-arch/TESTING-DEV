@@ -3,7 +3,7 @@
 ## 2026-11-05 — T3-L5 (ngoài sổ, Truong yêu cầu): Điểm chuẩn cùng nền các thẻ khác, thẻ 05 chỉ ghi "Quản lý"
 
 - `style.css`: bỏ hai khối nền tối riêng của `#adminDiemChuanBlock` (`prefers-color-scheme: dark` và `[data-theme=dark]`); khối giờ dùng nền trắng như các thẻ khác.
-- `i18n.js`, `index.html`: `nav_admin` = "Quản lý" / "Manage" (thanh bên). Tiêu đề trang `admin_title` giữ nguyên.
+- `i18n.js`, `index.html`: `nav_admin` = "Quản lý" / "Manage" (thanh bên). `admin_title` (tiêu đề trang) cũng đổi thành "Quản lý" / "Manage".
 - Test: `tests/test_giao_dien_a13_10_diem_chuan.py` (thay test chế độ tối bằng test cùng nền), `tests/test_giao_dien_t3_l3.py`, `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json` (thêm `nav_admin`).
 
 ## 2026-11-04 — T3-L4 (ngoài sổ, Truong duyệt 04/11/2026): thứ tự tệp "Tải bảng này", bỏ dòng nhắc chết, Điểm chuẩn gọn
