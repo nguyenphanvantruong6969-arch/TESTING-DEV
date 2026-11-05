@@ -1,8 +1,12 @@
 # CHANGELOG
 
-## 2026-11-05 — Z-CLAUDE-GON (ngoài sổ, Truong yêu cầu 05/11/2026; bản tiếng Anh CHỜ Truong duyệt)
+## 2026-11-05 — T4M-NC GĐ1 + P4: kết quả đọc tài liệu Microsoft / PowerSchool, hợp đồng nhập của kiosk
 
-Chỉ tài liệu. `CLAUDE.md` gọn lại (9.112 B → 5.512 B): viết tiếng Anh (vẫn yêu cầu trả lời Truong bằng tiếng Việt); quy tắc 3 và 5 trỏ về bất biến 1 và 8 thay vì lặp; giữ nguyên số quy tắc 1–11 (tệp khác trỏ theo số) và câu "Trước khi push: chạy skill `soat-ma`" (test kiểm). Đoạn "Kiểm verify nhanh" và ghi chú thời gian bộ test chuyển nguyên văn sang `docs/ke_hoach/CLAUDE_CHI_TIET.md`. Test liên quan: `tests/test_skill_soat_ma.py`, `tests/test_a13_12_tai_lieu.py`, `tests/test_hook_ban_giao.py` (61 đạt). Nếu Truong chọn bản tiếng Việt: sửa ở commit sau.
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md` (mới): 16 câu NC loại tài liệu, nhãn ĐXM / TT-CXM / GĐ / HỎI-IT, nguồn và ngày đọc; P4 tóm tắt hợp đồng nhập (`api_nhap.py`, `so_nhap.py`); câu mới cho IT; ma trận quyết định điền trước. Phát hiện chính: Dataverse for Teams và Developer Plan ngừng tạo mới từ 15/11/2026; PowerSchool không có trong danh sách OneRoster của SDS; hồ sơ Low của Power Automate (6.000 yêu cầu/người/ngày) nên V1 không ghi kết quả về app từng dòng; Sổ nhập không biểu diễn được CLB nhiều buổi. `TIEN_DO.md`: T4-K2 tạm dừng (Truong quyết 05/11/2026).
+
+## 2026-11-05 — Z-CLAUDE-GON (ngoài sổ, Truong yêu cầu 05/11/2026; Truong duyệt bản tiếng Anh)
+
+Chỉ tài liệu. `CLAUDE.md` gọn lại (9.112 B → 5.512 B): viết tiếng Anh (vẫn yêu cầu trả lời Truong bằng tiếng Việt); quy tắc 3 và 5 trỏ về bất biến 1 và 8 thay vì lặp; giữ nguyên số quy tắc 1–11 (tệp khác trỏ theo số) và câu "Trước khi push: chạy skill `soat-ma`" (test kiểm). Đoạn "Kiểm verify nhanh" và ghi chú thời gian bộ test chuyển nguyên văn sang `docs/ke_hoach/CLAUDE_CHI_TIET.md`. Test liên quan: `tests/test_skill_soat_ma.py`, `tests/test_a13_12_tai_lieu.py`, `tests/test_hook_ban_giao.py` (61 đạt).
 
 ## 2026-11-05 — T4M-NC (ngoài sổ, Truong yêu cầu 05/11/2026): kế hoạch nghiên cứu hệ sinh thái Microsoft của trường
 

@@ -15,19 +15,18 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 ## Plan (written by Opus; ticked by Sonnet)
 - [x] Write research plan + prompts (T4M_KE_HOACH_NGHIEN_CUU.md)
 - [ ] GĐ0: Truong emails IT / ECA teacher, tries make.powerapps.com (NC-02)
-- [ ] GĐ1: run prompt P1 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md
+- [x] GĐ1: run prompt P1 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md (05/11/2026, done in this session)
 - [ ] GĐ2: Truong interviews IT + ECA teacher (plan §6), gets anonymised export sample
 - [ ] GĐ3: prompt P3 (Sonnet) -> T4M_HUONG_DAN_THU.md; Truong runs sandbox tests (only if NC-02 allows)
-- [ ] Before GĐ4: prompt P4 (Haiku, read-only) -> kiosk import contract summary in chat
+- [x] Before GĐ4: P4 kiosk import contract -> §3 of T4M_KET_QUA_TAI_LIEU.md
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
-- Done so far: research plan and prompts written; nothing researched yet.
-- In progress: none.
-- Tests: docs only; run `python .claude/skills/soat-ma/scripts/kiem_nhanh.py` before push.
-- Open problems: T4-K2 (Google Apps Script) is NOT formally paused yet; Truong has not approved (a) writing
-  T4M_MICROSOFT.md / pausing K2 in TIEN_DO, (b) a new item code for the "bundle" phase, (c) item code for the
-  Power Apps -> Sổ nhập adapter. Ask before doing any of these beyond what the plan's prompts say.
+- Done: plan + prompts; CLAUDE.md slimmed to English (Z-CLAUDE-GON, Truong approved); GĐ1 + P4 results in
+  `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md`; T4-K2 marked PAUSED in TIEN_DO (Truong decided 05/11/2026).
+- In progress: none. Waiting on GĐ2 (Truong interviews IT; questions = plan §6 + results §4).
+- Tests: docs only; kiem_nhanh.py before push.
+- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> plan fallback B; PowerSchool->M365 path unknown.
 
 ## Decisions and gotchas (keep short)
 - Japanese club = multi-day bundle (e.g. 3A Mon+Wed+Thu), level assigned by school (eligibility, not priority),
@@ -39,15 +38,19 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - Network was reachable on 05/11/2026 (learn.microsoft.com 302, support.powerschool.com 200), unlike the T4 session.
 
 ## Next steps (ordered)
-1. Truong: GĐ0 (email IT with plan §6 questions; try make.powerapps.com).
-2. Run prompt P1 in a new Opus session.
+1. Truong: GĐ0/GĐ2 (email + meet IT with plan §6 and results §4 questions; ask for anonymised export sample).
+2. If IT grants an environment: prompt P3 (GĐ3). Otherwise fallback B.
+3. Prompt P2 (GĐ4) -> T4M_MICROSOFT.md.
 
 ## Files touched
 - docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md: the plan
 - docs/phien/claude__upbeat-shannon-g5nnms.md: this handoff
-- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: T4M-NC entry
+- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: T4M-NC, Z-CLAUDE-GON, T4-K2 paused
+- CLAUDE.md, docs/ke_hoach/CLAUDE_CHI_TIET.md: slimmed (Z-CLAUDE-GON)
+- docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: GĐ1 + P4 results
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-05 | Opus | Explained T4; gathered school profile via 28 questions; wrote T4M research plan + prompts P1..P4 | No code changed |
+| 2026-11-05 | Opus | Slimmed prompts + CLAUDE.md; ran GĐ1 + P4 (web docs read, kiosk import contract) | Key: DVfT + Developer Plan end 15/11/2026; PowerSchool not an SDS OneRoster provider |
