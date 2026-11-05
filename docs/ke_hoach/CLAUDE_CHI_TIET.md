@@ -35,6 +35,11 @@
 
 Thứ tự làm chung khi chuẩn bị nhiều ngành: `Z6 → Z3 → Z7 → Z4 → Z5 → Z2 → Z1 → B1 → B2 → A1 → A2 → A3 → A4 → A5 → A6 → A7 → A8 → A9 → A10 → A11 → A12 → B3 → C1 → C2 → C3 → E1 → E2 → E3 → G1 → G2 → G3 → G4 → G5`
 
+## Kiểm verify nhanh (chuyển từ CLAUDE.md, 05/11/2026)
+- Chạy: `pip install numpy` (chỉ cho kịch bản tham khảo, KHÔNG thêm vào requirements) rồi `python docs/ke_hoach/tham_khao/kiem_verify_nhanh.py <thư mục chứa rbda_priority_pipeline.py>`.
+- Test `tests/test_tham_khao_verify_nhanh.py` (không cần numpy) canh `verify_stability_nhanh`, `exp_resume.resume_da` / `kiem_tien_de`, `_chung.nap_rb` (thư mục: nạp thẳng tệp .py, cùng bản, bản khác, tiến trình mới, mô-đun anh em lạ; tệp không phải PyInstaller); `_chung.gen` chỉ được kiểm khi có numpy; đường nạp `.exe` được kiểm bằng một tệp PyInstaller tối thiểu dựng trong test (không có bản build thật trong kho).
+- Thời gian toàn bộ bộ test: ~22 phút trên máy 4 nhân kèm test giao diện Chromium; `BAN_GIAO.md` ghi ~3,5 phút, chưa giải thích được (xem `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`).
+
 ## Tài liệu tham khảo thêm
 4. Trong kho: `BAN_GIAO.md`, `docs/CO_CHE_THUAT_TOAN.md`, `docs/NGHIEN_CUU_TOI_UU.md`, `docs/GIAI_DAP_BOC_THAM.md`, `docs/KE_HOACH_NHIEU_BUOI.md`, `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md`.
 5. Tham khảo: `docs/ke_hoach/tham_khao/de_xuat_verify_nhanh.py` (bản thay `verify_stability`, mục Z4), `kiem_verify_nhanh.py`, `exp_resume.py` (tiếp tục DA từ trạng thái cũ, mục G1).

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-05 — Z-CLAUDE-GON (ngoài sổ, Truong yêu cầu 05/11/2026; bản tiếng Anh CHỜ Truong duyệt)
+
+Chỉ tài liệu. `CLAUDE.md` gọn lại (9.112 B → 5.512 B): viết tiếng Anh (vẫn yêu cầu trả lời Truong bằng tiếng Việt); quy tắc 3 và 5 trỏ về bất biến 1 và 8 thay vì lặp; giữ nguyên số quy tắc 1–11 (tệp khác trỏ theo số) và câu "Trước khi push: chạy skill `soat-ma`" (test kiểm). Đoạn "Kiểm verify nhanh" và ghi chú thời gian bộ test chuyển nguyên văn sang `docs/ke_hoach/CLAUDE_CHI_TIET.md`. Test liên quan: `tests/test_skill_soat_ma.py`, `tests/test_a13_12_tai_lieu.py`, `tests/test_hook_ban_giao.py` (61 đạt). Nếu Truong chọn bản tiếng Việt: sửa ở commit sau.
+
 ## 2026-11-05 — T4M-NC (ngoài sổ, Truong yêu cầu 05/11/2026): kế hoạch nghiên cứu hệ sinh thái Microsoft của trường
 
 Chỉ tài liệu; không đổi mã, test, hợp đồng CSV hay bất biến nào.
