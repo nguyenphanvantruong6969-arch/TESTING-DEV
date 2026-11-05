@@ -35,6 +35,12 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
   "không bảo đảm ổn định toàn tuần khi có gói" (invariant 8). Year-committed seats reduce quota only (invariant 2 safe).
 - No scores at this school: everyone is Tầng 2 (STB only). Each campus is allocated separately (one workspace each).
 - Never commit real school data, tenantId, app URL or names. Sandbox only; never touch the live app.
+- GĐ1 findings that drive design (see T4M_KET_QUA_TAI_LIEU.md §0): store = SharePoint List, one row per (student, day)
+  (CSV export cap 30,000 rows); Dataverse for Teams + Developer Plan stop new environments 15/11/2026 (ask IT for a
+  sandbox/managed dev env); PowerSchool is NOT an SDS OneRoster provider (sync path = HỎI-IT); M365 Power Automate =
+  Low profile, 6,000 requests/user/day -> V1 returns results as per-homeroom Excel (`export_theo_lop`), no row-by-row
+  write-back; converter = Python on IT machine, lowercase emails (student_id is case-sensitive); Sổ nhập has one Buổi
+  per club -> bundles need a new item code.
 - Network was reachable on 05/11/2026 (learn.microsoft.com 302, support.powerschool.com 200), unlike the T4 session.
 
 ## Next steps (ordered)
@@ -54,3 +60,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 |---|---|---|---|
 | 2026-11-05 | Opus | Explained T4; gathered school profile via 28 questions; wrote T4M research plan + prompts P1..P4 | No code changed |
 | 2026-11-05 | Opus | Slimmed prompts + CLAUDE.md; ran GĐ1 + P4 (web docs read, kiosk import contract) | Key: DVfT + Developer Plan end 15/11/2026; PowerSchool not an SDS OneRoster provider |
+| 2026-11-05 | Opus | Handoff at ~400k context (Stop hook); no new work | Next: Truong GĐ2 with IT |
