@@ -18,7 +18,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] GĐ1: run prompt P1 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md (05/11/2026, done in this session)
 - [x] GĐ2 prep: printable interview sheet T4M_PHIEU_PHONG_VAN.md (plan §6 + results §4, blocking Qs first) (Sonnet)
 - [ ] GĐ2: Truong interviews IT + ECA teacher (use T4M_PHIEU_PHONG_VAN.md), gets anonymised export sample
-- [ ] GĐ3 doc: prompt P3 (separate Sonnet SESSION, not a subagent; rule 10) -> T4M_HUONG_DAN_THU.md + fake Lists-export generator in du_lieu_test/ with test.
+- [x] GĐ3 doc: prompt P3 (separate Sonnet SESSION, not a subagent; rule 10) -> T4M_HUONG_DAN_THU.md + fake Lists-export generator in du_lieu_test/ with test.
       Amended by Opus: wide store model (one row per student x day, NV1..NV3), SharePoint List only, two readers
       (Truong if sandbox; IT 1-page variant = fallback B), no row-by-row write-back in V1 (export_theo_lop instead).
 - [ ] GĐ3 run: Truong (or IT) runs the sandbox checklist, only if NC-02 allows
@@ -28,7 +28,8 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 ## Current state (overwrite each handoff)
 - Done: plan + prompts; CLAUDE.md slimmed to English (Z-CLAUDE-GON, Truong approved); GĐ1 + P4 results in
   `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md`; T4-K2 marked PAUSED in TIEN_DO (Truong decided 05/11/2026).
-- In progress: none. GĐ2 interview sheet done (T4M_PHIEU_PHONG_VAN.md). P3 handed to a new Sonnet session (rule 11); it reads this file, does P3 as amended in Plan, ticks it.
+- Done (Sonnet, 05/11/2026): GĐ3 doc = `T4M_HUONG_DAN_THU.md` (Truong path + 1-page IT variant, pass/fail table, Premium table) + `du_lieu_test/sinh_xuat_lists_gia.py` (fake wide-model Lists export, 7,500 rows) + `tests/test_sinh_xuat_lists_gia.py` (7 tests, written first).
+- In progress: none. Nobody has run the guide yet; all canvas formulas are labelled GĐ (untested).
 - Tests: docs only; kiem_nhanh.py before push.
 - Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> plan fallback B; PowerSchool->M365 path unknown.
 
@@ -47,6 +48,8 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
   per club -> bundles need a new item code.
 - Network was reachable on 05/11/2026 (learn.microsoft.com 302, support.powerschool.com 200), unlike the T4 session.
 
+- Finding while writing P3: Power Automate Low profile caps paging at 5,000 items, so a 7,500-row export flow must filter per day (guide §7.1; verify by TH).
+
 ## Next steps (ordered)
 1. Truong: GĐ0/GĐ2 (email + meet IT; print T4M_PHIEU_PHONG_VAN.md; ask for anonymised export sample).
 2. If IT grants an environment: prompt P3 (GĐ3). Otherwise fallback B.
@@ -59,6 +62,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - CLAUDE.md, docs/ke_hoach/CLAUDE_CHI_TIET.md: slimmed (Z-CLAUDE-GON)
 - docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: GĐ1 + P4 results
 - docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md: GĐ2 interview sheet
+- docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, du_lieu_test/sinh_xuat_lists_gia.py, tests/test_sinh_xuat_lists_gia.py: GĐ3 doc
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -67,3 +71,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-05 | Opus | Slimmed prompts + CLAUDE.md; ran GĐ1 + P4 (web docs read, kiosk import contract) | Key: DVfT + Developer Plan end 15/11/2026; PowerSchool not an SDS OneRoster provider |
 | 2026-11-05 | Opus | Handoff at ~400k context (Stop hook); no new work | Next: Truong GĐ2 with IT |
 | 2026-11-05 | Opus+Sonnet | GĐ2 interview sheet written (by a subagent: rule 10 breach, Truong flagged it; reviewed by Opus); P3 subagent stopped, partial file deleted; P3 moved to a new Sonnet session | Never use Agent tool; open sessions |
+| 2026-11-05 | Sonnet | GĐ3 doc (P3 amended): guide, fake Lists-export generator, test first (7 red -> green) | No subagent; ruff clean on new files |

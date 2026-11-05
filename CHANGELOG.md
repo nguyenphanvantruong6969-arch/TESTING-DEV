@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-05 — T4M-NC GĐ3 (tài liệu): hướng dẫn thử môi trường Microsoft + bộ sinh tệp xuất Lists giả
+
+`docs/he_sinh_thai/T4M_HUONG_DAN_THU.md` (mới): hai người đọc (Truong nếu có môi trường thử; bản một trang cho IT = dự phòng B); kho SharePoint List, mô hình RỘNG (một dòng mỗi em mỗi ngày, `NV1..NV3`), mô hình dài ghi là phương án bị loại kèm lý do; màn Top 3, màn gói tiếng Nhật, flow xuất CSV và flow gửi Excel theo lớp (không ghi từng dòng, NC-13); bảng pass/fail/lý do; mục Premium kèm phương án chuẩn; thời gian đều là ước lượng mô phỏng. `du_lieu_test/sinh_xuat_lists_gia.py` (mới): chỉ thư viện chuẩn, `random.Random(seed)`, mặc định 1.500 em × 5 ngày = 7.500 dòng, UTF-8 có BOM, email giả (có chữ hoa), có ngày trống và dòng gói tiếng Nhật. `tests/test_sinh_xuat_lists_gia.py` (mới, 7 test, viết trước): tái lập theo seed, số dòng, BOM, không trùng NV, cột khớp tài liệu, email, dòng đặc biệt. Không đổi mã sản phẩm, hợp đồng CSV hay bất biến nào. Dữ liệu hoàn toàn mô phỏng.
+
 ## 2026-11-05 — T4M-NC chuẩn bị GĐ2: phiếu phỏng vấn in mang theo
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md` (mới): gộp mục 6 của kế hoạch với mục 4 và cột "Còn hỏi IT" của kết quả GĐ1; 5 câu CHẶN cho IT (NC-01, 02, 03, 08, 16), 8 câu IT khác, 8 câu cho giáo viên ECA, mỗi câu có bối cảnh một dòng và chỗ ghi trả lời; nhắc riêng tư; checklist sau buổi gặp (mốc C2, dự phòng A/B). Kế hoạch bàn giao: P3 sửa sang mô hình kho rộng (một dòng mỗi em mỗi buổi) và hai người đọc (Truong hoặc IT).
