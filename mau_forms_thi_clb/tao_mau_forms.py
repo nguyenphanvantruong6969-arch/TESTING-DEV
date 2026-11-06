@@ -258,7 +258,11 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
 
     Cố ý gài ba cảnh báo (cộng email viết HOA, bộ chuyển đổi hạ chữ thường nên không báo gì):
     một phiếu nộp lần hai, một email không có trong Lists, một bài thi CLB không xếp nguyện vọng.
-    Trả {email_trung, email_la, khong_xep: (email, club_id), n_phieu}. Dữ liệu MÔ PHỎNG."""
+    Trả {email_trung, email_la, khong_xep: (email, club_id), n_phieu}. Dữ liệu MÔ PHỎNG.
+
+    T4M-Q5c: nếu `danh_sach` có khoá "tick" (List có cột THIk) thì em chỉ nộp bài cho CLB đã tick (mỗi bài
+    nộp với xác suất 0,85, nên có em tick mà vắng), và gài thêm hai trường hợp, báo trong kết quả:
+    `tick_vang` = (email, club_id) tick mà KHÔNG nộp bài; `nop_khong_tick` = (email, club_id) nộp bài mà KHÔNG tick."""
     from openpyxl import Workbook
 
     rd = random.Random(hat_giong)
@@ -291,10 +295,14 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
         return o
 
     co_de = {c["club_id"] for c in clb_thi}
+    co_tick = any("tick" in h for h in danh_sach.values())
     dong, thi_cua = [], {}
     for n, (email, hs) in enumerate(danh_sach.items(), 1):
         xep = {m for ds in hs["nguyen_vong"].values() for m in ds}
-        thi = {m for m in sorted(xep & co_de) if rd.random() < 0.7}
+        if co_tick:
+            thi = {m for m in sorted(hs["tick"] & co_de) if rd.random() < 0.85}
+        else:
+            thi = {m for m in sorted(xep & co_de) if rd.random() < 0.7}
         nang_luc = rd.uniform(0.55, 0.95)
         if rd.random() < 0.15:                       # có em chưa làm bài nào: không có phiếu
             continue
@@ -321,9 +329,29 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
             break
     if khong_xep is None:
         raise ValueError("không có em nào để gài bài thi CLB không xếp nguyện vọng")
+    sua = {khong_xep[0]: thi_cua[khong_xep[0]] | {khong_xep[1]}}
+    gai_tick = {}
+    if co_tick:
+        da_dung = {email_trung, khong_xep[0]}
+        # 4) tick mà KHÔNG nộp bài: lấy em đã nộp một CLB đã tick và bỏ bài đó đi
+        e_vang = next(((e, c) for e in thi_cua if e not in da_dung for c in sorted(thi_cua[e])), None)
+        if e_vang is None:
+            raise ValueError("không có em nào để gài trường hợp tick mà vắng thi")
+        da_dung.add(e_vang[0])
+        sua[e_vang[0]] = thi_cua[e_vang[0]] - {e_vang[1]}
+        # 5) nộp bài mà KHÔNG tick: CLB có đề em đã xếp nhưng chưa tick
+        def chua_tick(e):
+            xep_e = {m for ds in danh_sach[e]["nguyen_vong"].values() for m in ds}
+            return sorted((xep_e & co_de) - danh_sach[e]["tick"])
+
+        e_khong = next(((e, c) for e in thi_cua if e not in da_dung for c in chua_tick(e)), None)
+        if e_khong is None:
+            raise ValueError("không có em nào để gài trường hợp nộp bài mà không tick")
+        sua[e_khong[0]] = thi_cua[e_khong[0]] | {e_khong[1]}
+        gai_tick = {"tick_vang": e_vang, "nop_khong_tick": e_khong}
     for k, (e, o, nl) in enumerate(dong):
-        if e == khong_xep[0]:
-            dong[k] = (e, phieu(o["Email"], danh_sach[e]["name"], thi_cua[e] | {khong_xep[1]}, nl), nl)
+        if e in sua:
+            dong[k] = (e, phieu(o["Email"], danh_sach[e]["name"], sua[e], nl), nl)
     them = [phieu(email_trung.upper(), danh_sach[email_trung]["name"], thi_cua[email_trung], 0.2),
             phieu(email_la, "Tài khoản lạ", {clb_thi[0]["club_id"]}, 0.8)]
 
@@ -338,8 +366,8 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
                   "Completion time": bat_dau + timedelta(minutes=rd.randint(6, 25))})
         ws.append([o.get(c) for c in tieu_de])
     wb.save(duong)
-    return {"email_trung": email_trung, "email_la": email_la, "khong_xep": khong_xep,
-            "n_phieu": len(dong) + len(them)}
+    return dict({"email_trung": email_trung, "email_la": email_la, "khong_xep": khong_xep,
+                 "n_phieu": len(dong) + len(them)}, **gai_tick)
 
 
 # ------------------------------------------------------ chế độ "chỉ thi" (T4M-Q2)

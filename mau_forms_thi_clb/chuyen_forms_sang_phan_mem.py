@@ -32,6 +32,10 @@ câu cổng. CLB nhận diện theo thẻ [clb_x-k]; có phiếu trong tệp c�
 dòng trong tệp của một CLB thì chỉ là không có điểm CLB đó. Thêm --bai-thi BaiThi.csv (Email, ClubId,
 ResponseId, NopLuc; T4M-Q4c) để đối chiếu list trạng thái của app với các tệp xuất: chỉ báo, không đổi điểm.
 
+Tick chọn thi và điểm quyết tâm (T4M-Q5a/b, chỉ khi List có cột THI1..THIn / WP1..WPn): "thi" trong Sổ nhập đi theo
+ô tick (có bài mà không tick thì bỏ điểm và báo), cột "Điểm quyết tâm" lấy từ WPk, hai quỹ 100 điểm mỗi ngày được
+soát để BÁO (không sửa). List không có hai nhóm cột này thì chạy y như trước.
+
 Tệp xuất thiếu hẳn một câu của mẫu thì dừng, không ghi tệp nào. Một ô sai
 lẻ (mã CLB lạ, thi CLB chưa xếp nguyện vọng…) thì bỏ riêng ô đó và báo
 đích danh dòng — đúng cách phần mềm xử lý khi nạp.
@@ -251,6 +255,12 @@ def doc_lists(duong_csv, de, co_so=None):
     Thu, NV1; tùy chọn: HoTen (hoặc Name), Lop (lớp chủ nhiệm, T4M-Q1b), NV2.. Dòng trùng (em, ngày):
     giữ dòng ĐẦU. `co_so` (T4M-Q1b): chỉ giữ dòng có cột CoSo bằng giá trị này (bỏ khoảng trắng, không
     phân biệt hoa thường); None = không lọc. `lop` là ô Lop không trống đầu tiên của em (chưa chuẩn hoá: so_nhap chuẩn hoá khi đọc).
+
+    Tick chọn thi và điểm quyết tâm (T4M-Q5a/b), TÙY CHỌN: cột THI1..THIn (`Có` hoặc trống; chỉ hợp lệ khi CLB ở
+    NVk có đề thi, tối đa TRAN_THI_MOI_BUOI tick mỗi ngày, quá thì giữ các tick đầu theo thứ tự NV) và WP1..WPn
+    (số nguyên >= 0, trống = chưa đặt); chỉ số k đi cùng NVk. Có cột THIk thì mỗi em có khoá "tick" (tập club_id đã
+    tick); có cột WPk thì có "wp" ({buổi: {club_id: số nguyên hoặc None}}) và "dong_buoi" ({buổi: số dòng}).
+    List KHÔNG có hai nhóm cột này thì kết quả y như trước (không thêm khoá nào).
     """
     with open(duong_csv, encoding="utf-8-sig", newline="") as f:
         bang = list(csv.reader(f))
@@ -264,6 +274,10 @@ def doc_lists(duong_csv, de, co_so=None):
     i_co_so = tieu.index("coso") if "coso" in tieu else None
     cot_nv = sorted((int(m.group(1)), i) for i, h in enumerate(tieu)
                     for m in [re.fullmatch(r"nv(\d+)", h)] if m)
+    cot_thi = {int(m.group(1)): i for i, h in enumerate(tieu) for m in [re.fullmatch(r"thi(\d+)", h)] if m}
+    cot_wp = {int(m.group(1)): i for i, h in enumerate(tieu) for m in [re.fullmatch(r"wp(\d+)", h)] if m}
+    cot_nv_theo_k = dict(cot_nv)
+    cac_k = sorted(set(cot_nv_theo_k) | set(cot_thi) | set(cot_wp))
     thieu = [k for k, v in (("Email", i_email), ("Thu", i_thu), ("NV1", cot_nv[0][0] if cot_nv else None))
              if v is None]
     if thieu:
@@ -295,6 +309,11 @@ def doc_lists(duong_csv, de, co_so=None):
             continue
         hs = ds.setdefault(email, {"dong": so_dong, "email": email, "name": "", "lop": "",
                                    "nguyen_vong": {}, "_buoi": set()})
+        if cot_thi:
+            hs.setdefault("tick", set())
+        if cot_wp:
+            hs.setdefault("wp", {})
+            hs.setdefault("dong_buoi", {})
         if i_ten is not None and not hs["name"]:
             hs["name"] = dong[i_ten].strip()
         if i_lop is not None and not hs["lop"]:
@@ -303,10 +322,17 @@ def doc_lists(duong_csv, de, co_so=None):
             bao("%s: dòng trùng (em, ngày) — bỏ dòng này, giữ dòng đầu" % buoi)
             continue
         hs["_buoi"].add(buoi)
-        xep = []
-        for _so, i in cot_nv:
-            muc = dong[i].strip()
+        xep, o_tick, o_wp = [], {}, {}
+        for k in cac_k:
+            i = cot_nv_theo_k.get(k)
+            muc = dong[i].strip() if i is not None else ""
+            tho_thi = dong[cot_thi[k]].strip() if k in cot_thi else ""
+            tho_wp = dong[cot_wp[k]].strip() if k in cot_wp else ""
             if not muc:
+                if tho_thi and _doc_tick(tho_thi) is not False:
+                    bao("%s: THI%d có giá trị mà NV%d trống — bỏ ô tick" % (buoi, k, k))
+                if tho_wp:
+                    bao("%s: WP%d có giá trị mà NV%d trống — bỏ ô điểm quyết tâm" % (buoi, k, k))
                 continue
             clb = (theo_ma.get(muc) or theo_ma.get(bm.ma_trong_lua_chon(muc))
                    or theo_ten.get(bm._chuan(muc)))
@@ -317,14 +343,60 @@ def doc_lists(duong_csv, de, co_so=None):
                     % (buoi, clb["club_id"], clb["buoi"]))
             elif clb["club_id"] not in xep:
                 xep.append(clb["club_id"])
+                if k in cot_thi:
+                    tick = _doc_tick(tho_thi)
+                    if tick is None:
+                        bao("%s: THI%d=%r không hiểu (chỉ nhận \"Có\" hoặc trống) — coi như không tick"
+                            % (buoi, k, tho_thi))
+                    o_tick[clb["club_id"]] = bool(tick)
+                if k in cot_wp:
+                    gia_tri = _doc_diem_quyet_tam(tho_wp)
+                    if gia_tri is False:
+                        bao("%s: WP%d=%r không phải số nguyên từ 0 trở lên — để trống ô này"
+                            % (buoi, k, tho_wp))
+                        gia_tri = None
+                    o_wp[clb["club_id"]] = gia_tri
         if len(xep) > bm.TRAN_CLB_MOI_BUOI:
             bao("%s: %d nguyện vọng, chỉ giữ %d đầu" % (buoi, len(xep), bm.TRAN_CLB_MOI_BUOI))
             xep = xep[:bm.TRAN_CLB_MOI_BUOI]
+        if cot_thi:
+            da_tick = [c for c in xep if o_tick.get(c)]
+            co_de = [c for c in da_tick if theo_ma[c]["de_thi"]]
+            for c in da_tick:
+                if c not in co_de:
+                    bao("%s: tick thi %s nhưng CLB này không có đề thi — bỏ tick" % (buoi, c))
+            if len(co_de) > bm.TRAN_THI_MOI_BUOI:
+                bo = co_de[bm.TRAN_THI_MOI_BUOI:]
+                bao("%s: tick thi %d CLB, tối đa %d mỗi ngày — chỉ giữ %d CLB đầu theo thứ tự nguyện vọng; "
+                    "bỏ tick: %s" % (buoi, len(co_de), bm.TRAN_THI_MOI_BUOI, bm.TRAN_THI_MOI_BUOI, ", ".join(bo)))
+                co_de = co_de[:bm.TRAN_THI_MOI_BUOI]
+            hs["tick"].update(co_de)
+        if cot_wp and xep:
+            hs["wp"][buoi] = {c: o_wp.get(c) for c in xep}
+            hs["dong_buoi"][buoi] = so_dong
         if xep:
             hs["nguyen_vong"][buoi] = xep
     for hs in ds.values():
         del hs["_buoi"]
     return ds, canh_bao
+
+
+def _doc_tick(o):
+    """Ô THIk của List: True = tick ("Có"), False = không tick (trống, "Không"), None = giá trị lạ."""
+    g = bm._chuan(o)
+    if g in ("có", "co", "yes", "true", "1"):
+        return True
+    if g in ("", "không", "khong", "no", "false", "0"):
+        return False
+    return None
+
+
+def _doc_diem_quyet_tam(o):
+    """Ô WPk: số nguyên >= 0 -> int; trống -> None; còn lại (12.5, -3, abc) -> False."""
+    if not o:
+        return None
+    m = re.fullmatch(r"([0-9]+)(\.0+)?", o)
+    return int(m.group(1)) if m else False
 
 
 def _cot_chi_thi(de, tieu_de):
@@ -412,6 +484,8 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
     hoc_sinh = {e: {"dong": h["dong"], "student_id": e, "name": h["name"], "lop": h.get("lop", ""),
                     "nguyen_vong": h["nguyen_vong"], "bai_thi": []}
                 for e, h in danh_sach.items()}
+    for e, h in danh_sach.items():                    # tick / điểm quyết tâm (Q5a/b): chỉ khi List có cột
+        hoc_sinh[e].update({k: h[k] for k in ("tick", "wp", "dong_buoi") if k in h})
     da_phu = set()
     for ten_tep, tieu_de, cac_dong in cac_tep:
         i_email, i_ten, cot, cot_diem, phu, la = _cot_chi_thi(de, tieu_de)
@@ -474,8 +548,12 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
                     bao("%s: em làm bài thi nhưng KHÔNG xếp CLB này ở nguyện vọng %s "
                         "— điểm có trong BANG_DIEM.xlsx nhưng không nạp vào phần mềm"
                         % (ma, clb["buoi"]))
-                bai_thi.append({"club_id": ma, "diem": diem, "dung": dung,
-                                "tra_loi": tra_loi, "nap": da_xep})
+                bai = {"club_id": ma, "diem": diem, "dung": dung, "tra_loi": tra_loi, "nap": da_xep}
+                if da_xep and "tick" in hs and ma not in hs["tick"]:
+                    bao("%s: em có bài thi nhưng KHÔNG tick thi CLB này — điểm có trong BANG_DIEM.xlsx "
+                        "nhưng không nạp vào phần mềm" % ma)
+                    bai["nap"], bai["khong_tick"] = False, True
+                bai_thi.append(bai)
             hs["bai_thi"] += bai_thi
 
     for e, hs in hoc_sinh.items():
@@ -483,11 +561,41 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
                      lambda nd, e=e, hs=hs: canh_bao.append((hs["dong"], e, nd)))
         if not hs["nguyen_vong"]:
             canh_bao.append((hs["dong"], e, "không xếp nguyện vọng buổi nào"))
+        for buoi, noi_dung in _soat_hai_quy(hs):
+            canh_bao.append((hs["dong_buoi"][buoi], e, noi_dung))
     for clb in bm.clb_co_thi(de):
         if clb["club_id"] not in da_phu:
             canh_bao.append(("", "", "%s có đề thi nhưng không tệp Forms nào chứa câu của CLB này "
                              "— không có điểm cho CLB này" % clb["club_id"]))
     return list(hoc_sinh.values()), canh_bao
+
+
+def tap_thi(hs, buoi):
+    """Các CLB của em ở `buoi` mà Sổ nhập sẽ đánh dấu "đã thi" (ô điểm hoặc chữ `thi`): có cột tick thì
+    là CLB đã tick; không thì là CLB có bài được nạp. Đây cũng là quỹ 1 của điểm quyết tâm."""
+    xep = hs["nguyen_vong"].get(buoi, [])
+    if "tick" in hs:
+        return [c for c in xep if c in hs["tick"]]
+    nap = {t["club_id"] for t in hs["bai_thi"] if t["nap"]}
+    return [c for c in xep if c in nap]
+
+
+def _soat_hai_quy(hs):
+    """[(buổi, nội dung)] cho mỗi quỹ điểm quyết tâm không cộng đúng 100 (T4M-Q5b). CHỈ BÁO: không sửa giá trị,
+    việc chặn lần chạy là của kiosk. Quỹ 1 = CLB đã thi (`tap_thi`), quỹ 2 = các CLB còn lại. Quỹ rỗng không
+    kiểm; quỹ chỉ một CLB mà để trống thì kiosk tự điền 100 trong bộ nhớ nên không báo."""
+    ket = []
+    for buoi, wp in hs.get("wp", {}).items():
+        thi = tap_thi(hs, buoi)
+        xep = hs["nguyen_vong"].get(buoi, [])
+        for so_quy, tap in ((1, thi), (2, [c for c in xep if c not in thi])):
+            if not tap or (len(tap) == 1 and wp.get(tap[0]) is None):
+                continue
+            tong = sum(wp.get(c) or 0 for c in tap)
+            if tong != 100:
+                ket.append((buoi, "%s: quỹ %d (%s) cộng %d điểm, phải đúng 100 — Sổ nhập giữ nguyên giá trị, "
+                                  "kiosk sẽ chặn lần chạy tới khi sửa" % (buoi, so_quy, ", ".join(tap), tong)))
+    return ket
 
 
 # ------------------------------------------------- đối chiếu list BaiThi (T4M-Q4c)
@@ -567,14 +675,19 @@ def ghi_tep_phan_mem(de, hoc_sinh, thu_muc):
               "reserve_group": c["reserve_group"], "buoi": c["buoi"]}
              for c in de["cau_lac_bo"]]
     students = []
+    co_wp = any("wp" in h for h in hoc_sinh)      # List có cột WPk (T4M-Q5b): sổ có cột "Điểm quyết tâm"
     for h in hoc_sinh:
         diem = {t["club_id"]: bm.ghi_so(t["diem"]) for t in h["bai_thi"] if t["nap"]}
         thu_tu = [ma for b in de["buoi"] for ma in h["nguyen_vong"].get(b["ma"], [])]
+        tick = h.get("tick")                  # có cột THIk: "thi" đi theo ô tick (ô "thi" khi chưa có điểm)
+        wp = {ma: v for d in h.get("wp", {}).values() for ma, v in d.items()}
         # Không có nhóm: sổ ghi KHÔNG có cột Nhóm ưu tiên (co_nhom=False bên dưới).
         students.append({
             "student_id": h["student_id"], "name": h["name"], "reserve_group": "",
             "class_id": h.get("lop") or "",
-            "nv": [{"club_id": ma, "thi": ma in diem, "diem": diem.get(ma, "")}
+            "nv": [dict({"club_id": ma, "thi": ma in diem or (tick is not None and ma in tick),
+                         "diem": diem.get(ma, "")},
+                        **({"diem_w": "" if wp.get(ma) is None else wp[ma]} if co_wp else {}))
                    for ma in thu_tu],
         })
     duong = os.path.join(thu_muc, TEN_SO)
@@ -582,7 +695,7 @@ def ghi_tep_phan_mem(de, hoc_sinh, thu_muc):
     # GIỮ nhóm đã gán; có cột mà trống thì phần mềm sẽ BỎ nhóm của em.
     # Cột Lớp (T4M-Q1b) CHỈ khi List có lớp cho ít nhất một em; không thì sổ y như trước.
     so_nhap.ghi_so_nhap(duong, clubs, students, co_nhom=False,
-                        co_lop=any(s["class_id"] for s in students))
+                        co_lop=any(s["class_id"] for s in students), luon_co_cot_w=co_wp)
     return duong
 
 
@@ -628,7 +741,8 @@ def ghi_bang_diem(de, hoc_sinh, canh_bao, duong, doi_chieu=None):
             ws.append([h["student_id"], h["name"], t["club_id"], buoi]
                       + ["Đ" if x else "S" for x in t["dung"]]
                       + [""] * (n_cau - len(t["dung"]))
-                      + [t["diem"], "Có" if t["nap"] else "Không — chưa xếp nguyện vọng"])
+                      + [t["diem"], "Có" if t["nap"] else (
+                          "Không — chưa tick thi" if t.get("khong_tick") else "Không — chưa xếp nguyện vọng")])
 
     ws = wb.create_sheet("Thống kê đề")
     dau_bang(ws, ["CLB", "Câu", "Nội dung", "Đáp án", "Số bài", "Số đúng", "Tỉ lệ đúng"],
@@ -660,6 +774,8 @@ def ghi_bang_diem(de, hoc_sinh, canh_bao, duong, doi_chieu=None):
 
 # A13.13: workspace trường học BẬT điểm quyết tâm mặc định, mà biểu mẫu KHÔNG thu điểm đó (và
 # không được bịa): sổ ra không có điểm quyết tâm, nên phải tắt tính năng trước khi nạp.
+GHI_CHU_CO_DIEM_QUYET_TAM = ("Sổ có cột điểm quyết tâm (thu trên app): giữ BẬT \"Dùng điểm quyết tâm\" khi nạp. "
+                            "Mỗi ngày, mỗi quỹ không rỗng phải cộng đúng 100 thì kiosk mới cho chạy.")
 GHI_CHU_DIEM_QUYET_TAM = ("Dữ liệu không có điểm quyết tâm nên cần TẮT \"Dùng điểm quyết tâm\" trong "
                           "cấu hình không gian làm việc trước khi nạp sổ này.")
 
@@ -704,7 +820,8 @@ def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None, co_so=None,
     kq = {"n_hoc_sinh": len(hoc_sinh),
           "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
           "canh_bao": canh_bao,
-          "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
+          "ghi_chu": [GHI_CHU_CO_DIEM_QUYET_TAM if any("wp" in h for h in hoc_sinh)
+                      else GHI_CHU_DIEM_QUYET_TAM]}
     if doi_chieu is not None:
         kq["doi_chieu_bai_thi"] = doi_chieu
     return kq

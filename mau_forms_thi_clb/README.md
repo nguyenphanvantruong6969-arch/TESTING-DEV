@@ -57,6 +57,19 @@ cho bộ chuyển đổi. Sinh lại từ `de_thi.json` không đổi cho ra t�
 Sổ nhập chỉ có nguyện vọng, không điểm. Ghi chú một trang cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.
 Chế độ mặc định (mục 1 trở xuống) không đổi.
 
+**Tick chọn thi và điểm quyết tâm (T4M-Q5a/b, tùy chọn).** Mỗi ngày List có tối đa 7 nguyện vọng (`NV1..NV7`; số ô
+= min(7, số CLB của ngày)). List thêm được hai nhóm cột, chỉ số `k` đi cùng `NVk`; List không có hai nhóm này
+thì Sổ nhập và `BANG_DIEM.xlsx` y như trước:
+
+| Cột | Giá trị | Bộ chuyển đổi làm gì |
+|---|---|---|
+| `THI1..THI7` | `Có` hoặc trống | Có cột `THIk` thì ô "thi" của Sổ nhập đi theo **tick**: tick + có bài → điểm; tick + không có bài → ô `thi` (chưa có điểm, kiosk coi là vắng thi); **có bài mà không tick → bỏ điểm** (vẫn ở `BANG_DIEM.xlsx`, cột *Nạp* ghi "chưa tick thi") và báo; tick CLB không có đề → bỏ tick, báo; quá 5 tick một ngày → giữ 5 CLB đầu theo thứ tự `NVk`, báo |
+| `WP1..WP7` | số nguyên ≥ 0, trống = chưa đặt | Ghi vào cột "Điểm quyết tâm" của Sổ nhập (kiosk giữ **BẬT** điểm quyết tâm). Mỗi ngày có hai quỹ: quỹ 1 = CLB đã tick, quỹ 2 = các CLB còn lại; quỹ không rỗng phải cộng **đúng 100**, nếu không thì **báo** (không sửa giá trị; kiosk chặn lần chạy tới khi sửa). Quỹ chỉ một CLB mà để trống thì không báo (kiosk tự điền 100). Ô không phải số nguyên ≥ 0 (`12.5`, `-3`, `abc`) → báo và để trống ô đó |
+
+Cột `THIk`/`WPk` có giá trị mà `NVk` trống bị báo và bỏ. Chỉ có `WPk` mà không có `THIk` thì quỹ 1 là các CLB có bài được nạp.
+`--bai-thi` (mục 0a) không đổi: vẫn chỉ đối chiếu các tệp xuất, không xét tick. Các quy tắc trên mới kiểm bằng test với dữ
+liệu giả (**TH** với tệp List thật).
+
 ## 0a. Cổng thi: mỗi CLB một biểu mẫu (T4M-Q4a/b/c)
 
 Thiết kế: `docs/he_sinh_thai/T4M_CONG_THI.md`. App ECA mở đúng biểu mẫu của CLB em đã chọn, nên mỗi CLB có đề
@@ -78,7 +91,13 @@ python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py <như trên> --bai-thi Ba
 python du_lieu_test/demo_t4m.py --ra ./demo_ra            # mặc định 120 học sinh giả
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7 --he-so-cho 1
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --moi-clb  # cách B: mỗi CLB một biểu mẫu + BaiThi.csv
+python du_lieu_test/demo_t4m.py --ra ./demo_ra --day-du   # tick chọn thi + điểm quyết tâm (kết hợp được với --moi-clb)
 ```
+
+`--day-du` (T4M-Q5c): List giả có `THIk` và `WPk` hợp lệ (số ô nguyện vọng = min(7, số CLB của ngày); với `de_thi.json`
+mẫu mỗi ngày có 3 CLB nên ra `NV1..NV3`), phiếu Forms giả chỉ cho CLB đã tick, điểm quyết tâm **BẬT** trong CSDL tạm.
+Cố ý gài: một em tick mà vắng, một em nộp bài mà không tick, một quỹ cộng thiếu 100 (kiosk chặn lần chạy đầu, demo sửa
+như ở "Bước 3" rồi chạy lại). Dòng "Điểm quyết tâm: BẬT/TẮT" luôn có trong tóm tắt.
 
 `--moi-clb` (cổng thi, `T4M_CONG_THI.md`): tệp Forms giả được tách thành `forms_moi_clb/<club_id>.xlsx` (không câu cổng), thêm `BaiThi.csv` giả như flow "Đã làm" ghi (cố ý thiếu một bài), và bộ chuyển đổi chạy với `--bai-thi`. Cùng seed thì kết quả xếp trùng với chế độ một biểu mẫu chung.
 

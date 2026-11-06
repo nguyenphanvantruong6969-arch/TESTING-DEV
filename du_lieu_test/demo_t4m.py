@@ -4,6 +4,7 @@
     python du_lieu_test/demo_t4m.py --ra ./demo_ra
     python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7
     python du_lieu_test/demo_t4m.py --ra ./demo_ra --moi-clb     # cách B: mỗi CLB một biểu mẫu
+    python du_lieu_test/demo_t4m.py --ra ./demo_ra --day-du      # Top 7 + tick chọn thi + điểm quyết tâm
 
 Các bước (đúng đường phần mềm dùng thật, không đụng app.db của workspace nào):
   1. sinh tệp Lists giả (nguyện vọng; mã CLB lấy từ de_thi.json)      -> lists_gia.csv
@@ -16,6 +17,13 @@ Các bước (đúng đường phần mềm dùng thật, không đụng app.db 
 --moi-clb (cách B, T4M_CONG_THI.md): bước 2 tách phiếu giả thành MỘT tệp xuất mỗi CLB có đề (không câu
 cổng) trong forms_moi_clb/, sinh BaiThi.csv giả như flow "Đã làm" ghi (cố ý thiếu một dòng), và bước 3
 chạy bộ chuyển đổi với --bai-thi. Cùng seed thì kết quả xếp trùng với chế độ một biểu mẫu chung.
+
+--day-du (T4M-Q5c, kết hợp được với --moi-clb): List giả có THIk (tick chọn thi, tối đa 5 mỗi ngày) và WPk
+(điểm quyết tâm, hai quỹ 100); số ô nguyện vọng mỗi ngày = min(7, số CLB của ngày); phiếu Forms giả chỉ cho CLB
+đã tick, gài thêm: một em tick mà vắng, một em nộp bài mà không tick, một quỹ điểm cộng thiếu 100. Bộ chuyển đổi
+báo hai trường hợp đầu; quỹ sai làm kiosk CHẶN lần chạy đầu (đúng thiết kế), demo sửa quỹ đó ở "Bước 3" của
+kiosk (admin_save_wharton) rồi chạy lại. Điểm quyết tâm trong CSDL TẠM được BẬT (không có --day-du: TẮT, như cũ).
+Dòng "Điểm quyết tâm: BẬT/TẮT" luôn có trong tóm tắt.
 
 DỮ LIỆU MÔ PHỎNG: tên, email (miền example.test), lớp, điểm đều bịa; không phải khảo sát thật.
 Cùng --seed cho cùng kết quả. Thư mục `ket_qua_theo_lop` cũ trong --ra (của lần chạy trước) bị thay.
@@ -45,15 +53,37 @@ SO_HS_MAC_DINH = 120
 SEED_MAC_DINH = 6112026          # 06/11/2026
 
 
-def sinh_lists(de, duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
-    """Tệp Lists giả dùng đúng mã CLB của `de` (mỗi ngày trong Lists = một buổi của de_thi.json)."""
+def _clb_theo_ngay(de):
     theo_ngay = {}
     for ngay in lists_gia.NGAY:
         buoi = cv._ma_buoi_tu_thu(de, ngay)
         theo_ngay[ngay] = [c["club_id"] for c in de["cau_lac_bo"] if c["buoi"] == buoi]
         if not theo_ngay[ngay]:
             raise ValueError("de_thi.json không có CLB nào ở %s" % ngay)
-    return lists_gia.ghi_csv(duong, so_hs=so_hs, seed=seed, clb_theo_ngay=theo_ngay)
+    return theo_ngay
+
+
+def sinh_lists(de, duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
+    """Tệp Lists giả dùng đúng mã CLB của `de` (mỗi ngày trong Lists = một buổi của de_thi.json)."""
+    return lists_gia.ghi_csv(duong, so_hs=so_hs, seed=seed, clb_theo_ngay=_clb_theo_ngay(de))
+
+
+TOP_TOI_DA = 7                      # số nguyện vọng tối đa mỗi ngày (Truong quyết 06/11/2026)
+
+
+def sinh_lists_day_du(de, duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
+    """Lists giả có THIk + WPk (T4M-Q5c) và MỘT quỹ điểm cố ý cộng thiếu. Số ô NV = min(7, số CLB nhiều nhất
+    của một ngày). Trả {"n": số dòng, "so_nv": số ô, "quy_sai": {email, thu, quy, club_id, thieu}}."""
+    theo_ngay = _clb_theo_ngay(de)
+    so_nv = min(TOP_TOI_DA, max(len(v) for v in theo_ngay.values()))
+    co_de = {c["club_id"] for c in bm.clb_co_thi(de)}
+    dong = lists_gia.sinh(so_hs=so_hs, seed=seed, clb_theo_ngay=theo_ngay, so_nv=so_nv,
+                          co_tick=True, co_wp=True, clb_co_de=co_de)
+    quy_sai = lists_gia.gai_quy_khong_du(dong, so_nv)
+    if quy_sai is None:
+        raise ValueError("không có dòng nào để gài quỹ điểm thiếu 100 (tăng --so-hs)")
+    n = lists_gia.ghi_dong(duong, dong, so_nv, True, True)
+    return {"n": n, "so_nv": so_nv, "quy_sai": quy_sai}
 
 
 def _so(x):
@@ -142,10 +172,27 @@ def he_so_cho_tu_dong(de, so_hs):
     return max(1.0, round(0.7 * so_hs / tb, 1))
 
 
-def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_clb=False):
+def sua_quy_gai(api, duong_db, quy_sai):
+    """Giả lập "Bước 3. Điểm quyết tâm" của kiosk: cộng phần điểm thiếu vào CLB bị gài, lưu bằng
+    admin_save_wharton (cùng luật kiểm với kiosk). Trả kết quả của API."""
+    sid = quy_sai["email"].lower()
+    con = sqlite3.connect(duong_db)
+    try:
+        dong = con.execute("SELECT club_id, tier, points FROM wharton_bids WHERE student_id = ?", (sid,)).fetchall()
+    finally:
+        con.close()
+    w = {1: {}, 2: {}}
+    for club, tier, diem in dong:
+        w[tier][club] = diem + (quy_sai["thieu"] if club == quy_sai["club_id"] else 0)
+    return api.admin_save_wharton(sid, w[1], w[2])
+
+
+def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_clb=False, day_du=False):
     """Chạy trọn chuỗi vào thư mục `ra`. Trả tóm tắt (dict) để in hoặc kiểm.
 
     `moi_clb`: cách B (mỗi CLB một biểu mẫu + BaiThi.csv + --bai-thi); thêm khoá `doi_chieu`, `n_bieu_mau`.
+    `day_du` (T4M-Q5c): List có THIk + WPk, điểm quyết tâm BẬT trong CSDL tạm; thêm `quy_sai`, `bi_chan_lan_dau`.
+    Luôn có khoá `diem_quyet_tam` (True/False: giá trị rules.wharton thật sự dùng khi chạy).
 
     `he_so_cho`: nhân chỉ tiêu mỗi CLB của de_thi.json (bản sao trong bộ nhớ; tệp không đổi).
     None = tự tính theo `so_hs`; 1 = giữ nguyên chỉ tiêu mẫu."""
@@ -162,7 +209,10 @@ def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_
     os.makedirs(ra, exist_ok=True)
     duong_lists = os.path.join(ra, "lists_gia.csv")
     duong_forms = os.path.join(ra, "forms_chi_thi_gia.xlsx")
-    sinh_lists(de, duong_lists, so_hs, seed)
+    if day_du:
+        gai_lists = sinh_lists_day_du(de, duong_lists, so_hs, seed)
+    else:
+        sinh_lists(de, duong_lists, so_hs, seed)
     danh_sach, canh_bao_lists = cv.doc_lists(duong_lists, de)
     if not moi_clb:
         gai = tm.ghi_mau_xuat_chi_thi(de, duong_forms, danh_sach, hat_giong=seed)
@@ -183,14 +233,23 @@ def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_
     with tempfile.TemporaryDirectory(prefix="demo_t4m_") as tam:
         duong_db = os.path.join(tam, "app.db")
         api = PipelineAPI(duong_db)
-        # Dữ liệu demo không có điểm quyết tâm (mặc định BẬT): tắt trong CSDL TẠM, như người quản trị
-        # tắt ở Cài đặt workspace.
-        ch.ghi_cau_hinh(duong_db, {"rules": {"wharton": False}})
+        # Không --day-du: dữ liệu demo không có điểm quyết tâm (mặc định BẬT): tắt trong CSDL TẠM, như người
+        # quản trị tắt ở Cài đặt workspace. Có --day-du: Sổ có điểm quyết tâm nên BẬT.
+        ch.ghi_cau_hinh(duong_db, {"rules": {"wharton": bool(day_du)}})
+        diem_quyet_tam = bool(ch.doc_cau_hinh(duong_db)["rules"]["wharton"])
         with open(duong_so, "rb") as f:
             r = api.import_so_nhap(base64.b64encode(f.read()).decode())
         if not r["ok"]:
             raise RuntimeError("nạp Sổ nhập thất bại: %s" % r["errors"])
         r = api.run_pipeline(seed=seed)
+        bi_chan = False
+        if not r["ok"] and day_du and any(e["code"] == "wharton_ho_so_chua_hop_le" for e in r["errors"]):
+            # Quỹ điểm bị gài làm kiosk chặn (đúng thiết kế): sửa như người dùng ở Bước 3, rồi chạy lại.
+            bi_chan = True
+            sua = sua_quy_gai(api, duong_db, gai_lists["quy_sai"])
+            if not sua["ok"]:
+                raise RuntimeError("sửa quỹ điểm quyết tâm thất bại: %s" % sua["errors"])
+            r = api.run_pipeline(seed=seed)
         if not r["ok"]:
             raise RuntimeError("chạy pipeline thất bại: %s" % r["errors"])
         r = api.export_theo_lop(thu_muc_lop)
@@ -216,7 +275,11 @@ def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_
             "n_nv1": sum(1 for x in ket_qua if x[5] == 1), "n_clb": n_clb, "n_tang1": n_tang1,
             "n_bai_thi": kq_cv["n_bai_thi"], "n_tep_lop": n_tep_lop,
             "canh_bao": canh_bao_lists + kq_cv["canh_bao"], "gai": gai, "ket_qua": ket_qua,
-            "ra": ra}
+            "ra": ra, "diem_quyet_tam": diem_quyet_tam}
+    if day_du:
+        gai["quy_sai"] = gai_lists["quy_sai"]
+        kq["bi_chan_lan_dau"] = bi_chan
+        kq["so_nv"] = gai_lists["so_nv"]
     if moi_clb:
         kq["doi_chieu"] = kq_cv["doi_chieu_bai_thi"]
         kq["n_bieu_mau"] = len(cac_tep)
@@ -229,6 +292,17 @@ def in_tom_tat(kq, out=None):
     p("=== CHẠY THỬ TRỌN CHUỖI (dữ liệu MÔ PHỎNG) ===")
     if "doi_chieu" in kq:
         p("Cách B: mỗi CLB một biểu mẫu (%d tệp xuất trong forms_moi_clb/, không câu cổng)." % kq["n_bieu_mau"])
+    p("Điểm quyết tâm: %s" % ("BẬT (Sổ nhập có cột điểm quyết tâm)" if kq["diem_quyet_tam"] else "TẮT (dữ liệu không có)"))
+    if "bi_chan_lan_dau" in kq:
+        q = kq["gai"]["quy_sai"]
+        p("Số ô nguyện vọng mỗi ngày = %d (= min(7, số CLB của ngày)), tick chọn thi (tối đa 5 CLB/ngày), hai quỹ 100 điểm. "
+          "Quỹ %d của %s bị gài thiếu %d điểm: "
+          "kiosk %s lần chạy đầu, demo sửa ở Bước 3 rồi chạy lại."
+          % (kq["so_nv"], q["quy"], q["email"], q["thieu"], "CHẶN" if kq["bi_chan_lan_dau"] else "không chặn"))
+        e, c = kq["gai"]["tick_vang"]
+        p("Gài tick mà vắng thi: %s ở %s (bộ chuyển đổi không báo; kiosk cảnh báo vắng thi và bỏ điểm quỹ 1 của CLB đó)." % (e, c))
+        e, c = kq["gai"]["nop_khong_tick"]
+        p("Gài nộp bài mà không tick: %s ở %s (điểm bỏ khỏi Sổ nhập, có cảnh báo)." % (e, c))
     p("%d học sinh, %d bài thi đã chấm, %d CLB (%d CLB có thi tuyển = Tầng 1)."
       % (kq["n_hoc_sinh"], kq["n_bai_thi"], kq["n_clb"], kq["n_tang1"]))
     ty_le = 100.0 * kq["n_nv1"] / kq["n_luot"] if kq["n_luot"] else 0.0
@@ -262,11 +336,14 @@ def main(argv=None):
     ap.add_argument("--seed", type=int, default=SEED_MAC_DINH, help="hạt giống (mặc định %(default)s)")
     ap.add_argument("--he-so-cho", type=float, default=None,
                     help="nhân chỉ tiêu mỗi CLB (mặc định: tự tính theo số học sinh; 1 = giữ nguyên de_thi.json)")
+    ap.add_argument("--day-du", action="store_true",
+                    help="Top 7 + tick chọn thi (tối đa 5/ngày) + điểm quyết tâm (hai quỹ 100); bật điểm quyết tâm")
     ap.add_argument("--moi-clb", action="store_true",
                     help="cách B: mỗi CLB một biểu mẫu (tệp xuất riêng, BaiThi.csv giả, đối chiếu --bai-thi)")
     a = ap.parse_args(argv)
     try:
-        kq = chay_demo(a.ra, so_hs=a.so_hs, seed=a.seed, he_so_cho=a.he_so_cho, moi_clb=a.moi_clb)
+        kq = chay_demo(a.ra, so_hs=a.so_hs, seed=a.seed, he_so_cho=a.he_so_cho, moi_clb=a.moi_clb,
+                      day_du=a.day_du)
     except (bm.LoiDeThi, cv.LoiTepXuat, RuntimeError, ValueError) as e:
         print("DEMO DỪNG — %s" % e, file=sys.stderr)
         return 1

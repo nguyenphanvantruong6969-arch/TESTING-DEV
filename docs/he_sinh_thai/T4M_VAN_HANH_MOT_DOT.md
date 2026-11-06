@@ -1,7 +1,7 @@
 # T4M. Vận hành một đợt xếp CLB (cho nhân viên IT của trường)
 
 Mã việc: T4M-VH (06/11/2026). Chỉ tài liệu. Nhãn: **ĐXM** = có nguồn đã mở; **TH** = chưa thử, cần chạy thật; **HỎI-IT** = chờ trường trả lời.
-Một đợt = một lần học sinh đăng ký (Top 3 mỗi ngày trong app ECA) + làm bài thi CLB (Microsoft Forms) → xếp → trả kết quả theo lớp.
+Một đợt = một lần học sinh đăng ký (tối đa 7 nguyện vọng mỗi ngày, tick CLB muốn thi, điểm quyết tâm trong app ECA) + làm bài thi CLB (Microsoft Forms) → xếp → trả kết quả theo lớp.
 Mọi dữ liệu học sinh **nằm trên máy IT**. Không gửi tệp có tên/email học sinh qua kênh công khai. Thời hạn xoá tệp sau đợt: **HỎI-IT**.
 Tập thử không cần dữ liệu thật: `python du_lieu_test/demo_t4m.py --ra ./demo_ra` (120 em giả, ngoại tuyến, chạy trọn chuỗi bước 5 đến 7).
 
@@ -20,7 +20,7 @@ Tập thử không cần dữ liệu thật: `python du_lieu_test/demo_t4m.py --
 
 ## 1. Giáo viên dựng bài thi
 Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a template → Get a link to duplicate**, chép nội dung không chép phản hồi, ĐXM).
-1. Giáo viên của từng CLB có thi gửi đề; người phụ trách dự án ghi vào `mau_forms_thi_clb/de_thi.json` (nguồn duy nhất: buổi, CLB, chỉ tiêu, đề, đáp án). `club_id` trong `de_thi.json` **phải trùng** mã CLB trong cột `NV1..NV3` của List.
+1. Giáo viên của từng CLB có thi gửi đề; người phụ trách dự án ghi vào `mau_forms_thi_clb/de_thi.json` (nguồn duy nhất: buổi, CLB, chỉ tiêu, đề, đáp án). `club_id` trong `de_thi.json` **phải trùng** mã CLB trong cột `NV1..NV7` của List.
 2. Sinh tệp: `python mau_forms_thi_clb/tao_mau_forms.py --chi-thi` → `NHAP_FORMS_CHI_THI.docx` (vượt 200 câu thì `_1.docx`, `_2.docx`: mỗi tệp một biểu mẫu) và `CAI_DAT_FORMS_CHI_THI.md`.
 3. Forms: forms.office.com bằng tài khoản trường → **Quick import** từ ổ máy (không từ SharePoint/OneDrive, tối đa 10 MB) → chọn **Quiz** (ĐXM).
 4. Làm theo `CAI_DAT_FORMS_CHI_THI.md` và `mau_forms_thi_clb/GHI_CHU_GIAO_VIEN.md`: tick đáp án + điểm, đặt rẽ nhánh (chỉ đáp án "Không" của câu cổng), **giữ nguyên phần `[mã]` đầu mỗi câu**.
@@ -35,7 +35,7 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 ## 2. Mở và đóng đăng ký
 1. App ECA: đặt trạng thái các dòng là "Đang mở" (cách đặt: **HỎI-IT**, phụ thuộc kho hiện tại là SharePoint List hay Dataverse).
 2. Forms: Start/End date (bước 1.5). **Đóng bài thi sau hạn đăng ký** hoặc cùng lúc, để không ai thi CLB mà chưa kịp xếp nguyện vọng.
-3. Thông báo học sinh hai việc: xếp Top 3 ở app và làm bài thi ở link Forms (mỗi bài một lần).
+3. Thông báo học sinh hai việc: xếp tối đa 7 nguyện vọng mỗi ngày ở app, tick CLB muốn thi (tối đa 5 mỗi ngày), chia điểm quyết tâm (hai quỹ 100 mỗi ngày) và làm bài thi ở link Forms (mỗi bài một lần).
 - **Kiểm:** mở thử bằng một tài khoản học sinh thử (HỎI-IT có sẵn không); thử nộp hai lần, lần hai phải bị chặn.
 - **Nếu lỗi:** em kêu không vào được Forms → thường do không đăng nhập bằng email trường; không mở rộng quyền sang "Anyone" (mất cột Email).
 
@@ -45,7 +45,7 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 - **Kiểm:** thử sửa một dòng bằng tài khoản học sinh thử: phải bị từ chối.
 
 ## 4. Xuất dữ liệu
-1. **List:** mở list → bỏ chọn mọi mục → **Export > Export to CSV** (nút chỉ hiện khi không chọn mục; tối đa 30.000 dòng; tệp là bản chụp, ĐXM). Lưu `DANH_SACH.csv`. 1.500 em × 5 ngày = 7.500 dòng: đủ. Cột cần có: `Email`, `Thu`, `NV1..NVn`, tuỳ chọn `HoTen`, `Lop`, `CoSo`.
+1. **List:** mở list → bỏ chọn mọi mục → **Export > Export to CSV** (nút chỉ hiện khi không chọn mục; tối đa 30.000 dòng; tệp là bản chụp, ĐXM). Lưu `DANH_SACH.csv`. 1.500 em × 5 ngày = 7.500 dòng: đủ. Cột cần có: `Email`, `Thu`, `NV1..NVn`, tuỳ chọn `HoTen`, `Lop`, `CoSo`, và (T4M-Q5, nếu app thu) `THI1..THIn`, `WP1..WPn` cùng chỉ số với `NVk`.
 2. **Forms:** mỗi biểu mẫu → **Responses → Open in Excel** (hoặc Download a copy) → lưu `.xlsx`. Có nhiều biểu mẫu (tách theo buổi) thì lưu hết.
 - **Kiểm** (đoạn Python 4.2 của `T4M_HUONG_DAN_THU.md`): có BOM hay không; tiếng Việt còn dấu; số dòng khớp số em × số ngày; cột `Thu`/`CoSo` ra chữ đọc được. Cách List mã hoá/đặt tên cột khi xuất: **TH** (tài liệu không ghi).
 - **Nếu lỗi:** không thấy nút Export hoặc bị chặn → ghi lý do cho người phụ trách (HỎI-IT, có thể do chính sách DLP). Chữ vỡ dấu → xuất lại bằng đường khác, báo người phụ trách.
@@ -58,11 +58,14 @@ python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py KET_QUA_FORMS.xlsx --chi-
 ```
 Nhiều biểu mẫu: liệt kê nhiều `.xlsx` ngay sau lệnh. Chạy riêng cho từng cơ sở bằng `--co-so`: `... --co-so CS1 --ra ./nap_CS1`, rồi `... --co-so CS2 --ra ./nap_CS2` (cùng một `DANH_SACH.csv`, cùng các tệp Forms). Không có `--co-so` thì không lọc (như cũ). Cơ sở không có em nào, hoặc List thiếu cột `CoSo`: bộ chuyển đổi báo lỗi và không ghi tệp. `--co-so` mới kiểm bằng test, chưa chạy với tệp List thật (TH).
 **Mỗi CLB một biểu mẫu (Q4b):** liệt kê hết các `.xlsx`, mỗi tệp một CLB, không cần câu cổng: `... clb_covua.xlsx clb_vanhoc.xlsx ... --chi-thi --lists DANH_SACH.csv --ra ./nap`. Tệp trộn nhiều CLB hoặc có thẻ lạ làm bộ chuyển đổi dừng, không ghi tệp nào. CLB có đề mà chưa có tệp nào thì được báo ("không tệp Forms nào chứa câu của CLB này"). Thêm `--bai-thi BaiThi.csv` (Q4c) để so list trạng thái với các tệp xuất: mục *Đối chiếu BaiThi* ở màn hình và trong `BANG_DIEM.xlsx`; `chi_co_o_bai_thi` nghĩa là xuất thiếu hoặc em chưa nộp, `chi_co_o_tep_xuat` nghĩa là flow chưa chạy; **chỉ báo, không đổi điểm**. Khớp hết thì mục rỗng.
+**Tick và điểm quyết tâm (Q5a/b):** nếu List có cột `THIk`/`WPk` thì bộ chuyển đổi tự nhận. "Thi" trong Sổ nhập đi theo tick (có bài mà không tick → bỏ điểm, báo; tick CLB không có đề → bỏ tick, báo; quá 5 tick/ngày → giữ 5 đầu, báo). Cột "Điểm quyết tâm" của Sổ nhập lấy từ `WPk`; quỹ 1 (CLB đã tick) và quỹ 2 (CLB còn lại) mỗi ngày phải cộng đúng 100, nếu không thì **chỉ báo**: kiosk sẽ chặn lần chạy, khi đó sửa ở thẻ Quản lý của kiosk hoặc sửa List rồi xuất lại. Khi nạp Sổ có điểm quyết tâm, **giữ BẬT** "Dùng điểm quyết tâm" (ghi chú in ra cuối lệnh nói đúng điều này). List không có hai nhóm cột thì như cũ. Mới kiểm bằng dữ liệu giả (**TH** với List thật).
 Luồng dữ liệu: cột Lớp của List đi vào cột Lớp của Sổ nhập (kiosk dùng để xuất theo lớp chủ nhiệm ở bước 7); Email (chữ thường) ghép bài thi với nguyện vọng; điểm được **chấm lại từ `de_thi.json`**, không tin cột Points của Forms.
 1. **Đọc hết cảnh báo** (in ra màn hình, cũng ở sheet *Cảnh báo* của `BANG_DIEM.xlsx`). Ý nghĩa:
    - phiếu nộp hai lần → giữ phiếu đầu (đúng luật);
    - email không có trong List (hoặc, khi dùng `--co-so`, "ở cơ sở khác hoặc không có trong danh sách") → bỏ phiếu: kiểm xem có phải em ở cơ sở khác, em chuyển đến chưa có trong List, hay gõ sai;
    - thi một CLB mà không xếp nguyện vọng CLB đó → bỏ điểm (đúng luật);
+   - (khi List có `THIk`) có bài thi mà em không tick → bỏ điểm; tick mà không có bài → không báo, kiosk coi là vắng thi;
+   - (khi List có `WPk`) "quỹ 1/quỹ 2 ... cộng X điểm, phải đúng 100" → kiosk sẽ chặn lần chạy tới khi sửa;
    - điểm Forms lệch điểm chấm lại → **có câu tick nhầm đáp án**: sửa Forms hoặc `de_thi.json` rồi xuất lại.
 2. Mở `BANG_DIEM.xlsx`, soát vài em theo chi tiết đúng/sai từng câu.
 - **Nếu lỗi:** "thiếu câu" → ai đó xoá phần `[mã]` đầu câu; khôi phục tên câu. Không có bài thi nào → vẫn ra Sổ nhập (nguyện vọng, không điểm), hợp lệ cho CLB không thi.
@@ -99,8 +102,9 @@ Luồng dữ liệu: cột Lớp của List đi vào cột Lớp của Sổ nh�
 python du_lieu_test/demo_t4m.py --ra ./demo_ra                         # 120 em
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7 --he-so-cho 1
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --moi-clb               # cách B (cổng thi)
+python du_lieu_test/demo_t4m.py --ra ./demo_ra --day-du                # tick chọn thi + điểm quyết tâm (BẬT)
 ```
-Ra `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`, `ket_qua_theo_lop/`. Với `--moi-clb`: `forms_moi_clb/` (mỗi CLB một tệp xuất) và `BaiThi.csv` thay cho `forms_chi_thi_gia.xlsx`; kết quả xếp như bản một biểu mẫu chung. Em nộp hai lần bị báo một lần cho mỗi biểu mẫu em thi. Dữ liệu hoàn toàn **mô phỏng**.
+Ra `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`, `ket_qua_theo_lop/`. Với `--moi-clb`: `forms_moi_clb/` (mỗi CLB một tệp xuất) và `BaiThi.csv` thay cho `forms_chi_thi_gia.xlsx`; kết quả xếp như bản một biểu mẫu chung. Em nộp hai lần bị báo một lần cho mỗi biểu mẫu em thi. Với `--day-du`: List giả có `THIk`, `WPk`; gài một em tick mà vắng, một em nộp bài mà không tick và một quỹ thiếu 100 (kiosk chặn lần chạy đầu, demo sửa rồi chạy lại); tóm tắt luôn in "Điểm quyết tâm: BẬT/TẮT". Dữ liệu hoàn toàn **mô phỏng**.
 
 ## Việc còn chờ (không thuộc tài liệu này)
 HỎI-IT: kho của app ECA, cách khoá, đường PowerSchool → M365, danh sách giáo viên chủ nhiệm, chính sách cài `.exe`, thời hạn xoá tệp. **TH:** cách List mã hoá khi xuất, bộ chuyển đổi lọc theo cơ sở, flow gửi tệp.
