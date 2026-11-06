@@ -29,7 +29,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - STATUS T4M-M5: DONE (docs only, no tests). `T4M_DAC_TA_SUA_APP.md` §10 "Màn Thi tuyển" + requirements R15..R24 (pass/fail each; proposed HDT §9 rows 7.1-7.3 not yet added); new `T4M_FLOW_DA_LAM.md` (85 lines): one template flow per quiz form, service-account owner, request estimate 9,000-12,000 vs 6,000/day (ƯL), manual fallback with `--bai-thi`. Level 5a, standard connectors, `=` filters only. Did not touch `T4M_VAN_HANH_MOT_DOT.md` / `mau_forms_thi_clb/README.md` (C1). Nothing for Truong to approve; Opus may add HDT §9 rows 7.x.
 - Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
 - C2 reported DONE (c4371e4: T4M_DAC_TA_SUA_APP.md §10 R15..R24, new T4M_FLOW_DA_LAM.md, estimate 9,000-12,000
-  actions vs 6,000/day); it suggests adding HDT §9 rows 7.x. Review it. C1 still running at last handoff.
+  actions vs 6,000/day); it suggests adding HDT §9 rows 7.x. Review it. C1 reported DONE d887988 (tests/test_t4m_cong_thi.py 24; demo --moi-clb not done). Review both.
 - Round 3 RUNNING: C1 and C2 were launched by the old root session (session_01YVAyu3Zzm2AEVFAPhazqHY). They report
   DONE/BLOCKED by send_message to THAT old session and also write `STATUS <code>: ...` lines here. The new root
   session will NOT get those messages: poll with get_session on the two ids above and read STATUS lines after git pull.
@@ -114,3 +114,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Sonnet | T4M-M5 (C2): Thi tuyển screen spec (§10, R15..R24) + "Đã làm" flow guide; docs only | No subagent; C1 files untouched |
 | 2026-11-06 | Opus | Second handoff note: C2 reported DONE (unreviewed); C1 running | No new work started |
 | 2026-11-06 | Sonnet | T4M-Q4a/b/c (C1): `--moi-clb` generator, one-club-per-export converter, `--bai-thi` report; tests first (24) | No subagent; default and --chi-thi unchanged |
+| 2026-11-06 | Opus | Third handoff note: C1 also reported DONE (unreviewed) | Round 3 needs Opus review only |
