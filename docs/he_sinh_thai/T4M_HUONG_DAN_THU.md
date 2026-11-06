@@ -245,6 +245,8 @@ Mỗi dòng: đánh dấu **Pass** hoặc **Fail**; nếu Fail thì ghi **lý do
 | 5.2 | Không chọn trùng; ô trống hợp lệ | NC-05 | ☐ | ☐ | | màn 5 ngày, ô `NV2` | 1 đến 2 giờ | |
 | 5.3 | Gửi lưu đủ 5 dòng; lỗi một ngày được báo | NC-05 | ☐ | ☐ | | thông báo lỗi | 1 đến 2 giờ | |
 | 5.4 | Khoá khi `Đã khóa`; điện thoại | NC-05 | ☐ | ☐ | | ảnh điện thoại | 30 phút | |
+| 5.5 | Hai ngôn ngữ: chuyển vi/en, mọi nhãn đổi, không chữ cứng sót (R10 của `T4M_DAC_TA_SUA_APP.md`) | NC-05 | ☐ | ☐ | | màn vi và en | 30 phút | |
+| 5.6 | Khôi phục phiên bản: Restore + Publish trên bản thử, app chạy lại như cũ (R12) | NC-21 | ☐ | ☐ | | trang Versions | 20 phút | |
 | 6.1 | Gói chỉ hiện đúng cấp độ | NC-06 | ☐ | ☐ | | | 30 phút | |
 | 6.2 | Đăng ký gói chiếm 3 ngày, khoá 3 ô | NC-06 | ☐ | ☐ | | | 1 giờ | |
 | 6.3 | Tối đa một gói | NC-06 | ☐ | ☐ | | | 15 phút | |

@@ -94,13 +94,13 @@ Mỗi yêu cầu một dòng kiểm; điền kết quả vào HDT §9 (cột bư
 | R7 | Lỗi nửa chừng được báo đúng ngày | Cố ý làm hỏng `Patch` dòng thứ 3: thông báo nêu ngày đó; Gửi lại thì đủ | 5.3 |
 | R8 | Khoá theo `TrangThai` | Dòng `Đã khóa` không sửa được, dòng `Đang mở` sửa được; `Patch` bị chặn nếu khoá giữa chừng | 5.4 |
 | R9 | Chỉ phép lọc uỷ quyền được | Giới hạn dòng = 1: không cảnh báo uỷ quyền ở công thức nào chạm `ECA` | 5.1 |
-| R10 | Hai ngôn ngữ | Chuyển vi/en: mọi nhãn đổi, không chữ cứng sót | (thêm dòng) |
+| R10 | Hai ngôn ngữ | Chuyển vi/en: mọi nhãn đổi, không chữ cứng sót | HDT §9 dòng 5.5 |
 | R11 | Điện thoại | Mở trên điện thoại, thao tác 3 ô một ngày bằng ngón tay, không cuộn ngang | 5.4 |
-| R12 | Phiên bản có thể khôi phục | Làm một lần Restore + Publish trên bản thử, app chạy lại như cũ | (thêm dòng) |
+| R12 | Phiên bản có thể khôi phục | Làm một lần Restore + Publish trên bản thử, app chạy lại như cũ | HDT §9 dòng 5.6 |
 | R13 | Tệp xuất qua bộ chuyển đổi không cảnh báo | Xuất List từ bản sao, chạy `chuyen_forms_sang_phan_mem.py --chi-thi --lists`: 0 cảnh báo ở phần Lists (`T4M_MICROSOFT.md` §8 hàng M1) | 4.2 |
 | R14 | Không dữ liệu thật trong kho mã | Rà tệp, ảnh: không tên, email thật, `tenantId`, địa chỉ app | (thủ công) |
 
-R10 và R12 chưa có dòng trong HDT §9: thêm khi chạy.
+R10 và R12 ứng với dòng 5.5 và 5.6 của HDT §9.
 
 ## 8. Màn hình gói (chờ A8-GOI)
 
