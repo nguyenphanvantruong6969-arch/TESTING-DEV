@@ -151,6 +151,20 @@ Chỉ tài liệu; không đổi mã, test, hợp đồng CSV hay bất biến n
 - T4-K2 (Google) chưa được đánh dấu tạm dừng: chờ Truong quyết.
 - Gọn prompt (cùng ngày): luật chung gom một chỗ (mục 8.0, C1 đến C4) thay vì lặp ở từng prompt; prompt viết tiếng Anh; mỗi prompt chỉ đọc đúng mục cần; mục 4 bỏ phần trùng `CLAUDE.md`; báo cáo cuối có trần độ dài. Nội dung yêu cầu giữ nguyên.
 
+## 2026-11-05 — T3-L5 (ngoài sổ, Truong yêu cầu): Điểm chuẩn cùng nền các thẻ khác, thẻ 05 chỉ ghi "Quản lý"
+
+- `style.css`: bỏ hai khối nền tối riêng của `#adminDiemChuanBlock` (`prefers-color-scheme: dark` và `[data-theme=dark]`); khối giờ dùng nền trắng như các thẻ khác.
+- `i18n.js`, `index.html`: `nav_admin` = "Quản lý" / "Manage" (thanh bên). `admin_title` (tiêu đề trang) cũng đổi thành "Quản lý" / "Manage".
+- Test: `tests/test_giao_dien_a13_10_diem_chuan.py` (thay test chế độ tối bằng test cùng nền), `tests/test_giao_dien_t3_l3.py`, `tests/du_lieu_ws/chu_ui_doi_co_y_t3.json` (thêm `nav_admin`).
+
+## 2026-11-04 — T3-L4 (ngoài sổ, Truong duyệt 04/11/2026): thứ tự tệp "Tải bảng này", bỏ dòng nhắc chết, Điểm chuẩn gọn
+
+- Chỉ hiển thị / xuất theo màn hình; không đổi CSV, schema hay kết quả xếp.
+- `api_xuat.py::export_bang_dang_xem`: thêm tham số tuỳ chọn `thu_tu` (mã theo thứ tự đang hiện); hàng tệp đi theo thứ tự đó, mã lạ xếp cuối. Không truyền thì như cũ. `js/09_the_xem.js`: `kqThuTuMan()` gửi thứ tự sắp hiện tại của tiêu đề cột.
+- Bỏ nhánh "Chưa có lớp nào" của Theo lớp (`veKqTheoLop`) và khoá `theolop_khong_co_lop` (vi, en) trong `i18n.js`.
+- `style.css`: nút "Xem chi tiết" không xuống dòng; chú giải Điểm chuẩn thành hàng ngang có ô mẫu.
+- Test: `tests/test_t3_l3_backend.py::test_xuat_theo_thu_tu_man_hinh_thu_tu`, `tests/test_giao_dien_t3_l3.py` (`test_tai_bang_theo_thu_tu_dang_sap_tren_man_hinh`, `test_diem_chuan_nut_mot_dong_va_chu_giai_gon_trong_css`); `test_giao_dien_a14_lop.py` bỏ test dòng nhắc chết, đếm khoá 25→24.
+
 ## 2026-11-04 — T3-L3 fix (điều phối): test "chưa có lớp" theo hành vi thật
 
 - `tests/test_giao_dien_a14_lop.py::test_theo_lop_chua_co_lop_nao_hien_dong_nhac`: bỏ đoạn ép `kq.tang1 = 'lop'` (người dùng không tới được từ T3-16, và lần vẽ lại bất đồng bộ làm test chập chờn trên CI); nay kiểm nút "Theo lớp" ẩn, bảng có dòng, không có ngõ cụt "Chưa có lớp nào". Dòng nhắc trong `js/03_ket_qua.js` thành đường mã chết, ghi ở mục "Cần Truong" của PR #10.

@@ -224,15 +224,15 @@ TU_ANH_CAM = re.compile(r"\b(class|filter|export|sort|save|student|club|choose|a
 
 
 def test_chu_moi_vi_sach_tieng_anh_va_en_khong_dung_you():
-    """Đọc thẳng i18n.js: 25 khoá mới (thẻ Kết quả; T3-18 bỏ cột "Thứ tự" nên mất khoá th_stt) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
+    """Đọc thẳng i18n.js: 24 khoá mới (thẻ Kết quả; T3-18 bỏ cột "Thứ tự" nên mất khoá th_stt; T3-L4 bỏ khoá theolop_khong_co_lop) × 2 ngôn ngữ (vi đứng trước en trong tệp)."""
     with open(os.path.join(GOC, "i18n.js"), encoding="utf-8") as f:
         nguon = f.read()
     mach = re.compile(r'^\s{6}((?:lop_|kiosk_lop|th_cohort|btn_xuat_theo_lop|xuat_theo_lop|'
                       r'xuat_kq_theo_lop|xuat_muc_theo_lop|aria_loc_lop|aria_sap_xep|toast_lop|'
                       r'ws_dt_cohort|th_stt|members_|theolop_|the_xem_)\w*): "(.*)",$', re.M)
     cap = mach.findall(nguon)
-    assert len(cap) == 50, len(cap)                  # 25 khoá × 2 ngôn ngữ
-    vi, en = cap[:25], cap[25:]
+    assert len(cap) == 48, len(cap)                  # 24 khoá × 2 ngôn ngữ
+    vi, en = cap[:24], cap[24:]
     assert [k for k, _ in vi] == [k for k, _ in en]
     for k, v in vi:
         assert not TU_ANH_CAM.search(re.sub(r"\{\w+\}", "", v)), (k, v)
@@ -422,25 +422,4 @@ def test_kiosk_luu_xong_thi_o_lop_het_chua_luu_va_chon_lai_ve_nhu_cu_cung_het(mo
     assert page.locator("#kioskLopChuaLuu").is_visible()
     page.select_option("#kioskLop", "10A1")                            # ...đổi lại đúng giá trị đã lưu
     assert page.locator("#kioskLopChuaLuu").is_hidden()
-    assert not loi, loi
-
-
-@pytest.mark.parametrize("ngon", ["vi", "en"])
-def test_dong_nhac_chua_co_lop_goi_dung_ten_the_tren_thanh_ben(mo, ngon):
-    """B5: dòng nhắc ở thẻ 02 (Theo lớp) gọi đúng tên thẻ 05 như thanh bên (không viết cứng), theo nhãn workspace."""
-    page, api, loi = mo({}, chay=True)
-    if ngon == "en":
-        page.locator("#btnLangToggle").click()
-        page.wait_for_function("() => document.getElementById('btnLangToggle').textContent.trim() === 'VI'")
-    page.evaluate("() => I18N.applyLabels({slot: {vi: 'Dự án', en: 'Project'}})")
-    _mo_ket_qua(page, "ma")
-    page.wait_for_function("() => !document.getElementById('kqBang').hidden")   # bảng "Theo mã" đã vẽ xong
-    # ép vào chế độ lớp (nút đã ẩn); lặp lại mỗi lần hỏi vì một lần vẽ "Theo mã" đến muộn có thể che dòng nhắc
-    page.wait_for_function("() => { kq.tang1 = 'lop'; veKetQua(); return !document.getElementById('kqRong').hidden; }")
-    ten_the = page.locator('.nav-item[data-tab="admin"] [data-i18n="nav_admin"]').inner_text().strip()
-    ten_muc = page.locator("#qlTabHs").inner_text().strip()
-    chu = page.locator("#kqRong").inner_text()
-    assert ten_the in chu and ten_muc in chu, (ten_the, ten_muc, chu)
-    assert ("Dự án" if ngon == "vi" else "Project").casefold() in ten_the.casefold()
-    assert "{" not in chu and "Quản lý." not in chu
     assert not loi, loi

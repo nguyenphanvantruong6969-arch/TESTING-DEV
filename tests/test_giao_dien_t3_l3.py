@@ -48,15 +48,15 @@ def _ma_trong_tep(duong):
 def test_ten_the_03_va_05_vi_va_en(mo):
     page, api, loi = mo({"HS1": "10A1"}, chay=True)
     nhan = lambda tab: page.locator('.nav-item[data-tab="%s"]' % tab).inner_text()  # noqa: E731
-    assert "Chi tiết và xuất tệp" in nhan("others") and "Quản lý CLB" in nhan("admin")
+    assert "Chi tiết và xuất tệp" in nhan("others") and re.sub(r"^\d+\s*", "", nhan("admin")) == "Quản lý"
     assert "dự trữ" not in nhan("admin")
     page.locator('.nav-item[data-tab="admin"]').click()
-    assert page.locator("#view-admin h1").inner_text() == "Quản lý CLB"
+    assert page.locator("#view-admin h1").inner_text() == "Quản lý"
     page.locator('.nav-item[data-tab="others"]').click()
     assert page.locator("#view-others h1").inner_text() == "Chi tiết và xuất tệp"
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("() => /Details and export/.test(document.querySelector('#view-others h1').textContent)")
-    assert "Manage clubs" in page.locator('.nav-item[data-tab="admin"]').inner_text()
+    assert page.locator('.nav-item[data-tab="admin"]').inner_text().split("\n")[-1].strip() == "Manage"
     assert not loi, loi
 
 
@@ -117,6 +117,23 @@ def test_tai_bang_theo_clb_va_theo_ma_co_tim(mo):
     _bam_tai(page)
     tep2 = sorted(set(glob.glob(os.path.join(api.thu_muc_xuat, "*.xlsx"))) - set(tep))
     assert len(tep2) == 1 and _ma_trong_tep(tep2[0]) == ["HS3"]
+    assert not loi, loi
+
+
+def test_tai_bang_theo_thu_tu_dang_sap_tren_man_hinh(mo):
+    """T3-L4: bấm tiêu đề cột "Mã" để sắp giảm dần, rồi tải: tệp theo đúng thứ tự trên màn hình."""
+    page, api, loi = mo({"HS1": "10A1", "HS2": "10A1", "HS3": "10A2"}, chay=True, them=("HS10",))
+    _mo_ket_qua(page, "ma")
+    page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length === 4")
+    page.locator('#kqDau .kq-sx-cot[data-cot="0"]').click()                 # cùng cột mã: đảo chiều
+    page.wait_for_function("() => document.querySelector('#kqThan tr td').textContent.trim() === 'HS10'")
+    man_hinh = page.locator("#kqThan tr").evaluate_all("rs => rs.map(r => r.cells[0].textContent.trim())")
+    assert man_hinh == ["HS10", "HS3", "HS2", "HS1"], man_hinh
+    _bam_tai(page)
+    tep = glob.glob(os.path.join(api.thu_muc_xuat, "*.xlsx"))
+    assert len(tep) == 1
+    ma = [str(r[0]) for r in _o(tep[0]) if r[0] and re.fullmatch(r"HS\d+", str(r[0]))]
+    assert ma == man_hinh, ma
     assert not loi, loi
 
 
@@ -185,3 +202,11 @@ def test_buoc_xem_lai_bo_dong_nhom_thu_tu_trong(mo_trang):
     if page.locator("#rvTiers").count():
         assert page.locator("#rvTiers").inner_text().strip() not in ("", "—")
     assert not loi, loi
+
+
+def test_diem_chuan_nut_mot_dong_va_chu_giai_gon_trong_css():
+    """T3-L4: "Xem chi tiết" không xuống dòng; chú giải là hàng ngang có ô mẫu (không còn danh sách gạch đầu dòng)."""
+    css = _doc("style.css")
+    assert re.search(r"\.dc-chi-tiet-nut\s*\{[^}]*white-space:\s*nowrap", css)
+    assert re.search(r"\.dc-chu-giai\s*\{[^}]*list-style:\s*none[^}]*display:\s*flex", css)
+    assert re.search(r"\.dc-mau\s*\{[^}]*display:\s*inline-block", css)

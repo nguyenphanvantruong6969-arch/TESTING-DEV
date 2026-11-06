@@ -2805,34 +2805,6 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 @media (prefers-reduced-motion: no-preference) {
   .dc-svg .dc-cham { animation: dc-hien 0.35s var(--ease-out) both; }
 }
-/* Chế độ tối: chỉ khối Điểm chuẩn tự đổi sang nền tối (ứng dụng chưa có giao diện tối chung).
-   Bảng màu tối nằm ở các biến `--dcd-*`, rồi gán lại các biến chung NGAY trên khối nên mọi hình con
-   (bảng, thanh, chấm, chữ) theo cùng. Gán qua `var()` để test độ tương phản của `:root` (đọc mã
-   màu thẳng trong tệp) không nhầm màu tối với màu sáng. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) #adminDiemChuanBlock {
-    --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-    --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-    --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-    --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-    --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-    --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-    --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-    --rust-text: var(--dcd-do-chu);
-    background: var(--dcd-nen); color: var(--ink);
-  }
-}
-:root[data-theme="dark"] #adminDiemChuanBlock {
-  --dcd-ink: #E8ECE9; --dcd-ink-soft: #C6CEC9; --dcd-slate: #A3ADA8; --dcd-nen: #1B2320;
-  --dcd-hover: #27312D; --dcd-line: #37423D; --dcd-xanh: #3FBF86; --dcd-vang: #E0A63A;
-  --dcd-xam: #9AA3AD; --dcd-do: #E8776A; --dcd-focus: #7FB0F5; --dcd-vang-chu: #8A6A1E; --dcd-do-chu: #B5483C;
-  --ink: var(--dcd-ink); --ink-soft: var(--dcd-ink-soft); --slate: var(--dcd-slate);
-  --paper-raised: var(--dcd-nen); --paper-hover: var(--dcd-hover); --hairline: var(--dcd-line);
-  --chart-general: var(--dcd-xanh); --chart-reserve: var(--dcd-vang); --chart-khong-nhan: var(--dcd-xam);
-  --chart-nong: var(--dcd-do); --focus-ring: var(--dcd-focus); --gold-text: var(--dcd-vang-chu);
-  --rust-text: var(--dcd-do-chu);
-  background: var(--dcd-nen); color: var(--ink);
-}
 .dc-an-chu { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .dc-bang-hai-tang { margin-top: 14px; max-width: 640px; }
 .dc-bang-hai-tang caption { text-align: left; font-size: 13.5px; font-weight: 600; padding-bottom: 6px; }
@@ -2937,3 +2909,12 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .dc-cot-nut { width: 1%; }
 .dc-chi-tiet-dau { display: flex; justify-content: flex-end; margin: 12px 0 4px; }
 .ws-tuy-chinh { margin-top: 8px; }
+
+/* T3-L4: Điểm chuẩn. "Xem chi tiết" không xuống dòng; chú giải thành một dòng gọn, mỗi mục có ô mẫu. */
+.dc-chi-tiet-nut { white-space: nowrap; }
+.dc-chu-giai { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-soft); }
+.dc-chu-giai li { display: inline-flex; align-items: center; gap: 6px; }
+.dc-mau { display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; flex: none; }
+.dc-mau.is-duoc, .dc-mau.is-cham-duoc { background: var(--chart-general); }
+.dc-mau.is-khong, .dc-mau.is-cham-khong { background: var(--paper-raised); border: 2px solid var(--chart-khong-nhan); }
+.dc-mau.is-vach { width: 3px; height: 14px; border-radius: 1px; background: var(--ink); }

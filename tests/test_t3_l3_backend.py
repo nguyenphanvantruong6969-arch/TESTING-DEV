@@ -102,3 +102,18 @@ def test_khong_ghi_de_tep_co_san(api, tmp_path):
     a = api.export_bang_dang_xem("ma", "", p)
     b = api.export_bang_dang_xem("ma", "", p)
     assert a["ok"] and b["ok"] and a["data"]["path"] != b["data"]["path"]
+
+
+def test_xuat_theo_thu_tu_man_hinh_thu_tu(api, tmp_path):
+    """T3-L4: `thu_tu` = mã em theo thứ tự đang hiện trên màn hình; tệp xuất đi đúng thứ tự đó
+    (mã không có trong danh sách xếp cuối, giữ thứ tự cũ)."""
+    _nap(api)
+    thu_tu = ["HS005", "HS003", "HS001"]
+    r = api.export_bang_dang_xem("ma", "", str(tmp_path / "t.xlsx"), thu_tu)
+    assert r["ok"], r["errors"]
+    _, dong = _dong_du_lieu(_o(r["data"]["path"]), "Mã học sinh")
+    ma = [d[0] for d in dong]
+    assert ma[:3] == thu_tu and ma[3:] == ["HS002", "HS004", "HS006"], ma
+    r2 = api.export_bang_dang_xem("ma", "", str(tmp_path / "u.xlsx"))
+    _, dong2 = _dong_du_lieu(_o(r2["data"]["path"]), "Mã học sinh")
+    assert [d[0] for d in dong2] == sorted(d[0] for d in dong2)
