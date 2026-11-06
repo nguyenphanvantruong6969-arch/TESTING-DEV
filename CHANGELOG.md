@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-M6 (vòng 4, bước D2): app Top 7, tick chọn thi, điểm quyết tâm; chỉ tài liệu
+
+Không có mã, test, schema hay hợp đồng CSV; không đụng lõi. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`.
+- `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md`: tối đa 7 nguyện vọng mỗi ngày (số ô = min(7, số CLB ngày)), tick "Thi" chỉ ở CLB có đề (tối đa 5 mỗi ngày), bước điểm quyết tâm (hai khung 100, bộ đếm "Đã dùng X / 100", chặn Gửi khi khung không rỗng khác 100), một `Patch` ghi 21 cột; R2 đến R6 sửa; R15 sửa (thẻ Thi tuyển = CLB đã tick); mục 11 thêm R25 đến R38 (pass/fail, trỏ HDT §9 dòng 14.x).
+- `T4M_HUONG_DAN_THU.md`: bảng cột §1, §2 (mô hình dài tới 52.500 dòng, vượt trần 30.000), §5 (7 ô), §10, §12; §9 thêm dòng 14.1 đến 14.5; mục 14 mới. Bộ sinh giả mặc định vẫn NV1..NV3 (ghi rõ; tuỳ chọn tới NV7 chờ T4M-Q5c).
+- `T4M_CONG_THI.md` §1, §2, §4.5; `T4M_MICROSOFT.md` (tóm tắt, sơ đồ, ma trận, bảng cột kho, P3, §8 thêm hàng T4M-M6); `T4M_PHIEU_PHONG_VAN.md`: ECA-6 (tối đa 7, số CLB mỗi buổi), ECA-9 (tick tối đa 5), ECA-12 mới (điểm quyết tâm, màn điện thoại), IT-19 mới.
+- Không còn chữ "Top 3" lỗi thời trong năm tệp được giao (kiểm bằng grep). Mọi thứ nhãn TH, không có số đo.
+
 ## 2026-11-06 — T4M-DEMO-B: `demo_t4m.py --moi-clb` (cách B) và câu hỏi cổng thi cho GĐ2
 
 Không đổi lõi, schema, hợp đồng CSV, bộ chuyển đổi hay bộ sinh mẫu; chế độ mặc định của demo không đổi (test cũ không sửa).

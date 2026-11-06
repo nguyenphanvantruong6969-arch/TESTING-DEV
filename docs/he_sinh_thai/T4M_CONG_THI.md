@@ -5,8 +5,10 @@ Mã việc: **T4M-NC**. Truong duyệt 06/11/2026: Q4a–c, M5, trả điểm m�
 ## 1. Luồng mong muốn
 ```
 Học sinh mở app ECA (đăng nhập tài khoản trường)
-  → chọn Top 3 mỗi buổi (đã có trong T4M_DAC_TA_SUA_APP.md)
-  → màn "Thi tuyển": danh sách CLB có thi mà em đã chọn, mỗi CLB một nút
+  → mỗi buổi chọn tối đa 7 nguyện vọng có xếp hạng (NV1..NV7), TICK "Thi" ở các CLB có đề muốn thi
+    (tối đa 5 CLB mỗi buổi), rồi chia điểm quyết tâm: hai quỹ 100 điểm mỗi buổi, quỹ 1 cho CLB đã tick,
+    quỹ 2 cho CLB còn lại (T4M-M6; đặc tả: T4M_DAC_TA_SUA_APP.md mục 2 và 11)
+  → màn "Thi tuyển": danh sách CLB em đã TICK thi (không phải mọi CLB có đề trong NV), mỗi CLB một nút
       [Làm bài]  → mở biểu mẫu thi CỦA RIÊNG CLB đó (Microsoft Forms, tab mới)
       em nộp bài → flow ghi "Đã làm" vào list BaiThi
       quay lại app → CLB đó hiện "Đã làm" (và điểm, nếu bật mục 5)
@@ -17,7 +19,7 @@ Học sinh mở app ECA (đăng nhập tài khoản trường)
 
 | Thành phần | Dùng gì | Vai trò | Căn cứ |
 |---|---|---|---|
-| "Website" | **App Power Apps ECA** (đã có, học sinh đã đăng nhập) | Nhận CLB đã chọn, hiện nút làm bài, hiện trạng thái | NC-02, NC-05 |
+| "Website" | **App Power Apps ECA** (đã có, học sinh đã đăng nhập) | Nhận nguyện vọng, tick thi và điểm quyết tâm; hiện nút làm bài cho CLB đã tick, hiện trạng thái | NC-02, NC-05 |
 | Bài thi | **Mỗi CLB có thi một biểu mẫu Forms dạng Quiz**, không câu cổng | Đề, hẹn giờ, một lần nộp, ghi Email | KQ §7.1 (ĐXM) |
 | Bảng CLB | SharePoint List `CLB` thêm cột `FormUrl` | Nút [Làm bài] lấy địa chỉ ở đây | — |
 | Trạng thái | SharePoint List `BaiThi` (Email, ClubId, ResponseId, NopLuc, Diem tuỳ chọn) | Một dòng mỗi bài đã nộp | NC-04 |
@@ -38,7 +40,7 @@ Trang cảm ơn của biểu mẫu (Customize thank you message, ĐXM KQ §7.1) 
 2. **Một flow mỗi biểu mẫu** (trigger nhận một Form Id; ĐXM connector). 10 biểu mẫu = 10 flow giống nhau, sao từ một flow mẫu. Biểu mẫu nhóm (Teams) phải dán Form Id tay (ĐXM).
 3. **Số yêu cầu** (ước lượng): mỗi bài nộp khoảng 3 hành động. 1.500 em × 2 bài = 3.000 bài × 3 = 9.000 hành động trong cả đợt. Hồ sơ Low: 6.000 yêu cầu mỗi người mỗi ngày (ĐXM, NC-13); đợt mở vài ngày thì vừa, **một ngày cao điểm có thể chạm trần**. Chủ flow là tài khoản dịch vụ IT; xem lại khi biết số thật (HỎI-IT).
 4. Trigger Forms có tần suất kiểm 86.400 giây cho kiểu cũ; kiểu webhook hiện tại báo ngay (ĐXM bảng throttling của connector). Trạng thái có thể trễ: app nên có nút "Làm mới".
-5. **Em thi CLB không chọn**: biểu mẫu vẫn nhận (Forms không biết NV). App chỉ hiện nút cho CLB em đã chọn; bộ chuyển đổi vẫn bỏ điểm và báo (đã có).
+5. **Em thi CLB không tick (hoặc không chọn)**: biểu mẫu vẫn nhận (Forms không biết NV). App chỉ hiện nút cho CLB em đã tick thi; bộ chuyển đổi vẫn bỏ điểm của CLB không tick và báo (T4M-Q5a). Tick là điều kiện để điểm thi được dùng; điểm quyết tâm quỹ 1 chỉ chia cho CLB đã tick.
 6. Liên kết biểu mẫu chia nhau được; "Only people in my organization" + Email bảo đảm đúng người, không chống được làm hộ (NC-26, giáo viên ECA quyết cách giám sát).
 
 ## 5. "Trả điểm về": ba mức, chọn một

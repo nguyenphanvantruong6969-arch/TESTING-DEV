@@ -91,8 +91,8 @@ Trả lời: ______________________________________________________________
 *Bối cảnh:* ảnh hưởng đến thiết kế xử lý thay đổi theo thời gian.
 Trả lời: ______________________________________________________________
 
-**ECA-6. [giai đoạn 2]** Thầy cô muốn học sinh xếp hạng mấy nguyện vọng mỗi buổi? (Kế hoạch đề xuất Top 3.)
-*Bối cảnh:* app hiện chỉ cho chọn một lựa chọn mỗi buổi, không xếp hạng.
+**ECA-6. [giai đoạn 2]** Thầy cô đồng ý cho học sinh xếp hạng tối đa 7 nguyện vọng mỗi buổi không? Một buổi có bao nhiêu CLB (để định số ô thả xuống: min(7, số CLB của buổi))?
+*Bối cảnh:* app hiện chỉ cho chọn một lựa chọn mỗi buổi, không xếp hạng; Truong quyết 06/11/2026 là tối đa 7 (kiosk cho tới 10). Số CLB mỗi buổi quyết định có đủ 7 ô hay ít hơn.
 Trả lời: ______________________________________________________________
 
 **ECA-7. [NC-12]** Kết quả gửi giáo viên chủ nhiệm theo dạng nào thì tiện nhất (Excel theo lớp, Teams, email)?
@@ -105,8 +105,8 @@ Trả lời: ______________________________________________________________
 
 ### B2. Thi tuyển (quyết định 05/11/2026: trường theo RB-DA)
 
-**ECA-9. [NC-25]** CLB nào sẽ thi? Mỗi CLB thi một biểu mẫu riêng, học sinh mở từ app (cổng thi, Truong chọn 06/11/2026): giáo viên CLB có đồng ý tự giữ biểu mẫu của mình và bấm "Post scores" khi hết đợt không?
-*Bối cảnh:* Microsoft Forms Quiz, mỗi CLB một biểu mẫu 5 đến 10 câu, không câu cổng (`T4M_CONG_THI.md`); em chỉ thấy CLB có thi mà em đã chọn trong Top 3; điểm xếp do bộ chuyển đổi chấm lại, ghép qua email trường.
+**ECA-9. [NC-25, T4M-M6]** CLB nào sẽ thi? Mỗi CLB thi một biểu mẫu riêng, học sinh mở từ app (cổng thi, Truong chọn 06/11/2026): giáo viên CLB có đồng ý tự giữ biểu mẫu của mình và bấm "Post scores" khi hết đợt không? Và: trong mỗi buổi học sinh tự **tick** những CLB có đề mà em muốn thi, **tối đa 5 CLB mỗi buổi**, chỉ thấy bài thi của CLB đã tick; thầy cô đồng ý không, 5 đã đủ cho buổi nhiều CLB thi nhất chưa, và em tick rồi mà không làm bài thì xử lý thế nào (kiosk bỏ điểm quyết tâm quỹ 1 của CLB đó và cảnh báo)?
+*Bối cảnh:* Microsoft Forms Quiz, mỗi CLB một biểu mẫu 5 đến 10 câu, không câu cổng (`T4M_CONG_THI.md`); ô tick nằm ở từng dòng nguyện vọng, chỉ hiện với CLB có đề; trần 5 là `TRAN_CLB_THI_MOI_BUOI` (quyết định 06/11/2026); điểm xếp do bộ chuyển đổi chấm lại, ghép qua email trường.
 Trả lời: ______________________________________________________________
 
 **ECA-10. [NC-26]** Thi ở đâu, có giám sát không? Mỗi buổi một đề hay dùng chung (lộ đề)? Có thể dùng chế độ Take a Test (máy Windows) không?
@@ -115,6 +115,10 @@ Trả lời: ______________________________________________________________
 
 **ECA-11. [NC-26]** Em vắng thi xếp thế nào: sau mọi em có điểm, hay như CLB không thi? Thang điểm bao nhiêu? Ai giữ đề và đáp án?
 *Bối cảnh:* hoà điểm phân bằng bốc thăm STB; đáp án phải giữ kín đến hết đợt.
+Trả lời: ______________________________________________________________
+
+**ECA-12. [T4M-M6]** Thầy cô có chấp nhận **điểm quyết tâm** không? Mỗi buổi học sinh có hai quỹ 100 điểm: quỹ 1 chia cho các CLB em đã tick thi (chỉ dùng phá hoà khi bằng điểm thi), quỹ 2 chia cho các CLB còn lại (điểm cao đứng trước, bằng điểm mới đến bốc thăm). Học sinh chia điểm trên **màn điện thoại** có chấp nhận được không, hay cần máy tính?
+*Bối cảnh:* `HUONG_DAN_SU_DUNG.md` §14; thu trên app (phương án b). Thứ tự nguyện vọng không bao giờ ảnh hưởng thứ tự ưu tiên của CLB. Cần biết giáo viên có coi điểm quyết tâm là công bằng và học sinh có hiểu cách chia không.
 Trả lời: ______________________________________________________________
 
 **IT-14. [NC-23]** Tenant có hạn chế Microsoft Forms không (tắt chia sẻ ngoài, tắt Quick Import, chặn Take a Test)? Giáo viên tạo được Forms dạng Quiz bằng tài khoản trường chứ?
@@ -137,6 +141,10 @@ Trả lời: ______________________________________________________________
 
 **IT-18. [NC-04]** Đặt được list `BaiThi` chỉ đọc với học sinh (chỉ flow ghi) và list `CLB` chỉ đọc không? DLP có cho phép Forms và SharePoint chung một flow không?
 *Bối cảnh:* học sinh ghi được `BaiThi` thì tự đánh "Đã làm" được (R24); flow chỉ dùng connector chuẩn.
+Trả lời: ______________________________________________________________
+
+**IT-19. [NC-05, T4M-M6]** Màn nguyện vọng cần thêm tick thi và hai khung điểm quyết tâm (tối đa 7 nguyện vọng mỗi buổi): người sửa app có làm được trên bản sao không? List `ECA` thêm cột `NV1..NV7`, `THI1..THI7`, `WP1..WP7` (khoảng 30 cột mỗi dòng) có vượt giới hạn hay làm chậm không?
+*Bối cảnh:* đặc tả `T4M_DAC_TA_SUA_APP.md` mục 2 và 11 (R25 đến R38); chưa thử (TH).
 Trả lời: ______________________________________________________________
 
 ## Sau buổi gặp

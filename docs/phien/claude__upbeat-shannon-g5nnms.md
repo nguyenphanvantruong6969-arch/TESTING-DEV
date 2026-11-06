@@ -20,7 +20,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
       points collected in app = option b; no core change):
       [ ] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet)
-      [ ] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet)
+      [x] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet) DONE 06/11 (awaits Opus review)
       [ ] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
 - [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
@@ -47,6 +47,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   Interview sheet: ECA-9 rewritten for B, new B3 IT-15..IT-18 (app edit or SharePoint fallback, form owner,
   service account + flow quota, BaiThi read-only/DLP). Note: converter warnings with many files give row number
   but not file name (pre-existing).
+STATUS T4M-M6: DONE 06/11/2026 (docs only). App spec Top 7 + tick (max 5) + determination-point screen (R25..R38, HDT rows 14.x, HDT section 14); CONG_THI, MICROSOFT v0, interview sheet (ECA-6/9/12, IT-19) updated. Decisions for review: ECA-12 numbered after ECA-11; HDT says default fake generator still NV1..NV3 (7 NV + THI/WP flag awaits D1/Q5c, flag name not written); DAC_TA R36/R37 need D1 code.
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
@@ -126,3 +127,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Reviewed round 3 (C1, C2): 134 tests, kiem_nhanh 7/7, outputs identical; added 1 test (mutation survivor), HDT §13 rows 13.1-13.4 (C2 numbering clash); round 3 ticked | Next: Truong decides PR to main |
 | 2026-11-06 | Opus | Truong chose cách B; T4M-DEMO-B: demo --moi-clb (tests first, 4 red -> green, 2 mutations caught), interview sheet B3 IT-15..18 | Next: PR to main? |
 | 2026-11-06 | Opus | Built simulation artifact (cách B); Truong flagged 10 NV / 5 tests / determination points missing; decided 7 NV, tick max 5, points in app (b); wrote plan §8 round 4 | Launching D1, D2 |
+| 2026-11-06 | Sonnet | T4M-M6 (D2): app spec Top 7, tick max 5, determination-point screen; R25..R38, HDT rows 14.x + section 14; CONG_THI, MICROSOFT, interview sheet | Docs only; no subagent; no code touched; grep shows no stale "Top 3" in the five files |

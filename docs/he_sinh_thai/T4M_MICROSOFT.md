@@ -10,8 +10,8 @@ Nguồn dùng: `T4M_KET_QUA_TAI_LIEU.md` (gọi tắt **KQ**), `T4M_GOI_THIET_KE
 
 ## 1. Tóm tắt điều hành (10 dòng)
 
-1. **Giữ app Power Apps "ECA" của trường** làm cửa thu nguyện vọng; sửa để mỗi ngày nhận **Top 3** có xếp hạng thay cho một lựa chọn (ô A; NC-04, NC-05).
-2. **Kho = SharePoint List, mô hình rộng** (một dòng mỗi em × ngày, cột `NV1..NV3`) là nhánh khuyến nghị: connector chuẩn, không cần Premium, xuất CSV dư khoảng 4 lần trần (NC-03, NC-09, ĐXM). Nhánh D chỉ khi app hiện đã chạy Dataverse (HỎI-IT, NC-01).
+1. **Giữ app Power Apps "ECA" của trường** làm cửa thu nguyện vọng; sửa để mỗi ngày nhận **tối đa 7** nguyện vọng có xếp hạng thay cho một lựa chọn, kèm **tick chọn thi** (tối đa 5 CLB có thi mỗi ngày) và **điểm quyết tâm** (hai quỹ 100 điểm mỗi ngày: quỹ 1 cho CLB đã tick, quỹ 2 cho CLB còn lại) (ô A; NC-04, NC-05; T4M-M6, Truong quyết 06/11/2026).
+2. **Kho = SharePoint List, mô hình rộng** (một dòng mỗi em × ngày, cột `NV1..NV7`, `THI1..THI7`, `WP1..WP7`) là nhánh khuyến nghị: connector chuẩn, không cần Premium, xuất CSV dư khoảng 4 lần trần (NC-03, NC-09, ĐXM). Nhánh D chỉ khi app hiện đã chạy Dataverse (HỎI-IT, NC-01).
 3. **Điểm thi qua Microsoft Forms Quiz** (chế độ "chỉ thi" đã có trong kho, T4M-Q1..Q3); ghép với nguyện vọng bằng **Email chữ thường**.
 4. **Xuất thủ công** (Export to CSV của Lists; Open in Excel của Forms) → **bộ chuyển đổi Python trên máy IT** (`chuyen_forms_sang_phan_mem.py --chi-thi --lists`) → Sổ nhập → **kiosk ngoại tuyến**, mỗi cơ sở một workspace.
 5. **Trả kết quả bằng Excel theo lớp chủ nhiệm** (`export_theo_lop`), gửi GVCN qua Teams/Outlook (tay, hoặc flow tuỳ chọn). V1 **không** ghi từng dòng về app (hồ sơ Low 6.000 yêu cầu/người/ngày, NC-13, ĐXM).
@@ -28,7 +28,7 @@ Nguồn dùng: `T4M_KET_QUA_TAI_LIEU.md` (gọi tắt **KQ**), `T4M_GOI_THIET_KE
 ```
 PowerSchool ─(đường đồng bộ: HỎI-IT, NC-08)─► Entra ID / list học sinh
         │
-[A] App ECA (Power Apps canvas): Top 3 mỗi ngày + màn gói ── [A'] Forms Quiz "chỉ thi" (email tự ghi)
+[A] App ECA (Power Apps canvas): tối đa 7 NV + tick thi + điểm quyết tâm mỗi ngày + màn gói ── [A'] Forms Quiz "chỉ thi" (email tự ghi)
         │                                                        │
 [B] SharePoint List (rộng)  ‖  nhánh D: bảng Dataverse           │
         │ [C] cột TrangThai = "Đã khóa" + tắt sửa trong app      │
@@ -45,7 +45,7 @@ PowerSchool ─(đường đồng bộ: HỎI-IT, NC-08)─► Entra ID / list h
 
 | Ô | Ứng dụng chọn (V1) | Căn cứ | Nhánh D khác gì |
 |---|---|---|---|
-| A. Thu thập | App ECA hiện có, sửa ô mỗi ngày thành Top 3 (dropdown ×3, chặn trùng trước khi ghi); màn gói hiện theo cấp | NC-04, NC-05, NC-06 (ĐXM giới hạn, GĐ mẫu) | Lọc uỷ quyền rộng hơn với Dataverse; mẫu màn giữ nguyên |
+| A. Thu thập | App ECA hiện có, sửa ô mỗi ngày thành tối đa 7 nguyện vọng (số dropdown = min(7, số CLB của ngày), chặn trùng trước khi ghi), tick thi (tối đa 5 mỗi ngày, chỉ CLB có đề), màn chia điểm quyết tâm (hai quỹ 100, chặn Gửi khi quỹ không rỗng ≠ 100); màn gói hiện theo cấp | NC-04, NC-05, NC-06 (ĐXM giới hạn, GĐ mẫu) | Lọc uỷ quyền rộng hơn với Dataverse; mẫu màn giữ nguyên |
 | A'. Điểm thi | Microsoft Forms Quiz, chế độ "chỉ thi" (`tao_mau_forms.py --chi-thi`) | NC-23, NC-24 (ĐXM), KQ §7.4 | Không đổi |
 | B. Lưu | SharePoint List `ECA` dạng rộng | NC-03, NC-04, NC-09 (ĐXM) | Bảng Dataverse cùng cột; cần giấy phép/dung lượng (NC-03) |
 | C. Khoá | Cột `TrangThai`; app tắt sửa khi "Đã khóa"; IT xuất ngay sau khoá | NC-10 (HỎI-IT) | Có thể dùng quyền theo vai trò của Dataverse (HỎI-IT) |
@@ -61,7 +61,7 @@ PowerSchool ─(đường đồng bộ: HỎI-IT, NC-08)─► Entra ID / list h
 
 | Ô | Lựa chọn | Giấy phép cần | Giới hạn chính (nhãn) | Ai làm, ai bảo trì | Rủi ro | Phương án lui | Khuyến nghị |
 |---|---|---|---|---|---|---|---|
-| A. Thu thập | Sửa app ECA: Top 3 mỗi ngày, màn gói | M365 A3/A5, connector chuẩn (L); Premium nếu D (NC-03, ĐXM) | Truy vấn không uỷ quyền: 500 dòng (tối đa 10.000); lọc `=` trên chữ uỷ quyền được, `IsBlank`/`Not` thì không (NC-04, ĐXM) | Người sửa app: HỎI-IT; bảo trì: IT | Không có môi trường thử (NC-02); sửa hỏng app thật (NC-21: Restore tạo bản mới, ĐXM) | Forms Ranking mỗi ngày một câu (≤10 mục, TT-CXM; NC-18) | Sửa app ECA, thử trên **bản sao** trước (NC-05) |
+| A. Thu thập | Sửa app ECA: tối đa 7 NV + tick thi + điểm quyết tâm mỗi ngày, màn gói | M365 A3/A5, connector chuẩn (L); Premium nếu D (NC-03, ĐXM) | Truy vấn không uỷ quyền: 500 dòng (tối đa 10.000); lọc `=` trên chữ uỷ quyền được, `IsBlank`/`Not` thì không (NC-04, ĐXM) | Người sửa app: HỎI-IT; bảo trì: IT | Không có môi trường thử (NC-02); sửa hỏng app thật (NC-21: Restore tạo bản mới, ĐXM) | Forms Ranking mỗi ngày một câu (≤10 mục, TT-CXM; NC-18); phương án này **không có** tick thi và điểm quyết tâm, nên phải tắt `rules.wharton` và thu tick bằng câu riêng (GĐ) | Sửa app ECA, thử trên **bản sao** trước (NC-05) |
 | B. Lưu | SharePoint List rộng | M365 (L); Dataverse: dung lượng + giấy phép (D) | 30 triệu mục; xuất 30.000 dòng; 7.500 dòng cho 1.500 em (NC-04, NC-09, ĐXM) | IT | App ECA đang ở Dataverse for Teams: không tạo mới từ 15/11/2026, treo 15/09/2027, xoá 30/10/2027 (NC-03, ĐXM) | Nhánh D nếu trường đã có Dataverse | **L**, trừ khi NC-01 trả lời "đã ở Dataverse" |
 | C. Khoá | Cột `TrangThai` + tắt sửa trong app | M365 | Khoá ở app, không ở kho: ai có quyền list vẫn sửa được ngoài app (GĐ, từ share-app ĐXM) | Giáo viên ECA bấm khoá; IT xuất | Sửa sau khoá làm lệch tệp xuất | Đặt quyền list chỉ đọc khi khoá (HỎI-IT) | Khoá rồi **xuất ngay**; tệp xuất là bản chụp chuẩn của đợt |
 | D. Xuất | Export to CSV (tay, 2 bước) | M365 | 30.000 dòng; mã hoá, cột Choice/Lookup chưa ghi trong tài liệu (NC-09, ĐXM + TH) | IT | Mã hoá sai dấu tiếng Việt; tên cột đổi giữa các lần | Flow "Create CSV table" (lọc theo ngày vì phân trang 5.000, NC-13, ĐXM) | Tay; bộ chuyển đổi đọc **theo tên cột**, bỏ cột thừa (HDT §1) |
@@ -84,7 +84,9 @@ PowerSchool ─(đường đồng bộ: HỎI-IT, NC-08)─► Entra ID / list h
 | `Khoi` | Số | Khối | Không dùng ở V1 |
 | `Lop` | Văn bản | Lớp chủ nhiệm (nguồn: HỎI-IT, NC-08) | Cột `Lớp` (T4M-Q1b xong 06/11/2026, 7f9a6bd: `doc_lists` đọc `Lop`/`Lớp`) |
 | `Thu` | Choice | Thứ 2 … Thứ 6 | Buổi (`ma_buoi` → `thu_2`…) |
-| `NV1..NV3` | Văn bản (mã CLB) | Top 3 của ngày | `NV1..` của em, lọc theo Buổi của CLB |
+| `NV1..NV7` | Văn bản (mã CLB) | Tối đa 7 nguyện vọng xếp hạng của ngày; số ô = min(7, số CLB của ngày) | `NV1..` của em, lọc theo Buổi của CLB |
+| `THI1..THI7` | Văn bản: `Có` hoặc rỗng | Em tick thi CLB ở `NVk` (chỉ CLB có đề; tối đa 5 mỗi ngày) | Ô "Điểm thi" thành điểm đã chấm lại nếu có bài, chữ `thi` nếu tick mà chưa có bài (T4M-Q5a) |
+| `WP1..WP7` | Số nguyên ≥ 0 (rỗng = 0) | Điểm quyết tâm của `NVk`: quỹ 1 = CLB đã tick, quỹ 2 = còn lại, mỗi quỹ không rỗng tổng đúng 100 | Cột "Điểm quyết tâm" (`diem_w`, `luon_co_cot_w=True`) (T4M-Q5b) |
 | `CapDo`, `Goi` | Choice | Cấp tiếng Nhật, gói đã chọn | **Chưa vào Sổ** (§5; cần A8-GOI-1) |
 | `TrangThai` | Choice | Đã khóa / Đang mở | Chỉ để kiểm |
 
@@ -128,7 +130,7 @@ Quy trình thật (ai duyệt, bao lâu một lần, ghi ở đâu): **HỎI-IT 
 | Tình huống | Phía Microsoft | Phía kiosk | Bất biến |
 |---|---|---|---|
 | **Đăng ký muộn** | Giáo viên ECA mở lại app cho em đó (hoặc nhập hộ vào list); `TrangThai` = "Đã khóa" sau khi nhập | Xuất lại → chuyển đổi lại → nạp; STB khoá; em mới nhận số qua `chen_stb_cho_hoc_sinh_moi` (chèn ngẫu nhiên đều, giữ thứ tự tương đối của em cũ) → chạy lại | 3, 4, 5 |
-| **Xin đổi CLB** | Giáo viên ECA sửa `NV1..NV3` của dòng (em, ngày) sau khi duyệt | Chạy lại toàn bộ; `get_thay_doi_ket_qua` liệt kê `moi_duoc_xep` / `mat_cho` / `doi_clb` để báo đúng những em bị ảnh hưởng | 1, 4 |
+| **Xin đổi CLB** | Giáo viên ECA sửa `NV1..NV7`, `THI1..THI7`, `WP1..WP7` của dòng (em, ngày) sau khi duyệt | Chạy lại toàn bộ; `get_thay_doi_ket_qua` liệt kê `moi_duoc_xep` / `mat_cho` / `doi_clb` để báo đúng những em bị ảnh hưởng | 1, 4 |
 | **Rút / chuyển trường** | Xoá dòng hoặc đặt trạng thái rút (cột mới `Rut`, HỎI-IT) | Nạp Sổ chỉ **cộng thêm**, không xoá em (VH §8): IT rút em trong thẻ Quản lý của kiosk; chạy lại; ghế trả về | 3 (STB em còn lại giữ nguyên thứ tự) |
 | **Em tiếng Nhật cam kết cả năm** | Không mở lại cho em đó | V0: trừ tay chỉ tiêu; sau A8-GOI: danh sách cam kết (§5) | 2 |
 
@@ -163,7 +165,7 @@ Quy trình thật (ai duyệt, bao lâu một lần, ghi ở đâu): **HỎI-IT 
 | P0 | GĐ2: phỏng vấn IT + ECA, tệp mẫu ẩn danh | — | 1–2 tuần lịch (phụ thuộc lịch IT) |
 | P1 | Soát lại tài liệu này (§10); chọn nhánh L/D; T4M-Q1b-b (`--co-so`) | P0 xong | 1–2 phiên |
 | P2 | Chạy thử "khô": tệp xuất mẫu → bộ chuyển đổi → kiosk → Excel theo lớp, trên máy IT | P1 | 1 buổi với IT |
-| P3 | Sửa app ECA: Top 3 mỗi ngày (bản sao trước) | Có người sửa app + môi trường (NC-02) | 1–2 tuần (ước lượng) |
+| P3 | Sửa app ECA: tối đa 7 NV, tick thi, điểm quyết tâm mỗi ngày (bản sao trước) | Có người sửa app + môi trường (NC-02) | 1–2 tuần (ước lượng) |
 | P4 | Đợt thật đầu tiên, gói theo V0 (c) | P2, P3; trường đồng ý | Theo lịch trường |
 | P5 | A8-GOI-1..3 nếu Truong duyệt D1–D5; G1–G3 cho thay đổi | Sau đợt đầu | Theo sổ (M, M, M–L) |
 
@@ -176,10 +178,11 @@ Mỗi mục có `kiem_nhan` để viết test đỏ trước. Cỡ là ước l�
 | Mã | Nội dung | `kiem_nhan` | Cỡ | Trạng thái |
 |---|---|---|---|---|
 | **T4M-Q1b** | `--chi-thi` ghi cột `Lớp` từ `Lop` của List vào Sổ nhập; bỏ đường vòng `set_student_class` trong demo | List có `Lop` ⇒ Sổ có `Lớp` đúng từng em; List không có `Lop` ⇒ Sổ trùng khít bản hiện nay; demo không còn gọi `set_student_class` mà `export_theo_lop` vẫn đúng | S | **Xong** 06/11/2026 (7f9a6bd); phần lọc `--co-so` (T4M-Q1b-b) còn chờ |
-| **T4M-M1** | Đặc tả sửa app ECA (tài liệu cho người sửa app): Top 3 mỗi ngày, chặn trùng, ngày trống hợp lệ, `Patch` + `IfError`, khoá theo `TrangThai` | Mỗi yêu cầu có một dòng kiểm pass/fail trong HDT §9; tệp xuất từ bản sao app qua được `doc_lists` không cảnh báo | S (tài liệu) | Chờ NC-01, NC-02 |
+| **T4M-M1** | Đặc tả sửa app ECA (tài liệu cho người sửa app): tối đa 7 nguyện vọng mỗi ngày, chặn trùng, ngày trống hợp lệ, `Patch` + `IfError`, khoá theo `TrangThai`; mở rộng bởi **T4M-M6** (tick thi, màn điểm quyết tâm, thẻ Thi tuyển theo tick) | Mỗi yêu cầu có một dòng kiểm pass/fail trong HDT §9 (R1 đến R14, R25 đến R38); tệp xuất từ bản sao app qua được `doc_lists` không cảnh báo | S (tài liệu) | Chờ NC-01, NC-02 |
 | **T4M-M2** | Tệp ánh xạ tên cột tuỳ chọn cho bộ chuyển đổi (nhánh D, hoặc List có tên cột khác) | Không có tệp ánh xạ ⇒ đầu ra trùng khít từng byte; có tệp ⇒ tệp xuất đổi tên cột cho cùng Sổ; tên cột ánh xạ không tồn tại ⇒ lỗi rõ | S–M | Chỉ làm nếu GĐ2 cho thấy tên cột khác |
 | **T4M-M3** | Đối chiếu hai lần xuất (đợt bổ sung): liệt kê em mới, em rút, dòng đổi NV trước khi chạy lại | Hai tệp giống nhau ⇒ rỗng; thêm/xoá/sửa một dòng ⇒ đúng một mục; không đổi gì ở kiosk | S | **Xong** 06/11/2026: `mau_forms_thi_clb/doi_chieu_lists.py`; quy trình thật chờ NC-17 |
 | **T4M-M4** | Hướng dẫn flow gửi Excel theo lớp cho GVCN (connector chuẩn, tài khoản dịch vụ) | Đối chiếu đủ giới hạn ĐXM ở NC-12, NC-13; không ghi về list | S (tài liệu) | Tuỳ chọn |
+| **T4M-M6** | Đặc tả app: tối đa 7 NV mỗi ngày, tick chọn thi (tối đa 5 mỗi ngày), màn điểm quyết tâm (hai quỹ 100), thẻ Thi tuyển theo tick; cột `NV1..NV7`, `THI1..THI7`, `WP1..WP7` | Mỗi yêu cầu có dòng pass/fail (R25 đến R38, HDT §9 dòng 14.x); bộ chuyển đổi (T4M-Q5a/b/c) đọc đúng ba nhóm cột | S (tài liệu) | Truong quyết 06/11/2026; mã bộ chuyển đổi do D1 |
 | **A8-GOI-1..3** | Gói nhiều buổi: dữ liệu, bộ điều phối, nối kiosk | Ở GOI §5 (T1–T9 mỗi mục) | M, M, M–L | **Chờ Truong duyệt D1–D5** và ECA Q1–Q3 |
 
 Không mục nào cần thư viện mới. Chỉ A8-GOI-1 đổi hợp đồng CSV/schema (D2, D3).
