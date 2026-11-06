@@ -27,22 +27,21 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
 - [ ] A8-GOI-1..3 (bundle code): D1-D5 approved in principle; code ONLY after ECA answers Q1-Q3
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
-- [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
+- [x] ROUND 5 T4M-BK build kit for IT DONE 06/11 (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
       [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11 (fixed after Opus review): bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen; Opus ACCEPTED 0e8d0ec
-      [x] K2 T4M-BK3+BK4 (Sonnet, session_01YVAyu3gLFjovc61oBj8zhY) DONE 06/11 (Opus review pending): bang_flow.py, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
-      [ ] K3 Opus review
+      [x] K2 T4M-BK3+BK4 (Sonnet, session_01YVAyu3gLFjovc61oBj8zhY) DONE 979213b, Opus ACCEPTED: bang_flow.py, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
+      [x] K3 Opus review: 171 related tests, ruff, kiem_nhanh 7/7, kit + zip regen byte-identical, no real data
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
 - [ ] Proposed, not approved: skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted. Round 5 approved; PR #13 open (CI pending).
-- K1 accepted by Opus (0e8d0ec). STATUS T4M-BK3/4: DONE 06/11. `tao_bo_dung_t4m.py --de-thi --ra [--zip]` -> 01_lists, 02_app (K1), 03_flow
-  (BANG_FLOW.md/.csv, 10 flows = 10 clubs with de_thi), 04_forms (calls `sinh_moi_clb`), HUONG_DAN_IT.md (R1..R38 all named; async apply only,
-  never Invoke-SPOSiteDesign). 25 new tests pass, 211 related pass, ruff clean, kiem_nhanh 7/7, 3 mutations caught, demo outputs identical.
-- STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
-  tests/test_t4m_bo_dung_bk1.py 37 pass; Opus review fixes done (subactions nesting, addSPField id, Nhan formula). FINDING: `ghi_clb_csv`
-  writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 was wrong; Opus fixed §9): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
+- Rounds 1-5 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; no check-in trigger. PR #13 open (CI not yet checked).
+- Round 5 DONE and reviewed (K1 0e8d0ec after 1 fix round; K2 979213b). One command:
+  `python mau_forms_thi_clb/tao_bo_dung_t4m.py --de-thi mau_forms_thi_clb/de_thi.json --ra <dir> --zip` -> 01_lists (site
+  script 46 actions, async apply only; CSV way C; ECA checklist), 02_app (Power Fx per property), 03_flow (10 DaLam_*),
+  04_forms, HUONG_DAN_IT.md (R1..R38 + HDT rows). Gap: K2 admitted tests were not run red before the module (rule 2);
+  its mutation check caught 3/3, so accepted. Everything touching Microsoft is still TH (needs IT, GĐ3).
 - Round 4 (plan §8) DONE, reviewed: 7 NV/day, tick max 5/day, determination points in app (b); D1 7e274d4,
   D2 7e31127; no core/schema/CSV change; 173 related tests, kiem_nhanh 7/7 (details: Session log, CHANGELOG).
 - Simulation artifact (interactive, 7 stages, fake data; shared "Anyone with the link" by Truong):
@@ -74,9 +73,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. K3: Opus reviews K2 per §9 "Nhận khi" (flow rows == clubs with quiz, ClubId in CLB.csv, byte-identical regen incl. zip, demos unchanged),
-   then ticks round 5 and reports to Truong.
-2. Watch PR #13 CI (tests.yml with coverage >= 85 %, build-windows-exe.yml); fix red only on this branch; never merge.
+1. Truong: hand the kit (zip) to IT with the GĐ2 questions; Truong has not yet said whether Opus should watch PR #13.
+2. Check PR #13 CI (tests.yml with coverage >= 85 %, build-windows-exe.yml); fix red only on this branch; never merge.
 3. After Truong's GĐ2 meeting (before 15/11): GĐ4 v1, M2, A8-GOI; GĐ2 also answers KQ §8 HỎI-IT (SharePoint admin?
    Entra app for PnP? Environment Maker? legacy flow import blocked?).
 
@@ -148,3 +146,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Sonnet | K1 fixes after Opus review: site script subactions + $schema + addSPField id, Nhan named formula, xfail -> normal test; tests first (5 red), 2 mutations caught | No core/schema/CSV change |
 | 2026-11-06 | Opus | Re-reviewed K1 0e8d0ec: accepted; launched K2 | |
 | 2026-11-06 | Sonnet | T4M-BK3/BK4 (K2): flow table + one-command kit (4 folders + zip) + HUONG_DAN_IT.md; tests first (25); 3 mutations caught (1 weak test tightened) | No subagent; no core/schema/CSV change; demo outputs identical |
+| 2026-11-06 | Opus | K3: reviewed K2 979213b (accepted; rule-2 gap noted); round 5 done | Next: Truong/IT |
