@@ -5,100 +5,69 @@
 > File name = branch name with "/" replaced by "__" (see `.claude/hooks/handoff_khi_day_ngu_canh.py`).
 
 ## Feature / goal
-T4M-NC (outside the 33-item registry; Truong asked 05/11/2026): research plan for fitting RB-DA into the school's
-EXISTING Microsoft ecosystem instead of the Google design of T4. The school runs a Power Apps canvas app
-"ECA Registration HVT" (M365 A3/A5, students sign in with school email, PowerSchool auto-syncs, one pick per weekday,
-no capacity cap, admin locks after deadline, manual allocation). T4's premise "Microsoft rejected because Power Apps is
-paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (22 research questions NC-01..22,
-5 phases, 4 session prompts P1..P4, IT interview script, decision matrix template).
+T4M-NC (outside the 33-item registry; Truong asked 05/11/2026): fit RB-DA into the school's EXISTING Microsoft
+ecosystem (Power Apps "ECA Registration HVT", M365 A3/A5, PowerSchool sync, IT runs the kiosk). Truong decided the
+school adopts RB-DA incl. entrance quizzes (Tầng 1) built by our tooling on Microsoft Forms.
+Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prompts P1..P5),
+`docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md` (auto chain: §5 round 1, §6 round 2, §7 round 3, with prompts and rules).
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [x] Write research plan + prompts (T4M_KE_HOACH_NGHIEN_CUU.md)
-- [ ] GĐ0: Truong emails IT / ECA teacher, tries make.powerapps.com (NC-02)
-- [x] GĐ1: run prompt P1 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md (05/11/2026, done in this session)
-- [x] GĐ2 prep: printable interview sheet T4M_PHIEU_PHONG_VAN.md (plan §6 + results §4, blocking Qs first) (Sonnet)
-- [ ] GĐ2: Truong interviews IT + ECA teacher (use T4M_PHIEU_PHONG_VAN.md), gets anonymised export sample
-- [x] GĐ3 doc: prompt P3 (separate Sonnet SESSION, not a subagent; rule 10) -> T4M_HUONG_DAN_THU.md + fake Lists-export generator in du_lieu_test/ with test.
-      Amended by Opus: wide store model (one row per student x day, NV1..NV3), SharePoint List only, two readers
-      (Truong if sandbox; IT 1-page variant = fallback B), no row-by-row write-back in V1 (export_theo_lop instead).
-- [ ] GĐ3 run: Truong (or IT) runs the sandbox checklist, only if NC-02 allows
-- [x] Before GĐ4: P4 kiosk import contract -> §3 of T4M_KET_QUA_TAI_LIEU.md
-- [x] Quiz path: prompt P5 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md §7 + NC-25/26 Qs in interview sheet (05/11)
-- [x] T4M-Q1..Q3 (Sonnet, done 05/11/2026; Truong APPROVED 05/11/2026, separate session): quiz-only Forms converter keyed on lowercase Email; quiz-only mode
-      in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
-- [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
-      (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
-- [x] AUTO CHAIN (done + reviewed 06/11/2026; Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
-      [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [x] S3 T4M-GD4-V0 (Opus; v0 done 06/11, revisit after GĐ2)  [x] S4 T4M-DO (Sonnet, done 06/11)
-      [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
-      [x] T4M-Q1b-b (Sonnet, 06/11): optional --co-so filter in --chi-thi; T4M_VAN_HANH_MOT_DOT.md steps 4-5 updated
-- [x] ROUND 2 (Truong approved 06/11; plan §6): [x] R1 T4M-M1 (Sonnet, done 06/11)  [x] R2 T4M-M3 (Sonnet, done 06/11)  [x] R3 T4M-M4 (Sonnet, done 06/11; reviewed OK, DLP ref NC-16->NC-14 fixed)
-- [ ] ROUND 3 quiz portal (Truong approved 06/11; score level 5a; plan §7): [ ] C1 T4M-Q4a/b/c (Sonnet)  [ ] C2 T4M-M5 (Sonnet)
-- [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
+- [x] Research plan; GĐ1 docs (P1); P4 kiosk contract; P5 quiz path; GĐ2 interview sheet; GĐ3 sandbox guide
+- [x] T4M-Q1..Q3, Q1b, Q1b-b (quiz-only Forms, Email key, Lớp, --co-so); T4M-DEMO; Round 1 S1-S4; Round 2 R1-R3
+- [ ] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a):
+      [ ] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, RUNNING at handoff)
+      [ ] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, RUNNING at handoff)
+- [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
+- [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
+- [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
+- [ ] A8-GOI-1..3 (bundle code): D1-D5 approved in principle; code ONLY after ECA answers Q1-Q3
+- [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
+- [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- STATUS T4M-M3: DONE. `mau_forms_thi_clb/doi_chieu_lists.py OLD NEW [--co-so] [--ra x.xlsx]` reuses `doc_lists`; reports moi/rut/doi_nv/doi_lop/doi_co_so keyed on lowercased Email + Thu; identical files -> empty. 24 tests in `tests/test_doi_chieu_lists.py` (written first; 7 added after orchestrator review: diff compares RAW NV values so unknown club codes cannot hide changes, headline `CẢNH BÁO: N ô ...` first), ruff clean; no kiosk/core/schema/CSV change. Ops guide step 8 + MICROSOFT §8 row updated. Real-export behaviour: TH. Nothing for Truong to approve.
-- STATUS T4M-M4: DONE. `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` (77 lines, docs only, no tests): optional Power Automate flow, standard connectors, IT service account, mapping keyed on sanitised file name (HỎI-IT NC-08), ĐXM limits NC-12/13, DLP NC-14, manual fallback, no write-back. Untested steps TH. kiem_nhanh 7/7. Nothing for Truong to approve.
-- STATUS T4M-M1: DONE. Doc `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (~113 lines, docs only, all formulas labelled GĐ; 14-row requirement table R1..R14 with pass/fail checks mapped to HDT §9; bundle screen = placeholder "chờ A8-GOI"). Nothing for Truong to approve. Open: NC-01 real column names, NC-02 sandbox; R10/R12 need new rows in HDT §9.
-- STATUS T4M-DO: DONE (fixed after orchestrator review: table 2 counted 15 clubs with exams, true count is 10; only the count was wrong, condition B was already Tier 1 for exactly the 10 clubs with de_thi; tables 3+ unchanged except run-time seconds; test added). `du_lieu_test/do_t4m_thi.py` + `tests/test_do_t4m_thi.py` (8 pass; related with test_demo_t4m 19 pass, ruff clean) + `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` + `du_lieu_test/ket_qua_t4m/*.csv`. Full grid 3 sets (120/500/1500 hs) x 20 seeds x 2 conditions = 120 runs, 0 blocking pairs, runtime ~30 s (so `--nhanh` is only a small grid for tests, needs --ra and --tai-lieu). Condition A = same pipeline with scores dropped but applicant lists kept (checked byte-identical to run_pipeline on a DB without club_scores); B = with quiz scores (also byte-identical to run_pipeline). Tables only, no commentary. No product code changed. AI log: the project's AI log is an artifact outside the repo (BAN_GIAO.md §Nhật ký AI) - Truong must add the entry himself/herself.
-- STATUS T4M-Q1b-b: DONE. `--co-so` filter (CoSo column, case-insensitive; other-campus quiz emails warned; missing column / no match -> error, nothing written; omitted -> unchanged). 4 new test_q1bb_*. Ops guide steps 4-5 updated.
-- STATUS T4M-Q1b: DONE. Converter `doc_lists` reads `Lop`/`Lớp`, `ghi_tep_phan_mem` writes the Lớp column only when some student has one (no column in Lists -> old bytes). Demo workaround removed. Tests: test_t4m_chi_thi + test_demo_t4m + test_mau_forms_thi_clb 65 pass (3 new test_q1b_*), ruff clean, kiem_nhanh 7/7. No schema/CSV contract/core change.
-- STATUS T4M-DEMO: DONE. Commit 4c7ad66. Tests: test_demo_t4m 11 pass, related group 69 pass, ruff clean, kiem_nhanh 7/7. No product code, schema or CSV contract changed.
-- Done earlier: research plan + prompts; GĐ1 + P4 results; interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path; T4M-Q1..Q3 (quiz-only converter/form generator/teacher note; reviewed by Opus 06/11).
-- Done (Sonnet, 06/11/2026): T4M-DEMO, tests first (`tests/test_demo_t4m.py`, 11 tests; related 68 pass, ruff clean).
-  `tao_mau_forms.ghi_mau_xuat_chi_thi` (fake quiz-only Forms export, plants: uppercase emails, 1 duplicate, 1 unknown email, 1 test for an unranked club);
-  `sinh_xuat_lists_gia.sinh/ghi_csv(clb_theo_ngay=)` (default bytes unchanged); `du_lieu_test/demo_t4m.py --ra DIR [--so-hs 120] [--seed] [--he-so-cho]`; README section 0b.
-- Demo facts to confirm with Truong: (1) pipeline needs rules.wharton=False in the TEMP db (default ON, data has no bids); (2) converter does not copy the class column, so demo calls `set_student_class` from the Lists CSV (possible follow-up item: converter writes `Lớp` into the Sổ nhập); (3) sample capacities (~42 seats/day) fit ~50 students, so demo multiplies capacity by an auto factor (~2.0 at 120 students; in-memory copy, `de_thi.json` untouched; `--he-so-cho 1` keeps it). Result at 120 students: ~65% of (student x day) slots get choice 1.
-- Done (Opus, 06/11/2026): S2 T4M-GOI-TK -> `docs/he_sinh_thai/T4M_GOI_THIET_KE.md` (design only, no code). Two-phase orchestrator `run_rbda_co_goi` (new file goi_nhieu_buoi.py) above `run_rbda_nhieu_buoi`; bundle = pseudo-session `goi`; level = preference filter; commitments = quota only; phase-2 STB list excludes `goi` (one-day schools stay in short-circuit). Decisions pending Truong: D1 design, D2 CSV contract (optional `goi_buoi` column + optional `04_goi.csv`), D3 schema (`clubs.goi_buoi`, table `goi_dieu_kien`, `match_results` row `(sid, goi, G)`), D4 item codes A8-GOI-1..3, D5 phase-1 STB permutation. Wait for ECA answers Q1-Q3 before coding.
-- STATUS T4M-GOI-TK: DONE, commit 34ccd56 (doc docs/he_sinh_thai/T4M_GOI_THIET_KE.md, design only). Truong must approve D1 two-phase design (+ V0 fallback), D2 CSV contract (optional goi_buoi + 04_goi.csv, reserved label goi), D3 schema (clubs.goi_buoi, goi_dieu_kien, match_results row (sid, goi, G)), D4 item codes A8-GOI-1..3 after ECA Q1-Q3, D5 phase-1 STB permutation.
-- STATUS T4M-GD4-V0: DONE, commit ce342ee. Doc docs/he_sinh_thai/T4M_MICROSOFT.md (v0, fallback A, 9 P2 items + §10 revisit list); docs only, no tests needed, kiem_nhanh run. Pending Truong: S2 D1-D5 (still unapproved, shown as pending in §5/§8), new item codes T4M-M1..M4 (§8), T4-K2 option K2-a/b/c/d (§9). Cites S1 T4M_VAN_HANH_MOT_DOT.md and S4 T4M_DO_MO_PHONG.md tables (both arrived on rebase; no interpretation). Revisit after GĐ2: NC-01 (branch L vs D), NC-02, NC-03, NC-08, NC-16, sample export, NC-10/17, ECA Q1-Q8, NC-25/26.
-- Not done: nobody has run the chain against a real Forms or Lists export; push pending after soat-ma.
-- AUTO CHAIN FINISHED 06/11/2026: S0-S4, Q1b, Q1b-b all reviewed OK by Opus (S4 fixed: table 2 club count 15 -> 10,
-  numbers in tables 3+ unchanged). 77 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
-- TRUONG DECIDED 06/11/2026: D1-D5 approved in principle, A8-GOI code only after ECA Q1-Q3; M1, M3, M4 approved, M2 waits
-  for real sample export; T4-K2 = K2-b (stay paused); round 2 auto-run. Still for Truong: AI-log entry for T4M-DO (outside repo).
-- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
-
-- STATUS T4M-VH: DONE. Doc docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md (99 lines, 8 steps, docs only, untested parts labelled TH/HỎI-IT). Step 5 describes Lớp flowing List -> Sổ nhập (depends on T4M-Q1b); converter does not filter by CoSo (documented as TH). Nothing for Truong to approve.
+- Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
+- Round 3 RUNNING: C1 and C2 were launched by the old root session (session_01YVAyu3Zzm2AEVFAPhazqHY). They report
+  DONE/BLOCKED by send_message to THAT old session and also write `STATUS <code>: ...` lines here. The new root
+  session will NOT get those messages: poll with get_session on the two ids above and read STATUS lines after git pull.
+  The fallback check-in trigger was deleted at handoff; schedule your own (send_later) if you orchestrate.
+- Review checklist for round 3 (plan §7 "Nhận khi"): related tests (test_t4m_chi_thi, test_demo_t4m,
+  test_mau_forms_thi_clb, test_doi_chieu_lists, plus new ones); default and existing --chi-thi output unchanged
+  (compare unzipped docx/xlsx ignoring docProps/core.xml timestamp); no conflict markers in CHANGELOG/handoff;
+  M5: delegable filters only (Email = Lower(User().Email)), no score in app (level 5a), standard connectors only.
+- Container: pytest, openpyxl, python-docx, ruff were pip-installed in the old container; reinstall if missing.
+- Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
 ## Decisions and gotchas (keep short)
-- Japanese club = multi-day bundle (e.g. 3A Mon+Wed+Thu), level assigned by school (eligibility, not priority),
-  committed for the whole year. Bundles break day-independence (KE_HOACH_NHIEU_BUOI.md §2). Proposed: two phases
-  (bundles first, max one bundle per student; then per-day), guarantees only within each phase; must be labelled
-  "không bảo đảm ổn định toàn tuần khi có gói" (invariant 8). Year-committed seats reduce quota only (invariant 2 safe).
-- DECISION 05/11/2026 (Truong): school changes its process to match RB-DA -> clubs with entrance quizzes use Tầng 1
-  (-score then STB), others Tầng 2. Quizzes written by club teachers, built by OUR tooling (Microsoft version of
-  tao-google-form-clb / xu-li-raw-forms). CSV contract unchanged (test_club_k, score_k). Plan: NC-23..26, prompt P5.
-  Each campus is allocated separately (one workspace each).
-- Never commit real school data, tenantId, app URL or names. Sandbox only; never touch the live app.
-- GĐ1 findings that drive design (see T4M_KET_QUA_TAI_LIEU.md §0): store = SharePoint List, one row per (student, day)
-  (CSV export cap 30,000 rows); Dataverse for Teams + Developer Plan stop new environments 15/11/2026 (ask IT for a
-  sandbox/managed dev env); PowerSchool is NOT an SDS OneRoster provider (sync path = HỎI-IT); M365 Power Automate =
-  Low profile, 6,000 requests/user/day -> V1 returns results as per-homeroom Excel (`export_theo_lop`), no row-by-row
-  write-back; converter = Python on IT machine, lowercase emails (student_id is case-sensitive); Sổ nhập has one Buổi
-  per club -> bundles need a new item code.
-- Network was reachable on 05/11/2026 (learn.microsoft.com 302, support.powerschool.com 200), unlike the T4 session.
-
-- Finding while writing P3: Power Automate Low profile caps paging at 5,000 items, so a 7,500-row export flow must filter per day (guide §7.1; verify by TH).
+- Never commit real school data, tenantId, app URL or names. Sandbox/copy only; never touch the live app.
+- No subagents (rule 10): every step is a SEPARATE session (create_session), reporting DONE/BLOCKED (plan §3).
+- Store = SharePoint List, wide model (one row per student x day, NV1..NV3); CSV export cap 30,000 rows.
+  Dataverse for Teams + Developer Plan stop creating environments 15/11/2026. PowerSchool is not an SDS OneRoster
+  provider (sync path HỎI-IT). Power Automate Low profile: 6,000 requests/user/day; no row-by-row write-back in V1.
+- Quiz: Microsoft Forms Quiz (no supported API creates forms; Quick Import does not carry answers; Forms connector is
+  read-only, not in Power Apps, and per community does not return quiz points). Official scores = converter
+  re-grades from de_thi.json. Score level 5a: teachers "Post scores" in Forms; app shows no score.
+- Quiz portal (T4M_CONG_THI.md): app = portal, one Form per club, list CLB(FormUrl) + BaiThi(status), one small
+  standard flow per form writes "Đã làm"; request estimate ~9,000 per round vs 6,000/day (peak-day risk).
+- Bundles (T4M_GOI_THIET_KE.md): two-phase orchestrator above the pipeline, label "bảo đảm trong từng pha, không bảo
+  đảm ổn định toàn tuần khi có gói" (inv. 8); no bundles => byte-identical (inv. 1); D2/D3 add OPTIONAL CSV/schema.
+- T4-K2 (Google) = K2-b, stays paused (Truong 06/11/2026).
+- Review lessons: children once committed conflict markers into this file; S4 miscounted quiz clubs (15 vs 10);
+  R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Truong: GĐ0/GĐ2 (email + meet IT; print T4M_PHIEU_PHONG_VAN.md; ask for anonymised export sample).
-2. If IT grants an environment: prompt P3 (GĐ3). Otherwise fallback B.
-3. Prompt P2 (GĐ4) -> T4M_MICROSOFT.md.
+1. Poll C1/C2; review per checklist above; send fixes if needed; when both pass tick ROUND 3, push, report to Truong.
+2. Ask Truong about the pending proposals (PR to main for CI is the recommended next one).
+3. After Truong's GĐ2 meeting: paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA answered Q1-Q3.
 
-## Files touched
-- docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md: the plan
-- docs/phien/claude__upbeat-shannon-g5nnms.md: this handoff
-- du_lieu_test/demo_t4m.py, du_lieu_test/sinh_xuat_lists_gia.py, mau_forms_thi_clb/{tao_mau_forms.py,README.md}, tests/test_demo_t4m.py: T4M-DEMO
-- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: T4M-NC, Z-CLAUDE-GON, T4-K2 paused
-- CLAUDE.md, docs/ke_hoach/CLAUDE_CHI_TIET.md: slimmed (Z-CLAUDE-GON)
-- docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: GĐ1 + P4 results
-- docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md: GĐ2 interview sheet
-- docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, du_lieu_test/sinh_xuat_lists_gia.py, tests/test_sinh_xuat_lists_gia.py: GĐ3 doc
-- mau_forms_thi_clb/{chuyen_forms_sang_phan_mem,bieu_mau,tao_mau_forms}.py, GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx, README.md; tests/test_t4m_chi_thi.py: T4M-Q1..Q3
-- du_lieu_test/do_t4m_thi.py, du_lieu_test/ket_qua_t4m/, tests/test_do_t4m_thi.py, docs/he_sinh_thai/T4M_DO_MO_PHONG.md: T4M-DO
-- docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md: T4M-M4
-- docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md: T4M-M1
+## Files touched (T4M, this branch)
+- docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU, T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
+  T4M_KE_HOACH_TU_DONG, T4M_GOI_THIET_KE, T4M_MICROSOFT (v0), T4M_VAN_HANH_MOT_DOT, T4M_DO_MO_PHONG,
+  T4M_DAC_TA_SUA_APP, T4M_FLOW_GUI_GVCN, T4M_CONG_THI (.md)
+- mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
+  GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
+- du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py, do_t4m_thi.py, ket_qua_t4m/
+- tests/: test_sinh_xuat_lists_gia, test_t4m_chi_thi, test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists (.py)
+- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md, CLAUDE.md + docs/ke_hoach/CLAUDE_CHI_TIET.md (Z-CLAUDE-GON)
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -136,3 +105,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Opus | Reviewed R2 fix (raw NV compare, warning headline; my false-negative scenario now caught); round 2 finished; 109 related tests pass, ruff clean, kiem_nhanh 7/7 | Next needs Truong: GĐ2 interviews |
 | 2026-11-06 | Opus | Truong asked for a quiz portal loop; designed T4M_CONG_THI.md (app as portal, one Form per club, BaiThi status list via standard flow, score via converter); proposed Q4a-c, M5 | Awaiting Truong approval |
 | 2026-11-06 | Opus | Truong approved Q4a-c + M5, score level 5a; wrote plan §7; launched C1, C2 | |
+| 2026-11-06 | Opus | Handoff at ~400k context: rewrote state/next/decisions; round 3 C1, C2 still running; fallback trigger deleted | New root must poll C1/C2 (they message the old session) |
