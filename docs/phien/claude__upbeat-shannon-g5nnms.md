@@ -33,6 +33,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
       [x] T4M-Q1b-b (Sonnet, 06/11): optional --co-so filter in --chi-thi; T4M_VAN_HANH_MOT_DOT.md steps 4-5 updated
 - [x] ROUND 2 (Truong approved 06/11; plan §6): [x] R1 T4M-M1 (Sonnet, done 06/11)  [x] R2 T4M-M3 (Sonnet, done 06/11)  [x] R3 T4M-M4 (Sonnet, done 06/11; reviewed OK, DLP ref NC-16->NC-14 fixed)
+- [ ] ROUND 3 quiz portal (Truong approved 06/11; score level 5a; plan §7): [ ] C1 T4M-Q4a/b/c (Sonnet)  [ ] C2 T4M-M5 (Sonnet)
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
@@ -134,3 +135,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Sonnet | T4M-M3 review fix: raw NV comparison + unknown-code warning headline, tests first (6 red -> green) | Orchestrator false negative reproduced and fixed |
 | 2026-11-06 | Opus | Reviewed R2 fix (raw NV compare, warning headline; my false-negative scenario now caught); round 2 finished; 109 related tests pass, ruff clean, kiem_nhanh 7/7 | Next needs Truong: GĐ2 interviews |
 | 2026-11-06 | Opus | Truong asked for a quiz portal loop; designed T4M_CONG_THI.md (app as portal, one Form per club, BaiThi status list via standard flow, score via converter); proposed Q4a-c, M5 | Awaiting Truong approval |
+| 2026-11-06 | Opus | Truong approved Q4a-c + M5, score level 5a; wrote plan §7; launched C1, C2 | |

@@ -1,6 +1,6 @@
 # T4M. Cổng thi: chọn CLB → mở bài thi → cập nhật trạng thái → trả điểm → lặp lại (thiết kế, 06/11/2026)
 
-Mã việc: **T4M-NC** (thiết kế, chưa có mã). Truong yêu cầu 06/11/2026. Chỉ tài liệu, chưa thử (TH). Nhãn: ĐXM / TT-CXM / GĐ / HỎI-IT như `T4M_KE_HOACH_NGHIEN_CUU.md` §4.
+Mã việc: **T4M-NC**. Truong duyệt 06/11/2026: Q4a–c, M5, trả điểm mức **5a**. Truong yêu cầu 06/11/2026. Chỉ tài liệu, chưa thử (TH). Nhãn: ĐXM / TT-CXM / GĐ / HỎI-IT như `T4M_KE_HOACH_NGHIEN_CUU.md` §4.
 
 ## 1. Luồng mong muốn
 ```

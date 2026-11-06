@@ -154,3 +154,44 @@ teacher their file via Outlook or Teams; mapping file homeroom -> teacher email 
 with labels (ĐXM figures from KQ); failure handling and a manual fallback; DLP note (NC-14). No write-back to the
 list (NC-13). Label untested steps TH. Max 120 lines.
 ```
+
+## 7. Vòng 3: cổng thi (Truong duyệt 06/11/2026)
+
+Truong duyệt **Q4a, Q4b, Q4c, M5** của `T4M_CONG_THI.md`. Trả điểm cho học sinh theo **mức 5a**: giáo viên bấm Post scores trong Forms; app không hiện điểm. Điểm dùng để xếp vẫn do bộ chuyển đổi chấm lại. Luật §2–§4 giữ nguyên.
+
+| Bước | Mã | Ai | Đầu ra | Nhận khi |
+|---|---|---|---|---|
+| C1 | T4M-Q4a, Q4b, Q4c (tuần tự, một phiên) | Sonnet | `tao_mau_forms.py --moi-clb`, `CLB.csv`; bộ chuyển đổi nhận mỗi tệp một CLB; `--bai-thi` đối chiếu | `kiem_nhan` ở `T4M_CONG_THI.md` §6; chế độ cũ trùng khít |
+| C2 | T4M-M5 | Sonnet | Màn "Thi tuyển" bổ sung vào `T4M_DAC_TA_SUA_APP.md`; `docs/he_sinh_thai/T4M_FLOW_DA_LAM.md` | Mỗi yêu cầu có một dòng kiểm pass/fail; chỉ connector chuẩn; lọc `=`; mức 5a |
+
+### C1. T4M-Q4a/b/c
+```
+T4M-Q4a, Q4b, Q4c in this order (Sonnet). Follow T4M_KE_HOACH_TU_DONG.md §2-3 (incl. DONE/BLOCKED report).
+Tests first (rule 2). Read: T4M_CONG_THI.md (all, short); mau_forms_thi_clb/README.md quiz-only part; functions you
+change in tao_mau_forms.py, bieu_mau.py, chuyen_forms_sang_phan_mem.py (grep -n "^def"); tests/test_t4m_chi_thi.py.
+Q4a: tao_mau_forms.py --moi-clb writes one Quick Import .docx per club that has de_thi (no gate question; tags
+[clb_x-k] kept; settings note: Record name, One response per person, Show results OFF, timer optional) and
+CLB.csv (ClubId, Ten, Buoi, FormUrl empty) for "Create a list based on a spreadsheet". Regeneration identical.
+Q4b: the --chi-thi converter accepts N exports where each export holds ONE club's quiz (detect club by tags; an
+export mixing clubs or an unknown tag stops with a clear error). Same fake data as one shared form => same
+SO_NHAP_CLB.xlsx. A student missing from a club's export simply has no score for that club.
+Q4c: optional --bai-thi BaiThi.csv (Email, ClubId, ResponseId, NopLuc): report rows in BaiThi without a matching
+export row and export rows without a BaiThi row; all matched => empty section. Never changes scores.
+Default and existing --chi-thi behaviour unchanged (inv. 1). Extend du_lieu_test/demo_t4m.py with --moi-clb only if
+cheap. Update mau_forms_thi_clb/README.md and T4M_VAN_HANH_MOT_DOT.md steps 1, 4, 5. Related tests + ruff.
+```
+
+### C2. T4M-M5
+```
+T4M-M5 (Sonnet), docs only. Follow T4M_KE_HOACH_TU_DONG.md §2-3 (incl. DONE/BLOCKED report).
+Read: T4M_CONG_THI.md; T4M_DAC_TA_SUA_APP.md (structure, requirement table); T4M_FLOW_GUI_GVCN.md (style, limits);
+T4M_KET_QUA_TAI_LIEU.md NC-04, NC-13, §7.1 (Forms connector, settings).
+(1) Add a section "Màn Thi tuyển" to T4M_DAC_TA_SUA_APP.md: list of the student's chosen clubs that have a quiz
+(from their NV rows), button Launch(FormUrl) shown only when no BaiThi row exists and registration is open, status
+"Đã làm"/"Chưa làm", Refresh button, delegable filters only (Email = Lower(User().Email)), no score shown (level 5a:
+"Xem điểm trong Forms sau khi giáo viên công bố"). Add requirement rows (continue numbering) with pass/fail checks.
+(2) Write docs/he_sinh_thai/T4M_FLOW_DA_LAM.md: one template flow per quiz form (trigger When a new response is
+submitted -> Get response details -> Create item in BaiThi), owned by the IT service account, how to clone it per
+form, Form Id for group forms, request estimate (label estimate) vs 6,000/day, failure handling, manual fallback
+(IT exports responses and the converter --bai-thi report). Label untested TH. Max 120 lines.
+```
