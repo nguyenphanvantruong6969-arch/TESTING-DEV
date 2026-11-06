@@ -472,3 +472,71 @@ def test_q1b_moi_lists_khong_lop_nao_khong_ghi_cot(tmp_path, de):
     tieu = [o for o in next(wb[so_nhap.SHEET_HS].iter_rows(max_row=1, values_only=True))]
     wb.close()
     assert so_nhap.nhan_lop(None) not in tieu
+
+
+# ------------------------------------------------------------------ Q1b-b: --co-so
+
+def _ghi_lists_co_so(duong, de, co_so_theo_email):
+    with open(duong, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f, lineterminator="\r\n")
+        w.writerow(lists_gia.COT)
+        for email, co_so in co_so_theo_email.items():
+            for b in de["buoi"]:
+                dong = {c: "" for c in lists_gia.COT}
+                dong.update({"Email": email, "HoTen": email[:6], "CoSo": co_so, "Lop": "9A1",
+                             "Thu": "Thứ " + b["ma"][-1],
+                             "NV1": "clb_covua" if b["ma"] == "thu_2" else ""})
+                w.writerow([dong[c] for c in lists_gia.COT])
+
+
+def _hai_co_so(tmp_path, de):
+    cs = {"hs0001" + MIEN: "CS1", "hs0002" + MIEN: "CS2", "hs0003" + MIEN: " cs1 "}
+    _ghi_lists_co_so(str(tmp_path / "lists.csv"), de, cs)
+    _ghi_xuat_thi(de, str(tmp_path / "forms.xlsx"),
+                  [("hs0001" + MIEN, {"clb_covua": 4}), ("hs0002" + MIEN, {"clb_covua": 5})])
+    return [str(tmp_path / "forms.xlsx")], str(tmp_path / "lists.csv")
+
+
+def test_q1bb_co_so_chi_giu_hoc_sinh_cua_co_so(tmp_path, de):
+    forms, lists = _hai_co_so(tmp_path, de)
+    kq = cv.chuyen_chi_thi(forms, lists, str(tmp_path / "nap"), de, co_so="CS1")
+    assert kq["n_hoc_sinh"] == 2 and kq["n_bai_thi"] == 1
+    assert {s["student_id"] for s in _doc_so(tmp_path / "nap")["students"]} == \
+        {"hs0001" + MIEN, "hs0003" + MIEN}
+    # phiếu của em ở cơ sở khác: báo rõ, không im lặng bỏ
+    assert any("hs0002" in sid and "ở cơ sở khác hoặc không có trong danh sách" in nd
+               for _d, sid, nd in kq["canh_bao"])
+
+
+def test_q1bb_khong_co_so_giong_het_nhu_cu(tmp_path, de):
+    forms, lists = _hai_co_so(tmp_path, de)
+    kq = cv.chuyen_chi_thi(forms, lists, str(tmp_path / "nap"), de)
+    assert kq["n_hoc_sinh"] == 3
+    assert not any("cơ sở khác" in nd for _d, _s, nd in kq["canh_bao"])
+    kq2 = cv.chuyen_chi_thi(forms, lists, str(tmp_path / "nap2"), de, co_so=None)
+    assert kq2["canh_bao"] == kq["canh_bao"]
+    assert _doc_so(tmp_path / "nap")["students"] == _doc_so(tmp_path / "nap2")["students"]
+
+
+def test_q1bb_co_so_khong_co_hoc_sinh_hoac_thieu_cot_bao_loi(tmp_path, de):
+    forms, lists = _hai_co_so(tmp_path, de)
+    with pytest.raises(cv.LoiTepXuat):
+        cv.chuyen_chi_thi(forms, lists, str(tmp_path / "nap"), de, co_so="CS9")
+    assert not (tmp_path / "nap").exists()
+    _ghi_lists(lists, [("hs0001" + MIEN, "An", {})], de)
+    with open(lists, encoding="utf-8-sig", newline="") as f:
+        bang = list(csv.reader(f))
+    i = bang[0].index("CoSo")
+    with open(lists, "w", encoding="utf-8-sig", newline="") as f:
+        csv.writer(f).writerows([[x for j, x in enumerate(r) if j != i] for r in bang])
+    with pytest.raises(cv.LoiTepXuat, match="CoSo"):
+        cv.chuyen_chi_thi(forms, lists, str(tmp_path / "nap"), de, co_so="CS1")
+
+
+def test_q1bb_dong_lenh_co_so(tmp_path, de, capsys):
+    forms, lists = _hai_co_so(tmp_path, de)
+    assert cv.main([forms[0], "--chi-thi", "--lists", lists, "--co-so", "CS1",
+                    "--ra", str(tmp_path / "nap")]) == 0
+    assert "cơ sở khác" in capsys.readouterr().out
+    with pytest.raises(SystemExit):                      # --co-so chỉ cùng --chi-thi
+        cv.main([forms[0], "--co-so", "CS1", "--ra", str(tmp_path / "x")])

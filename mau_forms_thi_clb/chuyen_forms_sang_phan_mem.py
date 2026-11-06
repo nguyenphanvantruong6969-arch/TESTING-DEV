@@ -238,12 +238,13 @@ def _ma_buoi_tu_thu(de, gia_tri):
     return None
 
 
-def doc_lists(duong_csv, de):
+def doc_lists(duong_csv, de, co_so=None):
     """Đọc tệp xuất List (mô hình RỘNG: mỗi dòng một em × một ngày, cột NV1..NVn).
 
     Trả ({email chữ thường: {dong, email, name, lop, nguyen_vong}}, cảnh báo). Cột bắt buộc: Email,
     Thu, NV1; tùy chọn: HoTen (hoặc Name), Lop (lớp chủ nhiệm, T4M-Q1b), NV2.. Dòng trùng (em, ngày):
-    giữ dòng ĐẦU. `lop` là ô Lop không trống đầu tiên của em (chưa chuẩn hoá: so_nhap chuẩn hoá khi đọc).
+    giữ dòng ĐẦU. `co_so` (T4M-Q1b): chỉ giữ dòng có cột CoSo bằng giá trị này (bỏ khoảng trắng, không
+    phân biệt hoa thường); None = không lọc. `lop` là ô Lop không trống đầu tiên của em (chưa chuẩn hoá: so_nhap chuẩn hoá khi đọc).
     """
     with open(duong_csv, encoding="utf-8-sig", newline="") as f:
         bang = list(csv.reader(f))
@@ -254,6 +255,7 @@ def doc_lists(duong_csv, de):
     i_thu = tieu.index("thu") if "thu" in tieu else None
     i_ten = next((tieu.index(k) for k in ("hoten", "name") if k in tieu), None)
     i_lop = next((tieu.index(k) for k in ("lop", "lớp") if k in tieu), None)
+    i_co_so = tieu.index("coso") if "coso" in tieu else None
     cot_nv = sorted((int(m.group(1)), i) for i, h in enumerate(tieu)
                     for m in [re.fullmatch(r"nv(\d+)", h)] if m)
     thieu = [k for k, v in (("Email", i_email), ("Thu", i_thu), ("NV1", cot_nv[0][0] if cot_nv else None))
@@ -261,6 +263,9 @@ def doc_lists(duong_csv, de):
     if thieu:
         raise LoiTepXuat("tệp List thiếu cột bắt buộc: %s" % ", ".join(thieu))
 
+    if co_so is not None and i_co_so is None:
+        raise LoiTepXuat("tệp List thiếu cột CoSo nên không lọc được theo --co-so")
+    co_so_can = (co_so or "").strip().lower()
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
     theo_ten = {bm._chuan(c["name"]): c for c in de["cau_lac_bo"]}
     ds, canh_bao = {}, []
@@ -271,6 +276,8 @@ def doc_lists(duong_csv, de):
         email = dong[i_email].strip().lower()
         if not email:
             canh_bao.append((so_dong, "", "dòng List không có email — bỏ dòng"))
+            continue
+        if co_so is not None and dong[i_co_so].strip().lower() != co_so_can:
             continue
 
         def bao(noi_dung, so_dong=so_dong, email=email):
@@ -347,7 +354,7 @@ def _cot_chi_thi(de, tieu_de):
     return i_email, i_ten, cot, cot_diem, phu, sorted(set(cot) - can_het)
 
 
-def phan_tich_chi_thi(de, danh_sach, cac_tep):
+def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
     """Ghép các tệp Forms chỉ-thi với danh sách đăng ký. Không ghi gì.
 
     danh_sach: kết quả doc_lists. cac_tep: [(tên tệp, tiêu đề, các dòng)]. Trả (hoc_sinh theo
@@ -386,7 +393,11 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep):
             da_thay[email] = so_dong
             hs = hoc_sinh.get(email)
             if hs is None:
-                bao("email %s không có trong danh sách đăng ký (List) — bỏ cả phiếu" % email)
+                if co_so is None:
+                    bao("email %s không có trong danh sách đăng ký (List) — bỏ cả phiếu" % email)
+                else:
+                    bao("email %s ở cơ sở khác hoặc không có trong danh sách (--co-so %s) — bỏ cả phiếu"
+                        % (email, co_so))
                 continue
             if i_ten is not None and not hs["name"]:
                 hs["name"] = dong[i_ten].strip()
@@ -552,17 +563,18 @@ def chuyen(duong_xlsx, thu_muc_ra, de=None):
             "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
 
 
-def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None):
+def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None, co_so=None):
     """Chế độ chỉ thi: các tệp Forms (chỉ có bài thi) + tệp xuất List -> Sổ nhập + bảng điểm."""
     de = de or bm.doc_de_thi()
-    danh_sach, canh_bao = doc_lists(duong_lists, de)
+    danh_sach, canh_bao = doc_lists(duong_lists, de, co_so)
     if not danh_sach:
-        raise LoiTepXuat("tệp List không có học sinh nào")
+        raise LoiTepXuat("tệp List không có học sinh nào" if co_so is None else
+                         "tệp List không có học sinh nào ở cơ sở %r" % co_so)
     cac_tep = []
     for d in cac_duong_xlsx:
         tieu_de, cac_dong = doc_tep_xuat(d)
         cac_tep.append((os.path.basename(d), tieu_de, cac_dong))
-    hoc_sinh, canh_bao_thi = phan_tich_chi_thi(de, danh_sach, cac_tep)
+    hoc_sinh, canh_bao_thi = phan_tich_chi_thi(de, danh_sach, cac_tep, co_so)
     canh_bao += canh_bao_thi
     os.makedirs(thu_muc_ra, exist_ok=True)
     ghi_tep_phan_mem(de, hoc_sinh, thu_muc_ra)
@@ -583,16 +595,20 @@ def main(argv=None):
     ap.add_argument("--chi-thi", action="store_true",
                     help="Forms chỉ có bài thi, khoá là Email; cần --lists")
     ap.add_argument("--lists", help="tệp CSV xuất từ List đăng ký (chỉ với --chi-thi)")
+    ap.add_argument("--co-so", help="chỉ lấy học sinh có cột CoSo của List bằng giá trị này, ví dụ CS1 "
+                                    "(chỉ với --chi-thi); bỏ trống = không lọc")
     a = ap.parse_args(argv)
     if a.chi_thi and not a.lists:
         ap.error("--chi-thi cần --lists (tệp CSV nguyện vọng xuất từ List)")
     if a.lists and not a.chi_thi:
         ap.error("--lists chỉ dùng cùng --chi-thi")
+    if a.co_so is not None and not a.chi_thi:
+        ap.error("--co-so chỉ dùng cùng --chi-thi")
     if len(a.tep_xuat) > 1 and not a.chi_thi:
         ap.error("chế độ mặc định chỉ nhận một tệp .xlsx")
     try:
         if a.chi_thi:
-            kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de))
+            kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so)
         else:
             kq = chuyen(a.tep_xuat[0], a.ra, bm.doc_de_thi(a.de))
     except (bm.LoiDeThi, LoiTepXuat) as e:

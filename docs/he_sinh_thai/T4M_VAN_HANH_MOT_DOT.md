@@ -46,17 +46,17 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 2. **Forms:** mỗi biểu mẫu → **Responses → Open in Excel** (hoặc Download a copy) → lưu `.xlsx`. Có nhiều biểu mẫu (tách theo buổi) thì lưu hết.
 - **Kiểm** (đoạn Python 4.2 của `T4M_HUONG_DAN_THU.md`): có BOM hay không; tiếng Việt còn dấu; số dòng khớp số em × số ngày; cột `Thu`/`CoSo` ra chữ đọc được. Cách List mã hoá/đặt tên cột khi xuất: **TH** (tài liệu không ghi).
 - **Nếu lỗi:** không thấy nút Export hoặc bị chặn → ghi lý do cho người phụ trách (HỎI-IT, có thể do chính sách DLP). Chữ vỡ dấu → xuất lại bằng đường khác, báo người phụ trách.
-- **Giữ:** hai loại tệp chỉ trên máy IT, thư mục theo đợt, ví dụ `dot_2026_hk1/`. **Mỗi cơ sở xếp riêng** (CS1, CS2): lọc `DANH_SACH.csv` theo cột `CoSo` ra hai tệp (Excel: bộ lọc rồi lưu CSV UTF-8). Bộ chuyển đổi hiện **không** lọc cơ sở (TH); email của cơ sở kia trong tệp Forms sẽ hiện là "email lạ" ở bước 5, đó là cảnh báo mong đợi.
+- **Giữ:** hai loại tệp chỉ trên máy IT, thư mục theo đợt, ví dụ `dot_2026_hk1/`. **Mỗi cơ sở xếp riêng** (CS1, CS2): giữ MỘT `DANH_SACH.csv` có cột `CoSo`, không cần tách tay; bộ chuyển đổi lọc bằng `--co-so` ở bước 5 (cần cột `CoSo`; giá trị khớp không phân biệt hoa thường). Phiếu thi của em cơ sở khác hiện cảnh báo "ở cơ sở khác hoặc không có trong danh sách", đó là cảnh báo mong đợi.
 
 ## 5. Chuyển đổi
 ```
 python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py KET_QUA_FORMS.xlsx --chi-thi --lists DANH_SACH.csv --ra ./nap
 ```
-Nhiều biểu mẫu: liệt kê nhiều `.xlsx` ngay sau lệnh. Chạy riêng cho từng cơ sở (`--ra ./nap_CS1`, `--ra ./nap_CS2`).
+Nhiều biểu mẫu: liệt kê nhiều `.xlsx` ngay sau lệnh. Chạy riêng cho từng cơ sở bằng `--co-so`: `... --co-so CS1 --ra ./nap_CS1`, rồi `... --co-so CS2 --ra ./nap_CS2` (cùng một `DANH_SACH.csv`, cùng các tệp Forms). Không có `--co-so` thì không lọc (như cũ). Cơ sở không có em nào, hoặc List thiếu cột `CoSo`: bộ chuyển đổi báo lỗi và không ghi tệp. `--co-so` mới kiểm bằng test, chưa chạy với tệp List thật (TH).
 Luồng dữ liệu: cột Lớp của List đi vào cột Lớp của Sổ nhập (kiosk dùng để xuất theo lớp chủ nhiệm ở bước 7); Email (chữ thường) ghép bài thi với nguyện vọng; điểm được **chấm lại từ `de_thi.json`**, không tin cột Points của Forms.
 1. **Đọc hết cảnh báo** (in ra màn hình, cũng ở sheet *Cảnh báo* của `BANG_DIEM.xlsx`). Ý nghĩa:
    - phiếu nộp hai lần → giữ phiếu đầu (đúng luật);
-   - email không có trong List → bỏ phiếu: kiểm xem có phải em ở cơ sở khác, em chuyển đến chưa có trong List, hay gõ sai;
+   - email không có trong List (hoặc, khi dùng `--co-so`, "ở cơ sở khác hoặc không có trong danh sách") → bỏ phiếu: kiểm xem có phải em ở cơ sở khác, em chuyển đến chưa có trong List, hay gõ sai;
    - thi một CLB mà không xếp nguyện vọng CLB đó → bỏ điểm (đúng luật);
    - điểm Forms lệch điểm chấm lại → **có câu tick nhầm đáp án**: sửa Forms hoặc `de_thi.json` rồi xuất lại.
 2. Mở `BANG_DIEM.xlsx`, soát vài em theo chi tiết đúng/sai từng câu.
