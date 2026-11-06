@@ -19,7 +19,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
 - [x] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
       points collected in app = option b; no core change):
-      [x] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet) DONE 06/11; waits for Opus review
+      [x] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet) DONE 7e274d4; Opus reviewed OK (fixed HDT note that broke an old test)
       [x] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet) DONE 7e31127; Opus reviewed OK (fixed R37 wording)
       [x] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
@@ -30,7 +30,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- ROUND 4 RUNNING from root session session_01YVAyu44juJNZ7h3oUwVHfW (children report there + STATUS lines).
+- ROUND 4 DONE and reviewed 06/11 (root session session_01YVAyu44juJNZ7h3oUwVHfW). Next: artifact v3 numbers from demo --day-du; PR to main?
   Origin: Truong noticed the T4M design had cut core limits (10 NV -> Top 3, no tick, no determination points;
   demo_t4m silently turned wharton OFF). Opus's fault: Top 3 was my recommendation, not flagged as a cut.
 - Rounds 1, 2, 3 finished and reviewed by Opus 06/11/2026. Round 3 review: 134 related tests pass, ruff clean,
