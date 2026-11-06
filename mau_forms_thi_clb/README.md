@@ -57,6 +57,21 @@ cho bộ chuyển đổi. Sinh lại từ `de_thi.json` không đổi cho ra t�
 Sổ nhập chỉ có nguyện vọng, không điểm. Ghi chú một trang cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.
 Chế độ mặc định (mục 1 trở xuống) không đổi.
 
+## 0a. Cổng thi: mỗi CLB một biểu mẫu (T4M-Q4a/b/c)
+
+Thiết kế: `docs/he_sinh_thai/T4M_CONG_THI.md`. App ECA mở đúng biểu mẫu của CLB em đã chọn, nên mỗi CLB có đề
+cần **một biểu mẫu riêng, không câu cổng**.
+
+```bash
+python mau_forms_thi_clb/tao_mau_forms.py --moi-clb --ra ./forms   # NHAP_FORMS_MOI_CLB_<club_id>.docx (mỗi CLB có đề), CLB.csv, CAI_DAT_FORMS_MOI_CLB.md
+python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py clb_covua.xlsx clb_vanhoc.xlsx ... --chi-thi --lists DANH_SACH.csv --ra ./nap
+python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py <như trên> --bai-thi BaiThi.csv     # thêm đối chiếu list trạng thái
+```
+
+- `CLB.csv` (`ClubId, Ten, Buoi, FormUrl`) liệt kê **mọi** CLB, `FormUrl` để trống: dùng cho "Create a list from Excel/CSV", rồi dán địa chỉ từng biểu mẫu. Sinh lại cho ra tệp giống hệt từng byte; tệp `NHAP_FORMS_MOI_CLB_*.docx` của CLB không còn đề bị xoá. `--moi-clb` và `--chi-thi` là hai chế độ riêng (chọn một).
+- Bộ chuyển đổi nhận N tệp xuất, **mỗi tệp một CLB** (nhận theo thẻ `[clb_x-k]`). Tệp có câu cổng `[thi-...]` chạy như cũ. Tệp không câu cổng: phiếu có ít nhất một câu được trả lời = đã thi CLB đó; em không có dòng trong tệp của CLB nào chỉ là không có điểm CLB đó. Tệp trộn câu nhiều CLB, có thẻ lạ, hoặc thiếu câu của CLB thì **dừng, không ghi tệp nào**. Cùng dữ liệu giả, N tệp một-CLB cho đúng cùng `SO_NHAP_CLB.xlsx` như một biểu mẫu chung (có test).
+- `--bai-thi BaiThi.csv` (cột bắt buộc `Email`, `ClubId`; `ResponseId`, `NopLuc` tuỳ chọn) in mục "Đối chiếu BaiThi" và thêm sheet *Đối chiếu BaiThi* vào `BANG_DIEM.xlsx`: `chi_co_o_bai_thi` (list có, tệp xuất không: xuất thiếu?) và `chi_co_o_tep_xuat` (tệp xuất có, list không: flow chưa chạy?). Khớp hết thì mục rỗng. Chỉ báo; **không bao giờ đổi điểm**. Không có `--bai-thi` thì đầu ra y như trước. Email so không phân biệt hoa thường; không lọc theo `--co-so`.
+
 ## 0b. Chạy thử trọn chuỗi (T4M-DEMO): một lệnh, ngoại tuyến, để cho giáo viên ECA xem
 
 ```bash

@@ -29,6 +29,9 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 - **Nếu lỗi:** Quick Import biến câu trắc nghiệm thành ô văn bản → sửa tay (bản tiếng Anh chuyển chính xác hơn). Mỗi người tối đa 400 biểu mẫu kể cả thùng rác: dùng lại biểu mẫu mẫu.
 - **Giữ:** `de_thi.json` + đáp án chỉ trên máy IT / người phụ trách (đừng đặt đáp án trong List học sinh đọc được).
 
+**Cổng thi, mỗi CLB một biểu mẫu (T4M-Q4a; nếu app ECA có màn "Thi tuyển", xem `T4M_CONG_THI.md`).** Thay cho bước 2 đến 4 ở trên:
+`python mau_forms_thi_clb/tao_mau_forms.py --moi-clb` ra `NHAP_FORMS_MOI_CLB_<club_id>.docx` (mỗi CLB có đề một tệp, **không câu cổng**, không rẽ nhánh), `CAI_DAT_FORMS_MOI_CLB.md` (đáp án, điểm, Settings) và `CLB.csv`. Mỗi tệp Quick Import thành một biểu mẫu Quiz; Settings như trên (Record name BẬT, One response per person BẬT, Show results TẮT; hẹn giờ tuỳ chọn). Tạo list `CLB` từ `CLB.csv`, rồi dán địa chỉ từng biểu mẫu vào `FormUrl`. Khi hết đợt, giáo viên bấm **Post scores** trong Forms nếu muốn em xem điểm (mức 5a; điểm xếp vẫn do bộ chuyển đổi chấm lại). Chỉ kiểm bằng test, chưa dựng trên Forms thật (**TH**).
+
 ## 2. Mở và đóng đăng ký
 1. App ECA: đặt trạng thái các dòng là "Đang mở" (cách đặt: **HỎI-IT**, phụ thuộc kho hiện tại là SharePoint List hay Dataverse).
 2. Forms: Start/End date (bước 1.5). **Đóng bài thi sau hạn đăng ký** hoặc cùng lúc, để không ai thi CLB mà chưa kịp xếp nguyện vọng.
@@ -46,6 +49,7 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 2. **Forms:** mỗi biểu mẫu → **Responses → Open in Excel** (hoặc Download a copy) → lưu `.xlsx`. Có nhiều biểu mẫu (tách theo buổi) thì lưu hết.
 - **Kiểm** (đoạn Python 4.2 của `T4M_HUONG_DAN_THU.md`): có BOM hay không; tiếng Việt còn dấu; số dòng khớp số em × số ngày; cột `Thu`/`CoSo` ra chữ đọc được. Cách List mã hoá/đặt tên cột khi xuất: **TH** (tài liệu không ghi).
 - **Nếu lỗi:** không thấy nút Export hoặc bị chặn → ghi lý do cho người phụ trách (HỎI-IT, có thể do chính sách DLP). Chữ vỡ dấu → xuất lại bằng đường khác, báo người phụ trách.
+- **Cổng thi một-CLB-một-biểu-mẫu:** lưu mỗi biểu mẫu thành một `.xlsx` (đặt tên theo CLB cho dễ nhìn), và nếu có list `BaiThi` (do flow ghi) thì xuất thêm `BaiThi.csv` (cùng cách Export to CSV) để đối chiếu ở bước 5. Chưa có flow thì bỏ qua `BaiThi.csv`.
 - **Giữ:** hai loại tệp chỉ trên máy IT, thư mục theo đợt, ví dụ `dot_2026_hk1/`. **Mỗi cơ sở xếp riêng** (CS1, CS2): giữ MỘT `DANH_SACH.csv` có cột `CoSo`, không cần tách tay; bộ chuyển đổi lọc bằng `--co-so` ở bước 5 (cần cột `CoSo`; giá trị khớp không phân biệt hoa thường). Phiếu thi của em cơ sở khác hiện cảnh báo "ở cơ sở khác hoặc không có trong danh sách", đó là cảnh báo mong đợi.
 
 ## 5. Chuyển đổi
@@ -53,6 +57,7 @@ Làm một lần mỗi đợt (hoặc nhân biểu mẫu mẫu: **Share as a tem
 python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py KET_QUA_FORMS.xlsx --chi-thi --lists DANH_SACH.csv --ra ./nap
 ```
 Nhiều biểu mẫu: liệt kê nhiều `.xlsx` ngay sau lệnh. Chạy riêng cho từng cơ sở bằng `--co-so`: `... --co-so CS1 --ra ./nap_CS1`, rồi `... --co-so CS2 --ra ./nap_CS2` (cùng một `DANH_SACH.csv`, cùng các tệp Forms). Không có `--co-so` thì không lọc (như cũ). Cơ sở không có em nào, hoặc List thiếu cột `CoSo`: bộ chuyển đổi báo lỗi và không ghi tệp. `--co-so` mới kiểm bằng test, chưa chạy với tệp List thật (TH).
+**Mỗi CLB một biểu mẫu (Q4b):** liệt kê hết các `.xlsx`, mỗi tệp một CLB, không cần câu cổng: `... clb_covua.xlsx clb_vanhoc.xlsx ... --chi-thi --lists DANH_SACH.csv --ra ./nap`. Tệp trộn nhiều CLB hoặc có thẻ lạ làm bộ chuyển đổi dừng, không ghi tệp nào. CLB có đề mà chưa có tệp nào thì được báo ("không tệp Forms nào chứa câu của CLB này"). Thêm `--bai-thi BaiThi.csv` (Q4c) để so list trạng thái với các tệp xuất: mục *Đối chiếu BaiThi* ở màn hình và trong `BANG_DIEM.xlsx`; `chi_co_o_bai_thi` nghĩa là xuất thiếu hoặc em chưa nộp, `chi_co_o_tep_xuat` nghĩa là flow chưa chạy; **chỉ báo, không đổi điểm**. Khớp hết thì mục rỗng.
 Luồng dữ liệu: cột Lớp của List đi vào cột Lớp của Sổ nhập (kiosk dùng để xuất theo lớp chủ nhiệm ở bước 7); Email (chữ thường) ghép bài thi với nguyện vọng; điểm được **chấm lại từ `de_thi.json`**, không tin cột Points của Forms.
 1. **Đọc hết cảnh báo** (in ra màn hình, cũng ở sheet *Cảnh báo* của `BANG_DIEM.xlsx`). Ý nghĩa:
    - phiếu nộp hai lần → giữ phiếu đầu (đúng luật);

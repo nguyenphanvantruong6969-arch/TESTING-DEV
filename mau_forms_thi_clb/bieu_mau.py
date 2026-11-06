@@ -213,6 +213,16 @@ def cac_phan(de, chi_thi=False, buoi=None):
     return phan
 
 
+def cac_phan_moi_clb(de, clb):
+    """T4M-Q4a: bố cục biểu mẫu của MỘT CLB: một phần, các câu đề thi, KHÔNG câu cổng.
+
+    Thẻ câu vẫn là [<club_id>-<k>] như biểu mẫu chung, để bộ chuyển đổi nhận ra CLB.
+    """
+    return [("Đề thi %s" % clb["name"], [
+        (cau_de_thi(clb, i), "choice", cau["lua_chon"], True)
+        for i, cau in enumerate(clb["de_thi"], 1)])]
+
+
 def dem_cau(de, chi_thi=False, buoi=None):
     """Tổng số câu hỏi của biểu mẫu (Forms tính cả câu cổng và câu thông tin)."""
     return sum(len(c) for _, c in cac_phan(de, chi_thi, buoi))

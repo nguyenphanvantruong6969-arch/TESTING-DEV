@@ -4,6 +4,15 @@
 
 Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` thêm mục 10 "Màn Thi tuyển" (CLB có thi mà em đã chọn, `Launch(FormUrl)` chỉ khi chưa có dòng `BaiThi` và còn hạn, "Đã làm"/"Chưa làm", nút Làm mới, lọc `=` uỷ quyền được, không hiện điểm: mức 5a) và bảng yêu cầu R15 đến R24 mỗi dòng một kiểm pass/fail. `docs/he_sinh_thai/T4M_FLOW_DA_LAM.md` (mới, 85 dòng): flow mẫu mỗi biểu mẫu một flow (When a new response is submitted → Get response details → [kiểm trùng] → Create item `BaiThi`), chủ là tài khoản dịch vụ IT, cách nhân flow và Form Id biểu mẫu nhóm, ước tính 9.000 đến 12.000 hành động so với 6.000 mỗi ngày (nhãn ƯL), xử lý lỗi, đường thủ công với `--bai-thi`. Chỉ connector chuẩn; mọi bước TH/GĐ. Không đụng `T4M_VAN_HANH_MOT_DOT.md` và `mau_forms_thi_clb/README.md` (C1 sửa). Không test mới.
 
+## 2026-11-06 — T4M-Q4a, Q4b, Q4c: cổng thi, mỗi CLB một biểu mẫu (vòng 3, bước C1)
+
+Không đổi lõi, schema, hợp đồng CSV. Mặc định và `--chi-thi` giữ nguyên (bất biến 1): test cũ không sửa.
+- **Q4a** `bieu_mau.cac_phan_moi_clb`; `tao_mau_forms.py --moi-clb [--ra]`: `sinh_moi_clb`, `ghi_docx_moi_clb`, `ghi_clb_csv`, `ghi_cai_dat_moi_clb`. Mỗi CLB có đề một `NHAP_FORMS_MOI_CLB_<club_id>.docx` (không câu cổng, thẻ `[clb_x-k]` giữ nguyên), `CLB.csv` (ClubId, Ten, Buoi, FormUrl trống; mọi CLB), `CAI_DAT_FORMS_MOI_CLB.md`. Sinh lại giống hệt từng byte; kiểm đề trước khi ghi; tệp cũ của CLB hết đề bị xoá; không chung chế độ với `--chi-thi`.
+- **Q4b** `chuyen_forms_sang_phan_mem._cot_chi_thi/_cot_mot_clb/_da_thi`: tệp xuất không câu cổng phải chứa đủ câu của đúng MỘT CLB; trộn CLB, thẻ lạ, thiếu câu thì dừng không ghi gì; phiếu có ít nhất một câu trả lời = đã thi. Tệp có câu cổng chạy như cũ. N tệp một-CLB cho cùng `SO_NHAP_CLB.xlsx` như một biểu mẫu chung.
+- **Q4c** `--bai-thi BaiThi.csv` (`doc_bai_thi`, `bai_trong_tep_xuat`, `doi_chieu_bai_thi`): báo bài lệch hai phía, sheet *Đối chiếu BaiThi* chỉ khi có cờ; không đổi điểm; không cờ thì `BANG_DIEM.xlsx` như cũ.
+- Test mới (viết trước): `tests/test_t4m_cong_thi.py` (24). Liên quan: test_t4m_chi_thi, test_demo_t4m, test_mau_forms_thi_clb, test_doi_chieu_lists, test_do_t4m_thi: 126 pass; ruff sạch.
+- Tài liệu: `mau_forms_thi_clb/README.md` mục 0a; `T4M_VAN_HANH_MOT_DOT.md` bước 1, 4, 5. `demo_t4m.py --moi-clb` chưa làm (không rẻ: demo dựng một tệp chung).
+
 ## 2026-11-06 — T4M-NC: thiết kế cổng thi (chọn CLB → mở bài thi → trạng thái → điểm)
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_CONG_THI.md` (mới): app Power Apps ECA làm cổng, mỗi CLB có thi một biểu mẫu Forms Quiz, list `CLB` (FormUrl) và `BaiThi` (trạng thái), mỗi biểu mẫu một flow "Đã làm" (connector chuẩn); connector Forms không trả điểm (TT-CXM) nên điểm chính thức vẫn do bộ chuyển đổi chấm lại; ba mức trả điểm 5a/5b/5c; mã đề xuất Q4a–c, M5; phương án lui trang SharePoint.

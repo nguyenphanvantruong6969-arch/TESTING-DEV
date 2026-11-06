@@ -26,6 +26,12 @@ giữ phiếu ĐẦU; email lạ (không có trong List) bị báo và bỏ; thi
 vọng CLB đó thì bỏ điểm (vẫn nằm trong BANG_DIEM.xlsx) và báo. Không có bài thi nào thì
 SO_NHAP_CLB.xlsx chỉ có nguyện vọng, không điểm.
 
+Mỗi CLB một biểu mẫu (T4M-Q4b, tao_mau_forms.py --moi-clb): liệt kê N tệp, mỗi tệp một CLB, không có
+câu cổng. CLB nhận diện theo thẻ [clb_x-k]; có phiếu trong tệp của CLB nào thì em đó đã thi CLB ấy
+(phiếu để trống mọi câu không tính). Tệp trộn câu của nhiều CLB, hoặc có thẻ lạ, thì dừng. Em không có
+dòng trong tệp của một CLB thì chỉ là không có điểm CLB đó. Thêm --bai-thi BaiThi.csv (Email, ClubId,
+ResponseId, NopLuc; T4M-Q4c) để đối chiếu list trạng thái của app với các tệp xuất: chỉ báo, không đổi điểm.
+
 Tệp xuất thiếu hẳn một câu của mẫu thì dừng, không ghi tệp nào. Một ô sai
 lẻ (mã CLB lạ, thi CLB chưa xếp nguyện vọng…) thì bỏ riêng ô đó và báo
 đích danh dòng — đúng cách phần mềm xử lý khi nạp.
@@ -327,6 +333,9 @@ def _cot_chi_thi(de, tieu_de):
     Trả (i_email, i_ten, cot, cot_diem, các CLB tệp này phủ, mã câu lạ). Một CLB phủ khi tệp có
     câu cổng; có một phần cột của CLB mà thiếu phần khác thì dừng. CLB không có cột nào = tệp này
     là của buổi khác (tách theo buoi), không phải lỗi.
+
+    Tệp KHÔNG có câu cổng nào (T4M-Q4b, biểu mẫu của một CLB): phải chứa đủ câu của đúng MỘT CLB có
+    đề; trộn nhiều CLB hoặc có thẻ lạ thì dừng.
     """
     cot, cot_diem = _doc_cot(tieu_de)
     chuan = [h.strip().lower() for h in tieu_de]
@@ -335,6 +344,8 @@ def _cot_chi_thi(de, tieu_de):
                          "biểu mẫu (và chỉ cho người trong tổ chức làm bài)")
     i_email = chuan.index("email")
     i_ten = chuan.index("name") if "name" in chuan else None
+    if not any(m.startswith("thi-") for m in cot):
+        return (i_email, i_ten, cot, cot_diem) + _cot_mot_clb(de, cot)
     phu, thieu, can_het = [], [], set()
     for clb in bm.clb_co_thi(de):
         can = ["thi-" + clb["club_id"]] + ["%s-%d" % (clb["club_id"], i)
@@ -352,6 +363,42 @@ def _cot_chi_thi(de, tieu_de):
     if not phu:
         raise LoiTepXuat("tệp xuất không có câu bài thi nào của mẫu (không thấy mã [thi-...])")
     return i_email, i_ten, cot, cot_diem, phu, sorted(set(cot) - can_het)
+
+
+def _cot_mot_clb(de, cot):
+    """Tệp không câu cổng: trả ([CLB duy nhất], []). Dừng nếu rỗng, trộn CLB, thẻ lạ hoặc thiếu câu."""
+    co_thi = bm.clb_co_thi(de)
+    hop_le = {"%s-%d" % (c["club_id"], i) for c in co_thi for i in range(1, len(c["de_thi"]) + 1)}
+    la = sorted(m for m in cot if m not in hop_le)
+    if la:
+        raise LoiTepXuat("tệp xuất có mã câu không thuộc CLB nào có đề thi trong de_thi.json: %s. "
+                         "Mỗi tệp chỉ chứa câu của một CLB, giữ nguyên phần [mã] ở đầu câu."
+                         % ", ".join(la))
+    phu = [c for c in co_thi if any("%s-%d" % (c["club_id"], i) in cot
+                                    for i in range(1, len(c["de_thi"]) + 1))]
+    if not phu:
+        raise LoiTepXuat("tệp xuất không có câu bài thi nào của mẫu (không thấy mã [thi-...] "
+                         "hay [<club_id>-1])")
+    if len(phu) > 1:
+        raise LoiTepXuat("tệp xuất trộn câu của %d CLB (%s) mà không có câu cổng [thi-...]; mỗi tệp "
+                         "chỉ được chứa một CLB" % (len(phu), ", ".join(c["club_id"] for c in phu)))
+    clb = phu[0]
+    thieu = ["%s-%d" % (clb["club_id"], i) for i in range(1, len(clb["de_thi"]) + 1)
+             if "%s-%d" % (clb["club_id"], i) not in cot]
+    if thieu:
+        raise LoiTepXuat(
+            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải "
+            "giữ nguyên phần [mã] ở đầu." % (len(thieu), ", ".join(thieu)))
+    return phu, []
+
+
+def _da_thi(dong, cot, clb):
+    """Phiếu `dong` có bài thi của `clb` không: có câu cổng thì phải chọn Có; không câu cổng (biểu
+    mẫu một CLB) thì có ít nhất một câu được trả lời."""
+    ma = clb["club_id"]
+    if "thi-" + ma in cot:
+        return bm._chuan(_gia_tri(dong, cot["thi-" + ma])).startswith("có")
+    return any(_gia_tri(dong, cot["%s-%d" % (ma, i)]) for i in range(1, len(clb["de_thi"]) + 1))
 
 
 def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
@@ -404,7 +451,7 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
             bai_thi = []
             for clb in phu:
                 ma = clb["club_id"]
-                if not bm._chuan(_gia_tri(dong, cot["thi-" + ma])).startswith("có"):
+                if not _da_thi(dong, cot, clb):
                     continue
                 if any(t["club_id"] == ma for t in hs["bai_thi"]):
                     bao("%s: đã có bài từ tệp khác — giữ bài đầu" % ma)
@@ -443,6 +490,67 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None):
     return list(hoc_sinh.values()), canh_bao
 
 
+# ------------------------------------------------- đối chiếu list BaiThi (T4M-Q4c)
+
+COT_BAI_THI = ("Email", "ClubId")
+CHI_CO_O_BAI_THI = "chi_co_o_bai_thi"
+CHI_CO_O_TEP_XUAT = "chi_co_o_tep_xuat"
+
+
+def doc_bai_thi(duong_csv):
+    """Đọc list trạng thái BaiThi (Email, ClubId, ResponseId, NopLuc) -> tập {(email chữ thường, ClubId)}.
+
+    Chỉ Email và ClubId bắt buộc. Dòng trùng (em, CLB) tính một; dòng thiếu Email hoặc ClubId bị bỏ."""
+    with open(duong_csv, encoding="utf-8-sig", newline="") as f:
+        bang = list(csv.reader(f))
+    if not bang:
+        raise LoiTepXuat("tệp BaiThi trống")
+    tieu = [h.strip().lower() for h in bang[0]]
+    thieu = [c for c in COT_BAI_THI if c.lower() not in tieu]
+    if thieu:
+        raise LoiTepXuat("tệp BaiThi thiếu cột bắt buộc: %s" % ", ".join(thieu))
+    i_e, i_c = tieu.index("email"), tieu.index("clubid")
+    co = set()
+    for dong in bang[1:]:
+        dong = dong + [""] * (len(tieu) - len(dong))
+        email, ma = dong[i_e].strip().lower(), dong[i_c].strip()
+        if email and ma:
+            co.add((email, ma))
+    return co
+
+
+def bai_trong_tep_xuat(de, cac_tep):
+    """{(email chữ thường, club_id)} của mọi bài đã thi có trong các tệp xuất (cả email không có trong
+    List; phiếu trùng tính một). cac_tep: [(tên tệp, tiêu đề, các dòng)] — đã qua phan_tich_chi_thi."""
+    co = set()
+    for _ten, tieu_de, cac_dong in cac_tep:
+        i_email, _i_ten, cot, _cd, phu, _la = _cot_chi_thi(de, tieu_de)
+        for dong in cac_dong:
+            if not any(dong):
+                continue
+            dong = dong + [""] * (len(tieu_de) - len(dong))
+            email = dong[i_email].strip().lower()
+            if not email or email == "anonymous":
+                continue
+            for clb in phu:
+                if _da_thi(dong, cot, clb):
+                    co.add((email, clb["club_id"]))
+    return co
+
+
+def doi_chieu_bai_thi(bai_thi, bai_xuat):
+    """Hai tập {(email, club_id)} -> [(loại, email, club_id, chi tiết)] theo thứ tự (loại, email, club).
+    Chỉ báo; không đụng tới điểm. Khớp hết thì rỗng."""
+    ra = []
+    for e, c in sorted(bai_thi - bai_xuat):
+        ra.append((CHI_CO_O_BAI_THI, e, c, "list BaiThi có bài này nhưng không có phiếu tương ứng trong "
+                                           "các tệp xuất — xuất thiếu, hoặc em chưa nộp?"))
+    for e, c in sorted(bai_xuat - bai_thi):
+        ra.append((CHI_CO_O_TEP_XUAT, e, c, "tệp xuất có bài này nhưng list BaiThi không có dòng — flow "
+                                            "chưa chạy, hoặc bài nộp ngoài app"))
+    return ra
+
+
 # ---------------------------------------------------------------- ghi tệp
 
 TEN_SO = "SO_NHAP_CLB.xlsx"
@@ -478,7 +586,7 @@ def ghi_tep_phan_mem(de, hoc_sinh, thu_muc):
     return duong
 
 
-def ghi_bang_diem(de, hoc_sinh, canh_bao, duong):
+def ghi_bang_diem(de, hoc_sinh, canh_bao, duong, doi_chieu=None):
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Font, PatternFill
     from openpyxl.utils import get_column_letter
@@ -539,6 +647,14 @@ def ghi_bang_diem(de, hoc_sinh, canh_bao, duong):
         ws.append(list(x))
     if not canh_bao:
         ws.append(["", "", "Không có cảnh báo nào."])
+
+    if doi_chieu is not None:                     # chỉ khi có --bai-thi; không thì sổ y như trước
+        ws = wb.create_sheet("Đối chiếu BaiThi")
+        dau_bang(ws, ["Loại", "Email", "CLB", "Chi tiết"], [20, 34, 16, 90])
+        for x in doi_chieu:
+            ws.append(list(x))
+        if not doi_chieu:
+            ws.append(["", "", "", "Khớp hết: list BaiThi và các tệp xuất có cùng tập bài thi."])
     wb.save(duong)
 
 
@@ -563,9 +679,13 @@ def chuyen(duong_xlsx, thu_muc_ra, de=None):
             "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
 
 
-def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None, co_so=None):
-    """Chế độ chỉ thi: các tệp Forms (chỉ có bài thi) + tệp xuất List -> Sổ nhập + bảng điểm."""
+def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None, co_so=None, bai_thi=None):
+    """Chế độ chỉ thi: các tệp Forms (chỉ có bài thi) + tệp xuất List -> Sổ nhập + bảng điểm.
+
+    bai_thi (T4M-Q4c): đường dẫn BaiThi.csv; có thì thêm kq["doi_chieu_bai_thi"] và sheet đối chiếu.
+    """
     de = de or bm.doc_de_thi()
+    co_bai_thi = doc_bai_thi(bai_thi) if bai_thi else None       # lỗi tệp thì dừng trước khi ghi gì
     danh_sach, canh_bao = doc_lists(duong_lists, de, co_so)
     if not danh_sach:
         raise LoiTepXuat("tệp List không có học sinh nào" if co_so is None else
@@ -576,13 +696,18 @@ def chuyen_chi_thi(cac_duong_xlsx, duong_lists, thu_muc_ra, de=None, co_so=None)
         cac_tep.append((os.path.basename(d), tieu_de, cac_dong))
     hoc_sinh, canh_bao_thi = phan_tich_chi_thi(de, danh_sach, cac_tep, co_so)
     canh_bao += canh_bao_thi
+    doi_chieu = (doi_chieu_bai_thi(co_bai_thi, bai_trong_tep_xuat(de, cac_tep))
+                 if co_bai_thi is not None else None)
     os.makedirs(thu_muc_ra, exist_ok=True)
     ghi_tep_phan_mem(de, hoc_sinh, thu_muc_ra)
-    ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"))
-    return {"n_hoc_sinh": len(hoc_sinh),
-            "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
-            "canh_bao": canh_bao,
-            "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
+    ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"), doi_chieu)
+    kq = {"n_hoc_sinh": len(hoc_sinh),
+          "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
+          "canh_bao": canh_bao,
+          "ghi_chu": [GHI_CHU_DIEM_QUYET_TAM]}
+    if doi_chieu is not None:
+        kq["doi_chieu_bai_thi"] = doi_chieu
+    return kq
 
 
 def main(argv=None):
@@ -597,7 +722,11 @@ def main(argv=None):
     ap.add_argument("--lists", help="tệp CSV xuất từ List đăng ký (chỉ với --chi-thi)")
     ap.add_argument("--co-so", help="chỉ lấy học sinh có cột CoSo của List bằng giá trị này, ví dụ CS1 "
                                     "(chỉ với --chi-thi); bỏ trống = không lọc")
+    ap.add_argument("--bai-thi", help="CSV xuất từ list BaiThi (Email, ClubId, ResponseId, NopLuc): đối chiếu "
+                                      "với các tệp xuất, chỉ báo, không đổi điểm (chỉ với --chi-thi)")
     a = ap.parse_args(argv)
+    if a.bai_thi is not None and not a.chi_thi:
+        ap.error("--bai-thi chỉ dùng cùng --chi-thi")
     if a.chi_thi and not a.lists:
         ap.error("--chi-thi cần --lists (tệp CSV nguyện vọng xuất từ List)")
     if a.lists and not a.chi_thi:
@@ -608,7 +737,7 @@ def main(argv=None):
         ap.error("chế độ mặc định chỉ nhận một tệp .xlsx")
     try:
         if a.chi_thi:
-            kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so)
+            kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so, a.bai_thi)
         else:
             kq = chuyen(a.tep_xuat[0], a.ra, bm.doc_de_thi(a.de))
     except (bm.LoiDeThi, LoiTepXuat) as e:
@@ -621,6 +750,11 @@ def main(argv=None):
               % len(kq["canh_bao"]))
         for dong, sid, nd in kq["canh_bao"]:
             print("  dòng %s %s: %s" % (dong, sid, nd))
+    if "doi_chieu_bai_thi" in kq:
+        dc = kq["doi_chieu_bai_thi"]
+        print("\nĐối chiếu BaiThi: %s" % ("khớp hết." if not dc else "%d chỗ lệch:" % len(dc)))
+        for loai, email, ma, nd in dc:
+            print("  %s %s %s: %s" % (loai, email, ma, nd))
     for g in kq["ghi_chu"]:
         print("\nℹ %s" % g)
     print("\nKéo %s vào ô nạp ở màn hình Vận hành của phần mềm." % TEN_SO)

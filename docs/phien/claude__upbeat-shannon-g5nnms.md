@@ -15,7 +15,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [x] Research plan; GĐ1 docs (P1); P4 kiosk contract; P5 quiz path; GĐ2 interview sheet; GĐ3 sandbox guide
 - [x] T4M-Q1..Q3, Q1b, Q1b-b (quiz-only Forms, Email key, Lớp, --co-so); T4M-DEMO; Round 1 S1-S4; Round 2 R1-R3
 - [ ] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a):
-      [ ] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, RUNNING at handoff)
+      [x] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, DONE 06/11)
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
 - [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
@@ -25,6 +25,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
+- STATUS T4M-Q4a/b/c: DONE. Tests first (24 in `tests/test_t4m_cong_thi.py`; 20 red -> green), related 126 pass, ruff clean, kiem_nhanh 7/7. Q4a `tao_mau_forms.py --moi-clb` (one Quick Import .docx per club with de_thi, no gate, `CLB.csv` for ALL clubs with empty FormUrl, `CAI_DAT_FORMS_MOI_CLB.md`; byte-identical regeneration; stale files removed; exclusive with --chi-thi). Q4b converter accepts gate-less exports holding exactly ONE club (mixing / unknown tag / missing question -> LoiTepXuat, nothing written); same Sổ nhập as one shared form. Q4c `--bai-thi` (Email, ClubId) -> `chi_co_o_bai_thi` / `chi_co_o_tep_xuat`, extra sheet only with the flag, scores never change. Default and --chi-thi unchanged. No core/schema/CSV contract change. Not done: `demo_t4m.py --moi-clb` (not cheap). All Forms steps TH. Nothing for Truong to approve.
 - STATUS T4M-M5: DONE (docs only, no tests). `T4M_DAC_TA_SUA_APP.md` §10 "Màn Thi tuyển" + requirements R15..R24 (pass/fail each; proposed HDT §9 rows 7.1-7.3 not yet added); new `T4M_FLOW_DA_LAM.md` (85 lines): one template flow per quiz form, service-account owner, request estimate 9,000-12,000 vs 6,000/day (ƯL), manual fallback with `--bai-thi`. Level 5a, standard connectors, `=` filters only. Did not touch `T4M_VAN_HANH_MOT_DOT.md` / `mau_forms_thi_clb/README.md` (C1). Nothing for Truong to approve; Opus may add HDT §9 rows 7.x.
 - Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
 - C2 reported DONE (c4371e4: T4M_DAC_TA_SUA_APP.md §10 R15..R24, new T4M_FLOW_DA_LAM.md, estimate 9,000-12,000
@@ -111,3 +112,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Handoff at ~400k context: rewrote state/next/decisions; round 3 C1, C2 still running; fallback trigger deleted | New root must poll C1/C2 (they message the old session) |
 | 2026-11-06 | Sonnet | T4M-M5 (C2): Thi tuyển screen spec (§10, R15..R24) + "Đã làm" flow guide; docs only | No subagent; C1 files untouched |
 | 2026-11-06 | Opus | Second handoff note: C2 reported DONE (unreviewed); C1 running | No new work started |
+| 2026-11-06 | Sonnet | T4M-Q4a/b/c (C1): `--moi-clb` generator, one-club-per-export converter, `--bai-thi` report; tests first (24) | No subagent; default and --chi-thi unchanged |
