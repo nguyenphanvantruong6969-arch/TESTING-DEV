@@ -30,32 +30,28 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- ROUND 4 DONE and reviewed 06/11 (root session session_01YVAyu44juJNZ7h3oUwVHfW). Next: artifact v3 numbers from demo --day-du; PR to main?
-  Origin: Truong noticed the T4M design had cut core limits (10 NV -> Top 3, no tick, no determination points;
-  demo_t4m silently turned wharton OFF). Opus's fault: Top 3 was my recommendation, not flagged as a cut.
-- Rounds 1, 2, 3 finished and reviewed by Opus 06/11/2026. Round 3 review: 134 related tests pass, ruff clean,
-  kiem_nhanh 7/7 (needs `git fetch origin main:refs/remotes/origin/main` first, else trung_khit fails), default and
-  --chi-thi generator output identical before/after C1 (ignoring docProps/core.xml).
-- Review fixes: (1) mutation `any`->`all` in `_da_thi` survived -> added test_q4b_phieu_bo_trong_vai_cau_van_tinh_la_da_thi
-  (now 25 tests in tests/test_t4m_cong_thi.py); (2) C2 proposed HDT §9 rows "7.x" but 7.1/7.2 already exist (CSV flow) ->
-  new HDT §13 + rows 13.1..13.4; R15..R24 and T4M_FLOW_DA_LAM.md now point to 13.x.
-- Minor notes, not fixed (out of scope): default mode of tao_mau_forms.py ignores --ra (pre-existing); --bai-thi ClubId
-  compare is case-sensitive (club_id in de_thi.json is lower-case; IT must keep it so in list BaiThi).
-- C1/C2 child sessions are done; nothing is running. Truong chose cách B (portal) explicitly again 06/11.
-- T4M-DEMO-B DONE: `demo_t4m.py --moi-clb` (split fake shared export per club, fake BaiThi.csv missing one
-  single-submission row, converter --bai-thi); same match_results as shared form; 16 tests in test_demo_t4m.py.
-  Interview sheet: ECA-9 rewritten for B, new B3 IT-15..IT-18 (app edit or SharePoint fallback, form owner,
-  service account + flow quota, BaiThi read-only/DLP). Note: converter warnings with many files give row number
-  but not file name (pre-existing).
-STATUS T4M-M6: DONE 06/11/2026 (docs only). App spec Top 7 + tick (max 5) + determination-point screen (R25..R38, HDT rows 14.x, HDT section 14); CONG_THI, MICROSOFT v0, interview sheet (ECA-6/9/12, IT-19) updated. Decisions for review: ECA-12 numbered after ECA-11; HDT says default fake generator still NV1..NV3 (7 NV + THI/WP flag awaits D1/Q5c, flag name not written); DAC_TA R36/R37 need D1 code.
-STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticked submission dropped+warned; >5 ticks keep first 5; WPk -> diem_w, two funds checked = 100, warn only); fake Lists NV<=7/THIk/WPk; demo --day-du turns wharton ON, kiosk blocks the planted bad fund, demo fixes it via admin_save_wharton and reruns; summary always prints 'Điểm quyết tâm: BẬT/TẮT'. 34 new tests (tests/test_t4m_day_du.py) + 5/5 mutations caught; list without THIk/WPk => SO_NHAP/BANG_DIEM/fake Lists byte-identical (zip hash minus core.xml, 3 seeds x 2 modes). Decisions for review: (1) demo NV columns = min(7, clubs/day) = 3 with the sample de_thi.json; (2) tick values accepted: Có/co/yes/true/1 (others warn); (3) fund check treats a single-club blank fund as OK (kiosk auto-fills 100); (4) --bai-thi left untouched (ignores ticks).
+- Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
+- Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
+  the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
+  T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
+  D1 T4M-Q5a/b/c (7e274d4): converter reads THIk/WPk, fake Lists --so-nv/--tick/--wp, demo --day-du (wharton ON,
+  planted bad fund blocked by kiosk then fixed); tests/test_t4m_day_du.py 34 tests. D2 T4M-M6 (7e31127): app spec
+  R25..R38, HDT §14 rows 14.x, interview ECA-6/9/12, IT-19. Opus review: demo default and --moi-clb outputs
+  identical before/after D1; fixed R37 wording (legit "vắng thi" warnings) and HDT note (dropped `NV3` broke
+  test_sinh_xuat_lists_gia). Related tests 173 pass, ruff clean, kiem_nhanh 7/7.
+- Simulation artifact (interactive, 7 stages, fake data; shared "Anyone with the link" by Truong):
+  https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd (v4). Source is NOT in the repo (scratchpad only); it adds
+  invented clubs marked "*" so 7 slots and the cap of 5 are visible (sample de_thi.json has 3 clubs/day).
+- Minor notes, not fixed: tao_mau_forms.py default mode ignores --ra (pre-existing); --bai-thi ClubId compare is
+  case-sensitive; converter warnings over many files give row number but not file name (pre-existing).
+- kiem_nhanh needs `git fetch origin main:refs/remotes/origin/main` first, else trung_khit fails.
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
 ## Decisions and gotchas (keep short)
 - Never commit real school data, tenantId, app URL or names. Sandbox/copy only; never touch the live app.
 - No subagents (rule 10): every step is a SEPARATE session (create_session), reporting DONE/BLOCKED (plan §3).
-- Store = SharePoint List, wide model (one row per student x day, NV1..NV3); CSV export cap 30,000 rows.
+- Store = SharePoint List, wide model (one row per student x day, NV1..NV7 + THI1..THI7 + WP1..WP7, round 4); CSV export cap 30,000 rows.
   Dataverse for Teams + Developer Plan stop creating environments 15/11/2026. PowerSchool is not an SDS OneRoster
   provider (sync path HỎI-IT). Power Automate Low profile: 6,000 requests/user/day; no row-by-row write-back in V1.
 - Quiz: Microsoft Forms Quiz (no supported API creates forms; Quick Import does not carry answers; Forms connector is
@@ -65,13 +61,18 @@ STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticke
   standard flow per form writes "Đã làm"; request estimate ~9,000 per round vs 6,000/day (peak-day risk).
 - Bundles (T4M_GOI_THIET_KE.md): two-phase orchestrator above the pipeline, label "bảo đảm trong từng pha, không bảo
   đảm ổn định toàn tuần khi có gói" (inv. 8); no bundles => byte-identical (inv. 1); D2/D3 add OPTIONAL CSV/schema.
+- Round 4 rules: tick only on clubs with de_thi; ticked+no submission -> "thi" (absent); submission without tick ->
+  dropped+warned; >5 ticks keep first 5 by NV order; fund 1 = ticked clubs, fund 2 = rest, each non-empty = 100
+  (converter warns, kiosk blocks); single-club blank fund auto-filled 100 by kiosk (tu_dien_wharton_mot_clb).
 - T4-K2 (Google) = K2-b, stays paused (Truong 06/11/2026).
 - Review lessons: children once committed conflict markers into this file; S4 miscounted quiz clubs (15 vs 10);
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Ask Truong about the pending proposals (PR to main for full CI + Windows build is the recommended next one).
-2. After Truong's GĐ2 meeting: paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA answered Q1-Q3.
+1. Ask Truong: open a PR to main for full CI + Windows build (recommended next; Truong has not answered yet).
+2. Optional: commit the simulation page source into docs/he_sinh_thai/ if Truong wants it kept in the repo.
+3. After Truong's GĐ2 meeting (before 15/11): paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA
+   answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter.
 
 ## Files touched (T4M, this branch)
 - mau_forms_thi_clb/{bieu_mau,tao_mau_forms,chuyen_forms_sang_phan_mem}.py, README.md, tests/test_t4m_cong_thi.py, T4M_VAN_HANH_MOT_DOT.md: T4M-Q4a/b/c
@@ -80,8 +81,8 @@ STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticke
   T4M_DAC_TA_SUA_APP (+§10 M5), T4M_HUONG_DAN_THU (+§13), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
 - mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
   GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
-- du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py (+--moi-clb), do_t4m_thi.py, ket_qua_t4m/
-- tests/: test_sinh_xuat_lists_gia, test_t4m_chi_thi, test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists (.py)
+- du_lieu_test/: sinh_xuat_lists_gia.py (+--so-nv/--tick/--wp), demo_t4m.py (+--moi-clb, --day-du), do_t4m_thi.py, ket_qua_t4m/
+- tests/: test_t4m_day_du (round 4), test_sinh_xuat_lists_gia, test_t4m_chi_thi, test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists (.py)
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md, CLAUDE.md + docs/ke_hoach/CLAUDE_CHI_TIET.md (Z-CLAUDE-GON)
 
 ## Session log (append only, newest last)
@@ -132,3 +133,4 @@ STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticke
 | 2026-11-06 | Opus | Updated simulation artifact v2 (Top 7, tick, two funds); reviewed D2 T4M-M6 (OK; R37 no longer counts legit "vắng thi" warnings) | Waiting D1 |
 | 2026-11-06 | Sonnet | T4M-Q5a/b/c (D1): converter THIk/WPk, fake Lists/Forms with ticks and funds, demo --day-du; tests first (29 red on first run -> all 34 green), 5 mutations caught | No subagent; no core/schema/CSV change; default outputs byte-identical |
 | 2026-11-06 | Opus | Reviewed D1 T4M-Q5a/b/c: tests green after fixing D2/D1 clash (HDT no longer named `NV3`), demo default and --moi-clb outputs identical to before, --day-du runs; kiosk auto-fills single-club fund (confirmed); round 4 done | Artifact v3 next |
+| 2026-11-06 | Opus | Artifact v4 (demo --day-du numbers); handoff at ~400k context (Stop hook); no new work | Next: ask Truong about PR to main |
