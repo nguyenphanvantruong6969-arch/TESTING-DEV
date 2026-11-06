@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-BK1, BK2 (vòng 5, bước K1): bộ dựng list và công thức Power Fx cho IT
+
+Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ `json`, `csv`, `uuid`, `re`); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên SharePoint / Power Apps).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/`: `cot_lists.py` (MỘT định nghĩa cột cho ECA 30 cột, CLB 4, BaiThi 4, NHAT_KY_DA_LAM 4; GUID cố định uuid5), `site_script.py` (createSPList + addSPField / addSPFieldXml cho Choice; in số hành động, cảnh báo > 30, lỗi > 300; hiện 46), `mau_csv.py` (CSV mẫu một dòng ví dụ giả + `KIEM_COT_ECA.md`), `cong_thuc.py` (bốn tệp Power Fx khai triển k = 1..7 và bộ soát `soat_loc_uy_quyen`), `sinh_bk1.py` (một lệnh: `python -m bo_dung_t4m.sinh_bk1 --ra <thư mục>`; ra `01_lists/`, `02_app/`, `README_BK1.md`).
+- Test mới (viết trước, đỏ khi thiếu mô-đun; sau đó sửa 3 lỗi sinh do test cú pháp tĩnh bắt: thiếu `;` trong `OnVisible`, `If` lệch dòng, `OnChange` k=7 thừa `;`): `tests/test_t4m_bo_dung_bk1.py` (34 ca + 1 xfail có chủ đích). Gây hỏng tạm 3 chỗ (bỏ `WP7` khỏi ECA; khai triển chỉ tới k=6; `Email <>` trong `Filter(ECA…)`): test đỏ cả 3 (3, 3, 1 ca), khôi phục thì xanh.
+- PHÁT HIỆN (không sửa, theo luật): `tao_mau_forms.ghi_clb_csv` ghi `Buoi` là "Thứ Hai" còn cột `Thu` của ECA là "Thứ 2"; quyết định 1 của §9 nói "cùng chữ". Bộ dựng dùng ánh xạ `buoi_theo_thu(de)` nên công thức lọc `Filter(CLB, Buoi = "Thứ Hai")` đúng; xfail ghi lại lệch.
+- Ghi chú: schema site script không nêu thuộc tính `id` cho `addSPField`, nên GUID cố định chỉ có hiệu lực ở cột Choice (qua `ID` trong XML); chưa kiểm (TH).
+
 ## 2026-11-06 — T4M-Q5a/b/c (vòng 4, bước D1): bộ chuyển đổi đọc THIk/WPk, dữ liệu giả, `demo_t4m.py --day-du`
 
 Không đổi lõi (`run_rbda`, `compute_club_priority`, `club_choice_function`), schema hay hợp đồng CSV của kiosk. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`. List KHÔNG có `THIk`/`WPk` thì `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx` và tệp Lists giả giống hệt từng byte so với trước (băm toàn bộ khối zip trừ `docProps/core.xml`; 3 seed × {một biểu mẫu, `--moi-clb`} + tệp Lists giả mặc định; chạy tay trước và sau khi sửa).

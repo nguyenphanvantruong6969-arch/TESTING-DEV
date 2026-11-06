@@ -29,7 +29,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
 - [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
-      [ ] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx, launched 06/11): column module, site script + CSV + ECA checklist, Power Fx per screen
+      [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11: bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen (Opus review pending)
       [ ] K2 T4M-BK3+BK4 (Sonnet, after K1): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
       [ ] K3 Opus review
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
@@ -37,7 +37,10 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
-- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). K1 running (session id in Plan); it reports DONE/BLOCKED by send_message to THIS root session and as a `STATUS T4M-BK1/2:` line here. PR #13 open (CI pending).
+- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). PR #13 open (CI pending).
+- STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
+  tests/test_t4m_bo_dung_bk1.py 34 pass + 1 xfail, 183 related pass, ruff clean, 3 mutations caught. FINDING: `ghi_clb_csv`
+  writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 assumed equal): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
 - Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
   the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
   T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
@@ -49,8 +52,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - Simulation artifact (interactive, 7 stages, fake data; shared "Anyone with the link" by Truong):
   https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd (v4). Source is NOT in the repo (scratchpad only); it adds
   invented clubs marked "*" so 7 slots and the cap of 5 are visible (sample de_thi.json has 3 clubs/day).
-- Minor notes, not fixed: tao_mau_forms.py default mode ignores --ra (pre-existing); --bai-thi ClubId compare is
-  case-sensitive; converter warnings over many files give row number but not file name (pre-existing).
+- Minor, pre-existing, not fixed: tao_mau_forms default mode ignores --ra; --bai-thi ClubId compare case-sensitive.
 - kiem_nhanh needs `git fetch origin main:refs/remotes/origin/main` first; clone is shallow: `git fetch --unshallow` before diffing with main.
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
@@ -87,10 +89,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU (+§8 BK0), T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
   T4M_KE_HOACH_TU_DONG, T4M_GOI_THIET_KE, T4M_MICROSOFT (v0), T4M_VAN_HANH_MOT_DOT, T4M_DO_MO_PHONG,
   T4M_DAC_TA_SUA_APP (+§10 M5), T4M_HUONG_DAN_THU (+§13), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
-- mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
-  GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
-- du_lieu_test/: sinh_xuat_lists_gia.py (+--so-nv/--tick/--wp), demo_t4m.py (+--moi-clb, --day-du), do_t4m_thi.py, ket_qua_t4m/
-- tests/: test_t4m_day_du (round 4), test_sinh_xuat_lists_gia, test_t4m_chi_thi, test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists (.py)
+- mau_forms_thi_clb/: converter/generators above, doi_chieu_lists.py, README.md, bo_dung_t4m/ (K1, new package)
+- du_lieu_test/: sinh_xuat_lists_gia, demo_t4m (+--moi-clb, --day-du), do_t4m_thi, ket_qua_t4m/; tests/: test_t4m_* (+bo_dung_bk1), test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists, test_sinh_xuat_lists_gia
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md, CLAUDE.md + docs/ke_hoach/CLAUDE_CHI_TIET.md (Z-CLAUDE-GON)
 
 ## Session log (append only, newest last)
@@ -147,3 +147,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong pointed out he answered earlier; checked §1 of the research plan: path = build kit for IT; NC-02 stays an IT question | Plan T4M-BK next session |
 | 2026-11-06 | Opus | Wrote plan §9 round 5 T4M-BK (build kit for IT: K0 research, K1/K2 Sonnet, K3 review); asked Truong to approve it and the PR to main | No code; no child sessions |
 | 2026-11-06 | Opus | Truong approved T4M-BK + PR: merged main (CHANGELOG both sides, 157 tests pass), opened PR #13; K0 research -> KQ §8; wrote K1/K2 prompts; root session id updated in plan §3 | Launching K1 |
+| 2026-11-06 | Sonnet | T4M-BK1/BK2 (K1): bo_dung_t4m column module (ECA 30 cols), site script (46 actions), sample CSVs + KIEM_COT_ECA.md, 4 Power Fx files k=1..7; tests first, static syntax test caught 3 generator bugs; 3 mutations caught | No subagent; no core/schema/CSV change; Buoi text mismatch reported |
