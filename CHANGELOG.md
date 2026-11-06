@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-M4 (bước R3): hướng dẫn flow gửi Excel theo lớp cho GVCN, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` (mới, 77 dòng): flow Power Automate tuỳ chọn, chỉ connector chuẩn (SharePoint, Outlook/Teams), chủ là tài khoản dịch vụ IT; lấy tệp `export_theo_lop` từ thư viện SharePoint, ghép với tệp ánh xạ lớp → email GVCN (nguồn HỎI-IT, NC-08; khoá ghép theo tên tệp đã làm sạch), gửi từng GVCN. Bảng giới hạn ĐXM của NC-12, NC-13, đoạn DLP (NC-14), xử lý lỗi và đường thủ công; không ghi ngược về list (NC-13). Bước chưa thử nhãn TH, công thức/hành động nhãn GĐ. Không đổi hợp đồng CSV, schema, bất biến hay mã sản phẩm; không test mới.
+
 ## 2026-11-06 — T4M-M1 (vòng 2, R1): đặc tả sửa app ECA sang Top 3 mỗi ngày, chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (mới, ~113 dòng) cho người sửa app (IT): cột dữ liệu mô hình rộng (`NV1..NV3`, `TrangThai`), hành vi màn hình (không trùng, không ô trống chen giữa, ngày trống hợp lệ, nhãn hai ngôn ngữ, điện thoại), `Patch` + `IfError` kèm báo đúng ngày lỗi, khoá theo `TrangThai`, chỉ dùng phép lọc uỷ quyền được (NC-04), sao lưu / khôi phục phiên bản (NC-21), bảng 14 yêu cầu R1..R14 mỗi yêu cầu một dòng kiểm pass/fail ánh xạ HDT §9, mục gói chỉ giữ chỗ "chờ A8-GOI". Mọi công thức gắn nhãn GĐ. Không đụng app thật, không đổi mã, schema, hợp đồng CSV.
