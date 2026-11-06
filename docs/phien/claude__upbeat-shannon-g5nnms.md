@@ -29,7 +29,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
 - [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
-      [ ] K1 T4M-BK1+BK2 (Sonnet): column module, site script + CSV + ECA checklist, Power Fx per screen
+      [ ] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx, launched 06/11): column module, site script + CSV + ECA checklist, Power Fx per screen
       [ ] K2 T4M-BK3+BK4 (Sonnet, after K1): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
       [ ] K3 Opus review
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
@@ -37,9 +37,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
-- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). K1 launched as a separate Sonnet session (id in Plan once known);
-  it reports DONE/BLOCKED by send_message to THIS root session and as a `STATUS T4M-BK1/2:` line here. PR #13 open (CI pending).
-- Clone was shallow: `git fetch --unshallow` before comparing with main.
+- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). K1 running (session id in Plan); it reports DONE/BLOCKED by send_message to THIS root session and as a `STATUS T4M-BK1/2:` line here. PR #13 open (CI pending).
 - Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
   the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
   T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
@@ -53,7 +51,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   invented clubs marked "*" so 7 slots and the cap of 5 are visible (sample de_thi.json has 3 clubs/day).
 - Minor notes, not fixed: tao_mau_forms.py default mode ignores --ra (pre-existing); --bai-thi ClubId compare is
   case-sensitive; converter warnings over many files give row number but not file name (pre-existing).
-- kiem_nhanh needs `git fetch origin main:refs/remotes/origin/main` first, else trung_khit fails.
+- kiem_nhanh needs `git fetch origin main:refs/remotes/origin/main` first; clone is shallow: `git fetch --unshallow` before diffing with main.
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
