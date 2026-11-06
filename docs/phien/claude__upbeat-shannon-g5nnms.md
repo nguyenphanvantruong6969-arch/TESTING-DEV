@@ -17,11 +17,11 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [x] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a; Opus reviewed 06/11):
       [x] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, DONE 06/11)
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
-- [ ] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
+- [x] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
       points collected in app = option b; no core change):
       [x] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet) DONE 06/11; waits for Opus review
       [x] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet) DONE 7e31127; Opus reviewed OK (fixed R37 wording)
-      [ ] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
+      [x] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
 - [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
@@ -131,3 +131,4 @@ STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticke
 | 2026-11-06 | Sonnet | T4M-M6 (D2): app spec Top 7, tick max 5, determination-point screen; R25..R38, HDT rows 14.x + section 14; CONG_THI, MICROSOFT, interview sheet | Docs only; no subagent; no code touched; grep shows no stale "Top 3" in the five files |
 | 2026-11-06 | Opus | Updated simulation artifact v2 (Top 7, tick, two funds); reviewed D2 T4M-M6 (OK; R37 no longer counts legit "vắng thi" warnings) | Waiting D1 |
 | 2026-11-06 | Sonnet | T4M-Q5a/b/c (D1): converter THIk/WPk, fake Lists/Forms with ticks and funds, demo --day-du; tests first (29 red on first run -> all 34 green), 5 mutations caught | No subagent; no core/schema/CSV change; default outputs byte-identical |
+| 2026-11-06 | Opus | Reviewed D1 T4M-Q5a/b/c: tests green after fixing D2/D1 clash (HDT no longer named `NV3`), demo default and --moi-clb outputs identical to before, --day-du runs; kiosk auto-fills single-club fund (confirmed); round 4 done | Artifact v3 next |

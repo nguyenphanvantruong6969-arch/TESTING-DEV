@@ -66,7 +66,7 @@ Quan hệ dòng: 1.500 em × 5 ngày = **7.500 dòng**. Ngày không chọn gì 
 
 **Điểm thi không nằm trong tệp này; tick chọn thi và điểm quyết tâm thì có.** Câu lạc bộ có thi tuyển xếp theo Tầng 1 (điểm thi, rồi STB), câu lạc bộ không thi xếp theo Tầng 2 (STB). Tick `THIk` (tối đa 5 mỗi ngày) và điểm `WPk` được thu ngay trên app và nằm trong list; **điểm thi chính thức đến từ tệp xuất bài thi riêng** của Forms, và bộ chuyển đổi ghép hai nguồn theo email đã hạ chữ thường (T4M-Q5a/b/c).
 
-**Về bộ sinh tệp giả:** lệnh mặc định ở đầu mục này vẫn cho `NV1..NV3` và **không** có `THIk`, `WPk` (giữ nguyên để các đường cũ không đổi). Sau T4M-Q5c, bộ sinh có tuỳ chọn sinh tới `NV7` kèm `THIk`, `WPk` hợp lệ; tên cờ xem `python du_lieu_test/sinh_xuat_lists_gia.py --help` (khi viết mục này mã D1 chưa vào nhánh, nên không ghi cờ). Một list thử đúng đặc tả M6 phải có đủ 21 cột này.
+**Về bộ sinh tệp giả:** lệnh mặc định ở đầu mục này vẫn cho ba cột `NV1`, `NV2`, `NV3` và **không** có `THIk`, `WPk` (giữ nguyên để các đường cũ không đổi). Muốn tệp đúng đặc tả M6: `python du_lieu_test/sinh_xuat_lists_gia.py --so-nv 7 --tick --wp` (T4M-Q5c; `--tick` thêm `THIk`, tối đa 5 mỗi ngày; `--wp` thêm `WPk`, hai quỹ 100). Một list thử đúng đặc tả M6 phải có đủ 21 cột này.
 
 Tệp xuất thật từ Lists sẽ có thêm các cột hệ thống (`ID`, `Title`, `Modified`, …) và thứ tự cột có thể khác. Bộ chuyển đổi phải đọc **theo tên cột** và bỏ qua cột thừa.
 
