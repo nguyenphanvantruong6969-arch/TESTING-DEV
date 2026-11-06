@@ -25,7 +25,7 @@ Dừng, ghi vào tệp bàn giao, báo điều phối khi: bất biến xung đ�
 Đánh dấu dòng của mình trong Plan của tệp bàn giao, ghi đè "Current state" phần của mình, **thêm** một dòng Session log; một mục `CHANGELOG.md`; dòng T4M-NC trong `TIEN_DO.md`; chỉ chạy test liên quan + `ruff`; `git fetch origin main` rồi `python .claude/skills/soat-ma/scripts/kiem_nhanh.py`; `git pull --rebase` (xung đột ở CHANGELOG / tệp bàn giao: giữ cả hai bên); commit, push vào `claude/upbeat-shannon-g5nnms`. Báo cáo tiếng Việt, tối đa 10 dòng.
 
 **Báo trạng thái về điều phối (Truong yêu cầu 06/11/2026):** xong bước, hoặc gặp luật dừng mục 2, thì báo ngay:
-1. Nếu có công cụ `send_message` (claude-code-remote): gửi tới phiên gốc `session_01YVAyu44juJNZ7h3oUwVHfW` (từ vòng 4; vòng 1–3 là `session_01YVAyu3Zzm2AEVFAPhazqHY`), tối đa 8 dòng: `DONE` hoặc `BLOCKED`, mã commit, kết quả test, quyết định cần Truong duyệt; với `BLOCKED` thì ghi câu hỏi chính xác cho Truong và các phương án.
+1. Nếu có công cụ `send_message` (claude-code-remote): gửi tới phiên gốc `session_01YVAyu14xCxoLe4ArvejR4i` (từ vòng 5; vòng 4 là `session_01YVAyu44juJNZ7h3oUwVHfW`, vòng 1–3 là `session_01YVAyu3Zzm2AEVFAPhazqHY`), tối đa 8 dòng: `DONE` hoặc `BLOCKED`, mã commit, kết quả test, quyết định cần Truong duyệt; với `BLOCKED` thì ghi câu hỏi chính xác cho Truong và các phương án.
 2. Dù có công cụ hay không: ghi cùng khối đó vào tệp bàn giao, mục "Current state", dạng `STATUS <mã>: …`, rồi push.
 3. Không chờ Truong trả lời trong phiên con; báo xong thì dừng.
 
@@ -252,7 +252,7 @@ numbering after R24) with pass/fail checks; add matching HDT §9 rows and a shor
 Label everything untested TH; no numbers presented as measured.
 ```
 
-## 9. Vòng 5: bộ dựng sẵn cho IT, T4M-BK (Opus đề xuất 06/11/2026, **CHỜ TRUONG DUYỆT**)
+## 9. Vòng 5: bộ dựng sẵn cho IT, T4M-BK (Opus đề xuất, **Truong duyệt 06/11/2026**; K0 xong 06/11, kết quả `T4M_KET_QUA_TAI_LIEU.md` §8)
 
 Đích: từ mô phỏng sang **hệ thống thật trên sản phẩm Microsoft**, do **IT và giáo viên ECA** dựng trên bản sao app (kế hoạch nghiên cứu §1: IT và giáo viên ECA quản lý app, IT chạy kiosk). Dự án không đụng tenant của trường; dự án giao **một thư mục "nhập là dựng"** cho IT, sinh bằng một lệnh, kiểm được trên máy không có Microsoft 365. Mọi thứ chạm Microsoft vẫn nhãn **TH** cho tới khi IT chạy (HDT §9).
 
@@ -271,6 +271,55 @@ Không sửa lõi, schema, hợp đồng CSV; không thư viện mới (chỉ th
 | K2 | T4M-BK3, BK4 (tuần tự, một phiên, sau K1) | Sonnet | bảng cấu hình flow `DaLam_<ClubId>` sinh từ `de_thi.json`; lệnh gộp `tao_bo_dung_t4m.py` ra thư mục + `.zip` (`01_lists/`, `02_app/`, `03_flow/`, `04_forms/` gọi `tao_mau_forms.py --moi-clb`, `HUONG_DAN_IT.md`); hướng dẫn: thứ tự dựng, mỗi bước một dòng pass/fail trỏ về R1..R38 và HDT §9 | Một lệnh sinh đủ; số flow = số CLB có đề; mỗi `ClubId` của bảng flow có trong `CLB.csv`; không tên thật, tenantId, URL; `demo_t4m.py` và mọi đầu ra cũ trùng khít |
 | K3 | soát | Opus | soát K1, K2 theo cột "Nhận khi"; cập nhật trang mô phỏng nếu cần; báo Truong | Test liên quan đạt, `ruff` sạch, `kiem_nhanh` 7/7 |
 
-Phụ thuộc: K0 → K1 → K2 → K3 (K1 cần cách tạo list do K0 chọn). Prompt K1, K2 viết sau K0 (định dạng tệp phụ thuộc kết quả K0).
+Phụ thuộc: K0 → K1 → K2 → K3 (K1 cần cách tạo list do K0 chọn). K0 chọn (KQ §8.4): list mặc định **B** (site template, chủ site áp), **A** nếu có app Entra cho PnP, lui **C** (Lists từ CSV + thêm cột tay); app = công thức theo thuộc tính, **không** YAML điều khiển; flow = dựng tay một mẫu rồi nhân bản bằng gói.
+
+### K1. T4M-BK1, BK2
+```
+T4M-BK1 then T4M-BK2 (Sonnet), one session. Follow T4M_KE_HOACH_TU_DONG.md §2-3 and §9 (the 4 Opus decisions
+there are fixed). Tests first (rule 2). Read: §9; T4M_KET_QUA_TAI_LIEU.md §8 (all of it); T4M_DAC_TA_SUA_APP.md
+§1, §2, §3, §4, §5, §10, §11; T4M_FLOW_DA_LAM.md §2 (BaiThi, NHAT_KY_DA_LAM columns);
+du_lieu_test/sinh_xuat_lists_gia.cot_csv; chuyen_forms_sang_phan_mem.doc_lists docstring; tao_mau_forms.ghi_clb_csv.
+New package mau_forms_thi_clb/bo_dung_t4m/ (stdlib only: json, csv, uuid; no new library).
+BK1 columns + lists: module cot_lists.py = ONE definition of lists ECA, CLB, BaiThi, NHAT_KY_DA_LAM (internal name,
+display name, type Text/Number/DateTime/Choice with choices, required). ECA = cot_csv(7, True, True) minus SharePoint
+system column `Created`; `HoTen` optional (keep, not required). CLB = exactly ghi_clb_csv header. Generators:
+(a) site_script.json: createSPList (templateType 100) per list, addSPField for Text/Number/DateTime,
+addSPFieldXml for Choice; every field a FIXED id = uuid5(NAMESPACE_URL, "rbda-t4m/<list>/<col>") and internalName =
+contract name; prints the action count and warns when > 30 (sync limit) and fails when > 300 (KQ §8.1).
+(b) CSV templates for way C: header + one example row whose values make Lists guess the right type (fake data only).
+(c) KIEM_COT_ECA.md: checklist to add missing ECA columns by hand (name, type, choices), with "add only if absent".
+BK2 Power Fx: generator writes one .txt per screen (NguyenVong, DiemQuyetTam, ThiTuyen, Khoa) listing
+"Control.Property = formula", fully expanded for k = 1..7 (no "…" or "/* … */"), from spec §2, §3, §10.3, §11;
+data-source filters use `=` only, Lower(User().Email); local filtering on collections as in spec §5; App.OnStart
+part labelled "dán tay" (App Object cannot paste code, KQ §8.2). Every generated file starts with a line
+"TH: chưa chạy trên Power Apps / SharePoint" and the source spec section. Byte-identical regeneration.
+Tests (write first, see red): columns of ECA == cot_csv(7,True,True) minus Created; CLB == ghi_clb_csv header;
+doc_lists reads a CSV with exactly the ECA columns (via sinh_xuat_lists_gia) without warnings; Buoi values of
+CLB.csv == Thu values of the fake Lists; GUIDs stable and unique; JSON valid and every field's internalName in the
+contract; action count printed; formulas contain NV1..NV7, THI1..THI7, WP1..WP7 each; no `<>`, ` in `, IsBlank,
+Not( inside any Filter( whose first argument is ECA, BaiThi or CLB; no real names, tenantId or URLs;
+regeneration identical. Mutation-check 3 key tests (must go red). No core/schema/CSV change (stop rule §2).
+Do NOT edit existing generators or the app spec text (report mismatches you find instead).
+```
+
+### K2. T4M-BK3, BK4
+```
+T4M-BK3 then T4M-BK4 (Sonnet), one session, after K1 is merged on the branch. Follow §2-3 and §9.
+Tests first. Read: §9; T4M_KET_QUA_TAI_LIEU.md §8.3-8.4; T4M_FLOW_DA_LAM.md (all); T4M_DAC_TA_SUA_APP.md §7,
+§10.4, §11 (R1..R38); T4M_HUONG_DAN_THU.md §9 (HDT rows); mau_forms_thi_clb/bo_dung_t4m/ from K1;
+tao_mau_forms.py --moi-clb.
+BK3 flow table: from de_thi.json, one row per club WITH a quiz: flow name DaLam_<ClubId>, ClubId constant,
+empty Form Id / owner / tested-date cells for IT; plus the expressions to paste (toLower(responder), ClubId
+constant, OData filter ResponseId eq '...') from FLOW_DA_LAM §3. Markdown + CSV. No .zip (decision 3).
+BK4 one command: mau_forms_thi_clb/tao_bo_dung_t4m.py --de-thi <json> --ra <dir> [--zip] builds
+01_lists/ (K1 outputs), 02_app/ (K1 formulas), 03_flow/ (BK3), 04_forms/ (tao_mau_forms --moi-clb outputs, called
+as a function, not re-implemented), HUONG_DAN_IT.md: build order (lists -> CLB FormUrl -> app formulas -> flow ->
+test round), each step one pass/fail line pointing to R1..R38 / HDT §9 rows, the three list ways A/B/C with the
+permissions from KQ §8.1 and HỎI-IT marks. Byte-identical regeneration incl. the zip (fixed timestamps, sorted).
+Tests: one command makes all four folders; flow rows == clubs with de_thi; every flow ClubId in CLB.csv;
+HUONG_DAN_IT.md names every R1..R38 at least once; no real data/tenantId/URL; demo_t4m.py default, --moi-clb,
+--day-du outputs unchanged (compare as in round 4). Update mau_forms_thi_clb/README.md and
+T4M_VAN_HANH_MOT_DOT.md (one short section each). Related tests + ruff + mutation check of 3 key tests.
+```
 
 **Ngoài phạm vi T4M-BK (cần Truong hoặc IT):** chạy bộ dựng trong tenant (GĐ3, NC-02); tài khoản dịch vụ làm chủ flow; DLP; nạp dữ liệu thật. Nguyên mẫu riêng của Truong trên Developer Plan (hạn tạo môi trường 15/11/2026) là việc khác, chỉ làm nếu Truong yêu cầu.

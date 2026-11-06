@@ -27,13 +27,19 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
 - [ ] A8-GOI-1..3 (bundle code): D1-D5 approved in principle; code ONLY after ECA answers Q1-Q3
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
-- [ ] ROUND 5 T4M-BK build kit for IT (plan §9; PROPOSED 06/11, awaiting Truong): K0 Opus research -> K1 Sonnet
-      (column module, list creator, Power Fx) -> K2 Sonnet (flow table, one-command kit + IT guide) -> K3 Opus review
-- [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
+- [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
+      [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
+      [ ] K1 T4M-BK1+BK2 (Sonnet): column module, site script + CSV + ECA checklist, Power Fx per screen
+      [ ] K2 T4M-BK3+BK4 (Sonnet, after K1): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
+      [ ] K3 Opus review
+- [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
+- [ ] Proposed, not approved: skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
-- Round 5 T4M-BK planned in T4M_KE_HOACH_TU_DONG.md §9 (docs only, no code); awaiting Truong's approval.
+- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). K1 launched as a separate Sonnet session (id in Plan once known);
+  it reports DONE/BLOCKED by send_message to THIS root session and as a `STATUS T4M-BK1/2:` line here. PR #13 open (CI pending).
+- Clone was shallow: `git fetch --unshallow` before comparing with main.
 - Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
   the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
   T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
@@ -72,17 +78,15 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Get Truong's answers (asked 06/11 in this session): (a) approve T4M-BK as in plan §9 (4 Opus technical decisions
-   there: one `CLB` list replacing `CLB_GIA`, one column module, NO hand-made flow .zip/.msapp, Power Fx expanded by
-   code); (b) PR to main for full CI + Windows build (recommended, still unanswered).
-2. If (a) approved: Opus runs K0 (web research -> T4M_KET_QUA_TAI_LIEU.md §8), then writes K1/K2 prompts in §9 and
-   launches K1 (create_session, Sonnet); K2 after K1; K3 review. Status protocol §3 (send_message to the root session).
-3. After Truong's GĐ2 meeting (before 15/11): paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA
-   answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter. GĐ2 also answers which K0 method IT may use.
+1. Wait for K1 STATUS; review per §9 K1 test list (+ mutation evidence, regeneration identical, no edits to old generators).
+   Then launch K2 (prompt in §9), then K3 review, tick round 5, report to Truong.
+2. Watch PR #13 CI (tests.yml with coverage >= 85 %, build-windows-exe.yml); fix red only on this branch; never merge.
+3. After Truong's GĐ2 meeting (before 15/11): GĐ4 v1, M2, A8-GOI; GĐ2 also answers KQ §8 HỎI-IT (SharePoint admin?
+   Entra app for PnP? Environment Maker? legacy flow import blocked?).
 
 ## Files touched (T4M, this branch)
 - mau_forms_thi_clb/{bieu_mau,tao_mau_forms,chuyen_forms_sang_phan_mem}.py, README.md, tests/test_t4m_cong_thi.py, T4M_VAN_HANH_MOT_DOT.md: T4M-Q4a/b/c
-- docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU, T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
+- docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU (+§8 BK0), T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
   T4M_KE_HOACH_TU_DONG, T4M_GOI_THIET_KE, T4M_MICROSOFT (v0), T4M_VAN_HANH_MOT_DOT, T4M_DO_MO_PHONG,
   T4M_DAC_TA_SUA_APP (+§10 M5), T4M_HUONG_DAN_THU (+§13), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
 - mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
@@ -144,3 +148,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong wants the simulation as a real Microsoft system; proposed build kit T4M-BK + own prototype before 15/11; no work started | Ask Truong which path |
 | 2026-11-06 | Opus | Truong pointed out he answered earlier; checked §1 of the research plan: path = build kit for IT; NC-02 stays an IT question | Plan T4M-BK next session |
 | 2026-11-06 | Opus | Wrote plan §9 round 5 T4M-BK (build kit for IT: K0 research, K1/K2 Sonnet, K3 review); asked Truong to approve it and the PR to main | No code; no child sessions |
+| 2026-11-06 | Opus | Truong approved T4M-BK + PR: merged main (CHANGELOG both sides, 157 tests pass), opened PR #13; K0 research -> KQ §8; wrote K1/K2 prompts; root session id updated in plan §3 | Launching K1 |

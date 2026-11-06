@@ -244,3 +244,32 @@ Thi ở đâu, có giám sát không (Take a Test cần máy Windows); một đ�
 - Thư viện: `python-docx` đã có trong `requirements-dev.txt`; không cần thư viện mới.
 
 Nguồn mục 7 (đọc 05/11/2026): support.microsoft.com/forms/create-a-quiz-with-microsoft-forms; /office/adjust-your-form-or-quiz-settings-in-microsoft-forms-f255a4ba-e03c-4e12-b880-f7e8b62e0665; /forms/form-question-response-and-character-limits-in-microsoft-forms; /forms/check-and-share-your-quiz-results; /forms/convert-a-word-or-pdf-form-or-quiz-to-microsoft-forms; /office/share-a-form-or-quiz-as-a-template-82ea9d8a-260a-47a0-afdb-497f3d746e3f; /education/assignments/assign-quizzes-to-students-through-microsoft-teams; learn.microsoft.com/connectors/microsoftforms; learn.microsoft.com/graph/api/overview; learn.microsoft.com/power-apps/maker/canvas-apps/share-app; TT-CXM: Microsoft Q&A về Graph Forms API, item-level permissions, run-only users; support.microsoft.com/sharepoint/lists/data-and-lists/create-a-list-based-on-a-spreadsheet (đoạn trích).
+
+## 8. Bộ dựng sẵn cho IT (T4M-BK0, đọc 06/11/2026)
+
+Câu hỏi: dựng list có cột định sẵn, công thức app và flow **mà ít phải xin quyền quản trị tenant nhất**. Nhãn như trên. Chưa ai thử trong tenant của trường: mọi bước dựng vẫn **TH**.
+
+### 8.1 Tạo list và thêm cột
+
+| Cách | Quyền cần | Nhãn | Ghi chú |
+|---|---|---|---|
+| A. Site script JSON (`createSPList` + `addSPField` / `addSPFieldXml`), áp bằng `Invoke-PnPSiteScript -Script` | Quyền trên site (trang PnP: "when passing in a site script through -Script, you only need to have permissions to the site"); **nhưng** PnP PowerShell cần một ứng dụng Entra do tổ chức tự đăng ký (bắt buộc từ 09/09/2024; đăng ký cần quyền tạo app registration, nguồn thứ ba nói tối thiểu Cloud Application Administrator) | ĐXM (trang lệnh); TT-CXM (vai trò tối thiểu) | Hợp nhất: chạy lại **không nhân đôi**; list cùng tên thì **chỉ thêm cột còn thiếu** (ĐXM, trang tổng quan). Hợp với việc thêm `NV4..NV7`, `THI1..7`, `WP1..7` vào **bản sao list ECA có sẵn**. HỎI-IT: trường đã có app Entra cho PnP chưa |
+| B. Cùng JSON, quản trị SharePoint đăng ký một lần (`Add-SPOSiteScript`, `Add-SPOSiteDesign`), chủ site áp qua **Settings > Apply a site template** | Đăng ký: quản trị SharePoint (GĐ: trang hướng dẫn dùng SharePoint Online Management Shell, không ghi vai trò; lệnh `*-SPO*` cần kết nối site quản trị). Áp: "site owner permissions or higher" (ĐXM) | ĐXM / GĐ | Áp không đồng bộ: trần **300 hành động hoặc 100.000 ký tự**; áp bằng `Invoke-SPOSiteDesign` (đồng bộ) chỉ **30** (ĐXM). Tenant tối đa 100 site script, 100 site template |
+| C. Microsoft Lists "Create a list based on a spreadsheet" (CSV/Excel) | Chỉ quyền tạo list trên site | ĐXM (trang hỗ trợ, đoạn trích) | Kiểu cột **đoán theo dữ liệu**, sửa được ở bước Customize; bảng tối đa 5.000 dòng. Tạo list mới thì được; **không thêm cột vào list có sẵn**, nên với ECA phải thêm cột tay |
+
+Hệ quả cho K1: (1) cùng một định nghĩa cột sinh ra **cả ba**: JSON site script (A và B), CSV mẫu một dòng tiêu đề + một dòng ví dụ để đoán đúng kiểu (C), và bảng kiểm thêm cột tay cho ECA (C). (2) Mỗi cột có `id` GUID **cố định** (khuyến nghị của Microsoft để chạy lại không thêm cột lần hai; sinh bằng `uuid.uuid5` theo tên list + tên cột, thư viện chuẩn) và `internalName` đúng tên trong hợp đồng §8 (`NV1`, `THI1`, `WP1`…). (3) `addSPField` chỉ có Text, Note, Number, Boolean, User, DateTime; cột Choice (`Thu`, `TrangThai`, `CoSo`) dùng `addSPFieldXml` (ĐXM). (4) Đếm hành động: ECA khoảng 30 cột + `CLB` 4 + `BaiThi` 4 + `NHAT_KY_DA_LAM` 4 ≈ 45 (ƯL): **vượt trần 30 của áp đồng bộ**, dưới 300 của áp không đồng bộ; bộ sinh phải in số hành động và cảnh báo khi > 30. (5) Rủi ro TH: bản sao ECA có cột `NV1..NV3` tạo tay (GUID khác) thì site script có thể tạo cột trùng tên hiển thị; hướng dẫn IT phải thử trên bản sao trước và chỉ thêm cột chưa có.
+
+### 8.2 Công thức và điều khiển Power Apps
+- **Code view** (ĐXM, learn.microsoft.com/power-apps/maker/canvas-apps/code-view, cập nhật 10/2026): xem, chép và **dán mã YAML của điều khiển** (cả điều khiển con) vào Studio để tạo điều khiển mới; mã được kiểm trước khi tạo; **phải dùng đúng định dạng YAML do Studio sinh**; không chép/dán được **App Object**; không sửa mã trong code view; trình duyệt phải cho phép clipboard.
+- Hệ quả cho K1: bộ dựng giao **công thức Power Fx theo từng thuộc tính** (`OnVisible`, `Items`, `OnSelect`, `DisplayMode`…), dán vào thanh công thức: chắc chắn dùng được. **Không tự chế YAML điều khiển** khi chưa có mẫu do Studio sinh; khi IT có bản sao app, IT chép một điều khiển mẫu (View code > Copy code) gửi lại thì mới sinh YAML theo đúng mẫu đó (việc sau, TH). Công thức của `App.OnStart`/`App.Formulas` dán tay (App Object không dán YAML được).
+
+### 8.3 Flow
+- **Gói không thuộc solution** (ĐXM, learn.microsoft.com/power-automate/export-import-flow-non-solution): xuất `.zip` chỉ chủ hoặc đồng chủ flow; nhập cần vai trò **Environment Maker** ở môi trường đích; chọn "Create as new" hoặc "Update". Nguồn cộng đồng (TT-CXM): nút Import Package (Legacy) bị chặn khi quản trị bật "Create in Dataverse solutions".
+- Hệ quả cho K2: giữ quyết định 3 của §9 (không tự chế `.zip`): IT dựng tay một flow `DaLam_<ClubId>` theo `T4M_FLOW_DA_LAM.md` §3, xuất gói, nhập lại cho từng CLB và đổi `Form Id` + hằng `ClubId` theo bảng do bộ dựng sinh. HỎI-IT: có quyền Environment Maker và legacy import có bị chặn không.
+
+### 8.4 Chọn mặc định
+- **List:** mặc định **B** nếu IT có quản trị SharePoint (một lần đăng ký, chủ site bấm áp; không cần app Entra), **A** nếu trường đã có app Entra cho PnP; lui **C** (không cần gì thêm). Cả ba từ cùng một tệp nguồn.
+- **App:** công thức theo thuộc tính (mặc định); YAML điều khiển là việc sau.
+- **Flow:** dựng tay một mẫu, nhân bản bằng gói.
+
+Nguồn mục 8 (đọc 06/11/2026): learn.microsoft.com/sharepoint/dev/declarative-customization/site-design-json-schema; /site-design-overview; /get-started-create-site-design; /site-design-rest-api; support.microsoft.com/office/apply-and-customize-sharepoint-site-templates-39382463-0e45-4d1b-be27-0e96aeec8398; pnp.github.io/powershell/cmdlets/Invoke-PnPSiteScript.html; pnp.github.io/powershell/articles/registerapplication; learn.microsoft.com/power-apps/maker/canvas-apps/code-view; learn.microsoft.com/power-automate/export-import-flow-non-solution; support.microsoft.com/topic/380cfeb5-6e14-438e-988a-c2b9bea574fa (Create a list based on a spreadsheet). TT-CXM: o365reports.com (vai trò đăng ký app), cộng đồng Power Automate (legacy import bị chặn).
