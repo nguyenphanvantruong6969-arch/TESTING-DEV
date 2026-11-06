@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-06 — T3-L4 fix (ngoài sổ, chỉ sửa test): test tải bảng theo CLB hết chập chờn
+
+- Nguyên nhân (dựng lại tất định bằng cách làm chậm `get_danh_sach_clb` 0,5 s): thẻ Kết quả mở mặc định "Theo lớp" (lớp 10A1 = HS1, HS2); khi chuyển sang "Theo CLB", bảng lớp CŨ vẫn hiện tới lúc API CLB trả về, nên `wait_for_function(!kqBang.hidden)` qua ngay và test đếm 2 dòng cũ. Tệp xuất (3 em của CLB A) là ĐÚNG; `export_bang_dang_xem` / `kqThuTuMan` không lỗi.
+- `tests/test_giao_dien_t3_l3.py::test_tai_bang_theo_clb_va_theo_ma_co_tim`: chờ đến khi `#kqThan` hiện đúng danh sách mã của CLB A (lấy từ `api.get_danh_sach_clb("A")`, kiểm là HS1, HS2, HS3) rồi mới tải; so tệp với đúng danh sách đó. Không đổi mã sản phẩm.
+
 ## 2026-11-05 — T3-L5 (ngoài sổ, Truong yêu cầu): Điểm chuẩn cùng nền các thẻ khác, thẻ 05 chỉ ghi "Quản lý"
 
 - `style.css`: bỏ hai khối nền tối riêng của `#adminDiemChuanBlock` (`prefers-color-scheme: dark` và `[data-theme=dark]`); khối giờ dùng nền trắng như các thẻ khác.

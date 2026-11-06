@@ -106,11 +106,17 @@ def test_tai_bang_theo_clb_va_theo_ma_co_tim(mo):
     _mo_ket_qua(page, "clb")
     page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length === 2")
     page.select_option("#kqChonClb", "A")
-    page.wait_for_function("() => !document.getElementById('kqBang').hidden")
-    sl = page.evaluate("() => document.querySelectorAll('#kqThan tr').length")
+    # Chờ đúng bảng CLB A, không chỉ chờ #kqBang hiện: khi chuyển từ "Theo lớp" (mặc định, lớp
+    # 10A1 = HS1, HS2) sang "Theo CLB", bảng lớp CŨ vẫn hiện tới khi get_danh_sach_clb trả về, nên
+    # đếm dòng ngay lúc đó ra 2 thay vì 3 (lỗi chập chờn CI run 42225205261).
+    mong = sorted(m["student_id"] for m in api.get_danh_sach_clb("A")["data"]["thanh_vien"])
+    assert mong == ["HS1", "HS2", "HS3"], mong          # A sức chứa 5, cả ba em chọn A đầu tiên
+    page.wait_for_function(
+        "(m) => JSON.stringify(Array.from(document.querySelectorAll('#kqThan tr'),"
+        " r => r.cells[0].textContent.trim()).sort()) === JSON.stringify(m)", arg=mong)
     _bam_tai(page)
     tep = sorted(glob.glob(os.path.join(api.thu_muc_xuat, "*.xlsx")))
-    assert len(_ma_trong_tep(tep[-1])) == sl and sl >= 1
+    assert _ma_trong_tep(tep[-1]) == mong
     _mo_ket_qua(page, "ma")
     page.fill("#kqTimKiem", "HS3")
     page.wait_for_function("() => document.querySelectorAll('#kqThan tr').length === 1")
