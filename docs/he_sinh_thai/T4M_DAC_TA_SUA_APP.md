@@ -197,7 +197,7 @@ Hành vi: mục 2 (điểm 3, 4, 5a, 5b, 5c, 8, 9). Nối tiếp R1 đến R24. 
 | R34 | Khoá tắt cả tick và ô điểm | Dòng `Đã khóa`: không tick được, không gõ điểm được, nút Gửi tắt | 14.4 |
 | R35 | Thẻ Thi tuyển theo tick | CLB có đề trong `NV` nhưng không tick thì không có thẻ; tick rồi bỏ tick, bấm Làm mới thì thẻ biến mất; không bao giờ quá 5 thẻ mỗi ngày | 14.4 |
 | R36 | `FormUrl` khớp `de_thi.json` | Mọi CLB có đề trong `de_thi.json` có `FormUrl` ở list `CLB`; CLB không đề thì `FormUrl` rỗng (nếu lệch thì bộ chuyển đổi cảnh báo "tick ở CLB không có đề") | 14.5 |
-| R37 | Tệp xuất qua bộ chuyển đổi không cảnh báo | Xuất List từ bản sao, chạy `chuyen_forms_sang_phan_mem.py --chi-thi --lists`: 0 cảnh báo về tick (không đề, quá 5, vắng thi) và điểm (khung ≠ 100, ô không nguyên) | 14.5 |
+| R37 | Tệp xuất qua bộ chuyển đổi không cảnh báo | Xuất List từ bản sao, chạy `chuyen_forms_sang_phan_mem.py --chi-thi --lists`: 0 cảnh báo về tick (không đề, quá 5) và điểm (khung ≠ 100, ô không nguyên). Cảnh báo "vắng thi" chỉ có khi chạy kèm tệp xuất Forms và là hợp lệ khi em tick mà không nộp, nên không tính ở đây | 14.5 |
 | R38 | Hai ngôn ngữ và điện thoại cho nhãn và màn mới | Chuyển vi/en: nhãn tick, khung, bộ đếm, thông báo đổi hết; điện thoại: bảy dòng + hai khung thao tác bằng ngón tay, bàn phím số, không cuộn ngang | 14.4 |
 
 R36 và R37 cần D1 (T4M-Q5a/b/c) có mã trên nhánh; trước đó chỉ kiểm được R25 đến R35 bằng mắt trên app thử.
