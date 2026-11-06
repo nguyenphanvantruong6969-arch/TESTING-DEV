@@ -75,7 +75,10 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
    or SharePoint site script: verify which is allowed, HỎI-IT); (ii) Power Fx formulas per screen ready to paste
    (from DAC_TA §2, §10, §11); (iii) "Đã làm" flow as an exportable package; (iv) Forms via existing Quick Import
    .docx. Truong may also build a prototype himself if he gets a Power Apps environment: Developer Plan stops
-   creating environments 15/11/2026 (urgent). Ask Truong which path, then plan in a new §9 of T4M_KE_HOACH_TU_DONG.md.
+   creating environments 15/11/2026 (urgent). DO NOT re-ask what Truong answered on 05/11 (T4M_KE_HOACH_NGHIEN_CUU.md
+   §1: IT + ECA teacher manage the app, IT runs the kiosk, school agreed) => default path = build kit for IT (T4M-BK).
+   Truong skipped NC-02 (can his student account build apps?): that is an IT question for GĐ2, not for Truong.
+   Next: plan T4M-BK in a new §9 of T4M_KE_HOACH_TU_DONG.md and get Truong's approval of the item.
 3. After Truong's GĐ2 meeting (before 15/11): paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA
    answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter.
 
@@ -141,3 +144,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Artifact v4 (demo --day-du numbers); handoff at ~400k context (Stop hook); no new work | Next: ask Truong about PR to main |
 | 2026-11-06 | Opus | Truong asked to recreate the simulation page; asked clarifying questions only (no new work, context full) | New session: get answers first |
 | 2026-11-06 | Opus | Truong wants the simulation as a real Microsoft system; proposed build kit T4M-BK + own prototype before 15/11; no work started | Ask Truong which path |
+| 2026-11-06 | Opus | Truong pointed out he answered earlier; checked §1 of the research plan: path = build kit for IT; NC-02 stays an IT question | Plan T4M-BK next session |
