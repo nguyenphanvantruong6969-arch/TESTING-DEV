@@ -77,7 +77,10 @@ python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py <như trên> --bai-thi Ba
 ```bash
 python du_lieu_test/demo_t4m.py --ra ./demo_ra            # mặc định 120 học sinh giả
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7 --he-so-cho 1
+python du_lieu_test/demo_t4m.py --ra ./demo_ra --moi-clb  # cách B: mỗi CLB một biểu mẫu + BaiThi.csv
 ```
+
+`--moi-clb` (cổng thi, `T4M_CONG_THI.md`): tệp Forms giả được tách thành `forms_moi_clb/<club_id>.xlsx` (không câu cổng), thêm `BaiThi.csv` giả như flow "Đã làm" ghi (cố ý thiếu một bài), và bộ chuyển đổi chạy với `--bai-thi`. Cùng seed thì kết quả xếp trùng với chế độ một biểu mẫu chung.
 
 Lệnh chạy lần lượt: sinh tệp Lists giả (mã CLB lấy từ `de_thi.json`) → sinh tệp Forms chỉ-thi giả
 (Email, câu hỏi, cột Points) → bộ chuyển đổi `--chi-thi` → nạp `SO_NHAP_CLB.xlsx` vào một CSDL **tạm**

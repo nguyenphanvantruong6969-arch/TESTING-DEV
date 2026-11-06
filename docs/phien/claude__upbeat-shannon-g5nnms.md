@@ -33,7 +33,12 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   new HDT §13 + rows 13.1..13.4; R15..R24 and T4M_FLOW_DA_LAM.md now point to 13.x.
 - Minor notes, not fixed (out of scope): default mode of tao_mau_forms.py ignores --ra (pre-existing); --bai-thi ClubId
   compare is case-sensitive (club_id in de_thi.json is lower-case; IT must keep it so in list BaiThi).
-- C1/C2 child sessions are done; nothing is running. `demo_t4m.py --moi-clb` not done (C1 judged it not cheap).
+- C1/C2 child sessions are done; nothing is running. Truong chose cách B (portal) explicitly again 06/11.
+- T4M-DEMO-B DONE: `demo_t4m.py --moi-clb` (split fake shared export per club, fake BaiThi.csv missing one
+  single-submission row, converter --bai-thi); same match_results as shared form; 16 tests in test_demo_t4m.py.
+  Interview sheet: ECA-9 rewritten for B, new B3 IT-15..IT-18 (app edit or SharePoint fallback, form owner,
+  service account + flow quota, BaiThi read-only/DLP). Note: converter warnings with many files give row number
+  but not file name (pre-existing).
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
@@ -55,8 +60,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Ask Truong about the pending proposals (PR to main for full CI + Windows build is the recommended next one;
-   optional: `demo_t4m.py --moi-clb`).
+1. Ask Truong about the pending proposals (PR to main for full CI + Windows build is the recommended next one).
 2. After Truong's GĐ2 meeting: paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA answered Q1-Q3.
 
 ## Files touched (T4M, this branch)
@@ -66,7 +70,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   T4M_DAC_TA_SUA_APP (+§10 M5), T4M_HUONG_DAN_THU (+§13), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
 - mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
   GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
-- du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py, do_t4m_thi.py, ket_qua_t4m/
+- du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py (+--moi-clb), do_t4m_thi.py, ket_qua_t4m/
 - tests/: test_sinh_xuat_lists_gia, test_t4m_chi_thi, test_demo_t4m, test_do_t4m_thi, test_doi_chieu_lists (.py)
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md, CLAUDE.md + docs/ke_hoach/CLAUDE_CHI_TIET.md (Z-CLAUDE-GON)
 
@@ -112,3 +116,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Sonnet | T4M-Q4a/b/c (C1): `--moi-clb` generator, one-club-per-export converter, `--bai-thi` report; tests first (24) | No subagent; default and --chi-thi unchanged |
 | 2026-11-06 | Opus | Third handoff note: C1 also reported DONE (unreviewed) | Round 3 needs Opus review only |
 | 2026-11-06 | Opus | Reviewed round 3 (C1, C2): 134 tests, kiem_nhanh 7/7, outputs identical; added 1 test (mutation survivor), HDT §13 rows 13.1-13.4 (C2 numbering clash); round 3 ticked | Next: Truong decides PR to main |
+| 2026-11-06 | Opus | Truong chose cách B; T4M-DEMO-B: demo --moi-clb (tests first, 4 red -> green, 2 mutations caught), interview sheet B3 IT-15..18 | Next: PR to main? |

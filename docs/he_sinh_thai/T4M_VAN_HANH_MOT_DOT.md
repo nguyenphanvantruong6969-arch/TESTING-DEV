@@ -98,8 +98,9 @@ Luồng dữ liệu: cột Lớp của List đi vào cột Lớp của Sổ nh�
 ```
 python du_lieu_test/demo_t4m.py --ra ./demo_ra                         # 120 em
 python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7 --he-so-cho 1
+python du_lieu_test/demo_t4m.py --ra ./demo_ra --moi-clb               # cách B (cổng thi)
 ```
-Ra `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`, `ket_qua_theo_lop/`. Dữ liệu hoàn toàn **mô phỏng**.
+Ra `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`, `ket_qua_theo_lop/`. Với `--moi-clb`: `forms_moi_clb/` (mỗi CLB một tệp xuất) và `BaiThi.csv` thay cho `forms_chi_thi_gia.xlsx`; kết quả xếp như bản một biểu mẫu chung. Em nộp hai lần bị báo một lần cho mỗi biểu mẫu em thi. Dữ liệu hoàn toàn **mô phỏng**.
 
 ## Việc còn chờ (không thuộc tài liệu này)
 HỎI-IT: kho của app ECA, cách khoá, đường PowerSchool → M365, danh sách giáo viên chủ nhiệm, chính sách cài `.exe`, thời hạn xoá tệp. **TH:** cách List mã hoá khi xuất, bộ chuyển đổi lọc theo cơ sở, flow gửi tệp.

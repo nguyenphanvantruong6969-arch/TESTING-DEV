@@ -105,8 +105,8 @@ Trả lời: ______________________________________________________________
 
 ### B2. Thi tuyển (quyết định 05/11/2026: trường theo RB-DA)
 
-**ECA-9. [NC-25]** CLB nào sẽ thi? Học sinh chọn CLB thi (tối đa 5 mỗi buổi) ở app ECA hay ngay trong biểu mẫu thi?
-*Bối cảnh:* đề xuất dùng Microsoft Forms Quiz (kho đã có công cụ dựng đề và chấm lại); ghép điểm qua email trường.
+**ECA-9. [NC-25]** CLB nào sẽ thi? Mỗi CLB thi một biểu mẫu riêng, học sinh mở từ app (cổng thi, Truong chọn 06/11/2026): giáo viên CLB có đồng ý tự giữ biểu mẫu của mình và bấm "Post scores" khi hết đợt không?
+*Bối cảnh:* Microsoft Forms Quiz, mỗi CLB một biểu mẫu 5 đến 10 câu, không câu cổng (`T4M_CONG_THI.md`); em chỉ thấy CLB có thi mà em đã chọn trong Top 3; điểm xếp do bộ chuyển đổi chấm lại, ghép qua email trường.
 Trả lời: ______________________________________________________________
 
 **ECA-10. [NC-26]** Thi ở đâu, có giám sát không? Mỗi buổi một đề hay dùng chung (lộ đề)? Có thể dùng chế độ Take a Test (máy Windows) không?
@@ -119,6 +119,24 @@ Trả lời: ______________________________________________________________
 
 **IT-14. [NC-23]** Tenant có hạn chế Microsoft Forms không (tắt chia sẻ ngoài, tắt Quick Import, chặn Take a Test)? Giáo viên tạo được Forms dạng Quiz bằng tài khoản trường chứ?
 *Bối cảnh:* mỗi người tối đa 400 biểu mẫu tính cả thùng rác; tệp Quick Import phải nằm trên máy, tối đa 10 MB.
+Trả lời: ______________________________________________________________
+
+### B3. Cổng thi: câu cho IT (cách B, `T4M_CONG_THI.md`)
+
+**IT-15. [NC-05]** IT có sửa được app ECA để thêm một màn "Thi tuyển" (danh sách CLB có thi kèm nút Làm bài và trạng thái "Đã làm") trên bản sao trước không? Nếu không: chấp nhận trang SharePoint của đợt (danh sách CLB kèm link, khung xem list `BaiThi` lọc [Me]) không?
+*Bối cảnh:* đặc tả màn ở `T4M_DAC_TA_SUA_APP.md` §10 (R15 đến R24); phương án lui ở `T4M_CONG_THI.md` §7.
+Trả lời: ______________________________________________________________
+
+**IT-16. [NC-23]** Ai sở hữu khoảng 10 đến 20 biểu mẫu thi: một tài khoản chung của IT hay mỗi giáo viên CLB? Có tài khoản nào gần chạm 400 biểu mẫu (tính cả thùng rác) không?
+*Bối cảnh:* flow "Đã làm" phải đọc được biểu mẫu; giáo viên rời trường thì biểu mẫu theo tài khoản đó.
+Trả lời: ______________________________________________________________
+
+**IT-17. [NC-13]** Có tài khoản dịch vụ làm chủ khoảng 10 đến 20 flow nhỏ "Đã làm" không? Đợt thi mở mấy ngày?
+*Bối cảnh:* ước lượng khoảng 9.000 lượt mỗi đợt, hạn mức 6.000 lượt mỗi người mỗi ngày tính cộng dồn theo chủ flow (`T4M_FLOW_DA_LAM.md` §5); mở vài ngày thì vừa, một ngày cao điểm có thể chạm trần.
+Trả lời: ______________________________________________________________
+
+**IT-18. [NC-04]** Đặt được list `BaiThi` chỉ đọc với học sinh (chỉ flow ghi) và list `CLB` chỉ đọc không? DLP có cho phép Forms và SharePoint chung một flow không?
+*Bối cảnh:* học sinh ghi được `BaiThi` thì tự đánh "Đã làm" được (R24); flow chỉ dùng connector chuẩn.
 Trả lời: ______________________________________________________________
 
 ## Sau buổi gặp

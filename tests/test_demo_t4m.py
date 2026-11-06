@@ -159,3 +159,54 @@ def test_demo_chay_lai_cung_thu_muc_khong_de_ban_sao(tmp_path):
     b = demo_t4m.chay_demo(str(ra), so_hs=30, seed=11)
     assert a["ket_qua"] == b["ket_qua"]
     assert sorted(p.name for p in ra.iterdir() if p.is_dir()) == ["ket_qua_theo_lop"]
+
+
+# ------------------------------------------- cách B: mỗi CLB một biểu mẫu (T4M-DEMO-B)
+
+def test_demo_moi_clb_cung_ket_qua_nhu_bieu_mau_chung(tmp_path):
+    chung = demo_t4m.chay_demo(str(tmp_path / "a"), so_hs=40, seed=11)
+    rieng = demo_t4m.chay_demo(str(tmp_path / "b"), so_hs=40, seed=11, moi_clb=True)
+    assert rieng["ket_qua"] and rieng["ket_qua"] == chung["ket_qua"]
+    assert rieng["n_bai_thi"] == chung["n_bai_thi"]
+    # Cùng các em bị cảnh báo; em nộp hai lần được báo một lần MỖI biểu mẫu em thi, nên có thể nhiều dòng hơn.
+    assert {s for _d, s, _n in rieng["canh_bao"]} == {s for _d, s, _n in chung["canh_bao"]}
+    assert len(rieng["canh_bao"]) >= len(chung["canh_bao"])
+
+
+def test_demo_moi_clb_mot_tep_moi_clb_khong_cau_cong(tmp_path, de):
+    ra = tmp_path / "ra"
+    kq = demo_t4m.chay_demo(str(ra), so_hs=40, seed=11, moi_clb=True)
+    thu_muc = ra / "forms_moi_clb"
+    tep = sorted(p.name for p in thu_muc.glob("*.xlsx"))
+    assert tep == sorted("%s.xlsx" % c["club_id"] for c in bm.clb_co_thi(de))
+    assert kq["n_bieu_mau"] == len(tep)
+    assert not (ra / "forms_chi_thi_gia.xlsx").exists()
+    for p in thu_muc.glob("*.xlsx"):
+        tieu, _dong = cv.doc_tep_xuat(str(p))
+        ma = {bm.ma_cua_cau(h) for h in tieu} - {None}
+        assert not any(m.startswith("thi-") for m in ma), p.name
+        assert {m.rsplit("-", 1)[0] for m in ma if not m.startswith("thi-")} == {p.stem}
+
+
+def test_demo_moi_clb_doi_chieu_bai_thi_dung_mot_cho_gai(tmp_path):
+    ra = tmp_path / "ra"
+    kq = demo_t4m.chay_demo(str(ra), so_hs=40, seed=11, moi_clb=True)
+    assert (ra / "BaiThi.csv").is_file()
+    assert [(x[0], x[1], x[2]) for x in kq["doi_chieu"]] == [
+        (cv.CHI_CO_O_TEP_XUAT,) + kq["gai"]["bai_thi_thieu"]]
+    wb = openpyxl.load_workbook(str(ra / "BANG_DIEM.xlsx"), read_only=True)
+    assert "Đối chiếu BaiThi" in wb.sheetnames
+    wb.close()
+
+
+def test_demo_mac_dinh_khong_co_doi_chieu_va_khong_tep_moi_clb(tmp_path):
+    ra = tmp_path / "ra"
+    kq = demo_t4m.chay_demo(str(ra), so_hs=30, seed=11)
+    assert "doi_chieu" not in kq and not (ra / "forms_moi_clb").exists()
+    assert not (ra / "BaiThi.csv").exists()
+
+
+def test_demo_main_moi_clb_in_doi_chieu(tmp_path, capsys):
+    assert demo_t4m.main(["--ra", str(tmp_path / "ra"), "--so-hs", "40", "--seed", "11", "--moi-clb"]) == 0
+    ra = capsys.readouterr().out
+    assert "mỗi CLB một biểu mẫu" in ra and "Đối chiếu BaiThi" in ra and "1 chỗ lệch" in ra

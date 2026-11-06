@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-DEMO-B: `demo_t4m.py --moi-clb` (cách B) và câu hỏi cổng thi cho GĐ2
+
+Không đổi lõi, schema, hợp đồng CSV, bộ chuyển đổi hay bộ sinh mẫu; chế độ mặc định của demo không đổi (test cũ không sửa).
+- `du_lieu_test/demo_t4m.py`: `--moi-clb` / `chay_demo(moi_clb=True)`; `tach_moi_clb` tách tệp Forms giả chung thành một tệp xuất mỗi CLB có đề (không câu cổng, cột Points là số); `ghi_bai_thi_gia` sinh `BaiThi.csv` giả, cố ý thiếu một bài của em chỉ nộp một lần; bộ chuyển đổi chạy với `--bai-thi`; tóm tắt in mục đối chiếu.
+- Test mới (viết trước, 4 đỏ -> xanh): 5 ca trong `tests/test_demo_t4m.py` (nay 16): kết quả xếp trùng với bản một biểu mẫu chung cùng seed, đúng một tệp mỗi CLB không câu cổng, đối chiếu bắt đúng chỗ gài, mặc định không có tệp mới, lệnh in đối chiếu. Gây hỏng tạm 2 chỗ: cả hai bị bắt.
+- `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md`: sửa ECA-9 theo cách B; thêm mục B3 với IT-15 (sửa app hay trang SharePoint dự phòng), IT-16 (chủ biểu mẫu, trần 400), IT-17 (tài khoản dịch vụ, hạn mức flow, số ngày mở), IT-18 (quyền chỉ đọc `BaiThi`, DLP).
+- README mục 0b, `T4M_VAN_HANH_MOT_DOT.md` phụ lục: lệnh `--moi-clb`.
+
 ## 2026-11-06 — T4M-NC vòng 3: soát C1 (T4M-Q4a/b/c) và C2 (T4M-M5)
 
 Soát theo plan §7 "Nhận khi": 134 test liên quan đạt, ruff sạch, `kiem_nhanh` 7/7 (15 ca trùng khít với main); đầu ra mặc định và `--chi-thi` của `tao_mau_forms.py` trùng khít trước/sau C1 (bỏ qua `docProps/core.xml`). Không đổi mã sản phẩm.
