@@ -36,7 +36,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- Rounds 1-5 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; no check-in trigger. PR #13 open (CI not yet checked).
+- Rounds 1-5 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; no check-in trigger. PR #13: CI red on 3 branch causes, fixed 28c83dc (doc test count, demo_t4m explicit wharton, bk34 skip without docx);
+  1 flaky main UI test (test_giao_dien_t3_l3 theo_clb) left as a separate suggested task. Re-check CI.
 - Round 5 DONE and reviewed (K1 0e8d0ec after 1 fix round; K2 979213b). One command:
   `python mau_forms_thi_clb/tao_bo_dung_t4m.py --de-thi mau_forms_thi_clb/de_thi.json --ra <dir> --zip` -> 01_lists (site
   script 46 actions, async apply only; CSV way C; ECA checklist), 02_app (Power Fx per property), 03_flow (10 DaLam_*),
@@ -142,8 +143,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Wrote plan §9 round 5 T4M-BK (build kit for IT: K0 research, K1/K2 Sonnet, K3 review); asked Truong to approve it and the PR to main | No code; no child sessions |
 | 2026-11-06 | Opus | Truong approved T4M-BK + PR: merged main (CHANGELOG both sides, 157 tests pass), opened PR #13; K0 research -> KQ §8; wrote K1/K2 prompts; root session id updated in plan §3 | Launching K1 |
 | 2026-11-06 | Sonnet | T4M-BK1/BK2 (K1): bo_dung_t4m column module (ECA 30 cols), site script (46 actions), sample CSVs + KIEM_COT_ECA.md, 4 Power Fx files k=1..7; tests first, static syntax test caught 3 generator bugs; 3 mutations caught | No subagent; no core/schema/CSV change; Buoi text mismatch reported |
-| 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
+| 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (accepted 0e8d0ec, launched K2) (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
 | 2026-11-06 | Sonnet | K1 fixes after Opus review: site script subactions + $schema + addSPField id, Nhan named formula, xfail -> normal test; tests first (5 red), 2 mutations caught | No core/schema/CSV change |
-| 2026-11-06 | Opus | Re-reviewed K1 0e8d0ec: accepted; launched K2 | |
 | 2026-11-06 | Sonnet | T4M-BK3/BK4 (K2): flow table + one-command kit (4 folders + zip) + HUONG_DAN_IT.md; tests first (25); 3 mutations caught (1 weak test tightened) | No subagent; no core/schema/CSV change; demo outputs identical |
 | 2026-11-06 | Opus | K3: reviewed K2 979213b (accepted; rule-2 gap noted); round 5 done | Next: Truong/IT |
+| 2026-11-06 | Opus | Fixed PR #13 CI red (3 causes reproduced locally first); flaky UI test from main split off | |
