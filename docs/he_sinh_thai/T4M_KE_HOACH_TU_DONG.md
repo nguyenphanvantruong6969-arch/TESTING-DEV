@@ -24,11 +24,17 @@ Dừng, ghi vào tệp bàn giao, báo điều phối khi: bất biến xung đ�
 
 Đánh dấu dòng của mình trong Plan của tệp bàn giao, ghi đè "Current state" phần của mình, **thêm** một dòng Session log; một mục `CHANGELOG.md`; dòng T4M-NC trong `TIEN_DO.md`; chỉ chạy test liên quan + `ruff`; `git fetch origin main` rồi `python .claude/skills/soat-ma/scripts/kiem_nhanh.py`; `git pull --rebase` (xung đột ở CHANGELOG / tệp bàn giao: giữ cả hai bên); commit, push vào `claude/upbeat-shannon-g5nnms`. Báo cáo tiếng Việt, tối đa 10 dòng.
 
+**Báo trạng thái về điều phối (Truong yêu cầu 06/11/2026):** xong bước, hoặc gặp luật dừng mục 2, thì báo ngay:
+1. Nếu có công cụ `send_message` (claude-code-remote): gửi tới phiên gốc `session_01YVAyu3Zzm2AEVFAPhazqHY`, tối đa 8 dòng: `DONE` hoặc `BLOCKED`, mã commit, kết quả test, quyết định cần Truong duyệt; với `BLOCKED` thì ghi câu hỏi chính xác cho Truong và các phương án.
+2. Dù có công cụ hay không: ghi cùng khối đó vào tệp bàn giao, mục "Current state", dạng `STATUS <mã>: …`, rồi push.
+3. Không chờ Truong trả lời trong phiên con; báo xong thì dừng.
+
 ## 4. Vòng điều phối
 
 1. Phiên gốc hẹn tự kiểm (send_later) khoảng 40 phút một lần.
-2. Mỗi lần: xem trạng thái các phiên con; phiên nào xong thì **soát** (kéo nhánh, chạy test liên quan, so chế độ mặc định không đổi, đọc tài liệu theo "Nhận khi"); đạt thì mở bước kế; không đạt thì gửi phiên đó danh sách sửa.
-3. Hết chuỗi: cập nhật tệp bàn giao, báo Truong tóm tắt và các quyết định chờ duyệt (mã gói, bảng đo).
+2. Mỗi lần, hoặc ngay khi nhận tin `DONE` / `BLOCKED` từ phiên con: đọc các dòng `STATUS` trong tệp bàn giao, xem trạng thái các phiên con; phiên nào xong thì **soát** (kéo nhánh, chạy test liên quan, so chế độ mặc định không đổi, đọc tài liệu theo "Nhận khi"); đạt thì mở bước kế; không đạt thì gửi phiên đó danh sách sửa.
+3. Có `BLOCKED` cần Truong: phiên gốc hỏi Truong ngay (câu hỏi có phương án), không tự quyết thay.
+4. Hết chuỗi: cập nhật tệp bàn giao, báo Truong tóm tắt và các quyết định chờ duyệt (mã gói, bảng đo).
 
 ## 5. Prompt
 
