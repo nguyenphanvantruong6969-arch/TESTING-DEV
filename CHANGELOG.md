@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC: Truong duyệt vòng 2
+
+Chỉ tài liệu. Quyết định của Truong: duyệt nguyên tắc D1–D5 của thiết kế gói (mã A8-GOI chờ giáo viên ECA trả lời Q1–Q3); duyệt T4M-M1, M3, M4 (M2 chờ tệp xuất mẫu thật); T4-K2 giữ tạm dừng (K2-b). `T4M_KE_HOACH_TU_DONG.md` §6: vòng 2 R1–R3 kèm prompt.
+
 ## 2026-11-06 — T4M-GD4-V0 (bước S3): nháp v0 kiến trúc Microsoft, chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_MICROSOFT.md` (mới), ghi rõ "Bản nháp v0 — chưa có kết quả phỏng vấn (GĐ2)", chạy prompt P2 theo dự phòng A: đủ 9 mục (tóm tắt; kiến trúc ô A–H; ma trận §7 điền đủ; mô hình kho rộng + ánh xạ Sổ nhập + điểm kiểm khi `student_id` là email; pha gói tóm tắt và dẫn `T4M_GOI_THIET_KE.md`, D1–D5 ghi là CHỜ DUYỆT; luồng muộn/đổi/rút; rủi ro + lộ trình (ước lượng); mã mục đề xuất T4M-Q1b, T4M-M1..M4, A8-GOI-1..3 kèm `kiem_nhan`; phương án T4-K2 để Truong quyết) và §10 danh sách soát lại sau GĐ2. Điểm phụ thuộc trường mang nhãn HỎI-IT; chỗ đổi thiết kế có hai nhánh (SharePoint List / Dataverse). Dẫn `T4M_VAN_HANH_MOT_DOT.md` (S1) và các bảng của `T4M_DO_MO_PHONG.md` (S4), cả hai có sau `git pull --rebase`; không diễn giải số đo. Không đổi hợp đồng CSV, schema hay bất biến nào; không test mới.

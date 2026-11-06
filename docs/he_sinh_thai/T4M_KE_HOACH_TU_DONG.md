@@ -104,3 +104,53 @@ docs/he_sinh_thai/T4M_DO_MO_PHONG.md (method, parameters, tables with mean / min
 table title, the exact command to reproduce). Test: tests/test_do_t4m_thi.py (deterministic for fixed seeds; condition
 A equals the plain pipeline byte-for-byte on one small case). Do not change product code.
 ```
+
+## 6. Vòng 2 (Truong duyệt 06/11/2026)
+
+Quyết định của Truong ngày 06/11/2026:
+- Gói tiếng Nhật: **duyệt nguyên tắc D1–D5** của `T4M_GOI_THIET_KE.md`; mã A8-GOI-1..3 **chỉ viết sau khi giáo viên ECA trả lời Q1–Q3**.
+- Duyệt **T4M-M1, T4M-M3, T4M-M4**. T4M-M2 chờ tệp xuất mẫu thật (GĐ2).
+- T4-K2: **K2-b, giữ tạm dừng**.
+- Chạy vòng 2 theo cùng luật §2–§4.
+
+| Bước | Mã | Ai | Đầu ra | Nhận khi |
+|---|---|---|---|---|
+| R1 | T4M-M1 | Sonnet | `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` | Mỗi yêu cầu có một dòng kiểm pass/fail; chỉ dùng phép lọc ủy quyền được (KQ NC-04); không đụng app thật |
+| R2 | T4M-M3 | Sonnet | Công cụ đối chiếu hai lần xuất List + test | `kiem_nhan` ở `T4M_MICROSOFT.md` §8; không đổi kiosk |
+| R3 | T4M-M4 | Sonnet | `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` | Đủ giới hạn ĐXM NC-12, NC-13; connector chuẩn; tài khoản dịch vụ; không ghi ngược về list |
+
+### R1. T4M-M1
+```
+T4M-M1 (Sonnet), docs only. Follow T4M_KE_HOACH_TU_DONG.md §2-3 (incl. DONE/BLOCKED report).
+Read: T4M_MICROSOFT.md §2 cell A and §8 row M1; T4M_HUONG_DAN_THU.md (canvas screens, §9 checklist);
+T4M_KET_QUA_TAI_LIEU.md NC-04, NC-05/06, NC-21; T4M_KE_HOACH_NGHIEN_CUU.md §1 (current app screens).
+Write docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md for whoever edits the ECA app (IT): change list from today's app
+(one pick per weekday) to Top 3 per day: data columns (wide model, NV1..NV3, TrangThai), screen behaviour
+(no duplicates, empty day valid, bilingual labels, mobile), Patch + IfError, lock by TrangThai, delegable filters
+only, version backup/restore steps (NC-21), and a numbered requirement table with one pass/fail check each.
+Bundle screen: placeholder section "chờ A8-GOI" only. Label every formula GĐ (untested). Max 160 lines.
+```
+
+### R2. T4M-M3
+```
+T4M-M3 (Sonnet). Follow T4M_KE_HOACH_TU_DONG.md §2-3 (incl. DONE/BLOCKED report). Tests first (rule 2).
+Read: T4M_MICROSOFT.md §6 and §8 row M3; T4M_VAN_HANH_MOT_DOT.md step 8; mau_forms_thi_clb/
+chuyen_forms_sang_phan_mem.py doc_lists (reuse its parsing, do not duplicate); du_lieu_test/sinh_xuat_lists_gia.py.
+Build a CLI next to the converter (e.g. mau_forms_thi_clb/doi_chieu_lists.py OLD.csv NEW.csv [--co-so CS1]
+[--ra report.xlsx]) listing: new students, withdrawn students, rows whose NV1..NV3 / Lop / CoSo changed, keyed on
+lowercased Email + Thu. kiem_nhan: identical files -> empty report; add/remove/edit one row -> exactly one entry of
+the right kind; email case differences are not changes; kiosk untouched. Add a short section to
+T4M_VAN_HANH_MOT_DOT.md step 8. Run related tests + ruff.
+```
+
+### R3. T4M-M4
+```
+T4M-M4 (Sonnet), docs only. Follow T4M_KE_HOACH_TU_DONG.md §2-3 (incl. DONE/BLOCKED report).
+Read: T4M_KET_QUA_TAI_LIEU.md NC-11, NC-12, NC-13, NC-14; T4M_HUONG_DAN_THU.md (Teams/flow part);
+T4M_VAN_HANH_MOT_DOT.md step 7; grep export_theo_lop to learn the output file names.
+Write docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md: an optional Power Automate flow (standard connectors only) owned by an
+IT service account that takes the per-homeroom Excel files from a SharePoint library and sends each homeroom
+teacher their file via Outlook or Teams; mapping file homeroom -> teacher email (source HỎI-IT, NC-08); limits
+with labels (ĐXM figures from KQ); failure handling and a manual fallback; DLP note (NC-14). No write-back to the
+list (NC-13). Label untested steps TH. Max 120 lines.
+```
