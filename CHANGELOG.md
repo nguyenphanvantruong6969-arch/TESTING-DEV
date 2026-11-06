@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC: kế hoạch tự chạy (S1 đến S4)
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md` (mới): Truong duyệt 06/11/2026 bốn quyết định (gói tiếng Nhật chỉ thiết kế, nháp v0 GĐ4, tự chạy chuỗi, đo mô phỏng chỉ bảng số); chuỗi bước S1 T4M-VH, S2 T4M-GOI-TK, S3 T4M-GD4-V0, S4 T4M-DO kèm phụ thuộc, tiêu chí nhận, luật dừng, vòng điều phối và prompt từng bước.
+
 ## 2026-11-06 — T4M-DEMO (Truong duyệt 06/11/2026): chạy thử trọn chuỗi bằng một lệnh
 
 Thêm công cụ; không đụng mã sản phẩm, schema hay hợp đồng CSV. Dữ liệu hoàn toàn MÔ PHỎNG.

@@ -28,6 +28,8 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
 - [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
+- [ ] AUTO CHAIN (Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
+      [ ] S1 T4M-VH (Sonnet)  [ ] S2 T4M-GOI-TK (Opus, design only)  [ ] S3 T4M-GD4-V0 (Opus)  [ ] S4 T4M-DO (Sonnet)
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
@@ -37,6 +39,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
   `sinh_xuat_lists_gia.sinh/ghi_csv(clb_theo_ngay=)` (default bytes unchanged); `du_lieu_test/demo_t4m.py --ra DIR [--so-hs 120] [--seed] [--he-so-cho]`; README section 0b.
 - Demo facts to confirm with Truong: (1) pipeline needs rules.wharton=False in the TEMP db (default ON, data has no bids); (2) converter does not copy the class column, so demo calls `set_student_class` from the Lists CSV (possible follow-up item: converter writes `Lớp` into the Sổ nhập); (3) sample capacities (~42 seats/day) fit ~50 students, so demo multiplies capacity by an auto factor (~2.0 at 120 students; in-memory copy, `de_thi.json` untouched; `--he-so-cho 1` keeps it). Result at 120 students: ~65% of (student x day) slots get choice 1.
 - Not done: nobody has run the chain against a real Forms or Lists export; push pending after soat-ma.
+- Orchestration: root Opus session self-checks ~40 min (send_later), reviews each child, launches next (plan §4).
 - Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
 
 ## Decisions and gotchas (keep short)
@@ -89,3 +92,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-05 | Sonnet | T4M-Q1..Q3 done: quiz-only converter, quiz-only form generator, teacher note; tests first (27), mutation check found missing 200-boundary case, fixed | No subagent; default mode unchanged; kiem_nhanh 7/7 |
 | 2026-11-06 | Opus | Reviewed T4M-Q1..Q3 (58 related tests pass, ruff clean, default output identical except docx/xlsx core.xml timestamp); Truong approved T4M-DEMO, Sonnet session opened | |
 | 2026-11-06 | Sonnet | T4M-DEMO done: fake quiz-only Forms generator, `demo_t4m.py` one-command chain, README 0b; tests first (11), mutation check found 1 weak test (uppercase emails), fixed | No subagent; no product code, schema or CSV contract changed |
+| 2026-11-06 | Opus | Truong approved auto chain (bundle design only, GĐ4 v0, auto-run, simulation tables only); wrote T4M_KE_HOACH_TU_DONG.md | S2 launched |
