@@ -37,18 +37,14 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
+- K1 reported DONE 1fb93d0; Opus review: SENT BACK (site script fields must be createSPList subactions; addSPField needs id;
+  Buoi mapping accepted, §9 decision 1 corrected). Waiting K1 fix.
 - Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). PR #13 open (CI pending).
 - STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
   tests/test_t4m_bo_dung_bk1.py 34 pass + 1 xfail, 183 related pass, ruff clean, 3 mutations caught. FINDING: `ghi_clb_csv`
   writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 assumed equal): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
-- Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
-  the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
-  T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
-  D1 T4M-Q5a/b/c (7e274d4): converter reads THIk/WPk, fake Lists --so-nv/--tick/--wp, demo --day-du (wharton ON,
-  planted bad fund blocked by kiosk then fixed); tests/test_t4m_day_du.py 34 tests. D2 T4M-M6 (7e31127): app spec
-  R25..R38, HDT §14 rows 14.x, interview ECA-6/9/12, IT-19. Opus review: demo default and --moi-clb outputs
-  identical before/after D1; fixed R37 wording (legit "vắng thi" warnings) and HDT note (dropped `NV3` broke
-  test_sinh_xuat_lists_gia). Related tests 173 pass, ruff clean, kiem_nhanh 7/7.
+- Round 4 (plan §8) DONE, reviewed: 7 NV/day, tick max 5/day, determination points in app (b); D1 7e274d4,
+  D2 7e31127; no core/schema/CSV change; 173 related tests, kiem_nhanh 7/7 (details: Session log, CHANGELOG).
 - Simulation artifact (interactive, 7 stages, fake data; shared "Anyone with the link" by Truong):
   https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd (v4). Source is NOT in the repo (scratchpad only); it adds
   invented clubs marked "*" so 7 slots and the cap of 5 are visible (sample de_thi.json has 3 clubs/day).
@@ -148,3 +144,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Wrote plan §9 round 5 T4M-BK (build kit for IT: K0 research, K1/K2 Sonnet, K3 review); asked Truong to approve it and the PR to main | No code; no child sessions |
 | 2026-11-06 | Opus | Truong approved T4M-BK + PR: merged main (CHANGELOG both sides, 157 tests pass), opened PR #13; K0 research -> KQ §8; wrote K1/K2 prompts; root session id updated in plan §3 | Launching K1 |
 | 2026-11-06 | Sonnet | T4M-BK1/BK2 (K1): bo_dung_t4m column module (ECA 30 cols), site script (46 actions), sample CSVs + KIEM_COT_ECA.md, 4 Power Fx files k=1..7; tests first, static syntax test caught 3 generator bugs; 3 mutations caught | No subagent; no core/schema/CSV change; Buoi text mismatch reported |
+| 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
