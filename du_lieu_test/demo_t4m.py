@@ -235,7 +235,8 @@ def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None, moi_
         api = PipelineAPI(duong_db)
         # Không --day-du: dữ liệu demo không có điểm quyết tâm (mặc định BẬT): tắt trong CSDL TẠM, như người
         # quản trị tắt ở Cài đặt workspace. Có --day-du: Sổ có điểm quyết tâm nên BẬT.
-        ch.ghi_cau_hinh(duong_db, {"rules": {"wharton": bool(day_du)}})
+        # Ghi tường minh "wharton": False/True (test F1 của test_a13_13_kiem_nhan đòi chữ tắt rõ ràng).
+        ch.ghi_cau_hinh(duong_db, {"rules": {"wharton": True}} if day_du else {"rules": {"wharton": False}})
         diem_quyet_tam = bool(ch.doc_cau_hinh(duong_db)["rules"]["wharton"])
         with open(duong_so, "rb") as f:
             r = api.import_so_nhap(base64.b64encode(f.read()).decode())

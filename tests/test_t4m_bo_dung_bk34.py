@@ -12,6 +12,7 @@ import zipfile
 
 import pytest
 
+pytest.importorskip("docx", reason="bộ dựng gọi tao_mau_forms --moi-clb (cần python-docx)")
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
 

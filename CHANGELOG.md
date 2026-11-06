@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC: sửa CI đỏ của PR #13 (3 nguyên nhân do nhánh)
+
+- `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`: `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã ghi 194 tệp test, thực tế 201; cập nhật 201 tệp, 3.645 ca.
+- `tests/test_a13_13_kiem_nhan.py::test_F1_script_do_tat_wharton_ro_rang`: `du_lieu_test/demo_t4m.py` (từ T4M-Q5c) ghi `{"wharton": bool(day_du)}`; nay ghi tường minh `{"wharton": False}` / `{"wharton": True}`. Hành vi không đổi.
+- `tests/test_t4m_bo_dung_bk34.py` (Windows CI không cài `python-docx`): `pytest.importorskip("docx")` như các test Forms khác; tái hiện bằng cách giả lập thiếu `docx` (25 đỏ/lỗi trước, bỏ qua sau).
+- Không sửa: `tests/test_giao_dien_t3_l3.py::test_tai_bang_theo_clb_va_theo_ma_co_tim` đỏ một lần trên Linux CI (màn 2 dòng, tệp 3 dòng), xanh ở lần chạy CI kia và 6/6 lần ở máy: chập chờn, test của `main` (T3-L4), tách thành việc riêng.
+
 ## 2026-11-06 — T4M-BK3, BK4 (vòng 5, bước K2): bảng flow `DaLam_<ClubId>` và lệnh gộp `tao_bo_dung_t4m.py`
 
 Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ thư viện chuẩn); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên Power Apps / SharePoint / Power Automate).
