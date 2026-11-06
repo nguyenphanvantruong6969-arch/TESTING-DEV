@@ -7,6 +7,12 @@ Không có mã. `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` (mới, 77 dòng): flow
 ## 2026-11-06 — T4M-M1 (vòng 2, R1): đặc tả sửa app ECA sang Top 3 mỗi ngày, chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (mới, ~113 dòng) cho người sửa app (IT): cột dữ liệu mô hình rộng (`NV1..NV3`, `TrangThai`), hành vi màn hình (không trùng, không ô trống chen giữa, ngày trống hợp lệ, nhãn hai ngôn ngữ, điện thoại), `Patch` + `IfError` kèm báo đúng ngày lỗi, khoá theo `TrangThai`, chỉ dùng phép lọc uỷ quyền được (NC-04), sao lưu / khôi phục phiên bản (NC-21), bảng 14 yêu cầu R1..R14 mỗi yêu cầu một dòng kiểm pass/fail ánh xạ HDT §9, mục gói chỉ giữ chỗ "chờ A8-GOI". Mọi công thức gắn nhãn GĐ. Không đụng app thật, không đổi mã, schema, hợp đồng CSV.
+## 2026-11-06 — T4M-M3 (vòng 2, bước R2): đối chiếu hai lần xuất List
+
+Thêm công cụ dòng lệnh, chỉ đọc; không đụng kiosk, lõi, schema hay hợp đồng CSV.
+- `mau_forms_thi_clb/doi_chieu_lists.py` (mới): `OLD.csv NEW.csv [--co-so CS1] [--ra bao_cao.xlsx] [--de de_thi.json]`. Dùng lại `doc_lists` của bộ chuyển đổi (không viết lại cách đọc). Liệt kê em mới, em rút, dòng đổi nguyện vọng (theo email chữ thường + Thu, kể cả đổi thứ tự), đổi Lớp, đổi CoSo. Hai tệp giống nhau => báo cáo rỗng; hoa/thường của email và thứ tự dòng không phải thay đổi. Lỗi thiếu cột => mã thoát 1, không ghi tệp.
+- `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` bước 8: thêm đoạn dùng công cụ trước khi chạy lại.
+- Test mới (viết trước, 17 ca): `tests/test_doi_chieu_lists.py` (kiem_nhan ở T4M_MICROSOFT.md §8: rỗng / đúng một mục mỗi loại / email hoa-thường / lọc cơ sở / kiosk không bị nạp).
 
 ## 2026-11-06 — T4M-NC: Truong duyệt vòng 2
 
