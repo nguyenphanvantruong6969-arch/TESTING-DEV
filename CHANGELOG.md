@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-M5 (vòng 3, bước C2): màn "Thi tuyển" và flow "Đã làm", chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` thêm mục 10 "Màn Thi tuyển" (CLB có thi mà em đã chọn, `Launch(FormUrl)` chỉ khi chưa có dòng `BaiThi` và còn hạn, "Đã làm"/"Chưa làm", nút Làm mới, lọc `=` uỷ quyền được, không hiện điểm: mức 5a) và bảng yêu cầu R15 đến R24 mỗi dòng một kiểm pass/fail. `docs/he_sinh_thai/T4M_FLOW_DA_LAM.md` (mới, 85 dòng): flow mẫu mỗi biểu mẫu một flow (When a new response is submitted → Get response details → [kiểm trùng] → Create item `BaiThi`), chủ là tài khoản dịch vụ IT, cách nhân flow và Form Id biểu mẫu nhóm, ước tính 9.000 đến 12.000 hành động so với 6.000 mỗi ngày (nhãn ƯL), xử lý lỗi, đường thủ công với `--bai-thi`. Chỉ connector chuẩn; mọi bước TH/GĐ. Không đụng `T4M_VAN_HANH_MOT_DOT.md` và `mau_forms_thi_clb/README.md` (C1 sửa). Không test mới.
+
 ## 2026-11-06 — T4M-NC: thiết kế cổng thi (chọn CLB → mở bài thi → trạng thái → điểm)
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_CONG_THI.md` (mới): app Power Apps ECA làm cổng, mỗi CLB có thi một biểu mẫu Forms Quiz, list `CLB` (FormUrl) và `BaiThi` (trạng thái), mỗi biểu mẫu một flow "Đã làm" (connector chuẩn); connector Forms không trả điểm (TT-CXM) nên điểm chính thức vẫn do bộ chuyển đổi chấm lại; ba mức trả điểm 5a/5b/5c; mã đề xuất Q4a–c, M5; phương án lui trang SharePoint.

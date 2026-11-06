@@ -111,3 +111,58 @@ Chỗ giữ chỗ. Chưa thiết kế, chưa sửa. Chờ giáo viên ECA trả 
 - Giao cho người sửa app: tài liệu này, HDT §1 (bảng cột), tệp giả `lists_gia.csv` (sinh bằng lệnh HDT §1).
 - Còn mở: **NC-01** (kho thật là gì, tên cột thật), **NC-02** (có môi trường thử không), **NC-08** (nguồn `Lop`), cách app ECA thật đang lưu tiếng Việt/Anh, quyền SharePoint của học sinh.
 - Sau khi có tệp xuất mẫu thật (GĐ2): đối chiếu mục 1 với tên cột thật, sửa tài liệu này một lần.
+
+## 10. Màn "Thi tuyển" (T4M-M5, Truong duyệt 06/11/2026; mức điểm 5a)
+
+Bổ sung cho màn Top 3 ở mục 2. Thiết kế tổng thể: `T4M_CONG_THI.md` §1 đến §5. Flow ghi "Đã làm": `T4M_FLOW_DA_LAM.md`. **Mọi công thức là GĐ, mọi kiểm là TH.** Chỉ connector chuẩn; app **không** có connector Forms (Power Apps: Not available, KQ §7.1 ĐXM), nên app chỉ mở liên kết và đọc list.
+
+### 10.1 Dữ liệu thêm
+| Thứ | Cột | Ghi chú |
+|---|---|---|
+| List `CLB` (tạo từ `CLB.csv` do `tao_mau_forms.py --moi-clb` sinh, T4M-Q4a) | `ClubId`, `Ten`, `Buoi`, `FormUrl` | `FormUrl` rỗng = CLB không thi. IT dán liên kết biểu mẫu sau khi tạo; dưới 500 dòng nên đọc trọn vào collection |
+| List `BaiThi` (flow ghi, app chỉ đọc) | `Email`, `ClubId`, `ResponseId`, `NopLuc` (`Diem` không dùng ở mức 5a) | `Email` chữ thường. Một dòng mỗi bài đã nộp |
+
+### 10.2 Hành vi màn hình
+1. **CLB có thi mà em đã chọn:** từ năm dòng `ECA` của em (mục 2.1) gom `NV1..NV3` của mọi ngày vào `colChon` (`ForAll` + `Collect`, cục bộ), rồi `colThi` = các dòng `colCLB` có `ClubId` thuộc `colChon` và `FormUrl` không rỗng. Lọc `FormUrl` và `ClubId in` làm **trên collection**, không đẩy lên SharePoint (`IsBlank`, `Not` không uỷ quyền, mục 5).
+2. **Trạng thái:** `ClearCollect(colBaiThi, Filter(BaiThi, Email = Lower(User().Email)))` (lọc `=`, uỷ quyền được, NC-04). "Đã làm" khi `colBaiThi` có dòng cùng `ClubId`; ngược lại "Chưa làm".
+3. **Nút Làm bài:** `Launch(FormUrl)` (mở tab mới). Hiện **chỉ khi** chưa có dòng `BaiThi` của CLB đó **và** đang trong hạn (dòng `ECA` của em còn `TrangThai = "Đang mở"`); sau khoá thì ẩn, hiện nhãn "Đã đóng / Closed". Forms "One response per person" vẫn chặn nộp lần hai ở phía Forms.
+4. **Nút Làm mới:** chạy lại `ClearCollect(colBaiThi, …)`. Cạnh nút ghi: "Trạng thái cập nhật sau vài giây đến vài phút".
+5. **Em bỏ CLB khỏi NV sau khi đã thi:** dòng `BaiThi` vẫn có, nhưng CLB không còn trong `colThi` nên không hiện. Bộ chuyển đổi bỏ điểm CLB không chọn và báo (T4M_CONG_THI.md §4.5).
+6. **Không hiện điểm** (mức 5a): ghi cố định "Xem điểm trong Forms sau khi giáo viên công bố" / "See your score in Forms after your teacher posts scores". Không cột `Diem`, không điều khiển điểm.
+7. **Hai ngôn ngữ, điện thoại:** như mục 2.6 và 2.7: nhãn từ `colNhan`, thẻ mỗi CLB một dòng, nút đủ lớn cho ngón tay.
+8. **Rỗng:** em không chọn CLB nào có thi thì hiện "Bạn không có CLB cần thi", không để màn trắng.
+
+### 10.3 Công thức mẫu (GĐ)
+```
+// OnVisible của màn Thi tuyển
+ClearCollect(colCLB, CLB);
+ClearCollect(colBaiThi, Filter(BaiThi, Email = Lower(User().Email)));
+ClearCollect(colEca, Filter(ECA, Email = Lower(User().Email)));
+Clear(colChon);
+ForAll(colEca, Collect(colChon, {Id: NV1}, {Id: NV2}, {Id: NV3}));
+// Items của thư viện
+Filter(colCLB, ClubId in colChon.Id && FormUrl <> "")
+// Trạng thái từng thẻ
+!IsEmpty(Filter(colBaiThi, ClubId = ThisItem.ClubId))
+```
+`colCLB`, `colChon`, `colEca` là tên ví dụ. Ô `NV` rỗng thêm giá trị rỗng vào `colChon`, không khớp CLB nào nên vô hại.
+
+### 10.4 Bảng yêu cầu và kiểm pass/fail (nối tiếp R1 đến R14, mục 7)
+
+Chưa có dòng trong HDT §9: đề xuất thêm nhóm 7.x (Opus/Truong quyết); điền tạm vào cột "HDT §9" bằng "đề xuất 7.x".
+
+| # | Yêu cầu | Kiểm (pass khi) | HDT §9 |
+|---|---|---|---|
+| R15 | Chỉ hiện CLB có thi mà em đã chọn | Tài khoản thử chọn 2 CLB có thi, 1 không thi: màn hiện đúng 2 thẻ | đề xuất 7.1 |
+| R16 | Nút Làm bài mở đúng biểu mẫu của CLB | Bấm mỗi thẻ: tab mới mở biểu mẫu đúng CLB (đối chiếu tiêu đề) | đề xuất 7.1 |
+| R17 | Trạng thái "Đã làm" xuất hiện sau khi nộp | Nộp bài thử, bấm Làm mới: thẻ chuyển "Đã làm" và nút Làm bài ẩn; ghi thời gian trễ thực đo | đề xuất 7.2 |
+| R18 | Không hiện nút khi đã làm hoặc đã khoá | Có dòng `BaiThi` thì không nút; đặt `TrangThai = Đã khóa` thì không nút, hiện "Đã đóng" | đề xuất 7.2 |
+| R19 | Không hiện điểm | Tìm trên mọi màn: không số điểm; có dòng "Xem điểm trong Forms…" | đề xuất 7.3 |
+| R20 | Chỉ lọc uỷ quyền được | Giới hạn dòng = 1: không cảnh báo uỷ quyền ở công thức chạm `BaiThi`, `ECA` | đề xuất 7.3 |
+| R21 | Em chỉ thấy bài của mình | Hai tài khoản thử: mỗi em chỉ thấy dòng `BaiThi` của mình (kể cả email hoa) | đề xuất 7.3 |
+| R22 | Hai ngôn ngữ, điện thoại | Như R10 và R11 cho màn này | đề xuất 7.3 |
+| R23 | Màn trống không lỗi | Tài khoản không chọn CLB thi: hiện thông báo, không lỗi công thức | đề xuất 7.3 |
+| R24 | Em không sửa được `BaiThi` | Tài khoản học sinh thử ghi trực tiếp vào list `BaiThi` bị từ chối (quyền chỉ đọc; HỎI-IT) | đề xuất 7.3 |
+
+### 10.5 Lui (nếu không sửa được app)
+Trang SharePoint của đợt: danh sách CLB kèm liên kết biểu mẫu và khung xem `BaiThi` lọc **[Me]** (`T4M_CONG_THI.md` §7). Không rẽ theo NV; không cần sửa app.

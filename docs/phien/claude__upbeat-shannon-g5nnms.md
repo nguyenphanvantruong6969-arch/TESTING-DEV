@@ -16,7 +16,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [x] T4M-Q1..Q3, Q1b, Q1b-b (quiz-only Forms, Email key, Lớp, --co-so); T4M-DEMO; Round 1 S1-S4; Round 2 R1-R3
 - [ ] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a):
       [ ] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, RUNNING at handoff)
-      [ ] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, RUNNING at handoff)
+      [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
 - [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
@@ -25,6 +25,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
+- STATUS T4M-M5: DONE (docs only, no tests). `T4M_DAC_TA_SUA_APP.md` §10 "Màn Thi tuyển" + requirements R15..R24 (pass/fail each; proposed HDT §9 rows 7.1-7.3 not yet added); new `T4M_FLOW_DA_LAM.md` (85 lines): one template flow per quiz form, service-account owner, request estimate 9,000-12,000 vs 6,000/day (ƯL), manual fallback with `--bai-thi`. Level 5a, standard connectors, `=` filters only. Did not touch `T4M_VAN_HANH_MOT_DOT.md` / `mau_forms_thi_clb/README.md` (C1). Nothing for Truong to approve; Opus may add HDT §9 rows 7.x.
 - Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
 - Round 3 RUNNING: C1 and C2 were launched by the old root session (session_01YVAyu3Zzm2AEVFAPhazqHY). They report
   DONE/BLOCKED by send_message to THAT old session and also write `STATUS <code>: ...` lines here. The new root
@@ -62,7 +63,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 ## Files touched (T4M, this branch)
 - docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU, T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
   T4M_KE_HOACH_TU_DONG, T4M_GOI_THIET_KE, T4M_MICROSOFT (v0), T4M_VAN_HANH_MOT_DOT, T4M_DO_MO_PHONG,
-  T4M_DAC_TA_SUA_APP, T4M_FLOW_GUI_GVCN, T4M_CONG_THI (.md)
+  T4M_DAC_TA_SUA_APP (+§10 M5), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
 - mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
   GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
 - du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py, do_t4m_thi.py, ket_qua_t4m/
@@ -106,3 +107,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong asked for a quiz portal loop; designed T4M_CONG_THI.md (app as portal, one Form per club, BaiThi status list via standard flow, score via converter); proposed Q4a-c, M5 | Awaiting Truong approval |
 | 2026-11-06 | Opus | Truong approved Q4a-c + M5, score level 5a; wrote plan §7; launched C1, C2 | |
 | 2026-11-06 | Opus | Handoff at ~400k context: rewrote state/next/decisions; round 3 C1, C2 still running; fallback trigger deleted | New root must poll C1/C2 (they message the old session) |
+| 2026-11-06 | Sonnet | T4M-M5 (C2): Thi tuyển screen spec (§10, R15..R24) + "Đã làm" flow guide; docs only | No subagent; C1 files untouched |
