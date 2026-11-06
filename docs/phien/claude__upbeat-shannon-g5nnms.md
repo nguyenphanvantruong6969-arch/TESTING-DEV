@@ -19,7 +19,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
 - [ ] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
       points collected in app = option b; no core change):
-      [ ] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet)
+      [x] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet) DONE 06/11; waits for Opus review
       [x] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet) DONE 7e31127; Opus reviewed OK (fixed R37 wording)
       [ ] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
@@ -48,6 +48,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   service account + flow quota, BaiThi read-only/DLP). Note: converter warnings with many files give row number
   but not file name (pre-existing).
 STATUS T4M-M6: DONE 06/11/2026 (docs only). App spec Top 7 + tick (max 5) + determination-point screen (R25..R38, HDT rows 14.x, HDT section 14); CONG_THI, MICROSOFT v0, interview sheet (ECA-6/9/12, IT-19) updated. Decisions for review: ECA-12 numbered after ECA-11; HDT says default fake generator still NV1..NV3 (7 NV + THI/WP flag awaits D1/Q5c, flag name not written); DAC_TA R36/R37 need D1 code.
+STATUS T4M-Q5: DONE 06/11/2026. Converter reads THIk/WPk (tick -> 'thi'; unticked submission dropped+warned; >5 ticks keep first 5; WPk -> diem_w, two funds checked = 100, warn only); fake Lists NV<=7/THIk/WPk; demo --day-du turns wharton ON, kiosk blocks the planted bad fund, demo fixes it via admin_save_wharton and reruns; summary always prints 'Điểm quyết tâm: BẬT/TẮT'. 34 new tests (tests/test_t4m_day_du.py) + 5/5 mutations caught; list without THIk/WPk => SO_NHAP/BANG_DIEM/fake Lists byte-identical (zip hash minus core.xml, 3 seeds x 2 modes). Decisions for review: (1) demo NV columns = min(7, clubs/day) = 3 with the sample de_thi.json; (2) tick values accepted: Có/co/yes/true/1 (others warn); (3) fund check treats a single-club blank fund as OK (kiosk auto-fills 100); (4) --bai-thi left untouched (ignores ticks).
 - Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
@@ -129,3 +130,4 @@ STATUS T4M-M6: DONE 06/11/2026 (docs only). App spec Top 7 + tick (max 5) + dete
 | 2026-11-06 | Opus | Built simulation artifact (cách B); Truong flagged 10 NV / 5 tests / determination points missing; decided 7 NV, tick max 5, points in app (b); wrote plan §8 round 4 | Launching D1, D2 |
 | 2026-11-06 | Sonnet | T4M-M6 (D2): app spec Top 7, tick max 5, determination-point screen; R25..R38, HDT rows 14.x + section 14; CONG_THI, MICROSOFT, interview sheet | Docs only; no subagent; no code touched; grep shows no stale "Top 3" in the five files |
 | 2026-11-06 | Opus | Updated simulation artifact v2 (Top 7, tick, two funds); reviewed D2 T4M-M6 (OK; R37 no longer counts legit "vắng thi" warnings) | Waiting D1 |
+| 2026-11-06 | Sonnet | T4M-Q5a/b/c (D1): converter THIk/WPk, fake Lists/Forms with ticks and funds, demo --day-du; tests first (29 red on first run -> all 34 green), 5 mutations caught | No subagent; no core/schema/CSV change; default outputs byte-identical |

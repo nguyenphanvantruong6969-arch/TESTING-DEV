@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-Q5a/b/c (vòng 4, bước D1): bộ chuyển đổi đọc THIk/WPk, dữ liệu giả, `demo_t4m.py --day-du`
+
+Không đổi lõi (`run_rbda`, `compute_club_priority`, `club_choice_function`), schema hay hợp đồng CSV của kiosk. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`. List KHÔNG có `THIk`/`WPk` thì `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx` và tệp Lists giả giống hệt từng byte so với trước (băm toàn bộ khối zip trừ `docProps/core.xml`; 3 seed × {một biểu mẫu, `--moi-clb`} + tệp Lists giả mặc định; chạy tay trước và sau khi sửa).
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `doc_lists` nhận `THIk`/`WPk` (khoá "tick", "wp", "dong_buoi" chỉ khi có cột); Q5a: "thi" đi theo tick (tick + bài -> điểm; tick + vắng -> ô `thi`; bài không tick -> bỏ điểm, báo, BANG_DIEM ghi "chưa tick thi"; tick CLB không đề -> bỏ tick, báo; quá 5 tick/ngày -> giữ 5 đầu theo thứ tự NV, báo); Q5b: `diem_w` vào Sổ nhập (`luon_co_cot_w=True`), `_soat_hai_quy` chỉ BÁO quỹ không cộng đúng 100 (quỹ 1 = CLB đã tick, quỹ 2 = còn lại; quỹ một CLB để trống không báo), ô không phải số nguyên >= 0 -> báo, để trống; ghi chú cuối lệnh nói "giữ BẬT" khi có điểm quyết tâm. Hàm mới: `tap_thi`, `_doc_tick`, `_doc_diem_quyet_tam`.
+- `du_lieu_test/sinh_xuat_lists_gia.py`: `sinh`/`ghi_csv` thêm `so_nv`, `co_tick`, `co_wp`, `clb_co_de` (bộ ngẫu nhiên riêng cho tick/điểm, nên NV không đổi); `cot_csv`, `ghi_dong`, `gai_quy_khong_du`; cờ `--so-nv --tick --wp`.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `ghi_mau_xuat_chi_thi` khi List có tick thì chỉ nộp bài cho CLB đã tick và gài thêm `tick_vang`, `nop_khong_tick`.
+- `du_lieu_test/demo_t4m.py`: `--day-du` (kết hợp `--moi-clb`): bật `rules.wharton` trong CSDL tạm, gài một quỹ thiếu 100 -> kiosk CHẶN lần chạy đầu -> demo sửa bằng `admin_save_wharton` rồi chạy lại; tóm tắt LUÔN in "Điểm quyết tâm: BẬT/TẮT"; khoá `diem_quyet_tam`, `bi_chan_lan_dau`, `so_nv`.
+- Test mới (viết trước; chạy lần đầu 29 ca đỏ, nay đủ 34 xanh): `tests/test_t4m_day_du.py` (34 ca). Gây hỏng tạm 5 chỗ (`!=100` -> `>100`, bỏ việc bỏ điểm khi không tick, bỏ trần 5, bỏ miễn trừ quỹ một CLB, bỏ ô `thi` theo tick): cả 5 bị bắt.
+- Tài liệu: `mau_forms_thi_clb/README.md` (mục 0 và 0b), `T4M_VAN_HANH_MOT_DOT.md` (bước 2, 4, 5, phụ lục; bỏ "Top 3", `NV1..NV3`).
+
 ## 2026-11-06 — T4M-M6 (vòng 4, bước D2): app Top 7, tick chọn thi, điểm quyết tâm; chỉ tài liệu
 
 Không có mã, test, schema hay hợp đồng CSV; không đụng lõi. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`.
