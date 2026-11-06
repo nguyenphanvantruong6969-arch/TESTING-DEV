@@ -94,10 +94,12 @@ def test_buoi_theo_thu_phu_dung_cac_buoi_cua_clb_csv(tmp_path, de):
     assert len(set(anh_xa.values())) == len(anh_xa)
 
 
-@pytest.mark.xfail(strict=True, reason="PHÁT HIỆN: CLB.csv ghi Buoi 'Thứ Hai' còn cột Thu của ECA là 'Thứ 2' "
-                   "(quyết định 1 của §9 nói 'cùng chữ'); bộ dựng dùng ánh xạ buoi_theo_thu. Hết lệch thì bỏ xfail.")
-def test_buoi_clb_csv_bang_thu_cua_lists_thang(tmp_path, de):
-    assert _buoi_clb_csv(tmp_path, de) == set(lists_gia.NGAY)
+def test_buoi_theo_thu_khoa_la_nam_lua_chon_thu_gia_tri_la_buoi_cua_clb_csv(tmp_path, de):
+    """CLB.csv ghi tên buổi của de_thi.json ('Thứ Hai'), cột Thu của ECA là 'Thứ 2': ánh xạ nối hai bên."""
+    anh_xa = cong_thuc.buoi_theo_thu(de)
+    thu = next(c for c in cot_lists.ECA if c.ten == "Thu")
+    assert set(anh_xa) == set(thu.lua_chon) and len(anh_xa) == 5
+    assert set(anh_xa.values()) == _buoi_clb_csv(tmp_path, de)
 
 
 # ---------------------------------------------------------------- GUID cố định
@@ -110,44 +112,64 @@ def test_guid_on_dinh_duy_nhat_va_la_uuid5():
 
 
 # ---------------------------------------------------------------- site script
-def test_site_script_hop_le_va_ten_trong_cot_hop_dong():
-    ss = site_script.tao_site_script()
-    ss = json.loads(json.dumps(ss, ensure_ascii=False))
-    hop_dong = {(l, c.ten) for l, cs in cot_lists.TAT_CA.items() for c in cs}
-    thay = set()
-    list_hien_tai = None
+SCHEMA_URL = "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json"
+
+
+def _duyet_site_script(ss):
+    """Trả (số hành động đếm cả hành động con, tập (list, cột) thấy được). Kiểm cấu trúc theo schema site script."""
+    assert ss["$schema"] == SCHEMA_URL
+    assert {a["verb"] for a in ss["actions"]} == {"createSPList"}, "chỉ createSPList ở mức trên cùng"
+    dem, thay = 0, set()
     for a in ss["actions"]:
-        if a["verb"] == "createSPList":
-            assert a["templateType"] == 100
-            list_hien_tai = a["listName"]
-            assert list_hien_tai in cot_lists.TAT_CA
-        elif a["verb"] == "addSPField":
-            assert a["internalName"] and (list_hien_tai, a["internalName"]) in hop_dong
-            assert a["fieldType"] in ("Text", "Number", "DateTime")
-            thay.add((list_hien_tai, a["internalName"]))
-        elif a["verb"] == "addSPFieldXml":
-            m = re.search(r'StaticName="([^"]+)"', a["schemaXml"])
-            assert (list_hien_tai, m.group(1)) in hop_dong
-            assert 'Type="Choice"' in a["schemaXml"] and "<CHOICES>" in a["schemaXml"]
-            assert re.search(r'ID="\{[0-9a-f-]{36}\}"', a["schemaXml"])
-            thay.add((list_hien_tai, m.group(1)))
-        else:
-            pytest.fail("verb lạ: %s" % a["verb"])
-    assert thay == hop_dong
+        dem += 1
+        assert a["templateType"] == 100 and a["listName"] in cot_lists.TAT_CA
+        for sa in a["subactions"]:
+            dem += 1
+            assert sa["verb"] in ("addSPField", "addSPFieldXml"), sa["verb"]
+            if sa["verb"] == "addSPField":
+                assert sa["fieldType"] in ("Text", "Number", "DateTime")
+                ten = sa["internalName"]
+                assert sa["id"] == cot_lists.guid_cot(a["listName"], ten)
+            else:
+                m = re.search(r'StaticName="([^"]+)"', sa["schemaXml"])
+                ten = m.group(1)
+                assert 'Type="Choice"' in sa["schemaXml"] and "<CHOICES>" in sa["schemaXml"]
+                assert 'ID="{%s}"' % cot_lists.guid_cot(a["listName"], ten) in sa["schemaXml"]
+            thay.add((a["listName"], ten))
+    return dem, thay
+
+
+def test_site_script_long_dung_createSPList_va_ten_trong_cot_hop_dong():
+    ss = json.loads(json.dumps(site_script.tao_site_script(), ensure_ascii=False))
+    dem, thay = _duyet_site_script(ss)
+    assert thay == {(l, c.ten) for l, cs in cot_lists.TAT_CA.items() for c in cs}
+    assert [a["listName"] for a in ss["actions"]] == list(cot_lists.TAT_CA)
+    assert dem == site_script.dem_hanh_dong(ss)
 
 
 def test_kieu_cot_dung_loai_hanh_dong():
     ss = site_script.tao_site_script()
-    xml = {re.search(r'StaticName="([^"]+)"', a["schemaXml"]).group(1)
-           for a in ss["actions"] if a["verb"] == "addSPFieldXml"}
+    xml = {re.search(r'StaticName="([^"]+)"', sa["schemaXml"]).group(1)
+           for a in ss["actions"] for sa in a["subactions"] if sa["verb"] == "addSPFieldXml"}
     assert xml == {c.ten for c in cot_lists.ECA if c.kieu == "Choice"}
     assert {"Thu", "TrangThai", "CoSo"} <= xml
 
 
-def test_dem_hanh_dong_in_ra_va_canh_bao_tran(capsys):
+def test_site_script_phang_bi_bat():
+    """Đột biến 'làm phẳng' (đưa hành động con lên mức trên cùng) phải làm bộ duyệt đỏ."""
+    ss = site_script.tao_site_script()
+    phang = {"$schema": ss["$schema"], "bindata": {}, "version": 1, "actions": []}
+    for a in ss["actions"]:
+        phang["actions"].append(dict(a, subactions=[]))
+        phang["actions"].extend(a["subactions"])
+    with pytest.raises(AssertionError):
+        _duyet_site_script(phang)
+
+
+def test_dem_hanh_dong_dem_ca_hanh_dong_con_in_ra_va_canh_bao_tran(capsys):
     ss = site_script.tao_site_script()
     n = site_script.dem_hanh_dong(ss)
-    assert n == 4 + 30 + 4 + 4 + 4
+    assert n == 4 + 30 + 4 + 4 + 4 and len(ss["actions"]) == 4
     site_script.kiem_so_hanh_dong(n)
     out = capsys.readouterr().out
     assert str(n) in out and "30" in out          # in số hành động, cảnh báo vượt trần 30 (áp đồng bộ)
@@ -265,7 +287,7 @@ def test_quy_tac_diem_trong_cong_thuc(ra):
 def test_khong_ten_that_tenant_hay_url(ra):
     for ten, nd in _tep_ra(ra).items():
         van_ban = nd.decode("utf-8")
-        assert "http" not in van_ban.lower(), ten
+        assert "http" not in van_ban.replace(SCHEMA_URL, "").lower(), ten   # chỉ URL $schema được phép
         assert "tenant" not in van_ban.lower(), ten
         for email in re.findall(r"[\w.+-]+@[\w.-]+", van_ban):
             assert email.endswith("example.test"), (ten, email)
@@ -354,3 +376,13 @@ def test_khong_thuoc_tinh_nao_co_hai_cong_thuc(ra):
         for tieu, _ in _cac_khoi(_noi_dung(ra, ten)):
             assert tieu not in thay, (tieu, thay.get(tieu), ten)
             thay[tieu] = ten
+
+
+def test_nhan_la_cong_thuc_ten_trong_app_formulas_khong_collection_onstart(ra):
+    nv = _noi_dung(ra, "NguyenVong.txt")
+    assert "colNhan" not in nv
+    kh = nv[nv.index("App.Formulas ="):]
+    assert "Nhan = Table(" in kh and "T(khoa: Text): Text" in kh
+    for k, _, _ in cong_thuc.NHAN:
+        assert '{Khoa: "%s"' % k in kh
+    assert "ClearCollect(colNhan" not in nv

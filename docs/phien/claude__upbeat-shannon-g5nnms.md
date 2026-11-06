@@ -29,7 +29,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
 - [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
-      [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11: bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen (Opus review pending)
+      [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11 (fixed after Opus review): bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen (Opus review pending)
       [ ] K2 T4M-BK3+BK4 (Sonnet, after K1): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
       [ ] K3 Opus review
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
@@ -41,8 +41,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   Buoi mapping accepted, §9 decision 1 corrected). Waiting K1 fix.
 - Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). PR #13 open (CI pending).
 - STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
-  tests/test_t4m_bo_dung_bk1.py 34 pass + 1 xfail, 183 related pass, ruff clean, 3 mutations caught. FINDING: `ghi_clb_csv`
-  writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 assumed equal): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
+  tests/test_t4m_bo_dung_bk1.py 37 pass; Opus review fixes done (subactions nesting, addSPField id, Nhan formula). FINDING: `ghi_clb_csv`
+  writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 was wrong; Opus fixed §9): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
 - Round 4 (plan §8) DONE, reviewed: 7 NV/day, tick max 5/day, determination points in app (b); D1 7e274d4,
   D2 7e31127; no core/schema/CSV change; 173 related tests, kiem_nhanh 7/7 (details: Session log, CHANGELOG).
 - Simulation artifact (interactive, 7 stages, fake data; shared "Anyone with the link" by Truong):
@@ -54,7 +54,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
 ## Decisions and gotchas (keep short)
-- Never commit real school data, tenantId, app URL or names. Sandbox/copy only; never touch the live app.
+- Never commit real school data, tenantId, app URL or names; sandbox/copy only.
 - No subagents (rule 10): every step is a SEPARATE session (create_session), reporting DONE/BLOCKED (plan §3).
 - Store = SharePoint List, wide model (one row per student x day, NV1..NV7 + THI1..THI7 + WP1..WP7, round 4); CSV export cap 30,000 rows.
   Dataverse for Teams + Developer Plan stop creating environments 15/11/2026. PowerSchool is not an SDS OneRoster
@@ -145,3 +145,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong approved T4M-BK + PR: merged main (CHANGELOG both sides, 157 tests pass), opened PR #13; K0 research -> KQ §8; wrote K1/K2 prompts; root session id updated in plan §3 | Launching K1 |
 | 2026-11-06 | Sonnet | T4M-BK1/BK2 (K1): bo_dung_t4m column module (ECA 30 cols), site script (46 actions), sample CSVs + KIEM_COT_ECA.md, 4 Power Fx files k=1..7; tests first, static syntax test caught 3 generator bugs; 3 mutations caught | No subagent; no core/schema/CSV change; Buoi text mismatch reported |
 | 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
+| 2026-11-06 | Sonnet | K1 fixes after Opus review: site script subactions + $schema + addSPField id, Nhan named formula, xfail -> normal test; tests first (5 red), 2 mutations caught | No core/schema/CSV change |

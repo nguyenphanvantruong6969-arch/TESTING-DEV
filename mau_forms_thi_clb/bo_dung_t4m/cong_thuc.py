@@ -138,7 +138,7 @@ def _dau(nguon, tieu_de, ghi_chu=()):
     return "\n".join(L) + "\n"
 
 
-# ----------------------------------------------------------------- nhãn hai ngôn ngữ (colNhan)
+# ----------------------------------------------------------------- nhãn hai ngôn ngữ (công thức tên Nhan)
 NHAN = [("da_dung", "Đã dùng", "Used"), ("khung_1", "Khung 1 (CLB thi)", "Group 1 (exam clubs)"),
         ("khung_2", "Khung 2 (CLB còn lại)", "Group 2 (other clubs)"), ("thieu", "còn thiếu", "short by"),
         ("thua", "thừa", "over by"), ("loi_luu", "Chưa lưu được:", "Could not save:"),
@@ -158,12 +158,12 @@ NHAN = [("da_dung", "Đã dùng", "Used"), ("khung_1", "Khung 1 (CLB thi)", "Gro
 def _on_start():
     bang = ", ".join('{Khoa: "%s", Vi: "%s", En: "%s"}' % n for n in NHAN)
     return ("# ---- App.OnStart: DÁN TAY (App Object không dán mã được, KQ §8.2) ----\n"
-            + _bloc("App.OnStart",
-                    'Set(varNgonNgu, "vi");\nClear(colXoa);\nClearCollect(colNhan, Table(%s))' % bang)
-            + "\n# ---- App.Formulas: DÁN TAY (hàm T dùng ở mọi màn; GĐ về cú pháp hàm người dùng) ----\n"
+            + _bloc("App.OnStart", 'Set(varNgonNgu, "vi");\nClear(colXoa)')
+            + "\n# ---- App.Formulas: DÁN TAY. Nhãn là công thức tên (Nhan), hàm T đọc nó; GĐ về cú pháp hàm người dùng ----\n"
             + _bloc("App.Formulas",
-                    'T(khoa: Text): Text = If(varNgonNgu = "en", LookUp(colNhan, Khoa = khoa).En, '
-                    'LookUp(colNhan, Khoa = khoa).Vi);'))
+                    'Nhan = Table(%s);\n'
+                    'T(khoa: Text): Text = If(varNgonNgu = "en", LookUp(Nhan, Khoa = khoa).En, '
+                    'LookUp(Nhan, Khoa = khoa).Vi);' % bang))
 
 
 # ----------------------------------------------------------------- bốn tệp
