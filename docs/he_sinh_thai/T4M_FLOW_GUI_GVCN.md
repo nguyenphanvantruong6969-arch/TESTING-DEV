@@ -57,7 +57,7 @@ Số hành động/lớp ở trên là **GĐ** (đếm từ bảng §3, chưa đ
 
 ## 6. DLP (NC-14)
 - Admin lập chính sách dữ liệu; nếu Outlook/Teams/SharePoint bị xếp vào nhóm không được trộn, flow bị treo hoặc cách ly; chính sách mới có hiệu lực trong 1 đến 24 giờ (ĐXM).
-- **HỎI-IT trước khi dựng:** chính sách hiện hành có cho SharePoint + Outlook (hoặc Teams) cùng một flow không (NC-16). Không được: nhờ admin nới DLP chỉ để chạy flow này; nếu bị chặn thì dùng đường gửi tay.
+- **HỎI-IT trước khi dựng:** chính sách hiện hành có cho SharePoint + Outlook (hoặc Teams) cùng một flow không (NC-14). Không được: nhờ admin nới DLP chỉ để chạy flow này; nếu bị chặn thì dùng đường gửi tay.
 - Thông báo cho IT/DPO rằng tệp có tên học sinh nằm trong thư viện và trong hộp thư GVCN: thời hạn xoá do trường đặt (HỎI-IT).
 
 ## 7. Xử lý lỗi và đường thủ công
@@ -74,4 +74,4 @@ Số hành động/lớp ở trên là **GĐ** (đếm từ bảng §3, chưa đ
 - Đo thật chỉ điền vào bảng của HDT §9; không điền số ước lượng thành số đo.
 
 ## 9. Việc chờ (không thuộc tài liệu này)
-- NC-08: nguồn danh sách GVCN và có bao nhiêu GVCN mỗi lớp. NC-16: chính sách DLP. Có tài khoản dịch vụ hay không. Môi trường thử (NC-02).
+- NC-08: nguồn danh sách GVCN và có bao nhiêu GVCN mỗi lớp. NC-14: chính sách DLP. Có tài khoản dịch vụ hay không. Môi trường thử (NC-02).

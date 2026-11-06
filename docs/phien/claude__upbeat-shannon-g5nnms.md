@@ -32,7 +32,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [x] S3 T4M-GD4-V0 (Opus; v0 done 06/11, revisit after GĐ2)  [x] S4 T4M-DO (Sonnet, done 06/11)
       [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
       [x] T4M-Q1b-b (Sonnet, 06/11): optional --co-so filter in --chi-thi; T4M_VAN_HANH_MOT_DOT.md steps 4-5 updated
-- [ ] ROUND 2 (Truong approved 06/11; plan §6): [x] R1 T4M-M1 (Sonnet, done 06/11)  [ ] R2 T4M-M3 (Sonnet)  [x] R3 T4M-M4 (Sonnet, done 06/11)
+- [ ] ROUND 2 (Truong approved 06/11; plan §6): [x] R1 T4M-M1 (Sonnet, done 06/11)  [ ] R2 T4M-M3 (Sonnet)  [x] R3 T4M-M4 (Sonnet, done 06/11; reviewed OK, DLP ref NC-16->NC-14 fixed)
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
@@ -128,3 +128,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Sonnet | T4M-M1 (R1): app-edit spec for Top 3 per day, 14 requirements with pass/fail checks | Docs only; no subagent; no product code |
 | 2026-11-06 | Sonnet | T4M-M4 (R3): flow guide for sending per-homeroom Excel to homeroom teachers; docs only | No subagent; no code changed |
 | 2026-11-06 | Opus | Reviewed R1 T4M-M1 (OK); added HDT §9 rows 5.5 (bilingual) and 5.6 (restore) for R10/R12 | |
+| 2026-11-06 | Opus | Reviewed R3 T4M-M4 (OK; fixed DLP reference NC-16 -> NC-14) | Waiting R2 |
