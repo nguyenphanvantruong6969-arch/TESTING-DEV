@@ -14,7 +14,7 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 ## Plan (written by Opus; ticked by Sonnet)
 - [x] Research plan; GĐ1 docs (P1); P4 kiosk contract; P5 quiz path; GĐ2 interview sheet; GĐ3 sandbox guide
 - [x] T4M-Q1..Q3, Q1b, Q1b-b (quiz-only Forms, Email key, Lớp, --co-so); T4M-DEMO; Round 1 S1-S4; Round 2 R1-R3
-- [ ] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a):
+- [x] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a; Opus reviewed 06/11):
       [x] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, DONE 06/11)
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
@@ -25,20 +25,16 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- STATUS T4M-Q4a/b/c: DONE. Tests first (24 in `tests/test_t4m_cong_thi.py`; 20 red -> green), related 126 pass, ruff clean, kiem_nhanh 7/7. Q4a `tao_mau_forms.py --moi-clb` (one Quick Import .docx per club with de_thi, no gate, `CLB.csv` for ALL clubs with empty FormUrl, `CAI_DAT_FORMS_MOI_CLB.md`; byte-identical regeneration; stale files removed; exclusive with --chi-thi). Q4b converter accepts gate-less exports holding exactly ONE club (mixing / unknown tag / missing question -> LoiTepXuat, nothing written); same Sổ nhập as one shared form. Q4c `--bai-thi` (Email, ClubId) -> `chi_co_o_bai_thi` / `chi_co_o_tep_xuat`, extra sheet only with the flag, scores never change. Default and --chi-thi unchanged. No core/schema/CSV contract change. Not done: `demo_t4m.py --moi-clb` (not cheap). All Forms steps TH. Nothing for Truong to approve.
-- STATUS T4M-M5: DONE (docs only, no tests). `T4M_DAC_TA_SUA_APP.md` §10 "Màn Thi tuyển" + requirements R15..R24 (pass/fail each; proposed HDT §9 rows 7.1-7.3 not yet added); new `T4M_FLOW_DA_LAM.md` (85 lines): one template flow per quiz form, service-account owner, request estimate 9,000-12,000 vs 6,000/day (ƯL), manual fallback with `--bai-thi`. Level 5a, standard connectors, `=` filters only. Did not touch `T4M_VAN_HANH_MOT_DOT.md` / `mau_forms_thi_clb/README.md` (C1). Nothing for Truong to approve; Opus may add HDT §9 rows 7.x.
-- Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
-- C2 reported DONE (c4371e4: T4M_DAC_TA_SUA_APP.md §10 R15..R24, new T4M_FLOW_DA_LAM.md, estimate 9,000-12,000
-  actions vs 6,000/day); it suggests adding HDT §9 rows 7.x. Review it. C1 reported DONE d887988 (tests/test_t4m_cong_thi.py 24; demo --moi-clb not done). Review both.
-- Round 3 RUNNING: C1 and C2 were launched by the old root session (session_01YVAyu3Zzm2AEVFAPhazqHY). They report
-  DONE/BLOCKED by send_message to THAT old session and also write `STATUS <code>: ...` lines here. The new root
-  session will NOT get those messages: poll with get_session on the two ids above and read STATUS lines after git pull.
-  The fallback check-in trigger was deleted at handoff; schedule your own (send_later) if you orchestrate.
-- Review checklist for round 3 (plan §7 "Nhận khi"): related tests (test_t4m_chi_thi, test_demo_t4m,
-  test_mau_forms_thi_clb, test_doi_chieu_lists, plus new ones); default and existing --chi-thi output unchanged
-  (compare unzipped docx/xlsx ignoring docProps/core.xml timestamp); no conflict markers in CHANGELOG/handoff;
-  M5: delegable filters only (Email = Lower(User().Email)), no score in app (level 5a), standard connectors only.
-- Container: pytest, openpyxl, python-docx, ruff were pip-installed in the old container; reinstall if missing.
+- Rounds 1, 2, 3 finished and reviewed by Opus 06/11/2026. Round 3 review: 134 related tests pass, ruff clean,
+  kiem_nhanh 7/7 (needs `git fetch origin main:refs/remotes/origin/main` first, else trung_khit fails), default and
+  --chi-thi generator output identical before/after C1 (ignoring docProps/core.xml).
+- Review fixes: (1) mutation `any`->`all` in `_da_thi` survived -> added test_q4b_phieu_bo_trong_vai_cau_van_tinh_la_da_thi
+  (now 25 tests in tests/test_t4m_cong_thi.py); (2) C2 proposed HDT §9 rows "7.x" but 7.1/7.2 already exist (CSV flow) ->
+  new HDT §13 + rows 13.1..13.4; R15..R24 and T4M_FLOW_DA_LAM.md now point to 13.x.
+- Minor notes, not fixed (out of scope): default mode of tao_mau_forms.py ignores --ra (pre-existing); --bai-thi ClubId
+  compare is case-sensitive (club_id in de_thi.json is lower-case; IT must keep it so in list BaiThi).
+- C1/C2 child sessions are done; nothing is running. `demo_t4m.py --moi-clb` not done (C1 judged it not cheap).
+- Container: pip install pytest openpyxl python-docx if missing (ruff is present).
 - Still for Truong: AI-log entry for T4M-DO (log is outside the repo).
 
 ## Decisions and gotchas (keep short)
@@ -59,15 +55,15 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Poll C1/C2; review per checklist above; send fixes if needed; when both pass tick ROUND 3, push, report to Truong.
-2. Ask Truong about the pending proposals (PR to main for CI is the recommended next one).
-3. After Truong's GĐ2 meeting: paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA answered Q1-Q3.
+1. Ask Truong about the pending proposals (PR to main for full CI + Windows build is the recommended next one;
+   optional: `demo_t4m.py --moi-clb`).
+2. After Truong's GĐ2 meeting: paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA answered Q1-Q3.
 
 ## Files touched (T4M, this branch)
 - mau_forms_thi_clb/{bieu_mau,tao_mau_forms,chuyen_forms_sang_phan_mem}.py, README.md, tests/test_t4m_cong_thi.py, T4M_VAN_HANH_MOT_DOT.md: T4M-Q4a/b/c
 - docs/he_sinh_thai/: T4M_KE_HOACH_NGHIEN_CUU, T4M_KET_QUA_TAI_LIEU, T4M_PHIEU_PHONG_VAN, T4M_HUONG_DAN_THU,
   T4M_KE_HOACH_TU_DONG, T4M_GOI_THIET_KE, T4M_MICROSOFT (v0), T4M_VAN_HANH_MOT_DOT, T4M_DO_MO_PHONG,
-  T4M_DAC_TA_SUA_APP (+§10 M5), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
+  T4M_DAC_TA_SUA_APP (+§10 M5), T4M_HUONG_DAN_THU (+§13), T4M_FLOW_GUI_GVCN, T4M_CONG_THI, T4M_FLOW_DA_LAM (.md)
 - mau_forms_thi_clb/: chuyen_forms_sang_phan_mem.py, bieu_mau.py, tao_mau_forms.py, doi_chieu_lists.py, README.md,
   GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx
 - du_lieu_test/: sinh_xuat_lists_gia.py, demo_t4m.py, do_t4m_thi.py, ket_qua_t4m/
@@ -115,3 +111,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Second handoff note: C2 reported DONE (unreviewed); C1 running | No new work started |
 | 2026-11-06 | Sonnet | T4M-Q4a/b/c (C1): `--moi-clb` generator, one-club-per-export converter, `--bai-thi` report; tests first (24) | No subagent; default and --chi-thi unchanged |
 | 2026-11-06 | Opus | Third handoff note: C1 also reported DONE (unreviewed) | Round 3 needs Opus review only |
+| 2026-11-06 | Opus | Reviewed round 3 (C1, C2): 134 tests, kiem_nhanh 7/7, outputs identical; added 1 test (mutation survivor), HDT §13 rows 13.1-13.4 (C2 numbering clash); round 3 ticked | Next: Truong decides PR to main |

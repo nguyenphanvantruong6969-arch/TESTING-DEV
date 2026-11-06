@@ -253,6 +253,10 @@ Mỗi dòng: đánh dấu **Pass** hoặc **Fail**; nếu Fail thì ghi **lý do
 | 7.1 | Flow xuất: đủ dòng theo từng ngày | NC-09, 13 | ☐ | ☐ | | lịch sử chạy | 1 giờ | thời gian chạy: |
 | 7.2 | Tệp từ flow đọc được bằng Python | NC-09 | ☐ | ☐ | | | 30 phút | BOM: có / không |
 | 8.2 | Flow gửi 3 tệp theo lớp | NC-11, 12 | ☐ | ☐ | | email nhận được | 1 đến 2 giờ | thời gian chạy: |
+| 13.1 | Màn Thi tuyển: chỉ CLB có thi đã chọn, nút mở đúng biểu mẫu (R15, R16 của `T4M_DAC_TA_SUA_APP.md`) | NC-25 | ☐ | ☐ | | màn có 2 thẻ | 30 phút | |
+| 13.2 | Nộp bài thử: flow ghi `BaiThi`, thẻ thành "Đã làm", nút ẩn; khoá hiện "Đã đóng" (R17, R18) | NC-13, 25 | ☐ | ☐ | | lịch sử chạy flow | 1 giờ | trễ nộp→dòng: ; hành động/bài: |
+| 13.3 | Không điểm trên app; lọc uỷ quyền được; mỗi em chỉ thấy bài mình, kể cả email hoa (R19, R20, R21) | NC-04, 25 | ☐ | ☐ | | | 30 phút | |
+| 13.4 | Hai ngôn ngữ, điện thoại, màn trống không lỗi; học sinh không ghi được `BaiThi` (R22, R23, R24) | NC-04, 05 | ☐ | ☐ | | thông báo từ chối quyền | 30 phút | |
 
 Câu cần trả về kế hoạch sau khi điền: (1) có lấy đủ 7.500 dòng bằng đường thủ công không; (2) có cần lọc theo ngày cho flow không; (3) so sánh chữ hoa thường của `Email` trong app ra sao; (4) lưu 5 ngày có thể hỏng nửa chừng không; (5) mã hoá và dạng cột Choice của tệp xuất.
 
@@ -306,3 +310,14 @@ Kèm: tệp xuất ở bước 4 và ảnh chụp hộp thoại Export. **Không
 1. Điền mục 9, đưa kết quả cho phiên Opus chạy P2 (GĐ4); không sửa `T4_MO_HINH_HE_SINH_THAI.md`.
 2. Mọi tệp xuất ra từ môi trường thử chỉ chứa dữ liệu giả; vẫn không commit ảnh chụp có địa chỉ site hay tên tài khoản.
 3. Việc còn thiếu để V1 chạy được và cần **mã mục riêng** (chờ P2): bộ chuyển đổi Lists -> Sổ nhập (hạ chữ thường email, đổi `Thu` thành `thu_2`…, xoay `NV1..NV3` thành danh sách nguyện vọng); xếp hai pha cho gói tiếng Nhật.
+
+---
+
+## 13. Màn Thi tuyển và flow "Đã làm" (T4M-M5, tuỳ chọn)
+
+Đặc tả màn: `T4M_DAC_TA_SUA_APP.md` §10 (R15 đến R24). Flow: `T4M_FLOW_DA_LAM.md`. Chỉ trên bản sao app và list giả.
+
+**Bước 13.0.** Tạo list giả `CLB_GIA` (`ClubId`, `FormUrl`: 2 CLB có biểu mẫu thử, 1 CLB `FormUrl` trống) và `BaiThi_GIA` (`Email`, `ClubId`, `ResponseId`, `NopLuc`); học sinh thử chỉ có quyền đọc `BaiThi_GIA`. Biểu mẫu thử sinh bằng `tao_mau_forms.py --moi-clb`.
+**Bước 13.1 đến 13.4.** Chạy các kiểm R15 đến R24, điền dòng 13.x ở mục 9. Ở 13.2 ghi **thời gian trễ thật** từ lúc nộp tới lúc dòng hiện và **số hành động thật mỗi bài** trong lịch sử chạy (so với ước lượng ~3 của `T4M_FLOW_DA_LAM.md` §5).
+**Đối chiếu (không cần môi trường thử):** xuất `BaiThi_GIA` ra CSV, chạy bộ chuyển đổi với `--bai-thi`; khớp hết thì sheet "Đối chiếu BaiThi" ghi "Khớp hết".
+- Ước lượng mô phỏng: 2 đến 3 giờ cả mục (**chưa đo**).

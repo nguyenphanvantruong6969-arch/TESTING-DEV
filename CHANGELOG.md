@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC vòng 3: soát C1 (T4M-Q4a/b/c) và C2 (T4M-M5)
+
+Soát theo plan §7 "Nhận khi": 134 test liên quan đạt, ruff sạch, `kiem_nhanh` 7/7 (15 ca trùng khít với main); đầu ra mặc định và `--chi-thi` của `tao_mau_forms.py` trùng khít trước/sau C1 (bỏ qua `docProps/core.xml`). Không đổi mã sản phẩm.
+- Gây hỏng tạm 4 chỗ trong `chuyen_forms_sang_phan_mem.py`: 3 bị bắt; `_da_thi` `any` -> `all` sống sót. Thêm `test_q4b_phieu_bo_trong_vai_cau_van_tinh_la_da_thi` (`tests/test_t4m_cong_thi.py`, nay 25): phiếu làm dở vẫn có điểm.
+- M5: số dòng HDT §9 đề xuất "7.x" trùng với dòng 7.1/7.2 (flow xuất CSV) đã có. Thêm mục 13 vào `T4M_HUONG_DAN_THU.md` và dòng 13.1 đến 13.4 ở §9; cột "HDT §9" của R15 đến R24 trong `T4M_DAC_TA_SUA_APP.md` và hai chỗ trong `T4M_FLOW_DA_LAM.md` trỏ về 13.x.
+
 ## 2026-11-06 — T4M-M5 (vòng 3, bước C2): màn "Thi tuyển" và flow "Đã làm", chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` thêm mục 10 "Màn Thi tuyển" (CLB có thi mà em đã chọn, `Launch(FormUrl)` chỉ khi chưa có dòng `BaiThi` và còn hạn, "Đã làm"/"Chưa làm", nút Làm mới, lọc `=` uỷ quyền được, không hiện điểm: mức 5a) và bảng yêu cầu R15 đến R24 mỗi dòng một kiểm pass/fail. `docs/he_sinh_thai/T4M_FLOW_DA_LAM.md` (mới, 85 dòng): flow mẫu mỗi biểu mẫu một flow (When a new response is submitted → Get response details → [kiểm trùng] → Create item `BaiThi`), chủ là tài khoản dịch vụ IT, cách nhân flow và Form Id biểu mẫu nhóm, ước tính 9.000 đến 12.000 hành động so với 6.000 mỗi ngày (nhãn ƯL), xử lý lỗi, đường thủ công với `--bai-thi`. Chỉ connector chuẩn; mọi bước TH/GĐ. Không đụng `T4M_VAN_HANH_MOT_DOT.md` và `mau_forms_thi_clb/README.md` (C1 sửa). Không test mới.

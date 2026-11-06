@@ -149,20 +149,20 @@ Filter(colCLB, ClubId in colChon.Id && FormUrl <> "")
 
 ### 10.4 Bảng yêu cầu và kiểm pass/fail (nối tiếp R1 đến R14, mục 7)
 
-Chưa có dòng trong HDT §9: đề xuất thêm nhóm 7.x (Opus/Truong quyết); điền tạm vào cột "HDT §9" bằng "đề xuất 7.x".
+Dòng 13.1 đến 13.4 của HDT §9 (mục 13 của HDT; Opus thêm khi soát 06/11/2026; số 7.x đã dùng cho flow xuất CSV).
 
 | # | Yêu cầu | Kiểm (pass khi) | HDT §9 |
 |---|---|---|---|
-| R15 | Chỉ hiện CLB có thi mà em đã chọn | Tài khoản thử chọn 2 CLB có thi, 1 không thi: màn hiện đúng 2 thẻ | đề xuất 7.1 |
-| R16 | Nút Làm bài mở đúng biểu mẫu của CLB | Bấm mỗi thẻ: tab mới mở biểu mẫu đúng CLB (đối chiếu tiêu đề) | đề xuất 7.1 |
-| R17 | Trạng thái "Đã làm" xuất hiện sau khi nộp | Nộp bài thử, bấm Làm mới: thẻ chuyển "Đã làm" và nút Làm bài ẩn; ghi thời gian trễ thực đo | đề xuất 7.2 |
-| R18 | Không hiện nút khi đã làm hoặc đã khoá | Có dòng `BaiThi` thì không nút; đặt `TrangThai = Đã khóa` thì không nút, hiện "Đã đóng" | đề xuất 7.2 |
-| R19 | Không hiện điểm | Tìm trên mọi màn: không số điểm; có dòng "Xem điểm trong Forms…" | đề xuất 7.3 |
-| R20 | Chỉ lọc uỷ quyền được | Giới hạn dòng = 1: không cảnh báo uỷ quyền ở công thức chạm `BaiThi`, `ECA` | đề xuất 7.3 |
-| R21 | Em chỉ thấy bài của mình | Hai tài khoản thử: mỗi em chỉ thấy dòng `BaiThi` của mình (kể cả email hoa) | đề xuất 7.3 |
-| R22 | Hai ngôn ngữ, điện thoại | Như R10 và R11 cho màn này | đề xuất 7.3 |
-| R23 | Màn trống không lỗi | Tài khoản không chọn CLB thi: hiện thông báo, không lỗi công thức | đề xuất 7.3 |
-| R24 | Em không sửa được `BaiThi` | Tài khoản học sinh thử ghi trực tiếp vào list `BaiThi` bị từ chối (quyền chỉ đọc; HỎI-IT) | đề xuất 7.3 |
+| R15 | Chỉ hiện CLB có thi mà em đã chọn | Tài khoản thử chọn 2 CLB có thi, 1 không thi: màn hiện đúng 2 thẻ | 13.1 |
+| R16 | Nút Làm bài mở đúng biểu mẫu của CLB | Bấm mỗi thẻ: tab mới mở biểu mẫu đúng CLB (đối chiếu tiêu đề) | 13.1 |
+| R17 | Trạng thái "Đã làm" xuất hiện sau khi nộp | Nộp bài thử, bấm Làm mới: thẻ chuyển "Đã làm" và nút Làm bài ẩn; ghi thời gian trễ thực đo | 13.2 |
+| R18 | Không hiện nút khi đã làm hoặc đã khoá | Có dòng `BaiThi` thì không nút; đặt `TrangThai = Đã khóa` thì không nút, hiện "Đã đóng" | 13.2 |
+| R19 | Không hiện điểm | Tìm trên mọi màn: không số điểm; có dòng "Xem điểm trong Forms…" | 13.3 |
+| R20 | Chỉ lọc uỷ quyền được | Giới hạn dòng = 1: không cảnh báo uỷ quyền ở công thức chạm `BaiThi`, `ECA` | 13.3 |
+| R21 | Em chỉ thấy bài của mình | Hai tài khoản thử: mỗi em chỉ thấy dòng `BaiThi` của mình (kể cả email hoa) | 13.3 |
+| R22 | Hai ngôn ngữ, điện thoại | Như R10 và R11 cho màn này | 13.4 |
+| R23 | Màn trống không lỗi | Tài khoản không chọn CLB thi: hiện thông báo, không lỗi công thức | 13.4 |
+| R24 | Em không sửa được `BaiThi` | Tài khoản học sinh thử ghi trực tiếp vào list `BaiThi` bị từ chối (quyền chỉ đọc; HỎI-IT) | 13.4 |
 
 ### 10.5 Lui (nếu không sửa được app)
 Trang SharePoint của đợt: danh sách CLB kèm liên kết biểu mẫu và khung xem `BaiThi` lọc **[Me]** (`T4M_CONG_THI.md` §7). Không rẽ theo NV; không cần sửa app.

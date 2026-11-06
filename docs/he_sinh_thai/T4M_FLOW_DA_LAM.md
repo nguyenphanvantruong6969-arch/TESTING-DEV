@@ -58,7 +58,7 @@ Lưu ý:
 
 - Nếu cả đợt mở **nhiều ngày**: chia ra mỗi ngày dưới 6.000 là vừa. Nếu học sinh nộp dồn trong **một ngày** (vd. sát hạn), 9.000 đến 12.000 **vượt** 6.000 (ƯL): flow bị chậm hoặc bị điều tiết, dòng `BaiThi` đến muộn.
 - Giảm: (a) bỏ bước 3 và 4 (kiểm trùng; còn 3 hành động); (b) hai tài khoản dịch vụ, mỗi tài khoản chủ một nửa số flow (HỎI-IT, có thể cần giấy phép); (c) đặt hạn thi rải nhiều ngày theo CLB hoặc theo khối; (d) chấp nhận trễ rồi dùng đường thủ công §8.
-- Số thật chỉ có sau chạy thử: đo ở §7, điền vào HDT; **không** coi số ước tính là số đo.
+- Số thật chỉ có sau chạy thử: đo ở §7, điền vào HDT §9 dòng 13.2; **không** coi số ước tính là số đo.
 
 ## 6. Xử lý lỗi
 1. **Cấu hình mỗi hành động:** thử lại tự động (retry policy mặc định/mũ) cho bước 2 và 5 (TH).
@@ -71,7 +71,7 @@ Lưu ý:
 ## 7. Thử (TH, chưa làm)
 - Môi trường thử (NC-02): một biểu mẫu thử, một list `BaiThi_THU`, tài khoản thử; **không** dùng biểu mẫu hay dữ liệu thật.
 - Pass: nộp 1 bài thì có **đúng 1 dòng** với `Email` chữ thường, `ClubId` đúng, `NopLuc` hợp lý; nộp 3 bài từ 3 tài khoản thì 3 dòng; thử ghi thất bại cố ý thì có dòng nhật ký.
-- Đo: thời gian từ lúc nộp đến lúc dòng xuất hiện (ghi vào bảng kết quả, HDT); số hành động thật mỗi bài (so với §5).
+- Đo: thời gian từ lúc nộp đến lúc dòng xuất hiện (ghi vào HDT §9 dòng 13.2); số hành động thật mỗi bài (so với §5).
 - Fail: ghi nguyên văn thông báo lỗi.
 
 ## 8. Đường thủ công (không cần flow)

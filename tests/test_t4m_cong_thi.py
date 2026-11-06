@@ -282,6 +282,20 @@ def test_q4b_phieu_trong_khong_tinh_la_da_thi(tmp_path, de):
     assert sum("nộp lần nữa" in nd for _d, _s, nd in kq["canh_bao"]) == 1
 
 
+def test_q4b_phieu_bo_trong_vai_cau_van_tinh_la_da_thi(tmp_path, de):
+    """Soát vòng 3 (gây hỏng `any` -> `all` trong _da_thi không đỏ test nào): em làm dở vẫn có điểm."""
+    _ghi_lists(str(tmp_path / "lists.csv"), HS[:1], de)
+    _ghi_xuat_clb(de, str(tmp_path / "a.xlsx"), "clb_covua", [("hs0001" + MIEN, 5)])
+    wb = openpyxl.load_workbook(str(tmp_path / "a.xlsx"))
+    ws = wb.active
+    for c in range(8, ws.max_column + 1):            # cột 6, 7 = câu 1, 2 (đúng); bỏ trống câu 3 trở đi
+        ws.cell(2, c).value = None
+    wb.save(str(tmp_path / "a.xlsx"))
+    kq = cv.chuyen_chi_thi([str(tmp_path / "a.xlsx")], str(tmp_path / "lists.csv"), str(tmp_path / "nap"), de)
+    assert _diem(_doc_so(tmp_path / "nap")) == {"hs0001" + MIEN: {"clb_covua": "4"}}
+    assert kq["n_bai_thi"] == 1
+
+
 def test_q4b_tep_tron_nhieu_clb_dung_lai_khong_ghi_gi(tmp_path, de):
     _ghi_lists(str(tmp_path / "lists.csv"), HS[:1], de)
     _ghi_xuat_clb(de, str(tmp_path / "a.xlsx"), "clb_covua", [("hs0001" + MIEN, 3)])
