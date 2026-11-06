@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-GD4-V0 (bước S3): nháp v0 kiến trúc Microsoft, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_MICROSOFT.md` (mới), ghi rõ "Bản nháp v0 — chưa có kết quả phỏng vấn (GĐ2)", chạy prompt P2 theo dự phòng A: đủ 9 mục (tóm tắt; kiến trúc ô A–H; ma trận §7 điền đủ; mô hình kho rộng + ánh xạ Sổ nhập + điểm kiểm khi `student_id` là email; pha gói tóm tắt và dẫn `T4M_GOI_THIET_KE.md`, D1–D5 ghi là CHỜ DUYỆT; luồng muộn/đổi/rút; rủi ro + lộ trình (ước lượng); mã mục đề xuất T4M-Q1b, T4M-M1..M4, A8-GOI-1..3 kèm `kiem_nhan`; phương án T4-K2 để Truong quyết) và §10 danh sách soát lại sau GĐ2. Điểm phụ thuộc trường mang nhãn HỎI-IT; chỗ đổi thiết kế có hai nhánh (SharePoint List / Dataverse). Dẫn `T4M_VAN_HANH_MOT_DOT.md` (S1) và các bảng của `T4M_DO_MO_PHONG.md` (S4), cả hai có sau `git pull --rebase`; không diễn giải số đo. Không đổi hợp đồng CSV, schema hay bất biến nào; không test mới.
+
 ## 2026-11-06 — T4M-DO (bước S4): đo mô phỏng có / không bài thi tuyển, chỉ bảng số
 
 Thêm công cụ đo; không đụng mã sản phẩm, schema hay hợp đồng CSV. Mọi số liệu là MÔ PHỎNG; không có nhận xét.
