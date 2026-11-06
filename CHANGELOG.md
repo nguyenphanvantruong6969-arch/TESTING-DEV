@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-GOI-TK (bước S2): thiết kế gói nhiều buổi (tiếng Nhật), chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_GOI_THIET_KE.md` (mới): bộ điều phối hai pha đặt trên `run_rbda_nhieu_buoi` (pha 1 DA trên các gói như buổi giả `goi`, cấp độ là bộ lọc điều kiện ở dữ liệu vào, cam kết cả năm chỉ trừ chỉ tiêu; pha 2 từng ngày với ngày của gói bị khoá), so với hai phương án bị loại và một phương án V0 dự phòng; phân tích bất biến 1, 2, 3, 4, 5, 8 kèm phản ví dụ cặp phá vỡ toàn tuần và nhãn "bảo đảm trong từng pha, không bảo đảm ổn định toàn tuần khi có gói"; đề xuất đổi hợp đồng CSV / schema tương thích ngược (chờ Truong, quy tắc 7); ba mục con đề xuất A8-GOI-1..3 kèm `kiem_nhan`; 8 câu hỏi cho giáo viên ECA; 5 quyết định chờ duyệt. Test mới: không có.
+
 ## 2026-11-06 — T4M-NC: kế hoạch tự chạy (S1 đến S4)
 
 Chỉ tài liệu. `docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md` (mới): Truong duyệt 06/11/2026 bốn quyết định (gói tiếng Nhật chỉ thiết kế, nháp v0 GĐ4, tự chạy chuỗi, đo mô phỏng chỉ bảng số); chuỗi bước S1 T4M-VH, S2 T4M-GOI-TK, S3 T4M-GD4-V0, S4 T4M-DO kèm phụ thuộc, tiêu chí nhận, luật dừng, vòng điều phối và prompt từng bước.

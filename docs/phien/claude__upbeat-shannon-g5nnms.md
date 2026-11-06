@@ -29,7 +29,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
 - [ ] AUTO CHAIN (Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
-      [ ] S1 T4M-VH (Sonnet)  [ ] S2 T4M-GOI-TK (Opus, design only)  [ ] S3 T4M-GD4-V0 (Opus)  [ ] S4 T4M-DO (Sonnet)
+      [ ] S1 T4M-VH (Sonnet)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [ ] S3 T4M-GD4-V0 (Opus)  [ ] S4 T4M-DO (Sonnet)
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
@@ -38,6 +38,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
   `tao_mau_forms.ghi_mau_xuat_chi_thi` (fake quiz-only Forms export, plants: uppercase emails, 1 duplicate, 1 unknown email, 1 test for an unranked club);
   `sinh_xuat_lists_gia.sinh/ghi_csv(clb_theo_ngay=)` (default bytes unchanged); `du_lieu_test/demo_t4m.py --ra DIR [--so-hs 120] [--seed] [--he-so-cho]`; README section 0b.
 - Demo facts to confirm with Truong: (1) pipeline needs rules.wharton=False in the TEMP db (default ON, data has no bids); (2) converter does not copy the class column, so demo calls `set_student_class` from the Lists CSV (possible follow-up item: converter writes `Lớp` into the Sổ nhập); (3) sample capacities (~42 seats/day) fit ~50 students, so demo multiplies capacity by an auto factor (~2.0 at 120 students; in-memory copy, `de_thi.json` untouched; `--he-so-cho 1` keeps it). Result at 120 students: ~65% of (student x day) slots get choice 1.
+- Done (Opus, 06/11/2026): S2 T4M-GOI-TK -> `docs/he_sinh_thai/T4M_GOI_THIET_KE.md` (design only, no code). Two-phase orchestrator `run_rbda_co_goi` (new file goi_nhieu_buoi.py) above `run_rbda_nhieu_buoi`; bundle = pseudo-session `goi`; level = preference filter; commitments = quota only; phase-2 STB list excludes `goi` (one-day schools stay in short-circuit). Decisions pending Truong: D1 design, D2 CSV contract (optional `goi_buoi` column + optional `04_goi.csv`), D3 schema (`clubs.goi_buoi`, table `goi_dieu_kien`, `match_results` row `(sid, goi, G)`), D4 item codes A8-GOI-1..3, D5 phase-1 STB permutation. Wait for ECA answers Q1-Q3 before coding.
 - Not done: nobody has run the chain against a real Forms or Lists export; push pending after soat-ma.
 - Orchestration: root Opus session self-checks ~40 min (send_later), reviews each child, launches next (plan §4).
 - Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
@@ -93,3 +94,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Opus | Reviewed T4M-Q1..Q3 (58 related tests pass, ruff clean, default output identical except docx/xlsx core.xml timestamp); Truong approved T4M-DEMO, Sonnet session opened | |
 | 2026-11-06 | Sonnet | T4M-DEMO done: fake quiz-only Forms generator, `demo_t4m.py` one-command chain, README 0b; tests first (11), mutation check found 1 weak test (uppercase emails), fixed | No subagent; no product code, schema or CSV contract changed |
 | 2026-11-06 | Opus | Truong approved auto chain (bundle design only, GĐ4 v0, auto-run, simulation tables only); wrote T4M_KE_HOACH_TU_DONG.md | S2 launched |
+| 2026-11-06 | Opus | S2 T4M-GOI-TK: bundle design doc (two-phase orchestrator, invariants 1/2/3/4/5/8, week-level counter-example, CSV/schema proposal, A8-GOI-1..3 kiem_nhan, ECA questions) | Design only; no code; 5 decisions for Truong |
