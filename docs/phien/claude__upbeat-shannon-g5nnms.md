@@ -26,6 +26,8 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] Quiz path: prompt P5 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md §7 + NC-25/26 Qs in interview sheet (05/11)
 - [x] T4M-Q1..Q3 (Sonnet, done 05/11/2026; Truong APPROVED 05/11/2026, separate session): quiz-only Forms converter keyed on lowercase Email; quiz-only mode
       in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
+- [ ] T4M-DEMO (Sonnet; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
+      (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
@@ -85,3 +87,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-05 | Opus | P5 research (Forms Quiz, Graph, Quick Import, Power Apps quiz); found mau_forms_thi_clb already covers Forms quiz; results §7; interview sheet +4 Qs | Proposed T4M-Q1..Q3 |
 | 2026-11-05 | Opus | Truong approved T4M-Q1..Q3; opened Sonnet session for them | Order Q1 -> Q2 -> Q3 |
 | 2026-11-05 | Sonnet | T4M-Q1..Q3 done: quiz-only converter, quiz-only form generator, teacher note; tests first (27), mutation check found missing 200-boundary case, fixed | No subagent; default mode unchanged; kiem_nhanh 7/7 |
+| 2026-11-06 | Opus | Reviewed T4M-Q1..Q3 (58 related tests pass, ruff clean, default output identical except docx/xlsx core.xml timestamp); Truong approved T4M-DEMO, Sonnet session opened | |
