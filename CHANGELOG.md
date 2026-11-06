@@ -12,7 +12,8 @@ Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (mới, ~113 dòng) ch
 Thêm công cụ dòng lệnh, chỉ đọc; không đụng kiosk, lõi, schema hay hợp đồng CSV.
 - `mau_forms_thi_clb/doi_chieu_lists.py` (mới): `OLD.csv NEW.csv [--co-so CS1] [--ra bao_cao.xlsx] [--de de_thi.json]`. Dùng lại `doc_lists` của bộ chuyển đổi (không viết lại cách đọc). Liệt kê em mới, em rút, dòng đổi nguyện vọng (theo email chữ thường + Thu, kể cả đổi thứ tự), đổi Lớp, đổi CoSo. Hai tệp giống nhau => báo cáo rỗng; hoa/thường của email và thứ tự dòng không phải thay đổi. Lỗi thiếu cột => mã thoát 1, không ghi tệp.
 - `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` bước 8: thêm đoạn dùng công cụ trước khi chạy lại.
-- Test mới (viết trước, 17 ca): `tests/test_doi_chieu_lists.py` (kiem_nhan ở T4M_MICROSOFT.md §8: rỗng / đúng một mục mỗi loại / email hoa-thường / lọc cơ sở / kiosk không bị nạp).
+- Sửa sau soát của điều phối: bản đầu so sánh qua `doc_lists` nên ô có mã CLB không có trong `de_thi.json` bị bỏ trước khi so (báo "không thay đổi" sai). Nay so giá trị THÔ NV1..NVn (bỏ khoảng trắng, phân biệt hoa/thường); ô mã lạ chỉ được đếm (`n_clb_la`) và dòng đầu in `CẢNH BÁO: N ô ...`, không bao giờ in "Không có thay đổi" phía trên cảnh báo chưa đọc.
+- Test mới (viết trước, 17 ca + 7 ca sau soát = 24): `tests/test_doi_chieu_lists.py` (kiem_nhan ở T4M_MICROSOFT.md §8: rỗng / đúng một mục mỗi loại / email hoa-thường / lọc cơ sở / kiosk không bị nạp).
 
 ## 2026-11-06 — T4M-NC: Truong duyệt vòng 2
 

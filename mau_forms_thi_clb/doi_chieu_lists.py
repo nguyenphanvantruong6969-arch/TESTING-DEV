@@ -7,6 +7,10 @@ Liệt kê: em MỚI (có ở MOI, không có ở CU), em RÚT (có ở CU, khô
 (cùng cách đọc với bộ chuyển đổi: dùng lại `doc_lists`). Thứ tự dòng và hoa/thường của email không phải
 thay đổi. Ngày không có nguyện vọng và ngày không có dòng là như nhau.
 
+So sánh nguyện vọng dùng giá trị THÔ của NV1..NVn (bỏ khoảng trắng, phân biệt hoa/thường), không lọc
+theo de_thi.json: mã CLB gõ sai hoặc thiếu trong de_thi.json không được giấu thay đổi. Các ô đó chỉ
+được ĐẾM và báo ở dòng đầu ("CẢNH BÁO: ..."), kèm cảnh báo của `doc_lists`.
+
 Dùng trước khi chạy lại: biết em nào bị ảnh hưởng, rồi mới xuất lại → chuyển đổi → nạp → chạy lại
 (T4M_VAN_HANH_MOT_DOT.md bước 8). Công cụ này không nạp lõi, không mở CSDL, không ghi vào kiosk.
 """
@@ -26,22 +30,39 @@ NHAN_LOAI = {"moi": "Em mới", "rut": "Em rút", "doi_nv": "Đổi nguyện v�
              "doi_lop": "Đổi lớp", "doi_co_so": "Đổi cơ sở"}
 
 
-def _co_so_theo_email(duong):
-    """{email chữ thường: CoSo} (ô CoSo không trống đầu tiên); {} nếu tệp không có cột CoSo."""
+def _doc_tho(duong, de, co_so=None):
+    """{email chữ thường: {name, lop, co_so, nv: {buoi: [giá trị thô NV1..NVn không trống]}}}.
+
+    Cùng luật khoá với `doc_lists` (email chữ thường, dòng trùng (em, ngày) giữ dòng ĐẦU, `co_so`
+    lọc theo ô CoSo) nhưng KHÔNG kiểm mã CLB. Cột bắt buộc đã được `doc_lists` kiểm trước."""
     with open(duong, encoding="utf-8-sig", newline="") as f:
         bang = list(csv.reader(f))
-    if not bang:
-        return {}
     tieu = [h.strip().lower() for h in bang[0]]
-    if "email" not in tieu or "coso" not in tieu:
-        return {}
-    i_e, i_c = tieu.index("email"), tieu.index("coso")
+    i_e, i_t = tieu.index("email"), tieu.index("thu")
+    i_ten = next((tieu.index(k) for k in ("hoten", "name") if k in tieu), None)
+    i_lop = next((tieu.index(k) for k in ("lop", "lớp") if k in tieu), None)
+    i_cs = tieu.index("coso") if "coso" in tieu else None
+    cot_nv = [i for _n, i in sorted((int(h[2:]), i) for i, h in enumerate(tieu)
+                                    if h.startswith("nv") and h[2:].isdigit())]
     ket = {}
     for dong in bang[1:]:
-        dong = dong + [""] * (len(tieu) - len(dong))
-        email, cs = dong[i_e].strip().lower(), dong[i_c].strip()
-        if email and cs and email not in ket:
-            ket[email] = cs
+        dong = [x.strip() for x in dong] + [""] * (len(tieu) - len(dong))
+        email = dong[i_e].lower()
+        if not email:
+            continue
+        if co_so is not None and dong[i_cs].lower() != co_so.strip().lower():
+            continue
+        buoi = cv._ma_buoi_tu_thu(de, dong[i_t]) or dong[i_t]
+        hs = ket.setdefault(email, {"name": "", "lop": "", "co_so": "", "nv": {}})
+        if i_ten is not None and not hs["name"]:
+            hs["name"] = dong[i_ten]
+        if i_lop is not None and not hs["lop"]:
+            hs["lop"] = dong[i_lop]
+        if i_cs is not None and not hs["co_so"]:
+            hs["co_so"] = dong[i_cs]
+        if buoi in hs["nv"]:
+            continue
+        hs["nv"][buoi] = [dong[i] for i in cot_nv if dong[i]]
     return ket
 
 
@@ -50,13 +71,15 @@ def _chuan(s):
 
 
 def doi_chieu(duong_cu, duong_moi, de=None, co_so=None):
-    """Trả {"muc": [...], "canh_bao": [...]}. Mỗi mục: loai, email, ten, thu, cu, moi.
+    """Trả {"muc": [...], "canh_bao": [...], "n_clb_la": số ô mã CLB lạ ở cả hai tệp}. Mỗi mục: loai, email, ten, thu, cu, moi.
 
     Ném `cv.LoiTepXuat` nếu một tệp thiếu cột bắt buộc (không ghi gì)."""
     de = de or bm.doc_de_thi()
-    cu, canh_cu = cv.doc_lists(duong_cu, de, co_so)
-    moi, canh_moi = cv.doc_lists(duong_moi, de, co_so)
-    cs_cu, cs_moi = _co_so_theo_email(duong_cu), _co_so_theo_email(duong_moi)
+    # doc_lists: kiểm cột bắt buộc / --co-so (ném LoiTepXuat) và sinh cảnh báo; KHÔNG dùng để so sánh.
+    _, canh_cu = cv.doc_lists(duong_cu, de, co_so)
+    _, canh_moi = cv.doc_lists(duong_moi, de, co_so)
+    cu, moi = _doc_tho(duong_cu, de, co_so), _doc_tho(duong_moi, de, co_so)
+    n_la = sum(1 for c in canh_cu + canh_moi if "không phải CLB nào" in c[2])
     muc = []
 
     def them(loai, email, ten, thu="", truoc="", sau=""):
@@ -69,17 +92,17 @@ def doi_chieu(duong_cu, duong_moi, de=None, co_so=None):
     for email in sorted(set(cu) & set(moi)):
         a, b = cu[email], moi[email]
         ten = b["name"] or a["name"]
-        for buoi in sorted(set(a["nguyen_vong"]) | set(b["nguyen_vong"])):
-            x, y = a["nguyen_vong"].get(buoi, []), b["nguyen_vong"].get(buoi, [])
+        for buoi in sorted(set(a["nv"]) | set(b["nv"])):
+            x, y = a["nv"].get(buoi, []), b["nv"].get(buoi, [])
             if x != y:
                 them("doi_nv", email, ten, buoi, ", ".join(x), ", ".join(y))
         if _chuan(a["lop"]) != _chuan(b["lop"]):
             them("doi_lop", email, ten, "", a["lop"], b["lop"])
-        if _chuan(cs_cu.get(email, "")) != _chuan(cs_moi.get(email, "")):
-            them("doi_co_so", email, ten, "", cs_cu.get(email, ""), cs_moi.get(email, ""))
+        if _chuan(a["co_so"]) != _chuan(b["co_so"]):
+            them("doi_co_so", email, ten, "", a["co_so"], b["co_so"])
     muc.sort(key=lambda m: (LOAI.index(m["loai"]), m["email"], m["thu"]))
     canh_bao = [("CU",) + c for c in canh_cu] + [("MOI",) + c for c in canh_moi]
-    return {"muc": muc, "canh_bao": canh_bao}
+    return {"muc": muc, "canh_bao": canh_bao, "n_clb_la": n_la}
 
 
 def ghi_bao_cao(kq, duong):
@@ -95,6 +118,9 @@ def ghi_bao_cao(kq, duong):
         ws.append([NHAN_LOAI[m["loai"]], m["email"], m["ten"], m["thu"], m["cu"], m["moi"]])
     ws2 = wb.create_sheet("Cảnh báo")
     ws2.append(["Tệp", "Dòng", "Email", "Nội dung"])
+    if kq["n_clb_la"]:
+        ws2.append(["", "", "", "CẢNH BÁO: %d ô có mã CLB không có trong de_thi.json — kiểm trước khi "
+                    "tin kết quả đối chiếu" % kq["n_clb_la"]])
     for c in kq["canh_bao"]:
         ws2.append(list(c))
     for w in (ws, ws2):
@@ -120,8 +146,13 @@ def main(argv=None):
         print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
         return 1
     dem = {k: sum(1 for m in kq["muc"] if m["loai"] == k) for k in LOAI}
+    if kq["n_clb_la"]:
+        print("CẢNH BÁO: %d ô có mã CLB không có trong de_thi.json — kiểm trước khi tin kết quả đối chiếu"
+              % kq["n_clb_la"])
+        print("(nguyện vọng vẫn được so sánh theo giá trị thô; xem danh sách cảnh báo bên dưới)\n")
     if not kq["muc"]:
-        print("Không có thay đổi giữa hai tệp.")
+        print("Không có thay đổi giữa hai tệp." if not kq["n_clb_la"] else
+              "Không thấy thay đổi nguyện vọng, em rút hay em mới trong giá trị thô của hai tệp.")
     else:
         print("%d em mới, %d em rút, %d dòng đổi nguyện vọng, %d đổi lớp, %d đổi cơ sở."
               % (dem["moi"], dem["rut"], dem["doi_nv"], dem["doi_lop"], dem["doi_co_so"]))

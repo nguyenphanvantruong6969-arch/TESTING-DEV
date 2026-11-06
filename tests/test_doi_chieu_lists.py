@@ -189,3 +189,62 @@ def test_khong_dung_den_kiosk():
     src = open(os.path.join(GOC, "mau_forms_thi_clb", "doi_chieu_lists.py"), encoding="utf-8").read()
     for cam in ("import database", "import app_core", "sqlite3", "run_rbda", "import api"):
         assert cam not in src
+
+
+# ------------------------------------------------------------------ mã CLB lạ không được giấu thay đổi
+
+LA = [
+    ("a" + MIEN, "CS1", "9A1", "Thứ 2", "T2-CLB01", "T2-CLB02"),
+    ("a" + MIEN, "CS1", "9A1", "Thứ 3", "T3-CLB01", ""),
+    ("b" + MIEN, "CS1", "9A2", "Thứ 2", "T2-CLB02", ""),
+    ("b" + MIEN, "CS1", "9A2", "Thứ 3", "T3-CLB02", "T3-CLB01"),
+]
+
+
+def test_ma_la_cung_mot_doi_nv_dung_mot_muc(tmp_path, de):
+    sua = list(LA)
+    sua[0] = ("a" + MIEN, "CS1", "9A1", "Thứ 2", "T2-CLB02", "T2-CLB01")   # đổi chỗ NV1/NV2
+    kq = dc.doi_chieu(*_hai(tmp_path, sua, LA), de)
+    assert _kinds(kq) == [("doi_nv", "a" + MIEN, "thu_2")]
+    assert kq["n_clb_la"] > 0
+
+
+def test_ma_la_giong_nhau_khong_thay_doi_van_canh_bao(tmp_path, de):
+    kq = dc.doi_chieu(*_hai(tmp_path, LA, LA), de)
+    assert kq["muc"] == [] and kq["n_clb_la"] > 0
+
+
+def test_ma_la_xoa_dong_van_thay(tmp_path, de):
+    kq = dc.doi_chieu(*_hai(tmp_path, LA[:3], LA), de)
+    assert _kinds(kq) == [("doi_nv", "b" + MIEN, "thu_3")]
+
+
+def test_ma_clb_phan_biet_hoa_thuong(tmp_path, de):
+    sua = list(LA)
+    sua[2] = ("b" + MIEN, "CS1", "9A2", "Thứ 2", "t2-clb02", "")
+    assert len(dc.doi_chieu(*_hai(tmp_path, sua, LA), de)["muc"]) == 1
+
+
+def test_dong_lenh_canh_bao_dung_dau_khong_in_khong_thay_doi(tmp_path, de, capsys):
+    cu, moi = _hai(tmp_path, LA, LA)
+    assert dc.main([cu, moi]) == 0
+    out = capsys.readouterr().out
+    assert out.startswith("CẢNH BÁO: ")
+    assert "không có trong de_thi.json" in out.splitlines()[0]
+    assert "kiểm trước khi tin kết quả đối chiếu" in out.splitlines()[0]
+    assert "Không có thay đổi giữa hai tệp" not in out
+
+
+def test_dong_lenh_canh_bao_truoc_ca_khi_co_thay_doi(tmp_path, de, capsys):
+    sua = list(LA)
+    sua[0] = ("a" + MIEN, "CS1", "9A1", "Thứ 2", "T2-CLB02", "T2-CLB01")
+    cu, moi = _hai(tmp_path, sua, LA)
+    assert dc.main([cu, moi]) == 0
+    out = capsys.readouterr().out
+    assert out.startswith("CẢNH BÁO: ") and "1 dòng đổi nguyện vọng" in out
+
+
+def test_khong_ma_la_khong_co_dong_canh_bao(tmp_path, de, capsys):
+    cu, moi = _hai(tmp_path, GOC_DONG)
+    assert dc.main([cu, moi]) == 0
+    assert "CẢNH BÁO" not in capsys.readouterr().out
