@@ -26,19 +26,18 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] Quiz path: prompt P5 (Opus, network) -> T4M_KET_QUA_TAI_LIEU.md §7 + NC-25/26 Qs in interview sheet (05/11)
 - [x] T4M-Q1..Q3 (Sonnet, done 05/11/2026; Truong APPROVED 05/11/2026, separate session): quiz-only Forms converter keyed on lowercase Email; quiz-only mode
       in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
-- [ ] T4M-DEMO (Sonnet; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
+- [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
-- Done earlier: research plan + prompts; GĐ1 + P4 results (`T4M_KET_QUA_TAI_LIEU.md`); interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path (results §7).
-- Done (Sonnet, 05/11/2026): T4M-Q1..Q3, tests first (`tests/test_t4m_chi_thi.py`, 27 tests).
-  Q1 `chuyen_forms_sang_phan_mem.py --chi-thi --lists X.csv` (Email lower().strip() joins Lists; first response kept; unknown email, score without preference reported).
-  Q2 `tao_mau_forms.py --chi-thi [--ra]` (no Ranking, no typed ID/name; Record name + One response per person; split by day above 200; docx byte-identical).
-  Q3 `mau_forms_thi_clb/GHI_CHU_GIAO_VIEN.md`. Default mode unchanged. kiem_nhanh 7/7, ruff clean, related tests pass.
-- Deviation to confirm with Truong: typed name question dropped too (Forms records Name); Lists column names fixed (Email, Thu, NV1.., HoTen) and club codes in Lists must equal club_id in de_thi.json.
-- Not done: nobody has run it against a real Forms export or a real Lists export (no sandbox yet). Awaiting push + Truong review.
-- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> plan fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
+- Done earlier: research plan + prompts; GĐ1 + P4 results; interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path; T4M-Q1..Q3 (quiz-only converter/form generator/teacher note; reviewed by Opus 06/11).
+- Done (Sonnet, 06/11/2026): T4M-DEMO, tests first (`tests/test_demo_t4m.py`, 11 tests; related 68 pass, ruff clean).
+  `tao_mau_forms.ghi_mau_xuat_chi_thi` (fake quiz-only Forms export, plants: uppercase emails, 1 duplicate, 1 unknown email, 1 test for an unranked club);
+  `sinh_xuat_lists_gia.sinh/ghi_csv(clb_theo_ngay=)` (default bytes unchanged); `du_lieu_test/demo_t4m.py --ra DIR [--so-hs 120] [--seed] [--he-so-cho]`; README section 0b.
+- Demo facts to confirm with Truong: (1) pipeline needs rules.wharton=False in the TEMP db (default ON, data has no bids); (2) converter does not copy the class column, so demo calls `set_student_class` from the Lists CSV (possible follow-up item: converter writes `Lớp` into the Sổ nhập); (3) sample capacities (~42 seats/day) fit ~50 students, so demo multiplies capacity by an auto factor (~2.0 at 120 students; in-memory copy, `de_thi.json` untouched; `--he-so-cho 1` keeps it). Result at 120 students: ~65% of (student x day) slots get choice 1.
+- Not done: nobody has run the chain against a real Forms or Lists export; push pending after soat-ma.
+- Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
 
 ## Decisions and gotchas (keep short)
 - Japanese club = multi-day bundle (e.g. 3A Mon+Wed+Thu), level assigned by school (eligibility, not priority),
@@ -68,6 +67,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 ## Files touched
 - docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md: the plan
 - docs/phien/claude__upbeat-shannon-g5nnms.md: this handoff
+- du_lieu_test/demo_t4m.py, du_lieu_test/sinh_xuat_lists_gia.py, mau_forms_thi_clb/{tao_mau_forms.py,README.md}, tests/test_demo_t4m.py: T4M-DEMO
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: T4M-NC, Z-CLAUDE-GON, T4-K2 paused
 - CLAUDE.md, docs/ke_hoach/CLAUDE_CHI_TIET.md: slimmed (Z-CLAUDE-GON)
 - docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md: GĐ1 + P4 results
@@ -88,3 +88,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-05 | Opus | Truong approved T4M-Q1..Q3; opened Sonnet session for them | Order Q1 -> Q2 -> Q3 |
 | 2026-11-05 | Sonnet | T4M-Q1..Q3 done: quiz-only converter, quiz-only form generator, teacher note; tests first (27), mutation check found missing 200-boundary case, fixed | No subagent; default mode unchanged; kiem_nhanh 7/7 |
 | 2026-11-06 | Opus | Reviewed T4M-Q1..Q3 (58 related tests pass, ruff clean, default output identical except docx/xlsx core.xml timestamp); Truong approved T4M-DEMO, Sonnet session opened | |
+| 2026-11-06 | Sonnet | T4M-DEMO done: fake quiz-only Forms generator, `demo_t4m.py` one-command chain, README 0b; tests first (11), mutation check found 1 weak test (uppercase emails), fixed | No subagent; no product code, schema or CSV contract changed |

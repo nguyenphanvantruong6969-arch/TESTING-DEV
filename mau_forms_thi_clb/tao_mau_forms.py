@@ -242,6 +242,97 @@ def ghi_mau_xuat(de, duong, so_hoc_sinh=60, hat_giong=2026):
     wb.save(duong)
 
 
+def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
+    """T4M-DEMO: tệp Forms chỉ-thi GIẢ (Email + cột câu + cột 'Points - …', không Ranking, không mã HS),
+    khớp tệp Lists giả: `danh_sach` là kết quả `chuyen_forms_sang_phan_mem.doc_lists` ({email chữ thường:
+    {name, nguyen_vong}}). Em chỉ thi CLB đã xếp, trừ một em cố ý thi CLB không xếp. Cùng seed -> cùng ô.
+
+    Cố ý gài ba cảnh báo (cộng email viết HOA, bộ chuyển đổi hạ chữ thường nên không báo gì):
+    một phiếu nộp lần hai, một email không có trong Lists, một bài thi CLB không xếp nguyện vọng.
+    Trả {email_trung, email_la, khong_xep: (email, club_id), n_phieu}. Dữ liệu MÔ PHỎNG."""
+    from openpyxl import Workbook
+
+    rd = random.Random(hat_giong)
+    clb_thi = bm.clb_co_thi(de)
+    if not clb_thi:
+        raise ValueError("de_thi.json không có CLB nào có đề thi")
+    tieu_de = ["ID", "Start time", "Completion time", "Email", "Name", "Total points"]
+    for clb in clb_thi:
+        tieu_de.append(bm.cau_cong_thi(de, clb, chi_thi=True))
+        for i in range(1, len(clb["de_thi"]) + 1):
+            td = bm.cau_de_thi(clb, i)
+            tieu_de += [td, "Points - " + td]
+
+    def phieu(email, ten, cac_clb, nang_luc):
+        """Một dòng Forms: các CLB trong `cac_clb` thi, còn lại 'Không'."""
+        o, tong = {"Email": email, "Name": ten}, 0
+        for clb in clb_thi:
+            if clb["club_id"] not in cac_clb:
+                o[bm.cau_cong_thi(de, clb, chi_thi=True)] = bm.KHONG
+                continue
+            o[bm.cau_cong_thi(de, clb, chi_thi=True)] = bm.CO
+            for i, cau in enumerate(clb["de_thi"], 1):
+                dung = rd.random() < nang_luc
+                sai = [x for k, x in enumerate(cau["lua_chon"]) if k != cau["dap_an"]]
+                td = bm.cau_de_thi(clb, i)
+                o[td] = cau["lua_chon"][cau["dap_an"]] if dung else rd.choice(sai)
+                o["Points - " + td] = de["diem_moi_cau"] if dung else 0
+                tong += o["Points - " + td]
+        o["Total points"] = tong
+        return o
+
+    co_de = {c["club_id"] for c in clb_thi}
+    dong, thi_cua = [], {}
+    for n, (email, hs) in enumerate(danh_sach.items(), 1):
+        xep = {m for ds in hs["nguyen_vong"].values() for m in ds}
+        thi = {m for m in sorted(xep & co_de) if rd.random() < 0.7}
+        nang_luc = rd.uniform(0.55, 0.95)
+        if rd.random() < 0.15:                       # có em chưa làm bài nào: không có phiếu
+            continue
+        hien = email.upper() if n % 7 == 3 else email  # Forms ghi email đúng như tài khoản
+        thi_cua[email] = thi
+        dong.append((email, phieu(hien, hs["name"], thi, nang_luc), nang_luc))
+    if not dong:
+        raise ValueError("danh sách đăng ký quá nhỏ để dựng phiếu")
+
+    # 1) phiếu nộp lần hai của một em đã có bài thi (bộ chuyển đổi giữ phiếu đầu)
+    email_trung = next((e for e, o, _ in dong if thi_cua[e]), dong[0][0])
+    # 2) email không có trong Lists
+    email_la = "la0001@khac.example.test"
+    # 3) một em thi CLB có đề mà em KHÔNG xếp nguyện vọng
+    khong_xep = None
+    for e, hs in danh_sach.items():
+        if e == email_trung or e not in thi_cua:
+            continue
+        xep = {m for ds in hs["nguyen_vong"].values() for m in ds}
+        thieu = [c["club_id"] for c in clb_thi if c["club_id"] not in xep
+                 and len(hs["nguyen_vong"].get(c["buoi"], [])) < bm.TRAN_CLB_MOI_BUOI]
+        if thieu:
+            khong_xep = (e, thieu[0])
+            break
+    if khong_xep is None:
+        raise ValueError("không có em nào để gài bài thi CLB không xếp nguyện vọng")
+    for k, (e, o, nl) in enumerate(dong):
+        if e == khong_xep[0]:
+            dong[k] = (e, phieu(o["Email"], danh_sach[e]["name"], thi_cua[e] | {khong_xep[1]}, nl), nl)
+    them = [phieu(email_trung.upper(), danh_sach[email_trung]["name"], thi_cua[email_trung], 0.2),
+            phieu(email_la, "Tài khoản lạ", {clb_thi[0]["club_id"]}, 0.8)]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Sheet1"
+    ws.append(tieu_de)
+    gio = datetime(2026, 9, 7, 7, 30)
+    for n, o in enumerate([x[1] for x in dong] + them, 1):
+        bat_dau = gio + timedelta(minutes=3 * n + rd.randint(0, 2))
+        o.update({"ID": n, "Start time": bat_dau,
+                  "Completion time": bat_dau + timedelta(minutes=rd.randint(6, 25))})
+        ws.append([o.get(c) for c in tieu_de])
+    wb.save(duong)
+    return {"email_trung": email_trung, "email_la": email_la, "khong_xep": khong_xep,
+            "n_phieu": len(dong) + len(them)}
+
+
 # ------------------------------------------------------ chế độ "chỉ thi" (T4M-Q2)
 
 TEN_DOCX_CHI_THI = "NHAP_FORMS_CHI_THI"

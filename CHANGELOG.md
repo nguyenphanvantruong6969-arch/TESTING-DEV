@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-DEMO (Truong duyệt 06/11/2026): chạy thử trọn chuỗi bằng một lệnh
+
+Thêm công cụ; không đụng mã sản phẩm, schema hay hợp đồng CSV. Dữ liệu hoàn toàn MÔ PHỎNG.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong)` dựng tệp Forms chỉ-thi giả khớp tệp Lists giả và `de_thi.json` (Email, cột câu, cột Points); cố ý gài email viết hoa, một phiếu nộp lần hai, một email lạ, một bài thi CLB không xếp nguyện vọng.
+- `du_lieu_test/sinh_xuat_lists_gia.py`: `sinh`/`ghi_csv` nhận thêm `clb_theo_ngay` (mã CLB thật); bỏ trống thì từng byte như cũ.
+- `du_lieu_test/demo_t4m.py` (mới): `python du_lieu_test/demo_t4m.py --ra <thư mục>` chạy Lists giả → Forms giả → `--chi-thi` → nạp Sổ nhập vào CSDL tạm (`import_so_nhap`) → `run_pipeline` → `export_theo_lop` → tóm tắt tiếng Việt. Tắt điểm quyết tâm (mặc định BẬT) trong CSDL tạm; gán lớp bằng `set_student_class` vì bộ chuyển đổi chưa chép cột lớp; nhân chỉ tiêu mẫu cho vừa số em (`--he-so-cho`, bản sao trong bộ nhớ).
+- `mau_forms_thi_clb/README.md`: mục 0b "Chạy thử trọn chuỗi".
+- Test mới (viết trước): `tests/test_demo_t4m.py` (11 ca): hình dạng tệp, xác định, cảnh báo mong đợi, đủ tệp ra, không tạo `.db` ngoài thư mục tạm. Thử gây hỏng 5 chỗ: bỏ email viết hoa sống sót ở lần đầu, đã siết test; 4 chỗ còn lại bị bắt.
+
 ## 2026-11-05 — T4M-Q1, T4M-Q2, T4M-Q3 (Truong duyệt 05/11/2026): chế độ "chỉ thi" của mẫu Microsoft Forms
 
 Thêm chế độ mới; chế độ mặc định giữ nguyên (`CAI_DAT_FORMS.md` sinh lại giống hệt tệp trong kho, test cũ 25/25 đạt). Không đụng lõi thuật toán, backend, giao diện, hợp đồng CSV hay bất biến nào; `kiem_nhanh.py` 7/7 ĐẠT (gồm `trung_khit` 15 ca). Dữ liệu thử đều MÔ PHỎNG.

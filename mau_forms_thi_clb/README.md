@@ -35,7 +35,7 @@ thi chỉ xuất hiện trong câu nguyện vọng. Tổng cộng: **26 phần, 
 | `CAI_DAT_FORMS.md` | Những gì Quick Import không mang theo: Ranking, rẽ nhánh, đáp án, cài đặt |
 | `MAU_XUAT_TU_FORMS.xlsx` | Tệp Forms xuất ra, dựng giả 60 học sinh — để chạy thử trước |
 | `chuyen_forms_sang_phan_mem.py` | Excel của Forms → Sổ nhập CLB (`SO_NHAP_CLB.xlsx`) + `BANG_DIEM.xlsx` |
-| `tao_mau_forms.py` | Sinh lại `.docx`, `CAI_DAT_FORMS.md`, `MAU_XUAT_TU_FORMS.xlsx` từ `de_thi.json` |
+| `tao_mau_forms.py` | Sinh lại `.docx`, `CAI_DAT_FORMS.md`, `MAU_XUAT_TU_FORMS.xlsx` từ `de_thi.json`; hàm `ghi_mau_xuat_chi_thi` dựng tệp Forms chỉ-thi giả cho demo (mục 0b) |
 | `MO_PHONG_FORMS.html` | Bản mô phỏng tương tác: mở bằng trình duyệt để thử luồng rẽ nhánh, chấm điểm và xuất tệp trước khi dựng trên Forms |
 | `bieu_mau.py` | Phần dùng chung: tên câu hỏi, bố cục, chấm bài |
 
@@ -56,6 +56,35 @@ cho bộ chuyển đổi. Sinh lại từ `de_thi.json` không đổi cho ra t�
 đầu; email lạ bị báo và bỏ; thi CLB không có trong nguyện vọng thì bỏ điểm và báo; không có bài thi nào thì
 Sổ nhập chỉ có nguyện vọng, không điểm. Ghi chú một trang cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.
 Chế độ mặc định (mục 1 trở xuống) không đổi.
+
+## 0b. Chạy thử trọn chuỗi (T4M-DEMO): một lệnh, ngoại tuyến, để cho giáo viên ECA xem
+
+```bash
+python du_lieu_test/demo_t4m.py --ra ./demo_ra            # mặc định 120 học sinh giả
+python du_lieu_test/demo_t4m.py --ra ./demo_ra --so-hs 200 --seed 7 --he-so-cho 1
+```
+
+Lệnh chạy lần lượt: sinh tệp Lists giả (mã CLB lấy từ `de_thi.json`) → sinh tệp Forms chỉ-thi giả
+(Email, câu hỏi, cột Points) → bộ chuyển đổi `--chi-thi` → nạp `SO_NHAP_CLB.xlsx` vào một CSDL **tạm**
+và chạy pipeline như phần mềm thật → xuất Excel theo lớp → in tóm tắt. Không đụng `app.db` của workspace nào;
+cùng `--seed` cho cùng kết quả. Mọi con số là **dữ liệu mô phỏng**, không phải khảo sát thật.
+
+Chỉ tiêu mẫu trong `de_thi.json` (~42 chỗ mỗi buổi) chỉ đủ cho khoảng 50 em, nên mặc định demo nhân chỉ tiêu
+lên cho vừa số em (dòng đầu của tóm tắt nói rõ hệ số; `--he-so-cho 1` giữ nguyên). Tệp `de_thi.json` không đổi.
+
+Ra trong `--ra`: `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`,
+`ket_qua_theo_lop/` (mỗi lớp một tệp Excel).
+
+**Nên cho giáo viên xem:**
+1. `lists_gia.csv` và `forms_chi_thi_gia.xlsx`: hai tệp giáo viên sẽ nhận từ SharePoint List và Forms (cột `Email`
+   nối hai nơi; email viết hoa lẫn thường vẫn ghép đúng).
+2. Phần **cảnh báo** trong tóm tắt (và sheet "Cảnh báo" của `BANG_DIEM.xlsx`): ba loại gài sẵn là phiếu nộp lần
+   hai (giữ phiếu đầu), email không có trong List (bỏ phiếu), và bài thi của CLB mà em không xếp nguyện vọng.
+3. `BANG_DIEM.xlsx`: điểm chấm lại từ đáp án gốc, kèm chi tiết đúng/sai từng câu.
+4. Một tệp trong `ket_qua_theo_lop/`: bản gửi giáo viên chủ nhiệm (không điểm, không số bốc thăm).
+5. Dòng tóm tắt: bao nhiêu lượt (em × buổi) vào nguyện vọng 1 và bao nhiêu CLB thuộc Tầng 1 (có thi tuyển).
+
+Bộ chuyển đổi chưa chép cột lớp sang Sổ nhập, nên demo gán lớp từ `lists_gia.csv` bằng `set_student_class`.
 
 ## 1. Dựng biểu mẫu (khoảng 30–40 phút)
 

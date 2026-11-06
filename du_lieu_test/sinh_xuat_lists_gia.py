@@ -58,10 +58,13 @@ def _email(idx, rng):
     return local + MIEN_GIA
 
 
-def sinh(so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
-    """Trả về danh sách dòng (dict theo `COT`), `so_hs` × 5 dòng, thứ tự: từng em, từng ngày."""
+def sinh(so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, clb_theo_ngay=None):
+    """Trả về danh sách dòng (dict theo `COT`), `so_hs` × 5 dòng, thứ tự: từng em, từng ngày.
+
+    `clb_theo_ngay` ({tên ngày trong NGAY: [mã CLB]}) cho mã CLB thật thay cho mã giả T2-CLB01…
+    (T4M-DEMO: để khớp de_thi.json). Bỏ trống thì như cũ, từng byte."""
     rng = random.Random(seed)
-    clb = _clb_theo_ngay(rng)
+    clb = _clb_theo_ngay(rng) if clb_theo_ngay is None else clb_theo_ngay
     dong = []
     for idx in range(1, so_hs + 1):
         email = _email(idx, rng)
@@ -91,9 +94,9 @@ def sinh(so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
     return dong
 
 
-def ghi_csv(duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
+def ghi_csv(duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, clb_theo_ngay=None):
     """Ghi CSV UTF-8 CÓ BOM, xuống dòng CRLF như tệp Lists xuất ra."""
-    dong = sinh(so_hs=so_hs, seed=seed)
+    dong = sinh(so_hs=so_hs, seed=seed, clb_theo_ngay=clb_theo_ngay)
     with open(duong, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COT, lineterminator="\r\n")
         w.writeheader()
