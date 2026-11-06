@@ -28,7 +28,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       in tao_mau_forms.py (≤200 questions, split by day); 1-page teacher note. Spec: results §7.5, §7.7
 - [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
-- [ ] AUTO CHAIN (Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
+- [x] AUTO CHAIN (done + reviewed 06/11/2026; Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
       [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [x] S3 T4M-GD4-V0 (Opus; v0 done 06/11, revisit after GĐ2)  [x] S4 T4M-DO (Sonnet, done 06/11)
       [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
       [x] T4M-Q1b-b (Sonnet, 06/11): optional --co-so filter in --chi-thi; T4M_VAN_HANH_MOT_DOT.md steps 4-5 updated
@@ -48,7 +48,9 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - STATUS T4M-GOI-TK: DONE, commit 34ccd56 (doc docs/he_sinh_thai/T4M_GOI_THIET_KE.md, design only). Truong must approve D1 two-phase design (+ V0 fallback), D2 CSV contract (optional goi_buoi + 04_goi.csv, reserved label goi), D3 schema (clubs.goi_buoi, goi_dieu_kien, match_results row (sid, goi, G)), D4 item codes A8-GOI-1..3 after ECA Q1-Q3, D5 phase-1 STB permutation.
 - STATUS T4M-GD4-V0: DONE, commit ce342ee. Doc docs/he_sinh_thai/T4M_MICROSOFT.md (v0, fallback A, 9 P2 items + §10 revisit list); docs only, no tests needed, kiem_nhanh run. Pending Truong: S2 D1-D5 (still unapproved, shown as pending in §5/§8), new item codes T4M-M1..M4 (§8), T4-K2 option K2-a/b/c/d (§9). Cites S1 T4M_VAN_HANH_MOT_DOT.md and S4 T4M_DO_MO_PHONG.md tables (both arrived on rebase; no interpretation). Revisit after GĐ2: NC-01 (branch L vs D), NC-02, NC-03, NC-08, NC-16, sample export, NC-10/17, ECA Q1-Q8, NC-25/26.
 - Not done: nobody has run the chain against a real Forms or Lists export; push pending after soat-ma.
-- Orchestration: root Opus session self-checks ~40 min (send_later), reviews each child, launches next (plan §4).
+- AUTO CHAIN FINISHED 06/11/2026: S0-S4, Q1b, Q1b-b all reviewed OK by Opus (S4 fixed: table 2 club count 15 -> 10,
+  numbers in tables 3+ unchanged). 77 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
+- AWAITING TRUONG: S2 D1-D5 (bundle), T4M-M1..M4 (T4M_MICROSOFT.md §8), T4-K2 option (§9), AI-log entry for T4M-DO (outside repo).
 - Open problems: no sandbox likely (Developer Plan ends 15/11/2026) -> fallback B; PowerSchool->M365 path unknown; bundles (Japanese) need a new item code.
 
 - STATUS T4M-VH: DONE. Doc docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md (99 lines, 8 steps, docs only, untested parts labelled TH/HỎI-IT). Step 5 describes Lớp flowing List -> Sổ nhập (depends on T4M-Q1b); converter does not filter by CoSo (documented as TH). Nothing for Truong to approve.
@@ -115,3 +117,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Sonnet | T4M-Q1b-b (orchestrator addition): --co-so filter, tests first (4 red -> green), ops guide steps 4-5 | No subagent; default unchanged |
 | 2026-11-06 | Opus | Reviewed Q1b (OK, test expectation change justified), S3 (OK, cites DO sections not numbers); S4 sent back: table 2 says 15 clubs with tests, de_thi.json has 10 | Waiting S4 fix, Q1b-b |
 | 2026-11-06 | Sonnet | T4M-DO review fix: table 2 exam-club count 15 -> 10, method wording, test that B is Tier 1 for exactly the clubs with de_thi, grid rerun | Numbers in tables 3+ unchanged except seconds |
+| 2026-11-06 | Opus | Reviewed S4 fix (OK) and Q1b-b (OK); chain finished; cancelled check-in; asked Truong pending decisions | |
