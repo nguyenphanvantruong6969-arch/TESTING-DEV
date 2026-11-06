@@ -123,6 +123,16 @@ Ra trong `--ra`: `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, 
 
 Bộ chuyển đổi `--chi-thi` chép cột `Lop` của Lists sang cột Lớp của Sổ nhập (T4M-Q1b); Lists không có cột này thì Sổ nhập không có cột Lớp, như trước.
 
+## 0c. Bộ dựng sẵn cho IT trên Microsoft (T4M-BK3, BK4)
+```
+python mau_forms_thi_clb/tao_bo_dung_t4m.py --de-thi mau_forms_thi_clb/de_thi.json --ra ./bo_dung_t4m [--zip]
+```
+Một lệnh ra thư mục `01_lists/` (site script, CSV mẫu, bảng kiểm cột ECA), `02_app/` (công thức Power Fx bốn màn),
+`03_flow/` (`BANG_FLOW.md/.csv`: một flow `DaLam_<ClubId>` mỗi CLB có đề, kèm biểu thức để dán), `04_forms/`
+(đầu ra của `tao_mau_forms.py --moi-clb`, gọi như hàm), `HUONG_DAN_IT.md` (thứ tự dựng, mỗi bước một dòng pass/fail trỏ về
+R1..R38 và HDT §9). `--zip` thêm `<ra>.zip` ngoài thư mục. Sinh lại cho cùng từng byte. Bộ **không** có gói flow `.zip`
+(IT dựng tay một flow mẫu rồi nhân bản). Mọi thứ chạm Microsoft là **TH**: chưa chạy trên Power Apps / SharePoint.
+
 ## 1. Dựng biểu mẫu (khoảng 30–40 phút)
 
 1. Mở **forms.office.com** bằng tài khoản trường → **Quick import** → chọn

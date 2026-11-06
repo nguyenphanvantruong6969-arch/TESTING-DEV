@@ -30,15 +30,16 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
       [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11 (fixed after Opus review): bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen; Opus ACCEPTED 0e8d0ec
-      [ ] K2 T4M-BK3+BK4 (Sonnet, session_01YVAyu3gLFjovc61oBj8zhY, launched 06/11): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
+      [x] K2 T4M-BK3+BK4 (Sonnet, session_01YVAyu3gLFjovc61oBj8zhY) DONE 06/11 (Opus review pending): bang_flow.py, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
       [ ] K3 Opus review
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
 - [ ] Proposed, not approved: skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
-- Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
-- K1 accepted by Opus after one fix round (0e8d0ec: nested subactions, fixed ids, Nhan formula; 37 tests, regen identical). K2 running.
-- Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). PR #13 open (CI pending).
+- Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted. Round 5 approved; PR #13 open (CI pending).
+- K1 accepted by Opus (0e8d0ec). STATUS T4M-BK3/4: DONE 06/11. `tao_bo_dung_t4m.py --de-thi --ra [--zip]` -> 01_lists, 02_app (K1), 03_flow
+  (BANG_FLOW.md/.csv, 10 flows = 10 clubs with de_thi), 04_forms (calls `sinh_moi_clb`), HUONG_DAN_IT.md (R1..R38 all named; async apply only,
+  never Invoke-SPOSiteDesign). 25 new tests pass, 211 related pass, ruff clean, kiem_nhanh 7/7, 3 mutations caught, demo outputs identical.
 - STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
   tests/test_t4m_bo_dung_bk1.py 37 pass; Opus review fixes done (subactions nesting, addSPField id, Nhan formula). FINDING: `ghi_clb_csv`
   writes Buoi "Thứ Hai" but ECA Thu is "Thứ 2" (§9 decision 1 was wrong; Opus fixed §9): bo_dung uses `buoi_theo_thu(de)`; old code untouched.
@@ -73,8 +74,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Wait for K1 STATUS; review per §9 K1 test list (+ mutation evidence, regeneration identical, no edits to old generators).
-   Then launch K2 (prompt in §9), then K3 review, tick round 5, report to Truong.
+1. K3: Opus reviews K2 per §9 "Nhận khi" (flow rows == clubs with quiz, ClubId in CLB.csv, byte-identical regen incl. zip, demos unchanged),
+   then ticks round 5 and reports to Truong.
 2. Watch PR #13 CI (tests.yml with coverage >= 85 %, build-windows-exe.yml); fix red only on this branch; never merge.
 3. After Truong's GĐ2 meeting (before 15/11): GĐ4 v1, M2, A8-GOI; GĐ2 also answers KQ §8 HỎI-IT (SharePoint admin?
    Entra app for PnP? Environment Maker? legacy flow import blocked?).
@@ -146,3 +147,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
 | 2026-11-06 | Sonnet | K1 fixes after Opus review: site script subactions + $schema + addSPField id, Nhan named formula, xfail -> normal test; tests first (5 red), 2 mutations caught | No core/schema/CSV change |
 | 2026-11-06 | Opus | Re-reviewed K1 0e8d0ec: accepted; launched K2 | |
+| 2026-11-06 | Sonnet | T4M-BK3/BK4 (K2): flow table + one-command kit (4 folders + zip) + HUONG_DAN_IT.md; tests first (25); 3 mutations caught (1 weak test tightened) | No subagent; no core/schema/CSV change; demo outputs identical |

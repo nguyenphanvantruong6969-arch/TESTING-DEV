@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-BK3, BK4 (vòng 5, bước K2): bảng flow `DaLam_<ClubId>` và lệnh gộp `tao_bo_dung_t4m.py`
+
+Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ thư viện chuẩn); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên Power Apps / SharePoint / Power Automate).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/bang_flow.py` (BK3): một hàng mỗi CLB CÓ đề (`bieu_mau.clb_co_thi`): `Flow` = `DaLam_<ClubId>`, `ClubId`, ô trống cho IT (`FormId`, `ChuBieuMau`, `DaThuNgay`), tệp Quick Import; `BANG_FLOW.md` (bảng + biểu thức dán `toLower(responder)`, hằng `ClubId`, OData `ResponseId eq '…'`, nhãn GĐ) và `BANG_FLOW.csv`. Không gói flow `.zip` (quyết định 3).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/huong_dan_it.py` (BK4): sinh `HUONG_DAN_IT.md`: bước 0 (HỎI-IT) đến bước 6 (vòng thử), mỗi bước có dòng `☐ Pass ☐ Fail` trỏ về R1..R38 và HDT §9; ba cách A/B/C với quyền và nhãn ĐXM/TT-CXM từ KQ §8.1; site script 46 hành động nên chỉ áp không đồng bộ (Settings > Apply a site template, hoặc `Add-SPOSiteDesignTask`), cấm `Invoke-SPOSiteDesign`; phụ lục R1..R38.
+- Mới `mau_forms_thi_clb/tao_bo_dung_t4m.py` (BK4): `--de-thi`, `--ra`, `--zip`; ra `01_lists/` và `02_app/` (gọi `sinh_bk1.ghi_tat_ca` của K1), `03_flow/`, `04_forms/` (gọi `tao_mau_forms.sinh_moi_clb` như hàm), `HUONG_DAN_IT.md`; `<ra>.zip` nằm ngoài thư mục, tên sắp xếp, giờ cố định, sinh lại cho cùng từng byte. Kiểm đề trước khi ghi.
+- Test mới `tests/test_t4m_bo_dung_bk34.py` (+25): số flow = số CLB có đề, mọi `ClubId` có trong `CLB.csv`, đủ R1..R38 (đọc từ đặc tả), dòng HDT có thật, `Invoke-SPOSiteDesign` chỉ để cấm, sinh lại giống từng byte kể cả zip (và sinh đè lên thư mục cũ), `04_forms` trùng khít đầu ra của `sinh_moi_clb`, không tên thật/tenantId/URL. Mutation check bắt 3 đột biến (flow cho mọi CLB, bỏ chữ cấm Invoke-SPOSiteDesign, đảo thứ tự zip); một đột biến sống sót lần đầu (kiểm "không" cùng dòng quá lỏng) nên đã siết test.
+- `demo_t4m.py` mặc định, `--moi-clb`, `--day-du`: đầu ra trùng khít trước/sau (42, 52, 42 tệp; docx/xlsx so bỏ core.xml). README (mục 0c) và `T4M_VAN_HANH_MOT_DOT.md` (phụ lục) mỗi nơi một đoạn ngắn.
+
 ## 2026-11-06 — T4M-BK1, BK2 (vòng 5, bước K1): bộ dựng list và công thức Power Fx cho IT
 
 Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ `json`, `csv`, `uuid`, `re`); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên SharePoint / Power Apps).

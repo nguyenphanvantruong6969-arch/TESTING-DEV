@@ -106,5 +106,12 @@ python du_lieu_test/demo_t4m.py --ra ./demo_ra --day-du                # tick ch
 ```
 Ra `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx`, `ket_qua_theo_lop/`. Với `--moi-clb`: `forms_moi_clb/` (mỗi CLB một tệp xuất) và `BaiThi.csv` thay cho `forms_chi_thi_gia.xlsx`; kết quả xếp như bản một biểu mẫu chung. Em nộp hai lần bị báo một lần cho mỗi biểu mẫu em thi. Với `--day-du`: List giả có `THIk`, `WPk`; gài một em tick mà vắng, một em nộp bài mà không tick và một quỹ thiếu 100 (kiosk chặn lần chạy đầu, demo sửa rồi chạy lại); tóm tắt luôn in "Điểm quyết tâm: BẬT/TẮT". Dữ liệu hoàn toàn **mô phỏng**.
 
+## Phụ lục: bộ dựng sẵn cho IT (T4M-BK3, BK4)
+Khi trường dựng hệ thống ECA trên Microsoft (list, công thức app, flow, biểu mẫu), một lệnh sinh thư mục để IT làm theo `HUONG_DAN_IT.md` bên trong:
+```
+python mau_forms_thi_clb/tao_bo_dung_t4m.py --de-thi mau_forms_thi_clb/de_thi.json --ra ./bo_dung_t4m --zip
+```
+Ra `01_lists/`, `02_app/`, `03_flow/` (bảng một flow `DaLam_<ClubId>` mỗi CLB có đề), `04_forms/` và `HUONG_DAN_IT.md`. Chưa chạy trên Microsoft thật: **TH**; làm trên bản sao.
+
 ## Việc còn chờ (không thuộc tài liệu này)
 HỎI-IT: kho của app ECA, cách khoá, đường PowerSchool → M365, danh sách giáo viên chủ nhiệm, chính sách cài `.exe`, thời hạn xoá tệp. **TH:** cách List mã hoá khi xuất, bộ chuyển đổi lọc theo cơ sở, flow gửi tệp.
