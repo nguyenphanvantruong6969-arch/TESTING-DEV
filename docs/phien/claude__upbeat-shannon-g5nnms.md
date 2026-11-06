@@ -32,10 +32,11 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [x] S3 T4M-GD4-V0 (Opus; v0 done 06/11, revisit after GĐ2)  [x] S4 T4M-DO (Sonnet, done 06/11)
       [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
       [x] T4M-Q1b-b (Sonnet, 06/11): optional --co-so filter in --chi-thi; T4M_VAN_HANH_MOT_DOT.md steps 4-5 updated
-- [ ] ROUND 2 (Truong approved 06/11; plan §6): [ ] R1 T4M-M1 (Sonnet)  [ ] R2 T4M-M3 (Sonnet)  [ ] R3 T4M-M4 (Sonnet)
+- [ ] ROUND 2 (Truong approved 06/11; plan §6): [x] R1 T4M-M1 (Sonnet, done 06/11)  [ ] R2 T4M-M3 (Sonnet)  [ ] R3 T4M-M4 (Sonnet)
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
+- STATUS T4M-M1: DONE. Doc `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (~113 lines, docs only, all formulas labelled GĐ; 14-row requirement table R1..R14 with pass/fail checks mapped to HDT §9; bundle screen = placeholder "chờ A8-GOI"). Nothing for Truong to approve. Open: NC-01 real column names, NC-02 sandbox; R10/R12 need new rows in HDT §9.
 - STATUS T4M-DO: DONE (fixed after orchestrator review: table 2 counted 15 clubs with exams, true count is 10; only the count was wrong, condition B was already Tier 1 for exactly the 10 clubs with de_thi; tables 3+ unchanged except run-time seconds; test added). `du_lieu_test/do_t4m_thi.py` + `tests/test_do_t4m_thi.py` (8 pass; related with test_demo_t4m 19 pass, ruff clean) + `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` + `du_lieu_test/ket_qua_t4m/*.csv`. Full grid 3 sets (120/500/1500 hs) x 20 seeds x 2 conditions = 120 runs, 0 blocking pairs, runtime ~30 s (so `--nhanh` is only a small grid for tests, needs --ra and --tai-lieu). Condition A = same pipeline with scores dropped but applicant lists kept (checked byte-identical to run_pipeline on a DB without club_scores); B = with quiz scores (also byte-identical to run_pipeline). Tables only, no commentary. No product code changed. AI log: the project's AI log is an artifact outside the repo (BAN_GIAO.md §Nhật ký AI) - Truong must add the entry himself/herself.
 - STATUS T4M-Q1b-b: DONE. `--co-so` filter (CoSo column, case-insensitive; other-campus quiz emails warned; missing column / no match -> error, nothing written; omitted -> unchanged). 4 new test_q1bb_*. Ops guide steps 4-5 updated.
 - STATUS T4M-Q1b: DONE. Converter `doc_lists` reads `Lop`/`Lớp`, `ghi_tep_phan_mem` writes the Lớp column only when some student has one (no column in Lists -> old bytes). Demo workaround removed. Tests: test_t4m_chi_thi + test_demo_t4m + test_mau_forms_thi_clb 65 pass (3 new test_q1b_*), ruff clean, kiem_nhanh 7/7. No schema/CSV contract/core change.
@@ -93,6 +94,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, du_lieu_test/sinh_xuat_lists_gia.py, tests/test_sinh_xuat_lists_gia.py: GĐ3 doc
 - mau_forms_thi_clb/{chuyen_forms_sang_phan_mem,bieu_mau,tao_mau_forms}.py, GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx, README.md; tests/test_t4m_chi_thi.py: T4M-Q1..Q3
 - du_lieu_test/do_t4m_thi.py, du_lieu_test/ket_qua_t4m/, tests/test_do_t4m_thi.py, docs/he_sinh_thai/T4M_DO_MO_PHONG.md: T4M-DO
+- docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md: T4M-M1
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -121,3 +123,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Sonnet | T4M-DO review fix: table 2 exam-club count 15 -> 10, method wording, test that B is Tier 1 for exactly the clubs with de_thi, grid rerun | Numbers in tables 3+ unchanged except seconds |
 | 2026-11-06 | Opus | Reviewed S4 fix (OK) and Q1b-b (OK); chain finished; cancelled check-in; asked Truong pending decisions | |
 | 2026-11-06 | Opus | Truong decided D1-D5 (principle), M1/M3/M4, K2-b, round 2; wrote plan §6; launched R1-R3 | |
+| 2026-11-06 | Sonnet | T4M-M1 (R1): app-edit spec for Top 3 per day, 14 requirements with pass/fail checks | Docs only; no subagent; no product code |

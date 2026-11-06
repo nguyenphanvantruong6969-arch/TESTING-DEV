@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-M1 (vòng 2, R1): đặc tả sửa app ECA sang Top 3 mỗi ngày, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (mới, ~113 dòng) cho người sửa app (IT): cột dữ liệu mô hình rộng (`NV1..NV3`, `TrangThai`), hành vi màn hình (không trùng, không ô trống chen giữa, ngày trống hợp lệ, nhãn hai ngôn ngữ, điện thoại), `Patch` + `IfError` kèm báo đúng ngày lỗi, khoá theo `TrangThai`, chỉ dùng phép lọc uỷ quyền được (NC-04), sao lưu / khôi phục phiên bản (NC-21), bảng 14 yêu cầu R1..R14 mỗi yêu cầu một dòng kiểm pass/fail ánh xạ HDT §9, mục gói chỉ giữ chỗ "chờ A8-GOI". Mọi công thức gắn nhãn GĐ. Không đụng app thật, không đổi mã, schema, hợp đồng CSV.
+
 ## 2026-11-06 — T4M-NC: Truong duyệt vòng 2
 
 Chỉ tài liệu. Quyết định của Truong: duyệt nguyên tắc D1–D5 của thiết kế gói (mã A8-GOI chờ giáo viên ECA trả lời Q1–Q3); duyệt T4M-M1, M3, M4 (M2 chờ tệp xuất mẫu thật); T4-K2 giữ tạm dừng (K2-b). `T4M_KE_HOACH_TU_DONG.md` §6: vòng 2 R1–R3 kèm prompt.
