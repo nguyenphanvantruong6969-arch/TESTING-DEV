@@ -157,8 +157,9 @@ def test_q1_khong_co_bai_thi_so_nhap_trung_khit_ban_khong_diem(tmp_path, de):
     mong_doi = tmp_path / "mong_doi"
     mong_doi.mkdir()
     cv.ghi_tep_phan_mem(de, [
-        {"student_id": "hs0001" + MIEN, "name": "An", "nguyen_vong": {"thu_2": ["clb_covua"]}, "bai_thi": []},
-        {"student_id": "hs0002" + MIEN, "name": "Bình", "nguyen_vong": {}, "bai_thi": []},
+        {"student_id": "hs0001" + MIEN, "name": "An", "lop": "9A1",     # _ghi_lists đặt lớp 9A1 cho mọi em
+         "nguyen_vong": {"thu_2": ["clb_covua"]}, "bai_thi": []},
+        {"student_id": "hs0002" + MIEN, "name": "Bình", "lop": "9A1", "nguyen_vong": {}, "bai_thi": []},
     ], str(mong_doi))
     a, b = _doc_so(ra), _doc_so(mong_doi)
     assert a["clubs"] == b["clubs"] and a["students"] == b["students"]
@@ -407,3 +408,67 @@ def test_q3_ghi_chu_giao_vien_mot_trang_du_muc():
     # Post scores là việc của giáo viên, kiosk không cần
     dong = [d for d in van_ban.splitlines() if "Post scores" in d]
     assert dong and any("không cần" in d.lower() for d in dong)
+
+
+# ------------------------------------------------------------------ Q1b: Lớp chủ nhiệm từ Lists -> Sổ nhập
+
+def _ghi_lists_lop(duong, de, lop_theo_email, bo_cot_lop=False):
+    """CSV Lists rộng; cột `Lop` lấy từ lop_theo_email (mỗi dòng ngày lặp lại cùng lớp). bo_cot_lop: bỏ hẳn cột."""
+    with open(duong, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f, lineterminator="\r\n")
+        cot = [c for c in lists_gia.COT if not (bo_cot_lop and c == "Lop")]
+        w.writerow(cot)
+        for email, lop in lop_theo_email.items():
+            for b in de["buoi"]:
+                dong = {c: "" for c in lists_gia.COT}
+                dong.update({"Email": email, "HoTen": email[:6], "Lop": lop,
+                             "Thu": "Thứ " + b["ma"][-1],
+                             "NV1": "clb_covua" if b["ma"] == "thu_2" else ""})
+                w.writerow([dong[c] for c in cot])
+
+
+def _chuyen_lists(tmp_path, de, lop_theo_email, bo_cot_lop=False):
+    _ghi_lists_lop(str(tmp_path / "lists.csv"), de, lop_theo_email, bo_cot_lop)
+    _ghi_xuat_thi(de, str(tmp_path / "forms.xlsx"), [])
+    ra = tmp_path / "nap"
+    kq = cv.chuyen_chi_thi([str(tmp_path / "forms.xlsx")], str(tmp_path / "lists.csv"), str(ra), de)
+    return kq, ra
+
+
+def test_q1b_lop_tu_lists_toi_cot_lop_cua_so_nhap(tmp_path, de):
+    """Lớp ở Lists (cả dạng bẩn ' 9a1 ') thành cột Lớp của Sổ nhập; so_nhap đọc và chuẩn hoá qua chuan_hoa_lop."""
+    import rbda_priority_pipeline as pl
+    lop = {"hs0001" + MIEN: " 9a1 ", "hs0002" + MIEN: "10B2", "hs0003" + MIEN: ""}
+    kq, ra = _chuyen_lists(tmp_path, de, lop)
+    assert kq["canh_bao"] != [] or kq["n_hoc_sinh"] == 3
+    du = _doc_so(ra)
+    theo = {s["student_id"]: s["class_id"] for s in du["students"]}
+    assert theo == {"hs0001" + MIEN: pl.chuan_hoa_lop(" 9a1 "),
+                    "hs0002" + MIEN: pl.chuan_hoa_lop("10B2"),
+                    "hs0003" + MIEN: ""}
+    assert theo["hs0001" + MIEN] and theo["hs0002" + MIEN]      # không phải hai chuỗi rỗng khớp tình cờ
+    wb = openpyxl.load_workbook(str(ra / "SO_NHAP_CLB.xlsx"), read_only=True)
+    tieu = [o for o in next(wb[so_nhap.SHEET_HS].iter_rows(max_row=1, values_only=True))]
+    wb.close()
+    assert so_nhap.nhan_lop(None) in tieu
+
+
+def test_q1b_lists_khong_co_cot_lop_giu_hanh_vi_cu(tmp_path, de):
+    """Lists không có cột Lop: Sổ nhập KHÔNG có cột Lớp (giống từng byte hành vi cũ), không lỗi, không cảnh báo mới."""
+    lop = {"hs0001" + MIEN: "9A1", "hs0002" + MIEN: "9A2"}
+    kq, ra = _chuyen_lists(tmp_path, de, lop, bo_cot_lop=True)
+    wb = openpyxl.load_workbook(str(ra / "SO_NHAP_CLB.xlsx"), read_only=True)
+    tieu = [o for o in next(wb[so_nhap.SHEET_HS].iter_rows(max_row=1, values_only=True))]
+    wb.close()
+    assert so_nhap.nhan_lop(None) not in tieu
+    assert all(not s.get("class_id") for s in _doc_so(ra)["students"])
+    assert not any("lớp" in nd.lower() for _d, _s, nd in kq["canh_bao"])
+
+
+def test_q1b_moi_lists_khong_lop_nao_khong_ghi_cot(tmp_path, de):
+    """Có cột Lop nhưng mọi ô trống: coi như không có lớp, không ghi cột Lớp."""
+    kq, ra = _chuyen_lists(tmp_path, de, {"hs0001" + MIEN: "", "hs0002" + MIEN: ""})
+    wb = openpyxl.load_workbook(str(ra / "SO_NHAP_CLB.xlsx"), read_only=True)
+    tieu = [o for o in next(wb[so_nhap.SHEET_HS].iter_rows(max_row=1, values_only=True))]
+    wb.close()
+    assert so_nhap.nhan_lop(None) not in tieu

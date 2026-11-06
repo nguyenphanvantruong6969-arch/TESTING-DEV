@@ -30,11 +30,12 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
 - [ ] AUTO CHAIN (Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
       [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [ ] S3 T4M-GD4-V0 (Opus)  [ ] S4 T4M-DO (Sonnet)
-      [ ] T4M-Q1b (Sonnet): --chi-thi converter writes Lớp from Lists into Sổ nhập; drop set_student_class workaround in demo;
-      + optional --co-so filter (S1 gap) and update T4M_VAN_HANH_MOT_DOT.md steps 4-5
+      [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
+      [ ] T4M-Q1b-b (Sonnet, NOT done; outside the Q1b task text): optional --co-so filter (S1 gap) + update T4M_VAN_HANH_MOT_DOT.md steps 4-5
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
+- STATUS T4M-Q1b: DONE. Converter `doc_lists` reads `Lop`/`Lớp`, `ghi_tep_phan_mem` writes the Lớp column only when some student has one (no column in Lists -> old bytes). Demo workaround removed. Tests: test_t4m_chi_thi + test_demo_t4m + test_mau_forms_thi_clb 65 pass (3 new test_q1b_*), ruff clean, kiem_nhanh 7/7. No schema/CSV contract/core change.
 - STATUS T4M-DEMO: DONE. Commit 4c7ad66. Tests: test_demo_t4m 11 pass, related group 69 pass, ruff clean, kiem_nhanh 7/7. No product code, schema or CSV contract changed.
 - Done earlier: research plan + prompts; GĐ1 + P4 results; interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path; T4M-Q1..Q3 (quiz-only converter/form generator/teacher note; reviewed by Opus 06/11).
 - Done (Sonnet, 06/11/2026): T4M-DEMO, tests first (`tests/test_demo_t4m.py`, 11 tests; related 68 pass, ruff clean).
@@ -104,3 +105,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Opus | Reviewed S0 T4M-DEMO (69 tests pass, demo runs, 3 seeded warnings) and S2 (OK); found Lớp gap -> T4M-Q1b; launched S1, S3, S4, Q1b | S2 D1-D5 await Truong |
 | 2026-11-06 | Sonnet | S1 T4M-VH done: one-round operations guide for school IT (8 steps) | Docs only; no subagent; Lớp described as flowing into Sổ nhập (Q1b) |
 | 2026-11-06 | Opus | Reviewed S1 T4M-VH (OK); added --co-so filter to Q1b scope | |
+| 2026-11-06 | Sonnet | T4M-Q1b: tests first (1 red), converter carries Lớp from Lists into Sổ nhập, demo workaround removed; one old test's expectation updated (test Lists has class 9A1) | No subagent; default mode unchanged |

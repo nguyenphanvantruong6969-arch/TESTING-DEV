@@ -84,7 +84,7 @@ Ra trong `--ra`: `lists_gia.csv`, `forms_chi_thi_gia.xlsx`, `SO_NHAP_CLB.xlsx`, 
 4. Một tệp trong `ket_qua_theo_lop/`: bản gửi giáo viên chủ nhiệm (không điểm, không số bốc thăm).
 5. Dòng tóm tắt: bao nhiêu lượt (em × buổi) vào nguyện vọng 1 và bao nhiêu CLB thuộc Tầng 1 (có thi tuyển).
 
-Bộ chuyển đổi chưa chép cột lớp sang Sổ nhập, nên demo gán lớp từ `lists_gia.csv` bằng `set_student_class`.
+Bộ chuyển đổi `--chi-thi` chép cột `Lop` của Lists sang cột Lớp của Sổ nhập (T4M-Q1b); Lists không có cột này thì Sổ nhập không có cột Lớp, như trước.
 
 ## 1. Dựng biểu mẫu (khoảng 30–40 phút)
 

@@ -19,7 +19,6 @@ Cùng --seed cho cùng kết quả. Thư mục `ket_qua_theo_lop` cũ trong --ra
 import argparse
 import base64
 import copy
-import csv
 import os
 import shutil
 import sqlite3
@@ -49,11 +48,6 @@ def sinh_lists(de, duong, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH):
         if not theo_ngay[ngay]:
             raise ValueError("de_thi.json không có CLB nào ở %s" % ngay)
     return lists_gia.ghi_csv(duong, so_hs=so_hs, seed=seed, clb_theo_ngay=theo_ngay)
-
-
-def _lop_theo_email(duong_lists):
-    with open(duong_lists, encoding="utf-8-sig", newline="") as f:
-        return {r["Email"].strip().lower(): r["Lop"] for r in csv.DictReader(f)}
 
 
 def he_so_cho_tu_dong(de, so_hs):
@@ -103,9 +97,6 @@ def chay_demo(ra, so_hs=SO_HS_MAC_DINH, seed=SEED_MAC_DINH, he_so_cho=None):
             r = api.import_so_nhap(base64.b64encode(f.read()).decode())
         if not r["ok"]:
             raise RuntimeError("nạp Sổ nhập thất bại: %s" % r["errors"])
-        # Bộ chuyển đổi chưa chép lớp sang Sổ nhập: gán lớp bằng chính API của phần mềm.
-        for email, lop in _lop_theo_email(duong_lists).items():
-            api.set_student_class(email, lop)
         r = api.run_pipeline(seed=seed)
         if not r["ok"]:
             raise RuntimeError("chạy pipeline thất bại: %s" % r["errors"])

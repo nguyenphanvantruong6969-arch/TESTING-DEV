@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-Q1b (trong T4M-Q1 đã duyệt): `--chi-thi` chép Lớp từ Lists vào Sổ nhập
+
+`chuyen_forms_sang_phan_mem.py`: `doc_lists` đọc cột `Lop` (hoặc `Lớp`) của tệp xuất Lists, giữ ô không trống đầu tiên của mỗi em; `phan_tich_chi_thi` mang `lop` theo; `ghi_tep_phan_mem` truyền `class_id` và `co_lop=True` CHỈ khi có ít nhất một em có lớp (Lists không có cột Lop hoặc mọi ô trống thì Sổ nhập y như cũ, không cột Lớp). Chế độ mặc định (Forms có Ranking) không đổi. `du_lieu_test/demo_t4m.py`: bỏ workaround `_lop_theo_email` + `set_student_class`. Test mới trong `tests/test_t4m_chi_thi.py`: `test_q1b_*` (3); sửa kỳ vọng của `test_q1_khong_co_bai_thi_so_nhap_trung_khit_ban_khong_diem` vì dữ liệu Lists của test có lớp 9A1. Không đổi hợp đồng CSV, schema, lõi.
+
 ## 2026-11-06 — T4M-VH (bước S1): vận hành một đợt xếp CLB, chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` (mới, 99 dòng): 8 bước cho IT của trường (dựng bài thi, mở/đóng, khoá, xuất, chuyển đổi, nạp kiosk, xuất theo lớp, em đến muộn/rút); mỗi bước có lệnh hoặc đường bấm, chỗ kiểm, cách xử lý lỗi, tệp cần giữ. Phần chưa thử gắn nhãn TH, phụ thuộc trường gắn HỎI-IT. Không đổi mã, schema, hợp đồng CSV. Test mới: không (tài liệu).

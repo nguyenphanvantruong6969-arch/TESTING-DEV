@@ -241,8 +241,9 @@ def _ma_buoi_tu_thu(de, gia_tri):
 def doc_lists(duong_csv, de):
     """Đọc tệp xuất List (mô hình RỘNG: mỗi dòng một em × một ngày, cột NV1..NVn).
 
-    Trả ({email chữ thường: {dong, email, name, nguyen_vong}}, cảnh báo). Cột bắt buộc: Email,
-    Thu, NV1; tùy chọn: HoTen (hoặc Name), NV2.. Dòng trùng (em, ngày): giữ dòng ĐẦU.
+    Trả ({email chữ thường: {dong, email, name, lop, nguyen_vong}}, cảnh báo). Cột bắt buộc: Email,
+    Thu, NV1; tùy chọn: HoTen (hoặc Name), Lop (lớp chủ nhiệm, T4M-Q1b), NV2.. Dòng trùng (em, ngày):
+    giữ dòng ĐẦU. `lop` là ô Lop không trống đầu tiên của em (chưa chuẩn hoá: so_nhap chuẩn hoá khi đọc).
     """
     with open(duong_csv, encoding="utf-8-sig", newline="") as f:
         bang = list(csv.reader(f))
@@ -252,6 +253,7 @@ def doc_lists(duong_csv, de):
     i_email = tieu.index("email") if "email" in tieu else None
     i_thu = tieu.index("thu") if "thu" in tieu else None
     i_ten = next((tieu.index(k) for k in ("hoten", "name") if k in tieu), None)
+    i_lop = next((tieu.index(k) for k in ("lop", "lớp") if k in tieu), None)
     cot_nv = sorted((int(m.group(1)), i) for i, h in enumerate(tieu)
                     for m in [re.fullmatch(r"nv(\d+)", h)] if m)
     thieu = [k for k, v in (("Email", i_email), ("Thu", i_thu), ("NV1", cot_nv[0][0] if cot_nv else None))
@@ -278,10 +280,12 @@ def doc_lists(duong_csv, de):
         if buoi is None:
             bao("ngày %r không khớp buổi nào trong de_thi.json — bỏ dòng" % dong[i_thu])
             continue
-        hs = ds.setdefault(email, {"dong": so_dong, "email": email, "name": "",
+        hs = ds.setdefault(email, {"dong": so_dong, "email": email, "name": "", "lop": "",
                                    "nguyen_vong": {}, "_buoi": set()})
         if i_ten is not None and not hs["name"]:
             hs["name"] = dong[i_ten].strip()
+        if i_lop is not None and not hs["lop"]:
+            hs["lop"] = dong[i_lop].strip()
         if buoi in hs["_buoi"]:
             bao("%s: dòng trùng (em, ngày) — bỏ dòng này, giữ dòng đầu" % buoi)
             continue
@@ -351,7 +355,7 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep):
     """
     canh_bao = []
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
-    hoc_sinh = {e: {"dong": h["dong"], "student_id": e, "name": h["name"],
+    hoc_sinh = {e: {"dong": h["dong"], "student_id": e, "name": h["name"], "lop": h.get("lop", ""),
                     "nguyen_vong": h["nguyen_vong"], "bai_thi": []}
                 for e, h in danh_sach.items()}
     da_phu = set()
@@ -450,13 +454,16 @@ def ghi_tep_phan_mem(de, hoc_sinh, thu_muc):
         # Không có nhóm: sổ ghi KHÔNG có cột Nhóm ưu tiên (co_nhom=False bên dưới).
         students.append({
             "student_id": h["student_id"], "name": h["name"], "reserve_group": "",
+            "class_id": h.get("lop") or "",
             "nv": [{"club_id": ma, "thi": ma in diem, "diem": diem.get(ma, "")}
                    for ma in thu_tu],
         })
     duong = os.path.join(thu_muc, TEN_SO)
     # co_nhom=False: Forms không hỏi nhóm ưu tiên. Không có cột thì phần mềm
     # GIỮ nhóm đã gán; có cột mà trống thì phần mềm sẽ BỎ nhóm của em.
-    so_nhap.ghi_so_nhap(duong, clubs, students, co_nhom=False)
+    # Cột Lớp (T4M-Q1b) CHỈ khi List có lớp cho ít nhất một em; không thì sổ y như trước.
+    so_nhap.ghi_so_nhap(duong, clubs, students, co_nhom=False,
+                        co_lop=any(s["class_id"] for s in students))
     return duong
 
 
