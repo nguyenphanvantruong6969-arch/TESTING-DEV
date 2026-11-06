@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-VH (bước S1): vận hành một đợt xếp CLB, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` (mới, 99 dòng): 8 bước cho IT của trường (dựng bài thi, mở/đóng, khoá, xuất, chuyển đổi, nạp kiosk, xuất theo lớp, em đến muộn/rút); mỗi bước có lệnh hoặc đường bấm, chỗ kiểm, cách xử lý lỗi, tệp cần giữ. Phần chưa thử gắn nhãn TH, phụ thuộc trường gắn HỎI-IT. Không đổi mã, schema, hợp đồng CSV. Test mới: không (tài liệu).
+
 ## 2026-11-06 — T4M-GOI-TK (bước S2): thiết kế gói nhiều buổi (tiếng Nhật), chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_GOI_THIET_KE.md` (mới): bộ điều phối hai pha đặt trên `run_rbda_nhieu_buoi` (pha 1 DA trên các gói như buổi giả `goi`, cấp độ là bộ lọc điều kiện ở dữ liệu vào, cam kết cả năm chỉ trừ chỉ tiêu; pha 2 từng ngày với ngày của gói bị khoá), so với hai phương án bị loại và một phương án V0 dự phòng; phân tích bất biến 1, 2, 3, 4, 5, 8 kèm phản ví dụ cặp phá vỡ toàn tuần và nhãn "bảo đảm trong từng pha, không bảo đảm ổn định toàn tuần khi có gói"; đề xuất đổi hợp đồng CSV / schema tương thích ngược (chờ Truong, quy tắc 7); ba mục con đề xuất A8-GOI-1..3 kèm `kiem_nhan`; 8 câu hỏi cho giáo viên ECA; 5 quyết định chờ duyệt. Test mới: không có.
