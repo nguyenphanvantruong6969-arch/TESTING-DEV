@@ -132,3 +132,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Opus | Reviewed R3 T4M-M4 (OK; fixed DLP reference NC-16 -> NC-14) | Waiting R2 |
 | 2026-11-06 | Sonnet | T4M-M3 (R2): `doi_chieu_lists.py` list-export diff tool, tests first (17), ops guide step 8 | No subagent; kiosk untouched |
 | 2026-11-06 | Sonnet | T4M-M3 review fix: raw NV comparison + unknown-code warning headline, tests first (6 red -> green) | Orchestrator false negative reproduced and fixed |
+| 2026-11-06 | Opus | Reviewed R2 fix (raw NV compare, warning headline; my false-negative scenario now caught); round 2 finished; 109 related tests pass, ruff clean, kiem_nhanh 7/7 | Next needs Truong: GĐ2 interviews |
