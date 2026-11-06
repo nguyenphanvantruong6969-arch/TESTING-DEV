@@ -4,7 +4,7 @@
 
 ## 1. Phương pháp
 
-- Dữ liệu: chuỗi T4M ngoại tuyến (`demo_t4m.sinh_lists` -> `tao_mau_forms.ghi_mau_xuat_chi_thi` -> `chuyen_chi_thi` -> `import_so_nhap`), 15 CLB x 5 buổi theo `de_thi.json`; chỉ tiêu mỗi CLB nhân hệ số ở bảng 2 (cách tính của `demo_t4m.he_so_cho_tu_dong`).
+- Dữ liệu: chuỗi T4M ngoại tuyến (`demo_t4m.sinh_lists` -> `tao_mau_forms.ghi_mau_xuat_chi_thi` -> `chuyen_chi_thi` -> `import_so_nhap`), 15 CLB (3 mỗi buổi, 5 buổi) theo `de_thi.json`, trong đó 10 CLB có đề thi (Tầng 1 ở điều kiện B); chỉ tiêu mỗi CLB nhân hệ số ở bảng 2 (cách tính của `demo_t4m.he_so_cho_tu_dong`).
 - Mỗi bộ dữ liệu x 20 hạt giống STB (1..20) x 2 điều kiện. Dữ liệu đọc MỘT lần; mỗi lần chạy sinh lại `generate_stb_lottery`, gọi `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) rồi `verify_stability_tuan`.
 - Điều kiện A. không bài thi (mọi CLB Tầng 2)
 - Điều kiện B. có bài thi theo de_thi.json (CLB có đề = Tầng 1)
@@ -19,9 +19,9 @@
 
 | Bộ | Số học sinh | Hạt giống sinh dữ liệu | Hệ số chỉ tiêu | Số CLB | Số CLB có đề thi | Chỉ tiêu TB mỗi buổi |
 |---|---|---|---|---|---|---|
-| 120 hs | 120 | 20261101 | 2 | 15 | 15 | 84 |
-| 500 hs | 500 | 20261102 | 8.3 | 15 | 15 | 349 |
-| 1500 hs | 1500 | 20261103 | 25 | 15 | 15 | 1050 |
+| 120 hs | 120 | 20261101 | 2 | 15 | 10 | 84 |
+| 500 hs | 500 | 20261102 | 8.3 | 15 | 10 | 349 |
+| 1500 hs | 1500 | 20261103 | 25 | 15 | 10 | 1050 |
 
 ## 3. Tỉ lệ xếp vào nguyện vọng 1 (% lượt em x buổi có đăng ký) — MÔ PHỎNG
 
@@ -79,9 +79,9 @@
 
 | Bộ | Điều kiện A | Điều kiện B |
 |---|---|---|
-| 120 hs | 0.0045 / 0.0041 / 0.0051 | 0.0051 / 0.0048 / 0.0056 |
-| 500 hs | 0.0487 / 0.0402 / 0.0692 | 0.0496 / 0.0465 / 0.0647 |
-| 1500 hs | 0.3793 / 0.3357 / 0.5215 | 0.4259 / 0.3916 / 0.5045 |
+| 120 hs | 0.0057 / 0.0044 / 0.0089 | 0.0053 / 0.0050 / 0.0060 |
+| 500 hs | 0.0483 / 0.0408 / 0.0863 | 0.0540 / 0.0464 / 0.0960 |
+| 1500 hs | 0.3922 / 0.3419 / 0.4855 | 0.4296 / 0.4018 / 0.5742 |
 
 ## 9. Số em có đăng ký mà chưa có CLB, theo buổi — MÔ PHỎNG
 
@@ -112,4 +112,4 @@ python du_lieu_test/do_t4m_thi.py
 
 Tệp số liệu từng lần chạy: `du_lieu_test/ket_qua_t4m/t4m_tung_lan.csv`, `t4m_theo_buoi.csv`.
 
-Thời gian chạy cả lưới trên máy đo: 29 giây (0.5 phút).
+Thời gian chạy cả lưới trên máy đo: 30 giây (0.5 phút).

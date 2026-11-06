@@ -193,7 +193,7 @@ def chay_luoi(bo_du_lieu=None, so_seed=SO_SEED, log=None):
             students, clubs, diem, uv, nv, _s = bo["du_lieu"]
             thong_tin.append({
                 "bo": nhan, "so_hs": so_hs, "hat_sinh": hat_sinh, "he_so_cho": bo["he_so_cho"],
-                "n_clb": len(clubs), "n_clb_thi": len(diem),
+                "n_clb": len(clubs), "n_clb_thi": sum(1 for m in diem.values() if m),
                 "suc_chua_buoi": round(sum(c["capacity"] for c in clubs.values())
                                        / len({c.get("buoi") for c in clubs.values()})),
                 "n_luot_dk": sum(1 for sid in nv for _ in {clubs[c].get("buoi") for c in nv[sid]
@@ -259,7 +259,7 @@ def bang_markdown(dong, theo_buoi, thong_tin, so_seed, lenh, giay_tong=None):
     p("## 1. Phương pháp")
     p("")
     p("- Dữ liệu: chuỗi T4M ngoại tuyến (`demo_t4m.sinh_lists` -> `tao_mau_forms.ghi_mau_xuat_chi_thi` -> "
-      "`chuyen_chi_thi` -> `import_so_nhap`), 15 CLB x 5 buổi theo `de_thi.json`; chỉ tiêu mỗi CLB nhân hệ số "
+      "`chuyen_chi_thi` -> `import_so_nhap`), 15 CLB (3 mỗi buổi, 5 buổi) theo `de_thi.json`, trong đó 10 CLB có đề thi (Tầng 1 ở điều kiện B); chỉ tiêu mỗi CLB nhân hệ số "
       "ở bảng 2 (cách tính của `demo_t4m.he_so_cho_tu_dong`).")
     p("- Mỗi bộ dữ liệu x %d hạt giống STB (1..%d) x 2 điều kiện. Dữ liệu đọc MỘT lần; mỗi lần chạy sinh lại "
       "`generate_stb_lottery`, gọi `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) rồi "

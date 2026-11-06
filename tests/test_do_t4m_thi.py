@@ -19,7 +19,9 @@ GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 for p in ("mau_forms_thi_clb", "du_lieu_test"):
     sys.path.insert(0, os.path.join(GOC, p))
 
+import bieu_mau as bm  # noqa: E402
 import do_t4m_thi as dt  # noqa: E402
+import rbda_priority_pipeline as loi  # noqa: E402
 
 BO_NHO = [("30 hs", 30, 20261104)]
 
@@ -119,3 +121,23 @@ def test_main_nhanh_ghi_tai_lieu_co_nhan_mo_phong(tmp_path):
 
 def test_nhanh_khong_duoc_ghi_de_ket_qua_day_du(capsys):
     assert dt.main(["--nhanh"]) == 2
+
+
+def test_dieu_kien_b_chi_clb_co_de_thi_la_tang_1(bo):
+    """Đúng các CLB có `de_thi` mới có điểm (Tầng 1) trong đầu vào của B; A không có điểm nào."""
+    co_de = {c["club_id"] for c in bm.doc_de_thi()["cau_lac_bo"] if c["de_thi"]}
+    assert 0 < len(co_de) < len(bo["du_lieu"][1])
+    _s, _c, diem_b, uv_b, _n = dt._dau_vao(bo["du_lieu"], "B")
+    _s, _c, diem_a, uv_a, _n = dt._dau_vao(bo["du_lieu"], "A")
+    assert {c for c, m in diem_b.items() if m} == co_de
+    assert not any(diem_a.values()) and uv_a == uv_b
+    # Tầng 1 thật sự đứng trước Tầng 2 ở CLB có đề, và CLB không đề chỉ có Tầng 2.
+    stb = loi.generate_stb_lottery(list(bo["du_lieu"][0]), seed=1)
+    for cid in bo["du_lieu"][1]:
+        thu_tu = loi.compute_club_priority(cid, uv_b.get(cid, []), diem_b.get(cid, {}), stb)
+        co_diem = [s for s in thu_tu if s in diem_b.get(cid, {})]
+        assert (cid in co_de) == bool(co_diem) or not uv_b.get(cid)
+        assert thu_tu[:len(co_diem)] == co_diem
+    # Bảng 2 dùng đúng con số này.
+    tt = dt.chay_luoi(BO_NHO, so_seed=1)[2][0]
+    assert tt["n_clb_thi"] == len(co_de) and tt["n_clb"] == 15
