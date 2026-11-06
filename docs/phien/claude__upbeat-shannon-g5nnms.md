@@ -29,16 +29,15 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
 - [ ] ROUND 5 T4M-BK build kit for IT (plan §9; Truong approved 06/11; root session_01YVAyu14xCxoLe4ArvejR4i):
       [x] K0 T4M-BK0 research (Opus) DONE: T4M_KET_QUA_TAI_LIEU.md §8 (lists B default / A / C, Power Fx per property, flow by package)
-      [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11 (fixed after Opus review): bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen (Opus review pending)
-      [ ] K2 T4M-BK3+BK4 (Sonnet, after K1): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
+      [x] K1 T4M-BK1+BK2 (Sonnet, session_01YVAyu2STZJKWASxgM6Qjmx) DONE 06/11 (fixed after Opus review): bo_dung_t4m/ column module, site script + CSV + ECA checklist, Power Fx per screen; Opus ACCEPTED 0e8d0ec
+      [ ] K2 T4M-BK3+BK4 (Sonnet, session_01YVAyu3gLFjovc61oBj8zhY, launched 06/11): flow table, tao_bo_dung_t4m.py, HUONG_DAN_IT.md
       [ ] K3 Opus review
 - [x] PR to main for full CI + Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/pull/13 (opened 06/11; main merged in first, CHANGELOG conflict kept both sides)
 - [ ] Proposed, not approved: skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
-- K1 reported DONE 1fb93d0; Opus review: SENT BACK (site script fields must be createSPList subactions; addSPField needs id;
-  Buoi mapping accepted, §9 decision 1 corrected). Waiting K1 fix.
+- K1 accepted by Opus after one fix round (0e8d0ec: nested subactions, fixed ids, Nhan formula; 37 tests, regen identical). K2 running.
 - Round 5 T4M-BK approved by Truong 06/11. K0 done (KQ §8). PR #13 open (CI pending).
 - STATUS T4M-BK1/2: DONE 06/11. `mau_forms_thi_clb/bo_dung_t4m/` (cot_lists, site_script, mau_csv, cong_thuc, sinh_bk1);
   tests/test_t4m_bo_dung_bk1.py 37 pass; Opus review fixes done (subactions nesting, addSPField id, Nhan formula). FINDING: `ghi_clb_csv`
@@ -146,3 +145,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Sonnet | T4M-BK1/BK2 (K1): bo_dung_t4m column module (ECA 30 cols), site script (46 actions), sample CSVs + KIEM_COT_ECA.md, 4 Power Fx files k=1..7; tests first, static syntax test caught 3 generator bugs; 3 mutations caught | No subagent; no core/schema/CSV change; Buoi text mismatch reported |
 | 2026-11-06 | Opus | Reviewed K1: sent back 2 blocking fixes (site script nesting, addSPField id), 2 minor; corrected §9 decision 1 (Buoi text differs) | Waiting K1 |
 | 2026-11-06 | Sonnet | K1 fixes after Opus review: site script subactions + $schema + addSPField id, Nhan named formula, xfail -> normal test; tests first (5 red), 2 mutations caught | No core/schema/CSV change |
+| 2026-11-06 | Opus | Re-reviewed K1 0e8d0ec: accepted; launched K2 | |
