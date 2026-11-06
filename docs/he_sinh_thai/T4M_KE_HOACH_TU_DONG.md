@@ -25,7 +25,7 @@ Dừng, ghi vào tệp bàn giao, báo điều phối khi: bất biến xung đ�
 Đánh dấu dòng của mình trong Plan của tệp bàn giao, ghi đè "Current state" phần của mình, **thêm** một dòng Session log; một mục `CHANGELOG.md`; dòng T4M-NC trong `TIEN_DO.md`; chỉ chạy test liên quan + `ruff`; `git fetch origin main` rồi `python .claude/skills/soat-ma/scripts/kiem_nhanh.py`; `git pull --rebase` (xung đột ở CHANGELOG / tệp bàn giao: giữ cả hai bên); commit, push vào `claude/upbeat-shannon-g5nnms`. Báo cáo tiếng Việt, tối đa 10 dòng.
 
 **Báo trạng thái về điều phối (Truong yêu cầu 06/11/2026):** xong bước, hoặc gặp luật dừng mục 2, thì báo ngay:
-1. Nếu có công cụ `send_message` (claude-code-remote): gửi tới phiên gốc `session_01YVAyu3Zzm2AEVFAPhazqHY`, tối đa 8 dòng: `DONE` hoặc `BLOCKED`, mã commit, kết quả test, quyết định cần Truong duyệt; với `BLOCKED` thì ghi câu hỏi chính xác cho Truong và các phương án.
+1. Nếu có công cụ `send_message` (claude-code-remote): gửi tới phiên gốc `session_01YVAyu44juJNZ7h3oUwVHfW` (từ vòng 4; vòng 1–3 là `session_01YVAyu3Zzm2AEVFAPhazqHY`), tối đa 8 dòng: `DONE` hoặc `BLOCKED`, mã commit, kết quả test, quyết định cần Truong duyệt; với `BLOCKED` thì ghi câu hỏi chính xác cho Truong và các phương án.
 2. Dù có công cụ hay không: ghi cùng khối đó vào tệp bàn giao, mục "Current state", dạng `STATUS <mã>: …`, rồi push.
 3. Không chờ Truong trả lời trong phiên con; báo xong thì dừng.
 
@@ -194,4 +194,60 @@ T4M_KET_QUA_TAI_LIEU.md NC-04, NC-13, §7.1 (Forms connector, settings).
 submitted -> Get response details -> Create item in BaiThi), owned by the IT service account, how to clone it per
 form, Form Id for group forms, request estimate (label estimate) vs 6,000/day, failure handling, manual fallback
 (IT exports responses and the converter --bai-thi report). Label untested TH. Max 120 lines.
+```
+
+## 8. Vòng 4: Top 7, tick chọn thi, điểm quyết tâm (Truong duyệt 06/11/2026)
+
+Truong quyết: (1) mỗi ngày **tối đa 7** nguyện vọng có xếp hạng (thay Top 3; số ô = min(7, số CLB của ngày)); (2) **tick chọn thi**, tối đa **5 CLB có thi mỗi ngày** (`TRAN_CLB_THI_MOI_BUOI`); chỉ CLB được tick mới hiện ở màn Thi tuyển; (3) **thu điểm quyết tâm trên app** (phương án b): mỗi ngày hai quỹ 100 điểm, quỹ 1 cho CLB đã tick thi, quỹ 2 cho CLB còn lại.
+
+Kiosk đã hỗ trợ đủ, **không sửa lõi, schema, hợp đồng CSV**: Sổ nhập ô "Điểm thi" chữ `thi` = tick mà chưa có điểm; cột "Điểm quyết tâm" (`ghi_so_nhap(..., luon_co_cot_w=True)`, khoá `diem_w`); trần 5 (`so_nhap_qua_tran_thi`); tick mà vắng thì bỏ điểm quỹ 1 và cảnh báo (`diem_wharton_hieu_luc`, `wharton_vang_thi`). Luật §2–§4 giữ nguyên.
+
+**Cột List (mô hình rộng, mỗi dòng một em × một ngày), cố định cho cả hai bước:** `NV1..NV7` (mã CLB), `THI1..THI7` (`Có` hoặc trống; `Có` chỉ hợp lệ khi CLB ở `NVk` có đề), `WP1..WP7` (số nguyên ≥ 0, trống = 0). Chỉ số k của ba nhóm đi cùng nhau.
+
+| Bước | Mã | Ai | Đầu ra | Nhận khi |
+|---|---|---|---|---|
+| D1 | T4M-Q5a, Q5b, Q5c (tuần tự, một phiên) | Sonnet | bộ chuyển đổi đọc `THIk`, `WPk`; dữ liệu giả và demo `--day-du` | List không có `THIk`/`WPk` cho Sổ nhập và BANG_DIEM trùng khít như trước; test mới viết trước; kiosk nạp được sổ có điểm quyết tâm và chạy với `rules.wharton` bật |
+| D2 | T4M-M6 | Sonnet | đặc tả app (Top 7, tick, màn điểm quyết tâm), màn Thi tuyển theo tick, phiếu phỏng vấn, HDT | Mỗi yêu cầu mới có dòng kiểm pass/fail; chỉ lọc `=`; không còn chữ "Top 3" lỗi thời trong các tệp được giao |
+
+Chạy song song được (cột đã cố định ở trên). D1 chỉ sửa mã, test, `mau_forms_thi_clb/README.md`, `T4M_VAN_HANH_MOT_DOT.md`; D2 chỉ sửa các tệp tài liệu liệt kê trong prompt D2. Cả hai đều ghi CHANGELOG, TIEN_DO, tệp bàn giao: `git pull --rebase`, giữ cả hai bên, **không bao giờ commit dấu xung đột**.
+
+### D1. T4M-Q5a/b/c
+```
+T4M-Q5a, Q5b, Q5c in this order (Sonnet). Follow T4M_KE_HOACH_TU_DONG.md §2-3 and §8 (columns are FIXED there).
+Tests first (rule 2). Read: §8; so_nhap.py docstrings of ghi_so_nhap and the reader of "Điểm thi"/"thi"/diem_w
+(grep -n); HUONG_DAN_SU_DUNG.md §14 (two funds); rbda_priority_pipeline.diem_wharton_hieu_luc docstring;
+chuyen_forms_sang_phan_mem.py functions doc_lists, phan_tich_chi_thi, ghi_tep_phan_mem, ghi_bang_diem;
+du_lieu_test/sinh_xuat_lists_gia.py, demo_t4m.py, tao_mau_forms.ghi_mau_xuat_chi_thi; tests test_t4m_chi_thi,
+test_t4m_cong_thi, test_demo_t4m.
+Q5a (tick): when THIk columns exist, "thi" in the Sổ nhập follows the tick: ticked + submission -> score; ticked, no
+submission -> cell "thi" (absent); NOT ticked + submission -> score dropped (kept in BANG_DIEM, Nạp = Không) with a
+warning; tick on a club without de_thi -> warning, tick ignored; more than 5 ticks in a day -> warning, keep the
+first 5 in NV order. Only clubs ticked count for --bai-thi as before (report only).
+Q5b (determination points): when WPk columns exist, write diem_w per NV and call ghi_so_nhap with luon_co_cot_w=True.
+Pre-check per student-day: fund 1 = ticked clubs, fund 2 = the rest; each non-empty fund must sum to exactly 100;
+non-integer / negative cell -> warning, cell left empty. Warn only (the kiosk blocks the run); never change values.
+Q5c: sinh_xuat_lists_gia gains optional NV up to 7, THIk, WPk (valid funds, deterministic; defaults unchanged);
+ghi_mau_xuat_chi_thi submits only for ticked clubs when ticks exist, plus planted cases: one ticked-but-absent,
+one submitted-not-ticked, one fund not summing to 100. demo_t4m.py --day-du (combinable with --moi-clb) uses them,
+turns rules.wharton ON in the temp DB, and the summary ALWAYS prints "Điểm quyết tâm: BẬT/TẮT".
+Invariant: a List without THIk/WPk gives byte-identical SO_NHAP_CLB.xlsx and BANG_DIEM.xlsx (ignore docProps/core.xml)
+vs before; existing tests unchanged. No core change (stop rule §2). Update README (quiz-only part), ops guide steps 4-5
+and appendix. Related tests + ruff + mutation check of 3 key branches (rule: test must go red).
+```
+
+### D2. T4M-M6
+```
+T4M-M6 (Sonnet), docs only. Follow T4M_KE_HOACH_TU_DONG.md §2-3 and §8 (columns are FIXED there).
+Files you may edit: T4M_DAC_TA_SUA_APP.md, T4M_CONG_THI.md, T4M_MICROSOFT.md, T4M_PHIEU_PHONG_VAN.md,
+T4M_HUONG_DAN_THU.md (all in docs/he_sinh_thai/). Read HUONG_DAN_SU_DUNG.md §14 (two funds of 100) first.
+(1) T4M_DAC_TA_SUA_APP.md: Top 3 -> up to 7 per day (dropdown count = min(7, clubs that day), no duplicates, no gap);
+per NV row a tick "Thi" shown only for clubs with a quiz, max 5 ticks per day; a "Điểm quyết tâm" step per day with
+two boxes (fund 1 ticked clubs, fund 2 the rest), live "Đã dùng X / 100" counters, save blocked unless every
+non-empty fund is exactly 100; columns NV1..NV7, THI1..THI7, WP1..WP7; Patch + IfError as before; delegable `=`
+filters only. §10 Thi tuyển: cards = TICKED clubs only (not every quiz club in NV). New requirement rows (continue
+numbering after R24) with pass/fail checks; add matching HDT §9 rows and a short HDT section; replace outdated
+"Top 3" text in the five files. (2) T4M_CONG_THI.md §1 flow and T4M_MICROSOFT.md (v0) data table: same changes.
+(3) Interview sheet: rewrite ECA-9 for tick (max 5); add ECA questions: do teachers accept determination points
+(two funds of 100 per day) and is the phone screen acceptable; how many clubs per day (to size the 7 dropdowns).
+Label everything untested TH; no numbers presented as measured.
 ```

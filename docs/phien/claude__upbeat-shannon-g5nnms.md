@@ -17,6 +17,11 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [x] ROUND 3 quiz portal (plan §7; Truong approved 06/11; score level 5a; Opus reviewed 06/11):
       [x] C1 T4M-Q4a/b/c (Sonnet, session_01YVAyu2ANfZCsBcACp7Az4F, DONE 06/11)
       [x] C2 T4M-M5 (Sonnet, session_01YVAytz83xzruFD2dhwkPzs, DONE 06/11)
+- [ ] ROUND 4 (plan §8; Truong decided 06/11: up to 7 NV/day, tick to sit tests max 5/day, determination
+      points collected in app = option b; no core change):
+      [ ] D1 T4M-Q5a/b/c converter THIk/WPk + fake data + demo --day-du (Sonnet)
+      [ ] D2 T4M-M6 docs: app spec Top 7, tick, determination-point screen; interview sheet (Sonnet)
+      [ ] Opus: review D1/D2, then update the simulation artifact https://claude.ai/artifact/B9jnsdzuN57KNuhPUBMUCd
 - [ ] GĐ0/GĐ2: Truong meets IT + ECA teacher (before 15/11/2026), gets anonymised export sample
 - [ ] GĐ3 run: sandbox checklist (only if NC-02 allows)
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
@@ -25,6 +30,9 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
+- ROUND 4 RUNNING from root session session_01YVAyu44juJNZ7h3oUwVHfW (children report there + STATUS lines).
+  Origin: Truong noticed the T4M design had cut core limits (10 NV -> Top 3, no tick, no determination points;
+  demo_t4m silently turned wharton OFF). Opus's fault: Top 3 was my recommendation, not flagged as a cut.
 - Rounds 1, 2, 3 finished and reviewed by Opus 06/11/2026. Round 3 review: 134 related tests pass, ruff clean,
   kiem_nhanh 7/7 (needs `git fetch origin main:refs/remotes/origin/main` first, else trung_khit fails), default and
   --chi-thi generator output identical before/after C1 (ignoring docProps/core.xml).
@@ -117,3 +125,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Third handoff note: C1 also reported DONE (unreviewed) | Round 3 needs Opus review only |
 | 2026-11-06 | Opus | Reviewed round 3 (C1, C2): 134 tests, kiem_nhanh 7/7, outputs identical; added 1 test (mutation survivor), HDT §13 rows 13.1-13.4 (C2 numbering clash); round 3 ticked | Next: Truong decides PR to main |
 | 2026-11-06 | Opus | Truong chose cách B; T4M-DEMO-B: demo --moi-clb (tests first, 4 red -> green, 2 mutations caught), interview sheet B3 IT-15..18 | Next: PR to main? |
+| 2026-11-06 | Opus | Built simulation artifact (cách B); Truong flagged 10 NV / 5 tests / determination points missing; decided 7 NV, tick max 5, points in app (b); wrote plan §8 round 4 | Launching D1, D2 |
