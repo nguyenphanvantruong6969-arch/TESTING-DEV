@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC: thiết kế cổng thi (chọn CLB → mở bài thi → trạng thái → điểm)
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_CONG_THI.md` (mới): app Power Apps ECA làm cổng, mỗi CLB có thi một biểu mẫu Forms Quiz, list `CLB` (FormUrl) và `BaiThi` (trạng thái), mỗi biểu mẫu một flow "Đã làm" (connector chuẩn); connector Forms không trả điểm (TT-CXM) nên điểm chính thức vẫn do bộ chuyển đổi chấm lại; ba mức trả điểm 5a/5b/5c; mã đề xuất Q4a–c, M5; phương án lui trang SharePoint.
+
 ## 2026-11-06 — T4M-M4 (bước R3): hướng dẫn flow gửi Excel theo lớp cho GVCN, chỉ tài liệu
 
 Không có mã. `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` (mới, 77 dòng): flow Power Automate tuỳ chọn, chỉ connector chuẩn (SharePoint, Outlook/Teams), chủ là tài khoản dịch vụ IT; lấy tệp `export_theo_lop` từ thư viện SharePoint, ghép với tệp ánh xạ lớp → email GVCN (nguồn HỎI-IT, NC-08; khoá ghép theo tên tệp đã làm sạch), gửi từng GVCN. Bảng giới hạn ĐXM của NC-12, NC-13, đoạn DLP (NC-14), xử lý lỗi và đường thủ công; không ghi ngược về list (NC-13). Bước chưa thử nhãn TH, công thức/hành động nhãn GĐ. Không đổi hợp đồng CSV, schema, bất biến hay mã sản phẩm; không test mới.
