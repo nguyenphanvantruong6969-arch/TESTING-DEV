@@ -251,3 +251,26 @@ numbering after R24) with pass/fail checks; add matching HDT §9 rows and a shor
 (two funds of 100 per day) and is the phone screen acceptable; how many clubs per day (to size the 7 dropdowns).
 Label everything untested TH; no numbers presented as measured.
 ```
+
+## 9. Vòng 5: bộ dựng sẵn cho IT, T4M-BK (Opus đề xuất 06/11/2026, **CHỜ TRUONG DUYỆT**)
+
+Đích: từ mô phỏng sang **hệ thống thật trên sản phẩm Microsoft**, do **IT và giáo viên ECA** dựng trên bản sao app (kế hoạch nghiên cứu §1: IT và giáo viên ECA quản lý app, IT chạy kiosk). Dự án không đụng tenant của trường; dự án giao **một thư mục "nhập là dựng"** cho IT, sinh bằng một lệnh, kiểm được trên máy không có Microsoft 365. Mọi thứ chạm Microsoft vẫn nhãn **TH** cho tới khi IT chạy (HDT §9).
+
+Không sửa lõi, schema, hợp đồng CSV; không thư viện mới (chỉ thư viện chuẩn Python + `openpyxl`, `python-docx` đã có). Luật §2–§4 giữ nguyên.
+
+**Quyết định kỹ thuật của Opus (ghi để phiên con không làm khác):**
+1. **Một list CLB:** bộ dựng tạo list `CLB` với đúng các cột của `CLB.csv` (`ClubId`, `Ten`, `Buoi`, `FormUrl`, T4M-Q4a); công thức app lọc `Filter(CLB, Buoi = <ngày>)` thay cho `CLB_GIA` (`Buoi` dùng cùng chữ `Thứ 2`…`Thứ 6` như cột `Thu` của `ECA`; phiên con kiểm điều này bằng test). Chỉ tiêu không vào app (mục 0 của đặc tả app). Tài liệu cũ nói `CLB_GIA` được sửa trỏ về `CLB`.
+2. **Một nguồn cột:** định nghĩa cột của mọi list (`ECA`, `CLB`, `BaiThi`, `NHAT_KY_DA_LAM`) nằm ở một mô-đun; test so khớp với `sinh_xuat_lists_gia.cot_csv(7, True, True)`, `doc_lists` và tiêu đề `CLB.csv`. Không sửa các hàm cũ.
+3. **Không tự chế gói flow `.zip`** hay tệp `.msapp`: không kiểm được ở đây, sai định dạng thì IT mất công hơn. Flow giao dưới dạng bảng cấu hình theo từng CLB + biểu thức để dán; IT dựng một flow mẫu, xuất gói, nhân bản (`T4M_FLOW_DA_LAM.md` §4).
+4. **Công thức Power Fx khai triển đủ** `NV1..NV7`, `THI1..THI7`, `WP1..WP7` (không còn `/* … đến NV7 */`), sinh bằng mã để không gõ tay sai chỉ số; kiểm tĩnh bằng test (chỉ lọc `=` trên nguồn dữ liệu; tên cột đúng hợp đồng §8).
+
+| Bước | Mã | Ai | Đầu ra | Nhận khi |
+|---|---|---|---|---|
+| K0 | T4M-BK0 | Opus (phiên gốc, đọc web) | `T4M_KET_QUA_TAI_LIEU.md` §8: cách tạo list có cột định sẵn mà **không cần quyền quản trị tenant** (Lists "từ CSV/Excel"; site script `createSPList` qua REST `ExecuteTemplateScript` với quyền chủ site; PnP PowerShell và việc phải tự đăng ký ứng dụng Entra từ 09/2024; Graph); Power Apps Studio dán YAML điều khiển (có không, định dạng nào); nhập/xuất gói flow | Mỗi cách một dòng: quyền cần, có sẵn trong A3/A5 không, nhãn ĐXM với đường dẫn trang gốc; chọn cách mặc định và cách lui. Nếu không cách nào tạo cột tự động mà không cần quản trị: K1 chỉ sinh CSV + hướng dẫn tay |
+| K1 | T4M-BK1, BK2 (tuần tự, một phiên) | Sonnet | `mau_forms_thi_clb/bo_dung_t4m/` (tên GĐ): mô-đun cột; bộ sinh list theo cách K0 chọn (+ CSV mẫu cho cách lui); bộ sinh công thức Power Fx từng màn (nguyện vọng, điểm quyết tâm, Thi tuyển, khoá) từ đặc tả §2, §3, §10, §11; test viết trước | Test: cột khớp ba nguồn ở quyết định 2; công thức đủ 7 chỉ số, không `<>`/`in`/`IsBlank`/`Not` trong `Filter` trên `ECA`, `BaiThi`, `CLB`; sinh lại giống hệt từng byte; mọi tệp có dòng "TH: chưa chạy trên Power Apps" |
+| K2 | T4M-BK3, BK4 (tuần tự, một phiên, sau K1) | Sonnet | bảng cấu hình flow `DaLam_<ClubId>` sinh từ `de_thi.json`; lệnh gộp `tao_bo_dung_t4m.py` ra thư mục + `.zip` (`01_lists/`, `02_app/`, `03_flow/`, `04_forms/` gọi `tao_mau_forms.py --moi-clb`, `HUONG_DAN_IT.md`); hướng dẫn: thứ tự dựng, mỗi bước một dòng pass/fail trỏ về R1..R38 và HDT §9 | Một lệnh sinh đủ; số flow = số CLB có đề; mỗi `ClubId` của bảng flow có trong `CLB.csv`; không tên thật, tenantId, URL; `demo_t4m.py` và mọi đầu ra cũ trùng khít |
+| K3 | soát | Opus | soát K1, K2 theo cột "Nhận khi"; cập nhật trang mô phỏng nếu cần; báo Truong | Test liên quan đạt, `ruff` sạch, `kiem_nhanh` 7/7 |
+
+Phụ thuộc: K0 → K1 → K2 → K3 (K1 cần cách tạo list do K0 chọn). Prompt K1, K2 viết sau K0 (định dạng tệp phụ thuộc kết quả K0).
+
+**Ngoài phạm vi T4M-BK (cần Truong hoặc IT):** chạy bộ dựng trong tenant (GĐ3, NC-02); tài khoản dịch vụ làm chủ flow; DLP; nạp dữ liệu thật. Nguyên mẫu riêng của Truong trên Developer Plan (hạn tạo môi trường 15/11/2026) là việc khác, chỉ làm nếu Truong yêu cầu.

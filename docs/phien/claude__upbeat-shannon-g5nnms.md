@@ -27,10 +27,13 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 - [ ] GĐ4 final: update T4M_MICROSOFT.md v0 -> v1 after GĐ2 (its §10 lists what to revisit)
 - [ ] A8-GOI-1..3 (bundle code): D1-D5 approved in principle; code ONLY after ECA answers Q1-Q3
 - [ ] T4M-M2 (column-mapping file): waits for a real anonymised export
+- [ ] ROUND 5 T4M-BK build kit for IT (plan §9; PROPOSED 06/11, awaiting Truong): K0 Opus research -> K1 Sonnet
+      (column module, list creator, Power Fx) -> K2 Sonnet (flow table, one-command kit + IT guide) -> K3 Opus review
 - [ ] Proposed, not approved: PR to main for full CI + Windows build; skill T4M-SK; registry chain Z6 (new branch)
 
 ## Current state (overwrite each handoff)
 - Rounds 1-4 DONE and reviewed by Opus 06/11/2026. Nothing is running; no child sessions; check-in trigger deleted.
+- Round 5 T4M-BK planned in T4M_KE_HOACH_TU_DONG.md §9 (docs only, no code); awaiting Truong's approval.
 - Round 4 (plan §8): Truong decided up to 7 NV/day, tick to sit tests (max 5/day), determination points collected in
   the app (option b). Origin: Opus's earlier Top 3 recommendation silently cut core limits (10 NV, 5 tests) and the
   T4M path had no determination points (demo turned wharton OFF silently). No core/schema/CSV change was needed.
@@ -69,18 +72,13 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
   R2 diff tool had a false "no change" with unknown club codes (fixed: raw compare + warning headline).
 
 ## Next steps (ordered)
-1. Ask Truong: open a PR to main for full CI + Windows build (recommended next; Truong has not answered yet).
-2. Truong clarified (06/11): turn the simulation into a REAL system on Microsoft products. Proposed (not approved):
-   a "build kit" item T4M-BK: (i) script that creates lists ECA/CLB/BaiThi with the round-4 columns (PnP PowerShell
-   or SharePoint site script: verify which is allowed, HỎI-IT); (ii) Power Fx formulas per screen ready to paste
-   (from DAC_TA §2, §10, §11); (iii) "Đã làm" flow as an exportable package; (iv) Forms via existing Quick Import
-   .docx. Truong may also build a prototype himself if he gets a Power Apps environment: Developer Plan stops
-   creating environments 15/11/2026 (urgent). DO NOT re-ask what Truong answered on 05/11 (T4M_KE_HOACH_NGHIEN_CUU.md
-   §1: IT + ECA teacher manage the app, IT runs the kiosk, school agreed) => default path = build kit for IT (T4M-BK).
-   Truong skipped NC-02 (can his student account build apps?): that is an IT question for GĐ2, not for Truong.
-   Next: plan T4M-BK in a new §9 of T4M_KE_HOACH_TU_DONG.md and get Truong's approval of the item.
+1. Get Truong's answers (asked 06/11 in this session): (a) approve T4M-BK as in plan §9 (4 Opus technical decisions
+   there: one `CLB` list replacing `CLB_GIA`, one column module, NO hand-made flow .zip/.msapp, Power Fx expanded by
+   code); (b) PR to main for full CI + Windows build (recommended, still unanswered).
+2. If (a) approved: Opus runs K0 (web research -> T4M_KET_QUA_TAI_LIEU.md §8), then writes K1/K2 prompts in §9 and
+   launches K1 (create_session, Sonnet); K2 after K1; K3 review. Status protocol §3 (send_message to the root session).
 3. After Truong's GĐ2 meeting (before 15/11): paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA
-   answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter.
+   answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter. GĐ2 also answers which K0 method IT may use.
 
 ## Files touched (T4M, this branch)
 - mau_forms_thi_clb/{bieu_mau,tao_mau_forms,chuyen_forms_sang_phan_mem}.py, README.md, tests/test_t4m_cong_thi.py, T4M_VAN_HANH_MOT_DOT.md: T4M-Q4a/b/c
@@ -145,3 +143,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong asked to recreate the simulation page; asked clarifying questions only (no new work, context full) | New session: get answers first |
 | 2026-11-06 | Opus | Truong wants the simulation as a real Microsoft system; proposed build kit T4M-BK + own prototype before 15/11; no work started | Ask Truong which path |
 | 2026-11-06 | Opus | Truong pointed out he answered earlier; checked §1 of the research plan: path = build kit for IT; NC-02 stays an IT question | Plan T4M-BK next session |
+| 2026-11-06 | Opus | Wrote plan §9 round 5 T4M-BK (build kit for IT: K0 research, K1/K2 Sonnet, K3 review); asked Truong to approve it and the PR to main | No code; no child sessions |
