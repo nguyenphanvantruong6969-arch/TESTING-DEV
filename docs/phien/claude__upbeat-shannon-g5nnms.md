@@ -70,7 +70,10 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 
 ## Next steps (ordered)
 1. Ask Truong: open a PR to main for full CI + Windows build (recommended next; Truong has not answered yet).
-2. Optional: commit the simulation page source into docs/he_sinh_thai/ if Truong wants it kept in the repo.
+2. Truong said "I want to recreate something like that" (the simulation page). Opus asked, unanswered: (a) learn to
+   build it himself (tutor mode, hints first), (b) a similar page for another sector, or (c) use it in the project
+   report (Truong writes all commentary). Also asked whether to copy the page source into the repo: it exists only in
+   the old session scratchpad; if lost, read it back with the Artifact tool (action read) from the URL above.
 3. After Truong's GĐ2 meeting (before 15/11): paste anonymised summary -> GĐ4 v1, decide M2, start A8-GOI if ECA
    answered Q1-Q3; ECA-6 (clubs per day) decides whether 7 slots matter.
 
@@ -134,3 +137,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Sonnet | T4M-Q5a/b/c (D1): converter THIk/WPk, fake Lists/Forms with ticks and funds, demo --day-du; tests first (29 red on first run -> all 34 green), 5 mutations caught | No subagent; no core/schema/CSV change; default outputs byte-identical |
 | 2026-11-06 | Opus | Reviewed D1 T4M-Q5a/b/c: tests green after fixing D2/D1 clash (HDT no longer named `NV3`), demo default and --moi-clb outputs identical to before, --day-du runs; kiosk auto-fills single-club fund (confirmed); round 4 done | Artifact v3 next |
 | 2026-11-06 | Opus | Artifact v4 (demo --day-du numbers); handoff at ~400k context (Stop hook); no new work | Next: ask Truong about PR to main |
+| 2026-11-06 | Opus | Truong asked to recreate the simulation page; asked clarifying questions only (no new work, context full) | New session: get answers first |
