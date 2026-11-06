@@ -27,6 +27,8 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 ## Current state (overwrite each handoff)
 - STATUS T4M-M5: DONE (docs only, no tests). `T4M_DAC_TA_SUA_APP.md` §10 "Màn Thi tuyển" + requirements R15..R24 (pass/fail each; proposed HDT §9 rows 7.1-7.3 not yet added); new `T4M_FLOW_DA_LAM.md` (85 lines): one template flow per quiz form, service-account owner, request estimate 9,000-12,000 vs 6,000/day (ƯL), manual fallback with `--bai-thi`. Level 5a, standard connectors, `=` filters only. Did not touch `T4M_VAN_HANH_MOT_DOT.md` / `mau_forms_thi_clb/README.md` (C1). Nothing for Truong to approve; Opus may add HDT §9 rows 7.x.
 - Rounds 1 and 2 finished and reviewed by Opus 06/11/2026: 109 related tests pass, ruff clean repo-wide, kiem_nhanh 7/7.
+- C2 reported DONE (c4371e4: T4M_DAC_TA_SUA_APP.md §10 R15..R24, new T4M_FLOW_DA_LAM.md, estimate 9,000-12,000
+  actions vs 6,000/day); it suggests adding HDT §9 rows 7.x. Review it. C1 still running at last handoff.
 - Round 3 RUNNING: C1 and C2 were launched by the old root session (session_01YVAyu3Zzm2AEVFAPhazqHY). They report
   DONE/BLOCKED by send_message to THAT old session and also write `STATUS <code>: ...` lines here. The new root
   session will NOT get those messages: poll with get_session on the two ids above and read STATUS lines after git pull.
@@ -108,3 +110,4 @@ Plans: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (research, NC-01..27, prom
 | 2026-11-06 | Opus | Truong approved Q4a-c + M5, score level 5a; wrote plan §7; launched C1, C2 | |
 | 2026-11-06 | Opus | Handoff at ~400k context: rewrote state/next/decisions; round 3 C1, C2 still running; fallback trigger deleted | New root must poll C1/C2 (they message the old session) |
 | 2026-11-06 | Sonnet | T4M-M5 (C2): Thi tuyển screen spec (§10, R15..R24) + "Đã làm" flow guide; docs only | No subagent; C1 files untouched |
+| 2026-11-06 | Opus | Second handoff note: C2 reported DONE (unreviewed); C1 running | No new work started |
