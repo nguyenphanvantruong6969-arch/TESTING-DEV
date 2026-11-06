@@ -1,5 +1,180 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-NC: sửa CI đỏ của PR #13 (3 nguyên nhân do nhánh)
+
+- `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`: `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã ghi 194 tệp test, thực tế 201; cập nhật 201 tệp, 3.645 ca.
+- `tests/test_a13_13_kiem_nhan.py::test_F1_script_do_tat_wharton_ro_rang`: `du_lieu_test/demo_t4m.py` (từ T4M-Q5c) ghi `{"wharton": bool(day_du)}`; nay ghi tường minh `{"wharton": False}` / `{"wharton": True}`. Hành vi không đổi.
+- `tests/test_t4m_bo_dung_bk34.py` (Windows CI không cài `python-docx`): `pytest.importorskip("docx")` như các test Forms khác; tái hiện bằng cách giả lập thiếu `docx` (25 đỏ/lỗi trước, bỏ qua sau).
+- Không sửa: `tests/test_giao_dien_t3_l3.py::test_tai_bang_theo_clb_va_theo_ma_co_tim` đỏ một lần trên Linux CI (màn 2 dòng, tệp 3 dòng), xanh ở lần chạy CI kia và 6/6 lần ở máy: chập chờn, test của `main` (T3-L4), tách thành việc riêng.
+
+## 2026-11-06 — T4M-BK3, BK4 (vòng 5, bước K2): bảng flow `DaLam_<ClubId>` và lệnh gộp `tao_bo_dung_t4m.py`
+
+Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ thư viện chuẩn); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên Power Apps / SharePoint / Power Automate).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/bang_flow.py` (BK3): một hàng mỗi CLB CÓ đề (`bieu_mau.clb_co_thi`): `Flow` = `DaLam_<ClubId>`, `ClubId`, ô trống cho IT (`FormId`, `ChuBieuMau`, `DaThuNgay`), tệp Quick Import; `BANG_FLOW.md` (bảng + biểu thức dán `toLower(responder)`, hằng `ClubId`, OData `ResponseId eq '…'`, nhãn GĐ) và `BANG_FLOW.csv`. Không gói flow `.zip` (quyết định 3).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/huong_dan_it.py` (BK4): sinh `HUONG_DAN_IT.md`: bước 0 (HỎI-IT) đến bước 6 (vòng thử), mỗi bước có dòng `☐ Pass ☐ Fail` trỏ về R1..R38 và HDT §9; ba cách A/B/C với quyền và nhãn ĐXM/TT-CXM từ KQ §8.1; site script 46 hành động nên chỉ áp không đồng bộ (Settings > Apply a site template, hoặc `Add-SPOSiteDesignTask`), cấm `Invoke-SPOSiteDesign`; phụ lục R1..R38.
+- Mới `mau_forms_thi_clb/tao_bo_dung_t4m.py` (BK4): `--de-thi`, `--ra`, `--zip`; ra `01_lists/` và `02_app/` (gọi `sinh_bk1.ghi_tat_ca` của K1), `03_flow/`, `04_forms/` (gọi `tao_mau_forms.sinh_moi_clb` như hàm), `HUONG_DAN_IT.md`; `<ra>.zip` nằm ngoài thư mục, tên sắp xếp, giờ cố định, sinh lại cho cùng từng byte. Kiểm đề trước khi ghi.
+- Test mới `tests/test_t4m_bo_dung_bk34.py` (+25): số flow = số CLB có đề, mọi `ClubId` có trong `CLB.csv`, đủ R1..R38 (đọc từ đặc tả), dòng HDT có thật, `Invoke-SPOSiteDesign` chỉ để cấm, sinh lại giống từng byte kể cả zip (và sinh đè lên thư mục cũ), `04_forms` trùng khít đầu ra của `sinh_moi_clb`, không tên thật/tenantId/URL. Mutation check bắt 3 đột biến (flow cho mọi CLB, bỏ chữ cấm Invoke-SPOSiteDesign, đảo thứ tự zip); một đột biến sống sót lần đầu (kiểm "không" cùng dòng quá lỏng) nên đã siết test.
+- `demo_t4m.py` mặc định, `--moi-clb`, `--day-du`: đầu ra trùng khít trước/sau (42, 52, 42 tệp; docx/xlsx so bỏ core.xml). README (mục 0c) và `T4M_VAN_HANH_MOT_DOT.md` (phụ lục) mỗi nơi một đoạn ngắn.
+
+## 2026-11-06 — T4M-BK1, BK2 (vòng 5, bước K1): bộ dựng list và công thức Power Fx cho IT
+
+Không đổi lõi, schema, hợp đồng CSV, không thư viện mới (chỉ `json`, `csv`, `uuid`, `re`); không sửa bộ sinh hay đặc tả cũ. Mọi đầu ra nhãn TH (chưa chạy trên SharePoint / Power Apps).
+- Mới `mau_forms_thi_clb/bo_dung_t4m/`: `cot_lists.py` (MỘT định nghĩa cột cho ECA 30 cột, CLB 4, BaiThi 4, NHAT_KY_DA_LAM 4; GUID cố định uuid5), `site_script.py` (createSPList + addSPField / addSPFieldXml cho Choice; in số hành động, cảnh báo > 30, lỗi > 300; hiện 46), `mau_csv.py` (CSV mẫu một dòng ví dụ giả + `KIEM_COT_ECA.md`), `cong_thuc.py` (bốn tệp Power Fx khai triển k = 1..7 và bộ soát `soat_loc_uy_quyen`), `sinh_bk1.py` (một lệnh: `python -m bo_dung_t4m.sinh_bk1 --ra <thư mục>`; ra `01_lists/`, `02_app/`, `README_BK1.md`).
+- Test mới (viết trước, đỏ khi thiếu mô-đun; sau đó sửa 3 lỗi sinh do test cú pháp tĩnh bắt: thiếu `;` trong `OnVisible`, `If` lệch dòng, `OnChange` k=7 thừa `;`): `tests/test_t4m_bo_dung_bk1.py` (37 ca). Gây hỏng tạm 3 chỗ (bỏ `WP7` khỏi ECA; khai triển chỉ tới k=6; `Email <>` trong `Filter(ECA…)`): test đỏ cả 3 (3, 3, 1 ca), khôi phục thì xanh.
+- PHÁT HIỆN (không sửa, theo luật): `tao_mau_forms.ghi_clb_csv` ghi `Buoi` là "Thứ Hai" còn cột `Thu` của ECA là "Thứ 2"; quyết định 1 của §9 nói "cùng chữ". Bộ dựng dùng ánh xạ `buoi_theo_thu(de)` nên công thức lọc `Filter(CLB, Buoi = "Thứ Hai")` đúng; xfail ghi lại lệch.
+- Sửa sau soát Opus (cùng bước K1): `addSPField`/`addSPFieldXml` nay là hành động CON (`subactions`) của `createSPList` (mức trên cùng chỉ có `createSPList`), thêm `$schema`; số hành động đếm cả hành động con (vẫn 46; cảnh báo > 30, lỗi > 300); mọi `addSPField` có `id` = GUID cố định (chạy lại không thêm cột hai lần). Test site script viết lại để ĐỎ trên đầu ra phẳng cũ (4 ca đỏ), đột biến 'làm phẳng' và 'bỏ id' đều bị bắt. Xfail Buoi/Thu đổi thành test thường (ánh xạ: khoá = 5 lựa chọn Thu, giá trị = Buoi của CLB.csv). Nhãn: công thức tên `Nhan` trong App.Formulas thay cho `ClearCollect(colNhan…)` ở App.OnStart (GĐ cú pháp).
+
+## 2026-11-06 — T4M-Q5a/b/c (vòng 4, bước D1): bộ chuyển đổi đọc THIk/WPk, dữ liệu giả, `demo_t4m.py --day-du`
+
+Không đổi lõi (`run_rbda`, `compute_club_priority`, `club_choice_function`), schema hay hợp đồng CSV của kiosk. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`. List KHÔNG có `THIk`/`WPk` thì `SO_NHAP_CLB.xlsx`, `BANG_DIEM.xlsx` và tệp Lists giả giống hệt từng byte so với trước (băm toàn bộ khối zip trừ `docProps/core.xml`; 3 seed × {một biểu mẫu, `--moi-clb`} + tệp Lists giả mặc định; chạy tay trước và sau khi sửa).
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `doc_lists` nhận `THIk`/`WPk` (khoá "tick", "wp", "dong_buoi" chỉ khi có cột); Q5a: "thi" đi theo tick (tick + bài -> điểm; tick + vắng -> ô `thi`; bài không tick -> bỏ điểm, báo, BANG_DIEM ghi "chưa tick thi"; tick CLB không đề -> bỏ tick, báo; quá 5 tick/ngày -> giữ 5 đầu theo thứ tự NV, báo); Q5b: `diem_w` vào Sổ nhập (`luon_co_cot_w=True`), `_soat_hai_quy` chỉ BÁO quỹ không cộng đúng 100 (quỹ 1 = CLB đã tick, quỹ 2 = còn lại; quỹ một CLB để trống không báo), ô không phải số nguyên >= 0 -> báo, để trống; ghi chú cuối lệnh nói "giữ BẬT" khi có điểm quyết tâm. Hàm mới: `tap_thi`, `_doc_tick`, `_doc_diem_quyet_tam`.
+- `du_lieu_test/sinh_xuat_lists_gia.py`: `sinh`/`ghi_csv` thêm `so_nv`, `co_tick`, `co_wp`, `clb_co_de` (bộ ngẫu nhiên riêng cho tick/điểm, nên NV không đổi); `cot_csv`, `ghi_dong`, `gai_quy_khong_du`; cờ `--so-nv --tick --wp`.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `ghi_mau_xuat_chi_thi` khi List có tick thì chỉ nộp bài cho CLB đã tick và gài thêm `tick_vang`, `nop_khong_tick`.
+- `du_lieu_test/demo_t4m.py`: `--day-du` (kết hợp `--moi-clb`): bật `rules.wharton` trong CSDL tạm, gài một quỹ thiếu 100 -> kiosk CHẶN lần chạy đầu -> demo sửa bằng `admin_save_wharton` rồi chạy lại; tóm tắt LUÔN in "Điểm quyết tâm: BẬT/TẮT"; khoá `diem_quyet_tam`, `bi_chan_lan_dau`, `so_nv`.
+- Test mới (viết trước; chạy lần đầu 29 ca đỏ, nay đủ 34 xanh): `tests/test_t4m_day_du.py` (34 ca). Gây hỏng tạm 5 chỗ (`!=100` -> `>100`, bỏ việc bỏ điểm khi không tick, bỏ trần 5, bỏ miễn trừ quỹ một CLB, bỏ ô `thi` theo tick): cả 5 bị bắt.
+- Tài liệu: `mau_forms_thi_clb/README.md` (mục 0 và 0b), `T4M_VAN_HANH_MOT_DOT.md` (bước 2, 4, 5, phụ lục; bỏ "Top 3", `NV1..NV3`).
+
+## 2026-11-06 — T4M-M6 (vòng 4, bước D2): app Top 7, tick chọn thi, điểm quyết tâm; chỉ tài liệu
+
+Không có mã, test, schema hay hợp đồng CSV; không đụng lõi. Cột List cố định theo `T4M_KE_HOACH_TU_DONG.md` §8: `NV1..NV7`, `THI1..THI7`, `WP1..WP7`.
+- `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md`: tối đa 7 nguyện vọng mỗi ngày (số ô = min(7, số CLB ngày)), tick "Thi" chỉ ở CLB có đề (tối đa 5 mỗi ngày), bước điểm quyết tâm (hai khung 100, bộ đếm "Đã dùng X / 100", chặn Gửi khi khung không rỗng khác 100), một `Patch` ghi 21 cột; R2 đến R6 sửa; R15 sửa (thẻ Thi tuyển = CLB đã tick); mục 11 thêm R25 đến R38 (pass/fail, trỏ HDT §9 dòng 14.x).
+- `T4M_HUONG_DAN_THU.md`: bảng cột §1, §2 (mô hình dài tới 52.500 dòng, vượt trần 30.000), §5 (7 ô), §10, §12; §9 thêm dòng 14.1 đến 14.5; mục 14 mới. Bộ sinh giả mặc định vẫn NV1..NV3 (ghi rõ; tuỳ chọn tới NV7 chờ T4M-Q5c).
+- `T4M_CONG_THI.md` §1, §2, §4.5; `T4M_MICROSOFT.md` (tóm tắt, sơ đồ, ma trận, bảng cột kho, P3, §8 thêm hàng T4M-M6); `T4M_PHIEU_PHONG_VAN.md`: ECA-6 (tối đa 7, số CLB mỗi buổi), ECA-9 (tick tối đa 5), ECA-12 mới (điểm quyết tâm, màn điện thoại), IT-19 mới.
+- Không còn chữ "Top 3" lỗi thời trong năm tệp được giao (kiểm bằng grep). Mọi thứ nhãn TH, không có số đo.
+
+## 2026-11-06 — T4M-DEMO-B: `demo_t4m.py --moi-clb` (cách B) và câu hỏi cổng thi cho GĐ2
+
+Không đổi lõi, schema, hợp đồng CSV, bộ chuyển đổi hay bộ sinh mẫu; chế độ mặc định của demo không đổi (test cũ không sửa).
+- `du_lieu_test/demo_t4m.py`: `--moi-clb` / `chay_demo(moi_clb=True)`; `tach_moi_clb` tách tệp Forms giả chung thành một tệp xuất mỗi CLB có đề (không câu cổng, cột Points là số); `ghi_bai_thi_gia` sinh `BaiThi.csv` giả, cố ý thiếu một bài của em chỉ nộp một lần; bộ chuyển đổi chạy với `--bai-thi`; tóm tắt in mục đối chiếu.
+- Test mới (viết trước, 4 đỏ -> xanh): 5 ca trong `tests/test_demo_t4m.py` (nay 16): kết quả xếp trùng với bản một biểu mẫu chung cùng seed, đúng một tệp mỗi CLB không câu cổng, đối chiếu bắt đúng chỗ gài, mặc định không có tệp mới, lệnh in đối chiếu. Gây hỏng tạm 2 chỗ: cả hai bị bắt.
+- `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md`: sửa ECA-9 theo cách B; thêm mục B3 với IT-15 (sửa app hay trang SharePoint dự phòng), IT-16 (chủ biểu mẫu, trần 400), IT-17 (tài khoản dịch vụ, hạn mức flow, số ngày mở), IT-18 (quyền chỉ đọc `BaiThi`, DLP).
+- README mục 0b, `T4M_VAN_HANH_MOT_DOT.md` phụ lục: lệnh `--moi-clb`.
+
+## 2026-11-06 — T4M-NC vòng 3: soát C1 (T4M-Q4a/b/c) và C2 (T4M-M5)
+
+Soát theo plan §7 "Nhận khi": 134 test liên quan đạt, ruff sạch, `kiem_nhanh` 7/7 (15 ca trùng khít với main); đầu ra mặc định và `--chi-thi` của `tao_mau_forms.py` trùng khít trước/sau C1 (bỏ qua `docProps/core.xml`). Không đổi mã sản phẩm.
+- Gây hỏng tạm 4 chỗ trong `chuyen_forms_sang_phan_mem.py`: 3 bị bắt; `_da_thi` `any` -> `all` sống sót. Thêm `test_q4b_phieu_bo_trong_vai_cau_van_tinh_la_da_thi` (`tests/test_t4m_cong_thi.py`, nay 25): phiếu làm dở vẫn có điểm.
+- M5: số dòng HDT §9 đề xuất "7.x" trùng với dòng 7.1/7.2 (flow xuất CSV) đã có. Thêm mục 13 vào `T4M_HUONG_DAN_THU.md` và dòng 13.1 đến 13.4 ở §9; cột "HDT §9" của R15 đến R24 trong `T4M_DAC_TA_SUA_APP.md` và hai chỗ trong `T4M_FLOW_DA_LAM.md` trỏ về 13.x.
+
+## 2026-11-06 — T4M-M5 (vòng 3, bước C2): màn "Thi tuyển" và flow "Đã làm", chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` thêm mục 10 "Màn Thi tuyển" (CLB có thi mà em đã chọn, `Launch(FormUrl)` chỉ khi chưa có dòng `BaiThi` và còn hạn, "Đã làm"/"Chưa làm", nút Làm mới, lọc `=` uỷ quyền được, không hiện điểm: mức 5a) và bảng yêu cầu R15 đến R24 mỗi dòng một kiểm pass/fail. `docs/he_sinh_thai/T4M_FLOW_DA_LAM.md` (mới, 85 dòng): flow mẫu mỗi biểu mẫu một flow (When a new response is submitted → Get response details → [kiểm trùng] → Create item `BaiThi`), chủ là tài khoản dịch vụ IT, cách nhân flow và Form Id biểu mẫu nhóm, ước tính 9.000 đến 12.000 hành động so với 6.000 mỗi ngày (nhãn ƯL), xử lý lỗi, đường thủ công với `--bai-thi`. Chỉ connector chuẩn; mọi bước TH/GĐ. Không đụng `T4M_VAN_HANH_MOT_DOT.md` và `mau_forms_thi_clb/README.md` (C1 sửa). Không test mới.
+
+## 2026-11-06 — T4M-Q4a, Q4b, Q4c: cổng thi, mỗi CLB một biểu mẫu (vòng 3, bước C1)
+
+Không đổi lõi, schema, hợp đồng CSV. Mặc định và `--chi-thi` giữ nguyên (bất biến 1): test cũ không sửa.
+- **Q4a** `bieu_mau.cac_phan_moi_clb`; `tao_mau_forms.py --moi-clb [--ra]`: `sinh_moi_clb`, `ghi_docx_moi_clb`, `ghi_clb_csv`, `ghi_cai_dat_moi_clb`. Mỗi CLB có đề một `NHAP_FORMS_MOI_CLB_<club_id>.docx` (không câu cổng, thẻ `[clb_x-k]` giữ nguyên), `CLB.csv` (ClubId, Ten, Buoi, FormUrl trống; mọi CLB), `CAI_DAT_FORMS_MOI_CLB.md`. Sinh lại giống hệt từng byte; kiểm đề trước khi ghi; tệp cũ của CLB hết đề bị xoá; không chung chế độ với `--chi-thi`.
+- **Q4b** `chuyen_forms_sang_phan_mem._cot_chi_thi/_cot_mot_clb/_da_thi`: tệp xuất không câu cổng phải chứa đủ câu của đúng MỘT CLB; trộn CLB, thẻ lạ, thiếu câu thì dừng không ghi gì; phiếu có ít nhất một câu trả lời = đã thi. Tệp có câu cổng chạy như cũ. N tệp một-CLB cho cùng `SO_NHAP_CLB.xlsx` như một biểu mẫu chung.
+- **Q4c** `--bai-thi BaiThi.csv` (`doc_bai_thi`, `bai_trong_tep_xuat`, `doi_chieu_bai_thi`): báo bài lệch hai phía, sheet *Đối chiếu BaiThi* chỉ khi có cờ; không đổi điểm; không cờ thì `BANG_DIEM.xlsx` như cũ.
+- Test mới (viết trước): `tests/test_t4m_cong_thi.py` (24). Liên quan: test_t4m_chi_thi, test_demo_t4m, test_mau_forms_thi_clb, test_doi_chieu_lists, test_do_t4m_thi: 126 pass; ruff sạch.
+- Tài liệu: `mau_forms_thi_clb/README.md` mục 0a; `T4M_VAN_HANH_MOT_DOT.md` bước 1, 4, 5. `demo_t4m.py --moi-clb` chưa làm (không rẻ: demo dựng một tệp chung).
+
+## 2026-11-06 — T4M-NC: thiết kế cổng thi (chọn CLB → mở bài thi → trạng thái → điểm)
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_CONG_THI.md` (mới): app Power Apps ECA làm cổng, mỗi CLB có thi một biểu mẫu Forms Quiz, list `CLB` (FormUrl) và `BaiThi` (trạng thái), mỗi biểu mẫu một flow "Đã làm" (connector chuẩn); connector Forms không trả điểm (TT-CXM) nên điểm chính thức vẫn do bộ chuyển đổi chấm lại; ba mức trả điểm 5a/5b/5c; mã đề xuất Q4a–c, M5; phương án lui trang SharePoint.
+
+## 2026-11-06 — T4M-M4 (bước R3): hướng dẫn flow gửi Excel theo lớp cho GVCN, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_FLOW_GUI_GVCN.md` (mới, 77 dòng): flow Power Automate tuỳ chọn, chỉ connector chuẩn (SharePoint, Outlook/Teams), chủ là tài khoản dịch vụ IT; lấy tệp `export_theo_lop` từ thư viện SharePoint, ghép với tệp ánh xạ lớp → email GVCN (nguồn HỎI-IT, NC-08; khoá ghép theo tên tệp đã làm sạch), gửi từng GVCN. Bảng giới hạn ĐXM của NC-12, NC-13, đoạn DLP (NC-14), xử lý lỗi và đường thủ công; không ghi ngược về list (NC-13). Bước chưa thử nhãn TH, công thức/hành động nhãn GĐ. Không đổi hợp đồng CSV, schema, bất biến hay mã sản phẩm; không test mới.
+
+## 2026-11-06 — T4M-M1 (vòng 2, R1): đặc tả sửa app ECA sang Top 3 mỗi ngày, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` (mới, ~113 dòng) cho người sửa app (IT): cột dữ liệu mô hình rộng (`NV1..NV3`, `TrangThai`), hành vi màn hình (không trùng, không ô trống chen giữa, ngày trống hợp lệ, nhãn hai ngôn ngữ, điện thoại), `Patch` + `IfError` kèm báo đúng ngày lỗi, khoá theo `TrangThai`, chỉ dùng phép lọc uỷ quyền được (NC-04), sao lưu / khôi phục phiên bản (NC-21), bảng 14 yêu cầu R1..R14 mỗi yêu cầu một dòng kiểm pass/fail ánh xạ HDT §9, mục gói chỉ giữ chỗ "chờ A8-GOI". Mọi công thức gắn nhãn GĐ. Không đụng app thật, không đổi mã, schema, hợp đồng CSV.
+## 2026-11-06 — T4M-M3 (vòng 2, bước R2): đối chiếu hai lần xuất List
+
+Thêm công cụ dòng lệnh, chỉ đọc; không đụng kiosk, lõi, schema hay hợp đồng CSV.
+- `mau_forms_thi_clb/doi_chieu_lists.py` (mới): `OLD.csv NEW.csv [--co-so CS1] [--ra bao_cao.xlsx] [--de de_thi.json]`. Dùng lại `doc_lists` của bộ chuyển đổi (không viết lại cách đọc). Liệt kê em mới, em rút, dòng đổi nguyện vọng (theo email chữ thường + Thu, kể cả đổi thứ tự), đổi Lớp, đổi CoSo. Hai tệp giống nhau => báo cáo rỗng; hoa/thường của email và thứ tự dòng không phải thay đổi. Lỗi thiếu cột => mã thoát 1, không ghi tệp.
+- `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` bước 8: thêm đoạn dùng công cụ trước khi chạy lại.
+- Sửa sau soát của điều phối: bản đầu so sánh qua `doc_lists` nên ô có mã CLB không có trong `de_thi.json` bị bỏ trước khi so (báo "không thay đổi" sai). Nay so giá trị THÔ NV1..NVn (bỏ khoảng trắng, phân biệt hoa/thường); ô mã lạ chỉ được đếm (`n_clb_la`) và dòng đầu in `CẢNH BÁO: N ô ...`, không bao giờ in "Không có thay đổi" phía trên cảnh báo chưa đọc.
+- Test mới (viết trước, 17 ca + 7 ca sau soát = 24): `tests/test_doi_chieu_lists.py` (kiem_nhan ở T4M_MICROSOFT.md §8: rỗng / đúng một mục mỗi loại / email hoa-thường / lọc cơ sở / kiosk không bị nạp).
+
+## 2026-11-06 — T4M-NC: Truong duyệt vòng 2
+
+Chỉ tài liệu. Quyết định của Truong: duyệt nguyên tắc D1–D5 của thiết kế gói (mã A8-GOI chờ giáo viên ECA trả lời Q1–Q3); duyệt T4M-M1, M3, M4 (M2 chờ tệp xuất mẫu thật); T4-K2 giữ tạm dừng (K2-b). `T4M_KE_HOACH_TU_DONG.md` §6: vòng 2 R1–R3 kèm prompt.
+
+## 2026-11-06 — T4M-GD4-V0 (bước S3): nháp v0 kiến trúc Microsoft, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_MICROSOFT.md` (mới), ghi rõ "Bản nháp v0 — chưa có kết quả phỏng vấn (GĐ2)", chạy prompt P2 theo dự phòng A: đủ 9 mục (tóm tắt; kiến trúc ô A–H; ma trận §7 điền đủ; mô hình kho rộng + ánh xạ Sổ nhập + điểm kiểm khi `student_id` là email; pha gói tóm tắt và dẫn `T4M_GOI_THIET_KE.md`, D1–D5 ghi là CHỜ DUYỆT; luồng muộn/đổi/rút; rủi ro + lộ trình (ước lượng); mã mục đề xuất T4M-Q1b, T4M-M1..M4, A8-GOI-1..3 kèm `kiem_nhan`; phương án T4-K2 để Truong quyết) và §10 danh sách soát lại sau GĐ2. Điểm phụ thuộc trường mang nhãn HỎI-IT; chỗ đổi thiết kế có hai nhánh (SharePoint List / Dataverse). Dẫn `T4M_VAN_HANH_MOT_DOT.md` (S1) và các bảng của `T4M_DO_MO_PHONG.md` (S4), cả hai có sau `git pull --rebase`; không diễn giải số đo. Không đổi hợp đồng CSV, schema hay bất biến nào; không test mới.
+
+## 2026-11-06 — T4M-DO (bước S4): đo mô phỏng có / không bài thi tuyển, chỉ bảng số
+
+Thêm công cụ đo; không đụng mã sản phẩm, schema hay hợp đồng CSV. Mọi số liệu là MÔ PHỎNG; không có nhận xét.
+- `du_lieu_test/do_t4m_thi.py` (mới): 3 bộ giả (120 / 500 / 1.500 học sinh, hạt giống sinh cố định) x 20 hạt giống STB x 2 điều kiện (A không điểm thi, danh sách dự tuyển giữ nguyên; B có điểm thi như `de_thi.json`). Dữ liệu dựng bằng đúng chuỗi T4M (Lists giả → Forms giả → `--chi-thi` → `import_so_nhap`), đọc MỘT lần; mỗi lần chạy gọi `generate_stb_lottery`, `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) và `verify_stability_tuan`. Chỉ số: tỉ lệ nguyện vọng 1 / top-3, số em chưa có CLB (tổng và theo buổi), tỉ lệ suất Tầng 1 về nhóm điểm cao nhất, số cặp phá vỡ, thời gian. `--nhanh` (lưới nhỏ cho test; bắt buộc kèm `--ra`, `--tai-lieu`). Cả lưới đủ chạy ~30 giây.
+- `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` (sinh ra): phương pháp, tham số, bảng trung bình / nhỏ nhất / lớn nhất, nhãn MÔ PHỎNG ở mọi tiêu đề bảng, lệnh tái lập. `du_lieu_test/ket_qua_t4m/`: CSV từng lần chạy và theo buổi.
+- Sửa sau soát: bảng 2 ghi 15 CLB có đề thi, đúng là 10 (chỉ sai số đếm; điều kiện B vốn đã Tầng 1 đúng 10 CLB có `de_thi`); bảng 3 trở đi không đổi trừ số giây. Thêm test canh điều này (9 ca).
+- Test mới (viết trước): `tests/test_do_t4m_thi.py` (8 ca): điều kiện A và B trùng khít từng byte với `PipelineAPI.run_pipeline`; tất định; không cặp phá vỡ; nhãn MÔ PHỎNG và không có mục nhận xét. Thử gây hỏng: bỏ danh sách dự tuyển ở điều kiện A làm kết quả không còn phụ thuộc hạt giống — đã bị bắt.
+
+## 2026-11-06 — T4M-Q1b-b (bổ sung của điều phối vào T4M-Q1b): `--co-so` cho `--chi-thi`
+
+`chuyen_forms_sang_phan_mem.py`: tham số tuỳ chọn `co_so` (CLI `--co-so CS1`) ở `doc_lists`, `phan_tich_chi_thi`, `chuyen_chi_thi`: chỉ giữ dòng List có `CoSo` bằng giá trị (bỏ khoảng trắng, không phân biệt hoa thường); phiếu thi của em ngoài danh sách đã lọc báo "ở cơ sở khác hoặc không có trong danh sách"; thiếu cột `CoSo` hoặc không em nào khớp thì lỗi, không ghi tệp. Không truyền `--co-so`: kết quả và cảnh báo y như cũ. `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` bước 4-5 dùng `--co-so` thay cho tách tay. Test mới: `test_q1bb_*` (4) trong `tests/test_t4m_chi_thi.py`. Không đổi hợp đồng CSV, schema, lõi.
+
+## 2026-11-06 — T4M-Q1b (trong T4M-Q1 đã duyệt): `--chi-thi` chép Lớp từ Lists vào Sổ nhập
+
+`chuyen_forms_sang_phan_mem.py`: `doc_lists` đọc cột `Lop` (hoặc `Lớp`) của tệp xuất Lists, giữ ô không trống đầu tiên của mỗi em; `phan_tich_chi_thi` mang `lop` theo; `ghi_tep_phan_mem` truyền `class_id` và `co_lop=True` CHỈ khi có ít nhất một em có lớp (Lists không có cột Lop hoặc mọi ô trống thì Sổ nhập y như cũ, không cột Lớp). Chế độ mặc định (Forms có Ranking) không đổi. `du_lieu_test/demo_t4m.py`: bỏ workaround `_lop_theo_email` + `set_student_class`. Test mới trong `tests/test_t4m_chi_thi.py`: `test_q1b_*` (3); sửa kỳ vọng của `test_q1_khong_co_bai_thi_so_nhap_trung_khit_ban_khong_diem` vì dữ liệu Lists của test có lớp 9A1. Không đổi hợp đồng CSV, schema, lõi.
+
+## 2026-11-06 — T4M-VH (bước S1): vận hành một đợt xếp CLB, chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md` (mới, 99 dòng): 8 bước cho IT của trường (dựng bài thi, mở/đóng, khoá, xuất, chuyển đổi, nạp kiosk, xuất theo lớp, em đến muộn/rút); mỗi bước có lệnh hoặc đường bấm, chỗ kiểm, cách xử lý lỗi, tệp cần giữ. Phần chưa thử gắn nhãn TH, phụ thuộc trường gắn HỎI-IT. Không đổi mã, schema, hợp đồng CSV. Test mới: không (tài liệu).
+
+## 2026-11-06 — T4M-GOI-TK (bước S2): thiết kế gói nhiều buổi (tiếng Nhật), chỉ tài liệu
+
+Không có mã. `docs/he_sinh_thai/T4M_GOI_THIET_KE.md` (mới): bộ điều phối hai pha đặt trên `run_rbda_nhieu_buoi` (pha 1 DA trên các gói như buổi giả `goi`, cấp độ là bộ lọc điều kiện ở dữ liệu vào, cam kết cả năm chỉ trừ chỉ tiêu; pha 2 từng ngày với ngày của gói bị khoá), so với hai phương án bị loại và một phương án V0 dự phòng; phân tích bất biến 1, 2, 3, 4, 5, 8 kèm phản ví dụ cặp phá vỡ toàn tuần và nhãn "bảo đảm trong từng pha, không bảo đảm ổn định toàn tuần khi có gói"; đề xuất đổi hợp đồng CSV / schema tương thích ngược (chờ Truong, quy tắc 7); ba mục con đề xuất A8-GOI-1..3 kèm `kiem_nhan`; 8 câu hỏi cho giáo viên ECA; 5 quyết định chờ duyệt. Test mới: không có.
+
+## 2026-11-06 — T4M-NC: kế hoạch tự chạy (S1 đến S4)
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md` (mới): Truong duyệt 06/11/2026 bốn quyết định (gói tiếng Nhật chỉ thiết kế, nháp v0 GĐ4, tự chạy chuỗi, đo mô phỏng chỉ bảng số); chuỗi bước S1 T4M-VH, S2 T4M-GOI-TK, S3 T4M-GD4-V0, S4 T4M-DO kèm phụ thuộc, tiêu chí nhận, luật dừng, vòng điều phối và prompt từng bước.
+
+## 2026-11-06 — T4M-DEMO (Truong duyệt 06/11/2026): chạy thử trọn chuỗi bằng một lệnh
+
+Thêm công cụ; không đụng mã sản phẩm, schema hay hợp đồng CSV. Dữ liệu hoàn toàn MÔ PHỎNG.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong)` dựng tệp Forms chỉ-thi giả khớp tệp Lists giả và `de_thi.json` (Email, cột câu, cột Points); cố ý gài email viết hoa, một phiếu nộp lần hai, một email lạ, một bài thi CLB không xếp nguyện vọng.
+- `du_lieu_test/sinh_xuat_lists_gia.py`: `sinh`/`ghi_csv` nhận thêm `clb_theo_ngay` (mã CLB thật); bỏ trống thì từng byte như cũ.
+- `du_lieu_test/demo_t4m.py` (mới): `python du_lieu_test/demo_t4m.py --ra <thư mục>` chạy Lists giả → Forms giả → `--chi-thi` → nạp Sổ nhập vào CSDL tạm (`import_so_nhap`) → `run_pipeline` → `export_theo_lop` → tóm tắt tiếng Việt. Tắt điểm quyết tâm (mặc định BẬT) trong CSDL tạm; gán lớp bằng `set_student_class` vì bộ chuyển đổi chưa chép cột lớp; nhân chỉ tiêu mẫu cho vừa số em (`--he-so-cho`, bản sao trong bộ nhớ).
+- `mau_forms_thi_clb/README.md`: mục 0b "Chạy thử trọn chuỗi".
+- Test mới (viết trước): `tests/test_demo_t4m.py` (11 ca): hình dạng tệp, xác định, cảnh báo mong đợi, đủ tệp ra, không tạo `.db` ngoài thư mục tạm. Thử gây hỏng 5 chỗ: bỏ email viết hoa sống sót ở lần đầu, đã siết test; 4 chỗ còn lại bị bắt.
+
+## 2026-11-05 — T4M-Q1, T4M-Q2, T4M-Q3 (Truong duyệt 05/11/2026): chế độ "chỉ thi" của mẫu Microsoft Forms
+
+Thêm chế độ mới; chế độ mặc định giữ nguyên (`CAI_DAT_FORMS.md` sinh lại giống hệt tệp trong kho, test cũ 25/25 đạt). Không đụng lõi thuật toán, backend, giao diện, hợp đồng CSV hay bất biến nào; `kiem_nhanh.py` 7/7 ĐẠT (gồm `trung_khit` 15 ca). Dữ liệu thử đều MÔ PHỎNG.
+- **Q1** `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `--chi-thi --lists DANH_SACH.csv` (nhận nhiều tệp `.xlsx` khi biểu mẫu tách theo buổi). Hàm mới `doc_lists`, `phan_tich_chi_thi`, `chuyen_chi_thi`. Khoá là cột Email Forms (`lower().strip()`) ghép với cột Email của tệp xuất List (mô hình rộng, `Thu`, `NV1..NVn`, `HoTen`). Phiếu trùng giữ phiếu ĐẦU; email lạ báo và bỏ; thi CLB mà List không có nguyện vọng CLB đó thì bỏ điểm (vẫn có trong `BANG_DIEM.xlsx`) và báo; không có bài thi thì Sổ nhập chỉ có nguyện vọng, không điểm. Tách nhẹ hàm dùng chung `_doc_cot`, `_ap_tran_thi` (hành vi chế độ cũ không đổi).
+- **Q2** `bieu_mau.py`: `cac_phan/re_nhanh(..., chi_thi, buoi)`, `dem_cau`, `chia_theo_buoi`, `TRAN_CAU_MOI_BIEU_MAU = 200`, `cau_cong_thi(..., chi_thi)`. `tao_mau_forms.py --chi-thi [--ra]`: bỏ Ranking và ô gõ mã HS/họ tên (Forms tự ghi Name + Email), settings "Record name" + "One response per person"; tách theo buổi khi tổng câu vượt 200; `.docx` giống hệt từng byte khi `de_thi.json` không đổi (giờ zip và thuộc tính tài liệu cố định). Sinh `CAI_DAT_FORMS_CHI_THI.md`, `NHAP_FORMS_CHI_THI.docx` (60 câu, một biểu mẫu cho `de_thi.json` hiện tại).
+- **Q3** `mau_forms_thi_clb/GHI_CHU_GIAO_VIEN.md` (một trang): Quick Import, tick đáp án + điểm, Settings bắt buộc, giới hạn 200 câu / 400 biểu mẫu, Post scores không cần cho kiosk; khớp mục 7.1 của `T4M_KET_QUA_TAI_LIEU.md`. `README.md` của mẫu thêm mục 0.
+- Test mới (viết trước): `tests/test_t4m_chi_thi.py` (27 ca). Thử gây hỏng 4 chỗ (bỏ hạ chữ thường email, bỏ giữ phiếu đầu, đổi ranh giới 200, bỏ dedupe List): ban đầu ranh giới 200 sống sót, đã thêm ca biên đúng 200 câu rồi đỏ đúng.
+- Lệch nhỏ so với đặc tả cần Truong biết: bỏ cả ô gõ họ tên (không chỉ mã HS) vì Forms ghi Name tự động; tên cột List cố định (`Email`, `Thu`, `NV1..`, `HoTen`) và mã CLB trong List phải là `club_id` của `de_thi.json`.
+
+## 2026-11-05 — T4M-NC P5: đường thu điểm thi trên Microsoft (NC-23, 24, 27)
+
+Chỉ tài liệu. `T4M_KET_QUA_TAI_LIEU.md` mục 7 (mới): Forms Quiz (điểm, cài đặt, giới hạn 200 câu / 400 biểu mẫu, cột xuất Excel), connector Forms chỉ đọc và không có trong Power Apps, không có API được hỗ trợ để tạo biểu mẫu, Quick Import không mang đáp án; bài thi trong Power Apps và rủi ro lộ đáp án; phát hiện `mau_forms_thi_clb/` đã có sẵn đường Forms Quiz; bảng so sánh, khuyến nghị tạm V1 Forms Quiz; đặc tả ghép điểm NC-25; mã mục đề xuất T4M-Q1 đến Q3. `T4M_KE_HOACH_NGHIEN_CUU.md`: thêm NC-27. `T4M_PHIEU_PHONG_VAN.md`: thêm ECA-9 đến 11, IT-14.
+
+## 2026-11-05 — T4M-NC GĐ3 (tài liệu): hướng dẫn thử môi trường Microsoft + bộ sinh tệp xuất Lists giả
+
+`docs/he_sinh_thai/T4M_HUONG_DAN_THU.md` (mới): hai người đọc (Truong nếu có môi trường thử; bản một trang cho IT = dự phòng B); kho SharePoint List, mô hình RỘNG (một dòng mỗi em mỗi ngày, `NV1..NV3`), mô hình dài ghi là phương án bị loại kèm lý do; màn Top 3, màn gói tiếng Nhật, flow xuất CSV và flow gửi Excel theo lớp (không ghi từng dòng, NC-13); bảng pass/fail/lý do; mục Premium kèm phương án chuẩn; thời gian đều là ước lượng mô phỏng. `du_lieu_test/sinh_xuat_lists_gia.py` (mới): chỉ thư viện chuẩn, `random.Random(seed)`, mặc định 1.500 em × 5 ngày = 7.500 dòng, UTF-8 có BOM, email giả (có chữ hoa), có ngày trống và dòng gói tiếng Nhật. `tests/test_sinh_xuat_lists_gia.py` (mới, 7 test, viết trước): tái lập theo seed, số dòng, BOM, không trùng NV, cột khớp tài liệu, email, dòng đặc biệt. Không đổi mã sản phẩm, hợp đồng CSV hay bất biến nào. Dữ liệu hoàn toàn mô phỏng.
+
+## 2026-11-05 — T4M-NC: quyết định thi tuyển theo RB-DA (Truong), thêm NC-23 đến NC-26 và prompt P5
+
+Chỉ tài liệu. `T4M_KE_HOACH_NGHIEN_CUU.md`: dòng "Ưu tiên" mục 1 ghi quyết định 05/11/2026 (trường đổi quy trình theo RB-DA; CLB có thi dùng Tầng 1, bài thi do giáo viên ra, công cụ của dự án dựng giúp); hệ quả với bất biến 2 và 7; bốn câu mới NC-23 (Forms Quiz), NC-24 (tạo form bằng công cụ), NC-25 (ghép điểm vào `score_k`), NC-26 (luật công bằng của bài thi); prompt P5. Tệp bàn giao cập nhật.
+
+## 2026-11-05 — T4M-NC chuẩn bị GĐ2: phiếu phỏng vấn in mang theo
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md` (mới): gộp mục 6 của kế hoạch với mục 4 và cột "Còn hỏi IT" của kết quả GĐ1; 5 câu CHẶN cho IT (NC-01, 02, 03, 08, 16), 8 câu IT khác, 8 câu cho giáo viên ECA, mỗi câu có bối cảnh một dòng và chỗ ghi trả lời; nhắc riêng tư; checklist sau buổi gặp (mốc C2, dự phòng A/B). Kế hoạch bàn giao: P3 sửa sang mô hình kho rộng (một dòng mỗi em mỗi buổi) và hai người đọc (Truong hoặc IT).
+
+## 2026-11-05 — T4M-NC GĐ1 + P4: kết quả đọc tài liệu Microsoft / PowerSchool, hợp đồng nhập của kiosk
+
+Chỉ tài liệu. `docs/he_sinh_thai/T4M_KET_QUA_TAI_LIEU.md` (mới): 16 câu NC loại tài liệu, nhãn ĐXM / TT-CXM / GĐ / HỎI-IT, nguồn và ngày đọc; P4 tóm tắt hợp đồng nhập (`api_nhap.py`, `so_nhap.py`); câu mới cho IT; ma trận quyết định điền trước. Phát hiện chính: Dataverse for Teams và Developer Plan ngừng tạo mới từ 15/11/2026; PowerSchool không có trong danh sách OneRoster của SDS; hồ sơ Low của Power Automate (6.000 yêu cầu/người/ngày) nên V1 không ghi kết quả về app từng dòng; Sổ nhập không biểu diễn được CLB nhiều buổi. `TIEN_DO.md`: T4-K2 tạm dừng (Truong quyết 05/11/2026).
+
+## 2026-11-05 — Z-CLAUDE-GON (ngoài sổ, Truong yêu cầu 05/11/2026; Truong duyệt bản tiếng Anh)
+
+Chỉ tài liệu. `CLAUDE.md` gọn lại (9.112 B → 5.512 B): viết tiếng Anh (vẫn yêu cầu trả lời Truong bằng tiếng Việt); quy tắc 3 và 5 trỏ về bất biến 1 và 8 thay vì lặp; giữ nguyên số quy tắc 1–11 (tệp khác trỏ theo số) và câu "Trước khi push: chạy skill `soat-ma`" (test kiểm). Đoạn "Kiểm verify nhanh" và ghi chú thời gian bộ test chuyển nguyên văn sang `docs/ke_hoach/CLAUDE_CHI_TIET.md`. Test liên quan: `tests/test_skill_soat_ma.py`, `tests/test_a13_12_tai_lieu.py`, `tests/test_hook_ban_giao.py` (61 đạt).
+
+## 2026-11-05 — T4M-NC (ngoài sổ, Truong yêu cầu 05/11/2026): kế hoạch nghiên cứu hệ sinh thái Microsoft của trường
+
+Chỉ tài liệu; không đổi mã, test, hợp đồng CSV hay bất biến nào.
+
+- `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU.md` (mới): hồ sơ hệ thống đăng ký ECA của trường (Power Apps, M365 A3/A5, PowerSchool; Truong trả lời, chưa kiểm với IT), gói tiếng Nhật nhiều buổi và hướng xếp hai pha, 22 câu nghiên cứu NC-01 đến NC-22, quy tắc bằng chứng (ĐXM / TT-CXM / GĐ / HỎI-IT / TH), lộ trình 5 giai đoạn kèm hai kế hoạch dự phòng, bộ câu hỏi phỏng vấn IT và giáo viên ECA, mẫu ma trận quyết định, bốn prompt P1 đến P4.
+- `docs/phien/claude__upbeat-shannon-g5nnms.md` (mới): tệp bàn giao của nhánh.
+- T4-K2 (Google) chưa được đánh dấu tạm dừng: chờ Truong quyết.
+- Gọn prompt (cùng ngày): luật chung gom một chỗ (mục 8.0, C1 đến C4) thay vì lặp ở từng prompt; prompt viết tiếng Anh; mỗi prompt chỉ đọc đúng mục cần; mục 4 bỏ phần trùng `CLAUDE.md`; báo cáo cuối có trần độ dài. Nội dung yêu cầu giữ nguyên.
+
 ## 2026-11-05 — T3-L5 (ngoài sổ, Truong yêu cầu): Điểm chuẩn cùng nền các thẻ khác, thẻ 05 chỉ ghi "Quản lý"
 
 - `style.css`: bỏ hai khối nền tối riêng của `#adminDiemChuanBlock` (`prefers-color-scheme: dark` và `[data-theme=dark]`); khối giờ dùng nền trắng như các thẻ khác.

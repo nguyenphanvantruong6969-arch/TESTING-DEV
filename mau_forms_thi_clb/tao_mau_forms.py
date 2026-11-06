@@ -14,13 +14,33 @@ Sửa đề, thêm CLB, đổi buổi: sửa de_thi.json rồi chạy lại. Kh�
 tệp trên — lần sinh sau sẽ ghi đè, và sửa tay là cách biểu mẫu lệch khỏi
 đáp án dùng để chấm.
 
+Chế độ "chỉ thi" (T4M-Q2) — Forms chỉ có bài thi, nguyện vọng nằm ở ứng dụng đăng ký:
+
+    python mau_forms_thi_clb/tao_mau_forms.py --chi-thi [--ra THƯ_MỤC]
+
+Ghi CAI_DAT_FORMS_CHI_THI.md và NHAP_FORMS_CHI_THI.docx (hoặc NHAP_FORMS_CHI_THI_1.docx,
+_2.docx… khi tổng số câu vượt 200 và phải tách theo buổi). Sinh lại từ de_thi.json không
+đổi cho ra tệp giống hệt từng byte. Chế độ mặc định vẫn như trên và không đổi.
+
+Chế độ "mỗi CLB một biểu mẫu" (T4M-Q4a) — cổng thi trong app ECA, mỗi CLB có đề một biểu mẫu riêng:
+
+    python mau_forms_thi_clb/tao_mau_forms.py --moi-clb [--ra THƯ_MỤC]
+
+Ghi NHAP_FORMS_MOI_CLB_<club_id>.docx (mỗi CLB có đề một tệp, không câu cổng), CLB.csv (ClubId, Ten,
+Buoi, FormUrl để trống: đem tạo list CLB bằng "Create a list from Excel/CSV" rồi dán địa chỉ từng
+biểu mẫu vào FormUrl) và CAI_DAT_FORMS_MOI_CLB.md. Sinh lại cho ra tệp giống hệt từng byte.
+
 Cần python-docx (requirements-dev.txt) để ghi .docx; thiếu thì bỏ qua riêng
 tệp đó, hai tệp kia vẫn sinh.
 """
 
+import argparse
+import csv
+import io
 import os
 import random
 import sys
+import zipfile
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -65,6 +85,18 @@ def ghi_docx(de, duong):
 
 
 # -------------------------------------------------------- bảng cài đặt tay
+
+def _bang_dap_an(w, de, cac_clb):
+    for clb in cac_clb:
+        w("**%s** (`%s`, %s)" % (clb["name"], clb["club_id"], bm.ten_buoi(de, clb["buoi"])))
+        w("")
+        w("| Câu | Đáp án đúng |")
+        w("|---|---|")
+        for i, cau in enumerate(clb["de_thi"], 1):
+            w("| `[%s-%d]` %s | %s. %s |" % (clb["club_id"], i, cau["cau"].replace("|", "\\|"),
+                                          CHU_CAI[cau["dap_an"]], cau["lua_chon"][cau["dap_an"]]))
+        w("")
+
 
 def ghi_cai_dat(de):
     phan = bm.cac_phan(de)
@@ -127,15 +159,7 @@ def ghi_cai_dat(de):
     w("Bộ chuyển đổi **chấm lại** theo chính bảng này, và báo nếu điểm Forms")
     w("chấm lệch — tức là có câu tick nhầm đáp án trên Forms.")
     w("")
-    for clb in bm.clb_co_thi(de):
-        w("**%s** (`%s`, %s)" % (clb["name"], clb["club_id"], bm.ten_buoi(de, clb["buoi"])))
-        w("")
-        w("| Câu | Đáp án đúng |")
-        w("|---|---|")
-        for i, cau in enumerate(clb["de_thi"], 1):
-            w("| `[%s-%d]` %s | %s. %s |" % (clb["club_id"], i, cau["cau"].replace("|", "\\|"),
-                                          CHU_CAI[cau["dap_an"]], cau["lua_chon"][cau["dap_an"]]))
-        w("")
+    _bang_dap_an(w, de, bm.clb_co_thi(de))
     w("## 5. Settings")
     w("")
     w("| Cài đặt | Giá trị | Vì sao |")
@@ -227,8 +251,442 @@ def ghi_mau_xuat(de, duong, so_hoc_sinh=60, hat_giong=2026):
     wb.save(duong)
 
 
-def main():
-    de = bm.doc_de_thi()
+def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
+    """T4M-DEMO: tệp Forms chỉ-thi GIẢ (Email + cột câu + cột 'Points - …', không Ranking, không mã HS),
+    khớp tệp Lists giả: `danh_sach` là kết quả `chuyen_forms_sang_phan_mem.doc_lists` ({email chữ thường:
+    {name, nguyen_vong}}). Em chỉ thi CLB đã xếp, trừ một em cố ý thi CLB không xếp. Cùng seed -> cùng ô.
+
+    Cố ý gài ba cảnh báo (cộng email viết HOA, bộ chuyển đổi hạ chữ thường nên không báo gì):
+    một phiếu nộp lần hai, một email không có trong Lists, một bài thi CLB không xếp nguyện vọng.
+    Trả {email_trung, email_la, khong_xep: (email, club_id), n_phieu}. Dữ liệu MÔ PHỎNG.
+
+    T4M-Q5c: nếu `danh_sach` có khoá "tick" (List có cột THIk) thì em chỉ nộp bài cho CLB đã tick (mỗi bài
+    nộp với xác suất 0,85, nên có em tick mà vắng), và gài thêm hai trường hợp, báo trong kết quả:
+    `tick_vang` = (email, club_id) tick mà KHÔNG nộp bài; `nop_khong_tick` = (email, club_id) nộp bài mà KHÔNG tick."""
+    from openpyxl import Workbook
+
+    rd = random.Random(hat_giong)
+    clb_thi = bm.clb_co_thi(de)
+    if not clb_thi:
+        raise ValueError("de_thi.json không có CLB nào có đề thi")
+    tieu_de = ["ID", "Start time", "Completion time", "Email", "Name", "Total points"]
+    for clb in clb_thi:
+        tieu_de.append(bm.cau_cong_thi(de, clb, chi_thi=True))
+        for i in range(1, len(clb["de_thi"]) + 1):
+            td = bm.cau_de_thi(clb, i)
+            tieu_de += [td, "Points - " + td]
+
+    def phieu(email, ten, cac_clb, nang_luc):
+        """Một dòng Forms: các CLB trong `cac_clb` thi, còn lại 'Không'."""
+        o, tong = {"Email": email, "Name": ten}, 0
+        for clb in clb_thi:
+            if clb["club_id"] not in cac_clb:
+                o[bm.cau_cong_thi(de, clb, chi_thi=True)] = bm.KHONG
+                continue
+            o[bm.cau_cong_thi(de, clb, chi_thi=True)] = bm.CO
+            for i, cau in enumerate(clb["de_thi"], 1):
+                dung = rd.random() < nang_luc
+                sai = [x for k, x in enumerate(cau["lua_chon"]) if k != cau["dap_an"]]
+                td = bm.cau_de_thi(clb, i)
+                o[td] = cau["lua_chon"][cau["dap_an"]] if dung else rd.choice(sai)
+                o["Points - " + td] = de["diem_moi_cau"] if dung else 0
+                tong += o["Points - " + td]
+        o["Total points"] = tong
+        return o
+
+    co_de = {c["club_id"] for c in clb_thi}
+    co_tick = any("tick" in h for h in danh_sach.values())
+    dong, thi_cua = [], {}
+    for n, (email, hs) in enumerate(danh_sach.items(), 1):
+        xep = {m for ds in hs["nguyen_vong"].values() for m in ds}
+        if co_tick:
+            thi = {m for m in sorted(hs["tick"] & co_de) if rd.random() < 0.85}
+        else:
+            thi = {m for m in sorted(xep & co_de) if rd.random() < 0.7}
+        nang_luc = rd.uniform(0.55, 0.95)
+        if rd.random() < 0.15:                       # có em chưa làm bài nào: không có phiếu
+            continue
+        hien = email.upper() if n % 7 == 3 else email  # Forms ghi email đúng như tài khoản
+        thi_cua[email] = thi
+        dong.append((email, phieu(hien, hs["name"], thi, nang_luc), nang_luc))
+    if not dong:
+        raise ValueError("danh sách đăng ký quá nhỏ để dựng phiếu")
+
+    # 1) phiếu nộp lần hai của một em đã có bài thi (bộ chuyển đổi giữ phiếu đầu)
+    email_trung = next((e for e, o, _ in dong if thi_cua[e]), dong[0][0])
+    # 2) email không có trong Lists
+    email_la = "la0001@khac.example.test"
+    # 3) một em thi CLB có đề mà em KHÔNG xếp nguyện vọng
+    khong_xep = None
+    for e, hs in danh_sach.items():
+        if e == email_trung or e not in thi_cua:
+            continue
+        xep = {m for ds in hs["nguyen_vong"].values() for m in ds}
+        thieu = [c["club_id"] for c in clb_thi if c["club_id"] not in xep
+                 and len(hs["nguyen_vong"].get(c["buoi"], [])) < bm.TRAN_CLB_MOI_BUOI]
+        if thieu:
+            khong_xep = (e, thieu[0])
+            break
+    if khong_xep is None:
+        raise ValueError("không có em nào để gài bài thi CLB không xếp nguyện vọng")
+    sua = {khong_xep[0]: thi_cua[khong_xep[0]] | {khong_xep[1]}}
+    gai_tick = {}
+    if co_tick:
+        da_dung = {email_trung, khong_xep[0]}
+        # 4) tick mà KHÔNG nộp bài: lấy em đã nộp một CLB đã tick và bỏ bài đó đi
+        e_vang = next(((e, c) for e in thi_cua if e not in da_dung for c in sorted(thi_cua[e])), None)
+        if e_vang is None:
+            raise ValueError("không có em nào để gài trường hợp tick mà vắng thi")
+        da_dung.add(e_vang[0])
+        sua[e_vang[0]] = thi_cua[e_vang[0]] - {e_vang[1]}
+        # 5) nộp bài mà KHÔNG tick: CLB có đề em đã xếp nhưng chưa tick
+        def chua_tick(e):
+            xep_e = {m for ds in danh_sach[e]["nguyen_vong"].values() for m in ds}
+            return sorted((xep_e & co_de) - danh_sach[e]["tick"])
+
+        e_khong = next(((e, c) for e in thi_cua if e not in da_dung for c in chua_tick(e)), None)
+        if e_khong is None:
+            raise ValueError("không có em nào để gài trường hợp nộp bài mà không tick")
+        sua[e_khong[0]] = thi_cua[e_khong[0]] | {e_khong[1]}
+        gai_tick = {"tick_vang": e_vang, "nop_khong_tick": e_khong}
+    for k, (e, o, nl) in enumerate(dong):
+        if e in sua:
+            dong[k] = (e, phieu(o["Email"], danh_sach[e]["name"], sua[e], nl), nl)
+    them = [phieu(email_trung.upper(), danh_sach[email_trung]["name"], thi_cua[email_trung], 0.2),
+            phieu(email_la, "Tài khoản lạ", {clb_thi[0]["club_id"]}, 0.8)]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Sheet1"
+    ws.append(tieu_de)
+    gio = datetime(2026, 9, 7, 7, 30)
+    for n, o in enumerate([x[1] for x in dong] + them, 1):
+        bat_dau = gio + timedelta(minutes=3 * n + rd.randint(0, 2))
+        o.update({"ID": n, "Start time": bat_dau,
+                  "Completion time": bat_dau + timedelta(minutes=rd.randint(6, 25))})
+        ws.append([o.get(c) for c in tieu_de])
+    wb.save(duong)
+    return dict({"email_trung": email_trung, "email_la": email_la, "khong_xep": khong_xep,
+                 "n_phieu": len(dong) + len(them)}, **gai_tick)
+
+
+# ------------------------------------------------------ chế độ "chỉ thi" (T4M-Q2)
+
+TEN_DOCX_CHI_THI = "NHAP_FORMS_CHI_THI"
+TEN_CAI_DAT_CHI_THI = "CAI_DAT_FORMS_CHI_THI.md"
+# Giờ cố định trong zip: python-docx để zipfile ghi giờ hiện tại vào từng mục nên hai lần
+# sinh cách nhau vài giây cho hai tệp khác byte.
+_GIO_ZIP = (2026, 1, 1, 0, 0, 0)
+
+
+def ghi_docx_chi_thi(de, duong, buoi=None):
+    """Quick Import cho chế độ chỉ thi; giống hệt từng byte khi đầu vào không đổi."""
+    from docx import Document
+    from docx.shared import Pt
+
+    doc = Document()
+    st = doc.styles["Normal"]
+    st.font.name, st.font.size = "Calibri", Pt(11)
+
+    def dong(chu, co=11, dam=False, truoc=0, sau=4, thut=0):
+        p = doc.add_paragraph()
+        pf = p.paragraph_format
+        pf.space_before, pf.space_after = Pt(truoc), Pt(sau)
+        if thut:
+            pf.left_indent = Pt(thut)
+        r = p.add_run(chu)
+        r.bold, r.font.size = dam, Pt(co)
+
+    dong(de["tieu_de"] + " — bài thi", co=16, dam=True, sau=10)
+    so = 0
+    for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=buoi), 1):
+        dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
+        for tieu_de, _loai, lua_chon, _bb in cac_cau:
+            so += 1
+            dong("%d. %s" % (so, tieu_de), co=12, dam=True, truoc=12, sau=4)
+            for j, lc in enumerate(lua_chon):
+                dong("%s. %s" % (CHU_CAI[j], lc), thut=18, sau=2)
+    # Thuộc tính tài liệu cũng cố định (mặc định python-docx giữ giờ của tệp mẫu, nhưng ghi
+    # rõ để không phụ thuộc phiên bản thư viện).
+    cp = doc.core_properties
+    cp.author = cp.last_modified_by = "RB-DA"
+    cp.created = cp.modified = datetime(2026, 1, 1)
+    cp.title = de["tieu_de"]
+    bo_nho = io.BytesIO()
+    doc.save(bo_nho)
+    bo_nho.seek(0)
+    with zipfile.ZipFile(bo_nho) as zin, zipfile.ZipFile(duong, "w", zipfile.ZIP_DEFLATED) as zout:
+        for ten in sorted(zin.namelist()):
+            zi = zipfile.ZipInfo(ten, date_time=_GIO_ZIP)
+            zi.compress_type = zipfile.ZIP_DEFLATED
+            zi.external_attr = 0o600 << 16
+            zout.writestr(zi, zin.read(ten))
+
+
+def ghi_cai_dat_chi_thi(de, nhom):
+    """CAI_DAT_FORMS_CHI_THI.md. nhom: kết quả bm.chia_theo_buoi."""
+    tong = bm.dem_cau(de, chi_thi=True)
+    n_thi = len(bm.clb_co_thi(de))
+    L = []
+    w = L.append
+    w("# Cài đặt Microsoft Forms (chế độ chỉ thi) cho \"%s\"" % de["tieu_de"])
+    w("")
+    w("> **Tệp này do `tao_mau_forms.py --chi-thi` sinh từ `de_thi.json`.** Đừng sửa tay —")
+    w("> sửa `de_thi.json` rồi chạy lại. Ghi chú cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.")
+    w("")
+    w("Biểu mẫu chỉ có **bài thi**: không có câu Ranking (nguyện vọng nằm ở ứng dụng đăng ký) và")
+    w("không có ô gõ mã học sinh (Forms tự ghi **Name** và **Email** khi bật *Record name*).")
+    w("")
+    w("Tổng **%d câu** (%d CLB có thi, mỗi CLB một câu cổng + các câu đề), trần Forms là %d câu "
+      "mỗi biểu mẫu → **%d biểu mẫu**." % (tong, n_thi, bm.TRAN_CAU_MOI_BIEU_MAU, len(nhom)))
+    w("")
+    for k, ma_buoi in enumerate(nhom, 1):
+        n = bm.dem_cau(de, chi_thi=True, buoi=ma_buoi)
+        ten_tep = TEN_DOCX_CHI_THI + (".docx" if len(nhom) == 1 else "_%d.docx" % k)
+        w("## Biểu mẫu %d — %s (%d câu)" % (k, ", ".join(bm.ten_buoi(de, m) for m in ma_buoi), n)
+          if len(nhom) > 1 else "## Biểu mẫu — %s (%d câu)"
+          % (", ".join(bm.ten_buoi(de, m) for m in ma_buoi), n))
+        w("")
+        w("Tệp Quick Import: `%s`." % ten_tep)
+        w("")
+        w("### Bố cục")
+        w("")
+        w("| Phần | Tên phần | Câu hỏi | Loại | Bắt buộc |")
+        w("|---|---|---|---|---|")
+        so = 0
+        for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=ma_buoi), 1):
+            for j, (td, loai, _lc, bb) in enumerate(cac_cau):
+                so += 1
+                w("| %s | %s | %d · `[%s]` | Choice | %s |" % (
+                    i if j == 0 else "", ten if j == 0 else "", so, bm.ma_cua_cau(td),
+                    "✅" if bb else "—"))
+        w("")
+        w("### Rẽ nhánh")
+        w("")
+        w("Chọn câu cổng → **…** → **Add branching**. Đáp án **\"%s\"** để nguyên; đáp án "
+          "**\"%s\"** đặt **Go to**:" % (bm.CO, bm.KHONG))
+        w("")
+        w("| Câu cổng | \"%s\" → Go to |" % bm.KHONG)
+        w("|---|---|")
+        for clb, toi in bm.re_nhanh(de, chi_thi=True, buoi=ma_buoi):
+            w("| `[thi-%s]` %s | **%s** |" % (clb["club_id"], clb["name"], toi))
+        w("")
+        w("### Đáp án và điểm (chế độ Quiz)")
+        w("")
+        w("Quick Import **không mang đáp án**. Mỗi câu đề thi: bấm vào đáp án đúng → **Correct answer**,")
+        w("ô **Points** = **%s**. Câu cổng: không cho điểm. Bộ chuyển đổi **chấm lại** theo bảng này và"
+          % bm.ghi_so(de["diem_moi_cau"]))
+        w("báo nếu điểm Forms lệch (tick nhầm).")
+        w("")
+        _bang_dap_an(w, de, [c for c in bm.clb_co_thi(de) if c["buoi"] in ma_buoi])
+    w("## Settings (mọi biểu mẫu)")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Who can fill out this form | **Only people in my organization** | Học sinh đăng nhập tài khoản trường |")
+    w("| **Record name** | **BẬT** | Cột **Email** của tệp xuất là khoá ghép với danh sách đăng ký; không bật thì không biết bài của ai |")
+    w("| **One response per person** | **BẬT** | Đây là bài thi: nộp lại là làm lại. Bộ chuyển đổi cũng chỉ giữ phiếu **đầu** của mỗi email |")
+    w("| Shuffle questions | **TẮT** | Xáo câu là hỏng rẽ nhánh |")
+    w("| Shuffle options (từng câu đề thi) | Bật được | Chấm theo nội dung lựa chọn, không theo vị trí |")
+    w("| Show results automatically (Quiz) | **TẮT** | Bật là em làm trước biết đáp án, chuyền cho em làm sau |")
+    w("| Start date / End date | Đặt đủ cả hai | Hết giờ tự khoá, không phải canh |")
+    w("")
+    return "\n".join(L)
+
+
+def sinh_chi_thi(de, thu_muc):
+    """Ghi các tệp chế độ chỉ thi vào `thu_muc`. Trả danh sách đường dẫn đã ghi.
+
+    Tệp NHAP_FORMS_CHI_THI*.docx cũ bị xoá trước (lần trước có thể đã tách, lần này không).
+    """
+    nhom = bm.chia_theo_buoi(de, chi_thi=True)         # LoiDeThi ở đây thì chưa ghi gì
+    os.makedirs(thu_muc, exist_ok=True)
+    for ten in os.listdir(thu_muc):
+        if ten.startswith(TEN_DOCX_CHI_THI) and ten.endswith(".docx"):
+            os.remove(os.path.join(thu_muc, ten))
+    ra = []
+    duong = os.path.join(thu_muc, TEN_CAI_DAT_CHI_THI)
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_chi_thi(de, nhom))
+    ra.append(duong)
+    for k, ma_buoi in enumerate(nhom, 1):
+        duong = os.path.join(thu_muc, TEN_DOCX_CHI_THI + (".docx" if len(nhom) == 1 else "_%d.docx" % k))
+        ghi_docx_chi_thi(de, duong, ma_buoi)
+        ra.append(duong)
+    return ra
+
+
+# ------------------------------------------- chế độ "mỗi CLB một biểu mẫu" (T4M-Q4a)
+
+TIEN_TO_DOCX_MOI_CLB = "NHAP_FORMS_MOI_CLB_"
+TEN_CAI_DAT_MOI_CLB = "CAI_DAT_FORMS_MOI_CLB.md"
+TEN_CLB_CSV = "CLB.csv"
+
+
+def _kiem_moi_clb(de):
+    """Kiểm trước khi ghi bất cứ gì: có CLB có đề, và mỗi CLB không vượt trần câu của Forms."""
+    co_thi = bm.clb_co_thi(de)
+    if not co_thi:
+        raise bm.LoiDeThi("không CLB nào có đề thi — không có gì để dựng biểu mẫu")
+    loi = ["CLB %s có %d câu, vượt trần %d câu của một biểu mẫu Forms"
+           % (c["club_id"], len(c["de_thi"]), bm.TRAN_CAU_MOI_BIEU_MAU)
+           for c in co_thi if len(c["de_thi"]) > bm.TRAN_CAU_MOI_BIEU_MAU]
+    if loi:
+        raise bm.LoiDeThi("de_thi.json sai:\n  - " + "\n  - ".join(loi))
+    return co_thi
+
+
+def ghi_docx_moi_clb(de, clb, duong):
+    """Quick Import của một CLB; giống hệt từng byte khi đầu vào không đổi."""
+    from docx import Document
+    from docx.shared import Pt
+
+    doc = Document()
+    st = doc.styles["Normal"]
+    st.font.name, st.font.size = "Calibri", Pt(11)
+
+    def dong(chu, co=11, dam=False, truoc=0, sau=4, thut=0):
+        p = doc.add_paragraph()
+        pf = p.paragraph_format
+        pf.space_before, pf.space_after = Pt(truoc), Pt(sau)
+        if thut:
+            pf.left_indent = Pt(thut)
+        r = p.add_run(chu)
+        r.bold, r.font.size = dam, Pt(co)
+
+    dong("%s — %s — bài thi" % (de["tieu_de"], clb["name"]), co=16, dam=True, sau=10)
+    so = 0
+    for ten, cac_cau in bm.cac_phan_moi_clb(de, clb):
+        dong(ten, co=14, dam=True, truoc=18, sau=8)
+        for tieu_de, _loai, lua_chon, _bb in cac_cau:
+            so += 1
+            dong("%d. %s" % (so, tieu_de), co=12, dam=True, truoc=12, sau=4)
+            for j, lc in enumerate(lua_chon):
+                dong("%s. %s" % (CHU_CAI[j], lc), thut=18, sau=2)
+    cp = doc.core_properties
+    cp.author = cp.last_modified_by = "RB-DA"
+    cp.created = cp.modified = datetime(2026, 1, 1)
+    cp.title = "%s — %s" % (de["tieu_de"], clb["name"])
+    bo_nho = io.BytesIO()
+    doc.save(bo_nho)
+    bo_nho.seek(0)
+    with zipfile.ZipFile(bo_nho) as zin, zipfile.ZipFile(duong, "w", zipfile.ZIP_DEFLATED) as zout:
+        for ten in sorted(zin.namelist()):
+            zi = zipfile.ZipInfo(ten, date_time=_GIO_ZIP)
+            zi.compress_type = zipfile.ZIP_DEFLATED
+            zi.external_attr = 0o600 << 16
+            zout.writestr(zi, zin.read(ten))
+
+
+def ghi_clb_csv(de, duong):
+    """CLB.csv cho "Create a list based on a spreadsheet": mọi CLB, FormUrl để trống."""
+    with open(duong, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f, lineterminator="\r\n")
+        w.writerow(["ClubId", "Ten", "Buoi", "FormUrl"])
+        for c in de["cau_lac_bo"]:
+            w.writerow([c["club_id"], c["name"], bm.ten_buoi(de, c["buoi"]), ""])
+
+
+def ghi_cai_dat_moi_clb(de):
+    """CAI_DAT_FORMS_MOI_CLB.md: những gì Quick Import không mang theo, cho từng biểu mẫu."""
+    co_thi = bm.clb_co_thi(de)
+    L = []
+    w = L.append
+    w("# Cài đặt Microsoft Forms (mỗi CLB một biểu mẫu) cho \"%s\"" % de["tieu_de"])
+    w("")
+    w("> **Tệp này do `tao_mau_forms.py --moi-clb` sinh từ `de_thi.json`.** Đừng sửa tay —")
+    w("> sửa `de_thi.json` rồi chạy lại. Ghi chú cho giáo viên: `GHI_CHU_GIAO_VIEN.md`.")
+    w("")
+    w("Mỗi CLB có đề thi có **một biểu mẫu riêng** (không câu cổng, không câu Ranking, không ô mã học sinh):")
+    w("app ECA mở đúng biểu mẫu của CLB em đã chọn. **%d biểu mẫu**, tệp Quick Import tương ứng:" % len(co_thi))
+    w("")
+    w("| CLB | Mã | Buổi | Số câu | Tệp Quick Import |")
+    w("|---|---|---|---|---|")
+    for c in co_thi:
+        w("| %s | `%s` | %s | %d | `%s%s.docx` |" % (c["name"], c["club_id"], bm.ten_buoi(de, c["buoi"]),
+                                                   len(c["de_thi"]), TIEN_TO_DOCX_MOI_CLB, c["club_id"]))
+    w("")
+    w("`%s` liệt kê **mọi** CLB (cả CLB không thi), cột `FormUrl` để trống: tạo list `CLB` từ tệp này, rồi dán" % TEN_CLB_CSV)
+    w("địa chỉ biểu mẫu vào `FormUrl` của các CLB có đề.")
+    w("")
+    w("## Đáp án và điểm (chế độ Quiz)")
+    w("")
+    w("Quick Import **không mang đáp án**. Mỗi câu: bấm vào đáp án đúng → **Correct answer**, ô **Points** =")
+    w("**%s**. Bộ chuyển đổi **chấm lại** theo bảng này và báo nếu điểm Forms lệch (tick nhầm)."
+      % bm.ghi_so(de["diem_moi_cau"]))
+    w("")
+    _bang_dap_an(w, de, co_thi)
+    w("## Settings (mọi biểu mẫu)")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Who can fill out this form | **Only people in my organization** | Học sinh đăng nhập tài khoản trường |")
+    w("| **Record name** | **BẬT** | Cột **Email** của tệp xuất là khoá ghép với danh sách đăng ký; không bật thì không biết bài của ai |")
+    w("| **One response per person** | **BẬT** | Đây là bài thi: nộp lại là làm lại. Bộ chuyển đổi cũng chỉ giữ phiếu **đầu** của mỗi email |")
+    w("| Shuffle questions | Bật được | Mỗi biểu mẫu một CLB, không có rẽ nhánh để hỏng |")
+    w("| Shuffle options (từng câu) | Bật được | Chấm theo nội dung lựa chọn, không theo vị trí |")
+    w("| Show results automatically (Quiz) | **TẮT** | Bật là em làm trước biết đáp án, chuyền cho em làm sau. Giáo viên bấm **Post scores** khi hết đợt |")
+    w("| Timer | Tuỳ chọn | Hẹn giờ áp cho cả biểu mẫu, tức đúng một đề |")
+    w("| Start date / End date | Đặt đủ cả hai | Hết giờ tự khoá, không phải canh |")
+    w("| Customize thank you message | Nên ghi liên kết quay về app | Em quay lại app bấm Làm mới để thấy \"Đã làm\" |")
+    w("")
+    return "\n".join(L)
+
+
+def sinh_moi_clb(de, thu_muc):
+    """Ghi các tệp chế độ mỗi-CLB-một-biểu-mẫu vào `thu_muc`. Trả danh sách đường dẫn đã ghi.
+
+    Kiểm đề trước khi ghi: lỗi thì không ghi gì. Tệp NHAP_FORMS_MOI_CLB_*.docx cũ bị xoá trước
+    (CLB nào đó có thể không còn đề); tệp của chế độ khác không đụng tới.
+    """
+    co_thi = _kiem_moi_clb(de)
+    os.makedirs(thu_muc, exist_ok=True)
+    for ten in os.listdir(thu_muc):
+        if ten.startswith(TIEN_TO_DOCX_MOI_CLB) and ten.endswith(".docx"):
+            os.remove(os.path.join(thu_muc, ten))
+    ra = []
+    duong = os.path.join(thu_muc, TEN_CAI_DAT_MOI_CLB)
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_moi_clb(de))
+    ra.append(duong)
+    duong = os.path.join(thu_muc, TEN_CLB_CSV)
+    ghi_clb_csv(de, duong)
+    ra.append(duong)
+    for c in co_thi:
+        duong = os.path.join(thu_muc, "%s%s.docx" % (TIEN_TO_DOCX_MOI_CLB, c["club_id"]))
+        ghi_docx_moi_clb(de, c, duong)
+        ra.append(duong)
+    return ra
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--chi-thi", action="store_true",
+                    help="chế độ chỉ thi: bỏ câu Ranking và ô mã HS (nguyện vọng ở ứng dụng đăng ký)")
+    ap.add_argument("--moi-clb", action="store_true",
+                    help="mỗi CLB có đề một biểu mẫu riêng, không câu cổng (+ CLB.csv cho list CLB)")
+    ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
+    ap.add_argument("--de", default=bm.DE_THI_MAC_DINH, help="de_thi.json")
+    a = ap.parse_args(argv)
+    if a.moi_clb and a.chi_thi:
+        ap.error("--moi-clb và --chi-thi là hai chế độ khác nhau, chọn một")
+    try:
+        de = bm.doc_de_thi(a.de)
+        if a.moi_clb:
+            ra = sinh_moi_clb(de, a.ra)
+            print("Đã sinh mẫu Forms mỗi CLB một biểu mẫu: %d biểu mẫu (%s)."
+                  % (len(bm.clb_co_thi(de)), ", ".join(os.path.basename(x) for x in ra)))
+            return 0
+        if a.chi_thi:
+            ra = sinh_chi_thi(de, a.ra)
+            nhom = bm.chia_theo_buoi(de, chi_thi=True)
+            print("Đã sinh mẫu Forms chỉ thi: %d câu, %d biểu mẫu (%s)."
+                  % (bm.dem_cau(de, chi_thi=True), len(nhom),
+                     ", ".join(os.path.basename(x) for x in ra)))
+            return 0
+    except bm.LoiDeThi as e:
+        print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
+        return 1
     with open(os.path.join(THU_MUC, "CAI_DAT_FORMS.md"), "w", encoding="utf-8") as f:
         f.write(ghi_cai_dat(de))
     ghi_mau_xuat(de, os.path.join(THU_MUC, "MAU_XUAT_TU_FORMS.xlsx"))
@@ -239,7 +697,8 @@ def main():
               "(pip install -r requirements-dev.txt)", file=sys.stderr)
     print("Đã sinh mẫu Forms: %d phần, %d câu hỏi."
           % (len(bm.cac_phan(de)), sum(len(c) for _, c in bm.cac_phan(de))))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

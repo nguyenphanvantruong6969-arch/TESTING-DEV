@@ -14,7 +14,7 @@
 | `i18n_errors.py` → `tao_i18n_js.py` → `i18n_loi.js` | Thông báo lỗi song ngữ, **một nguồn** | `err`, `phan_hoi_ok`, `phan_hoi_loi` |
 | `browser_host.py`, `recovery.py`, `chan_doan.py`, `main.py` | Máy chủ dự phòng 127.0.0.1, phục hồi, log, điểm vào | |
 | `index.html`, `js/00…08_*.js`, `i18n.js`, `style.css` | Giao diện; gọi backend qua `window.pywebview.api.*`, trả `{ok, data, errors}` | |
-| `tests/` | 192 tệp `test_*.py`, 3.433 ca (`pytest --collect-only`, 04/11/2026, nhánh claude/gallant-mendel-uki8j2 sau T3-L3) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
+| `tests/` | 201 tệp `test_*.py`, 3.645 ca (`pytest --collect-only`, 06/11/2026, nhánh claude/upbeat-shannon-g5nnms sau T4M-BK) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
 | `du_lieu_test/`, `mau_csv/`, `docs/`, `BAN_GIAO.md` | Bộ dữ liệu mô phỏng, script đo, mẫu nhập, tài liệu cơ chế, nhật ký 25 lỗi đã sửa | |
 
 ## 12 ngành đích (mã dùng trong mọi tệp)
@@ -34,6 +34,11 @@
 | `TC` | Tài chính – ngân hàng (chia khách hàng, hồ sơ thẩm định) | 17 | 50,5 | 23 |
 
 Thứ tự làm chung khi chuẩn bị nhiều ngành: `Z6 → Z3 → Z7 → Z4 → Z5 → Z2 → Z1 → B1 → B2 → A1 → A2 → A3 → A4 → A5 → A6 → A7 → A8 → A9 → A10 → A11 → A12 → B3 → C1 → C2 → C3 → E1 → E2 → E3 → G1 → G2 → G3 → G4 → G5`
+
+## Kiểm verify nhanh (chuyển từ CLAUDE.md, 05/11/2026)
+- Chạy: `pip install numpy` (chỉ cho kịch bản tham khảo, KHÔNG thêm vào requirements) rồi `python docs/ke_hoach/tham_khao/kiem_verify_nhanh.py <thư mục chứa rbda_priority_pipeline.py>`.
+- Test `tests/test_tham_khao_verify_nhanh.py` (không cần numpy) canh `verify_stability_nhanh`, `exp_resume.resume_da` / `kiem_tien_de`, `_chung.nap_rb` (thư mục: nạp thẳng tệp .py, cùng bản, bản khác, tiến trình mới, mô-đun anh em lạ; tệp không phải PyInstaller); `_chung.gen` chỉ được kiểm khi có numpy; đường nạp `.exe` được kiểm bằng một tệp PyInstaller tối thiểu dựng trong test (không có bản build thật trong kho).
+- Thời gian toàn bộ bộ test: ~22 phút trên máy 4 nhân kèm test giao diện Chromium; `BAN_GIAO.md` ghi ~3,5 phút, chưa giải thích được (xem `docs/ke_hoach/DOI_CHIEU_KHO_MA.md`).
 
 ## Tài liệu tham khảo thêm
 4. Trong kho: `BAN_GIAO.md`, `docs/CO_CHE_THUAT_TOAN.md`, `docs/NGHIEN_CUU_TOI_UU.md`, `docs/GIAI_DAP_BOC_THAM.md`, `docs/KE_HOACH_NHIEU_BUOI.md`, `du_lieu_test/SO_LIEU_DA_KIEM_CHUNG.md`.
