@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-06 — T4M-DO (bước S4): đo mô phỏng có / không bài thi tuyển, chỉ bảng số
+
+Thêm công cụ đo; không đụng mã sản phẩm, schema hay hợp đồng CSV. Mọi số liệu là MÔ PHỎNG; không có nhận xét.
+- `du_lieu_test/do_t4m_thi.py` (mới): 3 bộ giả (120 / 500 / 1.500 học sinh, hạt giống sinh cố định) x 20 hạt giống STB x 2 điều kiện (A không điểm thi, danh sách dự tuyển giữ nguyên; B có điểm thi như `de_thi.json`). Dữ liệu dựng bằng đúng chuỗi T4M (Lists giả → Forms giả → `--chi-thi` → `import_so_nhap`), đọc MỘT lần; mỗi lần chạy gọi `generate_stb_lottery`, `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) và `verify_stability_tuan`. Chỉ số: tỉ lệ nguyện vọng 1 / top-3, số em chưa có CLB (tổng và theo buổi), tỉ lệ suất Tầng 1 về nhóm điểm cao nhất, số cặp phá vỡ, thời gian. `--nhanh` (lưới nhỏ cho test; bắt buộc kèm `--ra`, `--tai-lieu`). Cả lưới đủ chạy ~30 giây.
+- `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` (sinh ra): phương pháp, tham số, bảng trung bình / nhỏ nhất / lớn nhất, nhãn MÔ PHỎNG ở mọi tiêu đề bảng, lệnh tái lập. `du_lieu_test/ket_qua_t4m/`: CSV từng lần chạy và theo buổi.
+- Test mới (viết trước): `tests/test_do_t4m_thi.py` (8 ca): điều kiện A và B trùng khít từng byte với `PipelineAPI.run_pipeline`; tất định; không cặp phá vỡ; nhãn MÔ PHỎNG và không có mục nhận xét. Thử gây hỏng: bỏ danh sách dự tuyển ở điều kiện A làm kết quả không còn phụ thuộc hạt giống — đã bị bắt.
+
 ## 2026-11-06 — T4M-Q1b (trong T4M-Q1 đã duyệt): `--chi-thi` chép Lớp từ Lists vào Sổ nhập
 
 `chuyen_forms_sang_phan_mem.py`: `doc_lists` đọc cột `Lop` (hoặc `Lớp`) của tệp xuất Lists, giữ ô không trống đầu tiên của mỗi em; `phan_tich_chi_thi` mang `lop` theo; `ghi_tep_phan_mem` truyền `class_id` và `co_lop=True` CHỈ khi có ít nhất một em có lớp (Lists không có cột Lop hoặc mọi ô trống thì Sổ nhập y như cũ, không cột Lớp). Chế độ mặc định (Forms có Ranking) không đổi. `du_lieu_test/demo_t4m.py`: bỏ workaround `_lop_theo_email` + `set_student_class`. Test mới trong `tests/test_t4m_chi_thi.py`: `test_q1b_*` (3); sửa kỳ vọng của `test_q1_khong_co_bai_thi_so_nhap_trung_khit_ban_khong_diem` vì dữ liệu Lists của test có lớp 9A1. Không đổi hợp đồng CSV, schema, lõi.

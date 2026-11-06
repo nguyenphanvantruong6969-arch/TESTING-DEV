@@ -29,12 +29,13 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - [x] T4M-DEMO (Sonnet, done 06/11/2026; Truong APPROVED 06/11/2026): fake quiz-only Forms export generator + one-command demo
       (fake Lists CSV + fake quiz export -> Sổ nhập -> kiosk solve -> per-homeroom Excel) for the ECA meeting
 - [ ] AUTO CHAIN (Truong approved 06/11; plan + prompts: docs/he_sinh_thai/T4M_KE_HOACH_TU_DONG.md):
-      [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [ ] S3 T4M-GD4-V0 (Opus)  [ ] S4 T4M-DO (Sonnet)
+      [x] S1 T4M-VH (Sonnet, done 06/11)  [x] S2 T4M-GOI-TK (Opus, design only; done 06/11, awaiting Truong D1-D5)  [ ] S3 T4M-GD4-V0 (Opus)  [x] S4 T4M-DO (Sonnet, done 06/11)
       [x] T4M-Q1b (Sonnet, 06/11): --chi-thi converter writes Lớp from Lists into Sổ nhập; set_student_class workaround dropped from demo
       [ ] T4M-Q1b-b (Sonnet, NOT done; outside the Q1b task text): optional --co-so filter (S1 gap) + update T4M_VAN_HANH_MOT_DOT.md steps 4-5
 - [ ] GĐ4: prompt P2 (Opus) -> T4M_MICROSOFT.md + proposed item codes; Truong approves
 
 ## Current state (overwrite each handoff)
+- STATUS T4M-DO: DONE. `du_lieu_test/do_t4m_thi.py` + `tests/test_do_t4m_thi.py` (8 pass; related with test_demo_t4m 19 pass, ruff clean) + `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` + `du_lieu_test/ket_qua_t4m/*.csv`. Full grid 3 sets (120/500/1500 hs) x 20 seeds x 2 conditions = 120 runs, 0 blocking pairs, runtime ~30 s (so `--nhanh` is only a small grid for tests, needs --ra and --tai-lieu). Condition A = same pipeline with scores dropped but applicant lists kept (checked byte-identical to run_pipeline on a DB without club_scores); B = with quiz scores (also byte-identical to run_pipeline). Tables only, no commentary. No product code changed. AI log: the project's AI log is an artifact outside the repo (BAN_GIAO.md §Nhật ký AI) - Truong must add the entry himself/herself.
 - STATUS T4M-Q1b: DONE. Converter `doc_lists` reads `Lop`/`Lớp`, `ghi_tep_phan_mem` writes the Lớp column only when some student has one (no column in Lists -> old bytes). Demo workaround removed. Tests: test_t4m_chi_thi + test_demo_t4m + test_mau_forms_thi_clb 65 pass (3 new test_q1b_*), ruff clean, kiem_nhanh 7/7. No schema/CSV contract/core change.
 - STATUS T4M-DEMO: DONE. Commit 4c7ad66. Tests: test_demo_t4m 11 pass, related group 69 pass, ruff clean, kiem_nhanh 7/7. No product code, schema or CSV contract changed.
 - Done earlier: research plan + prompts; GĐ1 + P4 results; interview sheet; GĐ3 guide + fake Lists generator; P5 quiz path; T4M-Q1..Q3 (quiz-only converter/form generator/teacher note; reviewed by Opus 06/11).
@@ -85,6 +86,7 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 - docs/he_sinh_thai/T4M_PHIEU_PHONG_VAN.md: GĐ2 interview sheet
 - docs/he_sinh_thai/T4M_HUONG_DAN_THU.md, du_lieu_test/sinh_xuat_lists_gia.py, tests/test_sinh_xuat_lists_gia.py: GĐ3 doc
 - mau_forms_thi_clb/{chuyen_forms_sang_phan_mem,bieu_mau,tao_mau_forms}.py, GHI_CHU_GIAO_VIEN.md, CAI_DAT_FORMS_CHI_THI.md, NHAP_FORMS_CHI_THI.docx, README.md; tests/test_t4m_chi_thi.py: T4M-Q1..Q3
+- du_lieu_test/do_t4m_thi.py, du_lieu_test/ket_qua_t4m/, tests/test_do_t4m_thi.py, docs/he_sinh_thai/T4M_DO_MO_PHONG.md: T4M-DO
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -106,3 +108,4 @@ paid" is wrong for this school. Plan: `docs/he_sinh_thai/T4M_KE_HOACH_NGHIEN_CUU
 | 2026-11-06 | Sonnet | S1 T4M-VH done: one-round operations guide for school IT (8 steps) | Docs only; no subagent; Lớp described as flowing into Sổ nhập (Q1b) |
 | 2026-11-06 | Opus | Reviewed S1 T4M-VH (OK); added --co-so filter to Q1b scope | |
 | 2026-11-06 | Sonnet | T4M-Q1b: tests first (1 red), converter carries Lớp from Lists into Sổ nhập, demo workaround removed; one old test's expectation updated (test Lists has class 9A1) | No subagent; default mode unchanged |
+| 2026-11-06 | Sonnet | S4 T4M-DO: simulation grid script, tables, tests first; mutation check caught condition A dropping applicant lists (results no longer depended on seed) | No subagent; no product code changed; tables only |
