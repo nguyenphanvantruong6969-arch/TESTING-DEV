@@ -25,11 +25,11 @@ Night 1 — kiosk backend (order fixed; dependencies in CHAY_DEM_FA_DAA.md C.5):
 - [ ] FA-7 demand table + `so_sanh_suc_chua.py`
 - [ ] FA-8 property tests V§13 (`tests/test_fa_tinh_chat.py`)
 Later (NOT night 1):
-- [ ] FA-9 public seed (D5)  - [ ] FA-10 simulation compare (+ D1 abuse behaviour)
+- [ ] FA-9 witnessed lottery record (D5)  - [ ] FA-10 simulation compare (+ D1 two-term incentive behaviour)
 - [ ] Night 2 Microsoft: FA-M1 setup form, FA-M2 Forms registration (path B), FA-M3 converter, FA-M4 quiz variants + item analysis, FA-M5 Power Apps spec v2 (path A), FA-M6 after-allocation docs
 - [ ] Night 3: FA-UI kiosk screens (Chromium tests)
 - [ ] Opus review of each night before the next night starts
-- [ ] BLOCKED by decision: D1 compensation credit (invariant 2) — needs Truong + FA-10 measurement
+- [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
 - 2026-11-08 Opus: plan written and pushed; no product code changed yet. Nothing running. RUNNING lock: none.
@@ -37,10 +37,11 @@ Later (NOT night 1):
 - Open problems: D8 (Power Apps vs Forms registration) waits for Truong's GĐ2 meeting with IT (before 15/11).
 
 ## Decisions and gotchas (keep short)
-- D1..D10: table in plan §1; night run uses the Default column. Truong may edit that table before a run.
-- D1 compensation NOT built: invariant 2 + `stb_co_bu` precedent (TN7d 113/300 manipulable).
+- D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
+- D1 compensation deferred: NOT a stability problem; the issue is the cross-term incentive (lose NV1 on purpose), which invariant 2 guards. Simulate before term 2.
+- D3 close the club with the largest shortfall first. D4 waitlist SELECTIVE score>medal>STB, LIMITED medal>STB, only students ranking it above their club.
 - D2 default medals only at the registration layer (Power Apps / converter), never inside the kiosk.
-- D5 public seed reverses Truong's 24/10 "no SHA-256" decision; vision is newer; keep crc32 per-day derivation.
+- D5 no public seed (24/10 decision stands); FA-9 = witnessed lottery record. D9 Forms time limit + flag < 1/3 median. D11 variant mean gap > 1 blocks. D12 path B: 3 choice questions, no Ranking, medals by order.
 - Registry A13 already titled "FA-DAA": medals reuse `wharton_bids` and the `diem_wharton` input of `run_rbda`.
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
@@ -60,3 +61,4 @@ Later (NOT night 1):
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-08 | Opus | Read vision + code (priority, wharton, STB, registry A5/A6/A13/C3, T4M); wrote plan, night-run file, handoff | No code changed; D1 blocked; D8 waits for GĐ2 |
+| 2026-11-08 | Opus | Council review applied: D1 reason, D3, D4, D5->FA-9 record, D9, D11, D12 | Docs only |

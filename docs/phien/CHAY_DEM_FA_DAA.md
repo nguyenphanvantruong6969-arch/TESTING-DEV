@@ -81,7 +81,7 @@ Re-run only failing node ids with `--tb=short | tail -40`.
    h. Tick the item in the handoff Plan, append one Session-log row, commit `FA-<n>: <short summary>`, then
       `git pull --rebase origin claude/keen-ride-72sa7t && git push -u origin claude/keen-ride-72sa7t`
       (retry on network error: 2 s, 4 s, 8 s, 16 s). Never force-push. Never open or merge a PR.
-4. Decisions D1..D10 in §1 of the plan are settled: use the Default column. Never implement D1 (compensation).
+4. Decisions D1..D12 in §1 of the plan are settled: use the Default column. Never implement D1 (compensation, deferred to term 2).
 5. Stop rules (plan §5): invariant would break, baseline red, new library needed, schema/CSV change beyond the item,
    same test fails after 3 honest attempts -> mark the item `BLOCKED: <one line why>` in the handoff Plan, commit,
    continue with the next item that does not depend on it. FA-4 depends on FA-1 and FA-3; FA-5 and FA-6 depend on

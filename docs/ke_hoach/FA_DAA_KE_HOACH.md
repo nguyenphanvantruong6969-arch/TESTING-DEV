@@ -1,6 +1,7 @@
 # FA-DAA implementation plan (kiosk first, then Microsoft)
 
-> Written by Opus, 2026-11-08, branch `claude/keen-ride-72sa7t`. Source: `docs/ke_hoach/FA_DAA_VISION.md` (Truong's
+> Written by Opus, 2026-11-08 (revised after the council review the same day: D1, D3, D4, D5, D9, D11, D12, FA-9),
+> branch `claude/keen-ride-72sa7t`. Source: `docs/ke_hoach/FA_DAA_VISION.md` (Truong's
 > vision, cited as **V§n**). English (cheap). Night-run entry point: `docs/phien/CHAY_DEM_FA_DAA.md`.
 > Every item below has a code `FA-*`, its parent registry item (A5, A6, A13, C3, Z6, A2) or T4M-NC (Microsoft
 > track, outside the registry, already approved), its files, and its acceptance tests (`kiem_nhan`).
@@ -16,7 +17,7 @@
 | Pass mark filter (V§7.4) | registry A5 (hard filter before DA), not built | build, FA mode only |
 | Min members (V§8.5) | registry A6, not built | build, FA mode only |
 | Result reasons (V§9.1) | registry C3, not built; `get_diem_chuan`, `tinh_diem_chuan` give cut-offs | build |
-| Reproducible lottery (V§8.3) | crc32 STB, locked seed, `_seed_cua_buoi` | public-text seed (D5) |
+| Reproducible lottery (V§8.3) | crc32 STB stored in `students.stb_number`, locked seed (`stb_lock`), `_seed_cua_buoi` | witnessed lottery record (D5, FA-9) |
 | Microsoft path | T4M-NC: Power Apps "ECA" + SharePoint List (wide, NV1..NV7, THI1..7, WP1..7), Forms Quiz per club, converter `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`, IT build kit `tao_bo_dung_t4m.py` | medals, club types, setup form, results/feedback |
 
 Key design choice: **no change to the DA core**. FA-DAA is a wrapper (new module `fa_daa.py`) that prepares the
@@ -28,15 +29,17 @@ the same prepared inputs, so the existing safety net still applies.
 
 | # | Question | Default (recommended) | Why |
 |---|---|---|---|
-| D1 | Compensation credit (V§8.4) | **Not built this term** (BLOCKED). Has no effect before term 2 anyway | Invariant 2 forbids a previous outcome in the priority key; the `stb_co_bu` precedent let 113/300 students manipulate (TN7d). A student could list a hot club as NV1 just to lose and earn a credit. Simulate that strategy first (FA-10 extension) |
+| D1 | Compensation credit (V§8.4) | **Not built this term** (deferred, not rejected). Has no effect before term 2 anyway. Before term 2: measure the incentive with FA-10 | **Stability is NOT the problem**: within a term the credit is a fixed part of the priority key, so DA stays stable and truthful ranking stays optimal inside that term. **The real problem is the incentive across terms**: a student can rank a crowded club NV1 on purpose, lose the lottery, and gain priority next term. That is the concern invariant 2 guards ("no previous outcome in the priority key"; `stb_co_bu` precedent: 113/300 found a profitable lie, TN7d), so turning it on needs Truong's explicit exception to invariant 2 AND a simulation showing the abuse is small |
 | D2 | Default medals come from rank order (V§6.1) | Computed **only at the registration layer** (Power Apps / Forms converter) and stored as student data. Kiosk priority reads stored medals only; the kiosk never fills medals from rank | Keeps invariant 2 literal inside the kiosk. Truthful ranking stays optimal **given fixed medals** (acceptance V§13.1) |
-| D3 | Closing under-filled clubs (V§8.5) | Close **one club per iteration** (fewest members, tie by `club_id`), rerun, repeat | Closing all at once can close a club that would have reached its minimum after another closed. Bounded by number of clubs |
-| D4 | Waitlist order (V§9.3 says LotteryOrder) | Use the **club's own priority key** (reserved, score, medal, lottery) | Pure lottery can refill a SELECTIVE seat with a lower score ahead of a higher one (breaks V§13.7 at refill). For LIMITED without medals both orders coincide |
-| D5 | Public seed (V§8.3) | Build it, off by default: `seed = int(sha256(text+"\|"+term_id)[:8], 16) % 2**31`, then the EXISTING crc32 per-day derivation | Truong decided on 24/10 "no SHA-256, no public_value"; the vision reverses this. Feeding the existing path keeps invariant 3 |
+| D3 | Closing under-filled clubs (V§8.5) | Close **one club per iteration**: the one with the **largest shortfall** (`so_toi_thieu - members`; tie: fewer members, then `club_id`), rerun with the same STB, repeat until no club is short (council 08/11) | Closing all at once can close a club that would have reached its minimum after another closed. Bounded by number of clubs |
+| D4 | Waitlist order (V§9.3 said LotteryOrder; corrected by the council 08/11) | SELECTIVE: score -> medal -> lottery. LIMITED: medal -> lottery. Only students who rank that club ABOVE their current club are on the list and invited | Pure lottery can refill a SELECTIVE seat with a lower score ahead of a higher one (breaks V§13.7 at refill) |
+| D5 | Public seed (V§8.3) | **Not built** (Truong's 24/10 decision stands, council 08/11). Instead FA-9 = a witnessed lottery record. Re-running stays exact because STB numbers are already stored (`students.stb_number`) and locked (`stb_lock`, seed kept) | Students must be able to trust the draw without a public-text seed: a teacher witnesses the run, and the data fingerprint is frozen BEFORE the seed is entered |
 | D6 | Reserved seats | Use the existing soft reserve: `reserve_capacity` = number of reserved students of the club, eligibility = in `giu_cho`. FA workspaces may not also use `reserve_group` | Gives exactly the key "-is_reserved first" when reserved <= capacity (precheck) and reuses verified machinery |
 | D7 | Challenge score | Integer 0-10 = round-half-up(points / max * 10), done in the converter | V§7.4 |
 | D8 | Registration channel this term | Truong + IT decide at the GĐ2 meeting (before 15/11). Build both converters | See §4 table |
-| D9 | Anti-rush on Forms (V§7.2) | Total-time flag (completion - start < 10 % of the median of others), not per item | Microsoft Forms does not record per-question time (export has start/completion only, `T4M_KET_QUA_TAI_LIEU.md`) |
+| D9 | Anti-rush on Forms (V§7.2) | Turn ON the Forms quiz **time limit** (auto-submits at the end, no edits after) instead of a per-question limit. Flag = total time (completion - start) **< 1/3 of the median** of that club's takers -> one retake offer | Forms records start/completion only, not per question (`T4M_KET_QUA_TAI_LIEU.md`); time-limit feature: support.microsoft.com/office/f255a4ba-e03c-4e12-b880-f7e8b62e0665 (TH: check it is on in the school tenant) |
+| D11 | Fairness between quiz variants | After the quiz, compare mean scores per variant; gap > 1 point -> allocation for that club is blocked until the admin applies mean equating (shift the easier variant down / harder up so means match, then re-round) or drops bad items. Prefer **2 variants**, not 3 | Otherwise the easier variant becomes luck. With ~20 takers per variant and SD ≈ 2 (assumption), a gap > 1 point appears by chance ≈ 11 % of the time (SE of the difference ≈ 0.63); with ~40 per variant ≈ 2.5 %, so fewer variants = fewer false alarms |
+| D12 | Path B registration questions | No Forms **Ranking** question. Per day: 3 separate required choice questions "Nguyện vọng 1 / 2 / 3"; converter drops duplicates (warning). No medal questions on path B: converter assigns gold/silver/bronze to the first three non-FREE choices (D2). Swapping medals exists on path A only | Ranking allows at most 10 options, and partial-save bugs are reported when the respondent does not reorder: lazy students (main users) are hit (learn.microsoft.com/answers 5417196, 5779229) |
 | D10 | Which students need a club each day (V§8.6) | Every student in the student list, every day that has clubs | Vision: unregistered -> FREE club of that day |
 
 ## 2. Kiosk items (night 1, in this order)
@@ -112,19 +115,19 @@ After DA (first pass):
 
 ### FA-5 Minimum members (parent A6; V§8.5, D3)
 - Loop in `chay_fa_daa`: while some open `GIOI_HAN`/`TUYEN_CHON` club has members < `so_toi_thieu`, close the one
-  with fewest members (tie `club_id`), remove it from that day's lists, rerun with the SAME STB. Max iterations =
+  with the largest shortfall `so_toi_thieu - members` (tie: fewer members, then `club_id`; D3), remove it from that day's lists, rerun with the SAME STB. Max iterations =
   number of clubs of the day (assert). Record `CLUB_CLOSED` for its applicants. Label in the report: "đóng CLB thiếu
   người là xấp xỉ, không bảo đảm khai thật tối ưu" (A6 risk).
 - kiem_nhan: `tests/test_fa_toi_thieu.py`: V§13.11; every open club meets its minimum or is closed; same STB rerun
-  identical; closing order independent of input order.
+  identical; closing order independent of input order; with two short clubs, the larger shortfall closes first.
 
 ### FA-6 Reasons, cut-offs, waitlist (parent C3; V§8.2 reasons, V§9.1, D4)
 - `ly_do_ket_qua(run, prepared_inputs) -> rows`: for each student and each club ranked ABOVE the final assignment in
   the ORIGINAL list: `BELOW_PASS` / `NOT_ATTEMPTED` (from FA-4 step 2), `CLUB_CLOSED` (FA-5), else compare the
   student's key with the last admitted member's key (component order: reserved, score, medal, lottery) and take the
   first differing component -> `RESERVED` / `SCORE` / `MEDAL` / `LOTTERY`. If the student's key is better, raise
-  (stability bug). Snapshot: cut-off score, medal, STB of the last admitted. Waitlist position = rank by the club's
-  key among students who prefer that club to their final one. Plus one row for the accepted club
+  (stability bug). Snapshot: cut-off score, medal, STB of the last admitted. Waitlist (D4): only students who rank
+  the club ABOVE their final club; order SELECTIVE = score, medal, STB; LIMITED = medal, STB; position = rank in it. Plus one row for the accepted club
   (`ACCEPTED`, rank in list) and fallback rows (`KHONG_DANG_KY`, `HET_NGUYEN_VONG`).
 - Table `fa_ly_do(run_id, buoi, student_id, club_id, rank_in_list, outcome, reason, cut_score, cut_medal, cut_stb,
   waitlist_pos)`, append-only. Export `ket_qua_ly_do.csv` (email/student_id, day, club, group, reason code, Vietnamese
@@ -133,7 +136,8 @@ After DA (first pass):
 - `LOTTERY` sentence needs n (tied applicants on all non-lottery criteria) and k (seats among them): compute from the
   applicants who proposed to the club (club at or above their final position).
 - kiem_nhan: `tests/test_fa_ly_do.py`: V§13.9 (every rejection has a valid reason); no foreign id in any sentence;
-  reason matches a hand-built 6-student case for each code.
+  reason matches a hand-built 6-student case for each code; waitlist excludes students whose current club is ranked
+  above the waitlisted one; SELECTIVE waitlist never puts a lower score ahead of a higher one.
 
 ### FA-7 Demand table (outside registry, vision V§4.3)
 - `bang_nhu_cau(data, buoi) -> rows`: per club NV1 count, listed count, passed `diem_san` count (`TUYEN_CHON`),
@@ -148,19 +152,22 @@ After DA (first pass):
   list, medals fixed, `so_toi_thieu` off), 13.2 (`verify_stability` = 0 pairs), 13.3-13.9, 13.11; 13.5 rerun same
   seed identical. 13.10 belongs to FA-7, 13.12 is D1 (skip with reason).
 
-### FA-9 Public seed (parent A2/A13; D5)
-- `hat_giong_tu_chuoi(text, term_id) -> int`; store `public_text`, `sha256` in a new table
-  `hat_giong_cong_khai(term_id, public_text, sha256, created_at)` (append-only). Admin API accepts text OR number.
-  STB generation and locking unchanged. Default off.
-- kiem_nhan: `tests/test_fa_hat_giong.py`: same text -> same STB on two processes (subprocess, invariant 3); lock
-  still refuses a new seed without the two-step confirm.
+### FA-9 Witnessed lottery record (parent A2/A13; D5)
+- No public-text seed. Kiosk export `bien_ban_boc_tham` (xlsx/pdf-ready html, Vietnamese): date-time, term, data
+  fingerprint (`dau_van_tay_du_lieu`), seed, SHA-256 of the sorted (student_id, stb_number) list, counts per day,
+  signature lines for the admin and a witness teacher. Ceremony order printed on it: (1) freeze data and print the
+  fingerprint, (2) the witness chooses the seed (e.g. rolls a die six times) and types it, (3) run, (4) sign.
+  Students can look up their own STB number after publication (existing STB is stored and locked; nothing new).
+- kiem_nhan: `tests/test_fa_bien_ban.py`: same data + seed -> identical record except the timestamp; the STB hash
+  changes if any number changes; no student name in the record.
 
 ### FA-10 Simulation compare (parent A13 "mô phỏng VISEF"; V§12)
 - `du_lieu_test/mo_phong_fa_daa.py`: synthetic N students, K clubs/day, D days; liking = common hotness + own taste;
   score = ability + noise ±1; behaviour mix lazy / truthful / strategic (configurable). Same data, old mode
   (score + two funds) vs FA. Output TABLES ONLY (% NV1, % top 2, % no club, % decisions per reason, % lottery losers
   by behaviour type), each labelled "SỐ LIỆU MÔ PHỎNG". No interpretation text.
-- Extension for D1: add a "lose on purpose" behaviour to measure compensation abuse before Truong decides.
+- Extension for D1 (before term 2): two-term simulation with a "rank a crowded club NV1 on purpose" behaviour;
+  output: share of students for whom it pays off, with and without the credit. Tables only.
 - kiem_nhan: `tests/test_mo_phong_fa_daa.py`: deterministic per seed; columns present.
 
 ### FA-UI Kiosk screens (night 3, Chromium tests)
@@ -173,9 +180,9 @@ After DA (first pass):
 | Code | What | Files |
 |---|---|---|
 | FA-M1 | Club setup form (V§4.1, 5 questions with branching) on Microsoft Forms: build guide (Forms has no creation API) + converter Forms Excel -> Sổ nhập club sheet with automatic Loại classification and FA-2 precheck report | `mau_forms_thi_clb/chuyen_phieu_clb.py`, `mau_forms_thi_clb/PHIEU_THIET_LAP_CLB.md`, `tests/test_fa_m1_phieu_clb.py` |
-| FA-M2 | Path B registration on Microsoft Forms (one form per day): description = the one guidance line (V§5.1), NV1..NV3 required + NV4..NV7 optional dropdowns, shuffle options ON, 3 optional medal dropdowns (non-FREE clubs of the day). Extend the existing Forms generator (`tao_mau_forms.py`, `bieu_mau.py`) behind `--fa-daa` | as listed, `tests/test_fa_m2_forms_dang_ky.py` |
-| FA-M3 | Converter FA mode `--fa-daa` (Lists export OR Path B Forms export -> Sổ nhập): medals one fund, registration-layer default medals when all medal cells are empty and `HC_TuChinh` is not set (D2), Loại from club sheet, integer score (D7), `NOT_ATTEMPTED`, rush flag from duration (D9), duplicate/last-save rule (V§5.1) | `chuyen_forms_sang_phan_mem.py`, `tests/test_fa_m3_chuyen.py` |
-| FA-M4 | Quiz on Forms: 2-3 variant Forms per SELECTIVE club with the same difficulty mix; variant = crc32(email) % n; shuffle questions + options ON; retake = other variant when flagged; item analysis script (% correct, discrimination top third - bottom third, flag < 0, > 90 %, < 20 %; V§7.5) regraded from `de_thi.json` | `mau_forms_thi_clb/phan_tich_cau_hoi.py`, `tests/test_fa_m4_phan_tich.py`, doc section in `CAI_DAT_FORMS_CHI_THI.md` |
+| FA-M2 | Path B registration on Microsoft Forms (one form per day): description = the one guidance line (V§5.1); 3 separate required choice questions "Nguyện vọng 1 / 2 / 3", no Ranking question, no medal questions (D12); shuffle options ON where Forms offers it (TH). Extend the existing Forms generator (`tao_mau_forms.py`, `bieu_mau.py`) behind `--fa-daa` | as listed, `tests/test_fa_m2_forms_dang_ky.py` |
+| FA-M3 | Converter FA mode `--fa-daa` (Lists export OR Path B Forms export -> Sổ nhập): medals one fund; path A: default medals when all medal cells are empty and `HC_TuChinh` is not set; path B: always default medals = first three non-FREE choices (D2, D12); drop duplicate choices with a warning; Loại from club sheet; integer score (D7); `NOT_ATTEMPTED`; rush flag < 1/3 median (D9); duplicate/last-save rule (V§5.1) | `chuyen_forms_sang_phan_mem.py`, `tests/test_fa_m3_chuyen.py` |
+| FA-M4 | Quiz on Forms: 2 variant Forms per SELECTIVE club (3 only if many takers) with the same difficulty mix; variant = crc32(email) % n; time limit ON (D9); shuffle questions + options ON; retake = other variant when flagged; item analysis script (% correct, discrimination top third - bottom third, flag < 0, > 90 %, < 20 %; V§7.5) regraded from `de_thi.json`; variant mean comparison, gap > 1 point blocks with mean-equating option (D11) | `mau_forms_thi_clb/phan_tich_cau_hoi.py`, `tests/test_fa_m4_phan_tich.py`, doc section in `CAI_DAT_FORMS_CHI_THI.md` |
 | FA-M5 | Path A Power Apps spec v2: registration screen (V§5.1: random order with `Shuffle()`, ▲▼ buttons, autosave `Patch` with `TrangThai` DRAFT/SUBMITTED, min 3, FREE warning, card labels) and medal widget (V§6.1) replacing the two-fund screen R25..R38; SharePoint columns: reuse `WP1..WP7` (60/30/10) + `HC_TuChinh` + `TrangThai`; update build kit column module `bo_dung_t4m` | `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md`, `mau_forms_thi_clb/bo_dung_t4m/`, related tests |
 | FA-M6 | After allocation: `ket_qua_ly_do.csv` -> SharePoint List "KetQua" (CSV way C) -> app result screen + 3 one-tap feedback buttons (List "PhanHoi"); Forms for week-3 survey and appeals (3-day window); Power Automate reminders (open, -2 days, -3 hours; SELECTIVE not attempted x2; < 50 % after 3 days -> homeroom lists via `T4M_FLOW_GUI_GVCN.md`); attendance List "DiemDanh" + waitlist export. Watch the 6,000 requests/user/day limit (≈3 reminders x 1,000 students) | `docs/he_sinh_thai/FA_SAU_XEP.md` (docs only) |
 
@@ -184,7 +191,7 @@ After DA (first pass):
 | | Path A: Power Apps "ECA" (existing app) | Path B: Microsoft Forms only |
 |---|---|---|
 | IT work | Edit app + list columns (build kit exists) | Create 1 form per day from a guide; no app edits |
-| Autosave, random order per student, ▲▼, live medal defaults | Yes | No autosave; option shuffle only; medals filled after submit by converter |
+| Autosave, random order per student, ▲▼, live medal defaults | Yes; students can swap medals | No autosave; 3 choice questions (no Ranking, D12); medals always default by order, no swap |
 | Validation (min 3, distinct, medal rules) | In app, before submit | Required questions + converter warnings after |
 | Risk for "dùng thật học kỳ này" | Needs an Environment Maker and time (NC-02) | Lowest; works with M365 A3/A5 today |
 | Recommendation | If IT confirms edit rights by 15/11 | Otherwise; also the fallback if the app slips |

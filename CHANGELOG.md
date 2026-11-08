@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-08 — FA-KH (sửa sau soát hội đồng): D1, D3, D4, D5, D9, D11, D12, FA-9
+
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: D1 sửa lý do (không phá ổn định; vấn đề là động cơ giữa các kỳ, cần mô phỏng trước kỳ 2); D3 đóng CLB thiếu nhiều nhất trước; D4 danh sách chờ Tuyển chọn điểm → huy chương → bốc thăm, Giới hạn huy chương → bốc thăm, chỉ em xếp CLB đó cao hơn; D5 không làm hạt giống công khai, FA-9 thành biên bản bốc thăm có giáo viên chứng kiến; D9 bật giới hạn thời gian Forms, cờ < 1/3 trung vị; D11 so điểm trung bình giữa các bản đề; D12 đường B không dùng câu Ranking, 3 câu chọn NV1–3, huy chương gán theo thứ tự.
+- `docs/phien/claude__keen-ride-72sa7t.md`, `docs/phien/CHAY_DEM_FA_DAA.md`: cập nhật theo các quyết định trên. Không đổi mã.
+
 ## 2026-11-08 — FA-KH: kế hoạch triển khai FA-DAA và tệp chạy đêm (chỉ tài liệu)
 
 - `docs/ke_hoach/FA_DAA_VISION.md`: vision của Truong (chép nguyên văn).
