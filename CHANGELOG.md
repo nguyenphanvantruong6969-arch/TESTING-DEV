@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-08 — FA-KH: kế hoạch triển khai FA-DAA và tệp chạy đêm (chỉ tài liệu)
+
+- `docs/ke_hoach/FA_DAA_VISION.md`: vision của Truong (chép nguyên văn).
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: kế hoạch theo mục FA-0..FA-10, FA-UI, FA-M1..M6; mục cha A13, A5, A6, C3, Z6, A2, T4M-NC; quyết định D1..D10 (D1 ưu tiên bù CHẶN vì bất biến 2).
+- `docs/phien/CHAY_DEM_FA_DAA.md`: tệp duy nhất cho phiên chạy đêm; `docs/phien/claude__keen-ride-72sa7t.md`: bàn giao nhánh.
+- Không đổi mã, schema, hợp đồng CSV; không test mới.
+
 ## 2026-11-06 — T4M-NC: sửa CI đỏ của PR #13 (3 nguyên nhân do nhánh)
 
 - `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`: `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã ghi 194 tệp test, thực tế 201; cập nhật 201 tệp, 3.645 ca.
