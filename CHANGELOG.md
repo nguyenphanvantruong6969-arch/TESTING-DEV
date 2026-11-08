@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-08 — FA-KH (quyết định của Truong): ngoại lệ bất biến 2 cho huy chương mặc định, D11 không chặn
+
+- `CLAUDE.md`: ghi ngoại lệ bất biến 2 (huy chương mặc định theo thứ tự nguyện vọng, chỉ ở tầng đăng ký và chỉ khi học sinh đổi được; lý do: tín hiệu riêng kiểu CADA giữ khai thật thứ tự).
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: D2 (ngoại lệ), D11 (ngưỡng theo cỡ mẫu, tự điều chỉnh theo chênh lệch trung bình, admin xác nhận, không chặn), D12 (đường B thêm câu tuỳ chọn đặt huy chương vàng), FA-UI, FA-M2, FA-M3, FA-M4.
+- `docs/phien/claude__keen-ride-72sa7t.md`: quyết định mới. Không đổi mã; D1 vẫn hoãn.
+
 ## 2026-11-08 — FA-KH (sửa sau soát hội đồng): D1, D3, D4, D5, D9, D11, D12, FA-9
 
 - `docs/ke_hoach/FA_DAA_KE_HOACH.md`: D1 sửa lý do (không phá ổn định; vấn đề là động cơ giữa các kỳ, cần mô phỏng trước kỳ 2); D3 đóng CLB thiếu nhiều nhất trước; D4 danh sách chờ Tuyển chọn điểm → huy chương → bốc thăm, Giới hạn huy chương → bốc thăm, chỉ em xếp CLB đó cao hơn; D5 không làm hạt giống công khai, FA-9 thành biên bản bốc thăm có giáo viên chứng kiến; D9 bật giới hạn thời gian Forms, cờ < 1/3 trung vị; D11 so điểm trung bình giữa các bản đề; D12 đường B không dùng câu Ranking, 3 câu chọn NV1–3, huy chương gán theo thứ tự.
