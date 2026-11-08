@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-08 — FA-KH: báo cáo đêm tự đẩy lên GitHub
+
+- `docs/phien/CHAY_DEM_FA_DAA.md` mục E: phiên chạy đêm ghi `docs/phien/bao_cao_dem/<ngày>.md` (tiếng Việt, dễ hiểu), commit, push, kiểm push đã tới GitHub, in link. Không đổi mã.
+
 ## 2026-11-08 — FA-M3 (một phần, Truong duyệt): đặt huy chương trên đường B, đủ 6 cách đặt
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: hàm mới `dat_huy_chuong_duong_b` (mặc định theo thứ tự nguyện vọng, câu tuỳ chọn đặt vàng, câu tuỳ chọn đổi bạc/đồng; giá trị không dùng được thì giữ mặc định và báo). Chưa nối vào luồng chuyển (việc của FA-M3, đêm 2); đầu ra hiện có không đổi.

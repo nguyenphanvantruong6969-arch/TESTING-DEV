@@ -25,7 +25,8 @@ shows every night-1 item ticked or BLOCKED, disable the scheduled task named 'FA
 enabled=false), write nothing else, and stop."
 Do not fire it now. Show me the task id, next run time and stored prompt when done.
 ```
-5. Sáng ra: đọc mục "Night report" trong `docs/phien/claude__keen-ride-72sa7t.md`, gửi Truong.
+5. Sáng ra: không cần gửi gì. Claude tự đẩy báo cáo lên GitHub ở `docs/phien/bao_cao_dem/<ngày>.md` (link nằm ở dòng
+   cuối tin nhắn cuối của Claude).
 
 Chạy bằng máy cá nhân thay vì web: clone kho, `git checkout claude/keen-ride-72sa7t`, chạy `claude --model sonnet`,
 dán câu lệnh trên.
@@ -100,8 +101,20 @@ Re-run only failing node ids with `--tb=short | tail -40`.
 - Never commit real school data, names, tenant ids or app URLs.
 
 ### E. Final report (end of night or when nothing is left)
-Overwrite "Current state" in the handoff with: items done (commit hashes), items BLOCKED (why), tests run and
-counts, open questions for Truong. Append a "Night report <date>" Session-log row. Remove your RUNNING line. Commit,
-push. If you were started by the scheduled task "FA-DAA chay dem" and no night-1 item is left unticked (all done or
+1. Overwrite "Current state" in the handoff with: items done (commit hashes), items BLOCKED (why), tests run and
+   counts, open questions for Truong. Append a "Night report <date>" Session-log row. Remove your RUNNING line.
+2. Write the night report as its own file `docs/phien/bao_cao_dem/<YYYY-MM-DD>.md` (date the night started, Vietnam
+   time; if the file exists because an earlier session of the same night wrote it, UPDATE it, never create a second
+   one). In Vietnamese, plain words, no jargon, at most 60 lines:
+   - `# Báo cáo đêm <ngày>` and one line: xong X/9 mục, chặn Y mục.
+   - Table `| Mục | Việc (1 câu dễ hiểu) | Kết quả: xong / chặn / chưa làm | Commit |` for FA-0..FA-8.
+   - `## Bị chặn` : each blocked item, why, what Truong must decide.
+   - `## Kiểm tra` : test files run, pass/fail counts, ruff, kiem_nhanh result. Numbers are SIMULATED data.
+   - `## Câu hỏi cho Truong` and `## Đêm sau nên làm`.
+3. Commit (`FA-BC: night report <date>`) and push as in C.3 h. Verify the push reached GitHub:
+   `git fetch origin claude/keen-ride-72sa7t && git log -1 --format=%H origin/claude/keen-ride-72sa7t` equals your
+   HEAD. Then print the link
+   `https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/blob/claude/keen-ride-72sa7t/docs/phien/bao_cao_dem/<YYYY-MM-DD>.md`
+   as the last line of your final message. If you were started by the scheduled task "FA-DAA chay dem" and no night-1 item is left unticked (all done or
 BLOCKED), disable that task (`list_triggers` to find it, then `update_trigger` with `enabled=false`; never delete it).
 Stop.
