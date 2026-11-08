@@ -399,6 +399,44 @@ def _doc_diem_quyet_tam(o):
     return int(m.group(1)) if m else False
 
 
+HUY_CHUONG_DIEM = (60, 30, 10)  # vàng, bạc, đồng (FA-DAA V§6)
+
+
+def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
+    """Huy chương MỘT em MỘT ngày trên đường B (chỉ Forms; FA-M3, quyết định D2/D12 của Truong 08/11/2026).
+
+    Mặc định: vàng/bạc/đồng cho ba CLB KHÔNG Tự do đầu tiên theo thứ tự nguyện vọng (ngoại lệ bất biến 2 trong
+    CLAUDE.md — chỉ hợp lệ vì hai câu tuỳ chọn dưới đây cho em đổi được MỌI cách đặt):
+      * `vang`: CLB em muốn đặt vàng (trống = giữ mặc định); bạc, đồng đi theo thứ tự nguyện vọng ở các CLB còn lại.
+      * `doi_bac_dong`: "Có" thì đổi chỗ bạc và đồng; trống = giữ.
+    Giá trị không dùng được (vàng vào CLB Tự do / ngoài danh sách, ô đổi lạ, đổi khi chỉ còn một CLB) thì giữ mặc
+    định và báo. Trả `({club_id: 60|30|10}, [cảnh báo])`. Nguyện vọng trùng chỉ tính một lần.
+    """
+    canh_bao = []
+    ds = [c for c in dict.fromkeys(_o(c) for c in nguyen_vong) if c and c not in tu_do]
+    if not ds:
+        return {}, canh_bao
+    vang = _o(vang)
+    vang_dat = ds[0]
+    if vang:
+        if vang in ds:
+            vang_dat = vang
+        else:
+            canh_bao.append("Huy chương vàng: %s không phải CLB Giới hạn/Tuyển chọn trong nguyện vọng của em "
+                            "— giữ mặc định" % vang)
+    con_lai = [c for c in ds if c != vang_dat][:2]
+    doi = bm._chuan(_o(doi_bac_dong))
+    if doi in ("có", "co"):
+        if len(con_lai) == 2:
+            con_lai.reverse()
+        else:
+            canh_bao.append("Đổi chỗ bạc và đồng: chỉ còn %d CLB nhận huy chương — giữ mặc định" % len(con_lai))
+    elif doi:
+        canh_bao.append("Đổi chỗ bạc và đồng: %r không hiểu (chỉ nhận \"Có\" hoặc trống) — giữ mặc định"
+                        % doi_bac_dong)
+    return dict(zip([vang_dat] + con_lai, HUY_CHUONG_DIEM)), canh_bao
+
+
 def _cot_chi_thi(de, tieu_de):
     """Cột Email/Name và cột bài thi của MỘT tệp Forms chỉ-thi.
 

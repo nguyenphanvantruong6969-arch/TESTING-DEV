@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-08 — FA-M3 (một phần, Truong duyệt): đặt huy chương trên đường B, đủ 6 cách đặt
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: hàm mới `dat_huy_chuong_duong_b` (mặc định theo thứ tự nguyện vọng, câu tuỳ chọn đặt vàng, câu tuỳ chọn đổi bạc/đồng; giá trị không dùng được thì giữ mặc định và báo). Chưa nối vào luồng chuyển (việc của FA-M3, đêm 2); đầu ra hiện có không đổi.
+- `tests/test_fa_m3_huy_chuong_b.py` (19 ca, viết trước, đỏ rồi xanh; đột biến tắt bước đổi bạc/đồng làm 8 ca đỏ).
+- `CLAUDE.md`: ghi chú ngoại lệ bất biến 2 nay đạt trọn điều kiện "mọi học sinh đổi được". `docs/ke_hoach/FA_DAA_KE_HOACH.md` D12, FA-M2, FA-M3; `docs/ke_hoach/CLAUDE_CHI_TIET.md` 202 tệp test.
+
 ## 2026-11-08 — FA-KH (quyết định của Truong): ngoại lệ bất biến 2 cho huy chương mặc định, D11 không chặn
 
 - `CLAUDE.md`: ghi ngoại lệ bất biến 2 (huy chương mặc định theo thứ tự nguyện vọng, chỉ ở tầng đăng ký và chỉ khi học sinh đổi được; lý do: tín hiệu riêng kiểu CADA giữ khai thật thứ tự).

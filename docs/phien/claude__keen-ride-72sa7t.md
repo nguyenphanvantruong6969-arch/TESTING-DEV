@@ -26,6 +26,7 @@ Night 1 — kiosk backend (order fixed; dependencies in CHAY_DEM_FA_DAA.md C.5):
 - [ ] FA-8 property tests V§13 (`tests/test_fa_tinh_chat.py`)
 Later (NOT night 1):
 - [ ] FA-9 witnessed lottery record (D5)  - [ ] FA-10 simulation compare (+ D1 two-term incentive behaviour)
+- [x] FA-M3 part: `dat_huy_chuong_duong_b` + `tests/test_fa_m3_huy_chuong_b.py` (Opus, Truong asked 08/11; not yet wired)
 - [ ] Night 2 Microsoft: FA-M1 setup form, FA-M2 Forms registration (path B), FA-M3 converter, FA-M4 quiz variants + item analysis, FA-M5 Power Apps spec v2 (path A), FA-M6 after-allocation docs
 - [ ] Night 3: FA-UI kiosk screens (Chromium tests)
 - [ ] Opus review of each night before the next night starts
@@ -64,3 +65,4 @@ Later (NOT night 1):
 | 2026-11-08 | Opus | Read vision + code (priority, wharton, STB, registry A5/A6/A13/C3, T4M); wrote plan, night-run file, handoff | No code changed; D1 blocked; D8 waits for GĐ2 |
 | 2026-11-08 | Opus | Council review applied: D1 reason, D3, D4, D5->FA-9 record, D9, D11, D12 | Docs only |
 | 2026-11-08 | Opus | Truong decisions: D2 invariant-2 exception (CLAUDE.md), path B gold-override question, D11 no-block equating, D1 deferred | Docs + CLAUDE.md only |
+| 2026-11-08 | Opus | Truong: path B second medal question (swap silver/bronze); built `dat_huy_chuong_duong_b`, tests first (19 red -> green), mutation caught 8/19 | Converter only; not wired; no kiosk/schema/CSV change |
