@@ -10,8 +10,21 @@
 Read docs/phien/CHAY_DEM_FA_DAA.md and follow it exactly. Truong authorises commits and pushes to the branch named there. Work until every night-1 item is done or blocked, then write the final report.
 ```
 
-4. (Tuỳ chọn, để chạy tiếp khi phiên dừng giữa đêm) Tạo một **tác vụ định kỳ** mỗi 3 giờ, mỗi lần mở **phiên mới**, cùng
-   câu lệnh trên. Tệp này có khoá chống hai phiên chạy cùng lúc (mục C.2).
+4. (Tuỳ chọn, tự động cả đêm) Thay bước 3 bằng: mở một phiên claude.ai/code bất kỳ trên kho này, dán **prompt cài tự
+   động** dưới đây. Nó tạo tác vụ định kỳ 00:23, 02:23, 04:23 (giờ Việt Nam), mỗi lần mở phiên Sonnet mới; tệp này có
+   khoá chống hai phiên chạy cùng lúc (mục C.2) và phiên tự tắt tác vụ khi xong (mục E).
+
+```text
+Create a scheduled task for me. Name: "FA-DAA chay dem". Mode: create a NEW session on each firing, in this
+environment, repo nguyenphanvantruong6969-arch/TESTING-DEV, branch claude/keen-ride-72sa7t, model Sonnet
+(latest Sonnet id). Schedule: CRON_TZ=Asia/Ho_Chi_Minh 23 0,2,4 * * *. Push notifications on, email off.
+Prompt for each firing, verbatim:
+"Read docs/phien/CHAY_DEM_FA_DAA.md and follow it exactly. Truong authorises commits and pushes to the branch named
+there. Work until every night-1 item is done or blocked, then write the final report. If the handoff Plan already
+shows every night-1 item ticked or BLOCKED, disable the scheduled task named 'FA-DAA chay dem' (update_trigger,
+enabled=false), write nothing else, and stop."
+Do not fire it now. Show me the task id, next run time and stored prompt when done.
+```
 5. Sáng ra: đọc mục "Night report" trong `docs/phien/claude__keen-ride-72sa7t.md`, gửi Truong.
 
 Chạy bằng máy cá nhân thay vì web: clone kho, `git checkout claude/keen-ride-72sa7t`, chạy `claude --model sonnet`,
@@ -89,4 +102,6 @@ Re-run only failing node ids with `--tb=short | tail -40`.
 ### E. Final report (end of night or when nothing is left)
 Overwrite "Current state" in the handoff with: items done (commit hashes), items BLOCKED (why), tests run and
 counts, open questions for Truong. Append a "Night report <date>" Session-log row. Remove your RUNNING line. Commit,
-push, stop.
+push. If you were started by the scheduled task "FA-DAA chay dem" and no night-1 item is left unticked (all done or
+BLOCKED), disable that task (`list_triggers` to find it, then `update_trigger` with `enabled=false`; never delete it).
+Stop.
