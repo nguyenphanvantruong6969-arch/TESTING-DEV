@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-UI-1: công tắc "Xếp theo loại CLB và huy chương" khi tạo không gian làm việc (đêm 3)
+
+- `js/075_workspace.js`: bước luật có ô `#wzFaDaa` (tắt sẵn, lấy theo mẫu), hàng xem lại `#rvFaDaa`; chỉ gửi `rules.fa_daa: true` khi bật (tắt: cấu hình gửi đi như cũ); bật mà tắt điểm quyết tâm thì backend từ chối bằng lỗi sẵn có `ws_du_lieu_sai`, hiện trên màn hình. `wsApDungCauHinh` đặt `FA_BAT` (khai báo ở `js/05_quan_ly.js`) cho các màn FA sau.
+- `i18n.js`: `ws_r_fa_daa`, `ws_r_fa_daa_ngan`, `ws_r_fa_daa_ghi_chu` (vi + en). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 218 tệp test.
+- Test mới: `tests/test_giao_dien_fa_cai_dat.py` (5 ca Chromium, đều chạy thật).
+
 ## 2026-11-09 — FA-S10: sửa dòng đường B trong bảng D8 (đêm 3, chỉ tài liệu)
 
 - `docs/ke_hoach/FA_DAA_KE_HOACH.md` §4: đường B ghi "huy chương theo thứ tự + câu vàng và câu đổi bạc/đồng (đủ 6 cách đặt)" thay cho "không đổi được". Không đổi mã.

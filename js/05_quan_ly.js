@@ -36,6 +36,8 @@ let TRAN_NGUYEN_VONG_MOI_BUOI = 10;
 /* Diem quyet tam co bat khong, theo cau hinh da tai (wsApDungCauHinh, js/075). null = chua biet
    (chua tai xong cau hinh): luc do cu hoi API nhu truoc. false = khong goi API diem quyet tam nao. */
 let WHARTON_BAT = null;
+/* FA-UI: true khi workspace bật xếp theo loại CLB và huy chương (`rules.fa_daa`); đặt ở wsApDungCauHinh. */
+let FA_BAT = false;
 let TRAN_CLB_THI_MOI_BUOI = 5;
 
 /* Buoi cua mot CLB, tra tu danh sach da nap san — khong goi them API. */
