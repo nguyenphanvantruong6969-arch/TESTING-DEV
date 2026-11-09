@@ -33,6 +33,7 @@ Later (NOT night 1):
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-09T03:58Z opus-review-night1
 - 2026-11-09 Sonnet night 1 DONE: FA-0..FA-8 all ticked, none BLOCKED. RUNNING lock: none.
 - Commits: FA-0 lock 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920 (one commit, shared files).
 - Tests (related only): FA-1 1673 passed; FA-2 1823; FA-3 1992; FA-4..8 4075 passed, 1 skipped (V13.12, D1), 2 fixed after (rerun 50 targeted tests, not the whole set). ruff clean, kiem_nhanh 7/7. Full suite and UI tests NOT run (CI).
