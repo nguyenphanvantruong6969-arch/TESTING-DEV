@@ -112,3 +112,13 @@ def test_main_fa_daa_va_xung_khac_che_do_khac(tmp_path):
         tmf.main(["--fa-daa", "--chi-thi", "--ra", str(tmp_path)])
     with pytest.raises(SystemExit):
         tmf.main(["--fa-daa", "--moi-clb", "--ra", str(tmp_path)])
+
+
+def test_ngay_nhieu_hon_ba_clb_van_chi_ba_cau_nguyen_vong(de):
+    de2 = copy.deepcopy(de)
+    mau = copy.deepcopy([c for c in de["cau_lac_bo"] if c["buoi"] == "thu_2"][0])
+    mau.update(club_id="clb_them", name="CLB Thêm", de_thi=[])
+    de2["cau_lac_bo"].append(mau)
+    assert len(bm.clb_cua_buoi(de2, "thu_2")) == 4
+    nv = [c for c in _cau(bm.cac_phan_fa(de2, "thu_2")) if "Nguyện vọng" in c[0]]
+    assert len(nv) == 3

@@ -4,7 +4,7 @@
 
 - `bieu_mau.cac_phan_fa`, `tao_mau_forms.py --fa-daa`: mỗi ngày một biểu mẫu đăng ký (không câu Ranking; `[<buổi>-nv1..3]` bắt buộc, `[<buổi>-vang]` và `[<buổi>-doi]` tuỳ chọn, có đáp án \"giữ mặc định\" vì Forms không bỏ chọn được), `NHAP_FORMS_DANG_KY_<buổi>.docx` và `CAI_DAT_FORMS_DANG_KY.md` (một dòng mô tả V§5.1, cài đặt, giới hạn đường B). Không nói đường nào được khuyên dùng (D8 còn mở).
 - Không cờ: `--chi-thi` và `--moi-clb` sinh ra tệp giống hệt từng byte so với trước thay đổi (so bằng `diff -r`). `ghi_docx_chi_thi` thêm hai tham số tuỳ chọn.
-- Test mới: `tests/test_fa_m2_forms_dang_ky.py` (9 ca).
+- Test mới: `tests/test_fa_m2_forms_dang_ky.py` (10 ca).
 
 ## 2026-11-09 — FA-M1: Phiếu thiết lập CLB trên Forms và bộ chuyển đổi (đêm 2, TH = chưa thử trên Microsoft thật)
 
@@ -178,7 +178,7 @@ Không có mã. `docs/he_sinh_thai/T4M_MICROSOFT.md` (mới), ghi rõ "Bản nh�
 Thêm công cụ đo; không đụng mã sản phẩm, schema hay hợp đồng CSV. Mọi số liệu là MÔ PHỎNG; không có nhận xét.
 - `du_lieu_test/do_t4m_thi.py` (mới): 3 bộ giả (120 / 500 / 1.500 học sinh, hạt giống sinh cố định) x 20 hạt giống STB x 2 điều kiện (A không điểm thi, danh sách dự tuyển giữ nguyên; B có điểm thi như `de_thi.json`). Dữ liệu dựng bằng đúng chuỗi T4M (Lists giả → Forms giả → `--chi-thi` → `import_so_nhap`), đọc MỘT lần; mỗi lần chạy gọi `generate_stb_lottery`, `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) và `verify_stability_tuan`. Chỉ số: tỉ lệ nguyện vọng 1 / top-3, số em chưa có CLB (tổng và theo buổi), tỉ lệ suất Tầng 1 về nhóm điểm cao nhất, số cặp phá vỡ, thời gian. `--nhanh` (lưới nhỏ cho test; bắt buộc kèm `--ra`, `--tai-lieu`). Cả lưới đủ chạy ~30 giây.
 - `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` (sinh ra): phương pháp, tham số, bảng trung bình / nhỏ nhất / lớn nhất, nhãn MÔ PHỎNG ở mọi tiêu đề bảng, lệnh tái lập. `du_lieu_test/ket_qua_t4m/`: CSV từng lần chạy và theo buổi.
-- Sửa sau soát: bảng 2 ghi 15 CLB có đề thi, đúng là 10 (chỉ sai số đếm; điều kiện B vốn đã Tầng 1 đúng 10 CLB có `de_thi`); bảng 3 trở đi không đổi trừ số giây. Thêm test canh điều này (9 ca).
+- Sửa sau soát: bảng 2 ghi 15 CLB có đề thi, đúng là 10 (chỉ sai số đếm; điều kiện B vốn đã Tầng 1 đúng 10 CLB có `de_thi`); bảng 3 trở đi không đổi trừ số giây. Thêm test canh điều này (10 ca).
 - Test mới (viết trước): `tests/test_do_t4m_thi.py` (8 ca): điều kiện A và B trùng khít từng byte với `PipelineAPI.run_pipeline`; tất định; không cặp phá vỡ; nhãn MÔ PHỎNG và không có mục nhận xét. Thử gây hỏng: bỏ danh sách dự tuyển ở điều kiện A làm kết quả không còn phụ thuộc hạt giống — đã bị bắt.
 
 ## 2026-11-06 — T4M-Q1b-b (bổ sung của điều phối vào T4M-Q1b): `--co-so` cho `--chi-thi`
