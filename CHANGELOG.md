@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M5: Đặc tả Power Apps v2 (đường A) và cột list FA-DAA (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `T4M_DAC_TA_SUA_APP.md` §12 (mới): màn đăng ký v2 (xáo `Shuffle()`, ▲▼, tự lưu `Patch` DRAFT, tối thiểu 3, cảnh báo thiếu CLB Tự do, nhãn thẻ, Nộp SUBMITTED, ước tính số yêu cầu so với 6.000) và widget huy chương (mặc định theo thứ tự, tự cập nhật khi chưa chỉnh tay, hoán đổi, vàng vào Tuyển chọn có nhắc); yêu cầu R39 đến R54, tất cả TH; không nói đường nào nên chọn (D8 mở).
+- `bo_dung_t4m`: `cot_lists.ECA_FA` / `TAT_CA_FA` (`WP1..WP7` = huy chương, `HC_TuChinh`, `TrangThai` DRAFT/SUBMITTED/Đã khóa, không `THIk`); `site_script`, `mau_csv`, `sinh_bk1`, `tao_bo_dung_t4m.py --fa-daa` (+ `00_FA_DAA_GHI_CHU.md`). Không cờ: bộ dựng cho ra đúng như trước (`diff -r` giống hệt).
+- `tests/test_t4m_bo_dung_bk34.py`: test "nhắc mọi R1 đến R38" chỉ đếm R1..R38 (R39 trở đi thuộc bộ FA).
+- Test mới: `tests/test_fa_m5_bo_dung.py` (10 ca). Công thức Power Fx `02_app/` chưa viết lại cho màn FA.
+
 ## 2026-11-09 — FA-M4: Đề biến thể, phân tích câu hỏi và cân bằng điểm giữa các đề (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `chon_bien_the` (crc32(email) % n), `kiem_bien_the`, `phan_tich_cau` (V§7.5: % đúng, độ phân biệt 1/3 trên - 1/3 dưới, cờ PHAN_BIET_AM / QUA_DE / QUA_KHO), `so_sanh_bien_the` (D11: ngưỡng z·√(s²/n+s²/n), z = 1,96 hoặc 2,39; n < 5 chỉ báo; vượt ngưỡng thì dịch về trung bình chung; làm tròn nửa lên, kẹp 0-10), lệnh `chia` (Email -> đề giao, đề thi lại).

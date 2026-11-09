@@ -194,7 +194,8 @@ def test_main_va_co_zip(de, tmp_path, capsys):
 # ---------------------------------------------------------------- HUONG_DAN_IT.md
 def test_huong_dan_nhac_moi_R1_den_R38(ra):
     spec = _doc("T4M_DAC_TA_SUA_APP.md")
-    ma = re.findall(r"^\| (R\d+) \|", spec, flags=re.M)
+    # R39 trở đi (FA-M5, mục 12) thuộc bộ dựng FA (`--fa-daa`), không nằm trong HUONG_DAN_IT.md của bộ thường.
+    ma = [m for m in re.findall(r"^\| (R\d+) \|", spec, flags=re.M) if int(m[1:]) <= 38]
     assert len(ma) == 38 and ma[0] == "R1" and ma[-1] == "R38"
     hd = _doc_tep(ra / "HUONG_DAN_IT.md")
     thieu = [m for m in ma if not re.search(r"\b%s\b" % m, hd)]

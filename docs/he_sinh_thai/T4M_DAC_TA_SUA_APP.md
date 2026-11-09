@@ -201,3 +201,70 @@ Hành vi: mục 2 (điểm 3, 4, 5a, 5b, 5c, 8, 9). Nối tiếp R1 đến R24. 
 | R38 | Hai ngôn ngữ và điện thoại cho nhãn và màn mới | Chuyển vi/en: nhãn tick, khung, bộ đếm, thông báo đổi hết; điện thoại: bảy dòng + hai khung thao tác bằng ngón tay, bàn phím số, không cuộn ngang | 14.4 |
 
 R36 và R37 cần D1 (T4M-Q5a/b/c) có mã trên nhánh; trước đó chỉ kiểm được R25 đến R35 bằng mắt trên app thử.
+
+## 12. FA-DAA, đường A: màn đăng ký v2 và widget huy chương (FA-M5, TH, soạn 09/11/2026)
+
+Mã việc: **FA-M5** (kế hoạch `docs/ke_hoach/FA_DAA_KE_HOACH.md` §3; tầm nhìn `FA_DAA_VISION.md` §5.1, §6). **Mọi công thức là GĐ, mọi kiểm là TH**: chưa ai dựng, chưa có số đo. Quyết định **D8** (Power Apps hay Forms) **chưa có**; mục này chỉ mô tả **đường A**. Đường B là FA-M2 (`mau_forms_thi_clb/CAI_DAT_FORMS_DANG_KY.md` do `tao_mau_forms.py --fa-daa` sinh). Chỉ sửa **bản sao** app (NC-02); không dữ liệu thật trong kho mã.
+
+Mục này **thay thế** cho workspace FA: bước điểm quyết tâm hai khung (mục 2, điểm 5b, 5c: "Đã dùng X / 100", chặn Gửi theo tổng) và tick chọn thi (5a) cùng các yêu cầu R25 đến R38. Workspace không FA vẫn theo mục 2 và 11.
+
+### 12.1 Cột dữ liệu (list `ECA`, một dòng mỗi học sinh × ngày; bộ dựng `tao_bo_dung_t4m.py --fa-daa`)
+
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| `Email`, `CoSo`, `Khoi`, `Lop`, `Thu`, `NV1`…`NV7`, `CapDo`, `Goi` | như mục 1 | không đổi |
+| `WP1`…`WP7` | Số | **huy chương** của CLB ở `NVk`: 60 (vàng), 30 (bạc), 10 (đồng) hoặc rỗng. Không còn nghĩa "điểm quyết tâm". Cột có sẵn, dùng lại |
+| `HC_TuChinh` | Văn bản | `Có` khi em đã tự chỉnh huy chương của ngày đó; rỗng = chưa chỉnh |
+| `TrangThai` | Choice | `DRAFT` (tự lưu), `SUBMITTED` (đã nộp), `Đã khóa` (admin khoá sau hạn: đặt từ `SUBMITTED`) |
+| `THI1`…`THI7` | — | **bỏ** ở chế độ FA: em xếp CLB Tuyển chọn nào thì phải làm bài CLB đó (biểu mẫu FA-M4); chưa làm thì bị coi NOT_ATTEMPTED khi xếp |
+
+List `CLB_GIA` (hoặc `CLB`) cần thêm các cột lấy từ Phiếu thiết lập CLB (FA-M1, HỎI-IT về tên cột thật): `Loai` (Tự do / Giới hạn / Tuyển chọn), `ChiTieu`, `DiemSan`, `MoTa`. **Bộ chuyển đổi (FA-M3)**: bỏ dòng `DRAFT` (trừ khi chạy với `--nhan-ban-nhap`), lấy lần lưu cuối của (em, ngày), tự điền huy chương mặc định khi mọi `WPk` của ngày trống và `HC_TuChinh` trống, giữ nguyên `WPk` khi em đã đặt. Lệnh: `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx --lists ECA.csv`.
+
+### 12.2 Màn đăng ký (V§5.1)
+
+1. **Một câu hướng dẫn** duy nhất ở đầu màn: "Xếp đúng thứ tự em thích. Xếp CLB khó vào lên đầu không làm em mất cơ hội ở CLB sau." (lấy từ `colNhan`, hai ngôn ngữ).
+2. **Thứ tự CLB xáo ngẫu nhiên cho từng em:** `ClearCollect(colCLBNgau, Shuffle(Filter(CLB_GIA, Thu = <ngày>)))` ở `OnVisible` của thẻ ngày; chỉ chạy một lần mỗi lần mở ngày (thứ tự không đổi khi em chạm), để mỗi em thấy một thứ tự khác nhau.
+3. **Hai khu:** "Các CLB của ngày" (`colCLBNgau` trừ `colXep`) và "Danh sách của em" (`colXep`, tối đa 7). Mỗi thẻ trong "Danh sách của em" có nút **▲**, **▼** (đổi chỗ với dòng kề, `Patch` trên `colXep`), **Bỏ**; không bắt buộc kéo thả. Hoán đổi hai dòng: `Patch(colXep, Index(colXep, i), {Ma: Index(colXep, i - 1).Ma, ...})` rồi ngược lại (GĐ).
+4. **Thẻ CLB:** tên, mô tả một dòng, lịch, số chỗ, nhãn loại, có thử thách hay không, một ảnh. Nhãn: Tự do: "Tự do tham gia – em chắc chắn có chỗ." Giới hạn: "Giới hạn N chỗ – nếu đông, xét huy chương rồi bốc thăm." Tuyển chọn: "Tuyển chọn – N chỗ – có thử thách X phút. Dưới mốc M điểm sẽ không được xét." Học sinh **không** thấy số liệu nhu cầu và số huy chương mỗi CLB đang nhận.
+5. **Tối thiểu 3 nguyện vọng mỗi ngày** (hoặc tất cả nếu ngày có ít hơn 3 CLB): nút Nộp tắt kèm chữ giải thích. Nếu danh sách không có CLB Tự do: hiện "Thêm một CLB Tự do để chắc chắn có chỗ." (cảnh báo, không chặn).
+6. **Tự lưu:** sau mỗi thao tác (thêm, bỏ, ▲▼, đổi huy chương) chạy **một** `Patch` ghi `NV1`…`NV7`, `WP1`…`WP7`, `HC_TuChinh` và `TrangThai = "DRAFT"` của dòng ngày đó. Mở lại app thì đọc từ list (không từ biến cục bộ) và làm tiếp.
+7. **Nộp:** `Patch` đặt `TrangThai = "SUBMITTED"` cho từng ngày có đủ điều kiện (mục 5), kiểm đọc lại `TrangThai <> "Đã khóa"` trước mỗi `Patch` (như mục 3). Hiện màn xác nhận; email tóm tắt là việc của flow (FA-M6). Sau khoá: mọi ô tắt, nhãn "Đã khóa / Locked".
+8. **Số yêu cầu (NC-13, giới hạn 6.000 mỗi người mỗi 24 giờ):** giả sử tối đa 40 thao tác mỗi ngày × 5 ngày = 200 `Patch` tự lưu + 5 `Patch` nộp = 205 yêu cầu, còn xa dưới 6.000 (GĐ: 40 thao tác là ước lượng, chưa đo; đo ở R51).
+9. Chỉ dùng phép lọc uỷ quyền được (mục 5), nhãn hai ngôn ngữ từ `colNhan`, điện thoại như mục 2 (điểm 6, 7).
+
+### 12.3 Widget huy chương (V§6.1, D2)
+
+1. **Ba ô huy chương** trên "Danh sách của em": vàng (60), bạc (30), đồng (10), mỗi ô chứa **một** CLB.
+2. **Mặc định:** vàng, bạc, đồng cho ba CLB **không Tự do** xếp cao nhất trong danh sách của ngày; CLB Tự do bỏ qua. Ít hơn ba CLB không Tự do thì huy chương thừa để trống.
+3. **Chưa chỉnh tay** (`HC_TuChinh` rỗng): đổi thứ tự thì huy chương **tự cập nhật** theo thứ tự mới, và app ghi `WPk` tương ứng. **Đã chỉnh tay** (`HC_TuChinh = "Có"`): giữ nguyên, hiện nhắc nhẹ "Huy chương không đổi theo thứ tự nữa vì em đã tự đặt".
+4. **Hoán đổi** huy chương giữa các CLB trong danh sách; **mỗi CLB tối đa một huy chương**; không đặt vào CLB Tự do; một huy chương chỉ ở một CLB. Bỏ CLB khỏi danh sách thì huy chương của nó bị xoá (và nếu chưa chỉnh tay thì tự cập nhật lại).
+5. Khi đặt **vàng vào CLB Tuyển chọn** hiện: "Huy chương ở CLB Tuyển chọn chỉ dùng khi bằng điểm, và chỉ khi em vượt mốc."
+6. **Không** ô số, **không** bộ đếm "Đã dùng X / 100", **không** hai khung: chỉ thứ tự vàng > bạc > đồng > không có ý nghĩa (V§6.2); 60/30/10 chỉ để tương thích quỹ 100 điểm của kiosk.
+7. Ánh xạ: `WPk` của CLB ở `NVk` = 60, 30, 10 theo huy chương, rỗng nếu không có. Kiosk dùng đúng một quỹ (`fa_daa.diem_huy_chuong_hieu_luc`).
+
+### 12.4 Bảng yêu cầu và kiểm pass/fail (nối tiếp R1 đến R38; tất cả TH)
+
+| # | Yêu cầu | Kiểm (pass khi) |
+|---|---|---|
+| R39 | Thứ tự CLB xáo cho từng em | Hai tài khoản thử mở cùng ngày thấy hai thứ tự khác nhau; trong một lần mở, thứ tự không đổi khi chạm |
+| R40 | ▲ ▼ đổi đúng chỗ | Mỗi nút đổi đúng một dòng với dòng kề; ▲ ở dòng đầu và ▼ ở dòng cuối tắt |
+| R41 | Danh sách tối đa 7 và không trùng | Không thêm được CLB thứ 8; CLB đã vào danh sách biến khỏi khu "Các CLB của ngày" |
+| R42 | Tối thiểu 3 nguyện vọng mỗi ngày | Ngày có 9 CLB: dưới 3 thì Nộp tắt, đủ 3 thì bật; ngày có 2 CLB: chọn cả 2 là Nộp được |
+| R43 | Cảnh báo thiếu CLB Tự do | Danh sách không có CLB Tự do hiện đúng câu cảnh báo; thêm một CLB Tự do thì câu biến mất; Nộp vẫn được |
+| R44 | Tự lưu DRAFT | Sau mỗi thao tác, list có dòng đúng `NVk`, `WPk` và `TrangThai = DRAFT`; đóng và mở lại app thì danh sách và huy chương hiện đúng |
+| R45 | Nộp đặt SUBMITTED | Nộp 5 ngày: 5 dòng `SUBMITTED`; màn xác nhận hiện |
+| R46 | Khoá | Dòng `Đã khóa`: không sửa được; Nộp bị chặn nếu khoá giữa chừng |
+| R47 | Nhãn thẻ theo loại | Ba loại hiện đúng ba câu nhãn; không số liệu nhu cầu, không số huy chương mỗi CLB |
+| R48 | Huy chương mặc định | Danh sách [Tự do, A, B, C]: vàng A, bạc B, đồng C, Tự do không nhận; danh sách [Tự do, A]: chỉ vàng A |
+| R49 | Tự cập nhật khi chưa chỉnh tay; giữ khi đã chỉnh | Đổi ▲▼ khi `HC_TuChinh` rỗng: huy chương đổi theo; sau một lần hoán đổi tay (`HC_TuChinh = Có`): đổi ▲▼ không làm huy chương đổi, có nhắc nhẹ |
+| R50 | Hoán đổi đủ mọi cách, mỗi CLB tối đa một | Đặt được cả 6 cách vàng/bạc/đồng cho ba CLB; không đặt hai huy chương vào một CLB; không đặt vào CLB Tự do |
+| R51 | Số yêu cầu | Một em làm trọn 5 ngày: ghi số `Patch` thật trong lịch sử chạy, dưới 6.000 (ước lượng 205) |
+| R52 | Nhắc vàng ở Tuyển chọn | Đặt vàng vào CLB Tuyển chọn hiện đúng câu nhắc; đặt vào CLB Giới hạn thì không |
+| R53 | Tệp xuất qua bộ chuyển đổi FA không cảnh báo | Xuất List từ bản sao, chạy `chuyen_forms_sang_phan_mem.py --fa-daa --lists`: 0 cảnh báo, trừ dòng `DRAFT` còn sót; huy chương hợp lệ |
+| R54 | Hai ngôn ngữ, điện thoại, không dữ liệu thật | Chuyển vi/en: mọi nhãn mới đổi; điện thoại: không cuộn ngang; rà tệp và ảnh: không tên, email thật, `tenantId`, địa chỉ app |
+
+### 12.5 Còn mở
+
+- **D8** (đường A hay B) chờ cuộc họp GĐ2; bộ dựng và đặc tả này chỉ để sẵn.
+- Tên cột thật của `CLB_GIA` và quyền sửa app (NC-01, NC-02): HỎI-IT. Công thức Power Fx trong bộ dựng (`02_app/`) vẫn của chế độ thường, chưa viết lại cho màn FA.
+- Dòng `DRAFT` còn sót sau hạn: bộ chuyển đổi bỏ qua (em coi như không đăng ký, theo V§8.6 thành CLB Tự do); có nên giữ làm mặc định hay không là câu hỏi cho Truong.

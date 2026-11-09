@@ -11,7 +11,7 @@ import argparse
 import os
 import sys
 
-from . import cong_thuc, mau_csv, site_script
+from . import cong_thuc, cot_lists, mau_csv, site_script
 
 DONG_TH = "TH: chưa chạy trên Power Apps / SharePoint"
 
@@ -30,15 +30,16 @@ def _readme(tep_lists, tep_app):
     return "\n".join(L)
 
 
-def ghi_tat_ca(ra, de, in_ra=print):
-    """Sinh toàn bộ vào thư mục `ra`; trả danh sách tệp đã ghi (đường dẫn tương đối)."""
+def ghi_tat_ca(ra, de, in_ra=print, fa=False):
+    """Sinh toàn bộ vào thư mục `ra`; trả danh sách tệp đã ghi (đường dẫn tương đối). `fa` (FA-M5): cột ECA của FA-DAA."""
     d_lists = os.path.join(ra, "01_lists")
     d_app = os.path.join(ra, "02_app")
     os.makedirs(d_lists, exist_ok=True)
     os.makedirs(d_app, exist_ok=True)
-    tep_lists = ["site_script_t4m.json"] + mau_csv.ghi_csv_mau(d_lists) + ["KIEM_COT_ECA.md"]
-    site_script.ghi(os.path.join(d_lists, "site_script_t4m.json"), in_ra)
-    mau_csv.ghi_kiem_cot_eca(os.path.join(d_lists, "KIEM_COT_ECA.md"))
+    tat_ca = cot_lists.TAT_CA_FA if fa else None
+    tep_lists = ["site_script_t4m.json"] + mau_csv.ghi_csv_mau(d_lists, tat_ca) + ["KIEM_COT_ECA.md"]
+    site_script.ghi(os.path.join(d_lists, "site_script_t4m.json"), in_ra, tat_ca)
+    mau_csv.ghi_kiem_cot_eca(os.path.join(d_lists, "KIEM_COT_ECA.md"), fa)
     tep_app = cong_thuc.ghi(d_app, de)
     with open(os.path.join(ra, "README_BK1.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(_readme(sorted(tep_lists), tep_app))
