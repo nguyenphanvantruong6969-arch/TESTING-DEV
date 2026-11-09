@@ -33,10 +33,11 @@ Later (NOT night 1):
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- 2026-11-08 Opus: plan written and pushed; no product code changed yet. Nothing running.
-- RUNNING: 2026-11-09T02:08Z session_01VfPzNuHreMmsU2dsJPAz6x (night 1)
-- Tests: not run on this branch yet (container had no .venv). Baseline is FA-0.
-- Open problems: D8 (Power Apps vs Forms registration) waits for Truong's GĐ2 meeting with IT (before 15/11).
+- 2026-11-09 Sonnet night 1 DONE: FA-0..FA-8 all ticked, none BLOCKED. RUNNING lock: none.
+- Commits: FA-0 lock 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920 (one commit, shared files).
+- Tests (related only): FA-1 1673 passed; FA-2 1823; FA-3 1992; FA-4..8 4075 passed, 1 skipped (V13.12, D1), 2 fixed after (rerun 50 targeted tests, not the whole set). ruff clean, kiem_nhanh 7/7. Full suite and UI tests NOT run (CI).
+- Open for Truong: see bao_cao_dem/2026-11-09.md (commit split, D6 reserve override, fallback rank, shared wharton_lock, D8).
+- Not built: UI for FA (FA-UI), Microsoft items, FA-9, FA-10, D1.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -49,7 +50,7 @@ Later (NOT night 1):
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Night 1 implementer (Sonnet): follow `docs/phien/CHAY_DEM_FA_DAA.md`.
+1. (done 2026-11-09) Night 1 implementer: `docs/phien/CHAY_DEM_FA_DAA.md`.
 2. Opus: review night 1 diff (related tests, ruff, kiem_nhanh, invariant-1 byte identity), then release night 2.
 3. Truong: GĐ2 meeting -> decide D8; confirm or change D1..D10.
 
@@ -58,7 +59,8 @@ Later (NOT night 1):
 - docs/ke_hoach/FA_DAA_KE_HOACH.md: implementation plan and item specs
 - docs/phien/CHAY_DEM_FA_DAA.md: single entry file for the night run
 - docs/phien/claude__keen-ride-72sa7t.md: this handoff
-- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: FA-KH planning entry
+- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: FA-KH planning entry + FA-1..FA-8 entries
+- Code (night 1): fa_daa.py, fa_ly_do.py, mau_forms_thi_clb/so_sanh_suc_chua.py; edits in api.py, api_nhap.py, api_quan_ly.py, api_xuat.py, cau_hinh_ws.py, rbda_priority_pipeline.py, so_nhap.py, i18n_errors.py (+ i18n_loi.js); tests/test_fa_*.py and tests/_fa.py
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -72,3 +74,4 @@ Later (NOT night 1):
 | 2026-11-09 | Sonnet | FA-2: kiem_truoc_fa + hooks (pipeline, health); tests/test_fa_kiem_truoc.py (15); related 1823 passed (+1 expected count test, fixed); mutation caught | kiểu CLB helpers moved into so_nhap.py (standalone skill) |
 | 2026-11-09 | Sonnet | FA-3: huy chuong one fund + submit_huy_chuong + pipeline validation; tests/test_fa_huy_chuong.py (20); related 1992 passed; mutation caught (after adding invalid-value cases) | pipeline passes huy chuong as diem_wharton until FA-4 wrapper |
 | 2026-11-09 | Sonnet | FA-4..FA-8 (one commit, overlapping files): chay_fa_daa, minimum-members loop, fa_ly_do, demand table + so_sanh_suc_chua.py, property tests; related 4077 passed (+2 fixed: doc code map, COLLATE THU_TU_BUOI); mutations caught for every item | tests/test_fa_{chay,toi_thieu,ly_do,nhu_cau,tinh_chat}.py |
+| 2026-11-09 | Sonnet | Night report 2026-11-09: 9/9 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09.md | RUNNING line removed |
