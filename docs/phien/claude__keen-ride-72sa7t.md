@@ -40,17 +40,12 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-09T04:48Z session_01VfPzNrnmsTUhQDUGSanNrv (night 2)
-- 2026-11-09 Opus review of night 1: **GO**. RUNNING lock: none. Night 2 (FA-M1..FA-M6) released.
-- Night-1 commits: FA-0 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920; report a80e626.
-- Review: all 152 non-UI test files 4981 passed, 1 failed, 4 skipped; the failure (`test_van_phong_tu_nhien`, "DAA"
-  read as shouting caps in 4 new error messages) fixed in f9b9031 (DAA added to `VIET_TAT`), rerun 82/82. ruff clean,
-  kiem_nhanh 7/7. Invariant 1: 3 datasets x 20 seeds x 2 modes (default Wharton on; Wharton off), 5400 match_results
-  rows each, byte-identical to 5c4c645. Invariants 2-8 OK (rollback after last write, old DB migration, append-only).
-  Mutations 5/5 caught. UI tests and full suite NOT run (CI). Numbers are SIMULATED.
-- Open findings (report only): export_ly_do_csv exports the latest FA run even after a newer FA-off run; CSV club
-  import drops a row with an invalid `loai` even when FA is off; plan §4 path-B medal text stale vs D12.
-- Open for Truong: 5 questions of bao_cao_dem/2026-11-09.md (D8 among them) + whether to fix the findings.
+- 2026-11-09 night 2 (Sonnet): FA-M1..FA-M6 all DONE, 0 BLOCKED, all Microsoft parts TH (untested on real Microsoft). RUNNING lock removed. D8 still OPEN.
+- Commits: FA-M1 bfdc371; FA-M2 1efa8d1 + cde4384; FA-M3 7c48eae; FA-M4 a61d703; FA-M5 cd1fe46; FA-M6 58bc370. Report: bao_cao_dem/2026-11-09_dem2.md.
+- Tests: 6 new files (17+10+25+24+10+6 = 92 cases), each red first. Final run (all test_fa_*, mau forms, test_t4m_*, test_so_nhap, 2 doc tests): 2204 passed, 1 skipped. ruff clean, kiem_nhanh 7/7. UI/Chromium and full suite NOT run (CI).
+- Old modes unchanged: --chi-thi/--moi-clb output and T4M kit byte-identical (diff -r); default converter cell contents identical. One old test edited (R1..R38 count). No kiosk code touched.
+- Design notes: converter FA = `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb <FA-M1 sheet> (--dang-ky FORMS.. | --lists CSV) [quiz..] [--bien-the-tep F=B] [--ap-dung-dieu-chinh|--giu-diem-goc] [--bo-cau club-k]`; D11 gap without a flag -> report + exit 3, never blocks. DRAFT rows dropped (flag --nhan-ban-nhap). Variants: `de_thi_bien_the` in de_thi.json; guide in CAI_DAT_FORMS_BIEN_THE.md (separate file, deviates from the plan row).
+- Open for Truong: D8; DRAFT default; KetQua list read access; whether night 3 adds attendance/appeal/round-2 to the kiosk; the 2 night-1 review findings (see report).
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -63,8 +58,8 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Night 2 implementer (Sonnet): `docs/phien/CHAY_DEM_FA_DAA.md` (FA-M1..FA-M6, all TH, D8 left open).
-2. Opus: review night 2, then release night 3 (FA-UI).
+1. Opus: review night 2 (esp. FA-M3/FA-M4 converter wiring), then release night 3 (FA-UI, Chromium tests).
+2. Sonnet night 3: FA-UI after the Opus release.
 3. Truong: GĐ2 meeting -> decide D8; answer night-1 questions; decide whether to fix review findings 1-2.
 
 ## Files touched
@@ -95,3 +90,4 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 | 2026-11-09 | Sonnet | FA-M4: phan_tich_cau_hoi.py + tao_mau_forms --bien-the + converter gate (D11); tests/test_fa_m4_phan_tich.py 24; related 330 passed; old modes identical; 5 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | FA-M5: T4M_DAC_TA_SUA_APP §12 (R39-R54) + bo_dung_t4m ECA_FA + tao_bo_dung_t4m --fa-daa; tests/test_fa_m5_bo_dung.py 10; related 208 passed (after scoping old R1..R38 test); default kit byte-identical; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | FA-M6: docs/he_sinh_thai/FA_SAU_XEP.md (docs only) + tests/test_fa_m6_tai_lieu.py 6; related passed; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
+| 2026-11-09 | Sonnet | Night 2 report 2026-11-09: 6/6 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem2.md | RUNNING line removed |
