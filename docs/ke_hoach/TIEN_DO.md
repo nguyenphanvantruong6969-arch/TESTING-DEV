@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-S4 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 2 ca trong tests/test_fa_m4_phan_tich.py | Giờ không đọc được: 1 cảnh báo/tệp |
 | FA-S2 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, mau_forms_thi_clb/tao_mau_forms.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 3 ca trong tests/test_fa_m4_phan_tich.py | --bo-cau CLB-DE-SO |
 | FA-S5 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 1 ca trong tests/test_fa_m4_phan_tich.py | Sai đề giao: cảnh báo, giữ điểm |
 | FA-S1 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 3 ca trong tests/test_fa_m4_phan_tich.py | Thi lại theo V§7.2; không phụ thuộc thứ tự tệp |

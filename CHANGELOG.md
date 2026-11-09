@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S4: báo khi không đọc được giờ làm bài (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`_thoi_gian_lam_bai`): nhận ô `datetime` và chữ ISO; trả thêm số phiếu không đọc được (không đoán thứ tự ngày/tháng). `chuyen_fa_daa` thêm MỘT cảnh báo mỗi tệp kèm số phiếu đó.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` `test_fa_s4_thoi_gian_iso_va_datetime_doc_duoc_dang_khac_dem_loi`, `test_fa_s4_mot_canh_bao_moi_tep_kem_so_phieu`.
+
 ## 2026-11-09 — FA-S2: bỏ câu theo từng đề (đêm 3, TH)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `bo_cau` khoá `(CLB, đề, số câu)`; CLI `--bo-cau CLB-DE-SO` (ví dụ `C3-B-4`, hàm `_doc_bo_cau`); dạng cũ `CLB-SO` chỉ nhận khi CLB có một đề, nếu không là lỗi nêu các đề (`_chuan_bo_cau`). Bỏ câu 4 đề B không đổi điểm đề A.

@@ -442,3 +442,29 @@ def test_fa_s2_cli_doc_clb_de_so_va_clb_so():
     assert cv._doc_bo_cau("C3-B-4") == ("C3", "B", 4)
     assert cv._doc_bo_cau("clb_covua-3") == ("clb_covua", 3)
     assert cv._doc_bo_cau("clb-x-B-2") == ("clb-x", "B", 2)
+
+
+# ---------------------------------------------------------------- FA-S4: giờ làm bài không đọc được
+def test_fa_s4_thoi_gian_iso_va_datetime_doc_duoc_dang_khac_dem_loi():
+    from datetime import datetime
+    tieu = ["Start time", "Completion time", "Email"]
+    dong = [["2026-11-09 08:00:00", "2026-11-09T08:10:00", "a@x.vn"],
+            [datetime(2026, 11, 9, 8, 0), datetime(2026, 11, 9, 8, 5), "b@x.vn"],
+            ["11/9/26 08:00:00", "11/9/26 08:10:00", "c@x.vn"],
+            ["", "", "d@x.vn"]]
+    t, n_loi = cv._thoi_gian_lam_bai(tieu, dong)
+    assert t == {"a@x.vn": 600.0, "b@x.vn": 300.0}
+    assert n_loi == 2
+    assert cv._thoi_gian_lam_bai(["Email"], dong) == ({}, 0)            # không có cột: không báo
+
+
+def test_fa_s4_mot_canh_bao_moi_tep_kem_so_phieu(tmp_path):
+    de, lists, tep, sn, emails = _bo_thi_lai(tmp_path)
+    wb = openpyxl.load_workbook(tep["A"])
+    ws = wb.active
+    for r in (2, 3):
+        ws.cell(r, 2).value, ws.cell(r, 3).value = "11/9/26 08:00:00", "11/9/26 08:10:00"
+    wb.save(tep["A"])
+    kq = _chay_thu_tu(tmp_path, de, lists, tep, sn)
+    cb = [c[2] for c in kq["canh_bao"] if "không đọc được" in c[2]]
+    assert len(cb) == 1 and cb[0].startswith("thi_A.xlsx: 2 phiếu")

@@ -1130,21 +1130,31 @@ def doc_clb_fa(duong_so_nhap, de):
 
 
 def _thoi_gian_lam_bai(tieu_de, cac_dong):
-    """{email: giây} từ cột Start time / Completion time của tệp Forms; {} nếu thiếu cột hay không đọc được."""
+    """({email: giây}, số phiếu không đọc được giờ) từ cột Start time / Completion time của tệp Forms.
+
+    FA-S4: nhận ô `datetime` và chữ ISO (2026-11-09 08:00:00 hoặc có "T"); dạng khác (11/9/26 08:00:00) KHÔNG đoán
+    thứ tự ngày/tháng mà đếm vào số phiếu không đọc được. Thiếu cột: ({}, 0)."""
     from datetime import datetime
     chuan = [h.strip().lower() for h in tieu_de]
     if "start time" not in chuan or "completion time" not in chuan or "email" not in chuan:
-        return {}
+        return {}, 0
     i_b, i_x, i_e = chuan.index("start time"), chuan.index("completion time"), chuan.index("email")
-    ra = {}
+
+    def gio(o):
+        return o if isinstance(o, datetime) else datetime.fromisoformat(str(o).strip())
+
+    ra, n_loi = {}, 0
     for dong in cac_dong:
+        if not any(dong):
+            continue
         dong = list(dong) + [""] * (len(tieu_de) - len(dong))
         try:
-            t = (datetime.fromisoformat(dong[i_x]) - datetime.fromisoformat(dong[i_b])).total_seconds()
+            t = (gio(dong[i_x]) - gio(dong[i_b])).total_seconds()
         except ValueError:
+            n_loi += 1
             continue
-        ra.setdefault(dong[i_e].strip().lower(), t)               # phiếu đầu của mỗi email (như phan_tich_chi_thi)
-    return ra
+        ra.setdefault(str(dong[i_e]).strip().lower(), t)          # phiếu đầu của mỗi email (như phan_tich_chi_thi)
+    return ra, n_loi
 
 
 def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz_xlsx=(), nhan_ban_nhap=False,
@@ -1216,7 +1226,12 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
     bo_cau = _chuan_bo_cau(bo_cau, theo_ma)
     # D7 + D9: trung vị chỉ tính trên bài lần đầu (FA-S1)
-    t_tep = {ten: _thoi_gian_lam_bai(tieu_de, cac_dong) for ten, tieu_de, cac_dong in cac_tep}
+    t_tep = {}
+    for ten, tieu_de, cac_dong in cac_tep:
+        t_tep[ten], n_loi = _thoi_gian_lam_bai(tieu_de, cac_dong)
+        if n_loi:                                                  # FA-S4: một cảnh báo mỗi tệp
+            canh_bao.append(("", "", "%s: %d phiếu không đọc được Start time / Completion time (cần dạng "
+                             "2026-11-09 08:00:00) — các phiếu đó không xét cờ làm quá nhanh" % (ten, n_loi)))
     gio = {}
     for hs in hoc_sinh:
         for bai in hs["bai_thi"]:
