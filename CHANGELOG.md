@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S8: nhập CSV CLB khi FA tắt giữ nguyên dòng (đêm 3)
+
+- `api_nhap.py` (`import_clubs_csv`): FA tắt thì không đọc cột FA nữa (ô loại sai không còn làm bỏ dòng); dòng vẫn được tạo, một cảnh báo `fa_cot_bo_qua`. FA bật: như cũ.
+- Test mới (trong tệp cũ): `tests/test_fa_du_lieu.py` `test_fa_s8_csv_fa_tat_bo_cot_fa_giu_dong`, `test_fa_s8_csv_fa_bat_giu_hanh_vi_cu`.
+
 ## 2026-11-09 — FA-SOAT2: soát đêm 2 và mở đêm 3 (chỉ tài liệu, chưa sửa lỗi)
 
 - `docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md`: kết luận GO; danh sách sửa FA-S1..FA-S11 (6 lỗi mới của bộ chuyển đổi / bộ sinh, 4 phát hiện còn mở của soát đêm 1, 1 chỗ hở email ↔ mã học sinh). Theo yêu cầu của Truong: chưa sửa.

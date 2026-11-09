@@ -386,3 +386,22 @@ def test_giu_cho_khoa_chinh_va_khoa_ngoai(api):
     with api._ket_noi_ghi() as cur:
         with pytest.raises(sqlite3.IntegrityError):
             cur.execute("INSERT INTO giu_cho (club_id, student_id) VALUES ('A', 's1')")
+
+
+def test_fa_s8_csv_fa_tat_bo_cot_fa_giu_dong(api):
+    """FA-S8: FA tắt -> bỏ hẳn cột FA (kể cả ô sai), GIỮ dòng, một cảnh báo `fa_cot_bo_qua`."""
+    kq = api.import_clubs_csv("club_id,name,capacity,loai\nC1,CLB 1,5,abc\nC2,CLB 2,5,TU_DO\n")
+    assert kq["ok"], kq
+    assert kq["data"]["n_clubs_created"] == 2 and kq["data"]["n_rows_skipped"] == 0
+    assert [w["code"] for w in kq["data"]["warnings"]] == ["fa_cot_bo_qua"]
+    assert _fa_cua(api, "C1") == (None, None, None, None)
+    assert _fa_cua(api, "C2") == (None, None, None, None)
+
+
+def test_fa_s8_csv_fa_bat_giu_hanh_vi_cu(api):
+    _bat_fa(api)
+    kq = api.import_clubs_csv("club_id,name,capacity,loai\nC1,CLB 1,5,abc\nC2,CLB 2,5,TU_DO\n")
+    assert kq["ok"], kq
+    assert kq["data"]["n_clubs_created"] == 1 and kq["data"]["n_rows_skipped"] == 1
+    assert [w["code"] for w in kq["data"]["warnings"]] == ["csv_club_fa_invalid"]
+    assert _fa_cua(api, "C2") == ("TU_DO", None, None, None)

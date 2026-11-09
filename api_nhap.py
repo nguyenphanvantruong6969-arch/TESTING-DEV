@@ -676,7 +676,11 @@ class NhapDuLieuMixin:
                         continue
 
                     fa = {}
-                    if cot_fa:
+                    # FA-S8: FA tắt -> bỏ hẳn cột FA (không đọc, không bỏ dòng vì ô sai).
+                    if cot_fa and not fa_bat:
+                        if any((row.get(k) or "").strip() for k in cot_fa):
+                            n_fa_bo_qua += 1
+                    elif cot_fa:
                         fa, cot_sai = fa_daa.doc_thuoc_tinh_csv(row, cot_fa)
                         if cot_sai:
                             canh_bao.append(err("csv_club_fa_invalid", line=i, reason=cot_sai))
@@ -693,8 +697,6 @@ class NhapDuLieuMixin:
                                   buoi_value)
                     if fa_bat:
                         fa_daa.ghi_thuoc_tinh_clb(cur, club_id, fa)
-                    elif any(v is not None for v in fa.values()):
-                        n_fa_bo_qua += 1
                     if club_id in da_co:
                         n_sua += 1
                     else:

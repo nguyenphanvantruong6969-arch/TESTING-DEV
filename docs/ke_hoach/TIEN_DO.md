@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-S8 (FA-DAA đêm 3) | xong | 2026-11-09 | api_nhap.py, tests/test_fa_du_lieu.py, CHANGELOG.md | 2 ca trong tests/test_fa_du_lieu.py | FA tắt: bỏ cột FA, giữ dòng, 1 cảnh báo |
 | FA-SOAT2 (soát đêm 2, Truong yêu cầu 09/11/2026) | xong (GO, chưa sửa lỗi) | 2026-11-09 | docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md, docs/ke_hoach/FA_DAA_KE_HOACH.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/claude__keen-ride-72sa7t.md, CHANGELOG.md | — (chỉ tài liệu) | 11 mục sửa FA-S1..S11 cho đêm 3 |
 | FA-SOAT (Opus soát đêm 1, mục cha A13) | xong | 2026-11-09 | tests/test_van_phong_tu_nhien.py, CHANGELOG.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/bao_cao_dem/2026-11-09_soat_dem1.md | (không có tệp mới) | Soát đêm 1: GO; sửa 1 test đỏ (viết tắt DAA); mở đêm 2 FA-M1..FA-M6 |
 | FA-8 (FA-DAA, mục cha Z6) | xong | 2026-11-09 | (chỉ test) | tests/test_fa_tinh_chat.py | V§13.1-13.9, 13.11 trên 200 bộ ngẫu nhiên; 13.12 bỏ qua (D1 hoãn) |

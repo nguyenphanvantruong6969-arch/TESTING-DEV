@@ -37,7 +37,7 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [x] Opus review night 1 (2026-11-09: GO; report bao_cao_dem/2026-11-09_soat_dem1.md)
 - [x] Opus review night 2 (2026-11-09: GO with fix list; report bao_cao_dem/2026-11-09_soat_dem2.md; nothing fixed, Truong's instruction)
 Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6; order in CHAY_DEM_FA_DAA.md C.5):
-- [ ] FA-S7 export reasons of the latest run only   - [ ] FA-S8 CSV import keeps row when FA off   - [ ] FA-S9 rollback test fa_nhom/fa_ly_do
+- [ ] FA-S7 export reasons of the latest run only   - [x] FA-S8 CSV import keeps row when FA off   - [ ] FA-S9 rollback test fa_nhom/fa_ly_do
 - [ ] FA-S3 D11 small comparison group -> no shift   - [ ] FA-S1 retake counts only when flagged + retake variant
 - [ ] FA-S2 --bo-cau per variant   - [ ] FA-S4 warn on unreadable quiz times   - [ ] FA-S5 warn on wrong variant
 - [ ] FA-S6 generator reads Loại (--so-nhap-clb)   - [ ] FA-S11 email <-> student_id join for KetQua   - [ ] FA-S10 plan §4 D8 row
@@ -99,3 +99,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Sonnet | FA-M6: docs/he_sinh_thai/FA_SAU_XEP.md (docs only) + tests/test_fa_m6_tai_lieu.py 6; related passed; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | Night 2 report 2026-11-09: 6/6 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem2.md | RUNNING line removed |
 | 2026-11-09 | Opus | Reviewed night 2: GO; 6 new bugs + 4 open night-1 findings + 1 email gap listed as FA-S1..S11 (not fixed, Truong's instruction); wrote plan §6 and night-3 protocol | Repro: FA-S3, FA-S4; 197 related tests pass |
+| 2026-11-09 | Opus (night 3, Truong asked) | FA-S8: CSV club import keeps the row when FA is off; red first, mutation caught | related tests 2304 passed |
