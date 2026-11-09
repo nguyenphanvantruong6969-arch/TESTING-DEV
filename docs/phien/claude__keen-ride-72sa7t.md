@@ -27,18 +27,29 @@ Night 1 — kiosk backend (order fixed; dependencies in CHAY_DEM_FA_DAA.md C.5):
 Later (NOT night 1):
 - [ ] FA-9 witnessed lottery record (D5)  - [ ] FA-10 simulation compare (+ D1 two-term incentive behaviour)
 - [x] FA-M3 part: `dat_huy_chuong_duong_b` + `tests/test_fa_m3_huy_chuong_b.py` (Opus, Truong asked 08/11; not yet wired)
-- [ ] Night 2 Microsoft: FA-M1 setup form, FA-M2 Forms registration (path B), FA-M3 converter, FA-M4 quiz variants + item analysis, FA-M5 Power Apps spec v2 (path A), FA-M6 after-allocation docs
+Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CHAY_DEM_FA_DAA.md C.5; all TH):
+- [ ] FA-M1 club setup form guide + converter `chuyen_phieu_clb.py`
+- [ ] FA-M2 path B registration Forms (`--fa-daa` in `tao_mau_forms.py` / `bieu_mau.py`)
+- [ ] FA-M3 converter FA mode (`--fa-daa`), wires `dat_huy_chuong_duong_b` (needs FA-M1, FA-M2)
+- [ ] FA-M4 quiz variants + item analysis + D11 equating `phan_tich_cau_hoi.py` (needs FA-M3)
+- [ ] FA-M5 Power Apps spec v2 (path A) + `bo_dung_t4m` columns (needs FA-M3)
+- [ ] FA-M6 after-allocation docs `FA_SAU_XEP.md` (needs FA-M5)
 - [ ] Night 3: FA-UI kiosk screens (Chromium tests)
-- [ ] Opus review of each night before the next night starts
+- [x] Opus review night 1 (2026-11-09: GO; report bao_cao_dem/2026-11-09_soat_dem1.md)
+- [ ] Opus review night 2, night 3 before the next night starts
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-09T03:58Z opus-review-night1
-- 2026-11-09 Sonnet night 1 DONE: FA-0..FA-8 all ticked, none BLOCKED. RUNNING lock: none.
-- Commits: FA-0 lock 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920 (one commit, shared files).
-- Tests (related only): FA-1 1673 passed; FA-2 1823; FA-3 1992; FA-4..8 4075 passed, 1 skipped (V13.12, D1), 2 fixed after (rerun 50 targeted tests, not the whole set). ruff clean, kiem_nhanh 7/7. Full suite and UI tests NOT run (CI).
-- Open for Truong: see bao_cao_dem/2026-11-09.md (commit split, D6 reserve override, fallback rank, shared wharton_lock, D8).
-- Not built: UI for FA (FA-UI), Microsoft items, FA-9, FA-10, D1.
+- 2026-11-09 Opus review of night 1: **GO**. RUNNING lock: none. Night 2 (FA-M1..FA-M6) released.
+- Night-1 commits: FA-0 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920; report a80e626.
+- Review: all 152 non-UI test files 4981 passed, 1 failed, 4 skipped; the failure (`test_van_phong_tu_nhien`, "DAA"
+  read as shouting caps in 4 new error messages) fixed in f9b9031 (DAA added to `VIET_TAT`), rerun 82/82. ruff clean,
+  kiem_nhanh 7/7. Invariant 1: 3 datasets x 20 seeds x 2 modes (default Wharton on; Wharton off), 5400 match_results
+  rows each, byte-identical to 5c4c645. Invariants 2-8 OK (rollback after last write, old DB migration, append-only).
+  Mutations 5/5 caught. UI tests and full suite NOT run (CI). Numbers are SIMULATED.
+- Open findings (report only): export_ly_do_csv exports the latest FA run even after a newer FA-off run; CSV club
+  import drops a row with an invalid `loai` even when FA is off; plan §4 path-B medal text stale vs D12.
+- Open for Truong: 5 questions of bao_cao_dem/2026-11-09.md (D8 among them) + whether to fix the findings.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -51,9 +62,9 @@ Later (NOT night 1):
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. (done 2026-11-09) Night 1 implementer: `docs/phien/CHAY_DEM_FA_DAA.md`.
-2. Opus: review night 1 diff (related tests, ruff, kiem_nhanh, invariant-1 byte identity), then release night 2.
-3. Truong: GĐ2 meeting -> decide D8; confirm or change D1..D10.
+1. Night 2 implementer (Sonnet): `docs/phien/CHAY_DEM_FA_DAA.md` (FA-M1..FA-M6, all TH, D8 left open).
+2. Opus: review night 2, then release night 3 (FA-UI).
+3. Truong: GĐ2 meeting -> decide D8; answer night-1 questions; decide whether to fix review findings 1-2.
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -76,3 +87,4 @@ Later (NOT night 1):
 | 2026-11-09 | Sonnet | FA-3: huy chuong one fund + submit_huy_chuong + pipeline validation; tests/test_fa_huy_chuong.py (20); related 1992 passed; mutation caught (after adding invalid-value cases) | pipeline passes huy chuong as diem_wharton until FA-4 wrapper |
 | 2026-11-09 | Sonnet | FA-4..FA-8 (one commit, overlapping files): chay_fa_daa, minimum-members loop, fa_ly_do, demand table + so_sanh_suc_chua.py, property tests; related 4077 passed (+2 fixed: doc code map, COLLATE THU_TU_BUOI); mutations caught for every item | tests/test_fa_{chay,toi_thieu,ly_do,nhu_cau,tinh_chat}.py |
 | 2026-11-09 | Sonnet | Night report 2026-11-09: 9/9 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09.md | RUNNING line removed |
+| 2026-11-09 | Opus | Review night 1: GO. Non-UI tests 4981/1 fail/4 skip; fixed `test_van_phong_tu_nhien` (DAA acronym, f9b9031); invariant 1 3x20x2 identical; mutations 5/5; released night 2 in CHAY_DEM_FA_DAA.md | report bao_cao_dem/2026-11-09_soat_dem1.md; RUNNING line removed |
