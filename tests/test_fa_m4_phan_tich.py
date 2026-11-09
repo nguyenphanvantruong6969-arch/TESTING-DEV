@@ -309,3 +309,91 @@ def test_cli_chia_ghi_de_giao_va_de_thi_lai(tmp_path):
 def test_main_bien_the_loai_tru_voi_che_do_khac(tmp_path):
     with pytest.raises(SystemExit):
         tmf.main(["--bien-the", "--fa-daa", "--ra", str(tmp_path)])
+
+
+# ---------------------------------------------------------------- FA-S1 / FA-S5: thi lại, đề sai
+def _tep_thi_gio(tmp_path, clb_v, dong, ten):
+    """dong: [(email, so_cau_dung, so_giay)]."""
+    tieu = ["ID", "Start time", "Completion time", "Email", "Name", bm.cau_cong_thi(bm.doc_de_thi(), clb_v, chi_thi=True)]
+    tieu += [bm.cau_de_thi(clb_v, i) for i in range(1, len(clb_v["de_thi"]) + 1)]
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(tieu)
+    for email, k, giay in dong:
+        r = {"Email": email, "Name": email, "Start time": "2026-11-09 10:00:00",
+             "Completion time": "2026-11-09 10:%02d:%02d" % divmod(giay, 60), tieu[5]: bm.CO}
+        for i, cau in enumerate(clb_v["de_thi"], 1):
+            r[bm.cau_de_thi(clb_v, i)] = cau["lua_chon"][cau["dap_an"] if i <= k else (cau["dap_an"] + 1) % len(cau["lua_chon"])]
+        ws.append([r.get(h, "") for h in tieu])
+    p = str(tmp_path / ten)
+    wb.save(p)
+    return p
+
+
+def _bo_thi_lai(tmp_path, them_a=(), them_b=(), sua=None):
+    """12 em, mỗi em thi lần đầu đúng đề được giao (4 câu đúng, 600 giây). `sua` {email: (k, giây)} đổi lần đầu;
+    `them_a` / `them_b`: dòng thêm [(email, k, giây)] vào tệp đề A / đề B."""
+    de = _de_bien_the()
+    clb = next(c for c in de["cau_lac_bo"] if c["club_id"] == "clb_covua")
+    clb_b = dict(clb, de_thi=clb["de_thi_bien_the"][0])
+    emails = ["t%d@x.vn" % i for i in range(12)]
+    dong = {"A": list(them_a), "B": list(them_b)}
+    for e in emails:
+        k, g = (sua or {}).get(e, (4, 600))
+        dong["AB"[pt.chon_bien_the(e, 2)]].insert(0, (e, k, g))
+    pa = _tep_thi_gio(tmp_path, clb, dong["A"], "thi_A.xlsx")
+    pb = _tep_thi_gio(tmp_path, clb_b, dong["B"], "thi_B.xlsx")
+    import csv
+    p = tmp_path / "list.csv"
+    with open(p, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Email", "HoTen", "Thu", "NV1", "TrangThai"])
+        for e in emails:
+            w.writerow([e, e, "Thứ 2", "clb_covua", "SUBMITTED"])
+    clubs = [{"club_id": c["club_id"], "name": c["name"], "capacity": 40, "reserve_capacity": 0, "reserve_group": "",
+              "buoi": c["buoi"], "loai": so_nhap.TU_DO if c["club_id"] == "clb_nhiepanh" else so_nhap.GIOI_HAN}
+             for c in de["cau_lac_bo"]]
+    sn = str(tmp_path / "clb.xlsx")
+    so_nhap.ghi_so_nhap(sn, clubs=clubs)
+    return de, str(p), {"A": pa, "B": pb}, sn, emails
+
+
+def _chay_thu_tu(tmp_path, de, lists, tep, sn, dao=False):
+    q = [tep["B"], tep["A"]] if dao else [tep["A"], tep["B"]]
+    return cv.chuyen_fa_daa(str(tmp_path / "ra"), de, sn, lists=lists, quiz_xlsx=q,
+                            bien_the_tep={"thi_A.xlsx": "A", "thi_B.xlsx": "B"}, giu_diem_goc=True)
+
+
+def _de_lai(e):
+    return "AB"[pt.chon_bien_the_thi_lai(e, 2)]
+
+
+def test_fa_s1_bi_co_nhanh_va_dung_de_thi_lai_thi_lay_bai_lan_hai(tmp_path):
+    x = "t0@x.vn"
+    lai = [(x, 5, 600)]
+    de, lists, tep, sn, _ = _bo_thi_lai(tmp_path, sua={x: (1, 60)},
+                                        **{"them_" + _de_lai(x).lower(): lai})
+    kq = _chay_thu_tu(tmp_path, de, lists, tep, sn)
+    assert _diem(tmp_path)[x] == 10.0                                  # bài thi lại 5/5
+    assert not any("giữ bài đầu" in c[2] for c in kq["canh_bao"])
+
+
+def test_fa_s1_khong_bi_co_thi_bai_lan_hai_bi_bo_kem_canh_bao(tmp_path):
+    y = "t1@x.vn"
+    de, lists, tep, sn, _ = _bo_thi_lai(tmp_path, **{"them_" + _de_lai(y).lower(): [(y, 5, 600)]})
+    kq = _chay_thu_tu(tmp_path, de, lists, tep, sn)
+    assert _diem(tmp_path)[y] == 8.0                                   # giữ lần đầu 4/5
+    assert len([c for c in kq["canh_bao"] if c[1] == y and "không tính" in c[2]]) == 1
+
+
+def test_fa_s1_dao_thu_tu_tep_cho_cung_ket_qua(tmp_path):
+    x, y = "t0@x.vn", "t1@x.vn"
+    them = {"A": [], "B": []}
+    them[_de_lai(x)].append((x, 5, 600))
+    them[_de_lai(y)].append((y, 5, 600))
+    de, lists, tep, sn, _ = _bo_thi_lai(tmp_path, them_a=them["A"], them_b=them["B"], sua={x: (1, 60)})
+    k1 = _chay_thu_tu(tmp_path, de, lists, tep, sn)
+    d1 = _diem(tmp_path)
+    k2 = _chay_thu_tu(tmp_path, de, lists, tep, sn, dao=True)
+    assert _diem(tmp_path) == d1
+    assert sorted(map(str, k1["canh_bao"])) == sorted(map(str, k2["canh_bao"]))

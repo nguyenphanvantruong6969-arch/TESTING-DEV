@@ -586,7 +586,7 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
                 ma = clb["club_id"]
                 if not _da_thi(dong, cot, clb):
                     continue
-                if any(t["club_id"] == ma for t in hs["bai_thi"]):
+                if not fa and any(t["club_id"] == ma for t in hs["bai_thi"]):
                     bao("%s: đã có bài từ tệp khác — giữ bài đầu" % ma)
                     continue
                 tra_loi = {i: _gia_tri(dong, cot["%s-%d" % (ma, i)])
@@ -608,6 +608,8 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
                         "— điểm có trong BANG_DIEM.xlsx nhưng không nạp vào phần mềm"
                         % (ma, clb["buoi"]))
                 bai = {"club_id": ma, "diem": diem, "dung": dung, "tra_loi": tra_loi, "nap": da_xep}
+                if fa:
+                    bai["tep"] = ten_tep
                 if theo_tep is not None:
                     bai["bien_the"] = chu_de
                 if da_xep and "tick" in hs and ma not in hs["tick"]:
@@ -618,6 +620,9 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
             hs["bai_thi"] += bai_thi
 
     de = de_goc
+    if fa:
+        for e, hs in hoc_sinh.items():
+            _tach_lan_dau(theo_ma, e, hs)
     for e, hs in hoc_sinh.items():
         _ap_tran_thi(de, theo_ma, hs["nguyen_vong"], hs["bai_thi"],
                      lambda nd, e=e, hs=hs: canh_bao.append((hs["dong"], e, nd)))
@@ -630,6 +635,38 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
             canh_bao.append(("", "", "%s có đề thi nhưng không tệp Forms nào chứa câu của CLB này "
                              "— không có điểm cho CLB này" % clb["club_id"]))
     return list(hoc_sinh.values()), canh_bao
+
+
+def _so_de(clb):
+    import phan_tich_cau_hoi as pt
+    return len(pt.cac_bien_the(clb)) if clb.get("de_thi") else 1
+
+
+def _de_giao(email, clb, thi_lai=False):
+    """Chữ đề giao cho em (FA-M4): `chon_bien_the`, hoặc `chon_bien_the_thi_lai` khi thi lại."""
+    import phan_tich_cau_hoi as pt
+    n = _so_de(clb)
+    return pt.CHU_BIEN_THE[(pt.chon_bien_the_thi_lai if thi_lai else pt.chon_bien_the)(email, n)]
+
+
+def _tach_lan_dau(theo_ma, email, hs):
+    """FA-S1: mỗi CLB giữ MỘT "bài lần đầu" trong hs["bai_thi"], các bài khác sang hs["bai_khac"].
+
+    Bài lần đầu = bài làm đúng đề giao (`chon_bien_the`), không phụ thuộc thứ tự tệp trên dòng lệnh; không có bài
+    nào đúng đề giao thì lấy theo (khác đề thi lại, chữ đề, tên tệp)."""
+    nhom = {}
+    for bai in hs["bai_thi"]:
+        nhom.setdefault(bai["club_id"], []).append(bai)
+    giu, khac = [], []
+    for ma, ds in nhom.items():
+        clb = theo_ma[ma]
+        giao, lai = _de_giao(email, clb), _de_giao(email, clb, thi_lai=True)
+        ds = sorted(ds, key=lambda b: (b.get("bien_the", "A") != giao, b.get("bien_the", "A") != lai,
+                                       b.get("bien_the", "A"), b["tep"]))
+        giu.append(ds[0])
+        khac += ds[1:]
+    hs["bai_thi"] = [b for b in hs["bai_thi"] if any(b is g for g in giu)]
+    hs["bai_khac"] = khac
 
 
 def tap_thi(hs, buoi):
@@ -1149,18 +1186,33 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         cb = [x for x in cb if "có đề thi nhưng không tệp Forms" not in x[2]]
     canh_bao += cb
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
-    # D7 + D9
+    # D7 + D9: trung vị chỉ tính trên bài lần đầu (FA-S1)
+    t_tep = {ten: _thoi_gian_lam_bai(tieu_de, cac_dong) for ten, tieu_de, cac_dong in cac_tep}
     gio = {}
-    for ten, tieu_de, cac_dong in cac_tep:
-        t = _thoi_gian_lam_bai(tieu_de, cac_dong)
-        i_email, _, cot, _, phu, _ = _cot_chi_thi(de, tieu_de)
-        for dong in cac_dong:
-            dong = list(dong) + [""] * (len(tieu_de) - len(dong))
-            email = dong[i_email].strip().lower()
-            for clb in phu:
-                if _da_thi(dong, cot, clb) and email in t:
-                    gio.setdefault(clb["club_id"], {}).setdefault(email, t[email])
+    for hs in hoc_sinh:
+        for bai in hs["bai_thi"]:
+            t = t_tep.get(bai["tep"], {}).get(hs["student_id"])
+            if t is not None:
+                gio.setdefault(bai["club_id"], {})[hs["student_id"]] = t
     nhanh = {ma: co_nhanh_qua(t) for ma, t in gio.items()}
+    # FA-S1 (V§7.2): bài lần hai chỉ thay bài lần đầu khi lần đầu bị gắn cờ quá nhanh VÀ là đề thi lại của em.
+    for hs in hoc_sinh:
+        e = hs["student_id"]
+        for bai2 in sorted(hs.pop("bai_khac", []), key=lambda b: b["tep"]):
+            i = next(k for k, b in enumerate(hs["bai_thi"]) if b["club_id"] == bai2["club_id"])
+            bai1, clb = hs["bai_thi"][i], theo_ma[bai2["club_id"]]
+            if (not bai1.get("thi_lai") and e in nhanh.get(clb["club_id"], ()) and _so_de(clb) > 1
+                    and bai2.get("bien_the") == _de_giao(e, clb, thi_lai=True)):
+                bai2.update(nap=bai1["nap"], thi_lai=True)
+                if bai1.get("khong_tick"):
+                    bai2["khong_tick"] = True
+                hs["bai_thi"][i] = bai2
+                canh_bao.append((hs["dong"], e, "%s: lần đầu bị gắn cờ làm quá nhanh — dùng bài thi lại (đề %s, tệp %s)"
+                                 % (clb["club_id"], bai2.get("bien_the", "A"), bai2["tep"])))
+            else:
+                canh_bao.append((hs["dong"], e, "%s: bài lần hai (tệp %s) không tính — giữ bài lần đầu (tệp %s); "
+                                 "chỉ tính thi lại khi lần đầu bị gắn cờ làm quá nhanh và em làm đúng đề thi lại"
+                                 % (clb["club_id"], bai2["tep"], bai1["tep"])))
     bai_cua = {}                                                   # club_id -> [(bài, khoá email)]
     for hs in hoc_sinh:
         e = hs["student_id"]                                        # lúc này là khoá email (như doc_lists)
@@ -1172,7 +1224,7 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
                 if bo else Fraction(str(bai["diem"])) / Fraction(str(bm.diem_toi_da(de, clb))) * 10
             bai["diem_so_nhap"] = pt.diem_dieu_chinh(bai["diem_10_tho"], 0)
             bai_cua.setdefault(bai["club_id"], []).append((bai, e))
-            if e in nhanh.get(bai["club_id"], ()):
+            if e in nhanh.get(bai["club_id"], ()) and not bai.get("thi_lai"):
                 bai["nhanh_qua"] = True
                 canh_bao.append((hs["dong"], e, "%s: làm bài quá nhanh (dưới 1/3 thời gian trung vị của CLB này) "
                                  "— gắn cờ, cho thi lại một lần bằng đề khác nếu admin đồng ý" % bai["club_id"]))

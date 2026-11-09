@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-S1 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 3 ca trong tests/test_fa_m4_phan_tich.py | Thi lại theo V§7.2; không phụ thuộc thứ tự tệp |
 | FA-S3 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/phan_tich_cau_hoi.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 1 ca trong tests/test_fa_m4_phan_tich.py | Một phía < 5 bài -> chỉ báo, không dịch |
 | FA-S7, FA-S9 (FA-DAA đêm 3) | xong | 2026-11-09 | api_xuat.py, tests/test_fa_ly_do.py, CHANGELOG.md | 2 ca trong tests/test_fa_ly_do.py | Xuất lý do: chỉ lần chạy mới nhất; test rollback fa_nhom/fa_ly_do |
 | FA-S8 (FA-DAA đêm 3) | xong | 2026-11-09 | api_nhap.py, tests/test_fa_du_lieu.py, CHANGELOG.md | 2 ca trong tests/test_fa_du_lieu.py | FA tắt: bỏ cột FA, giữ dòng, 1 cảnh báo |

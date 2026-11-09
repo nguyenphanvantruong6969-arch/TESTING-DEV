@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S1: bài thi lại chỉ tính khi lần đầu bị gắn cờ và đúng đề thi lại (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `--fa-daa` giữ mọi bài của một CLB rồi `_tach_lan_dau` chọn "bài lần đầu" theo đề giao (`chon_bien_the`), không theo thứ tự tệp; trung vị D9 chỉ trên bài lần đầu; bài lần hai thay bài lần đầu CHỈ khi lần đầu bị cờ quá nhanh và bài lần hai là đề `chon_bien_the_thi_lai`; mọi bài lần hai khác: không tính + cảnh báo. Chế độ mặc định (không `--fa-daa`) giữ "giữ bài đầu", đường mã không đổi.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` 3 ca `test_fa_s1_*` (thi lại hợp lệ, lần hai không cờ bị bỏ, đảo thứ tự tệp cho cùng kết quả).
+
 ## 2026-11-09 — FA-S3: cân bằng đề không dịch điểm khi một phía có ít bài (đêm 3, TH)
 
 - `mau_forms_thi_clb/phan_tich_cau_hoi.py` (`so_sanh_bien_the`): `N_NHO` (chỉ báo, không dịch) khi đề này HOẶC phần còn lại có ít hơn `N_TOI_THIEU` bài.
