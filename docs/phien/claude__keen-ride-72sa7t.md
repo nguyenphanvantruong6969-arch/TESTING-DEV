@@ -51,6 +51,7 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-09T16:00Z session_01VfPzNsSNKFs4nFPgyEfvMe (night 4, Sonnet)
 - 2026-11-09 Opus handoff (context ~400k). Nights 1-3 DONE and reviewed (all GO). Night 4 RELEASED, not started. Nothing running, no RUNNING lock, no scheduled task created by this session.
 - Night 3 (Opus at Truong's request): 16/16 done (FA-S1..S11, FA-UI-1..5); commits listed in bao_cao_dem/2026-11-09_dem3.md.
 - Night-3 review (48467a9): non-UI related tests 2293 passed / 1 skipped (incl. TestTrungKhit 3x20); kiem_nhanh 7/7. UI tests NOT rerun here (pip install of playwright hung). Repro scripts were in scratchpad only; steps are in bao_cao_dem/2026-11-09_soat_dem3.md.
