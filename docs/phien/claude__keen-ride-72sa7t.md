@@ -25,7 +25,7 @@ Night 1 — kiosk backend (order fixed; dependencies in CHAY_DEM_FA_DAA.md C.5):
 - [x] FA-7 demand table + `so_sanh_suc_chua.py`
 - [x] FA-8 property tests V§13 (`tests/test_fa_tinh_chat.py`)
 Later (NOT night 1):
-- [ ] FA-9 witnessed lottery record (D5)  - [ ] FA-10 simulation compare (+ D1 two-term incentive behaviour)
+- [x] FA-9 witnessed lottery record (D5)  - [x] FA-10 simulation compare (+ D1 two-term incentive behaviour)
 - [x] FA-M3 part: `dat_huy_chuong_duong_b` + `tests/test_fa_m3_huy_chuong_b.py` (Opus, Truong asked 08/11; not yet wired)
 Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CHAY_DEM_FA_DAA.md C.5; all TH):
 - [x] FA-M1 club setup form guide + converter `chuyen_phieu_clb.py`
@@ -135,3 +135,5 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Sonnet (night 4) | FA-N2: on-site lazy medals saved + follow re-rank (js hcTheoNguyenVong); tests/test_giao_dien_fa_n2_luu_mac_dinh.py 3 Chromium red first; related UI 63 passed; mutation caught; kiem_nhanh 7/7 | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-N3: fa_can_diem_quyet_tam error code; tests/test_fa_n3_loi_diem_quyet_tam.py 5 red first; related fa+ws 2423 passed (1 count test fixed); mutation caught; kiem_nhanh 7/7 | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-N4: single-variant club retake warning + guide line; tests/test_fa_n4_mot_de_khong_thi_lai.py 3 red first; converter/forms tests 129 passed; mutation caught; kiem_nhanh 7/7 | night 4 |
+| 2026-11-09 | Sonnet (night 4) | FA-9: fa_bien_ban.py + export_bien_ban_boc_tham + button; tests/test_fa_bien_ban.py 9 + 1 Chromium; related 112 passed; 2 mutations caught; kiem_nhanh 7/7; pure module written before its tests, API/UI tests red first | night 4 |
+| 2026-11-09 | Sonnet (night 4) | FA-10: du_lieu_test/mo_phong_fa_daa.py tables only; tests/test_mo_phong_fa_daa.py 9; 3 mutations caught after adding 2 tests; module written before tests | night 4 |

@@ -91,3 +91,5 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-N2 (đêm 4) | xong | 2026-11-09 | js/04_nhap_tai_cho.js, index.html, i18n.js, CHANGELOG.md | tests/test_giao_dien_fa_n2_luu_mac_dinh.py | Huy chương mặc định được lưu và đi theo thứ tự |
 | FA-N3 (đêm 4) | xong | 2026-11-09 | cau_hinh_ws.py, api_workspace.py, i18n_errors.py, i18n_loi.js, CHANGELOG.md | tests/test_fa_n3_loi_diem_quyet_tam.py | Mã lỗi riêng khi bật FA mà tắt điểm quyết tâm |
 | FA-N4 (đêm 4) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, mau_forms_thi_clb/tao_mau_forms.py, CHANGELOG.md | tests/test_fa_n4_mot_de_khong_thi_lai.py | Cảnh báo CLB một đề không thi lại |
+| FA-9 (đêm 4) | xong | 2026-11-09 | fa_bien_ban.py, api_xuat.py, i18n_errors.py, i18n_loi.js, index.html, js/03_ket_qua.js, i18n.js, CHANGELOG.md | tests/test_fa_bien_ban.py, test_giao_dien_fa_ket_qua.py | Biên bản bốc thăm có người chứng kiến |
+| FA-10 (đêm 4) | xong | 2026-11-09 | du_lieu_test/mo_phong_fa_daa.py, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_mo_phong_fa_daa.py | Bảng số mô phỏng: cũ vs FA, thua bốc thăm theo hành vi, D1 hai kỳ (chỉ đo) |

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-10: mô phỏng so sánh chế độ cũ và FA-DAA, hành vi hai kỳ của D1 (đêm 4)
+
+- `du_lieu_test/mo_phong_fa_daa.py` (mới, không đụng phần mềm): cùng dữ liệu sinh có hạt giống, chạy chế độ cũ (điểm thi + hai quỹ) và `chay_fa_daa`; in bốn bảng: %NV1 / %top 2 / %không CLB, % dòng theo lý do, % thua bốc thăm theo hành vi (lười / thật thà / chiến lược), và bảng hai kỳ D1 (em xếp CLB Giới hạn hot nhất lên NV1 cố ý; không bù và có bù — bù chỉ mô phỏng bằng cách xếp em lên đầu bốc thăm kỳ 2). Mỗi bảng ghi "SỐ LIỆU MÔ PHỎNG"; KHÔNG có câu nhận định. D1 chưa cài vào phần mềm.
+- Test mới: `tests/test_mo_phong_fa_daa.py` (9).
+
+## 2026-11-09 — FA-9: biên bản bốc thăm có người chứng kiến (đêm 4)
+
+- `fa_bien_ban.py` (mới, hàm thuần): `sha256_stb`, `tao_ban_ghi`, `html_bien_ban`. `api_xuat.py` `export_bien_ban_boc_tham` → `bien_ban_boc_tham.html` (kỳ, thời điểm, dấu vân tay dữ liệu, hạt giống, SHA-256 danh sách (mã HS, số bốc thăm) đã sắp, số liệu từng buổi, thứ tự buổi lễ, dòng ký; không tên/mã học sinh; cảnh báo nếu dữ liệu đã sửa sau lần chạy). Chỉ đọc, không đổi schema/CSV. `i18n_errors.py` + `i18n_loi.js`: `bien_ban_chua_boc_tham`. Nút "Xuất biên bản bốc thăm" ở thẻ Kết quả (chỉ khi FA bật): `index.html`, `js/03_ket_qua.js`, `i18n.js`.
+- Test mới: `tests/test_fa_bien_ban.py` (9) + 1 test Chromium trong `tests/test_giao_dien_fa_ket_qua.py`.
+
 ## 2026-11-09 — FA-N4: cảnh báo CLB chỉ có một đề thì không thi lại được (đêm 4)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: em bị gắn cờ làm quá nhanh ở CLB chỉ có một đề → cảnh báo "không có đề thi lại; giữ điểm bài đầu" (thay câu hứa thi lại). `mau_forms_thi_clb/tao_mau_forms.py`: `CAI_DAT_FORMS_BIEN_THE.md` có thêm dòng nói rõ. CLB có từ hai đề: không đổi.
