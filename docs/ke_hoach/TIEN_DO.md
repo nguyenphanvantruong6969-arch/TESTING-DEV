@@ -4,6 +4,11 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-8 (FA-DAA, mục cha Z6) | xong | 2026-11-09 | (chỉ test) | tests/test_fa_tinh_chat.py | V§13.1-13.9, 13.11 trên 200 bộ ngẫu nhiên; 13.12 bỏ qua (D1 hoãn) |
+| FA-7 (FA-DAA, ngoài sổ) | xong | 2026-11-09 | fa_daa.py, api_xuat.py, mau_forms_thi_clb/so_sanh_suc_chua.py | tests/test_fa_nhu_cau.py | Bảng nhu cầu cho giáo viên, kiểm chỉ tăng |
+| FA-6 (FA-DAA, mục cha C3) | xong | 2026-11-09 | fa_daa.py, fa_ly_do.py, api.py, api_xuat.py, rbda_priority_pipeline.py, i18n_errors.py | tests/test_fa_ly_do.py | Lý do, điểm chuẩn, danh sách chờ, ket_qua_ly_do.csv |
+| FA-5 (FA-DAA, mục cha A6) | xong | 2026-11-09 | fa_daa.py, api.py, i18n_errors.py | tests/test_fa_toi_thieu.py | Đóng CLB thiếu người, mỗi vòng một CLB (D3) |
+| FA-4 (FA-DAA, mục cha A13 + A5) | xong | 2026-11-09 | fa_daa.py, api.py, rbda_priority_pipeline.py, i18n_errors.py, i18n_loi.js, CHANGELOG.md | tests/test_fa_chay.py | chay_fa_daa: Tự do, điểm sàn, giữ chỗ, dự phòng, nhóm phòng; commit chung với FA-5..FA-8 |
 | FA-3 (FA-DAA, mục cha A13) | xong | 2026-11-09 | fa_daa.py, api.py, api_quan_ly.py, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_huy_chuong.py | Huy chương một quỹ 60/30/10, submit_huy_chuong, chặn chạy khi hồ sơ sai |
 | FA-2 (FA-DAA, mục cha A5) | xong | 2026-11-09 | fa_daa.py, api.py, so_nhap.py, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, tests/_fa.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_kiem_truoc.py | kiem_truoc_fa nối vào chạy xếp và báo cáo sức khoẻ dữ liệu |
 | FA-1 (FA-DAA, mục cha A13) | xong | 2026-11-09 | fa_daa.py, cau_hinh_ws.py, rbda_priority_pipeline.py, api_quan_ly.py, api_nhap.py, so_nhap.py, i18n_errors.py, i18n_loi.js, tests/test_rang_buoc_csdl.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_du_lieu.py | Luật fa_daa (tắt mặc định), 4 cột CLB, bảng giu_cho, Sổ nhập/CSV tuỳ chọn |

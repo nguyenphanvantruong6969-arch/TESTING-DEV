@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-4 đến FA-8: chạy FA-DAA, đóng CLB thiếu người, lý do, bảng nhu cầu, tính chất V§13 (mục cha A13, A5, A6, C3, Z6)
+
+(Bốn mục dùng chung `fa_daa.py`, `api.py`, `i18n_errors.py` nên đi cùng một commit.)
+
+- **FA-4** `fa_daa.chay_fa_daa`: CLB Tự do không giới hạn trong bộ nhớ; lọc Tuyển chọn theo điểm sàn (`NOT_ATTEMPTED` / `BELOW_PASS`); bỏ điểm thi ở CLB Giới hạn; giữ chỗ bằng suất dự trữ mềm; phương án dự phòng (CLB Tự do ít người nhất, theo thứ tự STB của buổi); chia nhóm phòng (`fa_nhom`, chỉ thêm). Lõi `run_rbda_nhieu_buoi` không đổi; `api.py` gọi lớp bọc khi FA bật và chạy hai chốt (sanity, ổn định) trên đầu vào đã chuẩn bị, không ghi danh sách tăng cường vào `preferences`.
+- **FA-5** đóng CLB thiếu người: mỗi vòng một CLB (thiếu nhiều nhất trước; hoà: ít người hơn, rồi mã), chạy lại cùng STB; `dong_cua`, `CLUB_CLOSED`, cảnh báo `fa_clb_dong_thieu_nguoi` (nói rõ là xấp xỉ).
+- **FA-6** `ly_do_ket_qua` (RESERVED / SCORE / MEDAL / LOTTERY / BELOW_PASS / NOT_ATTEMPTED / CLUB_CLOSED, điểm chuẩn, danh sách chờ theo D4, lỗi ổn định thì ném ValueError); bảng `fa_ly_do` (chỉ thêm); `fa_ly_do.py` (mẫu câu V§9.1, không có mã học sinh khác, không hứa ưu tiên bù); `export_ly_do_csv` → `ket_qua_ly_do.csv`.
+- **FA-7** `bang_nhu_cau`, `export_bang_nhu_cau` (không có mã hay tên học sinh), `kiem_chi_tang` và `mau_forms_thi_clb/so_sanh_suc_chua.py` (từ chối giảm chỉ tiêu và đổi loại).
+- **FA-8** `tests/test_fa_tinh_chat.py`: 200 bộ nhỏ ngẫu nhiên cho V§13.1-13.9, 13.11 (13.12 bỏ qua có lý do: D1 hoãn).
+- Tệp mới: `fa_ly_do.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`. Bảng mới `fa_nhom`, `fa_ly_do` (CREATE TABLE IF NOT EXISTS, không đổi bảng cũ). Test mới: `tests/test_fa_chay.py`, `test_fa_toi_thieu.py`, `test_fa_ly_do.py`, `test_fa_nhu_cau.py`, `test_fa_tinh_chat.py`. `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 210 tệp test, hàng mới cho `fa_daa.py` / `fa_ly_do.py`.
+
 ## 2026-11-09 — FA-3: huy chương một quỹ (mục cha A13)
 
 - `fa_daa.py`: `kiem_ho_so_huy_chuong` (giá trị 60 / 30 / 10 đúng kiểu số nguyên, mỗi giá trị một lần mỗi buổi, mỗi CLB một huy chương, CLB trong nguyện vọng và không phải Tự do; ít hơn 3 huy chương hợp lệ), `diem_huy_chuong_hieu_luc` (một quỹ, bỏ qua `tier`, không đọc thứ hạng nguyện vọng).

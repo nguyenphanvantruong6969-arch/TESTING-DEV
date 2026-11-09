@@ -642,6 +642,18 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "{student_id}: CLB {club_id} là CLB Tự do nên không nhận huy chương.",
     "en": "{student_id}: club {club_id} is a Free club, so it can't take a medal."
   },
+  "fa_diem_bo_qua": {
+    "vi": "CLB {club_id} (Giới hạn) không xét điểm thi: {n} điểm thi đã được bỏ qua khi xếp.",
+    "en": "Club {club_id} (Limited) doesn't use test scores: {n} score(s) were ignored when allocating."
+  },
+  "fa_clb_dong_thieu_nguoi": {
+    "vi": "CLB {club_id} (buổi {buoi}) đã đóng vì chỉ có {thanh_vien} thành viên, thiếu {thieu} so với mức tối thiểu. Đóng CLB thiếu người là cách xấp xỉ, không bảo đảm khai thật nguyện vọng là tối ưu.",
+    "en": "Club {club_id} (session {buoi}) was closed because it had only {thanh_vien} members, {thieu} short of its minimum. Closing under-filled clubs is an approximation and doesn't guarantee that ranking truthfully is optimal."
+  },
+  "fa_chua_co_ly_do": {
+    "vi": "Chưa có lý do kết quả. Hãy bật chế độ FA-DAA và chạy xếp trước.",
+    "en": "No result reasons yet. Turn on FA-DAA mode and run the allocation first."
+  },
   "csv_wp_bo_qua": {
     "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
     "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved."

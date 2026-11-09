@@ -25,8 +25,10 @@ from nhan_ws import dien as dien_nhan
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
+    dung_fa_daa,
     BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton,
 )
+import fa_ly_do
 import so_nhap
 
 
@@ -1616,6 +1618,88 @@ class XuatKetQuaMixin:
                 duong_excel = None
             ra["excel_path"] = duong_excel
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    def export_ly_do_csv(self, output_path: str = ""):
+        """FA-DAA (FA-6): `ket_qua_ly_do.csv` — lý do của LẦN CHẠY MỚI NHẤT, mỗi dòng một học sinh một
+        CLB: mã học sinh, buổi, CLB, nhóm phòng, mã lý do, câu giải thích (`fa_ly_do.cau_ly_do`),
+        số bốc thăm CỦA CHÍNH EM, vị trí chờ. Câu không chứa mã học sinh khác. Chưa có lý do (FA tắt,
+        hay chưa chạy) thì `fa_chua_co_ly_do`."""
+        return self._khoa_xuat(self._export_ly_do_da_khoa, output_path)
+
+    def _export_ly_do_da_khoa(self, output_path: str = ""):
+        import csv
+        try:
+            with self._ket_noi_doc() as cur:
+                run_id = cur.execute("SELECT MAX(run_id) FROM fa_ly_do").fetchone()[0]
+                if run_id is None:
+                    return _fail(err("fa_chua_co_ly_do"))
+                dong = cur.execute(
+                    "SELECT l.student_id, l.buoi, l.club_id, COALESCE(c.name, l.club_id), "
+                    " l.outcome, l.reason, l.rank_in_list, l.cut_score, l.diem_em, l.n_hoa, "
+                    " l.k_cho, l.waitlist_pos, l.cut_medal, s.stb_number, n.group_no "
+                    "FROM fa_ly_do l LEFT JOIN clubs c ON c.club_id = l.club_id "
+                    "LEFT JOIN students s ON s.student_id = l.student_id "
+                    "LEFT JOIN fa_nhom n ON n.run_id = l.run_id AND n.buoi = l.buoi "
+                    " AND n.student_id = l.student_id AND n.club_id = l.club_id "
+                    "WHERE l.run_id = ? ORDER BY l.student_id, l.buoi COLLATE THU_TU_BUOI, "
+                    " COALESCE(l.rank_in_list, 999), l.club_id", (run_id,)).fetchall()
+            duong = self._duong_xuat(output_path, "ket_qua_ly_do.csv")
+            with open(duong, "w", newline="", encoding="utf-8-sig") as f:
+                w = csv.writer(f)
+                w.writerow(["student_id", "buoi", "club", "group", "reason", "sentence", "stb",
+                            "waitlist_pos"])
+                for r in dong:
+                    cau = fa_ly_do.cau_ly_do(
+                        {"outcome": r[4], "reason": r[5], "rank_in_list": r[6], "cut_score": r[7],
+                         "diem_em": r[8], "n_hoa": r[9], "k_cho": r[10], "waitlist_pos": r[11],
+                         "cut_medal": r[12]}, r[3])
+                    w.writerow([r[0], r[1], r[3], r[14] or "", r[5], cau, r[13], r[11] or ""])
+            return _ok({"path": duong, "run_id": run_id, "n_rows": len(dong)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    def export_bang_nhu_cau(self, output_path: str = "", buoi: str = ""):
+        """FA-DAA (FA-7): `bang_nhu_cau.csv` cho giáo viên xét chỉ tiêu — mỗi CLB: số em xếp đầu
+        tiên, số em có trong nguyện vọng, số đạt điểm sàn, chỉ tiêu, số giữ chỗ. KHÔNG có mã hay tên
+        học sinh. Cần `rules.fa_daa` bật (`fa_chua_bat`)."""
+        return self._khoa_xuat(self._export_bang_nhu_cau_da_khoa, output_path, buoi)
+
+    def _export_bang_nhu_cau_da_khoa(self, output_path: str = "", buoi: str = ""):
+        import csv
+
+        import fa_daa
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            with self._ket_noi_doc() as cur:
+                clubs, _hs, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
+                _, cap, _ = fa_daa.doc_du_lieu_fa(cur)
+                diem: dict = {}
+                for cid, sid, d in cur.execute(
+                        "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
+                        "JOIN club_test_selection t ON t.student_id = sc.student_id "
+                        "AND t.club_id = sc.club_id"):
+                    diem.setdefault(cid, {})[sid] = d
+                ten = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+            rows = fa_daa.bang_nhu_cau(clubs, prefs, diem, clubs, cap, buoi=buoi or None,
+                                       ten_clb=ten)
+            duong = self._duong_xuat(output_path, "bang_nhu_cau.csv")
+            with open(duong, "w", newline="", encoding="utf-8-sig") as f:
+                w = csv.writer(f)
+                w.writerow(["buoi", "club_id", "ten", "loai", "capacity", "nv1", "so_ghi",
+                            "so_dat_san", "so_giu_cho"])
+                for r in rows:
+                    w.writerow([r["buoi"], r["club_id"], r["ten"], r["loai"] or "", r["capacity"],
+                                r["nv1"], r["so_ghi"],
+                                "" if r["so_dat_san"] is None else r["so_dat_san"],
+                                r["so_giu_cho"]])
+            return _ok({"path": duong, "n_rows": len(rows)})
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:

@@ -1995,6 +1995,37 @@ CREATE TABLE IF NOT EXISTS giu_cho (
     PRIMARY KEY (club_id, student_id)
 );
 
+-- Nhóm phòng của CLB Tự do (FA-DAA, FA-4): CHỈ GHI THÊM, như run_history (không khoá ngoại: là dấu vết
+-- của từng lần chạy). CREATE TABLE IF NOT EXISTS đã đủ cho CSDL cũ.
+CREATE TABLE IF NOT EXISTS fa_nhom (
+    run_id INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    group_no INTEGER NOT NULL CHECK (group_no >= 1),
+    PRIMARY KEY (run_id, buoi, student_id)
+);
+
+-- Lý do kết quả của FA-DAA (FA-6): CHỈ GHI THÊM, như run_history; không khoá ngoại (dấu vết từng lần
+-- chạy). `outcome`: ACCEPTED | REJECTED | REMOVED | FALLBACK. `reason`: mã lý do (xem fa_daa.ly_do_ket_qua).
+CREATE TABLE IF NOT EXISTS fa_ly_do (
+    run_id INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    rank_in_list INTEGER,
+    outcome TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    cut_score REAL,
+    cut_medal INTEGER,
+    cut_stb INTEGER,
+    waitlist_pos INTEGER,
+    diem_em REAL,
+    n_hoa INTEGER,
+    k_cho INTEGER,
+    PRIMARY KEY (run_id, buoi, student_id, club_id)
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

@@ -56,6 +56,12 @@ MA_MOI_SAU_ANH_CHUP = {
     # FA-3: huy chương.
     "fa_chua_bat", "fa_huy_chuong_gia_tri_sai", "fa_huy_chuong_trung_gia_tri",
     "fa_huy_chuong_ngoai_nguyen_vong", "fa_huy_chuong_clb_tu_do",
+    # FA-4: chạy.
+    "fa_diem_bo_qua",
+    # FA-5: đóng CLB thiếu người.
+    "fa_clb_dong_thieu_nguoi",
+    # FA-6: lý do kết quả.
+    "fa_chua_co_ly_do",
     "so_nhap_diem_ca_nhan_sai", "scoring_not_per_person", "health_person_score_none",
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).

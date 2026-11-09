@@ -1055,7 +1055,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # sơ 100 điểm. Lỗi chặn thì dừng ở đây, trước khi bốc hay khoá số: không ghi gì.
                 with self._ket_noi_doc() as cur_fa:
                     loi_fa = fa_daa.kiem_fa_tu_csdl(cur_fa)
-                    huy_chuong = fa_daa.doc_du_lieu_fa(cur_fa)[2]
+                    fa_clb, fa_cap, huy_chuong = fa_daa.doc_du_lieu_fa(cur_fa)
                 canh_bao_wharton = [e for e in loi_fa if e["code"] in fa_daa.MA_CANH_BAO]
                 loi_fa = fa_daa.chi_loi_chan(loi_fa)
                 if loi_fa:
@@ -1291,24 +1291,39 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             # lieu mot buoi, run_rbda_nhieu_buoi goi run_rbda dung mot lan
             # voi dung du lieu do. Co test canh su trung khit ay tren ba bo
             # du lieu x 20 seed (tests/test_nhieu_buoi.py).
-            result = run_rbda_nhieu_buoi(
-                students, clubs, tested_scores, applicants, preferences,
-                stb_lottery, is_reserve_eligible_fn=reserve_fn,
-                che_do_boc_tham=CHE_DO_BOC_THAM_MAC_DINH, seed=seed,
-                chi_buoi=chi_buoi_chuan,
-                tier_rank=tham_so["tier_rank"], bo_qua_du_tru=tham_so["bo_qua_du_tru"],
-                diem_wharton=diem_wharton,
-            )
+            kq_fa = None
+            if fa_bat:
+                # FA-DAA (FA-4): lớp bọc chuẩn bị đầu vào trong bộ nhớ và xử lý sau (dự phòng, nhóm
+                # phòng); lõi DA không đổi. Hai chốt bên dưới chạy trên ĐẦU VÀO ĐÃ CHUẨN BỊ ấy.
+                kq_fa = fa_daa.chay_fa_daa(
+                    students, clubs, tested_scores, applicants, preferences, stb_lottery,
+                    fa_clb, fa_cap, huy_chuong, seed=seed, chi_buoi=chi_buoi_chuan,
+                    tier_rank=tham_so["tier_rank"], bo_qua_du_tru=tham_so["bo_qua_du_tru"])
+                result = kq_fa.ket_qua
+                clubs_ck, scores_ck, app_ck, prefs_ck, reserve_ck = (
+                    kq_fa.clubs, kq_fa.tested_scores, kq_fa.applicants, kq_fa.preferences,
+                    kq_fa.reserve_fn)
+            else:
+                result = run_rbda_nhieu_buoi(
+                    students, clubs, tested_scores, applicants, preferences,
+                    stb_lottery, is_reserve_eligible_fn=reserve_fn,
+                    che_do_boc_tham=CHE_DO_BOC_THAM_MAC_DINH, seed=seed,
+                    chi_buoi=chi_buoi_chuan,
+                    tier_rank=tham_so["tier_rank"], bo_qua_du_tru=tham_so["bo_qua_du_tru"],
+                    diem_wharton=diem_wharton,
+                )
+                clubs_ck, scores_ck, app_ck, prefs_ck, reserve_ck = (
+                    clubs, tested_scores, applicants, preferences, reserve_fn)
             sanity_problems = []
             stability_problems = []
-            _nhom = nhom_theo_buoi(clubs)   # một lần, không phải mỗi buổi
+            _nhom = nhom_theo_buoi(clubs_ck)   # một lần, không phải mỗi buổi
             for _buoi, _kq in result.per_buoi.items():
                 _clubs_b, _, _, _prefs_b = cat_du_lieu_theo_buoi(
-                    _buoi, _nhom[_buoi], clubs,
-                    tested_scores, applicants, preferences)
+                    _buoi, _nhom[_buoi], clubs_ck,
+                    scores_ck, app_ck, prefs_ck)
                 sanity_problems += sanity_check_result(_kq, _clubs_b, _prefs_b)
                 stability_problems += verify_stability(
-                    _kq, _clubs_b, _prefs_b, reserve_fn,
+                    _kq, _clubs_b, _prefs_b, reserve_ck,
                     bo_qua_du_tru=tham_so["bo_qua_du_tru"])
             if sanity_problems or stability_problems:
                 steps_log.append({
@@ -1320,10 +1335,15 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 conn = None
                 steps_log.append({"step": "rollback", "status": "done", "detail": err("pipeline_rolled_back")})
                 return _fail_co_buoc(steps_log, sanity_problems + stability_problems)
-            steps_log.append({
+            ly_do_fa = (fa_daa.ly_do_ket_qua(kq_fa, preferences, huy_chuong, fa_clb)
+                        if kq_fa is not None else [])
+            buoc_cascade = {
                 "step": "rbda_cascade", "status": "done",
                 "detail": err("rbda_done", rounds=result.rounds_run),
-            })
+            }
+            if kq_fa is not None and kq_fa.canh_bao:
+                buoc_cascade["warnings"] = kq_fa.canh_bao      # vd CLB bị đóng vì thiếu người
+            steps_log.append(buoc_cascade)
 
             # ---------------- Bước 5/6 · GHI KẾT QUẢ ----------------
             steps_log.append({"step": "write_results", "status": "running"})
@@ -1491,6 +1511,24 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                  1 if stb_redrawn else 0, result.che_do_boc_tham,
                  len(result.ds_buoi), buoi_da_chay, luat_xep_de_ghi(luat)),
             )
+            # FA-DAA (FA-4): nhóm phòng của lần chạy này — chỉ THÊM, cùng giao dịch với kết quả.
+            if kq_fa is not None and kq_fa.nhom:
+                _run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
+                cur.executemany(
+                    "INSERT INTO fa_nhom (run_id, buoi, student_id, club_id, group_no) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    [(_run_id, r["buoi"], r["student_id"], r["club_id"], r["group_no"])
+                     for r in kq_fa.nhom])
+            if ly_do_fa:
+                _run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
+                cur.executemany(
+                    "INSERT INTO fa_ly_do (run_id, buoi, student_id, club_id, rank_in_list, outcome, "
+                    " reason, cut_score, cut_medal, cut_stb, waitlist_pos, diem_em, n_hoa, k_cho) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [(_run_id, r["buoi"], r["student_id"], r["club_id"], r["rank_in_list"],
+                      r["outcome"], r["reason"], r["cut_score"], r["cut_medal"], r["cut_stb"],
+                      r["waitlist_pos"], r["diem_em"], r["n_hoa"], r["k_cho"])
+                     for r in ly_do_fa])
             # Điểm Wharton bật: lần chạy thành công KHOÁ điểm (khoá riêng, không dính STB), trong
             # CÙNG giao dịch với kết quả — chạy hỏng rollback thì không khoá. Tắt thì không đụng
             # bảng khoá. Đã khoá sẵn (chạy lại khi chưa mở) thì giữ nguyên, không ghi nhật ký thừa.
