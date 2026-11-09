@@ -35,6 +35,7 @@ tệp đó, hai tệp kia vẫn sinh.
 """
 
 import argparse
+import copy
 import csv
 import io
 import os
@@ -665,6 +666,19 @@ TIEN_TO_DOCX_DANG_KY = "NHAP_FORMS_DANG_KY_"
 TEN_CAI_DAT_DANG_KY = "CAI_DAT_FORMS_DANG_KY.md"
 
 
+def de_theo_so_nhap_clb(de, duong_so_nhap):
+    """FA-S6: bản sao `de` có `loai` của từng CLB lấy từ Sổ nhập CLB của FA-M1 (`doc_clb_fa` của bộ chuyển đổi).
+    Trả (de mới, cảnh báo); `de` gốc không đổi."""
+    import chuyen_forms_sang_phan_mem as cv
+    clb_fa, _giu, canh_bao = cv.doc_clb_fa(duong_so_nhap, de)
+    de2 = copy.deepcopy(de)
+    for c in de2["cau_lac_bo"]:
+        if clb_fa.get(c["club_id"], {}).get("loai"):
+            c["loai"] = clb_fa[c["club_id"]]["loai"]
+    de2["_loai_tu_so_nhap"] = True
+    return de2, canh_bao
+
+
 def ghi_cai_dat_dang_ky(de):
     """CAI_DAT_FORMS_DANG_KY.md: hướng dẫn dựng tay biểu mẫu đăng ký đường B (TH: chưa thử trên Forms thật)."""
     L = []
@@ -713,7 +727,10 @@ def ghi_cai_dat_dang_ky(de):
     w("")
     w("- Không tự lưu nháp; không có nút ▲▼; Forms không chặn chọn trùng CLB giữa ba câu (bộ chuyển đổi bỏ trùng và báo).")
     w("- Forms không bỏ chọn được đáp án: câu huy chương có sẵn đáp án \"%s\" / \"%s\"; bộ chuyển đổi đổi chúng thành ô trống." % (bm.GIU_MAC_DINH_VANG, bm.DOI_KHONG))
-    w("- Nếu `de_thi.json` chưa ghi `loai` của CLB, câu vàng liệt kê cả CLB Tự do; chọn nhầm thì bộ chuyển đổi giữ mặc định và báo.")
+    if de.get("_loai_tu_so_nhap"):
+        w("- Loại CLB lấy từ Sổ nhập CLB (`--so-nhap-clb`): câu vàng không liệt kê CLB Tự do.")
+    else:
+        w("- Nếu `de_thi.json` chưa ghi `loai` của CLB, câu vàng liệt kê cả CLB Tự do; chọn nhầm thì bộ chuyển đổi giữ mặc định và báo.")
     w("")
     return "\n".join(L)
 
@@ -844,6 +861,8 @@ def main(argv=None):
                     help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
     ap.add_argument("--bien-the", action="store_true",
                     help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
+    ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
+                    help="chỉ với --fa-daa: Sổ nhập CLB (FA-M1) để biết Loại; CLB Tự do không có trong câu vàng")
     ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
     ap.add_argument("--de", default=bm.DE_THI_MAC_DINH, help="de_thi.json")
     a = ap.parse_args(argv)
@@ -853,6 +872,8 @@ def main(argv=None):
         ap.error("--fa-daa là một chế độ riêng, không dùng chung với --chi-thi hay --moi-clb")
     if a.bien_the and (a.fa_daa or a.moi_clb or a.chi_thi):
         ap.error("--bien-the là một chế độ riêng, không dùng chung với --fa-daa, --chi-thi hay --moi-clb")
+    if a.so_nhap_clb and not a.fa_daa:
+        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
     try:
         de = bm.doc_de_thi(a.de)
         if a.bien_the:
@@ -860,6 +881,15 @@ def main(argv=None):
             print("Đã sinh mẫu Forms đề biến thể (TH): %d tệp (%s)." % (len(ra), ", ".join(os.path.basename(x) for x in ra)))
             return 0
         if a.fa_daa:
+            if a.so_nhap_clb:
+                import chuyen_forms_sang_phan_mem as cv
+                try:
+                    de, canh_bao = de_theo_so_nhap_clb(de, a.so_nhap_clb)
+                except cv.LoiTepXuat as e:
+                    print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
+                    return 1
+                for _d, _e, nd in canh_bao:
+                    print("CẢNH BÁO: " + nd, file=sys.stderr)
             ra = sinh_dang_ky(de, a.ra)
             print("Đã sinh mẫu Forms đăng ký FA-DAA (TH): %d biểu mẫu (%s)."
                   % (len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))

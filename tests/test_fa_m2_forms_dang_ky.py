@@ -122,3 +122,31 @@ def test_ngay_nhieu_hon_ba_clb_van_chi_ba_cau_nguyen_vong(de):
     assert len(bm.clb_cua_buoi(de2, "thu_2")) == 4
     nv = [c for c in _cau(bm.cac_phan_fa(de2, "thu_2")) if "Nguyện vọng" in c[0]]
     assert len(nv) == 3
+
+
+# ------------------------------------------- FA-S6: đọc Loại từ Sổ nhập CLB (FA-M1)
+def _so_nhap_clb(de, tmp_path, tu_do):
+    import so_nhap
+    clubs = [{"club_id": c["club_id"], "name": c["name"], "capacity": 40, "reserve_capacity": 0, "reserve_group": "",
+              "buoi": c["buoi"], "loai": so_nhap.TU_DO if c["club_id"] == tu_do else so_nhap.GIOI_HAN}
+             for c in de["cau_lac_bo"]]
+    p = str(tmp_path / "clb.xlsx")
+    so_nhap.ghi_so_nhap(p, clubs=clubs)
+    return p
+
+
+def test_fa_s6_so_nhap_clb_bo_clb_tu_do_khoi_cau_vang(de, tmp_path):
+    tu_do = next(c for c in de["cau_lac_bo"])
+    sn = _so_nhap_clb(de, tmp_path, tu_do["club_id"])
+    de2, _ = tmf.de_theo_so_nhap_clb(de, sn)
+    assert "loai" not in tu_do                                       # không sửa de gốc
+    vang = _cau(bm.cac_phan_fa(de2, tu_do["buoi"]))[-2]
+    assert not any(tu_do["club_id"] in x for x in vang[2])
+    assert tmf.main(["--fa-daa", "--so-nhap-clb", sn, "--ra", str(tmp_path / "ra")]) == 0
+    md = (tmp_path / "ra" / tmf.TEN_CAI_DAT_DANG_KY).read_text(encoding="utf-8")
+    assert "chưa ghi `loai`" not in md and "Sổ nhập CLB" in md
+
+
+def test_fa_s6_so_nhap_clb_chi_dung_cung_fa_daa(tmp_path):
+    with pytest.raises(SystemExit):
+        tmf.main(["--so-nhap-clb", "x.xlsx", "--ra", str(tmp_path)])

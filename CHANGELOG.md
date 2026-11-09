@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S6: bộ sinh biểu mẫu đăng ký đọc Loại CLB từ Sổ nhập CLB (đêm 3, TH)
+
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--fa-daa --so-nhap-clb <Sổ nhập CLB của FA-M1>` đọc Loại bằng `chuyen_forms_sang_phan_mem.doc_clb_fa` (`de_theo_so_nhap_clb`); CLB Tự do không có trong câu vàng; hướng dẫn ghi Loại lấy từ sổ. `--so-nhap-clb` chỉ dùng cùng `--fa-daa`. Không có cờ: tệp sinh ra giống hệt từng byte (đã so `diff -r` trước/sau).
+- Test mới (trong tệp cũ): `tests/test_fa_m2_forms_dang_ky.py` `test_fa_s6_so_nhap_clb_bo_clb_tu_do_khoi_cau_vang`, `test_fa_s6_so_nhap_clb_chi_dung_cung_fa_daa`.
+
 ## 2026-11-09 — FA-S4: báo khi không đọc được giờ làm bài (đêm 3, TH)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`_thoi_gian_lam_bai`): nhận ô `datetime` và chữ ISO; trả thêm số phiếu không đọc được (không đoán thứ tự ngày/tháng). `chuyen_fa_daa` thêm MỘT cảnh báo mỗi tệp kèm số phiếu đó.
