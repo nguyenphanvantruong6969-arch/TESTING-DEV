@@ -1338,12 +1338,18 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         hs["student_id"] = goc.get("student_id", hs["student_id"])
     os.makedirs(thu_muc_ra, exist_ok=True)
     ghi_tep_phan_mem(de, hoc_sinh, thu_muc_ra, clb_fa=clb_fa, giu_cho=giu_cho)
+    # FA-S11: email <-> mã học sinh để IT ghép kết quả vào list KetQua (ghep_ket_qua_email.py). Dữ liệu cá nhân.
+    with open(os.path.join(thu_muc_ra, TEN_EMAIL_MA_HS), "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Email", "student_id"])
+        w.writerows([h["email"], h["student_id"]] for h in hoc_sinh)
     if cac_tep:
         ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"))
     return {"n_hoc_sinh": len(hoc_sinh), "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
             "canh_bao": canh_bao, "ghi_chu": [GHI_CHU_FA_DAA]}
 
 
+TEN_EMAIL_MA_HS = "EMAIL_MA_HS.csv"
 GHI_CHU_FA_DAA = ("FA-DAA (TH, chưa thử trên Microsoft thật): huy chương là MỘT quỹ 60/30/10 ở cột \"Điểm quyết "
                   "tâm\"; điểm thi là số nguyên 0-10 (D7). Cờ \"làm quá nhanh\" chỉ để admin xem.")
 

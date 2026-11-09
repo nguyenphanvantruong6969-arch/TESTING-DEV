@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S11: ghép email với mã học sinh cho list KetQua (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`): ghi thêm `EMAIL_MA_HS.csv` (Email, student_id; dữ liệu cá nhân, chỉ trên máy IT).
+- `mau_forms_thi_clb/ghep_ket_qua_email.py` (mới): `ket_qua_ly_do.csv` + `EMAIL_MA_HS.csv` -> `KETQUA_NHAP_LIST.csv` với các cột list `KetQua`; em thiếu email: cảnh báo, dòng vẫn ghi, Email rỗng.
+- `docs/he_sinh_thai/FA_SAU_XEP.md` §2: cách ghép mới, cột `Email` "Lấy từ". `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 217 tệp test.
+- Test mới: `tests/test_fa_s11_ghep_email.py` (4 ca).
+
 ## 2026-11-09 — FA-S6: bộ sinh biểu mẫu đăng ký đọc Loại CLB từ Sổ nhập CLB (đêm 3, TH)
 
 - `mau_forms_thi_clb/tao_mau_forms.py`: `--fa-daa --so-nhap-clb <Sổ nhập CLB của FA-M1>` đọc Loại bằng `chuyen_forms_sang_phan_mem.doc_clb_fa` (`de_theo_so_nhap_clb`); CLB Tự do không có trong câu vàng; hướng dẫn ghi Loại lấy từ sổ. `--so-nhap-clb` chỉ dùng cùng `--fa-daa`. Không có cờ: tệp sinh ra giống hệt từng byte (đã so `diff -r` trước/sau).

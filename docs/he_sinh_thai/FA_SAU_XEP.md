@@ -16,11 +16,11 @@
 
 Tệp do kiosk xuất (`export_ly_do_csv`): mỗi dòng một học sinh một CLB của một buổi, lần chạy mới nhất. Cột thật của tệp: `student_id`, `buoi`, `club`, `group`, `reason`, `sentence`, `stb`, `waitlist_pos`. Câu `sentence` không chứa mã học sinh khác; `stb` là số bốc thăm của CHÍNH em; `waitlist_pos` rỗng nếu không ở danh sách chờ.
 
-Tệp không có email, mà app lọc theo email. **IT ghép email** từ danh sách học sinh (cùng nguồn đã dựng Sổ nhập) vào cột đầu bằng VLOOKUP trên mã học sinh, hạ chữ thường, rồi nhập. Cột của list:
+Tệp không có email, mà app lọc theo email. **IT ghép email** trên máy IT: bộ chuyển đổi `chuyen_forms_sang_phan_mem.py --fa-daa` ghi thêm `EMAIL_MA_HS.csv` (cột `Email`, `student_id`; dữ liệu cá nhân, không gửi đi, không đưa lên kho mã), rồi chạy `python mau_forms_thi_clb/ghep_ket_qua_email.py ket_qua_ly_do.csv EMAIL_MA_HS.csv --ra KETQUA_NHAP_LIST.csv`: mỗi dòng kết quả được thêm email (hạ chữ thường) và đổi tên cột như bảng dưới; em không có trong tệp email thì báo, dòng vẫn ghi với `Email` rỗng. Nhập `KETQUA_NHAP_LIST.csv` vào list. Cột của list:
 
 | Cột list | Kiểu | Lấy từ |
 |---|---|---|
-| `Email` | Một dòng văn bản, đặt chỉ mục | ghép từ `student_id` (HỎI-IT: nguồn email) |
+| `Email` | Một dòng văn bản, đặt chỉ mục | ghép từ `student_id` qua `EMAIL_MA_HS.csv` (`ghep_ket_qua_email.py`) |
 | `MaHS` | Một dòng văn bản | `student_id` |
 | `Buoi` | Một dòng văn bản | `buoi` (mã buổi, ví dụ `thu_2`) |
 | `CLB` | Một dòng văn bản | `club` (tên CLB) |

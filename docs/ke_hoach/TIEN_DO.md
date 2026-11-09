@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-S11 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, mau_forms_thi_clb/ghep_ket_qua_email.py, docs/he_sinh_thai/FA_SAU_XEP.md, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_s11_ghep_email.py (4 ca) | EMAIL_MA_HS.csv + lệnh ghép |
 | FA-S6 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/tao_mau_forms.py, tests/test_fa_m2_forms_dang_ky.py, CHANGELOG.md | 2 ca trong tests/test_fa_m2_forms_dang_ky.py | --so-nhap-clb; không cờ: byte-identical |
 | FA-S4 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 2 ca trong tests/test_fa_m4_phan_tich.py | Giờ không đọc được: 1 cảnh báo/tệp |
 | FA-S2 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, mau_forms_thi_clb/tao_mau_forms.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 3 ca trong tests/test_fa_m4_phan_tich.py | --bo-cau CLB-DE-SO |
