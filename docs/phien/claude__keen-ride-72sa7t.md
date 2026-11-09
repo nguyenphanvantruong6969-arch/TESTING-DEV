@@ -46,13 +46,11 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-09T06:41Z session_01VfPzNtErHSjc5Cohi9Fo5P (night 3; Opus session at Truong's request)
-- 2026-11-09 night 2 (Sonnet): FA-M1..FA-M6 all DONE, 0 BLOCKED, all Microsoft parts TH (untested on real Microsoft). RUNNING lock removed. D8 still OPEN.
-- Commits: FA-M1 bfdc371; FA-M2 1efa8d1 + cde4384; FA-M3 7c48eae; FA-M4 a61d703; FA-M5 cd1fe46; FA-M6 58bc370. Report: bao_cao_dem/2026-11-09_dem2.md.
-- Tests: 6 new files (17+10+25+24+10+6 = 92 cases), each red first. Final run (all test_fa_*, mau forms, test_t4m_*, test_so_nhap, 2 doc tests): 2204 passed, 1 skipped. ruff clean, kiem_nhanh 7/7. UI/Chromium and full suite NOT run (CI).
-- Old modes unchanged: --chi-thi/--moi-clb output and T4M kit byte-identical (diff -r); default converter cell contents identical. One old test edited (R1..R38 count). No kiosk code touched.
-- Design notes: converter FA = `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb <FA-M1 sheet> (--dang-ky FORMS.. | --lists CSV) [quiz..] [--bien-the-tep F=B] [--ap-dung-dieu-chinh|--giu-diem-goc] [--bo-cau club-k]`; D11 gap without a flag -> report + exit 3, never blocks. DRAFT rows dropped (flag --nhan-ban-nhap). Variants: `de_thi_bien_the` in de_thi.json; guide in CAI_DAT_FORMS_BIEN_THE.md (separate file, deviates from the plan row).
-- Open for Truong: D8; DRAFT default; KetQua list read access; whether night 3 adds attendance/appeal/round-2 to the kiosk; the 2 night-1 review findings (see report).
+- 2026-11-09 night 3 (Opus session at Truong's request, not Sonnet): 16/16 done, 0 BLOCKED. RUNNING lock removed. D8 still OPEN.
+- Commits: S8 e970ef5; S7+S9 c6ac99f; S3 2f41281; S1 6973664; S5 fc9170a; S2 149d745; S4 61f6cf9; S6 89af3f7; S11 2a74651; S10 831201d; UI-1 f3b6273; UI-2 c284398; UI-3 2560fa2; UI-4 0c8e5f8; UI-5 5bf7a8d. Report: bao_cao_dem/2026-11-09_dem3.md.
+- Tests: each item red first, mutation caught (docs items excepted). New files: test_fa_s11_ghep_email.py, test_giao_dien_fa_{cai_dat,quan_ly,huy_chuong,ket_qua}.py (16 Chromium cases, really ran). Largest related runs: 2704 passed/1 skipped, 2526/1. ruff clean, kiem_nhanh 7/7 (trung khit 3x5). Full suite and soat-ma four tiers NOT run.
+- Design notes: new API `get_ly_do_ket_qua` (api_xuat); `get_student_entry_state` adds `huy_chuong` when FA on; `list_clubs_admin` adds FA keys only when FA on; JS global `FA_BAT` (05_quan_ly.js, set in wsApDungCauHinh) is set but the FA screens decide from API responses. Converter FA mode keeps all attempts, `_tach_lan_dau` picks attempt 1 by assigned variant.
+- Open for Truong: D8; clearer error when FA on + commitment points off; require all 3 medals?; reason column shows all sentences of the day.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -65,9 +63,9 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Sonnet night 3: follow `docs/phien/CHAY_DEM_FA_DAA.md` (night-3 version): FA-S1..FA-S11, then FA-UI-1..5.
-2. Opus: review night 3.
-3. Truong: GĐ2 meeting -> decide D8; confirm the 2 wording points in the night-2 review (path B options, [code] in titles).
+1. Opus: review night 3 (diff from 19f6dd2; full suite; soat-ma four tiers; invariant 1 at 3 datasets x 20 seeds).
+2. Truong: GD2 meeting -> decide D8; answer the night-3 questions in bao_cao_dem/2026-11-09_dem3.md.
+3. Later: FA-9, FA-10 (+ D1 two-term simulation before term 2).
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -114,3 +112,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Opus (night 3) | FA-UI-3 medal step; red first (4/5); swap mutation caught; related 2704 passed / 1 skipped after wording fix | Chromium really ran |
 | 2026-11-09 | Opus (night 3) | FA-UI-4 reasons column + 2 export buttons; red first; mutation caught; related 2526 passed / 1 skipped | Chromium really ran |
 | 2026-11-09 | Opus (night 3) | FA-UI-5 user guide section 15; doc test red first | guide tests 92 passed, kiem_nhanh 7/7 |
+| 2026-11-09 | Opus (night 3) | Night 3 report 2026-11-09: 16/16 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem3.md | RUNNING line removed |
