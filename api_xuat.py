@@ -1630,16 +1630,14 @@ class XuatKetQuaMixin:
         hay chưa chạy) thì `fa_chua_co_ly_do`."""
         return self._khoa_xuat(self._export_ly_do_da_khoa, output_path)
 
-    def _export_ly_do_da_khoa(self, output_path: str = ""):
-        import csv
-        try:
-            with self._ket_noi_doc() as cur:
-                # FA-S7: chỉ lần chạy MỚI NHẤT; lần đó không phải FA -> không xuất lý do cũ.
-                run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
-                if run_id is None or cur.execute(
-                        "SELECT 1 FROM fa_ly_do WHERE run_id = ? LIMIT 1", (run_id,)).fetchone() is None:
-                    return _fail(err("fa_chua_co_ly_do"))
-                dong = cur.execute(
+    @staticmethod
+    def _doc_ly_do_moi_nhat(cur):
+        """(run_id, các dòng lý do) của lần chạy MỚI NHẤT (FA-S7); lần đó không phải FA -> (None, [])."""
+        run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
+        if run_id is None or cur.execute(
+                "SELECT 1 FROM fa_ly_do WHERE run_id = ? LIMIT 1", (run_id,)).fetchone() is None:
+            return None, []
+        return run_id, cur.execute(
                     "SELECT l.student_id, l.buoi, l.club_id, COALESCE(c.name, l.club_id), "
                     " l.outcome, l.reason, l.rank_in_list, l.cut_score, l.diem_em, l.n_hoa, "
                     " l.k_cho, l.waitlist_pos, l.cut_medal, s.stb_number, n.group_no "
@@ -1649,16 +1647,47 @@ class XuatKetQuaMixin:
                     " AND n.student_id = l.student_id AND n.club_id = l.club_id "
                     "WHERE l.run_id = ? ORDER BY l.student_id, l.buoi COLLATE THU_TU_BUOI, "
                     " COALESCE(l.rank_in_list, 999), l.club_id", (run_id,)).fetchall()
+
+    @staticmethod
+    def _cau_cua_dong(r):
+        return fa_ly_do.cau_ly_do(
+            {"outcome": r[4], "reason": r[5], "rank_in_list": r[6], "cut_score": r[7],
+             "diem_em": r[8], "n_hoa": r[9], "k_cho": r[10], "waitlist_pos": r[11],
+             "cut_medal": r[12]}, r[3])
+
+    def get_ly_do_ket_qua(self):
+        """FA-UI-4: câu giải thích của lần chạy mới nhất cho thẻ kết quả: {fa_bat, run_id, cau: {mã HS:
+        {buổi: [câu theo thứ tự nguyện vọng]}}}. FA tắt -> fa_bat False, không đọc gì thêm."""
+        try:
+            try:
+                fa_bat = dung_fa_daa(self._luat_nghiem())
+            except Exception:
+                fa_bat = False
+            if not fa_bat:
+                return _ok({"fa_bat": False, "run_id": None, "cau": {}})
+            with self._ket_noi_doc() as cur:
+                run_id, dong = self._doc_ly_do_moi_nhat(cur)
+            cau = {}
+            for r in dong:
+                cau.setdefault(r[0], {}).setdefault(r[1], []).append(self._cau_cua_dong(r))
+            return _ok({"fa_bat": True, "run_id": run_id, "cau": cau})
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def _export_ly_do_da_khoa(self, output_path: str = ""):
+        import csv
+        try:
+            with self._ket_noi_doc() as cur:
+                run_id, dong = self._doc_ly_do_moi_nhat(cur)
+            if run_id is None:
+                return _fail(err("fa_chua_co_ly_do"))
             duong = self._duong_xuat(output_path, "ket_qua_ly_do.csv")
             with open(duong, "w", newline="", encoding="utf-8-sig") as f:
                 w = csv.writer(f)
                 w.writerow(["student_id", "buoi", "club", "group", "reason", "sentence", "stb",
                             "waitlist_pos"])
                 for r in dong:
-                    cau = fa_ly_do.cau_ly_do(
-                        {"outcome": r[4], "reason": r[5], "rank_in_list": r[6], "cut_score": r[7],
-                         "diem_em": r[8], "n_hoa": r[9], "k_cho": r[10], "waitlist_pos": r[11],
-                         "cut_medal": r[12]}, r[3])
+                    cau = self._cau_cua_dong(r)
                     w.writerow([r[0], r[1], r[3], r[14] or "", r[5], cau, r[13], r[11] or ""])
             return _ok({"path": duong, "run_id": run_id, "n_rows": len(dong)})
         except LoiDuongXuat as e:

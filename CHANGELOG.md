@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-UI-4: câu lý do ở thẻ kết quả và hai nút xuất (đêm 3)
+
+- `api_xuat.py`: `get_ly_do_ket_qua` (mới: câu giải thích của lần chạy mới nhất theo học sinh và buổi; FA tắt thì `fa_bat` false); `_doc_ly_do_moi_nhat` và `_cau_cua_dong` dùng chung với `_export_ly_do_da_khoa` (cùng kết quả như trước).
+- `index.html`, `js/03_ket_qua.js` (`veCotLyDo`): cột "Lý do" và nút `#btnXuatLyDo` (`export_ly_do_csv`), `#btnXuatNhuCau` (`export_bang_nhu_cau`) chỉ khi FA bật; tắt thì không cột, nút ẩn. `i18n.js`: chữ vi + en.
+- Test mới: `tests/test_giao_dien_fa_ket_qua.py` (3 ca Chromium). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 221 tệp test.
+
 ## 2026-11-09 — FA-UI-3: bước "Huy chương" ở màn nhập tại chỗ (đêm 3)
 
 - `api_quan_ly.py`: `get_student_entry_state` thêm khoá `huy_chuong` khi FA bật (`_trang_thai_huy_chuong`: huy chương đã lưu, loại và buổi của từng CLB trong nguyện vọng, khoá). Tắt: phản hồi như cũ.
