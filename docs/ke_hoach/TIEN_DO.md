@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-UI-3 (FA-DAA đêm 3) | xong | 2026-11-09 | api_quan_ly.py, index.html, js/04_nhap_tai_cho.js, i18n.js, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_giao_dien_fa_huy_chuong.py (5 ca) | Bước huy chương thay điểm quyết tâm khi FA bật |
 | FA-UI-2 (FA-DAA đêm 3) | xong | 2026-11-09 | api_quan_ly.py, js/05_quan_ly.js, i18n.js, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_giao_dien_fa_quan_ly.py (3 ca) | Cột FA chỉ khi bật |
 | FA-UI-1 (FA-DAA đêm 3) | xong | 2026-11-09 | js/075_workspace.js, js/05_quan_ly.js, i18n.js, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_giao_dien_fa_cai_dat.py (5 ca) | Công tắc FA ở bước luật |
 | FA-S10 (FA-DAA đêm 3) | xong | 2026-11-09 | docs/ke_hoach/FA_DAA_KE_HOACH.md, CHANGELOG.md | — (chỉ tài liệu) | Bảng D8 đường B khớp D12 |

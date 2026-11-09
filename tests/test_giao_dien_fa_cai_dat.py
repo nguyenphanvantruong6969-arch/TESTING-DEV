@@ -16,7 +16,7 @@ from test_ws_wharton_giao_dien import _cho_ten, _toi_buoc_luat  # noqa: E402
 from test_ws_wharton_giao_dien import mo_trang  # noqa: E402,F401 (fixture)
 
 
-def test_o_fa_tat_san_va_nhan_khong_biet_ngu(mo_trang):  # noqa: F811
+def test_o_fa_tat_san_va_nhan_khong_biet_ngu(mo_trang):  # noqa: F811 (fixture dùng lại)
     page, _, loi = mo_trang()
     _toi_buoc_luat(page)
     o = page.locator("#wzFaDaa")
@@ -28,7 +28,7 @@ def test_o_fa_tat_san_va_nhan_khong_biet_ngu(mo_trang):  # noqa: F811
     assert not loi, loi
 
 
-def test_nhan_tieng_anh(mo_trang):  # noqa: F811
+def test_nhan_tieng_anh(mo_trang):  # noqa: F811 (fixture dùng lại)
     page, _, loi = mo_trang()
     page.evaluate("window.I18N.setLang('en')")
     page.wait_for_function("document.documentElement.lang === 'en'")
@@ -37,7 +37,7 @@ def test_nhan_tieng_anh(mo_trang):  # noqa: F811
     assert not loi, loi
 
 
-def test_bat_roi_tao_thi_luu_fa_daa_va_quay_lai_van_tich(mo_trang):  # noqa: F811
+def test_bat_roi_tao_thi_luu_fa_daa_va_quay_lai_van_tich(mo_trang):  # noqa: F811 (fixture dùng lại)
     page, api, loi = mo_trang()
     _toi_buoc_luat(page, "Đợt FA")
     page.locator("#wzFaDaa").check()
@@ -54,7 +54,7 @@ def test_bat_roi_tao_thi_luu_fa_daa_va_quay_lai_van_tich(mo_trang):  # noqa: F81
     assert not loi, loi
 
 
-def test_mac_dinh_tat_va_xem_lai_ghi_tat(mo_trang):  # noqa: F811
+def test_mac_dinh_tat_va_xem_lai_ghi_tat(mo_trang):  # noqa: F811 (fixture dùng lại)
     page, api, loi = mo_trang()
     _toi_buoc_luat(page, "Đợt thường")
     page.locator("#wzTiep").click()
@@ -65,7 +65,7 @@ def test_mac_dinh_tat_va_xem_lai_ghi_tat(mo_trang):  # noqa: F811
     assert not loi, loi
 
 
-def test_bat_fa_ma_tat_diem_quyet_tam_bi_tu_choi_va_hien_loi(mo_trang):  # noqa: F811
+def test_bat_fa_ma_tat_diem_quyet_tam_bi_tu_choi_va_hien_loi(mo_trang):  # noqa: F811 (fixture dùng lại)
     page, api, loi = mo_trang()
     _toi_buoc_luat(page, "Đợt sai")
     page.locator("#wzWharton").uncheck()

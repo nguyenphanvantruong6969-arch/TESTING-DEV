@@ -551,6 +551,10 @@ class QuanLyMixin:
             # Đọc cấu hình TRƯỚC khi mở kết nối đọc; chỉ để HIỂN THỊ nên đọc kiểu không nghiêm
             # (cấu hình hỏng thì coi như tắt, màn hình vẫn mở được như trước).
             bat_wharton = dung_wharton(self._cfg_ws()["rules"])
+            try:                                 # FA-UI-3: chỉ để HIỂN THỊ, cấu hình hỏng thì coi như tắt
+                bat_fa = bat_wharton and dung_fa_daa(self._cfg_ws()["rules"])
+            except Exception:
+                bat_fa = False
             with self._ket_noi_doc() as cur:
                 student = cur.execute(
                     "SELECT student_id, name, class_id FROM students WHERE student_id = ?",
@@ -582,6 +586,8 @@ class QuanLyMixin:
                 }
                 if bat_wharton:
                     du_lieu["wharton"] = self._trang_thai_wharton(cur, student_id, tested, prefs)
+                if bat_fa:
+                    du_lieu["huy_chuong"] = self._trang_thai_huy_chuong(cur, student_id, prefs)
                 return _ok(du_lieu)
         except Exception as e:
             return _fail(err("error_reading_student_state", detail=str(e)))
@@ -1030,6 +1036,22 @@ class QuanLyMixin:
             # Các buổi của em theo THỨ TỰ NGÀY của trường (như phần nguyện vọng), để màn hình
             # xếp khung theo buổi mà không phải gọi thêm.
             "ds_buoi": sap_buoi({buoi.get(c, BUOI_MAC_DINH) for c in prefs}),
+        }
+
+    @staticmethod
+    def _trang_thai_huy_chuong(cur, student_id: str, prefs: list) -> dict:
+        """FA-UI-3: khoá `huy_chuong` của `get_student_entry_state` (chỉ khi FA bật). `da_luu` là huy
+        chương ĐÃ LƯU {club_id: 60|30|10}; mặc định theo thứ tự (D2) do màn hình điền, chưa ghi gì."""
+        da_luu = {r[0]: r[1] for r in cur.execute(
+            "SELECT club_id, points FROM wharton_bids WHERE student_id = ? ORDER BY club_id", (student_id,))}
+        clb = {r[0]: (r[1] or BUOI_MAC_DINH, r[2]) for r in cur.execute("SELECT club_id, buoi, loai FROM clubs")}
+        return {
+            "bat": True,
+            "khoa": QuanLyMixin._wharton_dang_khoa(cur),
+            "da_luu": da_luu,
+            "loai_cua_clb": {c: clb.get(c, (None, None))[1] for c in prefs},
+            "buoi_cua_clb": {c: clb.get(c, (BUOI_MAC_DINH, None))[0] for c in prefs},
+            "ds_buoi": sap_buoi({clb.get(c, (BUOI_MAC_DINH, None))[0] for c in prefs}),
         }
 
     def submit_wharton(self, student_id: str, w1: dict, w2: dict):

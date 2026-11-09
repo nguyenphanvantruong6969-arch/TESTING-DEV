@@ -41,7 +41,7 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [x] FA-S3 D11 small comparison group -> no shift   - [x] FA-S1 retake counts only when flagged + retake variant
 - [x] FA-S2 --bo-cau per variant   - [x] FA-S4 warn on unreadable quiz times   - [x] FA-S5 warn on wrong variant
 - [x] FA-S6 generator reads Loại (--so-nhap-clb)   - [x] FA-S11 email <-> student_id join for KetQua   - [x] FA-S10 plan §4 D8 row
-- [x] FA-UI-1 FA switch   - [x] FA-UI-2 club columns   - [ ] FA-UI-3 medal step   - [ ] FA-UI-4 reasons + exports   - [ ] FA-UI-5 user guide
+- [x] FA-UI-1 FA switch   - [x] FA-UI-2 club columns   - [x] FA-UI-3 medal step   - [ ] FA-UI-4 reasons + exports   - [ ] FA-UI-5 user guide
 - [ ] Opus review night 3
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
@@ -111,3 +111,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Opus (night 3) | FA-S10 plan §4 D8 path-B row fixed | docs only |
 | 2026-11-09 | Opus (night 3) | FA-UI-1 FA switch in workspace wizard; red first (5/5); mutation caught; ws/wharton UI tests 341 passed after fixing 'em' wording | Chromium really ran |
 | 2026-11-09 | Opus (night 3) | FA-UI-2 club table FA columns; red first; mutation caught; related 2334 passed / 1 skipped | Chromium really ran |
+| 2026-11-09 | Opus (night 3) | FA-UI-3 medal step; red first (4/5); swap mutation caught; related 2704 passed / 1 skipped after wording fix | Chromium really ran |
