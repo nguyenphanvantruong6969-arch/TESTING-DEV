@@ -1,8 +1,8 @@
-# Chạy đêm FA-DAA — tệp DUY NHẤT cần đưa cho Claude (ĐÊM 3: sửa lỗi + giao diện kiosk)
+# Chạy đêm FA-DAA — tệp DUY NHẤT cần đưa cho Claude (ĐÊM 4: sửa lỗi soát đêm 3 + biên bản bốc thăm + mô phỏng)
 
-> Đêm 1 (kiosk) và đêm 2 (Microsoft) đã xong, Opus đã soát cả hai (GO). Báo cáo: `docs/phien/bao_cao_dem/2026-11-09.md`,
-> `2026-11-09_soat_dem1.md`, `2026-11-09_dem2.md`, `2026-11-09_soat_dem2.md`. Giao thức đêm 1 và đêm 2 nằm trong lịch sử
-> git của tệp này (commit a80e626 và 3e7d8a7).
+> Đêm 1 (kiosk), đêm 2 (Microsoft), đêm 3 (sửa lỗi + giao diện) đã xong, Opus đã soát cả ba (GO). Báo cáo trong
+> `docs/phien/bao_cao_dem/` (`*_soat_dem3.md` là bản soát mới nhất). Giao thức các đêm trước nằm trong lịch sử git của
+> tệp này (commit a80e626, 3e7d8a7, c962bb8).
 
 ## Phần cho người cài (tiếng Việt, 1 phút)
 
@@ -11,7 +11,7 @@
 3. Dán đúng câu lệnh sau rồi để chạy:
 
 ```text
-Start the night-3 job NOW in this session. Read docs/phien/CHAY_DEM_FA_DAA.md and follow it exactly. Truong authorises commits and pushes to branch claude/keen-ride-72sa7t. Write the RUNNING lock line first (section C.2). Do not create any scheduled task. Work through every night-3 item until each is done or BLOCKED. Then follow section E: write the report, commit, push, check the push reached GitHub, remove the RUNNING line, and print the report's GitHub link as your last line.
+Start the night-4 job NOW in this session. Read docs/phien/CHAY_DEM_FA_DAA.md and follow it exactly. Truong authorises commits and pushes to branch claude/keen-ride-72sa7t. Write the RUNNING lock line first (section C.2). Do not create any scheduled task. Work through every night-4 item until each is done or BLOCKED. Then follow section E: write the report, commit, push, check the push reached GitHub, remove the RUNNING line, and print the report's GitHub link as your last line.
 ```
 
 4. Phiên dừng giữa chừng thì mở phiên mới, dán lại đúng câu trên; phiên mới làm tiếp từ tệp bàn giao.
@@ -24,14 +24,15 @@ Start the night-3 job NOW in this session. Read docs/phien/CHAY_DEM_FA_DAA.md an
 ### A. Who you are and what this is
 - You are the **implementer** (Sonnet role). Plan by Opus; nights 1 and 2 reviewed by Opus (GO). Do not re-plan; do not
   reorder items.
-- Tonight ("night 3"): the fix list **FA-S1 .. FA-S11**, then the kiosk screens **FA-UI-1 .. FA-UI-5**, from
-  `docs/ke_hoach/FA_DAA_KE_HOACH.md` §6 (the spec; read the row of the item you start, plus the §1 decisions it cites).
-  Why each fix is needed: `docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md`. Vision: `docs/ke_hoach/FA_DAA_VISION.md`.
+- Tonight ("night 4"): **FA-N1 .. FA-N4** (fixes from the night-3 review), then **FA-9** (witnessed lottery record)
+  and **FA-10** (simulation compare + D1 two-term behaviour), from `docs/ke_hoach/FA_DAA_KE_HOACH.md` §7 (FA-9 and
+  FA-10 are specified in §2). Why each fix is needed: `docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md`.
+  Vision: `docs/ke_hoach/FA_DAA_VISION.md`.
 - Kiosk code IS allowed tonight (`api*.py`, `fa_daa.py`, `fa_ly_do.py`, `so_nhap.py`, `index.html`, `js/*.js`,
   `i18n.js`, `style.css`), but NOT `rbda_priority_pipeline.py` core functions (`run_rbda`, `club_choice_function`,
   `compute_club_priority`, `verify_stability`): an item that needs them is BLOCKED.
 - Microsoft parts stay **TH = untested on real Microsoft**. D8 (Power Apps or Forms) is still OPEN: never pick one.
-- Not tonight: attendance, appeals, round 2, FA-9, FA-10, D1.
+- Not tonight: attendance, appeals, round 2, D1 itself (FA-10 only MEASURES it), real-Microsoft tests.
 - `CLAUDE.md` is loaded automatically: invariants, working rules, no subagents (rule 10), tests first (rule 2),
   related tests only, simulated data only, never write report commentary.
 
@@ -46,7 +47,7 @@ git fetch --unshallow 2>/dev/null; git fetch origin main:refs/remotes/origin/mai
 ```
 Shell variables do not survive between commands: prefix EVERY UI test command with `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`.
 Check the browser once: `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers .venv/bin/python -m pytest -q tests/test_giao_dien_wharton.py -x 2>&1 | tail -3` must show
-PASSED tests, not only "skipped". If UI tests only skip, FA-UI items are BLOCKED ("no browser"); still do FA-S items.
+PASSED tests, not only "skipped". If UI tests only skip, FA-N2 and FA-N3 are BLOCKED ("no browser"); still do the other items.
 If your environment forces a different branch name, create it from `origin/claude/keen-ride-72sa7t`, push there,
 and write the branch name in the handoff Session log. Keep updating `docs/phien/claude__keen-ride-72sa7t.md` either way.
 
@@ -56,13 +57,13 @@ Quiet test command (never paste full pytest output):
 ```
 
 ### C. Protocol
-1. Read: this file, then `docs/phien/claude__keen-ride-72sa7t.md` (handoff), then ONLY the §6 row of the item you start
+1. Read: this file, then `docs/phien/claude__keen-ride-72sa7t.md` (handoff), then ONLY the §7 row (FA-9/FA-10: §2) of the item you start
    (and its line in the review report). Locate code by function name (`grep -n "def <name>" <file>`), never line numbers.
 2. Lock: in the handoff "Current state", if a line `RUNNING: <UTC time> <session>` is less than 3 hours old, another
    session is working: stop immediately and write nothing. Otherwise write your own RUNNING line, commit, push.
    Remove it in your final report.
-3. Take the first unticked night-3 item in the handoff Plan whose dependencies (C.5) are done. For each item:
-   a. Failing test first that REPRODUCES the bug (FA-S) or checks the screen (FA-UI); run it; RED for the right reason.
+3. Take the first unticked night-4 item in the handoff Plan whose dependencies (C.5) are done. For each item:
+   a. Failing test first that REPRODUCES the bug (FA-N) or checks the new feature (FA-9, FA-10); RED for the right reason.
    b. Minimal fix. Default behaviour unchanged: FA off / no `--fa-daa` -> byte-identical outputs (compare one sample
       run before/after for converter/generator items and say so in the commit).
    c. Run: the item's tests + every `tests/` file that greps a file or identifier you changed. Kiosk items also:
@@ -79,11 +80,9 @@ Quiet test command (never paste full pytest output):
       (retry on network error: 2 s, 4 s, 8 s, 16 s). Never force-push. Never open or merge a PR.
 4. Decisions D1..D12 (plan §1): use the Default column. D8 open. Never implement D1.
 5. Order and dependencies:
-   - FA-S7, FA-S8, FA-S9 (kiosk): none.
-   - FA-S1, FA-S2, FA-S3, FA-S4, FA-S5 (quiz part of the converter): none; do FA-S3 before FA-S1 (same module family).
-   - FA-S6 (generator reads Loại): none. FA-S11 (email join): none.
-   - FA-S10 (docs): none.
-   - FA-UI-1..FA-UI-5: after ALL FA-S items are done or BLOCKED; FA-UI-4 needs FA-S7.
+   - Order: FA-N1, FA-N2, FA-N3, FA-N4, FA-9, FA-10. None depends on another, except FA-10 should run last
+     (it uses the finished kiosk functions). FA-10 output is TABLES ONLY labelled "SỐ LIỆU MÔ PHỎNG", no
+     interpretation or conclusion text (academic integrity in CLAUDE.md).
    Stop rules (plan §5): invariant would break, baseline red, new library needed, schema/CSV change beyond the
    item, same test fails after 3 honest attempts -> mark `BLOCKED: <one line why>` in the handoff Plan, commit,
    continue with the next item that does not depend on it.
@@ -97,23 +96,24 @@ Quiet test command (never paste full pytest output):
 - UI tests skip silently without a browser: a skipped UI test is NOT a pass.
 - `rules` keys that are False never appear in `run_history.luat_xep` or the fingerprint (`_luat_de_ghi_hoac_bam`).
 - Variant choice `crc32(email) % n`: `zlib.crc32` on UTF-8, never `hash()`.
-- `EMAIL_MA_HS.csv` (FA-S11) is personal data: never commit a real one; tests use simulated emails.
+- `EMAIL_MA_HS.csv` is personal data: never commit a real one; tests use simulated emails.
+- FA-9 record and FA-10 tables: no student names; STB numbers and ids only in simulated data.
 - Never commit real school data, names, emails, tenant ids or app URLs.
 
 ### E. Final report (end of night or when nothing is left)
 1. Overwrite "Current state" in the handoff: items done (commit hashes), BLOCKED (why), tests run and counts, open
-   questions for Truong. Append a "Night 3 report <date>" Session-log row. Remove your RUNNING line.
-2. Report file `docs/phien/bao_cao_dem/<YYYY-MM-DD>_dem3.md` (date the night started, Vietnam time). If it exists and
-   its first line is `# Báo cáo đêm 3 ...`, an earlier session of tonight wrote it: UPDATE it; never touch other
+   questions for Truong. Append a "Night 4 report <date>" Session-log row. Remove your RUNNING line.
+2. Report file `docs/phien/bao_cao_dem/<YYYY-MM-DD>_dem4.md` (date the night started, Vietnam time). If it exists and
+   its first line is `# Báo cáo đêm 4 ...`, an earlier session of tonight wrote it: UPDATE it; never touch other
    nights' files. Vietnamese, plain words, no jargon, at most 70 lines:
-   - `# Báo cáo đêm 3 <ngày>` and one line: xong X/16 mục, chặn Y mục.
-   - Table `| Mục | Việc (1 câu dễ hiểu) | Kết quả: xong / chặn / chưa làm | Commit |` with rows FA-S1 .. FA-S11,
-     FA-UI-1 .. FA-UI-5.
+   - `# Báo cáo đêm 4 <ngày>` and one line: xong X/6 mục, chặn Y mục.
+   - Table `| Mục | Việc (1 câu dễ hiểu) | Kết quả: xong / chặn / chưa làm | Commit |` with rows FA-N1 .. FA-N4,
+     FA-9, FA-10.
    - `## Bị chặn` : each blocked item, why, what Truong must decide.
    - `## Kiểm tra` : test files run, pass/fail/skip counts (UI tests: how many really ran), ruff, kiem_nhanh.
      Numbers are SIMULATED data.
-   - `## Câu hỏi cho Truong` (D8 stays here until decided) and `## Đêm sau nên làm` (Opus review of night 3).
-3. Commit (`FA-BC: night 3 report <date>`) and push as in C.3 h. Verify:
+   - `## Câu hỏi cho Truong` (D8 stays here until decided) and `## Đêm sau nên làm` (Opus review of night 4).
+3. Commit (`FA-BC: night 4 report <date>`) and push as in C.3 h. Verify:
    `git fetch origin claude/keen-ride-72sa7t && git log -1 --format=%H origin/claude/keen-ride-72sa7t` equals HEAD.
    Last line of your final message: the link
    `https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/blob/claude/keen-ride-72sa7t/docs/phien/bao_cao_dem/<report file name>`

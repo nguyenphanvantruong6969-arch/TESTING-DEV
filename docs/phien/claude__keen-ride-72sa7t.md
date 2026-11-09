@@ -42,7 +42,12 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [x] FA-S2 --bo-cau per variant   - [x] FA-S4 warn on unreadable quiz times   - [x] FA-S5 warn on wrong variant
 - [x] FA-S6 generator reads Loại (--so-nhap-clb)   - [x] FA-S11 email <-> student_id join for KetQua   - [x] FA-S10 plan §4 D8 row
 - [x] FA-UI-1 FA switch   - [x] FA-UI-2 club columns   - [x] FA-UI-3 medal step   - [x] FA-UI-4 reasons + exports   - [x] FA-UI-5 user guide
-- [ ] Opus review night 3
+- [x] Opus review night 3 (2026-11-09: GO; 2 new bugs + 2 small items listed as FA-N1..N4, not fixed; report bao_cao_dem/2026-11-09_soat_dem3.md)
+Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-09; spec plan §7, FA-9/FA-10 in §2):
+- [ ] FA-N1 reasons per day after a partial run   - [ ] FA-N2 on-site lazy medals saved + follow re-rank
+- [ ] FA-N3 clear error FA on / points off   - [ ] FA-N4 warn: single-variant club, no retake
+- [ ] FA-9 witnessed lottery record   - [ ] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
+- [ ] Opus review night 4
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
@@ -63,9 +68,9 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Opus: review night 3 (diff from 19f6dd2; full suite; soat-ma four tiers; invariant 1 at 3 datasets x 20 seeds).
-2. Truong: GD2 meeting -> decide D8; answer the night-3 questions in bao_cao_dem/2026-11-09_dem3.md.
-3. Later: FA-9, FA-10 (+ D1 two-term simulation before term 2).
+1. Night 4 implementer (Sonnet): `docs/phien/CHAY_DEM_FA_DAA.md` (night-4 version).
+2. Truong: OK to open a PR to main for the full CI suite + Windows build? GĐ2 -> D8. Night-3 questions: defaults in the night-3 review.
+3. Opus: review night 4.
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -113,3 +118,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Opus (night 3) | FA-UI-4 reasons column + 2 export buttons; red first; mutation caught; related 2526 passed / 1 skipped | Chromium really ran |
 | 2026-11-09 | Opus (night 3) | FA-UI-5 user guide section 15; doc test red first | guide tests 92 passed, kiem_nhanh 7/7 |
 | 2026-11-09 | Opus (night 3) | Night 3 report 2026-11-09: 16/16 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem3.md | RUNNING line removed |
+| 2026-11-09 | Opus | Reviewed night 3: GO; repro FA-N1 (partial run drops other days' reasons) and FA-N2 (on-site lazy path saves no medals); kiem_nhanh 7/7; wrote plan §7 and night-4 protocol | UI tests not rerun (playwright install did not finish) |

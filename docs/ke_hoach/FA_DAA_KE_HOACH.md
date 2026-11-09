@@ -240,3 +240,21 @@ without `--fa-daa` byte-identical).
 | FA-UI-5 | `HUONG_DAN_SU_DUNG.md`: one FA section (turn on, import Sổ nhập with types, medals, read reasons, demand table) | doc test if one exists for the guide |
 
 Not in night 3 (Truong did not select): attendance, appeals, round 2 in the kiosk; FA-9; FA-10.
+
+## 7. Night 4: night-3 review fixes, lottery record, simulation (Opus, 2026-11-09, after the night-3 review)
+
+Source: `docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md`. Same rules as §6: failing test that reproduces first,
+minimal fix, FA off byte-identical.
+
+| Code | Fix / build | kiem_nhan |
+|---|---|---|
+| FA-N1 | Reasons after a PARTIAL run (`chi_buoi`): `_doc_ly_do_moi_nhat` (api_xuat.py) takes, for EACH day, the rows of the latest run that included that day, and only when that run is the one that wrote the day's current `match_results`. A day whose latest run was not FA has no reasons: leave it out and return a warning (fail only when no day has reasons). Same for `get_ly_do_ket_qua` and the `fa_nhom` join | 2 days, FA full run (6 rows), then `run_pipeline(chi_buoi=[day 1])` -> export still has both days (day 1 from run 2, day 2 from run 1). Repro script in the review report |
+| FA-N2 | On-site entry lazy path (V§6.1, D2): when step 2 is saved with FA on and the day has NO saved medals, the screen saves the D2 defaults at once through `submit_huy_chuong`. When the student re-ranks and the saved medals still equal the defaults of the OLD ranking (never moved by hand), save the defaults of the new ranking; if they were moved by hand, keep them and show the gentle reminder (V§6.1). No schema change, no server-side derivation | Chromium: save step 2 only -> `wharton_bids` has 60/30/10 on the first 3 non-FREE clubs; re-rank -> medals follow; move gold then re-rank -> kept + reminder |
+| FA-N3 | Clear message when the FA switch is on while determination points are off (night-3 question 1): new code in `i18n_errors.py` (+ `tao_i18n_js.py`), shown at the rules step | Chromium/API: the new code, not the generic one |
+| FA-N4 | Retake needs a second variant: when a flagged student's club has ONE variant, the converter warns "không có đề thi lại" and the guide `CAI_DAT_FORMS_BIEN_THE.md` says so | flagged + single-variant club -> warning; nothing else changes |
+| FA-9 | Witnessed lottery record, as specified in §2 FA-9 (export `bien_ban_boc_tham`, ceremony order, signature lines, STB hash, data fingerprint) + one admin button | `tests/test_fa_bien_ban.py` as in §2 |
+| FA-10 | Simulation compare, as specified in §2 FA-10, including the D1 two-term "lose NV1 on purpose" behaviour. TABLES ONLY, labelled "SỐ LIỆU MÔ PHỎNG", no interpretation text | `tests/test_mo_phong_fa_daa.py` as in §2 |
+
+Defaults for the other night-3 questions (Truong may change before the run): medals are NOT forced to 3 (V§6.1
+allows fewer); the result column keeps every sentence of the day in list order; `fa_ly_do.py` wording keeps V§9.1.
+Not in night 4: attendance, appeals, round 2, D1 itself, any real-Microsoft test (needs IT, GĐ3).

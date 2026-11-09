@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-SOAT3: soát đêm 3 và mở đêm 4 (chỉ tài liệu, chưa sửa lỗi)
+
+- `docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md`: kết luận GO; FA-N1 (chạy lại một ngày làm mất lý do của ngày khác, đã tái hiện), FA-N2 (màn nhập tại chỗ không lưu huy chương mặc định, đã tái hiện), FA-N3, FA-N4.
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §7: spec đêm 4 (FA-N1..N4, FA-9, FA-10). `docs/phien/CHAY_DEM_FA_DAA.md`: giao thức đêm 4. `docs/phien/claude__keen-ride-72sa7t.md`: Plan đêm 4.
+
 ## 2026-11-09 — FA-UI-5: mục hướng dẫn sử dụng "Xếp theo loại CLB và huy chương" (đêm 3, chỉ tài liệu)
 
 - `HUONG_DAN_SU_DUNG.md` §15 (mới) + mục lục: bật ở bước luật (cần điểm quyết tâm), bốn cột mới của Sổ nhập và trang Giữ chỗ, bước huy chương, cột Lý do và `ket_qua_ly_do.csv`, `bang_nhu_cau.csv`.
