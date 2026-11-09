@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S5: cảnh báo khi em làm sai đề được giao (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`, khi có `--bien-the-tep`): bài làm đề khác đề giao (`chon_bien_the`, hoặc `chon_bien_the_thi_lai` với bài thi lại hợp lệ) -> một cảnh báo nêu email, CLB, đề đã làm và đề giao; vẫn giữ điểm.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` `test_fa_s5_lam_sai_de_duoc_giao_thi_canh_bao_giu_diem`; thêm một dòng kiểm vào ca thi lại FA-S1.
+
 ## 2026-11-09 — FA-S1: bài thi lại chỉ tính khi lần đầu bị gắn cờ và đúng đề thi lại (đêm 3, TH)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `--fa-daa` giữ mọi bài của một CLB rồi `_tach_lan_dau` chọn "bài lần đầu" theo đề giao (`chon_bien_the`), không theo thứ tự tệp; trung vị D9 chỉ trên bài lần đầu; bài lần hai thay bài lần đầu CHỈ khi lần đầu bị cờ quá nhanh và bài lần hai là đề `chon_bien_the_thi_lai`; mọi bài lần hai khác: không tính + cảnh báo. Chế độ mặc định (không `--fa-daa`) giữ "giữ bài đầu", đường mã không đổi.

@@ -376,6 +376,7 @@ def test_fa_s1_bi_co_nhanh_va_dung_de_thi_lai_thi_lay_bai_lan_hai(tmp_path):
     kq = _chay_thu_tu(tmp_path, de, lists, tep, sn)
     assert _diem(tmp_path)[x] == 10.0                                  # bài thi lại 5/5
     assert not any("giữ bài đầu" in c[2] for c in kq["canh_bao"])
+    assert not any("đề giao" in c[2] for c in kq["canh_bao"] if c[1] == x)   # FA-S5: thi lại đúng đề thi lại
 
 
 def test_fa_s1_khong_bi_co_thi_bai_lan_hai_bi_bo_kem_canh_bao(tmp_path):
@@ -397,3 +398,23 @@ def test_fa_s1_dao_thu_tu_tep_cho_cung_ket_qua(tmp_path):
     k2 = _chay_thu_tu(tmp_path, de, lists, tep, sn, dao=True)
     assert _diem(tmp_path) == d1
     assert sorted(map(str, k1["canh_bao"])) == sorted(map(str, k2["canh_bao"]))
+
+
+def test_fa_s5_lam_sai_de_duoc_giao_thi_canh_bao_giu_diem(tmp_path):
+    z = "t2@x.vn"
+    giao = "AB"[pt.chon_bien_the(z, 2)]
+    sai = "B" if giao == "A" else "A"
+    de, lists, tep, sn, emails = _bo_thi_lai(tmp_path, **{"them_" + sai.lower(): [(z, 5, 600)]})
+    # z chỉ nộp đề sai: bỏ bài đúng đề của z
+    tep = dict(tep)
+    clb = next(c for c in de["cau_lac_bo"] if c["club_id"] == "clb_covua")
+    clb_g = clb if giao == "A" else dict(clb, de_thi=clb["de_thi_bien_the"][0])
+    dong = [(e, 4, 600) for e in emails if "AB"[pt.chon_bien_the(e, 2)] == giao and e != z]
+    tep[giao] = _tep_thi_gio(tmp_path, clb_g, dong, "thi_%s.xlsx" % giao)
+    kq = _chay_thu_tu(tmp_path, de, lists, tep, sn)
+    assert _diem(tmp_path)[z] == 10.0                                  # giữ điểm, admin quyết
+    cb = [c[2] for c in kq["canh_bao"] if c[1] == z and "đề giao" in c[2]]
+    assert len(cb) == 1 and "clb_covua" in cb[0] and z in cb[0]
+    assert "đề %s" % sai in cb[0] and "đề giao %s" % giao in cb[0]
+    # em làm đúng đề: không có cảnh báo đề sai
+    assert not [c for c in kq["canh_bao"] if c[1] != z and "đề giao" in c[2]]

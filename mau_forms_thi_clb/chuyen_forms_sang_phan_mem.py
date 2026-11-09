@@ -1213,6 +1213,15 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
                 canh_bao.append((hs["dong"], e, "%s: bài lần hai (tệp %s) không tính — giữ bài lần đầu (tệp %s); "
                                  "chỉ tính thi lại khi lần đầu bị gắn cờ làm quá nhanh và em làm đúng đề thi lại"
                                  % (clb["club_id"], bai2["tep"], bai1["tep"])))
+    if theo_tep is not None:                                       # FA-S5: làm sai đề giao -> báo, giữ điểm
+        for hs in hoc_sinh:
+            for bai in hs["bai_thi"]:
+                clb = theo_ma[bai["club_id"]]
+                giao = _de_giao(hs["student_id"], clb, thi_lai=bool(bai.get("thi_lai")))
+                if _so_de(clb) > 1 and bai.get("bien_the", "A") != giao:
+                    canh_bao.append((hs["dong"], hs["student_id"], "%s: email %s làm đề %s nhưng đề giao %s — vẫn giữ "
+                                     "điểm, admin quyết định" % (clb["club_id"], hs["student_id"],
+                                                                bai.get("bien_the", "A"), giao)))
     bai_cua = {}                                                   # club_id -> [(bài, khoá email)]
     for hs in hoc_sinh:
         e = hs["student_id"]                                        # lúc này là khoá email (như doc_lists)
