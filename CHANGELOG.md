@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-N2: màn nhập tại chỗ lưu huy chương mặc định và đi theo thứ tự mới (đêm 4)
+
+- `js/04_nhap_tai_cho.js` (`hcTheoNguyenVong`), `index.html` (`hcNhacDaChinh`), `i18n.js` (`hc_nhac_da_chinh`): sau khi lưu nguyện vọng ở workspace FA, mỗi ngày: chưa có huy chương → lưu mặc định D2; huy chương = mặc định của thứ tự cũ và thứ tự đổi → lưu mặc định mới; đã chỉnh tay → giữ nguyên + câu nhắc. Chỉ gọi `submit_huy_chuong`; không suy diễn ở máy chủ, không đổi schema.
+- Test mới: `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (3, Chromium chạy thật).
+
 ## 2026-11-09 — FA-N1: lý do theo từng buổi sau khi chạy lại một phần (đêm 4)
 
 - `api_xuat.py` `_doc_ly_do_moi_nhat`: mỗi buổi lấy lý do của lần chạy mới nhất CÓ chạy buổi đó (`run_history.buoi_da_chay`); buổi mà lần đó không phải FA thì bỏ và báo `canh_bao` (`fa_ly_do_thieu_buoi`); chỉ lỗi `fa_chua_co_ly_do` khi không buổi nào có lý do. `i18n_errors.py` + `i18n_loi.js`: mã mới.

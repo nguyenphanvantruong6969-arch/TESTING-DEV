@@ -181,6 +181,7 @@ function loadFallbackTab() {
 
 function boChonHocSinhDuPhong() {
   currentFallbackStudent = null;
+  hcNhacSid = null;
   currentRanking = [];
   daLuuThi = [];
   daLuuNv = [];
@@ -344,6 +345,8 @@ function initFallbackHandlers() {
        lúc chờ thì CLB đó vẫn là "chưa lưu" (A13.12, soát nhập 2.3). */
     const sid = currentFallbackStudent;
     const chup = currentRanking.slice();
+    const nvTruoc = daLuuNv.slice();                       /* FA-N2: thu tu da luu TRUOC lan luu nay */
+    const hcTruoc = huyChuongState ? huyChuongState.huy_chuong : null;
     const lop = lopKioskDeGui();
     if (lop === undefined) { feedback(el("preferencesFeedback"), t("kiosk_lop_nhac"), true); return; }
     khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", sid, chup, lop)).then((res) => {
@@ -353,7 +356,11 @@ function initFallbackHandlers() {
           daLuuNv = chup;
           if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
-          lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+          if (hcTruoc && hcTruoc.bat && !hcTruoc.khoa) {
+            hcTheoNguyenVong(sid, nvTruoc, chup, hcTruoc);   /* FA-N2 (V§6.1, D2) */
+          } else {
+            lamMoiBuoc3(true);        /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+          }
           feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
         }
         loadFallbackStudentList(); // cap nhat the "n nguyen vong" trong danh sach
@@ -939,12 +946,73 @@ function hcDoi(khung, chon) {
   hcCapNhatNhac();
 }
 
+/* FA-N2 (V§6.1, D2): sau khi LUU nguyen vong, giu huy chuong khop thu tu. Moi ngay:
+   - chua co huy chuong nao da luu (em luoi)            -> luu mac dinh cua thu tu MOI;
+   - huy chuong da luu = mac dinh cua thu tu CU (chua chinh tay) va thu tu doi -> luu mac dinh moi;
+   - da chinh tay va thu tu doi                         -> giu nguyen, hien cau nhac nhe.
+   Chi goi submit_huy_chuong (may chu van kiem moi thu); khong suy dien o may chu. */
+let hcNhacSid = null;   // em dang can cau nhac "da chinh tay"
+
+function hcDanhSachNgay(nv, hc, buoi) {
+  return nv.filter((cid) => hc.buoi_cua_clb[cid] === buoi && hc.loai_cua_clb[cid] !== "TU_DO");
+}
+
+function hcCoDatNhu(daLuu, macDinh, dsClb) {
+  /* daLuu {cid: diem} so voi macDinh {diem: cid}, chi xet cac CLB cua ngay (dsClb). */
+  const a = {};
+  dsClb.forEach((cid) => { if (cid in daLuu) a[cid] = daLuu[cid]; });
+  const b = {};
+  Object.keys(macDinh).forEach((d) => { b[macDinh[d]] = Number(d); });
+  const ka = Object.keys(a).sort();
+  const kb = Object.keys(b).sort();
+  return ka.length === kb.length && ka.every((k, i) => k === kb[i] && a[k] === b[k]);
+}
+
+function hcTheoNguyenVong(sid, nvTruoc, nvMoi, hcTruoc) {
+  callApi("get_student_entry_state", sid).then((res) => {
+    if (!res.ok || sid !== currentFallbackStudent) return;
+    const hc = res.data.huy_chuong;
+    if (!hc || !hc.bat || hc.khoa) { lamMoiBuoc3(true); return; }
+    /* Ban do ngay/loai chi co CLB dang trong nguyen vong: gop ban CU de loc dung ca danh sach cu. */
+    const gop = {
+      buoi_cua_clb: Object.assign({}, hcTruoc.buoi_cua_clb, hc.buoi_cua_clb),
+      loai_cua_clb: Object.assign({}, hcTruoc.loai_cua_clb, hc.loai_cua_clb),
+    };
+    const dsBuoi = Array.from(new Set([...(hcTruoc.ds_buoi || []), ...(hc.ds_buoi || [])]));
+    const moi = Object.assign({}, hc.da_luu);              /* sau khi luu, may chu da bo CLB bi go */
+    let nhac = false;
+    dsBuoi.forEach((buoi) => {
+      const dsMoi = hcDanhSachNgay(nvMoi, gop, buoi);
+      const dsCu = hcDanhSachNgay(nvTruoc, gop, buoi);
+      const daLuuCu = hcTruoc.da_luu || {};
+      const coLuuCu = dsCu.some((cid) => cid in daLuuCu);
+      const doiThuTu = dsMoi.join(",") !== dsCu.join(",");
+      let macDinhMoi = false;
+      if (!coLuuCu) macDinhMoi = dsMoi.length > 0 && !dsMoi.some((cid) => cid in moi);
+      else if (doiThuTu) {
+        if (hcCoDatNhu(daLuuCu, hcMacDinh(dsCu), dsCu)) macDinhMoi = true;
+        else nhac = true;
+      }
+      if (macDinhMoi) {
+        dsMoi.forEach((cid) => { delete moi[cid]; });
+        const md = hcMacDinh(dsMoi);
+        Object.keys(md).forEach((d) => { moi[md[d]] = Number(d); });
+      }
+    });
+    hcNhacSid = nhac ? sid : null;
+    const doi = JSON.stringify(Object.entries(moi).sort()) !== JSON.stringify(Object.entries(hc.da_luu).sort());
+    if (!doi) { lamMoiBuoc3(true); return; }
+    callApi("submit_huy_chuong", sid, moi).then(() => lamMoiBuoc3(true));
+  });
+}
+
 /* V§6.1: vang o CLB Tuyen chon thi nhac huy chuong chi dung khi bang diem va da vuot diem san. */
 function hcCapNhatNhac() {
   const hc = huyChuongState && huyChuongState.huy_chuong;
   const co = !!hc && Array.from(document.querySelectorAll('#fbHuyChuongBody select.hc-chon[data-diem="60"]'))
     .some((o) => o.value && hc.loai_cua_clb[o.value] === "TUYEN_CHON");
   el("hcNhacTuyenChon").hidden = !co;
+  el("hcNhacDaChinh").hidden = hcNhacSid !== currentFallbackStudent || !currentFallbackStudent;
 }
 
 function hcThuThap() {
