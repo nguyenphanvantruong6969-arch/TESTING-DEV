@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-UI-2: cột FA trong bảng CLB ở thẻ Quản lý (đêm 3)
+
+- `api_quan_ly.py` (`list_clubs_admin`): khi FA bật, mỗi CLB thêm `loai`, `diem_san`, `so_toi_thieu`, `suc_chua_phong`, `n_giu_cho`; tắt thì phản hồi như cũ.
+- `js/05_quan_ly.js` (`veCotFaBangClb`, `oFaClb`): năm cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, Giữ chỗ chỉ khi có dữ liệu FA; tắt thì không thêm phần tử nào. `i18n.js`: `th_fa_*`, `fa_loai_*` (vi + en).
+- Test mới: `tests/test_giao_dien_fa_quan_ly.py` (3 ca Chromium). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 219 tệp test.
+
 ## 2026-11-09 — FA-UI-1: công tắc "Xếp theo loại CLB và huy chương" khi tạo không gian làm việc (đêm 3)
 
 - `js/075_workspace.js`: bước luật có ô `#wzFaDaa` (tắt sẵn, lấy theo mẫu), hàng xem lại `#rvFaDaa`; chỉ gửi `rules.fa_daa: true` khi bật (tắt: cấu hình gửi đi như cũ); bật mà tắt điểm quyết tâm thì backend từ chối bằng lỗi sẵn có `ws_du_lieu_sai`, hiện trên màn hình. `wsApDungCauHinh` đặt `FA_BAT` (khai báo ở `js/05_quan_ly.js`) cho các màn FA sau.

@@ -159,7 +159,20 @@ class QuanLyMixin:
                     "SELECT club_id, name, capacity, reserve_capacity, "
                     "reserve_group, buoi FROM clubs ORDER BY COALESCE(buoi, '') COLLATE THU_TU_BUOI, club_id"
                 ).fetchall()
-            return _ok([dict(r) for r in rows])
+                ra = [dict(r) for r in rows]
+                # FA-UI-2: thuộc tính FA chỉ khi bật (tắt: phản hồi như cũ, bảng như cũ).
+                try:
+                    fa_bat = dung_fa_daa(self._luat_nghiem())
+                except Exception:
+                    fa_bat = False
+                if fa_bat:
+                    fa = {r[0]: r[1:] for r in cur.execute(
+                        "SELECT c.club_id, c.loai, c.diem_san, c.so_toi_thieu, c.suc_chua_phong, "
+                        " (SELECT COUNT(*) FROM giu_cho g WHERE g.club_id = c.club_id) FROM clubs c")}
+                    for c in ra:
+                        (c["loai"], c["diem_san"], c["so_toi_thieu"], c["suc_chua_phong"],
+                         c["n_giu_cho"]) = fa[c["club_id"]]
+            return _ok(ra)
         except Exception as e:
             return _fail(err("error_reading_club_list", detail=str(e)))
 
