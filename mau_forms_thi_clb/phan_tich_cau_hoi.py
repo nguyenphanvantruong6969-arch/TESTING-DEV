@@ -106,7 +106,7 @@ def so_sanh_bien_the(diem):
     """D11. `diem`: {đề: [điểm thang 10 chưa làm tròn]} của MỘT CLB.
 
     Trả {co_lech, trung_binh_chung, bien_the: {đề: {n, trung_binh, trung_binh_con_lai, chenh_lech, nguong, ly_do, dich}}}.
-    ly_do: MOT_DE (chỉ một đề), N_NHO (n < 5: chỉ báo), TRONG_NGUONG, NGOAI_NGUONG. `dich` (0 nếu không chỉnh) cộng vào điểm
+    ly_do: MOT_DE (chỉ một đề), N_NHO (đề này hoặc phần còn lại n < 5: chỉ báo), TRONG_NGUONG, NGOAI_NGUONG. `dich` (0 nếu không chỉnh) cộng vào điểm
     chưa làm tròn của đề đó (xem `diem_dieu_chinh`). Quá 3 đề: ValueError (bảng z chỉ có 2 và 3 đề)."""
     k = len(diem)
     if k > TRAN_BIEN_THE:
@@ -121,7 +121,7 @@ def so_sanh_bien_the(diem):
         if k > 1 and x and khac:
             o["chenh_lech"] = o["trung_binh"] - o["trung_binh_con_lai"]
             o["nguong"] = Z_THEO_SO_DE[k] * math.sqrt(_sd(x) ** 2 / len(x) + _sd(khac) ** 2 / len(khac))
-            if len(x) < N_TOI_THIEU:
+            if len(x) < N_TOI_THIEU or len(khac) < N_TOI_THIEU:   # FA-S3: một phía nhỏ -> chỉ báo
                 o["ly_do"] = "N_NHO"
             elif abs(o["chenh_lech"]) > o["nguong"]:
                 o["ly_do"], o["dich"] = "NGOAI_NGUONG", chung - o["trung_binh"]

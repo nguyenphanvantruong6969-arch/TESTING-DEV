@@ -138,7 +138,15 @@ def _sd(x):
 def test_d11_de_it_hon_5_em_chi_bao_khong_bao_gio_chinh():
     kq = pt.so_sanh_bien_the({"A": [9, 9, 9, 9, 9, 9, 9, 9], "B": [1, 1, 1, 1]})
     assert kq["bien_the"]["B"]["dich"] == 0 and kq["bien_the"]["B"]["ly_do"] == "N_NHO"
-    assert kq["bien_the"]["A"]["ly_do"] in ("NGOAI_NGUONG", "TRONG_NGUONG")
+    assert kq["bien_the"]["A"]["ly_do"] == "N_NHO"          # FA-S3: phía bên kia nhỏ cũng chỉ báo
+
+
+def test_fa_s3_mot_phia_nho_thi_khong_dich_ca_hai_de():
+    """FA-S3: {A: 10 bài, B: 3 bài} -> không dịch A, không dịch B, co_lech False."""
+    kq = pt.so_sanh_bien_the({"A": [9, 8, 9, 10, 9, 8, 9, 9, 10, 9], "B": [1, 2, 1]})
+    for bt in ("A", "B"):
+        assert kq["bien_the"][bt]["dich"] == 0 and kq["bien_the"][bt]["ly_do"] == "N_NHO"
+    assert kq["co_lech"] is False
 
 
 def test_d11_ba_de_dung_z_2_39_va_mot_de():

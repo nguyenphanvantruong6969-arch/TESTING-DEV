@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-S3 (FA-DAA đêm 3, TH) | xong | 2026-11-09 | mau_forms_thi_clb/phan_tich_cau_hoi.py, tests/test_fa_m4_phan_tich.py, CHANGELOG.md | 1 ca trong tests/test_fa_m4_phan_tich.py | Một phía < 5 bài -> chỉ báo, không dịch |
 | FA-S7, FA-S9 (FA-DAA đêm 3) | xong | 2026-11-09 | api_xuat.py, tests/test_fa_ly_do.py, CHANGELOG.md | 2 ca trong tests/test_fa_ly_do.py | Xuất lý do: chỉ lần chạy mới nhất; test rollback fa_nhom/fa_ly_do |
 | FA-S8 (FA-DAA đêm 3) | xong | 2026-11-09 | api_nhap.py, tests/test_fa_du_lieu.py, CHANGELOG.md | 2 ca trong tests/test_fa_du_lieu.py | FA tắt: bỏ cột FA, giữ dòng, 1 cảnh báo |
 | FA-SOAT2 (soát đêm 2, Truong yêu cầu 09/11/2026) | xong (GO, chưa sửa lỗi) | 2026-11-09 | docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md, docs/ke_hoach/FA_DAA_KE_HOACH.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/claude__keen-ride-72sa7t.md, CHANGELOG.md | — (chỉ tài liệu) | 11 mục sửa FA-S1..S11 cho đêm 3 |

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S3: cân bằng đề không dịch điểm khi một phía có ít bài (đêm 3, TH)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py` (`so_sanh_bien_the`): `N_NHO` (chỉ báo, không dịch) khi đề này HOẶC phần còn lại có ít hơn `N_TOI_THIEU` bài.
+- `tests/test_fa_m4_phan_tich.py`: ca mới `test_fa_s3_mot_phia_nho_thi_khong_dich_ca_hai_de`; ca cũ `test_d11_de_it_hon_5_em_chi_bao_khong_bao_gio_chinh` đổi kỳ vọng của đề A sang `N_NHO` (đúng theo spec §6.2).
+
 ## 2026-11-09 — FA-S7, FA-S9: xuất lý do chỉ của lần chạy mới nhất; test rollback bảng FA (đêm 3)
 
 - `api_xuat.py` (`_export_ly_do_da_khoa`): lấy lần chạy mới nhất trong `run_history`; lần đó không có lý do FA thì trả `fa_chua_co_ly_do` (không xuất lý do của lần FA cũ hơn).

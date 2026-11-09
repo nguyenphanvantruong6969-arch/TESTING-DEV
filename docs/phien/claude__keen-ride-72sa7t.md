@@ -38,7 +38,7 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [x] Opus review night 2 (2026-11-09: GO with fix list; report bao_cao_dem/2026-11-09_soat_dem2.md; nothing fixed, Truong's instruction)
 Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6; order in CHAY_DEM_FA_DAA.md C.5):
 - [x] FA-S7 export reasons of the latest run only   - [x] FA-S8 CSV import keeps row when FA off   - [x] FA-S9 rollback test fa_nhom/fa_ly_do
-- [ ] FA-S3 D11 small comparison group -> no shift   - [ ] FA-S1 retake counts only when flagged + retake variant
+- [x] FA-S3 D11 small comparison group -> no shift   - [ ] FA-S1 retake counts only when flagged + retake variant
 - [ ] FA-S2 --bo-cau per variant   - [ ] FA-S4 warn on unreadable quiz times   - [ ] FA-S5 warn on wrong variant
 - [ ] FA-S6 generator reads Loại (--so-nhap-clb)   - [ ] FA-S11 email <-> student_id join for KetQua   - [ ] FA-S10 plan §4 D8 row
 - [ ] FA-UI-1 FA switch   - [ ] FA-UI-2 club columns   - [ ] FA-UI-3 medal step   - [ ] FA-UI-4 reasons + exports   - [ ] FA-UI-5 user guide
@@ -101,3 +101,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Opus | Reviewed night 2: GO; 6 new bugs + 4 open night-1 findings + 1 email gap listed as FA-S1..S11 (not fixed, Truong's instruction); wrote plan §6 and night-3 protocol | Repro: FA-S3, FA-S4; 197 related tests pass |
 | 2026-11-09 | Opus (night 3, Truong asked) | FA-S8: CSV club import keeps the row when FA is off; red first, mutation caught | related tests 2304 passed |
 | 2026-11-09 | Opus (night 3) | FA-S7 export latest run only + FA-S9 rollback test; red first; mutations caught (S9: commit before lock -> red) | kiem_nhanh 7/7 |
+| 2026-11-09 | Opus (night 3) | FA-S3: N_NHO when either side small; 1 old expectation changed per spec | test_fa_m4 25 passed |
