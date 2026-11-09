@@ -72,6 +72,7 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 2. Truong: OK to open a PR to main for the full CI suite + Windows build? GĐ2 -> D8. Night-3 questions: defaults in the night-3 review.
 3. Opus: review night 4 (auto task "FA-DAA soat dem 4" may do it): only when night 4 is finished (no RUNNING < 3 h, every night-4 item ticked or BLOCKED). Same method as bao_cao_dem/2026-11-09_soat_dem3.md: list bugs, do NOT fix; write bao_cao_dem/<date>_soat_dem4.md; plan §8 'Night 5' = that fix list only (no new features without Truong); turn CHAY_DEM_FA_DAA.md into the night-5 version; add Night 5 items to this Plan (or 'Night 5: nothing to do'); tick 'Opus review night 4'.
 4. Sonnet night 5 (auto task "FA-DAA chay dem 5"): runs only after step 3 released night 5.
+5. LOOP (supersedes the two tasks above if the collaborator creates it): "FA-DAA vong soat" (Opus, CRON_TZ=Asia/Ho_Chi_Minh 43 */2 * * *) reviews the latest finished night N and releases night N+1 = fix list only; "FA-DAA vong sua" (Sonnet, 13 1-23/2 * * *) runs the released night. Stops with "LOOP DONE: <reason>" in Current state when no trung/cao bug, N+1 > 8, or a fixed bug returns twice; then both tasks are disabled. Fixes only: no new features, invariants, D-decisions or scope changes without Truong. Prompt text was given to Truong in chat; no task created by this session.
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -126,3 +127,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus | Handoff at ~400k context (Stop hook): rewrote Current state; night 4 released, not started | Next session: Read CLAUDE.md + this file |
 | 2026-11-09 | Opus | Gave Truong a night-4 schedule prompt (23:13/01:13/03:13 VN); no new work (context over limit) | Report may be named 2026-11-09_dem4.md or 2026-11-10_dem4.md |
 | 2026-11-09 | Opus | Night 4 running on collaborator side; wrote chained auto plan (Opus review night 4 -> Sonnet night 5) in Next steps | No task created by this session |
+| 2026-11-09 | Opus | Gave Truong a self-review/self-fix loop prompt (two recurring tasks, stop rules in Next steps 5); no new work | Context over limit |
