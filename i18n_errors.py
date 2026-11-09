@@ -690,6 +690,10 @@ MESSAGES = {
         "vi": "CLB {club_id} (buổi {buoi}) đã đóng vì chỉ có {thanh_vien} thành viên, thiếu {thieu} so với mức tối thiểu. Đóng CLB thiếu người là cách xấp xỉ, không bảo đảm khai thật nguyện vọng là tối ưu.",
         "en": "Club {club_id} (session {buoi}) was closed because it had only {thanh_vien} members, {thieu} short of its minimum. Closing under-filled clubs is an approximation and doesn't guarantee that ranking truthfully is optimal.",
     },
+    "fa_ly_do_thieu_buoi": {
+        "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",
+        "en": "Session {buoi} has no reasons: its latest run did not use FA-DAA mode.",
+    },
     "fa_chua_co_ly_do": {
         "vi": "Chưa có lý do kết quả. Hãy bật chế độ FA-DAA và chạy xếp trước.",
         "en": "No result reasons yet. Turn on FA-DAA mode and run the allocation first.",

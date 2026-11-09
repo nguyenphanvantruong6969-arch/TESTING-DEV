@@ -87,3 +87,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | T3-L3 (ngoài sổ, Truong duyệt 04/11/2026) | chưa | | | | Các quyết định của Truong ngày 04/11/2026 |
 | CI-HUY (ngoài sổ, Truong yêu cầu 04/11/2026) | xong | 2026-11-04 | .github/workflows/tests.yml, CHANGELOG.md | (không) | Huỷ lượt CI cũ trên nhánh không phải main |
 | T3-L4 (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | api_xuat.py, js/09_the_xem.js, i18n.js, style.css, CHANGELOG.md | tests/test_t3_l3_backend.py, test_giao_dien_t3_l3.py | Thứ tự tệp "Tải bảng này" theo màn hình, bỏ dòng nhắc chết "Chưa có lớp nào", Điểm chuẩn gọn. Chờ CI |
+| FA-N1 (đêm 4) | xong | 2026-11-09 | api_xuat.py, i18n_errors.py, i18n_loi.js, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py | Lý do theo từng buổi sau khi chạy một phần |

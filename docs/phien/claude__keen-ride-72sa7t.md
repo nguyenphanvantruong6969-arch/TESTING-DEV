@@ -44,7 +44,7 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [x] FA-UI-1 FA switch   - [x] FA-UI-2 club columns   - [x] FA-UI-3 medal step   - [x] FA-UI-4 reasons + exports   - [x] FA-UI-5 user guide
 - [x] Opus review night 3 (2026-11-09: GO; 2 new bugs + 2 small items listed as FA-N1..N4, not fixed; report bao_cao_dem/2026-11-09_soat_dem3.md)
 Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-09; spec plan §7, FA-9/FA-10 in §2):
-- [ ] FA-N1 reasons per day after a partial run   - [ ] FA-N2 on-site lazy medals saved + follow re-rank
+- [x] FA-N1 reasons per day after a partial run   - [ ] FA-N2 on-site lazy medals saved + follow re-rank
 - [ ] FA-N3 clear error FA on / points off   - [ ] FA-N4 warn: single-variant club, no retake
 - [ ] FA-9 witnessed lottery record   - [ ] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
 - [ ] Opus review night 4
@@ -131,3 +131,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus | Gave Truong a self-review/self-fix loop prompt (two recurring tasks, stop rules in Next steps 5); no new work | Context over limit |
 | 2026-11-09 | Opus | Answered vision coverage (projected after night 5: P1 ~90 %, P2 ~95 %, P3 ~30-40 %, overall ~75-80 %; gaps: real Microsoft test/D8, full CI + Windows build, P3 features, admin dashboard §11). No night-4 commits on this branch yet at 2026-11-09 ~23:00 | No new work |
 | 2026-11-09 | Opus | Answered: Forms yes (setup form, quizzes, surveys); Power Apps vs Forms-only registration = D8 open; NOT everything in M365 (kiosk + converters run offline on the IT Windows PC, files moved by Excel/CSV) | No new work |
+| 2026-11-09 | Sonnet (night 4) | FA-N1: per-day latest run reasons + warning; tests/test_fa_n1_ly_do_mot_phan.py 3 (red first); related 1955 passed/1 skipped; mutation caught; kiem_nhanh 7/7 | night 4 |

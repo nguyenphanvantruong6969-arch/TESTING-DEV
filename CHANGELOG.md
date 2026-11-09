@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-N1: lý do theo từng buổi sau khi chạy lại một phần (đêm 4)
+
+- `api_xuat.py` `_doc_ly_do_moi_nhat`: mỗi buổi lấy lý do của lần chạy mới nhất CÓ chạy buổi đó (`run_history.buoi_da_chay`); buổi mà lần đó không phải FA thì bỏ và báo `canh_bao` (`fa_ly_do_thieu_buoi`); chỉ lỗi `fa_chua_co_ly_do` khi không buổi nào có lý do. `i18n_errors.py` + `i18n_loi.js`: mã mới.
+- Test mới: `tests/test_fa_n1_ly_do_mot_phan.py` (3). FA tắt: không đổi.
+
 ## 2026-11-09 — FA-SOAT3: soát đêm 3 và mở đêm 4 (chỉ tài liệu, chưa sửa lỗi)
 
 - `docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md`: kết luận GO; FA-N1 (chạy lại một ngày làm mất lý do của ngày khác, đã tái hiện), FA-N2 (màn nhập tại chỗ không lưu huy chương mặc định, đã tái hiện), FA-N3, FA-N4.

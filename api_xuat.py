@@ -1632,21 +1632,45 @@ class XuatKetQuaMixin:
 
     @staticmethod
     def _doc_ly_do_moi_nhat(cur):
-        """(run_id, các dòng lý do) của lần chạy MỚI NHẤT (FA-S7); lần đó không phải FA -> (None, [])."""
-        run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
-        if run_id is None or cur.execute(
-                "SELECT 1 FROM fa_ly_do WHERE run_id = ? LIMIT 1", (run_id,)).fetchone() is None:
-            return None, []
-        return run_id, cur.execute(
-                    "SELECT l.student_id, l.buoi, l.club_id, COALESCE(c.name, l.club_id), "
-                    " l.outcome, l.reason, l.rank_in_list, l.cut_score, l.diem_em, l.n_hoa, "
-                    " l.k_cho, l.waitlist_pos, l.cut_medal, s.stb_number, n.group_no "
-                    "FROM fa_ly_do l LEFT JOIN clubs c ON c.club_id = l.club_id "
-                    "LEFT JOIN students s ON s.student_id = l.student_id "
-                    "LEFT JOIN fa_nhom n ON n.run_id = l.run_id AND n.buoi = l.buoi "
-                    " AND n.student_id = l.student_id AND n.club_id = l.club_id "
-                    "WHERE l.run_id = ? ORDER BY l.student_id, l.buoi COLLATE THU_TU_BUOI, "
-                    " COALESCE(l.rank_in_list, 999), l.club_id", (run_id,)).fetchall()
+        """(run_id, các dòng lý do, các buổi thiếu lý do) — FA-S7 + FA-N1.
+
+        MỖI buổi lấy lý do của lần chạy MỚI NHẤT có chạy buổi đó (chạy riêng một buổi không làm mất
+        lý do các buổi khác). Lần đó không phải FA (không có `fa_ly_do` cho buổi ấy) -> buổi đó
+        không có lý do và được liệt kê ở phần thứ ba. `run_id` trả về = lần FA mới nhất được dùng;
+        không buổi nào có lý do -> (None, [], buổi...)."""
+        runs = cur.execute(
+            "SELECT run_id, buoi_da_chay FROM run_history ORDER BY run_id DESC").fetchall()
+        buoi_ket_qua = {r[0] for r in cur.execute(
+            "SELECT DISTINCT buoi FROM match_results").fetchall()}
+        buoi_ly_do = {(r[0], r[1]) for r in cur.execute(
+            "SELECT DISTINCT run_id, buoi FROM fa_ly_do").fetchall()}
+        tat_ca_buoi = sorted(buoi_ket_qua | {b for _, b in buoi_ly_do})
+        chon, thieu = {}, []                      # buổi -> run_id dùng
+        for buoi in tat_ca_buoi:
+            for run_id, da_chay in runs:
+                ds = [x for x in (da_chay or "").split(",") if x]
+                if ds and buoi not in ds:
+                    continue
+                if (run_id, buoi) in buoi_ly_do:
+                    chon[buoi] = run_id
+                else:
+                    thieu.append(buoi)
+                break
+        if not chon:
+            return None, [], thieu
+        dong = []
+        for buoi, run_id in chon.items():
+            dong += cur.execute(
+                "SELECT l.student_id, l.buoi, l.club_id, COALESCE(c.name, l.club_id), "
+                " l.outcome, l.reason, l.rank_in_list, l.cut_score, l.diem_em, l.n_hoa, "
+                " l.k_cho, l.waitlist_pos, l.cut_medal, s.stb_number, n.group_no "
+                "FROM fa_ly_do l LEFT JOIN clubs c ON c.club_id = l.club_id "
+                "LEFT JOIN students s ON s.student_id = l.student_id "
+                "LEFT JOIN fa_nhom n ON n.run_id = l.run_id AND n.buoi = l.buoi "
+                " AND n.student_id = l.student_id AND n.club_id = l.club_id "
+                "WHERE l.run_id = ? AND l.buoi = ?", (run_id, buoi)).fetchall()
+        dong.sort(key=lambda r: (r[0], r[1], r[6] if r[6] is not None else 999, r[2]))
+        return max(chon.values()), dong, thieu
 
     @staticmethod
     def _cau_cua_dong(r):
@@ -1666,7 +1690,7 @@ class XuatKetQuaMixin:
             if not fa_bat:
                 return _ok({"fa_bat": False, "run_id": None, "cau": {}})
             with self._ket_noi_doc() as cur:
-                run_id, dong = self._doc_ly_do_moi_nhat(cur)
+                run_id, dong, _thieu = self._doc_ly_do_moi_nhat(cur)
             cau = {}
             for r in dong:
                 cau.setdefault(r[0], {}).setdefault(r[1], []).append(self._cau_cua_dong(r))
@@ -1678,7 +1702,7 @@ class XuatKetQuaMixin:
         import csv
         try:
             with self._ket_noi_doc() as cur:
-                run_id, dong = self._doc_ly_do_moi_nhat(cur)
+                run_id, dong, thieu = self._doc_ly_do_moi_nhat(cur)
             if run_id is None:
                 return _fail(err("fa_chua_co_ly_do"))
             duong = self._duong_xuat(output_path, "ket_qua_ly_do.csv")
@@ -1689,7 +1713,10 @@ class XuatKetQuaMixin:
                 for r in dong:
                     cau = self._cau_cua_dong(r)
                     w.writerow([r[0], r[1], r[3], r[14] or "", r[5], cau, r[13], r[11] or ""])
-            return _ok({"path": duong, "run_id": run_id, "n_rows": len(dong)})
+            ra = {"path": duong, "run_id": run_id, "n_rows": len(dong)}
+            if thieu:
+                ra["canh_bao"] = [err("fa_ly_do_thieu_buoi", buoi=b) for b in thieu]
+            return _ok(ra)
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
