@@ -51,11 +51,11 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- 2026-11-09 night 3 (Opus session at Truong's request, not Sonnet): 16/16 done, 0 BLOCKED. RUNNING lock removed. D8 still OPEN.
-- Commits: S8 e970ef5; S7+S9 c6ac99f; S3 2f41281; S1 6973664; S5 fc9170a; S2 149d745; S4 61f6cf9; S6 89af3f7; S11 2a74651; S10 831201d; UI-1 f3b6273; UI-2 c284398; UI-3 2560fa2; UI-4 0c8e5f8; UI-5 5bf7a8d. Report: bao_cao_dem/2026-11-09_dem3.md.
-- Tests: each item red first, mutation caught (docs items excepted). New files: test_fa_s11_ghep_email.py, test_giao_dien_fa_{cai_dat,quan_ly,huy_chuong,ket_qua}.py (16 Chromium cases, really ran). Largest related runs: 2704 passed/1 skipped, 2526/1. ruff clean, kiem_nhanh 7/7 (trung khit 3x5). Full suite and soat-ma four tiers NOT run.
-- Design notes: new API `get_ly_do_ket_qua` (api_xuat); `get_student_entry_state` adds `huy_chuong` when FA on; `list_clubs_admin` adds FA keys only when FA on; JS global `FA_BAT` (05_quan_ly.js, set in wsApDungCauHinh) is set but the FA screens decide from API responses. Converter FA mode keeps all attempts, `_tach_lan_dau` picks attempt 1 by assigned variant.
-- Open for Truong: D8; clearer error when FA on + commitment points off; require all 3 medals?; reason column shows all sentences of the day.
+- 2026-11-09 Opus handoff (context ~400k). Nights 1-3 DONE and reviewed (all GO). Night 4 RELEASED, not started. Nothing running, no RUNNING lock, no scheduled task created by this session.
+- Night 3 (Opus at Truong's request): 16/16 done (FA-S1..S11, FA-UI-1..5); commits listed in bao_cao_dem/2026-11-09_dem3.md.
+- Night-3 review (48467a9): non-UI related tests 2293 passed / 1 skipped (incl. TestTrungKhit 3x20); kiem_nhanh 7/7. UI tests NOT rerun here (pip install of playwright hung). Repro scripts were in scratchpad only; steps are in bao_cao_dem/2026-11-09_soat_dem3.md.
+- Night 4 scope (plan §7; protocol CHAY_DEM_FA_DAA.md night-4 version): FA-N1 partial-run reasons, FA-N2 on-site lazy medals, FA-N3 clear FA/points error, FA-N4 single-variant retake warning, FA-9 lottery record, FA-10 simulation (+ D1 two-term, tables only).
+- Open for Truong: (1) OK to open a PR to main for the full CI suite + Windows build (Opus recommends, before real use); (2) D8 at GĐ2; (3) night-3 question defaults in the night-3 review (no forced 3 medals, keep all reason sentences, keep fa_ly_do wording); (4) night-2 review wording points (path B "Giữ mặc định" options, [code] in titles) still unconfirmed.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -79,6 +79,9 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - docs/phien/claude__keen-ride-72sa7t.md: this handoff
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: FA-KH planning entry + FA-1..FA-8 entries
 - Code (night 1): fa_daa.py, fa_ly_do.py, mau_forms_thi_clb/so_sanh_suc_chua.py; edits in api.py, api_nhap.py, api_quan_ly.py, api_xuat.py, cau_hinh_ws.py, rbda_priority_pipeline.py, so_nhap.py, i18n_errors.py (+ i18n_loi.js); tests/test_fa_*.py and tests/_fa.py
+
+- docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md, 2026-11-09_soat_dem3.md: Opus reviews of nights 2 and 3 (fix lists)
+- docs/ke_hoach/FA_DAA_KE_HOACH.md §6, §7: night-3 and night-4 specs
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -119,3 +122,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus (night 3) | FA-UI-5 user guide section 15; doc test red first | guide tests 92 passed, kiem_nhanh 7/7 |
 | 2026-11-09 | Opus (night 3) | Night 3 report 2026-11-09: 16/16 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem3.md | RUNNING line removed |
 | 2026-11-09 | Opus | Reviewed night 3: GO; repro FA-N1 (partial run drops other days' reasons) and FA-N2 (on-site lazy path saves no medals); kiem_nhanh 7/7; wrote plan §7 and night-4 protocol | UI tests not rerun (playwright install did not finish) |
+| 2026-11-09 | Opus | Handoff at ~400k context (Stop hook): rewrote Current state; night 4 released, not started | Next session: Read CLAUDE.md + this file |
