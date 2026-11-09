@@ -40,6 +40,7 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-09T04:48Z session_01VfPzNrnmsTUhQDUGSanNrv (night 2)
 - 2026-11-09 Opus review of night 1: **GO**. RUNNING lock: none. Night 2 (FA-M1..FA-M6) released.
 - Night-1 commits: FA-0 087090b; FA-1 3c22e0b; FA-2 8ae3e8e; FA-3 702b09e; FA-4..FA-8 1037920; report a80e626.
 - Review: all 152 non-UI test files 4981 passed, 1 failed, 4 skipped; the failure (`test_van_phong_tu_nhien`, "DAA"
