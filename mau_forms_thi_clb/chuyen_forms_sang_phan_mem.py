@@ -637,6 +637,33 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
     return list(hoc_sinh.values()), canh_bao
 
 
+def _doc_bo_cau(x):
+    """CLI `--bo-cau`: "CLB-DE-SO" (ví dụ C3-B-4) -> (CLB, đề, số); "CLB-SO" -> (CLB, số)."""
+    import phan_tich_cau_hoi as pt
+    phan = x.rsplit("-", 2)
+    if len(phan) == 3 and phan[1] in pt.CHU_BIEN_THE:
+        return phan[0], phan[1], int(phan[2])
+    ma, so = x.rsplit("-", 1)
+    return ma, int(so)
+
+
+def _chuan_bo_cau(bo_cau, theo_ma):
+    """FA-S2: {(CLB, đề, số)}. Dạng cũ (CLB, số) chỉ nhận khi CLB có MỘT đề (-> đề A), nếu không là lỗi nêu các đề."""
+    import phan_tich_cau_hoi as pt
+    ra = set()
+    for x in bo_cau or ():
+        if len(x) == 3:
+            ra.add(tuple(x))
+            continue
+        ma, so = x
+        n = _so_de(theo_ma[ma]) if ma in theo_ma else 1
+        if n > 1:
+            raise LoiTepXuat("--bo-cau %s-%d: CLB %s có %d đề (%s) — ghi rõ đề, ví dụ %s-%s-%d"
+                             % (ma, so, ma, n, ", ".join(pt.CHU_BIEN_THE[:n]), ma, pt.CHU_BIEN_THE[0], so))
+        ra.add((ma, "A", so))
+    return ra
+
+
 def _so_de(clb):
     import phan_tich_cau_hoi as pt
     return len(pt.cac_bien_the(clb)) if clb.get("de_thi") else 1
@@ -1133,7 +1160,8 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
     CLB trong de_thi.json); tệp không ghi là đề A. Mỗi CLB có từ hai đề trở lên được so sánh điểm giữa các đề (D11); có
     chênh lệch ngoài ngưỡng thì ghi DIEU_CHINH_BAN_DE.xlsx và dừng bằng LoiChoXacNhan TRỪ KHI admin chọn đúng một cờ:
     `ap_dung_dieu_chinh` (dịch về trung bình chung) hoặc `giu_diem_goc`. Không lệch thì không cần cờ. `bo_cau`
-    {(club_id, số câu)}: câu admin đã xác nhận bỏ (V§7.5), chấm lại cho mọi học sinh. Luôn ghi PHAN_TICH_CAU_HOI.xlsx."""
+    {(club_id, đề, số câu)} (FA-S2; (club_id, số câu) chỉ khi CLB có một đề): câu admin đã xác nhận bỏ (V§7.5), chấm
+    lại cho mọi học sinh làm đề đó. Luôn ghi PHAN_TICH_CAU_HOI.xlsx."""
     import fa_daa
     import phan_tich_cau_hoi as pt
     from fractions import Fraction
@@ -1186,6 +1214,7 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         cb = [x for x in cb if "có đề thi nhưng không tệp Forms" not in x[2]]
     canh_bao += cb
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
+    bo_cau = _chuan_bo_cau(bo_cau, theo_ma)
     # D7 + D9: trung vị chỉ tính trên bài lần đầu (FA-S1)
     t_tep = {ten: _thoi_gian_lam_bai(tieu_de, cac_dong) for ten, tieu_de, cac_dong in cac_tep}
     gio = {}
@@ -1227,7 +1256,7 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         e = hs["student_id"]                                        # lúc này là khoá email (như doc_lists)
         for bai in hs["bai_thi"]:
             clb = theo_ma[bai["club_id"]]
-            bo = {k for c, k in bo_cau if c == bai["club_id"]}
+            bo = {k for c, b, k in bo_cau if c == bai["club_id"] and b == bai.get("bien_the", "A")}
             bai["diem_10_tho"] = (Fraction(10 * sum(d for i, d in enumerate(bai["dung"], 1) if i not in bo),
                                            len(bai["dung"]) - len(bo)) if len(bai["dung"]) > len(bo) else Fraction(0)) \
                 if bo else Fraction(str(bai["diem"])) / Fraction(str(bm.diem_toi_da(de, clb))) * 10
@@ -1330,8 +1359,9 @@ def main(argv=None):
                     help="admin xác nhận: dịch điểm mỗi đề về trung bình chung khi các đề lệch (chỉ với --fa-daa)")
     ap.add_argument("--giu-diem-goc", action="store_true",
                     help="admin xác nhận: giữ điểm đã chấm dù các đề lệch (chỉ với --fa-daa)")
-    ap.add_argument("--bo-cau", nargs="+", metavar="CLB-SO",
-                    help="câu admin xác nhận bỏ, ví dụ clb_covua-3; chấm lại cho mọi học sinh (chỉ với --fa-daa)")
+    ap.add_argument("--bo-cau", nargs="+", metavar="CLB-DE-SO",
+                    help="câu admin xác nhận bỏ, ví dụ clb_covua-B-3 (đề B câu 3); CLB chỉ có một đề: clb_covua-3; "
+                         "chấm lại cho mọi học sinh làm đề đó (chỉ với --fa-daa)")
     ap.add_argument("--nhan-ban-nhap", action="store_true",
                     help="giữ cả dòng TrangThai = DRAFT của List (chỉ với --fa-daa, đường A)")
     a = ap.parse_args(argv)
@@ -1366,7 +1396,7 @@ def main(argv=None):
                                quiz_xlsx=a.tep_xuat, nhan_ban_nhap=a.nhan_ban_nhap, co_so=a.co_so,
                                bien_the_tep=dict(x.split("=", 1) for x in a.bien_the_tep or []) or None,
                                ap_dung_dieu_chinh=a.ap_dung_dieu_chinh, giu_diem_goc=a.giu_diem_goc,
-                               bo_cau={(x.rsplit("-", 1)[0], int(x.rsplit("-", 1)[1])) for x in a.bo_cau or []})
+                               bo_cau={_doc_bo_cau(x) for x in a.bo_cau or []})
         elif a.chi_thi:
             kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so, a.bai_thi)
         else:

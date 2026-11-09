@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S2: bỏ câu theo từng đề (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `bo_cau` khoá `(CLB, đề, số câu)`; CLI `--bo-cau CLB-DE-SO` (ví dụ `C3-B-4`, hàm `_doc_bo_cau`); dạng cũ `CLB-SO` chỉ nhận khi CLB có một đề, nếu không là lỗi nêu các đề (`_chuan_bo_cau`). Bỏ câu 4 đề B không đổi điểm đề A.
+- `mau_forms_thi_clb/tao_mau_forms.py`: dòng hướng dẫn `--bo-cau` trong `CAI_DAT_FORMS_BIEN_THE.md` (chỉ chế độ `--bien-the`).
+- `tests/test_fa_m4_phan_tich.py`: 3 ca mới `test_fa_s2_*`; ca cũ `test_bo_cau_cham_lai_cho_moi_hoc_sinh` dùng dạng mới (CLB có hai đề).
+
 ## 2026-11-09 — FA-S5: cảnh báo khi em làm sai đề được giao (đêm 3, TH)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`, khi có `--bien-the-tep`): bài làm đề khác đề giao (`chon_bien_the`, hoặc `chon_bien_the_thi_lai` với bài thi lại hợp lệ) -> một cảnh báo nêu email, CLB, đề đã làm và đề giao; vẫn giữ điểm.

@@ -280,9 +280,10 @@ def test_khong_lech_thi_khong_can_co_va_ghi_diem_goc(tmp_path):
 
 def test_bo_cau_cham_lai_cho_moi_hoc_sinh(tmp_path):
     de, lists, tep, sn = _bo(tmp_path, [4] * 10, [4] * 10)
-    _chay(tmp_path, de, lists, tep, sn, bo_cau={("clb_covua", 5)})
+    _chay(tmp_path, de, lists, tep, sn, bo_cau={("clb_covua", "A", 5), ("clb_covua", "B", 5)})
     d = _diem(tmp_path)
     assert d["a0@x.vn"] == 10.0                                          # 4 câu đúng đầu, bỏ câu 5 (sai) -> 4/4
+    assert d["b0@x.vn"] == 10.0
     assert (tmp_path / "ra" / "PHAN_TICH_CAU_HOI.xlsx").exists()
 
 
@@ -418,3 +419,26 @@ def test_fa_s5_lam_sai_de_duoc_giao_thi_canh_bao_giu_diem(tmp_path):
     assert "đề %s" % sai in cb[0] and "đề giao %s" % giao in cb[0]
     # em làm đúng đề: không có cảnh báo đề sai
     assert not [c for c in kq["canh_bao"] if c[1] != z and "đề giao" in c[2]]
+
+
+def test_fa_s2_bo_cau_de_b_khong_doi_diem_de_a(tmp_path):
+    de, lists, tep, sn = _bo(tmp_path, [4] * 10, [4] * 10)
+    _chay(tmp_path, de, lists, tep, sn)
+    goc = _diem(tmp_path)
+    _chay(tmp_path, de, lists, tep, sn, bo_cau={("clb_covua", "B", 5)}, giu_diem_goc=True)
+    d = _diem(tmp_path)
+    assert all(d["a%d@x.vn" % i] == goc["a%d@x.vn" % i] == 8.0 for i in range(10))   # đề A không đổi
+    assert all(d["b%d@x.vn" % i] == 10.0 for i in range(10))                         # đề B: 4/4
+
+
+def test_fa_s2_dang_cu_clb_so_loi_khi_clb_co_hai_de(tmp_path):
+    de, lists, tep, sn = _bo(tmp_path, [4] * 10, [4] * 10)
+    with pytest.raises(cv.LoiTepXuat) as e:
+        _chay(tmp_path, de, lists, tep, sn, bo_cau={("clb_covua", 5)})
+    assert "clb_covua" in str(e.value) and "A, B" in str(e.value)
+
+
+def test_fa_s2_cli_doc_clb_de_so_va_clb_so():
+    assert cv._doc_bo_cau("C3-B-4") == ("C3", "B", 4)
+    assert cv._doc_bo_cau("clb_covua-3") == ("clb_covua", 3)
+    assert cv._doc_bo_cau("clb-x-B-2") == ("clb-x", "B", 2)

@@ -795,7 +795,7 @@ def ghi_cai_dat_bien_the(de, co):
     w("```")
     w("")
     w("- `PHAN_TICH_CAU_HOI.xlsx`: mỗi câu % đúng và độ phân biệt (1/3 điểm cao - 1/3 điểm thấp). Cờ `PHAN_BIET_AM` (< 0), "
-      "`QUA_DE` (> 90 %), `QUA_KHO` (< 20 %). Admin xác nhận bỏ một câu lỗi thì chạy lại với `--bo-cau <club_id>-<số câu>`: chấm lại cho mọi em.")
+      "`QUA_DE` (> 90 %), `QUA_KHO` (< 20 %). Admin xác nhận bỏ một câu lỗi thì chạy lại với `--bo-cau <club_id>-<đề>-<số câu>` (ví dụ `clb_covua-B-3`; CLB chỉ có một đề: `clb_covua-3`): chấm lại cho mọi em làm đề đó.")
     w("- `DIEU_CHINH_BAN_DE.xlsx` (D11): so trung bình từng đề với các đề còn lại trên thang 0-10 chưa làm tròn. Ngưỡng "
       "= z × √(s²/n + s²/n), z = 1,96 (2 đề) hoặc 2,39 (3 đề). Đề dưới 5 bài chỉ báo, không bao giờ chỉnh. Chỉ khi vượt ngưỡng thì "
       "đề đó được dịch (trung bình chung − trung bình đề), rồi làm tròn nửa lên và kẹp 0-10.")
