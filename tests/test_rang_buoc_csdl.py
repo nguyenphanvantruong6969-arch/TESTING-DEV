@@ -82,7 +82,9 @@ def _ha_cap(db):
         conn.execute("BEGIN")
         for ten, than in LUOC_DO_CU.items():
             conn.execute("CREATE TABLE %s__cu (%s)" % (ten, than))
-            conn.execute("INSERT INTO %s__cu SELECT * FROM %s" % (ten, ten))
+            # Chỉ các cột của lược đồ cũ: bảng mới có thể có thêm cột (vd 4 cột FA của clubs).
+            cot = ", ".join(r[1] for r in conn.execute("PRAGMA table_info(%s__cu)" % ten))
+            conn.execute("INSERT INTO %s__cu (%s) SELECT %s FROM %s" % (ten, cot, cot, ten))
             conn.execute("DROP TABLE %s" % ten)
             conn.execute("ALTER TABLE %s__cu RENAME TO %s" % (ten, ten))
         conn.execute("COMMIT")

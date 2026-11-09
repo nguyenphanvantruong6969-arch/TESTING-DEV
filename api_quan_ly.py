@@ -281,6 +281,7 @@ class QuanLyMixin:
                     "ORDER BY student_id", (club_id,))]
                 cu_w = {sid: self._doc_diem_wharton_cua_em(cur, sid) for sid in bi_anh_huong}
                 cur.execute("DELETE FROM wharton_bids WHERE club_id = ?", (club_id,))
+                cur.execute("DELETE FROM giu_cho WHERE club_id = ?", (club_id,))
                 for sid in bi_anh_huong:
                     self._ghi_nhat_ky_wharton(
                         cur, "quan_ly", "xoa_theo_clb", sid, cu_w[sid],
@@ -1582,6 +1583,7 @@ class QuanLyMixin:
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
                 if self._co_diem(cu_w):
                     self._ghi_nhat_ky_wharton(cur, "quan_ly", "xoa_mot_em", student_id, cu_w, None)
+                cur.execute("DELETE FROM giu_cho WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_scores WHERE student_id = ?", (student_id,))
@@ -1606,9 +1608,9 @@ class QuanLyMixin:
 
     # Xoá theo đúng thứ tự phụ thuộc: bảng con trước, students sau cùng.
     _RESET_BANG = {
-        "hoc_sinh": ["wharton_bids", "match_results", "club_scores", "preferences",
+        "hoc_sinh": ["giu_cho", "wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students"],
-        "tat_ca":   ["wharton_bids", "match_results", "club_scores", "preferences",
+        "tat_ca":   ["giu_cho", "wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students", "clubs"],
     }
 
@@ -1649,6 +1651,8 @@ class QuanLyMixin:
                 }
                 # Điểm Wharton chỉ hiện trong báo cáo khi có dòng bị xoá: Wharton tắt thì phản
                 # hồi y hệt trước vòng 2.
+                if not da_xoa.get("giu_cho"):
+                    da_xoa.pop("giu_cho", None)      # FA-1: chỉ hiện khi có dòng bị xoá
                 if not da_xoa.get("wharton_bids"):
                     da_xoa.pop("wharton_bids", None)
                 else:

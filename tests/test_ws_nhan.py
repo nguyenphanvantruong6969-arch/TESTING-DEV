@@ -45,6 +45,11 @@ TRAN_MAC_DINH = {"pref_too_many": 10, "pref_too_many_buoi": 10,
 # Mã thêm SAU ảnh chụp ngoài nhóm ws_*: điểm theo người ở Sổ nhập (TASK 5); luật xếp, chấm
 # điểm theo người và cảnh báo sức khoẻ dữ liệu của chúng (TASK 6). Chỉ THÊM mã, không đổi mã cũ.
 MA_MOI_SAU_ANH_CHUP = {
+    # FA-DAA (FA-1): thuộc tính CLB, giữ chỗ, cảnh báo nạp.
+    "fa_loai_sai", "fa_diem_san_sai", "fa_toi_thieu_sai", "fa_suc_chua_phong_sai",
+    "so_nhap_fa_loai_sai", "so_nhap_fa_diem_san_sai", "so_nhap_fa_toi_thieu_sai",
+    "so_nhap_fa_suc_chua_phong_sai", "csv_club_fa_invalid", "fa_cot_bo_qua",
+    "fa_giu_cho_bo_qua", "so_nhap_fa_giu_cho_khong_ton_tai",
     "so_nhap_diem_ca_nhan_sai", "scoring_not_per_person", "health_person_score_none",
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).

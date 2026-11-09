@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-1: mô hình dữ liệu FA-DAA (mục cha A13)
+
+- Luật `rules.fa_daa` (mặc định TẮT; bật cần `wharton`): `cau_hinh_ws.py`, `rbda_priority_pipeline.py` (`dung_fa_daa`, khoá bỏ khỏi `run_history.luat_xep` và dấu vân tay khi tắt; khi bật, dấu vân tay gồm kiểu CLB + giữ chỗ).
+- `clubs` thêm bốn cột `loai`, `diem_san`, `so_toi_thieu`, `suc_chua_phong` (`di_tru_schema` idempotent, sao lưu trước); bảng mới `giu_cho(club_id, student_id)`; xoá CLB / học sinh / dữ liệu dọn cả `giu_cho`.
+- Sổ nhập: cột CLB tuỳ chọn Loại / Điểm sàn / Tối thiểu / Sức chứa phòng và sheet tuỳ chọn "Giữ chỗ" (đọc, ghi, nạp); CSV CLB nhận bốn cột cùng tên khoá. Không có cột thì giống từng byte như cũ; FA tắt thì bỏ qua kèm cảnh báo `fa_cot_bo_qua` / `fa_giu_cho_bo_qua`. Mã lỗi mới trong `i18n_errors.py` (đã chạy `tao_i18n_js.py`).
+- Module mới `fa_daa.py` (kiểu CLB, `kiem_thuoc_tinh`, ghi thuộc tính, `thay_giu_cho`).
+- `tests/test_fa_du_lieu.py` (mới, viết trước); `tests/test_rang_buoc_csdl.py`: hàm trợ giúp `_ha_cap` chọn đúng cột của lược đồ cũ (bảng `clubs` nay có thêm cột). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 203 tệp test.
+
 ## 2026-11-08 — FA-KH: báo cáo đêm tự đẩy lên GitHub
 
 - `docs/phien/CHAY_DEM_FA_DAA.md` mục E: phiên chạy đêm ghi `docs/phien/bao_cao_dem/<ngày>.md` (tiếng Việt, dễ hiểu), commit, push, kiểm push đã tới GitHub, in link. Không đổi mã.

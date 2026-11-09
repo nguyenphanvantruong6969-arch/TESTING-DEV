@@ -582,6 +582,55 @@ MESSAGES = {
         "vi": "{student_id}: có điểm quyết tâm ở cột {cot} nhưng ô nguyện vọng cạnh đó để trống. Điểm này chưa được lưu.",
         "en": "{student_id}: there are commitment points in column {cot} but the preference cell next to it is empty. Those points weren't saved.",
     },
+    # --- FA-DAA (FA-1): thuộc tính CLB, giữ chỗ ---
+    "fa_loai_sai": {
+        "vi": "Loại CLB \"{loai}\" không hợp lệ. Chỉ nhận Tự do, Giới hạn hoặc Tuyển chọn.",
+        "en": "Club type \"{loai}\" isn't valid. Use Free, Limited or Selective.",
+    },
+    "fa_diem_san_sai": {
+        "vi": "Điểm sàn \"{diem_san}\" không hợp lệ: phải là số nguyên từ 0 đến 10.",
+        "en": "Pass mark \"{diem_san}\" isn't valid: it must be a whole number from 0 to 10.",
+    },
+    "fa_toi_thieu_sai": {
+        "vi": "Số thành viên tối thiểu \"{so_toi_thieu}\" không hợp lệ: phải là số nguyên từ 0 trở lên.",
+        "en": "Minimum members \"{so_toi_thieu}\" isn't valid: it must be a whole number, 0 or more.",
+    },
+    "fa_suc_chua_phong_sai": {
+        "vi": "Sức chứa phòng \"{suc_chua_phong}\" không hợp lệ: phải là số nguyên lớn hơn 0.",
+        "en": "Room capacity \"{suc_chua_phong}\" isn't valid: it must be a whole number above 0.",
+    },
+    "so_nhap_fa_loai_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Loại \"{gia_tri}\" không hợp lệ. Chỉ nhận Tự do, Giới hạn hoặc Tuyển chọn.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): type \"{gia_tri}\" isn't valid. Use Free, Limited or Selective.",
+    },
+    "so_nhap_fa_diem_san_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Điểm sàn \"{gia_tri}\" phải là số nguyên từ 0 đến 10.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): pass mark \"{gia_tri}\" must be a whole number from 0 to 10.",
+    },
+    "so_nhap_fa_toi_thieu_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Tối thiểu \"{gia_tri}\" phải là số nguyên từ 0 trở lên.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): minimum \"{gia_tri}\" must be a whole number, 0 or more.",
+    },
+    "so_nhap_fa_suc_chua_phong_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Sức chứa phòng \"{gia_tri}\" phải là số nguyên lớn hơn 0.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): room capacity \"{gia_tri}\" must be a whole number above 0.",
+    },
+    "csv_club_fa_invalid": {
+        "vi": "Dòng {line} bị bỏ qua vì cột {reason} không hợp lệ (loại CLB, điểm sàn, tối thiểu hoặc sức chứa phòng).",
+        "en": "Line {line} was skipped because column {reason} isn't valid (club type, pass mark, minimum or room capacity).",
+    },
+    "fa_cot_bo_qua": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA: {n} CLB có cột loại / điểm sàn / tối thiểu / sức chứa phòng đã được bỏ qua phần đó, không lưu.",
+        "en": "This workspace doesn't use FA-DAA yet: the type / pass mark / minimum / room capacity columns of {n} club(s) were skipped and not saved.",
+    },
+    "fa_giu_cho_bo_qua": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA: {n} dòng giữ chỗ trong sổ đã được bỏ qua, không lưu.",
+        "en": "This workspace doesn't use FA-DAA yet: {n} reserved-seat row(s) in the file were skipped and not saved.",
+    },
+    "so_nhap_fa_giu_cho_khong_ton_tai": {
+        "vi": "{n} dòng giữ chỗ bị bỏ qua vì CLB hoặc học sinh không có trong phần mềm (ví dụ: {vi_du}).",
+        "en": "{n} reserved-seat row(s) were skipped because the club or student isn't in the app (for example: {vi_du}).",
+    },
     "csv_wp_bo_qua": {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
         "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved.",

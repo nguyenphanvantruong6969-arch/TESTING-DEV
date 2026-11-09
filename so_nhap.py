@@ -43,6 +43,9 @@ from nhan_ws import dang_chu
 SHEET_CLB = "1. CLB"
 SHEET_HS = "2. Học sinh"
 SHEET_HD = "Hướng dẫn"
+SHEET_GIU_CHO = "Giữ chỗ"                  # FA-1: sheet TUỲ CHỌN (Mã CLB, Mã học sinh)
+COT_FA = ["Loại", "Điểm sàn", "Tối thiểu", "Sức chứa phòng"]    # FA-1: cột CLB tuỳ chọn
+KHOA_FA = ("loai", "diem_san", "so_toi_thieu", "suc_chua_phong")
 
 # Số cột NV mặc định của mẫu trống. Trần nguyện vọng của phần mềm là 10 MỖI
 # BUỔI; 15 đủ cho trường một-hai buổi mà dòng vẫn vừa màn hình. Mẫu sinh từ
@@ -292,6 +295,11 @@ _TEN_COT_CLB = {
                          "suat du tru"},
     "reserve_group": {"nhom uu tien", "nhom du tru", "doi tuong uu tien"},
     "club_id": {"ma clb", "ma", "ma cau lac bo"},
+    # FA-DAA (FA-1): cột TUỲ CHỌN. Vắng cột = giữ giá trị đang lưu; sổ cũ không có chúng.
+    "loai": {"loai", "loai clb", "kieu", "kieu clb"},
+    "diem_san": {"diem san"},
+    "so_toi_thieu": {"toi thieu", "so toi thieu"},
+    "suc_chua_phong": {"suc chua phong"},
 }
 _TEN_COT_HS = {
     "student_id": {"ma hs", "ma hoc sinh", "ma", "ma so", "ma so hoc sinh"},
@@ -539,8 +547,13 @@ def doc_so_nhap(wb, clb_da_co=None, ma_da_co=None, clb_cu=None, cfg=None) -> dic
     clubs = _doc_sheet_clb(wb[ten_clb], loi, clb_da_co or {}, ma_da_co or {}, clb_cu or {},
                            cfg, chuan_clb)
     students = _doc_sheet_hs(wb[ten_hs], clubs, loi, cfg, chuan_hs)
-    return {"clubs": [c for c in clubs if not c.get("hong")],
-            "students": students, "loi": loi}
+    ra = {"clubs": [c for c in clubs if not c.get("hong")],
+          "students": students, "loi": loi}
+    # FA-1: sheet "Giữ chỗ" tuỳ chọn. Có sheet thì khoá `giu_cho` có mặt (kể cả rỗng = xoá hết).
+    ten_gc = _tim_sheet(ten_cac_sheet, SHEET_GIU_CHO, "Giu cho")
+    if ten_gc:
+        ra["giu_cho"] = _doc_sheet_giu_cho(wb[ten_gc], loi)
+    return ra
 
 
 def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHEET_CLB) -> list:
@@ -648,15 +661,88 @@ def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHE
             # một loạt lỗi "không có CLB" ở sheet học sinh.
             clubs.append({"club_id": ma, "name": ten, "hong": True})
             continue
+        fa, loi_fa = _doc_cot_fa(o, cot, lay, ten_sheet, so_dong, ten)
+        if loi_fa:
+            loi.extend(loi_fa)
+            clubs.append({"club_id": ma, "name": ten, "hong": True})
+            continue
         clubs.append({
             "club_id": ma, "name": ten, "capacity": n_chi_tieu,
             "reserve_capacity": n_uu_tien,
             "reserve_group": lay_hoac_cu("reserve_group", "") or "",
             "buoi": ma_buoi(lay(o, "buoi")) if "buoi" in cot else (cu.get("buoi") or ""),
             "dong": so_dong,
+            **fa,
         })
 
     return clubs
+
+
+def _doc_cot_fa(o, cot, lay, ten_sheet, so_dong, ten):
+    """Bốn cột FA tuỳ chọn của một dòng CLB -> ({khoá có cột: giá trị|None}, [lỗi]).
+
+    Cột vắng mặt thì khoá vắng (giữ giá trị đang lưu). Ô trống = None (xoá). Sai giá trị = lỗi
+    `so_nhap_fa_*` kèm sheet, dòng — sổ có lỗi thì không nạp gì (như mọi lỗi sổ khác).
+    """
+    from fa_daa import chuan_hoa_loai, kiem_thuoc_tinh
+
+    ra, loi = {}, []
+    for khoa in KHOA_FA:
+        if khoa not in cot:
+            continue
+        tho = lay(o, khoa)
+        if khoa == "loai":
+            try:
+                ra[khoa] = chuan_hoa_loai(tho)
+            except ValueError:
+                ra[khoa] = None
+                loi.append(err("so_nhap_fa_loai_sai", sheet=ten_sheet, dong=so_dong, ten=ten,
+                               gia_tri=tho))
+            continue
+        if not tho:
+            ra[khoa] = None
+            continue
+        try:
+            f = float(tho)
+            ra[khoa] = int(f) if math.isfinite(f) and f.is_integer() else tho
+        except (ValueError, OverflowError):
+            ra[khoa] = tho                  # để kiem_thuoc_tinh từ chối
+    if not loi:
+        bao = {"diem_san": "so_nhap_fa_diem_san_sai", "so_toi_thieu": "so_nhap_fa_toi_thieu_sai",
+               "suc_chua_phong": "so_nhap_fa_suc_chua_phong_sai"}
+        sai = {e["code"]: e for e in kiem_thuoc_tinh(
+            None, ra.get("diem_san"), ra.get("so_toi_thieu"), ra.get("suc_chua_phong"))}
+        for ma_fa, khoa in (("fa_diem_san_sai", "diem_san"), ("fa_toi_thieu_sai", "so_toi_thieu"),
+                            ("fa_suc_chua_phong_sai", "suc_chua_phong")):
+            if ma_fa in sai:
+                loi.append(err(bao[khoa], sheet=ten_sheet, dong=so_dong, ten=ten,
+                               gia_tri=str(ra[khoa])))
+    return ra, loi
+
+
+def _doc_sheet_giu_cho(ws, loi) -> list:
+    """Sheet "Giữ chỗ" tuỳ chọn -> [(club_id, student_id)] theo thứ tự dòng, bỏ trùng."""
+    dong_iter = _cac_dong(ws)
+    dau = next(dong_iter, None)
+    if dau is None:
+        return []
+    cot = {}
+    for i, t in enumerate(dau[1]):
+        b = bo_dau(t)
+        if b in ("ma clb", "ma cau lac bo", "club id") and "c" not in cot:
+            cot["c"] = i
+        elif b in ("ma hs", "ma hoc sinh", "student id") and "s" not in cot:
+            cot["s"] = i
+    if len(cot) < 2:
+        loi.append(err("so_nhap_thieu_cot", sheet=SHEET_GIU_CHO, cot="Mã CLB, Mã học sinh"))
+        return []
+    cap = []
+    for _, o in dong_iter:
+        c = o[cot["c"]].strip() if cot["c"] < len(o) else ""
+        h = o[cot["s"]].strip() if cot["s"] < len(o) else ""
+        if c and h:
+            cap.append((c, h))
+    return list(dict.fromkeys(cap))
 
 
 def _mau_diem_w(cfg=None):
@@ -900,10 +986,13 @@ def thanh_csv(du_lieu: dict) -> dict:
     không thi CLB nào: sổ là bản đầy đủ, nạp lại sổ phải xoá được lựa chọn
     thi cũ của em đã bỏ thi.
     """
-    clubs = [["club_id", "name", "capacity", "reserve_capacity", "reserve_group", "buoi"]]
+    # FA-1: cột FA chỉ khi sổ CÓ cột đó (khoá có mặt); không thì tệp giống từng byte như cũ.
+    cot_fa = [k for k in KHOA_FA if any(k in c for c in du_lieu["clubs"])]
+    clubs = [["club_id", "name", "capacity", "reserve_capacity", "reserve_group", "buoi"] + cot_fa]
     for c in du_lieu["clubs"]:
         clubs.append([c["club_id"], c["name"], c["capacity"], c["reserve_capacity"],
-                      c["reserve_group"], c["buoi"]])
+                      c["reserve_group"], c["buoi"]]
+                     + [("" if c.get(k) is None else c[k]) for k in cot_fa])
 
     hs = du_lieu["students"]
     if not hs:
@@ -1179,7 +1268,7 @@ def ten_khong_trung(clubs) -> int:
 
 
 def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=True,
-                cfg=None, luon_co_cot_w: bool = False, co_lop: bool = False):
+                cfg=None, luon_co_cot_w: bool = False, co_lop: bool = False, giu_cho=None):
     """Ghi sổ nhập ra tệp .xlsx (đường dẫn hoặc tệp nhị phân đang mở).
 
     clubs:    dict có name, capacity, reserve_capacity, reserve_group, buoi, club_id
@@ -1191,6 +1280,10 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     co_nhom:  False thì bỏ hẳn cột Nhóm ưu tiên ở sheet học sinh. Dùng cho sổ
               sinh từ biểu mẫu: biểu mẫu không hỏi nhóm, và cột VẮNG MẶT nghĩa
               là phần mềm giữ nhóm đã gán; cột có mà ô trống là BỎ nhóm.
+    giu_cho:  FA-1. None -> không có sheet "Giữ chỗ". Danh sách [(club_id, student_id)] -> thêm
+              sheet đó. Cột FA (Loại, Điểm sàn, Tối thiểu, Sức chứa phòng) của sheet CLB chỉ
+              được ghi khi có CLB mang khoá `loai` / `diem_san` / `so_toi_thieu` / `suc_chua_phong`;
+              không thì sổ giống từng byte như cũ.
     cfg:      cấu hình workspace (dict thô, xem `_cfg`; KHÔNG import cau_hinh_ws).
               None -> đúng sổ như trước khi có workspace. Có cfg thì:
                 * tên sheet "1. <chỗ xếp>" / "2. <người>" theo nhãn;
@@ -1244,11 +1337,18 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # ---- 1. CLB ---------------------------------------------------------
     ws = wb.active
     ws.title = sheet_clb
-    ws.append(cot_clb(cfg))
+    # FA-1: cột FA chỉ khi có CLB mang chúng.
+    co_fa = any(k in c for c in clubs for k in KHOA_FA)
+    ws.append(cot_clb(cfg) + (COT_FA if co_fa else []))
     for c in clubs:
+        hang_fa = []
+        if co_fa:
+            from fa_daa import NHAN_LOAI_HIEN_THI
+            hang_fa = [NHAN_LOAI_HIEN_THI.get(c.get("loai"), c.get("loai")) or None,
+                       c.get("diem_san"), c.get("so_toi_thieu"), c.get("suc_chua_phong")]
         ws.append([c.get("name", ""), nhan_buoi(c.get("buoi") or ""),
                    c.get("capacity", ""), c.get("reserve_capacity") or None,
-                   c.get("reserve_group") or None, c.get("club_id") or None])
+                   c.get("reserve_group") or None, c.get("club_id") or None] + hang_fa)
     so_dong_clb = max(len(clubs) + 1 + 20, SO_DONG_CLB_TRONG)
     for i, rong in enumerate([30, 12, 10, 13, 16, 18], start=1):
         ws.column_dimensions[get_column_letter(i)].width = rong
@@ -1453,9 +1553,21 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
         elif dong.startswith("Bước"):
             o.font = Font(bold=True)
 
+    # FA-1: sheet "Giữ chỗ" tuỳ chọn (chỉ khi người gọi truyền `giu_cho`).
+    wg = None
+    if giu_cho is not None:
+        wg = wb.create_sheet(SHEET_GIU_CHO)
+        wg.append(["Mã CLB", "Mã học sinh"])
+        for c, h in giu_cho:
+            wg.append([c, h])
+        wg.column_dimensions["A"].width = 16
+        wg.column_dimensions["B"].width = 16
+        for o in wg[1]:
+            o.fill, o.font, o.alignment = NEN_TIEU_DE, CHU_TIEU_DE, GIUA
+
     # Tên bắt đầu bằng "=" (vd học sinh tên "=1+1") phải là CHỮ, không thành
     # công thức Excel — vừa sai dữ liệu, vừa là lối chèn công thức độc.
-    for trang in (ws, wh):
+    for trang in (ws, wh) + ((wg,) if wg is not None else ()):
         for hang in trang.iter_rows(min_row=2, max_row=trang.max_row):
             for o in hang:
                 if isinstance(o.value, str) and o.value.startswith("="):

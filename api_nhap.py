@@ -9,6 +9,7 @@ import csv
 import io
 import re
 import cau_hinh_ws
+import fa_daa
 import so_nhap
 from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
@@ -21,6 +22,7 @@ from rbda_priority_pipeline import (
     sap_buoi,
     BUOI_MAC_DINH,
     doc_du_lieu_wharton,
+    dung_fa_daa,
     dung_wharton,
     gom_theo_buoi,
     kiem_ho_so_wharton,
@@ -468,6 +470,18 @@ class NhapDuLieuMixin:
                              for s in du_lieu["students"]
                              if s.get("diem_ca_nhan") is not None])
 
+                # FA-1: sheet "Giữ chỗ" (có sheet = bản đầy đủ). Sau cả CLB lẫn học sinh để
+                # kiểm được mã. FA tắt: bỏ qua kèm cảnh báo, không ghi gì.
+                if "giu_cho" in du_lieu:
+                    if dung_fa_daa(self._luat_nghiem()):
+                        with self._ket_noi_ghi() as cur:
+                            bo = fa_daa.thay_giu_cho(cur, du_lieu["giu_cho"])
+                        if bo:
+                            canh_bao.append(err("so_nhap_fa_giu_cho_khong_ton_tai", n=len(bo),
+                                                vi_du=", ".join("%s/%s" % p for p in bo[:3])))
+                    elif du_lieu["giu_cho"]:
+                        canh_bao.append(err("fa_giu_cho_bo_qua", n=len(du_lieu["giu_cho"])))
+
             kq["warnings"] = canh_bao
             return _ok(kq)
         except _HuyNapSo as huy:
@@ -625,6 +639,11 @@ class NhapDuLieuMixin:
                 if bat_buoc not in fieldnames:
                     return _fail(err("csv_missing_columns", fieldnames=fieldnames))
 
+            # FA-1: bốn cột FA tuỳ chọn. Không có cột nào -> đường cũ, không đọc cấu hình thêm.
+            cot_fa = [k for k in so_nhap.KHOA_FA if k in fieldnames]
+            fa_bat = bool(cot_fa) and dung_fa_daa(self._luat_nghiem())
+            n_fa_bo_qua = 0
+
             with self._ket_noi_ghi() as cur:
                 da_co = {r[0] for r in cur.execute("SELECT club_id FROM clubs")}
 
@@ -656,6 +675,14 @@ class NhapDuLieuMixin:
                         n_bo += 1
                         continue
 
+                    fa = {}
+                    if cot_fa:
+                        fa, cot_sai = fa_daa.doc_thuoc_tinh_csv(row, cot_fa)
+                        if cot_sai:
+                            canh_bao.append(err("csv_club_fa_invalid", line=i, reason=cot_sai))
+                            n_bo += 1
+                            continue
+
                     buoi_value = self._khop_buoi_da_co(
                         cur, self.chuan_hoa_buoi(row.get("buoi")), row.get("buoi")) or None
                     (co_buoi if buoi_value else khong_buoi).append(club_id)
@@ -664,6 +691,10 @@ class NhapDuLieuMixin:
                                   capacity, reserve_capacity,
                                   self.chuan_hoa_nhom_du_tru(row.get("reserve_group")) or None,
                                   buoi_value)
+                    if fa_bat:
+                        fa_daa.ghi_thuoc_tinh_clb(cur, club_id, fa)
+                    elif any(v is not None for v in fa.values()):
+                        n_fa_bo_qua += 1
                     if club_id in da_co:
                         n_sua += 1
                     else:
@@ -675,6 +706,8 @@ class NhapDuLieuMixin:
                 # bo trong roi hết vào cùng một buổi mặc định, tức là chúng
                 # bị coi là TRÙNG GIỜ với nhau — người nhập không hề định
                 # thế và không có gì trên màn hình nói ra. Phải kêu.
+                if n_fa_bo_qua:
+                    canh_bao.append(err("fa_cot_bo_qua", n=n_fa_bo_qua))
                 if co_buoi and khong_buoi:
                     canh_bao.append(err(
                         "clb_thieu_buoi",

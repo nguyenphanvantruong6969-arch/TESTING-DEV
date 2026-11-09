@@ -67,6 +67,9 @@ MAC_DINH_TRUONG_HOC = {
         # Xem `_chuan_hoa` về điều kiện bật; tổ hợp không cho phép mà không ghi rõ
         # `wharton` thì tự tắt.
         "wharton": True,
+        # FA-DAA (mục A13, FA-1): mặc định TẮT ở mọi nơi. Bật cần `wharton` (huy chương dùng
+        # `wharton_bids`), priority score / score+tier và per_slot.
+        "fa_daa": False,
     },
 }
 
@@ -251,6 +254,14 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
         raise ValueError(
             "wharton chỉ dùng được khi priority là score hoặc score+tier và score_scope là "
             "per_slot (điểm Wharton cần biết em có thi CLB nào).")
+
+    bat_fa = luat["fa_daa"]
+    if not isinstance(bat_fa, bool):
+        raise ValueError("fa_daa phải là true hoặc false, nhận %r." % (bat_fa,))
+    if bat_fa and not bat_wharton:
+        raise ValueError(
+            "fa_daa chỉ dùng được khi wharton bật (huy chương dùng bảng điểm Wharton) và "
+            "priority là score hoặc score+tier, score_scope là per_slot.")
 
     tiers = luat["tiers"]
     if not isinstance(tiers, list) or not all(isinstance(t, str) and t.strip() for t in tiers):
