@@ -28,6 +28,7 @@ from rbda_priority_pipeline import (
     dung_fa_daa,
     BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton,
 )
+import fa_bien_ban
 import fa_ly_do
 import so_nhap
 
@@ -1717,6 +1718,40 @@ class XuatKetQuaMixin:
             if thieu:
                 ra["canh_bao"] = [err("fa_ly_do_thieu_buoi", buoi=b) for b in thieu]
             return _ok(ra)
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    def export_bien_ban_boc_tham(self, output_path: str = ""):
+        """FA-9 (D5): `bien_ban_boc_tham.html` — biên bản bốc thăm có người chứng kiến (một trang để in và ký):
+        kỳ, thời điểm, dấu vân tay dữ liệu của lần chạy, hạt giống đã khoá, SHA-256 của danh sách (mã học sinh,
+        số bốc thăm) đã sắp xếp, số liệu từng buổi, dòng ký. KHÔNG có tên hay mã học sinh. Chưa bốc thăm (chưa
+        chạy xếp, chưa khoá hạt giống) thì `bien_ban_chua_boc_tham`. Chỉ ĐỌC dữ liệu."""
+        return self._khoa_xuat(self._export_bien_ban_da_khoa, output_path)
+
+    def _export_bien_ban_da_khoa(self, output_path: str = ""):
+        try:
+            rules = self._luat_nghiem()
+            with self._ket_noi_doc() as cur:
+                khoa = cur.execute("SELECT is_locked, seed FROM stb_lock WHERE id = 1").fetchone()
+                cap = [(r[0], r[1]) for r in cur.execute(
+                    "SELECT student_id, stb_number FROM students WHERE stb_number IS NOT NULL")]
+                dvt = cur.execute("SELECT dau_van_tay FROM dau_van_tay_chay WHERE id = 1").fetchone()
+                dem = {r[0]: {"n_hoc_sinh": r[1], "n_xep": r[2]} for r in cur.execute(
+                    "SELECT buoi, COUNT(DISTINCT student_id), COUNT(*) FROM match_results GROUP BY buoi")}
+                hien_tai = self._dau_van_tay_du_lieu(cur, rules) if dem else None
+            if not khoa or not khoa[0] or khoa[1] is None or not cap or not dvt or not dem:
+                return _fail(err("bien_ban_chua_boc_tham"))
+            ban_ghi = fa_bien_ban.tao_ban_ghi(
+                doc_cau_hinh(self.db_path).get("name", ""),
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), dvt[0], khoa[1], cap, dem,
+                ket_qua_con_khop=(dvt[0] == hien_tai), fa_daa=dung_fa_daa(rules))
+            duong = self._duong_xuat(output_path, "bien_ban_boc_tham.html")
+            with open(duong, "w", encoding="utf-8") as f:
+                f.write(fa_bien_ban.html_bien_ban(ban_ghi))
+            return _ok({"path": duong, "sha256_stb": ban_ghi["sha256_stb"], "hat_giong": ban_ghi["hat_giong"],
+                        "ket_qua_con_khop": ban_ghi["ket_qua_con_khop"], "n_hoc_sinh": len(cap)})
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:

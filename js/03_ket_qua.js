@@ -835,6 +835,7 @@ function loadMatchResults(search) {
     const cauLyDo = fa && lyDo.data.run_id !== null ? lyDo.data.cau : null;
     el("btnXuatLyDo").hidden = !fa;
     el("btnXuatNhuCau").hidden = !fa;
+    el("btnXuatBienBan").hidden = !fa;
     veCotLyDo(!!cauLyDo);
     napOLocLop(el("resultsLopLoc"), dsLop);
     const body = el("resultsTableBody");
@@ -1022,6 +1023,10 @@ function initResultsHandlers() {
   el("btnXuatLyDo").addEventListener("click", () => {
     chayXuat([["xuat_muc_ly_do", "export_ly_do_csv", [""],
       (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
+  });
+  el("btnXuatBienBan").addEventListener("click", () => {
+    chayXuat([["xuat_muc_bien_ban", "export_bien_ban_boc_tham", [""],
+      (d) => t("xuat_kq_bien_ban", { n: d.n_hoc_sinh, path: d.path })]]);
   });
   el("btnXuatNhuCau").addEventListener("click", () => {
     chayXuat([["xuat_muc_nhu_cau", "export_bang_nhu_cau", [""],
