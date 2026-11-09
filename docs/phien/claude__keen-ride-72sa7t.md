@@ -46,14 +46,15 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-09; spec plan §7, FA-9/FA-10 in §2):
 - [x] FA-N1 reasons per day after a partial run   - [x] FA-N2 on-site lazy medals saved + follow re-rank
 - [x] FA-N3 clear error FA on / points off   - [x] FA-N4 warn: single-variant club, no retake
-- [ ] FA-9 witnessed lottery record   - [ ] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
+- [x] FA-9 witnessed lottery record   - [x] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
 - [ ] Opus review night 4
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
 - 2026-11-09 Sonnet night 4 DONE: 6/6, 0 blocked, no RUNNING lock. Commits: FA-N1 24dc9a1, FA-N2 5ad2e48, FA-N3+N4 0d811dc, FA-9 cf90452, FA-10 6c7bf4d. Report: bao_cao_dem/2026-11-09_dem4.md.
 - Tests: related 2647 passed / 1 skipped; Chromium UI really ran; ruff clean; kiem_nhanh 7/7. Full suite not run (CI).
-- Open for Truong: D8; PR to main for full CI + Windows build; lottery record HTML only (Excel wanted?).
+- Truong 2026-11-10: night-4 review left to the auto task (not this session); PR to main AFTER night 5; D8 waits for GĐ2;
+  lottery record: ADD an Excel version (Truong approved this new feature -> Opus review puts it in night 5 as FA-9b).
 - Next: Opus review night 4 (list bugs, do not fix), release night 5 = fix list only. Opus review night 4 item stays unticked.
 
 ## Decisions and gotchas (keep short)
@@ -136,3 +137,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Sonnet (night 4) | FA-9: fa_bien_ban.py + export_bien_ban_boc_tham + button; tests/test_fa_bien_ban.py 9 + 1 Chromium; related 112 passed; 2 mutations caught; kiem_nhanh 7/7; pure module written before its tests, API/UI tests red first | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-10: du_lieu_test/mo_phong_fa_daa.py tables only; tests/test_mo_phong_fa_daa.py 9; 3 mutations caught after adding 2 tests; module written before tests | night 4 |
 | 2026-11-09 | Sonnet (night 4) | Night 4 report 2026-11-09: 6/6 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem4.md | RUNNING line removed |
+| 2026-11-10 | Opus | Status check; recorded Truong decisions (auto review, PR after night 5, D8 waits, Excel lottery record approved); ticked FA-9/FA-10 in Plan | Docs only |
