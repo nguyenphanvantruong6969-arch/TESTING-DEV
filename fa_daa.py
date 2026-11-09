@@ -186,5 +186,63 @@ def kiem_fa_tu_csdl(cur) -> list:
 
     Dùng chung cho lần chạy xếp (bước kiểm dữ liệu) và báo cáo sức khoẻ dữ liệu: cùng số, cùng em."""
     clubs, students, prefs = doc_clubs_va_nguyen_vong(cur)
-    _, cap, _ = doc_du_lieu_fa(cur)
-    return kiem_truoc_fa(clubs, cap, students, prefs)
+    _, cap, huy = doc_du_lieu_fa(cur)
+    return kiem_truoc_fa(clubs, cap, students, prefs) + kiem_ho_so_huy_chuong(prefs, huy, clubs)
+
+
+# ---------------------------------------------------------------------------
+# FA-3 · huy chương, MỘT quỹ (A13; V§6)
+# ---------------------------------------------------------------------------
+GIA_TRI_HUY_CHUONG = (60, 30, 10)        # vàng, bạc, đồng
+
+
+def kiem_ho_so_huy_chuong(preferences: dict, bids: dict, clubs: dict) -> list:
+    """Kiểm huy chương của mọi học sinh; trả TẤT CẢ lỗi, rỗng = hợp lệ (V§13.8).
+
+    `preferences` {student_id: [club_id]} (mọi buổi), `bids` {student_id: {club_id: điểm}},
+    `clubs` {club_id: {buoi, loai, ...}}. Mỗi học sinh, mỗi buổi: giá trị chỉ là 60, 30 hoặc 10 (số
+    nguyên thật, không `bool` / `float` / chuỗi), mỗi giá trị tối đa MỘT lần (nên tối đa 3 huy
+    chương mỗi buổi); mỗi CLB tối đa một huy chương (khoá `bids[sid]` là club_id); CLB phải nằm
+    trong nguyện vọng của em và không phải TU_DO. Ít hơn 3 huy chương là hợp lệ (V§6.1).
+
+    Mỗi ô có tối đa một lỗi. Thứ tự lỗi cố định: học sinh theo mã; trong em, từng CLB theo mã
+    (lỗi từng ô), rồi các giá trị trùng theo (buổi, giá trị). Hàm KHÔNG đọc thứ hạng nguyện vọng.
+    """
+    loi = []
+    for sid in sorted(set(preferences) | set(bids), key=str):
+        thich = set(preferences.get(sid) or [])
+        theo_buoi: dict = {}                     # (buoi, giá trị) -> số CLB hợp lệ
+        for cid in sorted(bids.get(sid) or {}, key=str):
+            v = bids[sid][cid]
+            if cid not in thich or cid not in clubs:
+                loi.append(err("fa_huy_chuong_ngoai_nguyen_vong", student_id=sid, club_id=cid))
+            elif clubs[cid].get("loai") == TU_DO:
+                loi.append(err("fa_huy_chuong_clb_tu_do", student_id=sid, club_id=cid))
+            elif type(v) is not int or v not in GIA_TRI_HUY_CHUONG:
+                loi.append(err("fa_huy_chuong_gia_tri_sai", student_id=sid, club_id=cid,
+                               gia_tri=repr(v)))
+            else:
+                k = (clubs[cid].get("buoi") or BUOI_MAC_DINH, v)
+                theo_buoi[k] = theo_buoi.get(k, 0) + 1
+        for (buoi, v), n in sorted(theo_buoi.items(), key=lambda kv: (str(kv[0][0]), -kv[0][1])):
+            if n > 1:
+                loi.append(err("fa_huy_chuong_trung_gia_tri", student_id=sid, buoi=buoi,
+                               gia_tri=v))
+    return loi
+
+
+def diem_huy_chuong_hieu_luc(preferences: dict, bids: dict) -> dict:
+    """Điểm huy chương hiệu lực {club_id: {student_id: điểm}} cho `diem_wharton` của
+    `run_rbda_nhieu_buoi`: MỘT quỹ (bỏ qua `tier`), 0 cho CLB trong nguyện vọng mà em chưa đặt
+    huy chương. Mỗi cặp (học sinh, CLB trong nguyện vọng) có một mục. Chỉ đọc TẬP CLB của em,
+    không đọc thứ hạng: hoán vị danh sách nguyện vọng không đổi kết quả (bất biến 2).
+
+    Dùng với `rbda_priority_pipeline.uu_tien_wharton`: CLB TUYEN_CHON → khoá
+    `(0, -điểm thi, (), -huy chương, stb, sid)` (em có điểm thi), GIOI_HAN → `(1, -huy chương,
+    stb, sid)`; đúng V§8.2 khi chưa có ưu tiên bù (D1)."""
+    ra: dict = {}
+    for sid in sorted(preferences, key=str):
+        cua_em = bids.get(sid) or {}
+        for cid in sorted(set(preferences[sid] or []), key=str):
+            ra.setdefault(cid, {})[sid] = cua_em.get(cid, 0)
+    return ra

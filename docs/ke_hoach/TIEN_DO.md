@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-3 (FA-DAA, mục cha A13) | xong | 2026-11-09 | fa_daa.py, api.py, api_quan_ly.py, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_huy_chuong.py | Huy chương một quỹ 60/30/10, submit_huy_chuong, chặn chạy khi hồ sơ sai |
 | FA-2 (FA-DAA, mục cha A5) | xong | 2026-11-09 | fa_daa.py, api.py, so_nhap.py, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, tests/_fa.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_kiem_truoc.py | kiem_truoc_fa nối vào chạy xếp và báo cáo sức khoẻ dữ liệu |
 | FA-1 (FA-DAA, mục cha A13) | xong | 2026-11-09 | fa_daa.py, cau_hinh_ws.py, rbda_priority_pipeline.py, api_quan_ly.py, api_nhap.py, so_nhap.py, i18n_errors.py, i18n_loi.js, tests/test_rang_buoc_csdl.py, CHANGELOG.md, docs/ke_hoach/CLAUDE_CHI_TIET.md | tests/test_fa_du_lieu.py | Luật fa_daa (tắt mặc định), 4 cột CLB, bảng giu_cho, Sổ nhập/CSV tuỳ chọn |
 | FA-M3 (một phần: `dat_huy_chuong_duong_b`, Truong duyệt 08/11/2026) | xong (chưa nối luồng) | 2026-11-08 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, CLAUDE.md, docs/ke_hoach/FA_DAA_KE_HOACH.md, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_m3_huy_chuong_b.py (19 ca) | Đường B đủ 6 cách đặt huy chương |

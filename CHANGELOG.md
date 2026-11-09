@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-3: huy chương một quỹ (mục cha A13)
+
+- `fa_daa.py`: `kiem_ho_so_huy_chuong` (giá trị 60 / 30 / 10 đúng kiểu số nguyên, mỗi giá trị một lần mỗi buổi, mỗi CLB một huy chương, CLB trong nguyện vọng và không phải Tự do; ít hơn 3 huy chương hợp lệ), `diem_huy_chuong_hieu_luc` (một quỹ, bỏ qua `tier`, không đọc thứ hạng nguyện vọng).
+- `api_quan_ly.py`: `submit_huy_chuong(student_id, huy_chuong)` (kiểm ở server, thay toàn bộ huy chương cũ của em, ghi `wharton_bids` + `wharton_nhat_ky`, tôn trọng khoá điểm). `api.py`: khi FA bật, hồ sơ huy chương được kiểm thay hồ sơ 100 điểm (chặn chạy, báo cáo sức khoẻ) và huy chương làm `diem_wharton` của lần chạy.
+- `i18n_errors.py` (+ `i18n_loi.js`): 5 mã mới. `tests/test_fa_huy_chuong.py` (mới, 20 ca); `tests/test_ws_nhan.py`; `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 205 tệp test.
+
 ## 2026-11-09 — FA-2: kiểm trước khi chạy FA-DAA (mục cha A5)
 
 - `fa_daa.py`: `kiem_truoc_fa` (mỗi buổi có CLB Tự do; mọi CLB có loại; Giới hạn / Tuyển chọn có chỉ tiêu; Tuyển chọn có điểm sàn; giữ chỗ không vượt chỉ tiêu; giữ chỗ cho học sinh lạ / em không xếp CLB đó chỉ là cảnh báo và không được tính), `giu_cho_hop_le`, `chi_loi_chan`, `doc_du_lieu_fa`, `kiem_fa_tu_csdl`.

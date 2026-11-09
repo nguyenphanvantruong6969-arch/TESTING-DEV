@@ -660,6 +660,27 @@ MESSAGES = {
         "vi": "Giữ chỗ ở CLB {club_id} cho {student_id} bị bỏ qua vì học sinh chưa xếp CLB này trong nguyện vọng.",
         "en": "The reserved seat at club {club_id} for {student_id} was ignored because the student didn't rank this club.",
     },
+    # --- FA-DAA (FA-3): huy chương ---
+    "fa_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA, nên chưa nhận huy chương.",
+        "en": "This workspace doesn't use FA-DAA yet, so medals can't be saved.",
+    },
+    "fa_huy_chuong_gia_tri_sai": {
+        "vi": "{student_id}: huy chương ở CLB {club_id} có giá trị {gia_tri}; chỉ nhận vàng (60), bạc (30) hoặc đồng (10).",
+        "en": "{student_id}: the medal at club {club_id} has value {gia_tri}; only gold (60), silver (30) or bronze (10) are allowed.",
+    },
+    "fa_huy_chuong_trung_gia_tri": {
+        "vi": "{student_id}: buổi {buoi} có hai CLB cùng huy chương {gia_tri}. Mỗi loại huy chương chỉ dùng một lần mỗi buổi.",
+        "en": "{student_id}: session {buoi} has two clubs with the same medal ({gia_tri}). Each medal can be used once per session.",
+    },
+    "fa_huy_chuong_ngoai_nguyen_vong": {
+        "vi": "{student_id}: huy chương đặt ở CLB {club_id} nhưng CLB này không nằm trong nguyện vọng.",
+        "en": "{student_id}: a medal is placed on club {club_id} but that club isn't in the student's choices.",
+    },
+    "fa_huy_chuong_clb_tu_do": {
+        "vi": "{student_id}: CLB {club_id} là CLB Tự do nên không nhận huy chương.",
+        "en": "{student_id}: club {club_id} is a Free club, so it can't take a medal.",
+    },
     "csv_wp_bo_qua": {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
         "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved.",

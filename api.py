@@ -1055,11 +1055,14 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # sơ 100 điểm. Lỗi chặn thì dừng ở đây, trước khi bốc hay khoá số: không ghi gì.
                 with self._ket_noi_doc() as cur_fa:
                     loi_fa = fa_daa.kiem_fa_tu_csdl(cur_fa)
+                    huy_chuong = fa_daa.doc_du_lieu_fa(cur_fa)[2]
                 canh_bao_wharton = [e for e in loi_fa if e["code"] in fa_daa.MA_CANH_BAO]
                 loi_fa = fa_daa.chi_loi_chan(loi_fa)
                 if loi_fa:
                     steps_log.append({"step": "validate", "status": "error", "detail": loi_fa})
                     return _fail_co_buoc(steps_log, loi_fa)
+                # Huy chương MỘT quỹ thay điểm hai quỹ (FA-3); FA-4 sẽ thay lời gọi chạy bằng lớp bọc.
+                diem_wharton = fa_daa.diem_huy_chuong_hieu_luc(preferences, huy_chuong)
             if wharton is not None and not fa_bat:
                 # Quỹ chỉ có MỘT CLB mà em chưa đặt điểm thì tự điền 100 TRONG BỘ NHỚ (quyết định
                 # của Truong, cách A): không ghi `wharton_bids`, và là hàm thuần của (nguyện vọng,

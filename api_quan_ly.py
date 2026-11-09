@@ -13,6 +13,7 @@ import re
 from api_chung import (
     _now,
 )
+import fa_daa
 import so_nhap
 from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
@@ -26,6 +27,7 @@ from rbda_priority_pipeline import (
     WHARTON_TU_DIEN_MOT_CLB,
     diem_wharton_hieu_luc,
     doc_du_lieu_wharton,
+    dung_fa_daa,
     dung_wharton,
     khoa_uu_tien_wharton,
     kiem_ho_so_wharton,
@@ -1190,6 +1192,46 @@ class QuanLyMixin:
             return _ok({"student_id": student_id, "n_rows": n_dong})
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
+
+    def submit_huy_chuong(self, student_id: str, huy_chuong: dict):
+        """FA-DAA (FA-3): học sinh đặt huy chương {club_id: 60 | 30 | 10} cho nguyện vọng của mình.
+
+        KIỂM Ở SERVER (`kiem_ho_so_huy_chuong`): giá trị, trùng giá trị trong buổi, CLB nằm trong
+        nguyện vọng và không phải Tự do. Sai thì không ghi gì. Thay TOÀN BỘ huy chương cũ của em;
+        ghi vào `wharton_bids` (tier = 1 với CLB Tuyển chọn, 2 với CLB khác — FA bỏ qua `tier`) và
+        một dòng `wharton_nhat_ky`. Đang khoá điểm thì từ chối (`wharton_da_khoa`), như Wharton.
+        """
+        try:
+            luat = self._luat_nghiem()           # đọc TRƯỚC khi mở giao dịch ghi
+            if not dung_fa_daa(luat):
+                return _fail(err("fa_chua_bat"))
+            if not isinstance(huy_chuong, dict):
+                return _fail(err("error_saving_wharton", detail="huy_chuong phai la dict"))
+            with self._ket_noi_ghi() as cur:
+                if self._wharton_dang_khoa(cur):
+                    return _fail(err("wharton_da_khoa"))
+                if not cur.execute("SELECT 1 FROM students WHERE student_id = ?",
+                                   (student_id,)).fetchone():
+                    return _fail(err("student_not_found", student_id=student_id))
+                clubs, _, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
+                loi = fa_daa.kiem_ho_so_huy_chuong(
+                    {student_id: prefs.get(student_id, [])}, {student_id: dict(huy_chuong)}, clubs)
+                if loi:
+                    return _fail(loi)
+                cu = self._doc_diem_wharton_cua_em(cur, student_id)
+                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+                dong = [(student_id, cid, 1 if clubs[cid].get("loai") == fa_daa.TUYEN_CHON else 2,
+                         diem) for cid, diem in sorted(huy_chuong.items())]
+                cur.executemany("INSERT INTO wharton_bids (student_id, club_id, tier, points) "
+                                "VALUES (?, ?, ?, ?)", dong)
+                moi = self._doc_diem_wharton_cua_em(cur, student_id)
+                if moi != cu:
+                    self._ghi_nhat_ky_wharton(cur, "kiosk", "luu", student_id, cu, moi)
+                return _ok({"student_id": student_id, "n_saved": len(dong)})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_saving_wharton", detail=str(e)))
 
     def _luu_wharton(self, student_id: str, w1: dict, w2: dict, nguon: str):
         """Lõi lưu điểm Wharton của một em, dùng chung cho kiosk (`submit_wharton`) và thẻ Quản lý
