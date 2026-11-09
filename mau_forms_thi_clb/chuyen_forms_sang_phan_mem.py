@@ -42,6 +42,7 @@ lẻ (mã CLB lạ, thi CLB chưa xếp nguyện vọng…) thì bỏ riêng ô 
 """
 
 import argparse
+import copy
 import csv
 import os
 import re
@@ -59,6 +60,10 @@ TIEN_TO_NHAN_XET = "Feedback - "
 
 class LoiTepXuat(ValueError):
     """Tệp xuất không dùng được — không ghi tệp nào."""
+
+
+class LoiChoXacNhan(LoiTepXuat):
+    """FA-M4 (D11): có chênh lệch giữa các đề; đã ghi báo cáo, chưa ghi Sổ nhập tới khi admin chọn một cờ."""
 
 
 def _o(gia_tri):
@@ -522,12 +527,14 @@ def _da_thi(dong, cot, clb):
     return any(_gia_tri(dong, cot["%s-%d" % (ma, i)]) for i in range(1, len(clb["de_thi"]) + 1))
 
 
-def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False):
+def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=None):
     """Ghép các tệp Forms chỉ-thi với danh sách đăng ký. Không ghi gì.
 
     danh_sach: kết quả doc_lists. cac_tep: [(tên tệp, tiêu đề, các dòng)]. Trả (hoc_sinh theo
     thứ tự List, cảnh báo). Học sinh trong List mà không có bài thi vẫn có mặt (chỉ nguyện vọng).
     `fa=True` (FA-M3): không soát hai quỹ 100 điểm của điểm quyết tâm (huy chương FA là MỘT quỹ 60/30/10).
+    `theo_tep` (FA-M4) {tên tệp: (chữ đề, de_thi của đề đó)}: tệp ghi trong đó được chấm bằng đề ấy và mỗi bài có
+    khoá "bien_the"; tệp không ghi là đề A. None = hành vi cũ (không khoá "bien_the").
     """
     canh_bao = []
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
@@ -537,7 +544,9 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False):
     for e, h in danh_sach.items():                    # tick / điểm quyết tâm (Q5a/b): chỉ khi List có cột
         hoc_sinh[e].update({k: h[k] for k in ("tick", "wp", "dong_buoi") if k in h})
     da_phu = set()
+    de_goc = de
     for ten_tep, tieu_de, cac_dong in cac_tep:
+        chu_de, de = (theo_tep or {}).get(ten_tep, ("A", de_goc))
         i_email, i_ten, cot, cot_diem, phu, la = _cot_chi_thi(de, tieu_de)
         da_phu.update(c["club_id"] for c in phu)
         if la:
@@ -599,6 +608,8 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False):
                         "— điểm có trong BANG_DIEM.xlsx nhưng không nạp vào phần mềm"
                         % (ma, clb["buoi"]))
                 bai = {"club_id": ma, "diem": diem, "dung": dung, "tra_loi": tra_loi, "nap": da_xep}
+                if theo_tep is not None:
+                    bai["bien_the"] = chu_de
                 if da_xep and "tick" in hs and ma not in hs["tick"]:
                     bao("%s: em có bài thi nhưng KHÔNG tick thi CLB này — điểm có trong BANG_DIEM.xlsx "
                         "nhưng không nạp vào phần mềm" % ma)
@@ -606,6 +617,7 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False):
                 bai_thi.append(bai)
             hs["bai_thi"] += bai_thi
 
+    de = de_goc
     for e, hs in hoc_sinh.items():
         _ap_tran_thi(de, theo_ma, hs["nguyen_vong"], hs["bai_thi"],
                      lambda nd, e=e, hs=hs: canh_bao.append((hs["dong"], e, nd)))
@@ -1072,15 +1084,43 @@ def _thoi_gian_lam_bai(tieu_de, cac_dong):
 
 
 def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz_xlsx=(), nhan_ban_nhap=False,
-                  co_so=None):
+                  co_so=None, bien_the_tep=None, ap_dung_dieu_chinh=False, giu_diem_goc=False, bo_cau=()):
     """FA-M3 (TH): đăng ký (đường B: Forms `dang_ky_xlsx`, hoặc đường A: CSV `lists`) + bài thi -> Sổ nhập FA.
 
     Loại CLB, chỉ tiêu, điểm sàn, giữ chỗ lấy từ Sổ nhập CLB của FA-M1 (`so_nhap_clb`). Huy chương MỘT quỹ 60/30/10
     vào cột "Điểm quyết tâm". Điểm thi quy về nguyên 0-10 (D7); em xếp CLB Tuyển chọn mà chưa thi: báo NOT_ATTEMPTED
     (kiosk cũng lọc theo điểm sàn); làm bài trong < 1/3 trung vị của CLB đó: gắn cờ (D9), chỉ báo. Soát huy chương
-    bằng `fa_daa.kiem_ho_so_huy_chuong`. Không ghi gì nếu có lỗi chặn (LoiTepXuat)."""
+    bằng `fa_daa.kiem_ho_so_huy_chuong`. Không ghi gì nếu có lỗi chặn (LoiTepXuat).
+
+    FA-M4: `bien_the_tep` {tên tệp: chữ đề "A"/"B"/"C"} cho các tệp bài thi của đề biến thể (đề B, C ở `de_thi_bien_the` của
+    CLB trong de_thi.json); tệp không ghi là đề A. Mỗi CLB có từ hai đề trở lên được so sánh điểm giữa các đề (D11); có
+    chênh lệch ngoài ngưỡng thì ghi DIEU_CHINH_BAN_DE.xlsx và dừng bằng LoiChoXacNhan TRỪ KHI admin chọn đúng một cờ:
+    `ap_dung_dieu_chinh` (dịch về trung bình chung) hoặc `giu_diem_goc`. Không lệch thì không cần cờ. `bo_cau`
+    {(club_id, số câu)}: câu admin đã xác nhận bỏ (V§7.5), chấm lại cho mọi học sinh. Luôn ghi PHAN_TICH_CAU_HOI.xlsx."""
     import fa_daa
+    import phan_tich_cau_hoi as pt
+    from fractions import Fraction
     from i18n_errors import format_all
+
+    if ap_dung_dieu_chinh and giu_diem_goc:
+        raise LoiTepXuat("chỉ chọn MỘT trong --ap-dung-dieu-chinh và --giu-diem-goc")
+    theo_tep = None
+    if bien_the_tep:
+        theo_tep = {}
+        loi_de = [x for c in de["cau_lac_bo"] for x in pt.kiem_bien_the(c)]
+        if loi_de:
+            raise LoiTepXuat("de_thi.json: " + "; ".join(loi_de))
+        for ten, chu in bien_the_tep.items():
+            if chu not in pt.CHU_BIEN_THE:
+                raise LoiTepXuat("đề %r không hợp lệ (A, B hoặc C)" % chu)
+            k = pt.CHU_BIEN_THE.index(chu)
+            de_t = copy.deepcopy(de)
+            for c in de_t["cau_lac_bo"]:
+                if c["de_thi"] and k < len(pt.cac_bien_the(c)):
+                    c["de_thi"] = pt.cac_bien_the(c)[k]
+                elif c["de_thi"] and len(pt.cac_bien_the(c)) > 1:
+                    raise LoiTepXuat("tệp %s là đề %s nhưng CLB %s chỉ có %d đề" % (ten, chu, c["club_id"], len(pt.cac_bien_the(c))))
+            theo_tep[ten] = (chu, de_t)
 
     if not so_nhap_clb:
         raise LoiTepXuat("chế độ FA-DAA cần Sổ nhập CLB (--so-nhap-clb) để biết Loại của từng CLB")
@@ -1104,7 +1144,7 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
     for d in quiz_xlsx:
         tieu_de, cac_dong = doc_tep_xuat(d)
         cac_tep.append((os.path.basename(d), tieu_de, cac_dong))
-    hoc_sinh, cb = phan_tich_chi_thi(de, danh_sach, cac_tep, co_so, fa=True)
+    hoc_sinh, cb = phan_tich_chi_thi(de, danh_sach, cac_tep, co_so, fa=True, theo_tep=theo_tep)
     if not cac_tep:
         cb = [x for x in cb if "có đề thi nhưng không tệp Forms" not in x[2]]
     canh_bao += cb
@@ -1121,15 +1161,53 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
                 if _da_thi(dong, cot, clb) and email in t:
                     gio.setdefault(clb["club_id"], {}).setdefault(email, t[email])
     nhanh = {ma: co_nhanh_qua(t) for ma, t in gio.items()}
+    bai_cua = {}                                                   # club_id -> [(bài, khoá email)]
     for hs in hoc_sinh:
         e = hs["student_id"]                                        # lúc này là khoá email (như doc_lists)
         for bai in hs["bai_thi"]:
             clb = theo_ma[bai["club_id"]]
-            bai["diem_so_nhap"] = quy_diem_10(bai["diem"], bm.diem_toi_da(de, clb))
+            bo = {k for c, k in bo_cau if c == bai["club_id"]}
+            bai["diem_10_tho"] = (Fraction(10 * sum(d for i, d in enumerate(bai["dung"], 1) if i not in bo),
+                                           len(bai["dung"]) - len(bo)) if len(bai["dung"]) > len(bo) else Fraction(0)) \
+                if bo else Fraction(str(bai["diem"])) / Fraction(str(bm.diem_toi_da(de, clb))) * 10
+            bai["diem_so_nhap"] = pt.diem_dieu_chinh(bai["diem_10_tho"], 0)
+            bai_cua.setdefault(bai["club_id"], []).append((bai, e))
             if e in nhanh.get(bai["club_id"], ()):
                 bai["nhanh_qua"] = True
                 canh_bao.append((hs["dong"], e, "%s: làm bài quá nhanh (dưới 1/3 thời gian trung vị của CLB này) "
                                  "— gắn cờ, cho thi lại một lần bằng đề khác nếu admin đồng ý" % bai["club_id"]))
+    so_sanh = {}
+    if cac_tep:
+        for ma, ds in bai_cua.items():
+            theo_de = {}
+            for bai, _ in ds:
+                if bai["nap"]:
+                    theo_de.setdefault(bai.get("bien_the", "A"), []).append(float(bai["diem_10_tho"]))
+            if len(theo_de) > 1:
+                so_sanh[ma] = pt.so_sanh_bien_the(theo_de)
+        hang_cau = pt.phan_tich_cau([{"sid": e, "club_id": b["club_id"], "bien_the": b.get("bien_the", "A"), "dung": b["dung"]}
+                                     for ds in bai_cua.values() for b, e in ds])
+        os.makedirs(thu_muc_ra, exist_ok=True)
+        pt.ghi_bao_cao(os.path.join(thu_muc_ra, "PHAN_TICH_CAU_HOI.xlsx"), hang_cau=hang_cau)
+        for r in hang_cau:
+            for co in r["co"]:
+                canh_bao.append(("", "", "%s đề %s câu %d: %s (%.0f%% đúng) — xem PHAN_TICH_CAU_HOI.xlsx"
+                                 % (r["club_id"], r["bien_the"], r["cau"], co, 100 * r["ti_le_dung"])))
+    if so_sanh:
+        pt.ghi_bao_cao(os.path.join(thu_muc_ra, "DIEU_CHINH_BAN_DE.xlsx"), so_sanh_theo_clb=so_sanh)
+        lech = [ma for ma, kq in so_sanh.items() if kq["co_lech"]]
+        if lech and not (ap_dung_dieu_chinh or giu_diem_goc):
+            raise LoiChoXacNhan(
+                "CLB %s: điểm giữa các đề lệch ngoài ngưỡng ngẫu nhiên (xem DIEU_CHINH_BAN_DE.xlsx). Chưa ghi %s. Chạy lại với "
+                "--ap-dung-dieu-chinh (dịch điểm mỗi đề về trung bình chung) hoặc --giu-diem-goc (giữ điểm đã chấm)."
+                % (", ".join(lech), TEN_SO))
+        if ap_dung_dieu_chinh:
+            for ma in [m for m, kq in so_sanh.items() if kq["co_lech"]]:
+                for bai, e in bai_cua[ma]:
+                    dich = so_sanh[ma]["bien_the"].get(bai.get("bien_the", "A"), {}).get("dich", 0.0)
+                    if dich:
+                        bai["diem_so_nhap"] = pt.diem_dieu_chinh(bai["diem_10_tho"], dich)
+                canh_bao.append(("", "", "%s: đã dịch điểm các đề về trung bình chung (admin xác nhận --ap-dung-dieu-chinh)" % ma))
     if cac_tep:
         for hs in hoc_sinh:
             nap = {b["club_id"] for b in hs["bai_thi"] if b["nap"]}
@@ -1185,6 +1263,14 @@ def main(argv=None):
                          "tệp đặt ở vị trí bắt buộc là bài thi (có thể không có)")
     ap.add_argument("--so-nhap-clb", help="Sổ nhập CLB do chuyen_phieu_clb.py sinh (chỉ với --fa-daa)")
     ap.add_argument("--dang-ky", nargs="+", help="tệp Forms đăng ký (FA-M2), mỗi ngày một tệp (chỉ với --fa-daa)")
+    ap.add_argument("--bien-the-tep", nargs="+", metavar="TEN_TEP=DE",
+                    help="tệp bài thi của đề biến thể, ví dụ thi_B.xlsx=B; tệp không ghi là đề A (chỉ với --fa-daa)")
+    ap.add_argument("--ap-dung-dieu-chinh", action="store_true",
+                    help="admin xác nhận: dịch điểm mỗi đề về trung bình chung khi các đề lệch (chỉ với --fa-daa)")
+    ap.add_argument("--giu-diem-goc", action="store_true",
+                    help="admin xác nhận: giữ điểm đã chấm dù các đề lệch (chỉ với --fa-daa)")
+    ap.add_argument("--bo-cau", nargs="+", metavar="CLB-SO",
+                    help="câu admin xác nhận bỏ, ví dụ clb_covua-3; chấm lại cho mọi học sinh (chỉ với --fa-daa)")
     ap.add_argument("--nhan-ban-nhap", action="store_true",
                     help="giữ cả dòng TrangThai = DRAFT của List (chỉ với --fa-daa, đường A)")
     a = ap.parse_args(argv)
@@ -1195,8 +1281,12 @@ def main(argv=None):
             ap.error("--fa-daa cần đúng một nguồn đăng ký: --dang-ky (Forms, đường B) hoặc --lists (CSV, đường A)")
         if a.chi_thi:
             ap.error("--fa-daa không dùng chung với --chi-thi")
-    elif a.so_nhap_clb or a.dang_ky or a.nhan_ban_nhap:
-        ap.error("--so-nhap-clb, --dang-ky và --nhan-ban-nhap chỉ dùng cùng --fa-daa")
+        if a.ap_dung_dieu_chinh and a.giu_diem_goc:
+            ap.error("chỉ chọn MỘT trong --ap-dung-dieu-chinh và --giu-diem-goc")
+    elif (a.so_nhap_clb or a.dang_ky or a.nhan_ban_nhap or a.bien_the_tep or a.ap_dung_dieu_chinh or a.giu_diem_goc
+          or a.bo_cau):
+        ap.error("--so-nhap-clb, --dang-ky, --nhan-ban-nhap, --bien-the-tep, --ap-dung-dieu-chinh, --giu-diem-goc và "
+                 "--bo-cau chỉ dùng cùng --fa-daa")
     if not a.tep_xuat and not a.fa_daa:
         ap.error("cần ít nhất một tệp .xlsx")
     if a.bai_thi is not None and not a.chi_thi:
@@ -1212,11 +1302,17 @@ def main(argv=None):
     try:
         if a.fa_daa:
             kq = chuyen_fa_daa(a.ra, bm.doc_de_thi(a.de), a.so_nhap_clb, dang_ky_xlsx=a.dang_ky or (), lists=a.lists,
-                               quiz_xlsx=a.tep_xuat, nhan_ban_nhap=a.nhan_ban_nhap, co_so=a.co_so)
+                               quiz_xlsx=a.tep_xuat, nhan_ban_nhap=a.nhan_ban_nhap, co_so=a.co_so,
+                               bien_the_tep=dict(x.split("=", 1) for x in a.bien_the_tep or []) or None,
+                               ap_dung_dieu_chinh=a.ap_dung_dieu_chinh, giu_diem_goc=a.giu_diem_goc,
+                               bo_cau={(x.rsplit("-", 1)[0], int(x.rsplit("-", 1)[1])) for x in a.bo_cau or []})
         elif a.chi_thi:
             kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so, a.bai_thi)
         else:
             kq = chuyen(a.tep_xuat[0], a.ra, bm.doc_de_thi(a.de))
+    except LoiChoXacNhan as e:
+        print("CHỜ ADMIN XÁC NHẬN — %s" % e, file=sys.stderr)
+        return 3
     except (bm.LoiDeThi, LoiTepXuat) as e:
         print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
         return 1

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M4: Đề biến thể, phân tích câu hỏi và cân bằng điểm giữa các đề (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `chon_bien_the` (crc32(email) % n), `kiem_bien_the`, `phan_tich_cau` (V§7.5: % đúng, độ phân biệt 1/3 trên - 1/3 dưới, cờ PHAN_BIET_AM / QUA_DE / QUA_KHO), `so_sanh_bien_the` (D11: ngưỡng z·√(s²/n+s²/n), z = 1,96 hoặc 2,39; n < 5 chỉ báo; vượt ngưỡng thì dịch về trung bình chung; làm tròn nửa lên, kẹp 0-10), lệnh `chia` (Email -> đề giao, đề thi lại).
+- `tao_mau_forms.py --bien-the`: mỗi CLB có `de_thi_bien_the` (đề B, C trong de_thi.json) sinh một biểu mẫu cho từng đề + `CAI_DAT_FORMS_BIEN_THE.md` (time limit BẬT, xáo câu và lựa chọn BẬT). Lệch so với bảng việc: phần hướng dẫn nằm ở tệp riêng này, không chèn vào `CAI_DAT_FORMS_CHI_THI.md`, để chế độ `--chi-thi` vẫn giống hệt từng byte khi không có cờ.
+- `chuyen_forms_sang_phan_mem.py --fa-daa`: `--bien-the-tep`, `--ap-dung-dieu-chinh`, `--giu-diem-goc`, `--bo-cau`; có chênh lệch ngoài ngưỡng thì ghi `DIEU_CHINH_BAN_DE.xlsx` rồi dừng (mã thoát 3) tới khi admin chọn một cờ; luôn ghi `PHAN_TICH_CAU_HOI.xlsx`.
+- Không cờ: `--chi-thi`, `--moi-clb` (sinh tệp) và chế độ mặc định của bộ chuyển đổi cho ra đúng như trước (so bằng `diff -r` và so nội dung ô).
+- Test mới: `tests/test_fa_m4_phan_tich.py` (24 ca).
+
 ## 2026-11-09 — FA-M3: Bộ chuyển đổi chế độ FA-DAA (đường A và đường B) (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx (--dang-ky FORMS... | --lists LIST.csv) [bài thi...]`: Loại CLB, chỉ tiêu, điểm sàn, giữ chỗ lấy từ Sổ nhập CLB của FA-M1; đường B đọc biểu mẫu FA-M2 và nối `dat_huy_chuong_duong_b` (không đổi hành vi, 19 test cũ xanh); đường A (`doc_lists(fa=True)`) bỏ dòng DRAFT (trừ `--nhan-ban-nhap`), lấy lần lưu cuối, điền huy chương mặc định khi ô trống và HC_TuChinh không đặt; bỏ nguyện vọng trùng và báo; điểm thi quy về nguyên 0-10 (D7, tính bằng phân số); em xếp CLB Tuyển chọn mà chưa thi -> cảnh báo NOT_ATTEMPTED; làm bài dưới 1/3 trung vị -> cờ (D9, chỉ báo); soát huy chương bằng `fa_daa.kiem_ho_so_huy_chuong`; không soát hai quỹ 100 điểm cũ.
