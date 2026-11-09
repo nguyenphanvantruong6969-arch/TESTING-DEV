@@ -129,3 +129,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus | Night 4 running on collaborator side; wrote chained auto plan (Opus review night 4 -> Sonnet night 5) in Next steps | No task created by this session |
 | 2026-11-09 | Opus | Gave Truong a self-review/self-fix loop prompt (two recurring tasks, stop rules in Next steps 5); no new work | Context over limit |
 | 2026-11-09 | Opus | Answered vision coverage (projected after night 5: P1 ~90 %, P2 ~95 %, P3 ~30-40 %, overall ~75-80 %; gaps: real Microsoft test/D8, full CI + Windows build, P3 features, admin dashboard §11). No night-4 commits on this branch yet at 2026-11-09 ~23:00 | No new work |
+| 2026-11-09 | Opus | Answered: Forms yes (setup form, quizzes, surveys); Power Apps vs Forms-only registration = D8 open; NOT everything in M365 (kiosk + converters run offline on the IT Windows PC, files moved by Excel/CSV) | No new work |
