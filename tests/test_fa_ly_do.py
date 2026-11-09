@@ -15,7 +15,7 @@ import pytest
 import fa_daa
 import fa_ly_do
 import rbda_priority_pipeline as rp
-from _fa import bat_fa, dung_fa_clb, dung_hs_fa
+from _fa import bat_fa, dung_fa_clb, dung_hs_fa, ma
 from test_fa_chay import _bo, _chay
 from test_fa_toi_thieu import _nho
 
@@ -269,3 +269,44 @@ def test_khong_sua_dau_vao():
     sao = copy.deepcopy((kq.preferences, kq.ket_qua.assignment))
     fa_daa.ly_do_ket_qua(kq, bo["preferences"], bo["huy_chuong"], bo["fa_clb"])
     assert sao == (kq.preferences, kq.ket_qua.assignment)
+
+
+def test_fa_s7_xuat_ly_do_chi_lay_lan_chay_moi_nhat(api, tmp_path):
+    """FA-S7: lần chạy mới nhất không phải FA -> báo lỗi, không xuất lý do của lần FA cũ."""
+    _dung(api)
+    assert api.run_pipeline(seed=9)["ok"]                # run 1 (FA)
+    assert api.run_pipeline(seed=9)["ok"]                # run 2 (FA)
+    import cau_hinh_ws as ch
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": False, "wharton": False}})
+    assert api.run_pipeline(seed=9)["ok"]                # run 3 (không FA)
+    ra = api.export_ly_do_csv(str(tmp_path / "a.csv"))
+    assert not ra["ok"] and ma(ra["errors"]) == ["fa_chua_co_ly_do"]
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": True, "wharton": True}})
+    assert api.run_pipeline(seed=9)["ok"]                # run 4 (FA)
+    ra = api.export_ly_do_csv(str(tmp_path / "b.csv"))
+    assert ra["ok"], ra
+    assert ra["data"]["run_id"] == 4
+
+
+def test_fa_s9_chay_hong_sau_khi_ghi_fa_rollback_ca_hai_bang(api, monkeypatch):
+    """FA-S9: lỗi ném SAU lần ghi FA cuối (bước khoá điểm) -> fa_nhom, fa_ly_do, match_results,
+    run_history giữ nguyên như sau lần chạy trước."""
+    _dung(api)
+    assert api.run_pipeline(seed=9)["ok"]
+
+    def chup():
+        with api._ket_noi_doc() as cur:
+            return {b: [tuple(r) for r in cur.execute("SELECT * FROM %s ORDER BY 1, 2, 3" % b)]
+                    for b in ("fa_nhom", "fa_ly_do", "match_results", "run_history")}
+
+    truoc = chup()
+    assert truoc["fa_ly_do"]
+
+    def hong(*a, **k):
+        raise RuntimeError("hỏng giả sau khi ghi FA")
+
+    monkeypatch.setattr(api, "_wharton_dang_khoa", hong)
+    ra = api.run_pipeline(seed=9)
+    assert not ra["ok"]
+    assert any(s["step"] == "rollback" for s in ra["data"]["steps"])
+    assert chup() == truoc

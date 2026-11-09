@@ -1634,8 +1634,10 @@ class XuatKetQuaMixin:
         import csv
         try:
             with self._ket_noi_doc() as cur:
-                run_id = cur.execute("SELECT MAX(run_id) FROM fa_ly_do").fetchone()[0]
-                if run_id is None:
+                # FA-S7: chỉ lần chạy MỚI NHẤT; lần đó không phải FA -> không xuất lý do cũ.
+                run_id = cur.execute("SELECT MAX(run_id) FROM run_history").fetchone()[0]
+                if run_id is None or cur.execute(
+                        "SELECT 1 FROM fa_ly_do WHERE run_id = ? LIMIT 1", (run_id,)).fetchone() is None:
                     return _fail(err("fa_chua_co_ly_do"))
                 dong = cur.execute(
                     "SELECT l.student_id, l.buoi, l.club_id, COALESCE(c.name, l.club_id), "

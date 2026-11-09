@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S7, FA-S9: xuất lý do chỉ của lần chạy mới nhất; test rollback bảng FA (đêm 3)
+
+- `api_xuat.py` (`_export_ly_do_da_khoa`): lấy lần chạy mới nhất trong `run_history`; lần đó không có lý do FA thì trả `fa_chua_co_ly_do` (không xuất lý do của lần FA cũ hơn).
+- FA-S9 (chỉ test): lỗi ném sau lần ghi FA cuối -> `fa_nhom`, `fa_ly_do`, `match_results`, `run_history` giữ nguyên.
+- Test mới (trong tệp cũ): `tests/test_fa_ly_do.py` `test_fa_s7_xuat_ly_do_chi_lay_lan_chay_moi_nhat`, `test_fa_s9_chay_hong_sau_khi_ghi_fa_rollback_ca_hai_bang`.
+
 ## 2026-11-09 — FA-S8: nhập CSV CLB khi FA tắt giữ nguyên dòng (đêm 3)
 
 - `api_nhap.py` (`import_clubs_csv`): FA tắt thì không đọc cột FA nữa (ô loại sai không còn làm bỏ dòng); dòng vẫn được tạo, một cảnh báo `fa_cot_bo_qua`. FA bật: như cũ.
