@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-SOAT2: soát đêm 2 và mở đêm 3 (chỉ tài liệu, chưa sửa lỗi)
+
+- `docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md`: kết luận GO; danh sách sửa FA-S1..FA-S11 (6 lỗi mới của bộ chuyển đổi / bộ sinh, 4 phát hiện còn mở của soát đêm 1, 1 chỗ hở email ↔ mã học sinh). Theo yêu cầu của Truong: chưa sửa.
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §6: spec đêm 3 (sửa lỗi rồi FA-UI-1..5). `docs/phien/CHAY_DEM_FA_DAA.md`: giao thức đêm 3. `docs/phien/claude__keen-ride-72sa7t.md`: Plan đêm 3.
+
 ## 2026-11-09 — FA-M6: Tài liệu sau khi xếp (kết quả, phản hồi, khiếu nại, nhắc hạn, điểm danh) (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `docs/he_sinh_thai/FA_SAU_XEP.md` (mới, chỉ tài liệu): `ket_qua_ly_do.csv` -> list `KetQua` (cách C; IT ghép email), màn kết quả và ba nút phản hồi -> list `PhanHoi`, Forms khiếu nại (3 ngày, chỉ lỗi dữ liệu, chạy lại cùng seed) và khảo sát tuần 3, flow nhắc (mở cổng, -2 ngày, -3 giờ, NOT_ATTEMPTED hai lần, dưới 50 % sau 3 ngày -> GVCN), phép tính hạn mức 6.000 (mỗi em một thư chạm hạn mức; gửi lô Bcc 50 người ≈ 225 yêu cầu), list `DiemDanh` với cột tính `GiaiPhong`, xuất danh sách chờ; bảng kiểm K1..K14 (TH). Không nói đường nào nên chọn (D8 mở).

@@ -34,9 +34,15 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [x] FA-M4 quiz variants + item analysis + D11 equating `phan_tich_cau_hoi.py` (needs FA-M3)
 - [x] FA-M5 Power Apps spec v2 (path A) + `bo_dung_t4m` columns (needs FA-M3)
 - [x] FA-M6 after-allocation docs `FA_SAU_XEP.md` (needs FA-M5)
-- [ ] Night 3: FA-UI kiosk screens (Chromium tests)
 - [x] Opus review night 1 (2026-11-09: GO; report bao_cao_dem/2026-11-09_soat_dem1.md)
-- [ ] Opus review night 2, night 3 before the next night starts
+- [x] Opus review night 2 (2026-11-09: GO with fix list; report bao_cao_dem/2026-11-09_soat_dem2.md; nothing fixed, Truong's instruction)
+Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6; order in CHAY_DEM_FA_DAA.md C.5):
+- [ ] FA-S7 export reasons of the latest run only   - [ ] FA-S8 CSV import keeps row when FA off   - [ ] FA-S9 rollback test fa_nhom/fa_ly_do
+- [ ] FA-S3 D11 small comparison group -> no shift   - [ ] FA-S1 retake counts only when flagged + retake variant
+- [ ] FA-S2 --bo-cau per variant   - [ ] FA-S4 warn on unreadable quiz times   - [ ] FA-S5 warn on wrong variant
+- [ ] FA-S6 generator reads Loại (--so-nhap-clb)   - [ ] FA-S11 email <-> student_id join for KetQua   - [ ] FA-S10 plan §4 D8 row
+- [ ] FA-UI-1 FA switch   - [ ] FA-UI-2 club columns   - [ ] FA-UI-3 medal step   - [ ] FA-UI-4 reasons + exports   - [ ] FA-UI-5 user guide
+- [ ] Opus review night 3
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
@@ -58,9 +64,9 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Opus: review night 2 (esp. FA-M3/FA-M4 converter wiring), then release night 3 (FA-UI, Chromium tests).
-2. Sonnet night 3: FA-UI after the Opus release.
-3. Truong: GĐ2 meeting -> decide D8; answer night-1 questions; decide whether to fix review findings 1-2.
+1. Sonnet night 3: follow `docs/phien/CHAY_DEM_FA_DAA.md` (night-3 version): FA-S1..FA-S11, then FA-UI-1..5.
+2. Opus: review night 3.
+3. Truong: GĐ2 meeting -> decide D8; confirm the 2 wording points in the night-2 review (path B options, [code] in titles).
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -91,3 +97,4 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 | 2026-11-09 | Sonnet | FA-M5: T4M_DAC_TA_SUA_APP §12 (R39-R54) + bo_dung_t4m ECA_FA + tao_bo_dung_t4m --fa-daa; tests/test_fa_m5_bo_dung.py 10; related 208 passed (after scoping old R1..R38 test); default kit byte-identical; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | FA-M6: docs/he_sinh_thai/FA_SAU_XEP.md (docs only) + tests/test_fa_m6_tai_lieu.py 6; related passed; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | Night 2 report 2026-11-09: 6/6 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem2.md | RUNNING line removed |
+| 2026-11-09 | Opus | Reviewed night 2: GO; 6 new bugs + 4 open night-1 findings + 1 email gap listed as FA-S1..S11 (not fixed, Truong's instruction); wrote plan §6 and night-3 protocol | Repro: FA-S3, FA-S4; 197 related tests pass |

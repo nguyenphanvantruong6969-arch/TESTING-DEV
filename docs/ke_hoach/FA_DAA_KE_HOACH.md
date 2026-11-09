@@ -200,3 +200,43 @@ After DA (first pass):
 Stop the current item and mark it BLOCKED in the handoff file when: an invariant would break; the baseline is red;
 a new library is needed; the schema or CSV contract must change beyond what the item says; the same test fails after
 3 honest attempts. Then continue with the next item that does not depend on it.
+
+## 6. Night 3: fix list, then kiosk screens (Opus, 2026-11-09, after the night-2 review)
+
+Source of the fix list: `docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md` (and `..._soat_dem1.md` #1-#4). Truong asked
+that the review only LIST bugs; night 3 fixes them. Each fix: failing test first that reproduces the bug, minimal
+fix, related tests. Default (non-FA) behaviour and outputs stay byte-identical (invariant 1; converter/generator
+without `--fa-daa` byte-identical).
+
+### 6.1 Kiosk fixes (first)
+| Code | Fix | kiem_nhan |
+|---|---|---|
+| FA-S7 | `api_xuat.py` `_export_ly_do_da_khoa`: export the reasons of the LATEST run only. If the latest `run_history` row is not an FA run (no `fa_ly_do` rows for it), return `_fail` with a code saying the latest run has no reasons (reuse `fa_chua_co_ly_do` or add one in `i18n_errors.py` + `tao_i18n_js.py`) | `tests/test_fa_ly_do.py` (or new): run FA (run 2), turn FA off, run (run 3) -> export fails with the code; run FA again -> exports run 4 |
+| FA-S8 | `api_nhap.py` club CSV import: when FA is OFF, ignore FA columns entirely (one `fa_cot_bo_qua` warning) and KEEP the row; when FA is ON, keep today's behaviour | CSV `club_id,name,capacity,loai` with `C1,...,abc`, FA off -> C1 and C2 created + warning; FA on -> unchanged |
+| FA-S9 | Test only: rollback of `fa_nhom` and `fa_ly_do` | inject a failure after the last FA write in `_run_pipeline_da_khoa`; both tables and `match_results` unchanged; `run_history` unchanged |
+
+### 6.2 Converter / generator fixes (`mau_forms_thi_clb/`, all TH)
+| Code | Fix | kiem_nhan |
+|---|---|---|
+| FA-S1 | Retake (V§7.2): in `--fa-daa`, a second attempt for the same club counts ONLY if the first attempt was flagged "too fast" (D9) AND the second file is the student's retake variant (`chon_bien_the_thi_lai`); then it REPLACES attempt 1. Any other second attempt: keep attempt 1, warn. "First attempt" = the file whose variant is `chon_bien_the(email)`, never the CLI file order. D9 median uses first attempts only. Default modes keep "giữ bài đầu" | flagged + retake variant -> score from attempt 2; unflagged second attempt -> ignored + warning; swapping the order of quiz files on the command line gives identical output |
+| FA-S2 | `--bo-cau` keys `(club, variant, item)`; CLI `CLB-DE-SO` (e.g. `C3-B-4`). `CLB-SO` accepted only when the club has one variant (else error naming the variants) | dropping item 4 of variant B leaves variant A scores unchanged; old form errors for a 2-variant club |
+| FA-S3 | `so_sanh_bien_the`: `N_NHO` (report, no shift) when EITHER side has n < `N_TOI_THIEU` | `{A: 10 scores, B: 3}` -> no `dich` for A or B, `co_lech` False |
+| FA-S4 | `_thoi_gian_lam_bai`: accept `datetime` cells and ISO text; when the time columns exist but some rows cannot be read, add ONE warning per file with the count (no guessing of day/month order) | `11/9/26 08:00:00` rows -> warning with count; ISO and datetime rows -> seconds |
+| FA-S5 | Warn when a quiz file's variant differs from the variant assigned to that email (`chon_bien_the`, or `chon_bien_the_thi_lai` for an allowed retake). Keep the score (admin decides) | wrong-variant submission -> one warning naming email, club, variant given/expected |
+| FA-S6 | `tao_mau_forms.py --fa-daa --so-nhap-clb <FA-M1 sổ>`: read Loại with `chuyen_forms_sang_phan_mem.doc_clb_fa`; FREE clubs are left out of the gold question. Without `--so-nhap-clb`: today's behaviour + its note | with the sổ: no FREE club among gold options; without: output byte-identical to now |
+| FA-S11 | Converter `--fa-daa` also writes `EMAIL_MA_HS.csv` (email, student_id; IT machine only, personal data) and a script `mau_forms_thi_clb/ghep_ket_qua_email.py` that joins `ket_qua_ly_do.csv` + that file into `KETQUA_NHAP_LIST.csv` with the `KetQua` columns of `FA_SAU_XEP.md` §2; update §2 "Lấy từ" of `Email` | join test: every row gets its email; a student missing from the mapping -> warning, row kept with empty Email |
+
+### 6.3 Docs fix
+- FA-S10: plan §4 D8 table, path B row: "medals by order + gold and silver/bronze-swap questions (all 6 placements)".
+
+### 6.4 Kiosk screens FA-UI (after 6.1-6.3; Chromium tests `tests/test_giao_dien_fa_*.py`, pattern of
+`tests/test_giao_dien_wharton.py`; texts in `i18n.js` vi + en; no jargon, never "Wharton", avoid "FA-DAA" on screen)
+| Code | Screen | kiem_nhan |
+|---|---|---|
+| FA-UI-1 | Workspace settings (`js/075_workspace.js`): switch "Xếp theo loại CLB và huy chương" (`rules.fa_daa`); refused with the existing error when `wharton` is off | toggle round-trips; refusal shown |
+| FA-UI-2 | Club table (`js/05_quan_ly.js`): columns Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, Giữ chỗ (count) only when FA is on | columns hidden when FA off (page identical to now) |
+| FA-UI-3 | On-site entry (`js/04_nhap_tai_cho.js`): when FA is on, a "Huy chương" step replaces `renderWhartonStep`: 3 slots prefilled with the D2 defaults; the student can move any medal (all 6 placements reachable); no medal on FREE clubs; V§6.1 note when gold is on a SELECTIVE club; saves through `submit_huy_chuong` | Chromium: default prefill; reach all 6 placements; FREE club cannot take a medal; server error shown |
+| FA-UI-4 | Results (`js/03_ket_qua.js` / `js/09_the_xem.js`): show the reason sentence per student; admin buttons for `export_ly_do_csv` and `export_bang_nhu_cau` | sentence visible; both exports produce files; nothing shown when FA off |
+| FA-UI-5 | `HUONG_DAN_SU_DUNG.md`: one FA section (turn on, import Sổ nhập with types, medals, read reasons, demand table) | doc test if one exists for the guide |
+
+Not in night 3 (Truong did not select): attendance, appeals, round 2 in the kiosk; FA-9; FA-10.
