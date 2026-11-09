@@ -24,6 +24,7 @@
 12. [Thuật toán làm gì](#12-thuật-toán-làm-gì)
 13. [Giới hạn đã biết](#13-giới-hạn-đã-biết)
 14. [Điểm quyết tâm (tuỳ chọn)](#14-điểm-quyết-tâm-tuỳ-chọn)
+15. [Xếp theo loại CLB và huy chương (tuỳ chọn)](#15-xếp-theo-loại-clb-và-huy-chương-tuỳ-chọn)
 
 ---
 
@@ -1094,6 +1095,58 @@ chặn chạy) và số học sinh vắng thi (mức vừa).
 Một học sinh tick thi CLB X và đặt điểm quỹ 1 cho X, nhưng đến lúc xếp không có điểm thi ở X. Khi đó X được xét như
 CLB **không thi** của em: điểm quỹ 1 đã đặt cho X **không được tính**; nếu em có đặt điểm quỹ 2 cho X thì dùng điểm
 đó, không có thì tính 0. Lần chạy vẫn tiếp tục; cảnh báo nằm trong chi tiết của bước Kiểm tra dữ liệu.
+
+## 15. Xếp theo loại CLB và huy chương (tuỳ chọn)
+
+Mặc định **TẮT**: không bật thì phần mềm chạy y hệt như trước. Khi bật, mỗi CLB có một **loại**, mỗi học sinh
+đặt **ba huy chương** mỗi ngày, và mỗi kết quả có một câu giải thích cho chính học sinh đó.
+
+### Bật
+
+1. Bấm tên không gian làm việc ở góc trên → **Tạo mới** → **Tuỳ chỉnh từ vựng và luật** → sang bước luật.
+2. Đánh dấu **Xếp theo loại CLB và huy chương**. Ô **Dùng điểm quyết tâm** phải đang bật (huy chương được lưu
+   như điểm quyết tâm); tắt ô đó mà vẫn bật ô này thì phần mềm từ chối tạo và báo lỗi.
+3. Xem lại rồi bấm **Tạo**. Không gian làm việc mới mở ra với chế độ này.
+
+### Sổ nhập CLB có thêm cột
+
+Trang `1. CLB` nhận thêm bốn cột (bỏ trống được):
+
+| Cột | Nghĩa |
+|---|---|
+| **Loại** | **Tự do** (nhận mọi học sinh, không giới hạn chỗ), **Giới hạn** (có chỉ tiêu, không xét điểm thi), **Tuyển chọn** (có chỉ tiêu và thử thách). |
+| **Điểm sàn** | Chỉ với CLB Tuyển chọn: học sinh dưới mốc này, hoặc chưa làm thử thách, không được xét CLB đó. |
+| **Tối thiểu** | CLB Giới hạn và Tuyển chọn: số thành viên ít nhất để CLB mở. Thiếu thì CLB tạm không mở kỳ này; CLB thiếu nhiều nhất đóng trước, rồi xếp lại. |
+| **Sức chứa phòng** | Chỉ với CLB Tự do: đông hơn số này thì chia thành nhiều nhóm theo số bốc thăm. |
+
+Trang **Giữ chỗ** (tuỳ chọn): mỗi dòng một cặp *Mã CLB*, *Mã học sinh* được giữ chỗ trước. Học sinh chưa có
+CLB nào trong ngày được đưa vào CLB Tự do ít người nhất.
+
+Không gian làm việc chưa bật chế độ này thì các cột trên bị bỏ qua (có một cảnh báo), dòng CLB vẫn được nạp.
+Bật rồi thì ở thẻ **Quản lý**, bảng CLB có thêm các cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, Giữ chỗ.
+
+### Huy chương (thẻ Nhập nguyện vọng, bước 3)
+
+- Mỗi ngày có **Vàng (60)**, **Bạc (30)**, **Đồng (10)**. Phần mềm điền sẵn theo thứ tự nguyện vọng, bỏ qua CLB
+  Tự do: vàng cho CLB đầu tiên, bạc cho CLB thứ hai, đồng cho CLB thứ ba.
+- Chọn CLB khác cho một huy chương; nếu CLB đó đang có huy chương khác thì hai huy chương đổi chỗ. Đổi như vậy
+  đặt được mọi cách. CLB Tự do không nhận huy chương.
+- Vàng đặt ở CLB Tuyển chọn thì có dòng nhắc: huy chương ở đó chỉ được tính khi bằng điểm, và chỉ khi đã vượt
+  điểm sàn.
+- Bấm **Lưu huy chương**. Phần mềm kiểm lại và báo nếu sai; sau lần chạy xếp, huy chương bị khoá như điểm quyết tâm.
+
+### Đọc lý do kết quả
+
+Thẻ **Chi tiết và xuất tệp**, bảng *Danh sách xếp CLB* có thêm cột **Lý do**: các câu giải thích của lần chạy
+mới nhất cho học sinh ở dòng đó (được xếp vào đâu, vì sao chưa vào các CLB xếp trên). Câu chỉ nói về chính học
+sinh đó, không có mã hay tên học sinh nào khác. Bấm **Xuất lý do kết quả (CSV)** để ghi `ket_qua_ly_do.csv`
+(mỗi dòng một học sinh, một CLB, một ngày). Lần chạy mới nhất không dùng chế độ này thì không có gì để xuất.
+
+### Bảng nhu cầu cho giáo viên
+
+Bấm **Xuất bảng nhu cầu (CSV)** để ghi `bang_nhu_cau.csv`: mỗi CLB có số học sinh xếp đầu tiên, số học sinh có
+CLB trong nguyện vọng, số đạt điểm sàn, chỉ tiêu và số giữ chỗ. Tệp không có mã hay tên học sinh nên gửi cho
+giáo viên xét chỉ tiêu được.
 
 ---
 

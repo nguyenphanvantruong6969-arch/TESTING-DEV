@@ -65,3 +65,17 @@ def test_khong_du_lieu_that_va_khong_ten_gia_cho_nguoi_that():
     d = _doc()
     assert "@" not in d.replace("@odata", "")
     assert "https://" not in d and not re.search(r"tenantId\s*[:=]\s*\S", d)
+
+
+def test_fa_ui_5_huong_dan_su_dung_co_muc_xep_theo_loai_clb():
+    """FA-UI-5: HUONG_DAN_SU_DUNG.md có MỘT mục FA: bật, Sổ nhập có Loại, huy chương, đọc lý do, bảng nhu cầu."""
+    van = open(os.path.join(GOC, "HUONG_DAN_SU_DUNG.md"), encoding="utf-8").read()
+    tieu_de = "## 15. Xếp theo loại CLB và huy chương (tuỳ chọn)"
+    assert van.count(tieu_de) == 1
+    assert "[Xếp theo loại CLB và huy chương (tuỳ chọn)](#15-" in van              # có trong mục lục
+    muc = van[van.index(tieu_de):]
+    for tu in ("Xếp theo loại CLB và huy chương", "Dùng điểm quyết tâm", "Loại", "Điểm sàn", "Tối thiểu",
+               "Sức chứa phòng", "Giữ chỗ", "Tự do", "Giới hạn", "Tuyển chọn", "Vàng (60)", "Bạc (30)", "Đồng (10)",
+               "Lý do", "Xuất lý do kết quả (CSV)", "ket_qua_ly_do.csv", "Xuất bảng nhu cầu (CSV)", "bang_nhu_cau.csv"):
+        assert tu in muc, tu
+    assert "FA-DAA" not in muc and "Wharton" not in muc

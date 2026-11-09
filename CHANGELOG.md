@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-UI-5: mục hướng dẫn sử dụng "Xếp theo loại CLB và huy chương" (đêm 3, chỉ tài liệu)
+
+- `HUONG_DAN_SU_DUNG.md` §15 (mới) + mục lục: bật ở bước luật (cần điểm quyết tâm), bốn cột mới của Sổ nhập và trang Giữ chỗ, bước huy chương, cột Lý do và `ket_qua_ly_do.csv`, `bang_nhu_cau.csv`.
+- Test mới (trong tệp cũ): `tests/test_fa_m6_tai_lieu.py` `test_fa_ui_5_huong_dan_su_dung_co_muc_xep_theo_loai_clb`.
+
 ## 2026-11-09 — FA-UI-4: câu lý do ở thẻ kết quả và hai nút xuất (đêm 3)
 
 - `api_xuat.py`: `get_ly_do_ket_qua` (mới: câu giải thích của lần chạy mới nhất theo học sinh và buổi; FA tắt thì `fa_bat` false); `_doc_ly_do_moi_nhat` và `_cau_cua_dong` dùng chung với `_export_ly_do_da_khoa` (cùng kết quả như trước).
