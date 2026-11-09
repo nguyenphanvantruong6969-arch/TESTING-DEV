@@ -31,6 +31,7 @@ import statistics
 import threading
 import types
 
+import fa_daa
 from api_chung import (
     _fail_co_buoc,
     _now,
@@ -47,6 +48,7 @@ from rbda_priority_pipeline import (
     connect_db,
     default_reserve_eligible_fn,
     diem_wharton_hieu_luc,
+    dung_fa_daa,
     dung_wharton,
     generate_stb_lottery,
     init_db,
@@ -279,6 +281,7 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 ma_cau_hinh_hong = e.ma
             tran_thi = luat["max_tests"]   # trần của workspace; None = không giới hạn
             bat_wharton = dung_wharton(luat)   # điểm Wharton (A13): thêm mục cuối báo cáo
+            bat_fa = dung_fa_daa(luat)         # FA-DAA (FA-2): hồ sơ huy chương thay hồ sơ 100 điểm
             # Điểm theo NGƯỜI, hay không dùng điểm (priority "tier"): không còn "chấm từng
             # CLB" để mà soát — các mục 1, 2b, 8 (điểm từng CLB) bỏ qua; mục 1b thay vào.
             diem_tung_clb = (luat["score_scope"] != "per_person"
@@ -594,7 +597,13 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
                 # --- Điểm Wharton (A13): chỉ khi workspace bật; đặt SAU các mục sẵn có ------
                 # Cùng hai hàm mà lần chạy xếp dùng, trên dữ liệu đang lưu: hồ sơ sai sẽ CHẶN
                 # lần chạy nên là "high"; vắng thi chỉ làm em bị xét như không thi: "medium".
-                if bat_wharton:
+                if bat_fa:
+                    # FA-DAA: cùng hàm kiểm mà lần chạy xếp dùng. Lỗi chặn là "high", cảnh báo
+                    # (giữ chỗ không dùng được) là "medium".
+                    for e in fa_daa.kiem_fa_tu_csdl(cur):
+                        warn("medium" if e["code"] in fa_daa.MA_CANH_BAO else "high",
+                             e["code"], **e["params"])
+                elif bat_wharton:
                     # MỘT hàm dùng chung với thẻ Quản lý (`list_wharton_canh_bao`): cùng em, cùng số.
                     ho_so = self._ho_so_wharton_tat_ca(cur, luat)
                     em_sai = {sid for sid, loi_em in ho_so["loi"].items() if loi_em}
@@ -1040,7 +1049,18 @@ class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
             # gì, trả đủ danh sách lỗi. Mọi mã trừ `wharton_vang_thi` là lỗi chặn; vắng thi chỉ
             # là cảnh báo và đi vào chi tiết của bước này.
             diem_wharton, canh_bao_wharton = None, []
-            if wharton is not None:
+            fa_bat = dung_fa_daa(luat)
+            if fa_bat:
+                # FA-DAA (FA-2): kiểm kiểu CLB, giữ chỗ (và, từ FA-3, hồ sơ huy chương) THAY cho hồ
+                # sơ 100 điểm. Lỗi chặn thì dừng ở đây, trước khi bốc hay khoá số: không ghi gì.
+                with self._ket_noi_doc() as cur_fa:
+                    loi_fa = fa_daa.kiem_fa_tu_csdl(cur_fa)
+                canh_bao_wharton = [e for e in loi_fa if e["code"] in fa_daa.MA_CANH_BAO]
+                loi_fa = fa_daa.chi_loi_chan(loi_fa)
+                if loi_fa:
+                    steps_log.append({"step": "validate", "status": "error", "detail": loi_fa})
+                    return _fail_co_buoc(steps_log, loi_fa)
+            if wharton is not None and not fa_bat:
                 # Quỹ chỉ có MỘT CLB mà em chưa đặt điểm thì tự điền 100 TRONG BỘ NHỚ (quyết định
                 # của Truong, cách A): không ghi `wharton_bids`, và là hàm thuần của (nguyện vọng,
                 # ô tick, điểm đã lưu) — tất cả đã nằm trong dấu vân tay — nên kết quả vẫn tất định.

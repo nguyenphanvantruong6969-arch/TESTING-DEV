@@ -594,6 +594,34 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "{n} dòng giữ chỗ bị bỏ qua vì CLB hoặc học sinh không có trong phần mềm (ví dụ: {vi_du}).",
     "en": "{n} reserved-seat row(s) were skipped because the club or student isn't in the app (for example: {vi_du})."
   },
+  "fa_thieu_clb_tu_do": {
+    "vi": "Buổi \"{buoi}\" chưa có CLB loại Tự do. Mỗi buổi cần ít nhất một CLB Tự do để nhận học sinh chưa có chỗ.",
+    "en": "Session \"{buoi}\" has no Free club. Each session needs at least one Free club to take students without a seat."
+  },
+  "fa_clb_thieu_loai": {
+    "vi": "CLB {club_id} chưa có loại (Tự do, Giới hạn hoặc Tuyển chọn).",
+    "en": "Club {club_id} has no type yet (Free, Limited or Selective)."
+  },
+  "fa_clb_thieu_suc_chua": {
+    "vi": "CLB {club_id} (Giới hạn hoặc Tuyển chọn) cần chỉ tiêu lớn hơn 0.",
+    "en": "Club {club_id} (Limited or Selective) needs a seat count above 0."
+  },
+  "fa_clb_thieu_diem_san": {
+    "vi": "CLB {club_id} (Tuyển chọn) chưa có điểm sàn.",
+    "en": "Club {club_id} (Selective) has no pass mark yet."
+  },
+  "fa_giu_cho_vuot_suc_chua": {
+    "vi": "CLB {club_id} giữ chỗ cho {n} học sinh, nhiều hơn chỉ tiêu {suc_chua}.",
+    "en": "Club {club_id} reserves seats for {n} students, more than its {suc_chua} seats."
+  },
+  "fa_giu_cho_hoc_sinh_la": {
+    "vi": "Giữ chỗ ở CLB {club_id} cho {student_id} bị bỏ qua vì không có học sinh này.",
+    "en": "The reserved seat at club {club_id} for {student_id} was ignored because that student doesn't exist."
+  },
+  "fa_giu_cho_khong_xep_clb": {
+    "vi": "Giữ chỗ ở CLB {club_id} cho {student_id} bị bỏ qua vì học sinh chưa xếp CLB này trong nguyện vọng.",
+    "en": "The reserved seat at club {club_id} for {student_id} was ignored because the student didn't rank this club."
+  },
   "csv_wp_bo_qua": {
     "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
     "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved."

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-2: kiểm trước khi chạy FA-DAA (mục cha A5)
+
+- `fa_daa.py`: `kiem_truoc_fa` (mỗi buổi có CLB Tự do; mọi CLB có loại; Giới hạn / Tuyển chọn có chỉ tiêu; Tuyển chọn có điểm sàn; giữ chỗ không vượt chỉ tiêu; giữ chỗ cho học sinh lạ / em không xếp CLB đó chỉ là cảnh báo và không được tính), `giu_cho_hop_le`, `chi_loi_chan`, `doc_du_lieu_fa`, `kiem_fa_tu_csdl`.
+- `api.py`: bước kiểm dữ liệu của `_run_pipeline_da_khoa` và `get_data_health_report` gọi kiểm FA khi `fa_daa` bật (lỗi chặn dừng trước khi bốc hay khoá số, không ghi gì); hồ sơ 100 điểm của Wharton không áp khi FA bật.
+- `so_nhap.py`: kiểu CLB và `kiem_thuoc_tinh` chuyển vào đây (skill đóng gói của so_nhap chạy một mình); `fa_daa.py` nhập lại.
+- `i18n_errors.py` (+ `i18n_loi.js`): 7 mã `fa_*` mới. `tests/test_fa_kiem_truoc.py` (mới, 15 ca); `tests/test_ws_nhan.py`: thêm mã vào danh sách mã mới; `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 204 tệp test.
+
 ## 2026-11-09 — FA-1: mô hình dữ liệu FA-DAA (mục cha A13)
 
 - Luật `rules.fa_daa` (mặc định TẮT; bật cần `wharton`): `cau_hinh_ws.py`, `rbda_priority_pipeline.py` (`dung_fa_daa`, khoá bỏ khỏi `run_history.luat_xep` và dấu vân tay khi tắt; khi bật, dấu vân tay gồm kiểu CLB + giữ chỗ).

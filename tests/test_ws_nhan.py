@@ -50,6 +50,9 @@ MA_MOI_SAU_ANH_CHUP = {
     "so_nhap_fa_loai_sai", "so_nhap_fa_diem_san_sai", "so_nhap_fa_toi_thieu_sai",
     "so_nhap_fa_suc_chua_phong_sai", "csv_club_fa_invalid", "fa_cot_bo_qua",
     "fa_giu_cho_bo_qua", "so_nhap_fa_giu_cho_khong_ton_tai",
+    # FA-2: kiểm trước khi chạy.
+    "fa_thieu_clb_tu_do", "fa_clb_thieu_loai", "fa_clb_thieu_suc_chua", "fa_clb_thieu_diem_san",
+    "fa_giu_cho_vuot_suc_chua", "fa_giu_cho_hoc_sinh_la", "fa_giu_cho_khong_xep_clb",
     "so_nhap_diem_ca_nhan_sai", "scoring_not_per_person", "health_person_score_none",
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).

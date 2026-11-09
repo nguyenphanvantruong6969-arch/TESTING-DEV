@@ -678,14 +678,64 @@ def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHE
     return clubs
 
 
+# ---------------------------------------------------------------------------
+# FA-DAA (FA-1): kiểu CLB và kiểm thuộc tính. Ở đây (không ở fa_daa.py) để so_nhap.py chạy được
+# một mình trong skill đóng gói; fa_daa.py nhập lại từ đây.
+# ---------------------------------------------------------------------------
+TU_DO, GIOI_HAN, TUYEN_CHON = "TU_DO", "GIOI_HAN", "TUYEN_CHON"
+CAC_LOAI = (TU_DO, GIOI_HAN, TUYEN_CHON)
+_NHAN_LOAI = {"tu do": TU_DO, "free": TU_DO, "gioi han": GIOI_HAN, "limited": GIOI_HAN,
+              "tuyen chon": TUYEN_CHON, "selective": TUYEN_CHON}
+NHAN_LOAI_HIEN_THI = {TU_DO: "Tự do", GIOI_HAN: "Giới hạn", TUYEN_CHON: "Tuyển chọn"}
+DIEM_SAN_TOI_DA = 10
+
+
+def chuan_hoa_loai(nhan):
+    """Nhãn (`Tự do`, `Giới hạn`, `Tuyển chọn`, hoặc mã) -> mã; trống/None -> None.
+
+    Nhãn lạ ném ValueError: tệp nhập phải báo lỗi chứ không đoán.
+    """
+    if nhan is None or not str(nhan).strip():
+        return None
+    k = bo_dau(nhan)
+    if k in _NHAN_LOAI:
+        return _NHAN_LOAI[k]
+    raise ValueError("Loại CLB không hợp lệ: %r" % (nhan,))
+
+
+def _la_nguyen(v) -> bool:
+    if isinstance(v, bool):
+        return False
+    if isinstance(v, int):
+        return True
+    return isinstance(v, float) and v.is_integer()
+
+
+def kiem_thuoc_tinh(loai, diem_san, so_toi_thieu, suc_chua_phong, **ngu_canh) -> list:
+    """Kiểm bốn thuộc tính FA của MỘT CLB (None = không đặt). Trả danh sách lỗi `err(...)`.
+
+    Chỉ kiểm giá trị từng ô; ràng buộc giữa các CLB là việc của `fa_daa.kiem_truoc_fa`.
+    `ngu_canh` (vd dong=, club_id=) gắn vào lỗi.
+    """
+    loi = []
+    if loai is not None and loai not in CAC_LOAI:
+        loi.append(err("fa_loai_sai", loai=str(loai), **ngu_canh))
+    if diem_san is not None and not (_la_nguyen(diem_san) and 0 <= diem_san <= DIEM_SAN_TOI_DA):
+        loi.append(err("fa_diem_san_sai", diem_san=str(diem_san), **ngu_canh))
+    if so_toi_thieu is not None and not (_la_nguyen(so_toi_thieu) and so_toi_thieu >= 0):
+        loi.append(err("fa_toi_thieu_sai", so_toi_thieu=str(so_toi_thieu), **ngu_canh))
+    if suc_chua_phong is not None and not (_la_nguyen(suc_chua_phong) and suc_chua_phong > 0):
+        loi.append(err("fa_suc_chua_phong_sai", suc_chua_phong=str(suc_chua_phong), **ngu_canh))
+    return loi
+
+
+
 def _doc_cot_fa(o, cot, lay, ten_sheet, so_dong, ten):
     """Bốn cột FA tuỳ chọn của một dòng CLB -> ({khoá có cột: giá trị|None}, [lỗi]).
 
     Cột vắng mặt thì khoá vắng (giữ giá trị đang lưu). Ô trống = None (xoá). Sai giá trị = lỗi
     `so_nhap_fa_*` kèm sheet, dòng — sổ có lỗi thì không nạp gì (như mọi lỗi sổ khác).
     """
-    from fa_daa import chuan_hoa_loai, kiem_thuoc_tinh
-
     ra, loi = {}, []
     for khoa in KHOA_FA:
         if khoa not in cot:
@@ -1343,7 +1393,6 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     for c in clubs:
         hang_fa = []
         if co_fa:
-            from fa_daa import NHAN_LOAI_HIEN_THI
             hang_fa = [NHAN_LOAI_HIEN_THI.get(c.get("loai"), c.get("loai")) or None,
                        c.get("diem_san"), c.get("so_toi_thieu"), c.get("suc_chua_phong")]
         ws.append([c.get("name", ""), nhan_buoi(c.get("buoi") or ""),
