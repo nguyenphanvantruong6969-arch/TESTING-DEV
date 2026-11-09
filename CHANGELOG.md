@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M3: Bộ chuyển đổi chế độ FA-DAA (đường A và đường B) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx (--dang-ky FORMS... | --lists LIST.csv) [bài thi...]`: Loại CLB, chỉ tiêu, điểm sàn, giữ chỗ lấy từ Sổ nhập CLB của FA-M1; đường B đọc biểu mẫu FA-M2 và nối `dat_huy_chuong_duong_b` (không đổi hành vi, 19 test cũ xanh); đường A (`doc_lists(fa=True)`) bỏ dòng DRAFT (trừ `--nhan-ban-nhap`), lấy lần lưu cuối, điền huy chương mặc định khi ô trống và HC_TuChinh không đặt; bỏ nguyện vọng trùng và báo; điểm thi quy về nguyên 0-10 (D7, tính bằng phân số); em xếp CLB Tuyển chọn mà chưa thi -> cảnh báo NOT_ATTEMPTED; làm bài dưới 1/3 trung vị -> cờ (D9, chỉ báo); soát huy chương bằng `fa_daa.kiem_ho_so_huy_chuong`; không soát hai quỹ 100 điểm cũ.
+- Không cờ: `doc_lists`, `phan_tich_chi_thi`, `ghi_tep_phan_mem` giữ hành vi cũ (nội dung ô SO_NHAP_CLB.xlsx và BANG_DIEM.xlsx của một lần chạy mặc định giống hệt trước thay đổi).
+- Test mới: `tests/test_fa_m3_chuyen.py` (25 ca). Chưa thử trên Forms/Lists thật (TH).
+
 ## 2026-11-09 — FA-M2: Biểu mẫu đăng ký đường B (--fa-daa) (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `bieu_mau.cac_phan_fa`, `tao_mau_forms.py --fa-daa`: mỗi ngày một biểu mẫu đăng ký (không câu Ranking; `[<buổi>-nv1..3]` bắt buộc, `[<buổi>-vang]` và `[<buổi>-doi]` tuỳ chọn, có đáp án \"giữ mặc định\" vì Forms không bỏ chọn được), `NHAP_FORMS_DANG_KY_<buổi>.docx` và `CAI_DAT_FORMS_DANG_KY.md` (một dòng mô tả V§5.1, cài đặt, giới hạn đường B). Không nói đường nào được khuyên dùng (D8 còn mở).
