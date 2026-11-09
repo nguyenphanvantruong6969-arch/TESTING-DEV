@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-SOAT: Opus soát đêm 1 (mục cha A13)
+
+- `tests/test_van_phong_tu_nhien.py`: thêm `DAA` vào `VIET_TAT` (tên chế độ FA-DAA là chữ viết tắt, như `DA`, `RB`). Bốn thông báo lỗi mới của đêm 1 (`fa_cot_bo_qua`, `fa_giu_cho_bo_qua`, `fa_chua_bat`, `fa_chua_co_ly_do`) làm test này đỏ; đêm 1 không chạy lại nó sau khi thêm mã lỗi.
+- Báo cáo soát: `docs/phien/bao_cao_dem/2026-11-09_soat_dem1.md`. Không có test mới.
+
 ## 2026-11-09 — FA-4 đến FA-8: chạy FA-DAA, đóng CLB thiếu người, lý do, bảng nhu cầu, tính chất V§13 (mục cha A13, A5, A6, C3, Z6)
 
 (Bốn mục dùng chung `fa_daa.py`, `api.py`, `i18n_errors.py` nên đi cùng một commit.)

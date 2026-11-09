@@ -42,7 +42,7 @@ process.stdout.write(JSON.stringify(eval("(" + src.slice(b, i) + ")")));
 """
 
 # Chữ viết hoa hợp lệ: từ viết tắt thật, không phải để nhấn mạnh.
-VIET_TAT = {"CLB", "CSV", "UTF", "XLSX", "RB", "DA", "EN", "VI", "HS", "ID"}
+VIET_TAT = {"CLB", "CSV", "UTF", "XLSX", "RB", "DA", "DAA", "EN", "VI", "HS", "ID"}  # DAA: tên chế độ FA-DAA
 
 
 def _ui_strings():

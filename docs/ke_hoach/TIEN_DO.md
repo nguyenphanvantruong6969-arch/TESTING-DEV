@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-SOAT (Opus soát đêm 1, mục cha A13) | xong | 2026-11-09 | tests/test_van_phong_tu_nhien.py, CHANGELOG.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/bao_cao_dem/2026-11-09_soat_dem1.md | (không có tệp mới) | Soát đêm 1: GO; sửa 1 test đỏ (viết tắt DAA); mở đêm 2 FA-M1..FA-M6 |
 | FA-8 (FA-DAA, mục cha Z6) | xong | 2026-11-09 | (chỉ test) | tests/test_fa_tinh_chat.py | V§13.1-13.9, 13.11 trên 200 bộ ngẫu nhiên; 13.12 bỏ qua (D1 hoãn) |
 | FA-7 (FA-DAA, ngoài sổ) | xong | 2026-11-09 | fa_daa.py, api_xuat.py, mau_forms_thi_clb/so_sanh_suc_chua.py | tests/test_fa_nhu_cau.py | Bảng nhu cầu cho giáo viên, kiểm chỉ tăng |
 | FA-6 (FA-DAA, mục cha C3) | xong | 2026-11-09 | fa_daa.py, fa_ly_do.py, api.py, api_xuat.py, rbda_priority_pipeline.py, i18n_errors.py | tests/test_fa_ly_do.py | Lý do, điểm chuẩn, danh sách chờ, ket_qua_ly_do.csv |
