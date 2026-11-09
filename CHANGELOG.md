@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M6: Tài liệu sau khi xếp (kết quả, phản hồi, khiếu nại, nhắc hạn, điểm danh) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `docs/he_sinh_thai/FA_SAU_XEP.md` (mới, chỉ tài liệu): `ket_qua_ly_do.csv` -> list `KetQua` (cách C; IT ghép email), màn kết quả và ba nút phản hồi -> list `PhanHoi`, Forms khiếu nại (3 ngày, chỉ lỗi dữ liệu, chạy lại cùng seed) và khảo sát tuần 3, flow nhắc (mở cổng, -2 ngày, -3 giờ, NOT_ATTEMPTED hai lần, dưới 50 % sau 3 ngày -> GVCN), phép tính hạn mức 6.000 (mỗi em một thư chạm hạn mức; gửi lô Bcc 50 người ≈ 225 yêu cầu), list `DiemDanh` với cột tính `GiaiPhong`, xuất danh sách chờ; bảng kiểm K1..K14 (TH). Không nói đường nào nên chọn (D8 mở).
+- Test mới: `tests/test_fa_m6_tai_lieu.py` (6 ca: cột CSV khớp mã xuất `api_xuat.py`, đủ tên list/biểu mẫu/flow, phép tính, nhãn TH, không dữ liệu thật). Không đổi mã.
+
 ## 2026-11-09 — FA-M5: Đặc tả Power Apps v2 (đường A) và cột list FA-DAA (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `T4M_DAC_TA_SUA_APP.md` §12 (mới): màn đăng ký v2 (xáo `Shuffle()`, ▲▼, tự lưu `Patch` DRAFT, tối thiểu 3, cảnh báo thiếu CLB Tự do, nhãn thẻ, Nộp SUBMITTED, ước tính số yêu cầu so với 6.000) và widget huy chương (mặc định theo thứ tự, tự cập nhật khi chưa chỉnh tay, hoán đổi, vàng vào Tuyển chọn có nhắc); yêu cầu R39 đến R54, tất cả TH; không nói đường nào nên chọn (D8 mở).

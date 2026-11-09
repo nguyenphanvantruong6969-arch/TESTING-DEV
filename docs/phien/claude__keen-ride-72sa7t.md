@@ -33,7 +33,7 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - [x] FA-M3 converter FA mode (`--fa-daa`), wires `dat_huy_chuong_duong_b` (needs FA-M1, FA-M2)
 - [x] FA-M4 quiz variants + item analysis + D11 equating `phan_tich_cau_hoi.py` (needs FA-M3)
 - [x] FA-M5 Power Apps spec v2 (path A) + `bo_dung_t4m` columns (needs FA-M3)
-- [ ] FA-M6 after-allocation docs `FA_SAU_XEP.md` (needs FA-M5)
+- [x] FA-M6 after-allocation docs `FA_SAU_XEP.md` (needs FA-M5)
 - [ ] Night 3: FA-UI kiosk screens (Chromium tests)
 - [x] Opus review night 1 (2026-11-09: GO; report bao_cao_dem/2026-11-09_soat_dem1.md)
 - [ ] Opus review night 2, night 3 before the next night starts
@@ -94,3 +94,4 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 | 2026-11-09 | Sonnet | FA-M3: chuyen_fa_daa (+doc_lists fa, doc_dang_ky_fa_forms, quy_diem_10, co_nhanh_qua); tests/test_fa_m3_chuyen.py 25; related 266 passed; default-mode cells identical; 3 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | FA-M4: phan_tich_cau_hoi.py + tao_mau_forms --bien-the + converter gate (D11); tests/test_fa_m4_phan_tich.py 24; related 330 passed; old modes identical; 5 mutations caught; kiem_nhanh 7/7 | night 2 |
 | 2026-11-09 | Sonnet | FA-M5: T4M_DAC_TA_SUA_APP §12 (R39-R54) + bo_dung_t4m ECA_FA + tao_bo_dung_t4m --fa-daa; tests/test_fa_m5_bo_dung.py 10; related 208 passed (after scoping old R1..R38 test); default kit byte-identical; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
+| 2026-11-09 | Sonnet | FA-M6: docs/he_sinh_thai/FA_SAU_XEP.md (docs only) + tests/test_fa_m6_tai_lieu.py 6; related passed; 2 mutations caught; kiem_nhanh 7/7 | night 2 |
