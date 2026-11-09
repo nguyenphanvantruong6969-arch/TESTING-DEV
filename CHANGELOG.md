@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-S10: sửa dòng đường B trong bảng D8 (đêm 3, chỉ tài liệu)
+
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §4: đường B ghi "huy chương theo thứ tự + câu vàng và câu đổi bạc/đồng (đủ 6 cách đặt)" thay cho "không đổi được". Không đổi mã.
+
 ## 2026-11-09 — FA-S11: ghép email với mã học sinh cho list KetQua (đêm 3, TH)
 
 - `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`): ghi thêm `EMAIL_MA_HS.csv` (Email, student_id; dữ liệu cá nhân, chỉ trên máy IT).

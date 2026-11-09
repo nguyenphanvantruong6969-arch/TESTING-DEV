@@ -40,7 +40,7 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [x] FA-S7 export reasons of the latest run only   - [x] FA-S8 CSV import keeps row when FA off   - [x] FA-S9 rollback test fa_nhom/fa_ly_do
 - [x] FA-S3 D11 small comparison group -> no shift   - [x] FA-S1 retake counts only when flagged + retake variant
 - [x] FA-S2 --bo-cau per variant   - [x] FA-S4 warn on unreadable quiz times   - [x] FA-S5 warn on wrong variant
-- [x] FA-S6 generator reads Loại (--so-nhap-clb)   - [x] FA-S11 email <-> student_id join for KetQua   - [ ] FA-S10 plan §4 D8 row
+- [x] FA-S6 generator reads Loại (--so-nhap-clb)   - [x] FA-S11 email <-> student_id join for KetQua   - [x] FA-S10 plan §4 D8 row
 - [ ] FA-UI-1 FA switch   - [ ] FA-UI-2 club columns   - [ ] FA-UI-3 medal step   - [ ] FA-UI-4 reasons + exports   - [ ] FA-UI-5 user guide
 - [ ] Opus review night 3
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
@@ -108,3 +108,4 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 | 2026-11-09 | Opus (night 3) | FA-S4 unreadable quiz times warning; red first; mutation caught | test_fa_m3/m4 green |
 | 2026-11-09 | Opus (night 3) | FA-S6 generator reads club type; red first; mutation caught; without flag diff -r identical | tao_mau_forms tests 241 passed |
 | 2026-11-09 | Opus (night 3) | FA-S11 email join script + EMAIL_MA_HS.csv; red first; mutation caught; new test file (count 217) | kiem_nhanh 7/7 |
+| 2026-11-09 | Opus (night 3) | FA-S10 plan §4 D8 path-B row fixed | docs only |
