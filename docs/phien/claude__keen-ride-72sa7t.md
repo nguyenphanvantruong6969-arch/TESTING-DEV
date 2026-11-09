@@ -52,8 +52,8 @@ Night 2 — Microsoft (released by Opus 2026-11-09; order and dependencies in CH
 - Truong 08/11: invariant-2 EXCEPTION approved for D2 (default medals from rank, only with override; in CLAUDE.md). D11 never blocks: sample-size threshold + mean equating, admin confirms. D1 stays deferred; FA-10 two-term simulation required before term 2.
 - D1 compensation deferred: NOT a stability problem; the issue is the cross-term incentive (lose NV1 on purpose), which invariant 2 guards. Simulate before term 2.
 - D3 close the club with the largest shortfall first. D4 waitlist SELECTIVE score>medal>STB, LIMITED medal>STB, only students ranking it above their club.
-- D2 default medals only at the registration layer (Power Apps / converter), never inside the kiosk.
-- D5 no public seed (24/10 decision stands); FA-9 = witnessed lottery record. D9 Forms time limit + flag < 1/3 median. D11 variant mean gap > 1 blocks. D12 path B: 3 choice questions, no Ranking, medals by order.
+- D2 default medals from rank only at the registration layer (Power Apps, converter, kiosk on-site entry screen) and only with an override; the priority key never reads rank (CLAUDE.md invariant-2 exception).
+- D5 no public seed (24/10 decision stands); FA-9 = witnessed lottery record. D9 Forms time limit + flag < 1/3 median. D11 never blocks (sample-size threshold + mean equating, admin confirms). D12 path B: 3 choice questions, no Ranking, medals by order + gold and silver/bronze-swap questions (all 6 placements).
 - Registry A13 already titled "FA-DAA": medals reuse `wharton_bids` and the `diem_wharton` input of `run_rbda`.
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
