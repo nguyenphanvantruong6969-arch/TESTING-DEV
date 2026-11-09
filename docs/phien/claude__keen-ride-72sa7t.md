@@ -33,7 +33,8 @@ Later (NOT night 1):
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- 2026-11-08 Opus: plan written and pushed; no product code changed yet. Nothing running. RUNNING lock: none.
+- 2026-11-08 Opus: plan written and pushed; no product code changed yet. Nothing running.
+- RUNNING: 2026-11-09T02:08Z session_01VfPzNuHreMmsU2dsJPAz6x (night 1)
 - Tests: not run on this branch yet (container had no .venv). Baseline is FA-0.
 - Open problems: D8 (Power Apps vs Forms registration) waits for Truong's GĐ2 meeting with IT (before 15/11).
 
