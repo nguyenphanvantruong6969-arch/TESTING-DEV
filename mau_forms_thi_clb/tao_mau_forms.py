@@ -819,6 +819,8 @@ def ghi_cai_dat_bien_the(de, co):
     w("- Khi có chênh lệch, bộ chuyển đổi **không** ghi Sổ nhập tới khi admin chọn: `--ap-dung-dieu-chinh` (dịch điểm) hoặc "
       "`--giu-diem-goc` (giữ điểm đã chấm). Luôn có cách đi tiếp, không có gì chặn cứng. Không lệch thì không cần cờ.")
     w("- Em làm bài dưới 1/3 thời gian trung vị của CLB bị gắn cờ (chỉ báo); admin cho thi lại bằng đề `DeThiLai`.")
+    w("- CLB chỉ có MỘT đề (không có đề B) thì em bị gắn cờ không thi lại được: thi lại phải bằng đề khác. "
+      "Bộ chuyển đổi báo \"không có đề thi lại\" và giữ điểm bài đầu; muốn cho thi lại thì thêm đề B cho CLB đó.")
     w("")
     return "\n".join(L)
 

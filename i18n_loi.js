@@ -650,6 +650,10 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "CLB {club_id} (buổi {buoi}) đã đóng vì chỉ có {thanh_vien} thành viên, thiếu {thieu} so với mức tối thiểu. Đóng CLB thiếu người là cách xấp xỉ, không bảo đảm khai thật nguyện vọng là tối ưu.",
     "en": "Club {club_id} (session {buoi}) was closed because it had only {thanh_vien} members, {thieu} short of its minimum. Closing under-filled clubs is an approximation and doesn't guarantee that ranking truthfully is optimal."
   },
+  "fa_can_diem_quyet_tam": {
+    "vi": "Chưa bật được xếp theo loại CLB và huy chương vì điểm quyết tâm đang tắt. Huy chương dùng chung bảng điểm quyết tâm: hãy bật điểm quyết tâm (cần ưu tiên theo điểm thi và điểm tính riêng từng CLB) rồi thử lại.",
+    "en": "Club-type and medal mode can't be turned on because determination points are off. Medals use the same points table: turn determination points on (this needs score-based priority and per-club scores) and try again."
+  },
   "fa_ly_do_thieu_buoi": {
     "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",
     "en": "Session {buoi} has no reasons: its latest run did not use FA-DAA mode."

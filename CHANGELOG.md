@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-N4: cảnh báo CLB chỉ có một đề thì không thi lại được (đêm 4)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: em bị gắn cờ làm quá nhanh ở CLB chỉ có một đề → cảnh báo "không có đề thi lại; giữ điểm bài đầu" (thay câu hứa thi lại). `mau_forms_thi_clb/tao_mau_forms.py`: `CAI_DAT_FORMS_BIEN_THE.md` có thêm dòng nói rõ. CLB có từ hai đề: không đổi.
+- Test mới: `tests/test_fa_n4_mot_de_khong_thi_lai.py` (3).
+
+## 2026-11-09 — FA-N3: câu báo rõ khi bật FA mà tắt điểm quyết tâm (đêm 4)
+
+- `cau_hinh_ws.py` `FaCanDiemQuyetTam(ValueError)`, `api_workspace.py` bắt riêng, `i18n_errors.py` + `i18n_loi.js`: mã `fa_can_diem_quyet_tam` (song ngữ) thay lỗi chung `ws_du_lieu_sai` ở bước luật (tạo và sửa cấu hình). Lỗi luật khác vẫn là lỗi chung.
+- Test mới: `tests/test_fa_n3_loi_diem_quyet_tam.py` (5); sửa kỳ vọng `tests/test_giao_dien_fa_cai_dat.py` (câu mới) và danh sách mã mới `tests/test_ws_nhan.py`.
+
 ## 2026-11-09 — FA-N2: màn nhập tại chỗ lưu huy chương mặc định và đi theo thứ tự mới (đêm 4)
 
 - `js/04_nhap_tai_cho.js` (`hcTheoNguyenVong`), `index.html` (`hcNhacDaChinh`), `i18n.js` (`hc_nhac_da_chinh`): sau khi lưu nguyện vọng ở workspace FA, mỗi ngày: chưa có huy chương → lưu mặc định D2; huy chương = mặc định của thứ tự cũ và thứ tự đổi → lưu mặc định mới; đã chỉnh tay → giữ nguyên + câu nhắc. Chỉ gọi `submit_huy_chuong`; không suy diễn ở máy chủ, không đổi schema.

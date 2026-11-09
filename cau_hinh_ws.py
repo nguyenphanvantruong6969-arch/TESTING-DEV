@@ -105,6 +105,10 @@ def _nhan_thieu_en_lay_vi(goc: dict, da_tron: dict) -> None:
             da_tron["labels"][dt]["en"] = da_tron["labels"][dt]["vi"]
 
 
+class FaCanDiemQuyetTam(ValueError):
+    """FA-N3: bật `fa_daa` khi `wharton` (điểm quyết tâm) đang tắt hoặc không dùng được."""
+
+
 class NhanTrung(ValueError):
     """Hai danh từ có CÙNG nhãn (sau strip + casefold, riêng vi và riêng en).
 
@@ -259,7 +263,7 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
     if not isinstance(bat_fa, bool):
         raise ValueError("fa_daa phải là true hoặc false, nhận %r." % (bat_fa,))
     if bat_fa and not bat_wharton:
-        raise ValueError(
+        raise FaCanDiemQuyetTam(
             "fa_daa chỉ dùng được khi wharton bật (huy chương dùng bảng điểm Wharton) và "
             "priority là score hoặc score+tier, score_scope là per_slot.")
 

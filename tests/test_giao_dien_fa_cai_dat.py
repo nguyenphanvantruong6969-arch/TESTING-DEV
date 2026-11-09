@@ -73,7 +73,7 @@ def test_bat_fa_ma_tat_diem_quyet_tam_bi_tu_choi_va_hien_loi(mo_trang):  # noqa:
     page.locator("#wzTiep").click()
     page.locator("#wzTao").click()
     page.wait_for_selector(".toast.is-error", timeout=10000)
-    assert "chưa hợp lệ" in page.locator(".toast.is-error").first.inner_text()   # lỗi sẵn có ws_du_lieu_sai
+    assert "điểm quyết tâm đang tắt" in page.locator(".toast.is-error").first.inner_text()   # FA-N3: mã riêng fa_can_diem_quyet_tam, không phải ws_du_lieu_sai
     ten = [w["name"] for w in api.list_workspaces()["data"]["workspaces"]]
     assert "Đợt sai" not in ten
     assert not loi, loi

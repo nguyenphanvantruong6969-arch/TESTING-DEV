@@ -89,3 +89,5 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | T3-L4 (ngoài sổ, Truong duyệt 04/11/2026) | xong | 2026-11-04 | api_xuat.py, js/09_the_xem.js, i18n.js, style.css, CHANGELOG.md | tests/test_t3_l3_backend.py, test_giao_dien_t3_l3.py | Thứ tự tệp "Tải bảng này" theo màn hình, bỏ dòng nhắc chết "Chưa có lớp nào", Điểm chuẩn gọn. Chờ CI |
 | FA-N1 (đêm 4) | xong | 2026-11-09 | api_xuat.py, i18n_errors.py, i18n_loi.js, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py | Lý do theo từng buổi sau khi chạy một phần |
 | FA-N2 (đêm 4) | xong | 2026-11-09 | js/04_nhap_tai_cho.js, index.html, i18n.js, CHANGELOG.md | tests/test_giao_dien_fa_n2_luu_mac_dinh.py | Huy chương mặc định được lưu và đi theo thứ tự |
+| FA-N3 (đêm 4) | xong | 2026-11-09 | cau_hinh_ws.py, api_workspace.py, i18n_errors.py, i18n_loi.js, CHANGELOG.md | tests/test_fa_n3_loi_diem_quyet_tam.py | Mã lỗi riêng khi bật FA mà tắt điểm quyết tâm |
+| FA-N4 (đêm 4) | xong | 2026-11-09 | mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py, mau_forms_thi_clb/tao_mau_forms.py, CHANGELOG.md | tests/test_fa_n4_mot_de_khong_thi_lai.py | Cảnh báo CLB một đề không thi lại |

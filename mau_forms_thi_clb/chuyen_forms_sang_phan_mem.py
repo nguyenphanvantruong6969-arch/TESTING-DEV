@@ -1279,8 +1279,13 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
             bai_cua.setdefault(bai["club_id"], []).append((bai, e))
             if e in nhanh.get(bai["club_id"], ()) and not bai.get("thi_lai"):
                 bai["nhanh_qua"] = True
-                canh_bao.append((hs["dong"], e, "%s: làm bài quá nhanh (dưới 1/3 thời gian trung vị của CLB này) "
-                                 "— gắn cờ, cho thi lại một lần bằng đề khác nếu admin đồng ý" % bai["club_id"]))
+                if _so_de(theo_ma[bai["club_id"]]) > 1:
+                    canh_bao.append((hs["dong"], e, "%s: làm bài quá nhanh (dưới 1/3 thời gian trung vị của CLB này) "
+                                     "— gắn cờ, cho thi lại một lần bằng đề khác nếu admin đồng ý" % bai["club_id"]))
+                else:                                              # FA-N4: thi lại cần đề khác
+                    canh_bao.append((hs["dong"], e, "%s: làm bài quá nhanh (dưới 1/3 thời gian trung vị của CLB này) "
+                                     "— gắn cờ, nhưng CLB chỉ có một đề nên không có đề thi lại; giữ điểm bài đầu"
+                                     % bai["club_id"]))
     so_sanh = {}
     if cac_tep:
         for ma, ds in bai_cua.items():

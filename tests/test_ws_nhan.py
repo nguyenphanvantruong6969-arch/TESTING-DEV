@@ -53,6 +53,8 @@ MA_MOI_SAU_ANH_CHUP = {
     # FA-2: kiểm trước khi chạy.
     "fa_thieu_clb_tu_do", "fa_clb_thieu_loai", "fa_clb_thieu_suc_chua", "fa_clb_thieu_diem_san",
     "fa_giu_cho_vuot_suc_chua", "fa_giu_cho_hoc_sinh_la", "fa_giu_cho_khong_xep_clb",
+    # FA-N1, FA-N3 (đêm 4).
+    "fa_ly_do_thieu_buoi", "fa_can_diem_quyet_tam",
     # FA-3: huy chương.
     "fa_chua_bat", "fa_huy_chuong_gia_tri_sai", "fa_huy_chuong_trung_gia_tri",
     "fa_huy_chuong_ngoai_nguyen_vong", "fa_huy_chuong_clb_tu_do",

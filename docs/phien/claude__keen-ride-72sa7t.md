@@ -45,7 +45,7 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [x] Opus review night 3 (2026-11-09: GO; 2 new bugs + 2 small items listed as FA-N1..N4, not fixed; report bao_cao_dem/2026-11-09_soat_dem3.md)
 Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-09; spec plan §7, FA-9/FA-10 in §2):
 - [x] FA-N1 reasons per day after a partial run   - [x] FA-N2 on-site lazy medals saved + follow re-rank
-- [ ] FA-N3 clear error FA on / points off   - [ ] FA-N4 warn: single-variant club, no retake
+- [x] FA-N3 clear error FA on / points off   - [x] FA-N4 warn: single-variant club, no retake
 - [ ] FA-9 witnessed lottery record   - [ ] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
 - [ ] Opus review night 4
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
@@ -133,3 +133,5 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus | Answered: Forms yes (setup form, quizzes, surveys); Power Apps vs Forms-only registration = D8 open; NOT everything in M365 (kiosk + converters run offline on the IT Windows PC, files moved by Excel/CSV) | No new work |
 | 2026-11-09 | Sonnet (night 4) | FA-N1: per-day latest run reasons + warning; tests/test_fa_n1_ly_do_mot_phan.py 3 (red first); related 1955 passed/1 skipped; mutation caught; kiem_nhanh 7/7 | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-N2: on-site lazy medals saved + follow re-rank (js hcTheoNguyenVong); tests/test_giao_dien_fa_n2_luu_mac_dinh.py 3 Chromium red first; related UI 63 passed; mutation caught; kiem_nhanh 7/7 | night 4 |
+| 2026-11-09 | Sonnet (night 4) | FA-N3: fa_can_diem_quyet_tam error code; tests/test_fa_n3_loi_diem_quyet_tam.py 5 red first; related fa+ws 2423 passed (1 count test fixed); mutation caught; kiem_nhanh 7/7 | night 4 |
+| 2026-11-09 | Sonnet (night 4) | FA-N4: single-variant club retake warning + guide line; tests/test_fa_n4_mot_de_khong_thi_lai.py 3 red first; converter/forms tests 129 passed; mutation caught; kiem_nhanh 7/7 | night 4 |
