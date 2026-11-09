@@ -46,6 +46,7 @@ Night 3 — fixes then kiosk screens (released by Opus 2026-11-09; spec plan §6
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-09T06:41Z session_01VfPzNtErHSjc5Cohi9Fo5P (night 3; Opus session at Truong's request)
 - 2026-11-09 night 2 (Sonnet): FA-M1..FA-M6 all DONE, 0 BLOCKED, all Microsoft parts TH (untested on real Microsoft). RUNNING lock removed. D8 still OPEN.
 - Commits: FA-M1 bfdc371; FA-M2 1efa8d1 + cde4384; FA-M3 7c48eae; FA-M4 a61d703; FA-M5 cd1fe46; FA-M6 58bc370. Report: bao_cao_dem/2026-11-09_dem2.md.
 - Tests: 6 new files (17+10+25+24+10+6 = 92 cases), each red first. Final run (all test_fa_*, mau forms, test_t4m_*, test_so_nhap, 2 doc tests): 2204 passed, 1 skipped. ruff clean, kiem_nhanh 7/7. UI/Chromium and full suite NOT run (CI).
