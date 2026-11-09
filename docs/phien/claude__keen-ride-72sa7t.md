@@ -51,12 +51,10 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-09T16:00Z session_01VfPzNsSNKFs4nFPgyEfvMe (night 4, Sonnet)
-- 2026-11-09 Opus handoff (context ~400k). Nights 1-3 DONE and reviewed (all GO). Night 4 RELEASED, not started. Nothing running, no RUNNING lock, no scheduled task created by this session.
-- Night 3 (Opus at Truong's request): 16/16 done (FA-S1..S11, FA-UI-1..5); commits listed in bao_cao_dem/2026-11-09_dem3.md.
-- Night-3 review (48467a9): non-UI related tests 2293 passed / 1 skipped (incl. TestTrungKhit 3x20); kiem_nhanh 7/7. UI tests NOT rerun here (pip install of playwright hung). Repro scripts were in scratchpad only; steps are in bao_cao_dem/2026-11-09_soat_dem3.md.
-- Night 4 scope (plan §7; protocol CHAY_DEM_FA_DAA.md night-4 version): FA-N1 partial-run reasons, FA-N2 on-site lazy medals, FA-N3 clear FA/points error, FA-N4 single-variant retake warning, FA-9 lottery record, FA-10 simulation (+ D1 two-term, tables only).
-- Open for Truong: (1) OK to open a PR to main for the full CI suite + Windows build (Opus recommends, before real use); (2) D8 at GĐ2; (3) night-3 question defaults in the night-3 review (no forced 3 medals, keep all reason sentences, keep fa_ly_do wording); (4) night-2 review wording points (path B "Giữ mặc định" options, [code] in titles) still unconfirmed.
+- 2026-11-09 Sonnet night 4 DONE: 6/6, 0 blocked, no RUNNING lock. Commits: FA-N1 24dc9a1, FA-N2 5ad2e48, FA-N3+N4 0d811dc, FA-9 cf90452, FA-10 6c7bf4d. Report: bao_cao_dem/2026-11-09_dem4.md.
+- Tests: related 2647 passed / 1 skipped; Chromium UI really ran; ruff clean; kiem_nhanh 7/7. Full suite not run (CI).
+- Open for Truong: D8; PR to main for full CI + Windows build; lottery record HTML only (Excel wanted?).
+- Next: Opus review night 4 (list bugs, do not fix), release night 5 = fix list only. Opus review night 4 item stays unticked.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -137,3 +135,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Sonnet (night 4) | FA-N4: single-variant club retake warning + guide line; tests/test_fa_n4_mot_de_khong_thi_lai.py 3 red first; converter/forms tests 129 passed; mutation caught; kiem_nhanh 7/7 | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-9: fa_bien_ban.py + export_bien_ban_boc_tham + button; tests/test_fa_bien_ban.py 9 + 1 Chromium; related 112 passed; 2 mutations caught; kiem_nhanh 7/7; pure module written before its tests, API/UI tests red first | night 4 |
 | 2026-11-09 | Sonnet (night 4) | FA-10: du_lieu_test/mo_phong_fa_daa.py tables only; tests/test_mo_phong_fa_daa.py 9; 3 mutations caught after adding 2 tests; module written before tests | night 4 |
+| 2026-11-09 | Sonnet (night 4) | Night 4 report 2026-11-09: 6/6 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-09_dem4.md | RUNNING line removed |
