@@ -213,6 +213,51 @@ def cac_phan(de, chi_thi=False, buoi=None):
     return phan
 
 
+# ---- FA-M2 (TH): biểu mẫu đăng ký đường B, một biểu mẫu MỖI NGÀY (`tao_mau_forms.py --fa-daa`) ----
+# Quyết định D12: không câu Ranking; ba câu chọn riêng bắt buộc; hai câu huy chương tuỳ chọn. Forms không
+# bỏ chọn được một đáp án đã chọn, nên mỗi câu tuỳ chọn có đáp án "giữ mặc định" rõ ràng (bộ chuyển đổi, FA-M3,
+# đổi nó thành ô trống rồi mới gọi `dat_huy_chuong_duong_b`).
+CAU_HUONG_DAN_DANG_KY = ("Xếp đúng thứ tự em thích. Xếp CLB khó vào lên đầu không làm em mất cơ hội ở CLB sau.")
+SO_NGUYEN_VONG_FA = 3
+GIU_MAC_DINH_VANG = "Giữ mặc định"
+DOI_CO = "Có"
+DOI_KHONG = "Không, giữ mặc định"
+
+
+def cau_nguyen_vong_fa(de, ma_buoi, k):
+    return "[%s-nv%d] %s — Nguyện vọng %d" % (ma_buoi, k, ten_buoi(de, ma_buoi), k)
+
+
+def cau_vang_fa(de, ma_buoi):
+    return ("[%s-vang] %s — Đặt huy chương vàng vào CLB khác NV1? Chọn \"%s\" nếu không đổi."
+            % (ma_buoi, ten_buoi(de, ma_buoi), GIU_MAC_DINH_VANG))
+
+
+def cau_doi_fa(de, ma_buoi):
+    return ("[%s-doi] %s — Đổi chỗ huy chương bạc và đồng? Chọn \"%s\" nếu không đổi."
+            % (ma_buoi, ten_buoi(de, ma_buoi), DOI_KHONG))
+
+
+def cac_phan_fa(de, ma_buoi):
+    """FA-M2: bố cục biểu mẫu đăng ký của MỘT ngày: [(tên phần, [(tiêu đề, loại, lựa chọn, bắt buộc)])].
+
+    Không có câu Ranking. Số câu nguyện vọng = min(3, số CLB của ngày). Câu vàng chỉ liệt kê CLB không Tự do
+    khi `de_thi.json` có khoá `loai` ở CLB (chưa có thì liệt kê hết; bộ chuyển đổi bỏ CLB Tự do và báo).
+    """
+    o_buoi = clb_cua_buoi(de, ma_buoi)
+    ds = [lua_chon_clb(c) for c in o_buoi]
+    khong_tu_do = [lua_chon_clb(c) for c in o_buoi if c.get("loai") != "TU_DO"]
+    return [
+        ("Thông tin học sinh", [(cau_ma_hoc_sinh(), "text", [], True), (cau_ho_ten(), "text", [], True)]),
+        ("%s · Nguyện vọng" % ten_buoi(de, ma_buoi), [
+            (cau_nguyen_vong_fa(de, ma_buoi, k), "choice", list(ds), True)
+            for k in range(1, min(SO_NGUYEN_VONG_FA, len(ds)) + 1)]),
+        ("%s · Huy chương (không bắt buộc)" % ten_buoi(de, ma_buoi), [
+            (cau_vang_fa(de, ma_buoi), "choice", [GIU_MAC_DINH_VANG] + khong_tu_do, False),
+            (cau_doi_fa(de, ma_buoi), "choice", [DOI_KHONG, DOI_CO], False)]),
+    ]
+
+
 def cac_phan_moi_clb(de, clb):
     """T4M-Q4a: bố cục biểu mẫu của MỘT CLB: một phần, các câu đề thi, KHÔNG câu cổng.
 

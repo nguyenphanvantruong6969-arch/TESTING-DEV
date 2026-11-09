@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M2: Biểu mẫu đăng ký đường B (--fa-daa) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `bieu_mau.cac_phan_fa`, `tao_mau_forms.py --fa-daa`: mỗi ngày một biểu mẫu đăng ký (không câu Ranking; `[<buổi>-nv1..3]` bắt buộc, `[<buổi>-vang]` và `[<buổi>-doi]` tuỳ chọn, có đáp án \"giữ mặc định\" vì Forms không bỏ chọn được), `NHAP_FORMS_DANG_KY_<buổi>.docx` và `CAI_DAT_FORMS_DANG_KY.md` (một dòng mô tả V§5.1, cài đặt, giới hạn đường B). Không nói đường nào được khuyên dùng (D8 còn mở).
+- Không cờ: `--chi-thi` và `--moi-clb` sinh ra tệp giống hệt từng byte so với trước thay đổi (so bằng `diff -r`). `ghi_docx_chi_thi` thêm hai tham số tuỳ chọn.
+- Test mới: `tests/test_fa_m2_forms_dang_ky.py` (9 ca).
+
 ## 2026-11-09 — FA-M1: Phiếu thiết lập CLB trên Forms và bộ chuyển đổi (đêm 2, TH = chưa thử trên Microsoft thật)
 
 - `mau_forms_thi_clb/chuyen_phieu_clb.py`: Excel xuất từ Phiếu thiết lập CLB -> `SO_NHAP_CLB.xlsx` (cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, sheet Giữ chỗ) + `BAO_CAO_PHIEU_CLB.md`; phân loại V§4.1, nộp nhiều lần lấy phiếu cuối, CLB chưa nộp phiếu -> Giới hạn với chỉ tiêu kỳ trước (`--ky-truoc`), kiểm trước bằng `fa_daa.kiem_truoc_fa`.
