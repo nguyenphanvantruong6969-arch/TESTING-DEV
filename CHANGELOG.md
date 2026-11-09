@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-09 — FA-M1: Phiếu thiết lập CLB trên Forms và bộ chuyển đổi (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/chuyen_phieu_clb.py`: Excel xuất từ Phiếu thiết lập CLB -> `SO_NHAP_CLB.xlsx` (cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, sheet Giữ chỗ) + `BAO_CAO_PHIEU_CLB.md`; phân loại V§4.1, nộp nhiều lần lấy phiếu cuối, CLB chưa nộp phiếu -> Giới hạn với chỉ tiêu kỳ trước (`--ky-truoc`), kiểm trước bằng `fa_daa.kiem_truoc_fa`.
+- `PHIEU_THIET_LAP_CLB.md`: hướng dẫn dựng Forms bằng tay (Forms không có API tạo biểu mẫu).
+- Test mới: `tests/test_fa_m1_phieu_clb.py` (17 ca). Không đổi mã kiosk, lược đồ hay CSV.
+
 ## 2026-11-09 — FA-SOAT: Opus soát đêm 1 (mục cha A13)
 
 - `tests/test_van_phong_tu_nhien.py`: thêm `DAA` vào `VIET_TAT` (tên chế độ FA-DAA là chữ viết tắt, như `DA`, `RB`). Bốn thông báo lỗi mới của đêm 1 (`fa_cot_bo_qua`, `fa_giu_cho_bo_qua`, `fa_chua_bat`, `fa_chua_co_ly_do`) làm test này đỏ; đêm 1 không chạy lại nó sau khi thêm mã lỗi.
