@@ -70,7 +70,8 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 ## Next steps (ordered)
 1. Night 4 implementer (Sonnet): `docs/phien/CHAY_DEM_FA_DAA.md` (night-4 version). Truong was given a scheduled-task prompt "FA-DAA chay dem 4" (CRON_TZ=Asia/Ho_Chi_Minh 13 23,1,3 * * *, fresh Sonnet session per firing, self-disables when done) for his collaborator; this session created no task.
 2. Truong: OK to open a PR to main for the full CI suite + Windows build? GĐ2 -> D8. Night-3 questions: defaults in the night-3 review.
-3. Opus: review night 4.
+3. Opus: review night 4 (auto task "FA-DAA soat dem 4" may do it): only when night 4 is finished (no RUNNING < 3 h, every night-4 item ticked or BLOCKED). Same method as bao_cao_dem/2026-11-09_soat_dem3.md: list bugs, do NOT fix; write bao_cao_dem/<date>_soat_dem4.md; plan §8 'Night 5' = that fix list only (no new features without Truong); turn CHAY_DEM_FA_DAA.md into the night-5 version; add Night 5 items to this Plan (or 'Night 5: nothing to do'); tick 'Opus review night 4'.
+4. Sonnet night 5 (auto task "FA-DAA chay dem 5"): runs only after step 3 released night 5.
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -124,3 +125,4 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 | 2026-11-09 | Opus | Reviewed night 3: GO; repro FA-N1 (partial run drops other days' reasons) and FA-N2 (on-site lazy path saves no medals); kiem_nhanh 7/7; wrote plan §7 and night-4 protocol | UI tests not rerun (playwright install did not finish) |
 | 2026-11-09 | Opus | Handoff at ~400k context (Stop hook): rewrote Current state; night 4 released, not started | Next session: Read CLAUDE.md + this file |
 | 2026-11-09 | Opus | Gave Truong a night-4 schedule prompt (23:13/01:13/03:13 VN); no new work (context over limit) | Report may be named 2026-11-09_dem4.md or 2026-11-10_dem4.md |
+| 2026-11-09 | Opus | Night 4 running on collaborator side; wrote chained auto plan (Opus review night 4 -> Sonnet night 5) in Next steps | No task created by this session |
