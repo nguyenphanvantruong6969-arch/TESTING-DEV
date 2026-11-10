@@ -55,7 +55,7 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - [x] FA-P1 lottery record Excel: formula guard (`_an_toan_cho_excel`)   - [x] FA-P2 on-site medals saved even if the operator switches student mid-save
 Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.md at repo root; order fixed):
 - [x] SM-1 `ghi_xlsx` cleans forbidden characters   - [x] FA-P3 `get_ly_do_ket_qua` returns + UI shows missing days
-- [x] FA-P4 record days in day order   - [ ] FA-P6 missing-day warnings in day order   - [ ] FA-P5 html/xlsx same base name
+- [x] FA-P4 record days in day order   - [x] FA-P6 missing-day warnings in day order   - [ ] FA-P5 html/xlsx same base name
 - [ ] SM-2 condition wait instead of fixed 800 ms   - [ ] FA-P7/SM-3 `kiem_nhanh --so-seed N>5` real seeds
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
@@ -152,3 +152,4 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 | 2026-11-10 | Opus (SOLO, small fixes) | SM-1: ghi_xlsx cleans cells via so_excel.lam_sach; 2 tests red first; related 2035 passed/1 skipped (D1 marker); mutation caught; ruff clean | |
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P3: get_ly_do_ket_qua returns thieu_buoi; one notice #lyDoThieuBuoi from fa_ly_do_thieu_buoi; 2 API + 1 UI tests red first (FA-off unchanged guard); 2 mutations caught (API, JS); related 2151 passed/1 skipped, Chromium ran; ruff clean | |
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P4: tao_ban_ghi sorts days with khoa_sap_buoi; 1 test red first (HTML + xlsx + hash unchanged); mutation caught; related passed; ruff clean | |
+| 2026-11-10 | Opus (SOLO, small fixes) | FA-P6: _doc_ly_do_moi_nhat sorts days with khoa_sap_buoi; 1 test red first (canh_bao + thieu_buoi); mutation caught; related passed; ruff clean | |

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P6: cảnh báo buổi thiếu lý do theo thứ tự ngày
+
+- `api_xuat.py` (`_doc_ly_do_moi_nhat`): `tat_ca_buoi` sắp bằng `khoa_sap_buoi`, nên cảnh báo `fa_ly_do_thieu_buoi` của `export_ly_do_csv` và `thieu_buoi` (FA-P3) liệt kê `thu_2` trước `chu_nhat`.
+- Test mới (đỏ trước): `tests/test_fa_n1_ly_do_mot_phan.py::test_buoi_thieu_ly_do_theo_thu_tu_ngay`.
+
 ## 2026-11-10 — FA-P4: biên bản bốc thăm liệt kê buổi theo thứ tự ngày
 
 - `fa_bien_ban.py` (`tao_ban_ghi`): `dem_theo_buoi` sắp bằng `khoa_sap_buoi` (như FA-O1), nên `thu_2` đứng trước `chu_nhat` ở cả bản HTML lẫn Excel; mã băm và số liệu không đổi.

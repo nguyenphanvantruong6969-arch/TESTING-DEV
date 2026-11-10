@@ -109,3 +109,26 @@ def test_get_ly_do_ket_qua_fa_tat_khong_doi(api):
     ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": False, "wharton": False}})
     assert api.get_ly_do_ket_qua() == {"ok": True, "data": {"fa_bat": False, "run_id": None, "cau": {}},
                                        "errors": []}
+
+
+# ----------------------------------------------------------------------------- FA-P6: buổi thiếu lý do theo thứ tự ngày
+
+
+def test_buoi_thieu_ly_do_theo_thu_tu_ngay(api, tmp_path):
+    """FA-P6: hai buổi `chu_nhat` và `thu_2` thiếu lý do -> `thu_2` trước (cảnh báo tệp xuất và `thieu_buoi`)."""
+    bat_fa(api)
+    dung_fa_clb(api, A=(3, "GIOI_HAN", None, None, None, "chu_nhat"),
+                B=(3, "GIOI_HAN", None, None, None, "thu_2"),
+                C=(3, "GIOI_HAN", None, None, None, "thu_3"),
+                FA=(9, "TU_DO", None, None, None, "chu_nhat"),
+                FB=(9, "TU_DO", None, None, None, "thu_2"),
+                FC=(9, "TU_DO", None, None, None, "thu_3"))
+    dung_hs_fa(api, "s1", "s2", nv={s: ["A", "FA", "B", "FB", "C", "FC"] for s in ("s1", "s2")})
+    assert api.run_pipeline(seed=3)["ok"]
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": False, "wharton": False}})
+    assert api.run_pipeline(seed=3, chi_buoi=["chu_nhat", "thu_2"])["ok"]
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": True, "wharton": True}})
+    ra = api.export_ly_do_csv(str(tmp_path / "e.csv"))
+    assert ra["ok"], ra
+    assert [c["params"]["buoi"] for c in ra["data"]["canh_bao"]] == ["thu_2", "chu_nhat"]
+    assert api.get_ly_do_ket_qua()["data"]["thieu_buoi"] == ["thu_2", "chu_nhat"]

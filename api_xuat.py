@@ -1645,7 +1645,8 @@ class XuatKetQuaMixin:
             "SELECT DISTINCT buoi FROM match_results").fetchall()}
         buoi_ly_do = {(r[0], r[1]) for r in cur.execute(
             "SELECT DISTINCT run_id, buoi FROM fa_ly_do").fetchall()}
-        tat_ca_buoi = sorted(buoi_ket_qua | {b for _, b in buoi_ly_do})
+        # FA-P6: thứ tự NGÀY (`chu_nhat` sau `thu_7`), nên cảnh báo / `thieu_buoi` cũng theo ngày
+        tat_ca_buoi = sorted(buoi_ket_qua | {b for _, b in buoi_ly_do}, key=khoa_sap_buoi)
         chon, thieu = {}, []                      # buổi -> run_id dùng
         for buoi in tat_ca_buoi:
             for run_id, da_chay in runs:
