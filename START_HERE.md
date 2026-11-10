@@ -8,6 +8,13 @@
 
 ## 1. Cho người chạy (tiếng Việt)
 
+**Cách nhanh nhất — tự động hết, không cần nhập thêm:** mở MỘT phiên, model **Opus**, quyền **auto**, dán:
+
+`Read START_HERE.md and act as SOLO. Truong authorises commits and pushes to claude/keen-ride-72sa7t and claude/fa-gaps only, scheduling check-in reminders for this session, and opening one draft PR at the end; never merge or close a PR; never force-push; no Agent tool; never ask me anything, just continue until ALL WAVES DONE.`
+
+Một phiên làm cả hai giai đoạn, tự soát lại, tự sửa và tự lặp. Chỉ khi phiên bị ngắt hẳn và in `RESTART`, dán lại đúng
+câu trên. Cách hai phiên CHA/CON bên dưới vẫn dùng được (soát độc lập hơn, nhưng cần người mở phiên con).
+
 Chỉ có **2 câu lệnh**. Dùng đúng câu theo loại phiên.
 
 | Loại phiên | Model | Câu lệnh dán vào |
@@ -62,6 +69,27 @@ git fetch origin claude/fa-gaps 2>/dev/null || true
 | FATHER | phase 1 NOT done | Phase 1 is a son job. If you can create sessions (claude-code-remote `create_session`), create ONE son for it (model Sonnet, repo `https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV`, revision `claude/keen-ride-72sa7t`, prompt = the SON prompt in section 1 verbatim) and wait for it as in `INSTRUCTION_FILL_GAPS.md` F4-wait (check-ins with `send_later`, never `sleep`); when its `_sua_nho.md` report exists, continue with the next row. If you cannot create sessions: print `SON PROMPT READY: phase 1` and stop. |
 | FATHER | phase 1 done, phase 2 not done | Follow **`INSTRUCTION_FILL_GAPS.md` PART 2 section F** from F0 (F1 creates `claude/fa-gaps` the first time). |
 | FATHER | phase 2 done | Print `ALL WAVES DONE`, the status link and the draft PR link. Stop. |
+
+### 2.2b. Role SOLO — one session does everything, no human input (Truong, 2026-11-10)
+Use when the prompt says `act as SOLO`. Truong explicitly allows ONE session to play both roles for this job
+(overrides `CLAUDE.md` rule 11 one-role-per-session for this job only). Never ask the human anything; never wait.
+1. **Phase 1:** if not done, do the SON row for phase 1 (`LATEST_INSTRUCTION.md` PART 2). Do not stop after its report.
+2. **Phase 2 setup:** do `INSTRUCTION_FILL_GAPS.md` F0–F1 (create `claude/fa-gaps`). Put `RUNNING-FATHER` and
+   `RUNNING-SON` lock lines with your session; `son session: solo`.
+3. **Loop per wave** (waves 1→4, then fix waves): F2 (write the wave spec, commit) → **switch hat** → S0–S4 (implement
+   every item of the wave exactly as a son: tests first, one commit per item) → **switch hat** → F5 review.
+   - Review with fresh eyes: re-read ONLY the spec block and `git diff <wave-start>..HEAD` (never your memory of
+     writing it), rerun every test yourself, Chromium must really run, `kiem_nhanh --so-seed 20` 60/60, `soat-ma` 4 tiers.
+   - NEEDS-FIX → fix wave (max 2 per wave, same loop) → 3rd failure BLOCKED. GO → next wave.
+4. **Never ask.** A `WAIT-TRUONG` item: write the exact question in the status file "Waiting for Truong", mark it
+   WAIT-TRUONG, continue with items that do not depend on it. A choice between technical options: take the safest one
+   that keeps default behaviour byte-identical and record it in the status file.
+5. **Never end your turn early.** Keep working until F7 (final report, `ALL WAVES DONE`, draft PR) is done. Long
+   context is summarised automatically; before each wave, re-read the status file and the current spec block so the
+   work never depends on chat memory (`INSTRUCTION_FILL_GAPS.md` C4). Commit + push after every item and every review.
+6. **If the turn is about to end anyway** (tool budget, error, interruption): commit, push, update the status file
+   with the exact next step, then try `send_later` (2 minutes, message `continue as SOLO from docs/phien/FA_GAPS_STATUS.md`).
+   If that is refused, print `RESTART: paste the SOLO prompt again` and the status link.
 
 ### 2.3. Always
 - Every stop: the last line of your message is a GitHub link (report, or `docs/phien/FA_GAPS_STATUS.md` on
