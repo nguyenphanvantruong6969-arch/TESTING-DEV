@@ -24,8 +24,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-10 | 3a | DONE | 3243c3a | reminders; 60/60 checked with wave 3a run |
 | GAP-11 | 4 | DONE | cd1d694 | Power Apps autosave kit (D8 still open: kit only) |
 | GAP-12 | 4 | DONE | 9a93289 | simulation (code before test: deviation from S2.b, mutations caught x2) |
-| GAP-13 | 4 | DONE | (next) | stable improvement cycles, measurement mode; spec edge rule corrected |
-| GAP-14 | 4 | TODO | | D1 memo |
+| GAP-13 | 4 | DONE | 0bc53b1 | stable improvement cycles, measurement mode; spec edge rule corrected |
+| GAP-14 | 4 | WAIT-TRUONG | (next) | D1 memo written (docs/ke_hoach/FA_GAPS_D1_MEMO.md); decision is Truong's |
 
 ## Baseline
 - 2026-11-10: `kiem_nhanh --co-so origin/main --so-seed 20` 7/7, 60/60 identical (run at 9ce1be3, same code as 60f75a5); `tests/test_nhieu_buoi.py -k TestTrungKhit` 7 passed. SIMULATED data.
@@ -47,6 +47,7 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
    DRAFT wave-3 spec at the end of FA_GAPS_KE_HOACH.md (F2) and continue.
 
 ## Waiting for Truong
+- GAP-14 / D1: "Kỳ 2 dùng A (không bù), B (bù đầy đủ V§8.4) hay C (bù hẹp, chỉ CLB đã thua)? Nếu B hoặc C: đồng ý ghi ngoại lệ bất biến 2 (chỉ tầng bốc thăm, nguồn fa_ly_do LOTTERY ở NV1, mỗi credit một lần, tắt mặc định) không?" — xem docs/ke_hoach/FA_GAPS_D1_MEMO.md.
 
 ## Review notes (newest last)
 - W2 notes (SOLO son): GAP-4/5/6 share files, so they landed in ONE commit (e76bf48) instead of one per item (deviation

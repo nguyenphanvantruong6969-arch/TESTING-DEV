@@ -121,3 +121,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | GAP-11 | xong | 2026-11-10 | mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py (mới), bo_dung_t4m/sinh_bk1.py, tao_bo_dung_t4m.py, docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap11_cong_thuc_fa.py | Công thức Power Fx màn đăng ký FA (TH) |
 | GAP-12 | xong | 2026-11-10 | du_lieu_test/mo_phong_fa_daa.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap12_mo_phong.py | Mô phỏng: kiểu tính toán + bảng theo kiểu |
 | GAP-13 | xong | 2026-11-10 | fa_vong_doi_cho.py (mới), api_sau_xep.py, cau_hinh_ws.py, du_lieu_test/mo_phong_fa_daa.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap13_vong_doi_cho.py | Chu trình cải thiện ổn định (chế độ đo) |
+| GAP-14 | chờ Truong | 2026-11-10 | docs/ke_hoach/FA_GAPS_D1_MEMO.md (mới), CHANGELOG.md | tests/test_fa_gap12_mo_phong.py (1 ca) | Bản ghi nhớ D1, không mã |

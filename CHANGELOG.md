@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-14: bản ghi nhớ D1 (ưu tiên bù), KHÔNG có mã
+
+- Mới : ba phương án A/B/C, rủi ro khuyến khích, bảng  đo bằng  (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.
+- Test: thêm 1 ca vào  (bản ghi nhớ có nhãn, có lệnh, số khớp lần chạy lại).
+
 ## 2026-11-10 — GAP-13: chu trình cải thiện ổn định, chế độ đo (không bảo đảm ổn định)
 
 - Mới `fa_vong_doi_cho.py` (hàm thuần): `tim_chu_trinh`, `chay_chu_trinh` (Erdil & Ergin 2008: em có khoá tốt nhất — cho phép hoà — trong những em muốn CLB đó mới được nhận chỗ; chỉ thứ tự bốc thăm giữa các em hoà khoá bị bỏ qua), `khoa_tho_fa` (khoá FA không có bốc thăm: giữ chỗ, điểm, huy chương), `NHAN_KHONG_BAO_DAM`.

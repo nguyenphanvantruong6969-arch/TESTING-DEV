@@ -90,3 +90,15 @@ def test_dong_lenh_day_du(tmp_path):
                          "--so-seed", "1", "--hai-ky", "2"], capture_output=True, text=True, encoding="utf-8",
                         timeout=300)
     assert "theo_loai_cu_moi" not in r2.stdout
+
+
+def test_ban_ghi_nho_d1_co_so_lieu_mo_phong_va_lenh():
+    """GAP-14: bản ghi nhớ D1 tồn tại, ghi rõ SỐ LIỆU MÔ PHỎNG và lệnh đã chạy; không viết mã cho D1."""
+    p = os.path.join(GOC, "docs", "ke_hoach", "FA_GAPS_D1_MEMO.md")
+    chu = open(p, encoding="utf-8").read()
+    assert "SỐ LIỆU MÔ PHỎNG" in chu and "du_lieu_test/mo_phong_fa_daa.py --n 100 --so-seed 5 --hai-ky 15" in chu
+    assert "A, B hay C" in chu and "bất biến 2" in chu
+    kq = mp.chay_mo_phong(n=100, so_seed=5, so_mau=15)["hai_ky"]
+    for d in kq:                                    # số trong bản ghi nhớ khớp lần chạy lại
+        assert "| %s | %d | %d | %d | %d | %s |" % (d["dieu_kien"], d["so_em_mau"], d["so_em_co_lech"],
+                                                    d["so_thua_ky_1"], d["so_em_co_loi"], d["pt_co_loi_tren_mau"]) in chu
