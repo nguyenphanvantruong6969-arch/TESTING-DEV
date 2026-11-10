@@ -54,6 +54,7 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-10 02:55Z sonnet-night-5 (manual, Truong asked)
 - 2026-11-10 night 4 REVIEWED (Sonnet session run by hand, not Opus; Truong asked): GO. 1 bug FA-O1 (reasons sorted as plain strings, `chu_nhat` before `thu_2`) rated `trung` by judgement + test gap FA-O2. Night 5 released = FA-O1 + FA-9b.
 - Tests: 2276 passed / 1 skipped / 0 failed (related, non-UI); Chromium 7 passed; kiem_nhanh 7/7; ruff clean. No code changed in this review.
 - The two scheduled tasks ("FA-DAA vong soat" Opus, "FA-DAA vong sua" Sonnet) fired but their fresh sessions had NO repo (empty /home/user) and stopped without writing. They need the repo + branch attached as source in the routines UI (create_trigger has no source field). Until then night 5 must be started by hand.
