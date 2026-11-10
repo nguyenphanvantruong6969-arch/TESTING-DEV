@@ -38,6 +38,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 
 ## Next step (exact, for the next session)
 1. Role SOLO/son, wave 2: own tests of GAP-3..6 pass (9+4 UI, 7+2 UI, 7+3 UI, 4); mutations caught (2, 2, 1, 1).
+   GAP-3 broad suite CONFIRMED on snapshot 513711a: 4791 passed, 4 skipped (D1 marker, numpy x2, POSIX user), 0 failed.
+   GAP-4/5/6 (snapshot e76bf48): broad suite result lost at context stop →
    Rerun the broad related suite once (≈25 min; same selection as in the log rows, plus tests grepping
    tao_mau_forms/bieu_mau/01_khung) and `kiem_nhanh --so-seed 20`; fix reds; then bookkeeping per item (CHANGELOG,
    TIEN_DO, handoff ticks) and set GAP-3..6 DONE; status "son done, waiting for father review".
@@ -70,3 +72,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | father (SOLO) | F5 review wave 1: GO (0 cao/trung, 4 nhỏ); report bao_cao_dem/2026-11-10_fa_gaps_wave1.md | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 2 (GAP-3..6) | ok |
 | 2026-11-10 | son (SOLO) | GAP-3..6 coded + own tests green; broad suites not confirmed; CONTEXT LIMIT stop | handoff |
+| 2026-11-10 | son (SOLO) | GAP-3 broad suite on 513711a: 4791 passed / 4 skipped / 0 failed | ok |
