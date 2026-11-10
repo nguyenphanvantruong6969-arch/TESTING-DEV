@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-10: nhắc hạn đăng ký + danh sách chưa đăng ký cho GVCN (TH)
+
+- Tài liệu mới `docs/he_sinh_thai/T4M_FLOW_NHAC_HAN.md`: ba lần nhắc (mở cổng, −2 ngày, −3 giờ) bằng email nhóm, nhắc riêng CLB Tuyển chọn chưa làm bài ×2, luật dưới 50 % sau 3 ngày → danh sách cho GVCN qua `T4M_FLOW_GUI_GVCN.md`, ước lượng theo giới hạn 6.000 yêu cầu/người/ngày. Nhãn TH/GĐ.
+- Công cụ mới `mau_forms_thi_clb/danh_sach_chua_dang_ky.py`: `ty_le_dang_ky` (hàm thuần, cờ `DUOI_50` khi < 50 %), `doc_da_dang_ky` (cột "[student_id] …" của Forms hoặc `student_id`), ghi `chua_dang_ky_<lớp>.csv` (chỉ mã + lớp) và `tong_hop.csv`; in số email cần và cảnh báo khi vượt 6.000.
+- Test mới (đỏ trước): `tests/test_fa_gap10_nhac_han.py` (4).
+
 ## 2026-11-10 — GAP-9: độ lệch giữa hai người chấm (TH)
 
 - `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `NGUONG_LECH_CHAM = 1.5`, `do_lech_cham(rows)` (hàm thuần: độ lệch tuyệt đối trung bình theo câu và theo CLB, cờ `LECH_CHAM` khi ≥ 1,5; dòng thiếu điểm người chấm 2 bị bỏ), `ghi_bao_cao(..., do_lech=None)` thêm trang "Độ lệch chấm" (các trang cũ giữ nguyên), lệnh `lech CHAM.csv --ra BAO_CAO.xlsx` (thiếu cột → báo, mã thoát 1).

@@ -18,10 +18,10 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-4 | 2 | DOING | e76bf48 | round 2 |
 | GAP-5 | 2 | DOING | e76bf48 | 3 feedback questions |
 | GAP-6 | 2 | DOING | e76bf48 | week-3 survey |
-| GAP-7 | 3 | TODO | | next-term capacity |
-| GAP-8 | 3 | TODO | | admin dashboard |
-| GAP-9 | 3a | DONE | (next) | two-grader deviation; 60/60 checked with wave 3a run |
-| GAP-10 | 3 | TODO | | reminders |
+| GAP-7 | 3a | TODO | | next-term capacity |
+| GAP-8 | 3b | TODO | | admin dashboard |
+| GAP-9 | 3a | DONE | 6587a64 | two-grader deviation; 60/60 checked with wave 3a run |
+| GAP-10 | 3a | DONE | (next) | reminders; 60/60 checked with wave 3a run |
 | GAP-11 | 4 | TODO | | Power Apps autosave kit |
 | GAP-12 | 4 | TODO | | simulation |
 | GAP-13 | 4 | TODO | | stable improvement cycles |
