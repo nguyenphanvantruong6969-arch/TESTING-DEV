@@ -8,6 +8,8 @@ chứng kiến. KHÔNG có tên hay mã học sinh. Hàm thuần (không đọc 
 import hashlib
 import html
 
+from rbda_priority_pipeline import khoa_sap_buoi
+
 THU_TU_LE = (
     "Chốt dữ liệu và in dấu vân tay dữ liệu (ô bên dưới) trước khi nhập hạt giống.",
     "Giáo viên chứng kiến chọn hạt giống (ví dụ gieo xúc xắc sáu lần) và tự gõ vào máy.",
@@ -33,7 +35,8 @@ def tao_ban_ghi(ky, thoi_diem, dau_van_tay, hat_giong, cap_stb, dem_theo_buoi, k
         "hat_giong": hat_giong,
         "sha256_stb": sha256_stb(cap_stb),
         "so_hoc_sinh_co_stb": len(cap_stb),
-        "dem_theo_buoi": {b: dict(v) for b, v in sorted(dem_theo_buoi.items())},
+        # FA-P4: buổi theo THỨ TỰ NGÀY (`chu_nhat` sau `thu_7`), như FA-O1, không theo vần
+        "dem_theo_buoi": {b: dict(v) for b, v in sorted(dem_theo_buoi.items(), key=lambda kv: khoa_sap_buoi(kv[0]))},
         "ket_qua_con_khop": bool(ket_qua_con_khop),
         "fa_daa": bool(fa_daa),
     }

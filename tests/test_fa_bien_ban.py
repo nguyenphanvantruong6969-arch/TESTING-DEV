@@ -245,3 +245,21 @@ def test_api_ten_workspace_co_ky_tu_dieu_khien_van_xuat_du_hai_tep(api, tmp_path
     assert os.path.isfile(ra["data"]["path"]) and os.path.isfile(ra["data"]["path_xlsx"])
     load_workbook(ra["data"]["path_xlsx"])
     assert "Kỳmột" in _o_xlsx(ra["data"]["path_xlsx"])
+
+
+# ----------------------------------------------------------------------------- FA-P4: buổi theo thứ tự ngày
+
+DEM_CN = {"chu_nhat": {"n_hoc_sinh": 2, "n_xep": 2}, "thu_2": {"n_hoc_sinh": 3, "n_xep": 3}}
+
+
+def test_bien_ban_buoi_theo_thu_tu_ngay_ca_html_lan_xlsx(tmp_path):
+    """FA-P4: `thu_2` đứng TRƯỚC `chu_nhat` (như THU_TU_BUOI), không theo vần; mã băm và số liệu không đổi."""
+    g = bb.tao_ban_ghi("Đợt", "t", "d", 1, CAP, DEM_CN)
+    assert list(g["dem_theo_buoi"]) == ["thu_2", "chu_nhat"]
+    assert g["sha256_stb"] == bb.sha256_stb(CAP) and g["dem_theo_buoi"]["chu_nhat"] == DEM_CN["chu_nhat"]
+    h = bb.html_bien_ban(g)
+    assert h.index("<td>thu_2</td>") < h.index("<td>chu_nhat</td>")
+    d = str(tmp_path / "bb.xlsx")
+    bb.ghi_xlsx(g, d)
+    o = _o_xlsx(d)
+    assert o.index("thu_2") < o.index("chu_nhat")

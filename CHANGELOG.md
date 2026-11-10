@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P4: biên bản bốc thăm liệt kê buổi theo thứ tự ngày
+
+- `fa_bien_ban.py` (`tao_ban_ghi`): `dem_theo_buoi` sắp bằng `khoa_sap_buoi` (như FA-O1), nên `thu_2` đứng trước `chu_nhat` ở cả bản HTML lẫn Excel; mã băm và số liệu không đổi.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py::test_bien_ban_buoi_theo_thu_tu_ngay_ca_html_lan_xlsx`.
+
 ## 2026-11-10 — FA-P3: màn hình kết quả báo buổi thiếu lý do
 
 - `api_xuat.py` (`get_ly_do_ket_qua`): khi FA bật trả thêm khoá `thieu_buoi` (buổi mà lần chạy mới nhất không dùng FA, nên không có lý do); FA tắt trả y như cũ.

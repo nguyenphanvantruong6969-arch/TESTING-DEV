@@ -102,3 +102,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-CI3 (PR #14) | xong | 2026-11-10 | .github/workflows/tests.yml, CHANGELOG.md | (CI Windows) | CI Windows cài python-docx; 9 test .docx chạy thật |
 | SM-1 | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản Excel bỏ ký tự openpyxl cấm |
 | FA-P3 | xong | 2026-11-10 | api_xuat.py, index.html, js/03_ket_qua.js, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py, test_giao_dien_fa_ket_qua.py | Màn hình kết quả báo buổi không có lý do |
+| FA-P4 | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản: buổi theo thứ tự ngày |
