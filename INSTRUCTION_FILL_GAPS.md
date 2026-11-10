@@ -1,5 +1,7 @@
 # INSTRUCTION — FILL ALL FA-DAA VISION GAPS (father / son sessions) — v2, 2026-11-10
 
+> **Simplest start:** see `START_HERE.md` (two short prompts, Claude routes itself). The prompts below still work.
+
 > **Order:** run this only **AFTER** `LATEST_INSTRUCTION.md` (7 small fixes) is finished (its report exists in
 > `docs/phien/bao_cao_dem/*_sua_nho.md`). PR #14 may still be open; this job works on its own branch.
 > **Goal:** bring every row of the vision priority table (`docs/ke_hoach/FA_DAA_VISION.md` §14), plus §11 (admin

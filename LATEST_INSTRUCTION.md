@@ -1,5 +1,7 @@
 # LATEST INSTRUCTION — Sửa 7 lỗi nhỏ trước khi merge PR #14 (2026-11-10)
 
+> **Simplest start:** see `START_HERE.md` (two short prompts, Claude routes itself). The prompts below still work.
+
 > Đây là tệp hướng dẫn **MỚI NHẤT**. Nếu tệp khác (kể cả `docs/phien/CHAY_DEM_FA_DAA.md`) nói khác, làm theo tệp này.
 > **Next after this:** `INSTRUCTION_FILL_GAPS.md` (fill all remaining vision gaps, father/son sessions).
 > Chỉ đọc nhãn "LATEST INSTRUCTION" ở dòng đầu là biết đây là bản đúng.
