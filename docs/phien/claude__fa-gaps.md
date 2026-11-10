@@ -23,7 +23,7 @@ Status: `docs/phien/FA_GAPS_STATUS.md`; specs: `docs/ke_hoach/FA_GAPS_KE_HOACH.m
 - Phase 1 (7 small fixes on claude/keen-ride-72sa7t) DONE: report docs/phien/bao_cao_dem/2026-11-10_sua_nho.md.
 - Wave 1 DONE + reviewed GO (bao_cao_dem/2026-11-10_fa_gaps_wave1.md): GAP-0 c6e0405, GAP-1 bb49d11, GAP-2 628cfb2.
 - Wave 2 coded and pushed (GAP-3 513711a; GAP-4/5/6 e76bf48); own tests + Chromium green, mutations caught;
-  BROAD related suites were running when context ran out → results unknown. Items are DOING, not DONE.
+  GAP-3 broad suite confirmed (4791 passed, 0 failed); GAP-4/5/6 broad suite must be rerun. Items are DOING.
 - Wave 3 spec: DRAFT at the end of docs/ke_hoach/FA_GAPS_KE_HOACH.md (not yet "spec ready").
 - Tests: new files tests/test_fa_gap{0..6}_*.py, tests/test_giao_dien_fa_gap{1,3,4,5}_*.py; count in
   CLAUDE_CHI_TIET.md = 238 test files.
