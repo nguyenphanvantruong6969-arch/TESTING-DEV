@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T22:55Z solo
 RUNNING-SON: 2026-11-10T22:55Z wave 2 solo
-Current wave: 3 (3a GAP-7/9/10 + 3b GAP-8) — son done, waiting for father review (wave 2: GO; wave 4 in progress in parallel)
+Current wave: 4 — son done, waiting for father review (wave 3: GO)
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -66,6 +66,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - W3 decisions (SOLO): split wave 3 into 3a (GAP-7, 9, 10) and 3b (GAP-8, size L); GAP-7 teacher limit in new table fa_gioi_han_gv; dashboard `khong_co_clb` is None before any run (never 0).
 - W4 decisions (SOLO): D8 still open → GAP-11 built as kit only; GAP-12/13 tables only via chay_mo_phong_day_du (old FA-10 tables unchanged); GAP-13 measurement mode only.
 
+- W3 review: GO (bao_cao_dem/2026-11-10_fa_gaps_wave3.md); 0 cao/trung.
+
 ## Log (append only: date | role | what | result)
 | 2026-11-10 | father (SOLO) | F1 setup: branch from keen-ride 60f75a5; phase 1 done 7/7 (bao_cao_dem/2026-11-10_sua_nho.md) | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
@@ -80,3 +82,5 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | father (SOLO) | F5 review wave 2: GO; report bao_cao_dem/2026-11-10_fa_gaps_wave2.md | ok |
 | 2026-11-10 | son (SOLO) | GAP-9, GAP-10, GAP-7, GAP-8: tests red first, own + related green, UI really ran, mutations caught, 60/60 after GAP-7 | ok |
 | 2026-11-10 | son (SOLO) | GAP-11: kit formulas, default kit byte-identical, mutation caught | ok |
+| 2026-11-10 | son (SOLO) | wave-3 broad suite on b0d832e: 5763 passed / 0 failed / 4 skipped | ok |
+| 2026-11-10 | father (SOLO) | F5 review wave 3: GO; report bao_cao_dem/2026-11-10_fa_gaps_wave3.md | ok |
