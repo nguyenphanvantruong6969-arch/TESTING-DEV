@@ -18,6 +18,7 @@
 ## 2026-11-10 — FA-CI1: sửa CI đỏ của PR #14 (Windows + văn phong)
 
 - `du_lieu_test/mo_phong_fa_daa.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`: `main` chuyển stdout/stderr sang UTF-8 (`reconfigure`, như `du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`); console Windows cp1252 làm hai script này ném `UnicodeEncodeError` khi in tiếng Việt. Tái hiện trên Linux bằng `PYTHONIOENCODING=cp1252` (4 đỏ trước, xanh sau).
+- `tests/test_mo_phong_fa_daa.py` `test_chay_dong_lenh`: đọc đầu ra script bằng `encoding="utf-8"` (như `test_fa_nhu_cau.py`); trên Windows bảng mã mặc định cp1252 làm `stdout` thành `None`. Tái hiện bằng `LC_ALL=C PYTHONUTF8=0 PYTHONCOERCECLOCALE=0`: đỏ trước, xanh sau.
 - `i18n_errors.py` (+ `i18n_loi.js` sinh lại): câu tiếng Anh của `bien_ban_chua_boc_tham` bỏ từ nội bộ "seed" (FA-9). `i18n.js`, `index.html`: nút biên bản ghi "bản in và Excel" / "printable page and Excel" thay chữ HOA "HTML" (FA-9, FA-9b). Cả hai do `tests/test_van_phong_tu_nhien.py` bắt.
 - Không test nào bị bỏ qua hay tắt.
 

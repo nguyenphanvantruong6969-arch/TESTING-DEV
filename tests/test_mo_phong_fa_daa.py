@@ -65,7 +65,7 @@ def test_khong_co_cau_nhan_dinh_va_khong_ma_hoc_sinh(kq):
 def test_chay_dong_lenh(tmp_path):
     ra = subprocess.run([sys.executable, os.path.join(GOC, "du_lieu_test", "mo_phong_fa_daa.py"),
                          "--n", "40", "--so-seed", "1", "--hai-ky", "3"], capture_output=True, text=True,
-                        timeout=120, cwd=str(tmp_path))
+                        encoding="utf-8", timeout=120, cwd=str(tmp_path))
     assert ra.returncode == 0, ra.stderr
     assert ra.stdout.count("SỐ LIỆU MÔ PHỎNG") >= 4
 
