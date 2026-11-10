@@ -51,6 +51,7 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-10 02:00Z sonnet-review-night-4 (manual, Truong asked)
 - 2026-11-09 Sonnet night 4 DONE: 6/6, 0 blocked, no RUNNING lock. Commits: FA-N1 24dc9a1, FA-N2 5ad2e48, FA-N3+N4 0d811dc, FA-9 cf90452, FA-10 6c7bf4d. Report: bao_cao_dem/2026-11-09_dem4.md.
 - Tests: related 2647 passed / 1 skipped; Chromium UI really ran; ruff clean; kiem_nhanh 7/7. Full suite not run (CI).
 - Truong 2026-11-10: night-4 review left to the auto task (not this session); PR to main AFTER night 5; D8 waits for GĐ2;
