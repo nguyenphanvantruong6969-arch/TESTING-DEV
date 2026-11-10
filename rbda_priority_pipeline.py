@@ -2071,6 +2071,22 @@ CREATE TABLE IF NOT EXISTS fa_khieu_nai (
     xu_ly_ghi_chu TEXT
 );
 
+-- Phản hồi của học sinh (FA gaps, GAP-5/GAP-6): 3 câu sau khi xem kết quả (loai ket_qua) và khảo sát tuần 3
+-- (loai tuan_3), từ kiosk hay nhập từ Forms. Lần trả lời sau cùng của mỗi em (theo loai) được tính. KHÔNG bao giờ đi
+-- vào khoá ưu tiên (bất biến 2).
+CREATE TABLE IF NOT EXISTS fa_phan_hoi (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    nguon TEXT NOT NULL CHECK (nguon IN ('kiosk', 'forms')),
+    loai TEXT NOT NULL CHECK (loai IN ('ket_qua', 'tuan_3')),
+    hai_long INTEGER CHECK (hai_long BETWEEN 1 AND 5),
+    hieu_ly_do INTEGER CHECK (hieu_ly_do IN (0, 1)),
+    kho_nhat TEXT CHECK (kho_nhat IN ('chon_clb', 'xep_thu_tu', 'huy_chuong', 'thu_thach', 'khong_co')),
+    con_di INTEGER CHECK (con_di IN (0, 1)),
+    muon_doi INTEGER CHECK (muon_doi IN (0, 1))
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

@@ -7,6 +7,7 @@ giờ đi vào `compute_club_priority` (bất biến 2).
 """
 
 import datetime
+import re
 
 # GAP-0 ---------------------------------------------------------------------------------------------------------------
 KIND = ("release", "invite_offer", "invite_accept", "invite_decline", "invite_expire", "round2", "appeal_rerun")
@@ -243,4 +244,115 @@ def anh_huong_sau_chay_lai(khieu_nai, run_goc: dict, dieu_chinh) -> dict:
         cu = sorted(d["id"] for d in dieu_chinh
                     if d["run_id_base"] == k["run_id_base"] and d["buoi"] == k["buoi"]) if da else []
         ra[k["id"]] = {"da_chay_lai": da, "dieu_chinh_cu": cu}
+    return ra
+
+
+# GAP-4 ---------------------------------------------------------------------------------------------------------------
+def can_vong_2(vi_tri: dict, nguyen_vong: dict, buoi: str) -> list:
+    """Học sinh của `buoi` chưa có CLB mong muốn: chưa có chỗ, hoặc chỗ hiện tại không nằm trong nguyện vọng của chính
+    em (dự phòng). Sắp theo mã. Hàm thuần."""
+    return sorted(sid for (sid, b), cid in vi_tri.items()
+                  if b == buoi and (cid is None or cid not in (nguyen_vong.get(sid) or [])))
+
+
+def cho_con_lai(vi_tri: dict, suc_chua: dict, dang_moi: dict, buoi: str, clb_cua_buoi) -> dict:
+    """{club_id: số chỗ còn} của các CLB thuộc `buoi`: chỉ tiêu − thành viên hiện tại − lời mời đang chờ; chỉ CLB còn
+    chỗ (> 0). Hàm thuần."""
+    dem: dict = {}
+    for (_, b), cid in vi_tri.items():
+        if b == buoi and cid:
+            dem[cid] = dem.get(cid, 0) + 1
+    ra = {}
+    for cid in sorted(clb_cua_buoi):
+        con = (suc_chua.get(cid) or 0) - dem.get(cid, 0) - dang_moi.get(cid, 0)
+        if con > 0:
+            ra[cid] = con
+    return ra
+
+
+def chay_vong_2(thu_tu, chon: dict, con_lai: dict) -> list:
+    """Vòng 2, MỘT lượt (độc tài tuần tự): theo `thu_tu` (thứ tự bốc thăm của buổi), mỗi em lấy CLB đầu tiên trong
+    `chon[em]` còn chỗ. Em không có lựa chọn dùng được thì bỏ qua. Trả [(em, club_id)]. Không sửa đầu vào."""
+    con = dict(con_lai)
+    ra = []
+    for sid in thu_tu:
+        for cid in chon.get(sid) or []:
+            if con.get(cid, 0) > 0:
+                con[cid] -= 1
+                ra.append((sid, cid))
+                break
+    return ra
+
+
+# GAP-5 / GAP-6 -------------------------------------------------------------------------------------------------------
+KHO_NHAT = ("chon_clb", "xep_thu_tu", "huy_chuong", "thu_thach", "khong_co")
+COT_PHAN_HOI = ("id", "created_at", "student_id", "nguon", "loai", "hai_long", "hieu_ly_do", "kho_nhat", "con_di",
+                "muon_doi")
+# Mã câu hỏi trong mẫu Forms (`mau_forms_thi_clb/bieu_mau.py` dựng tiêu đề "[mã] …"; lựa chọn kết thúc "(mã)").
+MA_CAU_PHAN_HOI = {"hai_long": "ket_qua", "hieu_ly_do": "ket_qua", "kho_nhat": "ket_qua",
+                   "con_di": "tuan_3", "muon_doi": "tuan_3"}
+_MA_CAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[([^\]]+)\]")
+_MA_LUA_CHON = re.compile(r"\(([A-Za-z0-9_]+)\)\s*$")
+
+
+def _ty_le(ds):
+    ds = [x for x in ds if x is not None]
+    return (sum(ds) / len(ds)) if ds else None
+
+
+def tong_hop_phan_hoi(rows, loai: str) -> dict:
+    """Tổng hợp phản hồi loại `loai` ("ket_qua" | "tuan_3"): lần trả lời SAU CÙNG (id lớn nhất) của mỗi em. Không có
+    mã học sinh trong kết quả. Rỗng -> n 0, các tỉ lệ None. Hàm thuần."""
+    cuoi = {}
+    for r in sorted(rows, key=lambda x: x["id"]):
+        if r["loai"] == loai:
+            cuoi[r["student_id"]] = r
+    ds = list(cuoi.values())
+    hl = [r["hai_long"] for r in ds if r["hai_long"] is not None]
+    return {
+        "n": len(ds),
+        "hai_long_tb": (sum(hl) / len(hl)) if hl else None,
+        "hai_long_dem": {k: sum(1 for x in hl if x == k) for k in range(1, 6)},
+        "hieu_ly_do_ty_le": _ty_le([r["hieu_ly_do"] for r in ds]),
+        "kho_nhat_dem": {k: sum(1 for r in ds if r["kho_nhat"] == k) for k in KHO_NHAT},
+        "con_di_ty_le": _ty_le([r["con_di"] for r in ds]),
+        "muon_doi_ty_le": _ty_le([r["muon_doi"] for r in ds]),
+    }
+
+
+def doc_tep_forms_phan_hoi(hang) -> list:
+    """Các dòng của tệp xuất Forms (hàng 1 = tiêu đề) -> [{student_id, loai, hai_long, ...}]. Cột nhận theo MÃ trong
+    "[mã]" của tiêu đề; giá trị theo "(mã)" cuối lựa chọn. Dòng thiếu mã học sinh bị bỏ. Không có cột câu hỏi nào
+    của mẫu -> ValueError."""
+    hang = list(hang)
+    if not hang:
+        raise ValueError("tep rong")
+    cot = {}
+    for i, o in enumerate(hang[0]):
+        m = _MA_CAU.match(str(o or ""))
+        if m:
+            cot[m.group(1).strip()] = i
+    loai_co = {MA_CAU_PHAN_HOI[m] for m in cot if m in MA_CAU_PHAN_HOI}
+    if "student_id" not in cot or not loai_co:
+        raise ValueError("khong co cot cau hoi phan hoi")
+
+    def lay(d, ma):
+        if ma not in cot or cot[ma] >= len(d) or d[cot[ma]] in (None, ""):
+            return None
+        m = _MA_LUA_CHON.search(str(d[cot[ma]]).strip())
+        return m.group(1) if m else None
+
+    ra = []
+    for d in hang[1:]:
+        sid = str(d[cot["student_id"]] or "").strip() if cot["student_id"] < len(d) else ""
+        if not sid:
+            continue
+        for loai in sorted(loai_co):
+            dong = {"student_id": sid, "loai": loai, "hai_long": None, "hieu_ly_do": None, "kho_nhat": None,
+                    "con_di": None, "muon_doi": None}
+            for ma, l in MA_CAU_PHAN_HOI.items():
+                if l == loai:
+                    v = lay(d, ma)
+                    dong[ma] = v if ma == "kho_nhat" else (int(v) if v is not None and v.isdigit() else None)
+            ra.append(dong)
     return ra

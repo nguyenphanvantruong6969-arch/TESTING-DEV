@@ -11,7 +11,7 @@ from api_workspace import CauHinhHong, LoiDuongXuat, loi_cau_hinh
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
-from rbda_priority_pipeline import dung_fa_daa, khoa_sap_buoi
+from rbda_priority_pipeline import BUOI_MAC_DINH, dung_fa_daa, khoa_sap_buoi
 
 CHU_TRANG_THAI = {"CO_MAT": "Có mặt", "VANG_CO_PHEP": "Vắng có phép", "VANG_KHONG_PHEP": "Vắng không phép"}
 
@@ -329,6 +329,223 @@ class SauXepMixin:
                        k["xu_ly_ghi_chu"] or "", "1" if k["da_chay_lai"] else "0",
                        ";".join(str(i) for i in k["dieu_chinh_cu"])] for k in sorted(ds, key=lambda x: x["id"])])
             return _ok({"path": duong, "n_rows": len(ds)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    # GAP-4 -----------------------------------------------------------------------------------------------------------
+    def _co_vong_2(self) -> bool:
+        luat = self._luat_nghiem()
+        return dung_fa_daa(luat) and luat.get("fa_vong_2") is True
+
+    def _du_lieu_vong_2(self, cur, buoi):
+        """(buoi, ds_buoi, da_chay, [em theo thứ tự bốc thăm], {club: còn}, run_goc, vi_tri)."""
+        from rbda_priority_pipeline import sinh_stb_theo_buoi
+        vi_tri, _, run_goc = sx.doc_vi_tri(cur)
+        ds_buoi = sorted(run_goc, key=khoa_sap_buoi)
+        buoi = buoi if buoi in run_goc else (ds_buoi[0] if ds_buoi else "")
+        dc = sx.doc_dieu_chinh(cur)
+        da_chay = any(d["kind"] == "round2" and d["buoi"] == buoi and d["run_id_base"] == run_goc.get(buoi)
+                      for d in dc)
+        nv: dict = {}
+        for sid, cid in cur.execute("SELECT student_id, club_id FROM preferences ORDER BY student_id, rank"):
+            nv.setdefault(sid, []).append(cid)
+        clubs = {r[0]: {"capacity": r[1], "buoi": r[2] or BUOI_MAC_DINH}
+                 for r in cur.execute("SELECT club_id, capacity, buoi FROM clubs")}
+        tat_ca_buoi = sorted({c["buoi"] for c in clubs.values()}, key=khoa_sap_buoi)
+        stb_goc = {r[0]: r[1] for r in cur.execute(
+            "SELECT student_id, stb_number FROM students WHERE stb_number IS NOT NULL")}
+        seed = (cur.execute("SELECT seed FROM stb_lock WHERE id = 1").fetchone() or [None])[0] or 0
+        stb = sinh_stb_theo_buoi(stb_goc, tat_ca_buoi, seed, "stb_ngay").get(buoi, stb_goc) if buoi else {}
+        can = sx.can_vong_2(vi_tri, nv, buoi)
+        thu_tu = sorted(can, key=lambda s: (stb.get(s, float("inf")), s))
+        dang = {}
+        for d in sx.moi_dang_cho(dc, run_goc).values():
+            if d["buoi"] == buoi:
+                dang[d["club_to"]] = dang.get(d["club_to"], 0) + 1
+        con = sx.cho_con_lai(vi_tri, {c: v["capacity"] for c, v in clubs.items()}, dang, buoi,
+                             {c for c, v in clubs.items() if v["buoi"] == buoi})
+        return buoi, ds_buoi, da_chay, thu_tu, con, run_goc, vi_tri
+
+    def get_vong_2(self, buoi: str = ""):
+        """GAP-4: học sinh cần vòng 2 (theo thứ tự bốc thăm của buổi) và chỗ còn trống. Cờ tắt -> {bat: False}."""
+        try:
+            if not self._co_vong_2():
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                buoi, ds_buoi, da_chay, thu_tu, con, _, vi_tri = self._du_lieu_vong_2(cur, buoi)
+                ten = {r[0]: r[1] or "" for r in cur.execute("SELECT student_id, name FROM students")}
+                ten_clb = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+            return _ok({"bat": True, "buoi": buoi, "ds_buoi": ds_buoi, "da_chay": da_chay,
+                        "hoc_sinh": [{"student_id": s, "name": ten.get(s, ""),
+                                      "club_hien_tai": vi_tri.get((s, buoi)) or ""} for s in thu_tu],
+                        "cho_con_lai": [{"club_id": c, "name": ten_clb.get(c, c), "con": n} for c, n in con.items()]})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def chay_vong_2_api(self, buoi: str, chon: dict):
+        """GAP-4: chạy vòng 2 của `buoi` MỘT lượt với lựa chọn {học sinh: [club_id theo thứ tự muốn]}; mỗi em được xếp
+        là một dòng `round2`. Không sửa kết quả xếp."""
+        try:
+            if not self._co_vong_2():
+                return _fail(err("fa_vong_2_chua_bat"))
+            if not isinstance(chon, dict):
+                return _fail(err("vong_2_lua_chon_sai", student_id="", club_id=""))
+            with self._ket_noi_ghi() as cur:
+                buoi, _, da_chay, thu_tu, con, run_goc, vi_tri = self._du_lieu_vong_2(cur, buoi)
+                if da_chay:
+                    return _fail(err("vong_2_da_chay"))
+                hop_le = set(thu_tu)
+                ds_clb = {r[0] for r in cur.execute("SELECT club_id, buoi FROM clubs")
+                          if (r[1] or BUOI_MAC_DINH) == buoi}
+                for sid, ds in chon.items():
+                    if sid not in hop_le:
+                        return _fail(err("vong_2_lua_chon_sai", student_id=sid, club_id=""))
+                    for cid in ds or []:
+                        if cid not in ds_clb:
+                            return _fail(err("vong_2_lua_chon_sai", student_id=sid, club_id=cid))
+                xep = sx.chay_vong_2(thu_tu, chon, con)
+                for sid, cid in xep:
+                    sx.ghi_dieu_chinh(cur, run_goc[buoi], buoi, sid, vi_tri.get((sid, buoi)), cid, "round2",
+                                      actor="vong_2")
+                da_xep = {s for s, _ in xep}
+                return _ok({"buoi": buoi, "xep": [{"student_id": s, "club_id": c} for s, c in xep],
+                            "bo_qua": [s for s in thu_tu if s in chon and s not in da_xep]})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    # GAP-5 / GAP-6 ---------------------------------------------------------------------------------------------------
+    def _co_phan_hoi(self) -> bool:
+        luat = self._luat_nghiem()
+        return dung_fa_daa(luat) and luat.get("fa_phan_hoi") is True
+
+    def _doc_phan_hoi(self, cur):
+        return [dict(zip(sx.COT_PHAN_HOI, r)) for r in cur.execute(
+            "SELECT %s FROM fa_phan_hoi ORDER BY id" % ", ".join(sx.COT_PHAN_HOI))]
+
+    def gui_phan_hoi(self, student_id: str, hai_long, hieu_ly_do, kho_nhat: str):
+        """GAP-5: ba câu một chạm của một học sinh ở kiosk (lần sau thay lần trước khi tổng hợp)."""
+        try:
+            if not self._co_phan_hoi():
+                return _fail(err("fa_phan_hoi_chua_bat"))
+            if isinstance(hai_long, bool) or hai_long not in (1, 2, 3, 4, 5) or not isinstance(hieu_ly_do, bool) \
+                    or kho_nhat not in sx.KHO_NHAT:
+                return _fail(err("phan_hoi_gia_tri_sai"))
+            with self._ket_noi_ghi() as cur:
+                if not cur.execute("SELECT 1 FROM students WHERE student_id = ?", (student_id,)).fetchone():
+                    return _fail(err("student_not_found", student_id=student_id))
+                cur.execute("INSERT INTO fa_phan_hoi (created_at, student_id, nguon, loai, hai_long, hieu_ly_do, "
+                            "kho_nhat) VALUES (?, ?, 'kiosk', 'ket_qua', ?, ?, ?)",
+                            (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), student_id, hai_long,
+                             1 if hieu_ly_do else 0, kho_nhat))
+                return _ok({"id": cur.lastrowid})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    def get_phan_hoi_tong_hop(self):
+        """GAP-5/6: tổng hợp (không có mã học sinh) của phản hồi 3 câu và khảo sát tuần 3."""
+        try:
+            if not self._co_phan_hoi():
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                rows = self._doc_phan_hoi(cur)
+            return _ok({"bat": True, "ket_qua": sx.tong_hop_phan_hoi(rows, "ket_qua"),
+                        "tuan_3": sx.tong_hop_phan_hoi(rows, "tuan_3")})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def nhap_phan_hoi_forms(self, file_base64: str):
+        """GAP-5/6 (TH): nạp tệp Excel xuất từ biểu mẫu phản hồi / khảo sát tuần 3. Mã học sinh lạ bị bỏ (đếm)."""
+        import base64
+        import binascii
+        import io
+
+        from openpyxl import load_workbook
+        try:
+            if not self._co_phan_hoi():
+                return _fail(err("fa_phan_hoi_chua_bat"))
+            try:
+                wb = load_workbook(io.BytesIO(base64.b64decode(file_base64, validate=True)), read_only=True,
+                                   data_only=True)
+                dong = sx.doc_tep_forms_phan_hoi(wb.worksheets[0].iter_rows(values_only=True))
+            except (ValueError, binascii.Error, OSError, KeyError, IndexError) as e:
+                return _fail(err("phan_hoi_tep_sai", detail=str(e)))
+            except Exception as e:                     # zipfile.BadZipFile, InvalidFileException…
+                return _fail(err("phan_hoi_tep_sai", detail=type(e).__name__))
+            luc = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            dem = {"ket_qua": 0, "tuan_3": 0}
+            bo_qua = set()
+            with self._ket_noi_ghi() as cur:
+                co = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+                for d in dong:
+                    if d["student_id"] not in co:
+                        bo_qua.add(d["student_id"])
+                        continue
+                    cur.execute(
+                        "INSERT INTO fa_phan_hoi (created_at, student_id, nguon, loai, hai_long, hieu_ly_do, "
+                        "kho_nhat, con_di, muon_doi) VALUES (?, ?, 'forms', ?, ?, ?, ?, ?, ?)",
+                        (luc, d["student_id"], d["loai"], d["hai_long"], d["hieu_ly_do"], d["kho_nhat"],
+                         d["con_di"], d["muon_doi"]))
+                    dem[d["loai"]] += 1
+            return _ok({"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua)})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    def export_phan_hoi(self, output_path: str = ""):
+        """GAP-5/6: `phan_hoi.xlsx` — trang "Tổng hợp" (không có mã), "Chi tiết" (mã học sinh, không có tên)."""
+        return self._khoa_xuat(self._export_phan_hoi_da_khoa, output_path)
+
+    def _export_phan_hoi_da_khoa(self, output_path: str = ""):
+        from openpyxl import Workbook
+
+        from so_excel import Trang
+        try:
+            if not self._co_phan_hoi():
+                return _fail(err("fa_phan_hoi_chua_bat"))
+            with self._ket_noi_doc() as cur:
+                rows = self._doc_phan_hoi(cur)
+            wb = Workbook()
+            t = Trang(wb.active)
+            wb.active.title = "Tổng hợp"
+            tq = sx.tong_hop_phan_hoi(rows, "ket_qua")
+            t.bang(["Chỉ số", "Giá trị"], [
+                ["Số học sinh trả lời (3 câu)", tq["n"]],
+                ["Hài lòng trung bình (1–5)", "" if tq["hai_long_tb"] is None else round(tq["hai_long_tb"], 2)],
+                *[["Hài lòng = %d" % k, v] for k, v in tq["hai_long_dem"].items()],
+                ["Tỉ lệ hiểu lý do", "" if tq["hieu_ly_do_ty_le"] is None else round(tq["hieu_ly_do_ty_le"], 3)],
+                *[["Khó nhất: %s" % k, v] for k, v in tq["kho_nhat_dem"].items()],
+            ])
+            t.xong()
+            t2 = Trang(wb.create_sheet("Chi tiết"))
+            t2.bang(["Mã học sinh", "Loại", "Nguồn", "Hài lòng", "Hiểu lý do", "Khó nhất", "Còn đi", "Muốn đổi",
+                     "Thời điểm"],
+                    [[r["student_id"], r["loai"], r["nguon"], r["hai_long"], r["hieu_ly_do"], r["kho_nhat"],
+                      r["con_di"], r["muon_doi"], r["created_at"]] for r in rows], khoa=True)
+            t2.xong()
+            t3 = Trang(wb.create_sheet("Tuần 3"))
+            tw = sx.tong_hop_phan_hoi(rows, "tuan_3")
+            t3.bang(["Chỉ số", "Giá trị"], [
+                ["Số học sinh trả lời (tuần 3)", tw["n"]],
+                ["Tỉ lệ còn đi CLB", "" if tw["con_di_ty_le"] is None else round(tw["con_di_ty_le"], 3)],
+                ["Tỉ lệ muốn đổi CLB", "" if tw["muon_doi_ty_le"] is None else round(tw["muon_doi_ty_le"], 3)],
+            ])
+            t3.xong()
+            duong = self._duong_xuat(output_path, "phan_hoi.xlsx")
+            wb.save(duong)
+            return _ok({"path": duong, "n_rows": len(rows)})
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except CauHinhHong as e:

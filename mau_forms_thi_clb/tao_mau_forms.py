@@ -853,6 +853,42 @@ def sinh_bien_the(de, thu_muc):
     return ra
 
 
+# ------------------------------------------- GAP-5 / GAP-6 (TH): biểu mẫu khảo sát học sinh sau khi xếp
+
+def _ghi_khao_sat(de, thu_muc, ten_docx, ten_md, phan, hau_to, tieu_de_md, cau_md):
+    """Ghi một biểu mẫu khảo sát (.docx Quick Import + hướng dẫn .md). Sinh lại cho ra tệp giống hệt từng byte."""
+    os.makedirs(thu_muc, exist_ok=True)
+    duong_md = os.path.join(thu_muc, ten_md)
+    dong = ["# %s" % tieu_de_md, "",
+            "> **TH — chưa thử trên Microsoft Forms thật.** Sinh từ `tao_mau_forms.py`; đừng sửa tay.", "",
+            "## Cài đặt", "",
+            "- Nhập `%s` bằng Quick Import." % ten_docx,
+            "- Settings: chỉ một lần trả lời mỗi người; mọi câu bắt buộc.",
+            "- Xuất kết quả: Responses → Open in Excel; đem tệp đó nạp ở kiosk (khung Phản hồi, nút Nạp từ Forms).",
+            "- Câu hỏi giữ nguyên phần mã trong ngoặc vuông và ngoặc tròn: kiosk đọc theo mã đó.", "",
+            "## Câu hỏi", ""] + ["- %s" % c for c in cau_md] + [""]
+    with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(dong))
+    duong_docx = os.path.join(thu_muc, ten_docx)
+    ghi_docx_chi_thi(de, duong_docx, phan=phan, hau_to=hau_to)
+    return [duong_md, duong_docx]
+
+
+def sinh_phan_hoi(de, thu_muc):
+    """GAP-5 (TH): biểu mẫu 3 câu phản hồi."""
+    return _ghi_khao_sat(de, thu_muc, "NHAP_FORMS_PHAN_HOI.docx", "CAI_DAT_FORMS_PHAN_HOI.md",
+                         bm.cac_phan_phan_hoi(), " — phản hồi sau khi xem kết quả",
+                         "Biểu mẫu phản hồi sau khi xem kết quả (3 câu)",
+                         [bm.CAU_HAI_LONG, bm.CAU_HIEU_LY_DO, bm.CAU_KHO_NHAT])
+
+
+def sinh_tuan_3(de, thu_muc):
+    """GAP-6 (TH): biểu mẫu khảo sát tuần 3."""
+    return _ghi_khao_sat(de, thu_muc, "NHAP_FORMS_TUAN_3.docx", "CAI_DAT_FORMS_TUAN_3.md",
+                         bm.cac_phan_tuan_3(), " — khảo sát tuần 3", "Khảo sát tuần 3 (2 câu)",
+                         [bm.CAU_CON_DI, bm.CAU_MUON_DOI])
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--chi-thi", action="store_true",
@@ -863,6 +899,10 @@ def main(argv=None):
                     help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
     ap.add_argument("--bien-the", action="store_true",
                     help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
+    ap.add_argument("--phan-hoi", action="store_true",
+                    help="GAP-5 (TH): biểu mẫu 3 câu phản hồi sau khi xem kết quả")
+    ap.add_argument("--tuan-3", action="store_true",
+                    help="GAP-6 (TH): biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
     ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
                     help="chỉ với --fa-daa: Sổ nhập CLB (FA-M1) để biết Loại; CLB Tự do không có trong câu vàng")
     ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
@@ -874,10 +914,22 @@ def main(argv=None):
         ap.error("--fa-daa là một chế độ riêng, không dùng chung với --chi-thi hay --moi-clb")
     if a.bien_the and (a.fa_daa or a.moi_clb or a.chi_thi):
         ap.error("--bien-the là một chế độ riêng, không dùng chung với --fa-daa, --chi-thi hay --moi-clb")
+    if a.tuan_3 and (a.phan_hoi or a.fa_daa or a.moi_clb or a.chi_thi or a.bien_the):
+        ap.error("--tuan-3 là một chế độ riêng, không dùng chung với chế độ khác")
+    if a.phan_hoi and (a.fa_daa or a.moi_clb or a.chi_thi or a.bien_the):
+        ap.error("--phan-hoi là một chế độ riêng, không dùng chung với chế độ khác")
     if a.so_nhap_clb and not a.fa_daa:
         ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
     try:
         de = bm.doc_de_thi(a.de)
+        if a.tuan_3:
+            ra = sinh_tuan_3(de, a.ra)
+            print("Đã sinh mẫu Forms khảo sát tuần 3 (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            return 0
+        if a.phan_hoi:
+            ra = sinh_phan_hoi(de, a.ra)
+            print("Đã sinh mẫu Forms phản hồi (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            return 0
         if a.bien_the:
             ra = sinh_bien_the(de, a.ra)
             print("Đã sinh mẫu Forms đề biến thể (TH): %d tệp (%s)." % (len(ra), ", ".join(os.path.basename(x) for x in ra)))

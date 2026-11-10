@@ -718,6 +718,30 @@ MESSAGES = {
         "vi": "Không lưu được thay đổi sau khi xếp. Hãy thử lại.",
         "en": "Couldn't save the after-allocation change. Try again.",
     },
+    "fa_vong_2_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật vòng 2 sau khi xếp.",
+        "en": "This workspace doesn't use a second round after allocation.",
+    },
+    "vong_2_lua_chon_sai": {
+        "vi": "Lựa chọn vòng 2 không hợp lệ: {person_l} {student_id} không cần vòng 2, hoặc {slot_l} {club_id} không thuộc buổi này.",
+        "en": "Invalid second-round choice: {person} {student_id} doesn't need round 2, or {slot_l} {club_id} isn't in this session.",
+    },
+    "vong_2_da_chay": {
+        "vi": "Vòng 2 của buổi này đã chạy rồi (chỉ chạy một lượt).",
+        "en": "Round 2 for this session has already run (it runs once).",
+    },
+    "fa_phan_hoi_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật phản hồi của {person_pl}.",
+        "en": "This workspace doesn't collect {person} feedback.",
+    },
+    "phan_hoi_gia_tri_sai": {
+        "vi": "Câu trả lời phản hồi không hợp lệ: hài lòng từ 1 đến 5, hiểu lý do có hoặc không, và một phần khó nhất trong danh sách.",
+        "en": "Invalid feedback answer: satisfaction 1 to 5, understood yes or no, and one hardest part from the list.",
+    },
+    "phan_hoi_tep_sai": {
+        "vi": "Tệp này không phải tệp xuất của biểu mẫu phản hồi (không thấy cột mã {person_l} và câu hỏi phản hồi).",
+        "en": "This file isn't an export of the feedback form (no {person} ID column or feedback question).",
+    },
     "fa_khieu_nai_chua_bat": {
         "vi": "Không gian làm việc này chưa bật nhận khiếu nại sau khi xếp.",
         "en": "This workspace doesn't take appeals after allocation.",
