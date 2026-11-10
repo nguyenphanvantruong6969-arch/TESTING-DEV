@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P5: cặp biên bản HTML + Excel luôn cùng tên gốc
+
+- `api_xuat.py` (`_export_bien_ban_da_khoa`): chọn MỘT tên gốc cho cả cặp bằng `_duong_xuat(..., kem_duoi=(".xlsx",))`, đường Excel suy từ đường HTML. Thư mục đã có `bb.xlsx` -> `bb (2).html` + `bb (2).xlsx` (trước đây `bb.html` + `bb (2).xlsx`); không ghi đè tệp cũ.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py` — `test_api_html_va_xlsx_cung_ten_goc_khi_da_co_tep_xlsx`, `test_api_thu_muc_trong_thi_ten_goc_giu_nguyen`.
+
 ## 2026-11-10 — FA-P6: cảnh báo buổi thiếu lý do theo thứ tự ngày
 
 - `api_xuat.py` (`_doc_ly_do_moi_nhat`): `tat_ca_buoi` sắp bằng `khoa_sap_buoi`, nên cảnh báo `fa_ly_do_thieu_buoi` của `export_ly_do_csv` và `thieu_buoi` (FA-P3) liệt kê `thu_2` trước `chu_nhat`.

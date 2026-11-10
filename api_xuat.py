@@ -1751,13 +1751,12 @@ class XuatKetQuaMixin:
                 doc_cau_hinh(self.db_path).get("name", ""),
                 datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), dvt[0], khoa[1], cap, dem,
                 ket_qua_con_khop=(dvt[0] == hien_tai), fa_daa=dung_fa_daa(rules))
-            duong = self._duong_xuat(output_path, "bien_ban_boc_tham.html")
+            # FA-9b + FA-P5: bản Excel cạnh bản HTML, MỘT tên gốc cho cả cặp (tên chỉ coi là trống khi trống cho
+            # cả .html lẫn .xlsx), không ghi đè tệp cũ
+            duong = self._duong_xuat(output_path, "bien_ban_boc_tham.html", kem_duoi=(".xlsx",))
+            duong_x = os.path.splitext(duong)[0] + ".xlsx"
             with open(duong, "w", encoding="utf-8") as f:
                 f.write(fa_bien_ban.html_bien_ban(ban_ghi))
-            # FA-9b: bản Excel cạnh bản HTML (cùng tên, đuôi .xlsx), cũng không ghi đè tệp cũ
-            goc = (output_path or "").strip()
-            duong_x = self._duong_xuat(os.path.splitext(goc)[0] + ".xlsx" if goc else "",
-                                       "bien_ban_boc_tham.xlsx")
             fa_bien_ban.ghi_xlsx(ban_ghi, duong_x)
             return _ok({"path": duong, "path_xlsx": duong_x, "sha256_stb": ban_ghi["sha256_stb"],
                         "hat_giong": ban_ghi["hat_giong"],

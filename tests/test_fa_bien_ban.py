@@ -263,3 +263,31 @@ def test_bien_ban_buoi_theo_thu_tu_ngay_ca_html_lan_xlsx(tmp_path):
     bb.ghi_xlsx(g, d)
     o = _o_xlsx(d)
     assert o.index("thu_2") < o.index("chu_nhat")
+
+
+# ----------------------------------------------------------------------------- FA-P5: cặp HTML + Excel cùng tên gốc
+
+
+def test_api_html_va_xlsx_cung_ten_goc_khi_da_co_tep_xlsx(api, tmp_path):
+    """FA-P5 repro: thư mục đã có `bb.xlsx` (không có `bb.html`) -> trước đây `bb.html` + `bb (2).xlsx`. Nay MỘT tên
+    gốc cho cả cặp: `bb (2).html` + `bb (2).xlsx`; tệp cũ không bị ghi đè."""
+    import os
+    _dung(api)
+    assert api.run_pipeline(seed=11)["ok"]
+    cu = tmp_path / "bb.xlsx"
+    cu.write_bytes(b"cu")
+    ra = api.export_bien_ban_boc_tham(str(tmp_path / "bb.html"))
+    assert ra["ok"], ra
+    assert os.path.basename(ra["data"]["path"]) == "bb (2).html"
+    assert os.path.basename(ra["data"]["path_xlsx"]) == "bb (2).xlsx"
+    assert cu.read_bytes() == b"cu"
+
+
+def test_api_thu_muc_trong_thi_ten_goc_giu_nguyen(api, tmp_path):
+    import os
+    _dung(api)
+    assert api.run_pipeline(seed=11)["ok"]
+    ra = api.export_bien_ban_boc_tham(str(tmp_path / "bb.html"))
+    assert ra["ok"], ra
+    assert (os.path.basename(ra["data"]["path"]), os.path.basename(ra["data"]["path_xlsx"])) == \
+        ("bb.html", "bb.xlsx")

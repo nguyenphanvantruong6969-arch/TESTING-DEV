@@ -104,3 +104,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-P3 | xong | 2026-11-10 | api_xuat.py, index.html, js/03_ket_qua.js, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py, test_giao_dien_fa_ket_qua.py | Màn hình kết quả báo buổi không có lý do |
 | FA-P4 | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản: buổi theo thứ tự ngày |
 | FA-P6 | xong | 2026-11-10 | api_xuat.py, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py | Cảnh báo buổi thiếu lý do theo thứ tự ngày |
+| FA-P5 | xong | 2026-11-10 | api_xuat.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản HTML và Excel cùng tên gốc |
