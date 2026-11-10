@@ -107,3 +107,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-P5 | xong | 2026-11-10 | api_xuat.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản HTML và Excel cùng tên gốc |
 | SM-2 | xong | 2026-11-10 | tests/test_giao_dien_fa_n2_luu_mac_dinh.py, CHANGELOG.md | tests/test_giao_dien_fa_n2_luu_mac_dinh.py | Test UI hết chờ cố định 800 ms |
 | FA-P7/SM-3 | xong | 2026-11-10 | .claude/skills/soat-ma/scripts/kiem_nhanh.py, CHANGELOG.md | tests/test_skill_soat_ma.py | kiem_nhanh --so-seed N > 5 không còn bị cắt ở 5 |
+| GAP-0 | xong | 2026-11-10 | fa_sau_xep.py, rbda_priority_pipeline.py (DEFAULT_SCHEMA), kiem_nhanh.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap0_dieu_chinh.py | Nhật ký điều chỉnh sau xếp + phát lại |

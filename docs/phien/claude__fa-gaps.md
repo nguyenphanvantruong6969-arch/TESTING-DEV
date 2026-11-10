@@ -13,7 +13,7 @@ D1 memo. Every behaviour behind a new `rules` key defaulting to False; default o
 Status: `docs/phien/FA_GAPS_STATUS.md`; specs: `docs/ke_hoach/FA_GAPS_KE_HOACH.md`. Run mode: SOLO (START_HERE §2.2b).
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [ ] GAP-0 fa_dieu_chinh + vi_tri_hien_tai (w1)  - [ ] GAP-1 attendance (w1)  - [ ] GAP-2 waitlist invites (w1)
+- [x] GAP-0 fa_dieu_chinh + vi_tri_hien_tai (w1)  - [ ] GAP-1 attendance (w1)  - [ ] GAP-2 waitlist invites (w1)
 - [ ] GAP-3 appeals (w2)  - [ ] GAP-4 round 2 (w2)  - [ ] GAP-5 feedback (w2)  - [ ] GAP-6 week-3 survey (w2)
 - [ ] GAP-7 next-term capacity (w3)  - [ ] GAP-8 admin dashboard (w3)  - [ ] GAP-9 two-grader deviation (w3)
 - [ ] GAP-10 reminders (w3)  - [ ] GAP-11 Power Apps kit (w4)  - [ ] GAP-12 simulation (w4)
@@ -35,3 +35,4 @@ Status: `docs/phien/FA_GAPS_STATUS.md`; specs: `docs/ke_hoach/FA_GAPS_KE_HOACH.m
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-10 | Opus (SOLO) | F1 setup: branch claude/fa-gaps from keen-ride 60f75a5 | phase 1 done 7/7 |
+| 2026-11-10 | Opus (SOLO, son hat) | GAP-0 done: fa_dieu_chinh + vi_tri_hien_tai; 16 tests red first; related 2456 passed/1 skipped; 2 mutations caught; 60/60 | |

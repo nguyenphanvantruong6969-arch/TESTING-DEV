@@ -2026,6 +2026,23 @@ CREATE TABLE IF NOT EXISTS fa_ly_do (
     PRIMARY KEY (run_id, buoi, student_id, club_id)
 );
 
+-- Nhật ký điều chỉnh sau khi xếp (FA gaps, GAP-0): CHỈ GHI THÊM, như run_history; không khoá ngoại (dấu vết).
+-- Kết quả DA (match_results) không bao giờ bị sửa tại chỗ: chỗ hiện tại = lần chạy gốc + các dòng này phát lại theo
+-- id (fa_sau_xep.vi_tri_hien_tai). Ghi duy nhất qua fa_sau_xep.ghi_dieu_chinh.
+CREATE TABLE IF NOT EXISTS fa_dieu_chinh (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    run_id_base INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_from TEXT,
+    club_to TEXT,
+    kind TEXT NOT NULL CHECK (kind IN ('release', 'invite_offer', 'invite_accept', 'invite_decline',
+                                       'invite_expire', 'round2', 'appeal_rerun')),
+    actor TEXT,
+    note TEXT
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

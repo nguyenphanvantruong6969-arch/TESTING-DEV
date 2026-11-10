@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-0: nhật ký điều chỉnh sau khi xếp + hàm phát lại
+
+- `fa_sau_xep.py` (mới): `vi_tri_hien_tai` (hàm thuần: kết quả lần chạy gốc + điều chỉnh phát lại theo `id`; dòng của lần chạy cũ hay không khớp chỗ hiện tại bị bỏ và báo `lech`), `run_goc_theo_buoi`, `doc_vi_tri`, `ghi_dieu_chinh` (cách duy nhất ghi, chỉ INSERT).
+- `rbda_priority_pipeline.py` (`DEFAULT_SCHEMA`): bảng mới `fa_dieu_chinh` chỉ ghi thêm; CSDL cũ nhận bảng khi mở (`init_db`). `match_results`/`run_history` không bị sửa.
+- `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: `BANG_NHAT_KY` thêm `fa_dieu_chinh`.
+- Test mới (đỏ trước): `tests/test_fa_gap0_dieu_chinh.py` (16 ca).
+
 ## 2026-11-10 — FA-P7/SM-3: kiem_nhanh --so-seed N > 5 chạy đủ N seed
 
 - `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: hàm mới `danh_sach_seed(n)` — n ≤ 5 lấy n seed đầu của `SEED_MAC_DINH` (không cờ: đúng 5 seed cũ); n > 5 thêm 2, 3, 4, … (bỏ số trùng) tới đủ n; tất định. `main` dùng hàm này; chữ trợ giúp ghi rõ luật. `--so-seed 20` nay in "60 ca (3 bộ × 20 seed) trùng khít" (trước đây cắt còn 15 ca).

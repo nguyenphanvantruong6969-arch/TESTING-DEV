@@ -62,7 +62,7 @@ def danh_sach_seed(n):
         k += 1
     return tuple(ds)
 BO_DU_LIEU_MAC_DINH = 3
-BANG_NHAT_KY = ("run_history", "wharton_nhat_ky")
+BANG_NHAT_KY = ("run_history", "wharton_nhat_ky", "fa_dieu_chinh")
 THU_MUC_BO_QUA = {".git", ".venv", ".venv_build", "build", "dist", "node_modules", "__pycache__",
                   "tests", "docs"}
 
@@ -416,7 +416,7 @@ MUC = [
     ("i18n_loi_khop", "i18n_loi.js khớp bản sinh lại"),
     ("i18n_khoa", "khoá i18n đủ tiếng Việt và tiếng Anh"),
     ("trung_khit", "trùng khít với nhánh so sánh (3 bộ × 5 seed)"),
-    ("khong_sua_nhat_ky", "không UPDATE/DELETE trên run_history, wharton_nhat_ky"),
+    ("khong_sua_nhat_ky", "không UPDATE/DELETE trên " + ", ".join(BANG_NHAT_KY)),
 ]
 
 
