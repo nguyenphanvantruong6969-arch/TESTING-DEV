@@ -69,3 +69,53 @@ def html_bien_ban(bg):
     ) % (e(bg["ky"]), e(bg["thoi_diem"]), " · xếp theo loại CLB và huy chương" if bg["fa_daa"] else "",
          canh_bao, le, e(bg["dau_van_tay_du_lieu"]), e(str(bg["hat_giong"])), bg["so_hoc_sinh_co_stb"],
          bg["sha256_stb"], dong_buoi)
+
+
+def ghi_xlsx(bg, duong):
+    """FA-9b: bản Excel của CÙNG bản ghi (`tao_ban_ghi`): cùng các mục như `html_bien_ban`, không mã/tên học sinh.
+    Hàm thuần theo nghĩa không đọc CSDL; chỉ ghi tệp `duong`."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+    from openpyxl.styles import Alignment
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Biên bản bốc thăm"
+    dam = Font(bold=True)
+    ws.append(["Biên bản bốc thăm"])
+    ws["A1"].font = Font(bold=True, size=14)
+    ws.append(["Kỳ", bg["ky"]])
+    ws.append(["Thời điểm xuất", bg["thoi_diem"]])
+    if bg["fa_daa"]:
+        ws.append(["Chế độ", "xếp theo loại CLB và huy chương"])
+    if not bg["ket_qua_con_khop"]:
+        ws.append(["CẢNH BÁO", "Dữ liệu đã sửa sau lần chạy này: dấu vân tay hiện tại khác dấu vân tay bên dưới. "
+                   "Hãy chạy lại xếp rồi xuất biên bản mới."])
+    ws.append([])
+    ws.append(["Thứ tự buổi lễ"])
+    ws.cell(ws.max_row, 1).font = dam
+    for i, x in enumerate(THU_TU_LE, 1):
+        ws.append([i, x])
+    ws.append([])
+    ws.append(["Số liệu"])
+    ws.cell(ws.max_row, 1).font = dam
+    ws.append(["Dấu vân tay dữ liệu", bg["dau_van_tay_du_lieu"]])
+    ws.append(["Hạt giống", bg["hat_giong"]])
+    ws.append(["Số học sinh có số bốc thăm", bg["so_hoc_sinh_co_stb"]])
+    ws.append(["SHA-256 của danh sách (mã học sinh, số bốc thăm) đã sắp xếp", bg["sha256_stb"]])
+    ws.append([])
+    ws.append(["Buổi", "Số học sinh", "Số dòng xếp"])
+    for c in ws[ws.max_row]:
+        c.font = dam
+    for b, v in bg["dem_theo_buoi"].items():
+        ws.append([str(b), v["n_hoc_sinh"], v["n_xep"]])
+    ws.append([])
+    ws.append([])
+    ws.append(["Quản trị viên (ký, ghi họ tên)", "", "Giáo viên chứng kiến (ký, ghi họ tên)"])
+    ws.column_dimensions["A"].width = 46
+    ws.column_dimensions["B"].width = 70
+    ws.column_dimensions["C"].width = 40
+    for row in ws.iter_rows():
+        for c in row:
+            c.alignment = Alignment(wrap_text=True, vertical="top", horizontal="left")
+    wb.save(duong)

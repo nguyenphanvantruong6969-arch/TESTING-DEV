@@ -110,3 +110,65 @@ def test_sua_du_lieu_sau_khi_chay_thi_co_canh_bao(api, tmp_path):
     ra = api.export_bien_ban_boc_tham(str(tmp_path / "c.html"))
     assert ra["ok"] and ra["data"]["ket_qua_con_khop"] is False
     assert 'class="canh-bao"' in _doc(ra["data"]["path"])
+
+
+# ----------------------------------------------------------------------------- FA-9b: bản Excel
+
+
+def _o_xlsx(duong):
+    """Mọi ô có giá trị của tệp xlsx, dạng chuỗi (theo thứ tự hàng, cột)."""
+    from openpyxl import load_workbook
+    wb = load_workbook(duong)
+    return [str(c.value) for ws in wb.worksheets for row in ws.iter_rows() for c in row if c.value is not None]
+
+
+def test_xlsx_co_du_muc_va_khong_co_ma_hoc_sinh(tmp_path):
+    d = str(tmp_path / "bb.xlsx")
+    bb.ghi_xlsx(_bg(), d)
+    o = _o_xlsx(d)
+    chung = " | ".join(o)
+    for tu in ("Biên bản bốc thăm", "Đợt thử", "abc123", "42", bb.sha256_stb(CAP), "Giáo viên chứng kiến",
+               "Quản trị viên", "thu_2", "thu_3"):
+        assert tu in chung, tu
+    for sid, _ in CAP:
+        assert not re.search(r"\b%s\b" % sid, chung)
+
+
+def test_xlsx_giong_nhau_tru_thoi_diem_va_ma_bam_doi_khi_mot_so_doi(tmp_path):
+    a, b, c = (str(tmp_path / n) for n in ("a.xlsx", "b.xlsx", "c.xlsx"))
+    bb.ghi_xlsx(_bg(t="2026-11-09 10:00:00"), a)
+    bb.ghi_xlsx(_bg(t="2026-11-10 23:59:59"), b)
+    oa, ob = _o_xlsx(a), _o_xlsx(b)
+    assert oa != ob
+    assert [x for x in oa if not x.startswith("2026-")] == [x for x in ob if not x.startswith("2026-")]
+    bb.ghi_xlsx(_bg(cap=[("s2", 6)] + CAP[1:]), c)
+    assert bb.sha256_stb(CAP) in oa and bb.sha256_stb(CAP) not in _o_xlsx(c)
+
+
+def test_xlsx_canh_bao_khi_du_lieu_da_sua(tmp_path):
+    d1, d2 = str(tmp_path / "1.xlsx"), str(tmp_path / "2.xlsx")
+    bb.ghi_xlsx(_bg(), d1)
+    bb.ghi_xlsx(_bg(ket_qua_con_khop=False), d2)
+    assert "CẢNH BÁO" in _o_xlsx(d2) and "CẢNH BÁO" not in _o_xlsx(d1)
+
+
+def test_api_xuat_ca_html_va_xlsx_cung_gia_tri(api, tmp_path):
+    _dung(api)
+    assert api.run_pipeline(seed=11)["ok"]
+    ra = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))
+    assert ra["ok"], ra
+    px = ra["data"]["path_xlsx"]
+    assert px.endswith(".xlsx") and px != ra["data"]["path"]
+    o = _o_xlsx(px)
+    assert ra["data"]["sha256_stb"] in o and "11" in o
+    assert ra["data"]["sha256_stb"] in _doc(ra["data"]["path"])
+    for sid in ("s1", "s2", "s3", "s4"):
+        assert not re.search(r"\b%s\b" % sid, " | ".join(o))
+
+
+def test_api_xlsx_khong_ghi_de_tep_cu(api, tmp_path):
+    _dung(api)
+    assert api.run_pipeline(seed=11)["ok"]
+    r1 = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))["data"]
+    r2 = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))["data"]
+    assert r1["path_xlsx"] != r2["path_xlsx"]

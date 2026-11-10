@@ -94,3 +94,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-9 (đêm 4) | xong | 2026-11-09 | fa_bien_ban.py, api_xuat.py, i18n_errors.py, i18n_loi.js, index.html, js/03_ket_qua.js, i18n.js, CHANGELOG.md | tests/test_fa_bien_ban.py, test_giao_dien_fa_ket_qua.py | Biên bản bốc thăm có người chứng kiến |
 | FA-10 (đêm 4) | xong | 2026-11-09 | du_lieu_test/mo_phong_fa_daa.py, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_mo_phong_fa_daa.py | Bảng số mô phỏng: cũ vs FA, thua bốc thăm theo hành vi, D1 hai kỳ (chỉ đo) |
 | FA-O1 (đêm 5) | xong | 2026-11-10 | api_xuat.py, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py | Lý do kết quả sắp theo thứ tự ngày (chu_nhat cuối tuần) |
+| FA-9b (đêm 5) | xong | 2026-11-10 | fa_bien_ban.py, api_xuat.py, i18n.js, index.html, js/03_ket_qua.js, CHANGELOG.md | tests/test_fa_bien_ban.py, test_giao_dien_fa_ket_qua.py | Biên bản bốc thăm bản Excel |

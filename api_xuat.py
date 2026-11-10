@@ -1751,7 +1751,13 @@ class XuatKetQuaMixin:
             duong = self._duong_xuat(output_path, "bien_ban_boc_tham.html")
             with open(duong, "w", encoding="utf-8") as f:
                 f.write(fa_bien_ban.html_bien_ban(ban_ghi))
-            return _ok({"path": duong, "sha256_stb": ban_ghi["sha256_stb"], "hat_giong": ban_ghi["hat_giong"],
+            # FA-9b: bản Excel cạnh bản HTML (cùng tên, đuôi .xlsx), cũng không ghi đè tệp cũ
+            goc = (output_path or "").strip()
+            duong_x = self._duong_xuat(os.path.splitext(goc)[0] + ".xlsx" if goc else "",
+                                       "bien_ban_boc_tham.xlsx")
+            fa_bien_ban.ghi_xlsx(ban_ghi, duong_x)
+            return _ok({"path": duong, "path_xlsx": duong_x, "sha256_stb": ban_ghi["sha256_stb"],
+                        "hat_giong": ban_ghi["hat_giong"],
                         "ket_qua_con_khop": ban_ghi["ket_qua_con_khop"], "n_hoc_sinh": len(cap)})
         except LoiDuongXuat as e:
             return _fail(e.loi)

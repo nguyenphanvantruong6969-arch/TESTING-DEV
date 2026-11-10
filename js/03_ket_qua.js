@@ -1026,7 +1026,7 @@ function initResultsHandlers() {
   });
   el("btnXuatBienBan").addEventListener("click", () => {
     chayXuat([["xuat_muc_bien_ban", "export_bien_ban_boc_tham", [""],
-      (d) => t("xuat_kq_bien_ban", { n: d.n_hoc_sinh, path: d.path })]]);
+      (d) => t("xuat_kq_bien_ban", { n: d.n_hoc_sinh, path: d.path, path_xlsx: d.path_xlsx })]]);
   });
   el("btnXuatNhuCau").addEventListener("click", () => {
     chayXuat([["xuat_muc_nhu_cau", "export_bang_nhu_cau", [""],

@@ -49,7 +49,7 @@ Night 4 — review fixes, lottery record, simulation (released by Opus 2026-11-0
 - [x] FA-9 witnessed lottery record   - [x] FA-10 simulation compare (+ D1 two-term behaviour, tables only)
 - [x] Opus review night 4 (2026-11-10: GO; 1 bug FA-O1 + 1 test gap listed, not fixed; report bao_cao_dem/2026-11-10_soat_dem4.md)
 Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8; protocol CHAY_DEM_FA_DAA.md, night-5 version):
-- [x] FA-O1 reasons sorted by day order (THU_TU_BUOI, chu_nhat last)   - [ ] FA-9b Excel version of the lottery record (Truong approved)
+- [x] FA-O1 reasons sorted by day order (THU_TU_BUOI, chu_nhat last)   - [x] FA-9b Excel version of the lottery record (Truong approved)
 - [ ] Opus review night 5
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
@@ -143,3 +143,4 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 | 2026-11-10 | Opus | Status check; recorded Truong decisions (auto review, PR after night 5, D8 waits, Excel lottery record approved); ticked FA-9/FA-10 in Plan | Docs only |
 | 2026-11-10 | Sonnet (review, by hand) | Reviewed night 4: GO; repro FA-O1 (reason rows sort `chu_nhat` before `thu_2`); biên bản after partial run OK; related 2276 passed, Chromium 7, kiem_nhanh 7/7; wrote plan §8 and night-5 protocol; scheduled tasks found sourceless | Docs only; report bao_cao_dem/2026-11-10_soat_dem4.md |
 | 2026-11-10 | Sonnet (night 5) | FA-O1: reasons sorted with khoa_sap_buoi; test in test_fa_n1_ly_do_mot_phan.py red first; related 2135 passed/1 skipped; mutation caught; ruff clean | night 5 |
+| 2026-11-10 | Sonnet (night 5) | FA-9b: fa_bien_ban.ghi_xlsx + path_xlsx + button/i18n; 5 tests red first + Chromium check; 3 mutations caught (2 unit/API, 1 UI); related 2195 passed/1 skipped; ruff clean; kiem_nhanh 7/7 | night 5 |

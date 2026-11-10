@@ -107,6 +107,8 @@ def test_nut_bien_ban_boc_tham_tao_tep_khong_co_ma_hoc_sinh(mo):
     with open(duong[0].strip(".,;"), encoding="utf-8") as f:
         h = f.read()
     assert "Biên bản bốc thăm" in h and "Giáo viên chứng kiến" in h
+    xl = [w for w in txt.split() if w.endswith(".xlsx")]                      # FA-9b
+    assert xl and os.path.exists(xl[0].strip(".,;")), txt
     for sid in ("s1", "s2", "s3", "s4"):
         assert sid not in h
     assert not loi, loi

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-9b: biên bản bốc thăm bản Excel (đêm 5, Truong duyệt)
+
+- `fa_bien_ban.py` `ghi_xlsx` (cùng bản ghi với HTML, không mã/tên học sinh); `api_xuat.py` `export_bien_ban_boc_tham` ghi thêm `.xlsx` cạnh `.html` (không ghi đè tệp cũ), trả `path_xlsx`; nút ở thẻ Kết quả báo cả hai tệp (`i18n.js`, `index.html`, `js/03_ket_qua.js`).
+- Test mới: 5 test trong `tests/test_fa_bien_ban.py` (đỏ trước; 3 đột biến bắt được) + kiểm tệp .xlsx trong test Chromium của `tests/test_giao_dien_fa_ket_qua.py`.
+
 ## 2026-11-10 — FA-O1: lý do kết quả sắp theo thứ tự ngày (đêm 5)
 
 - `api_xuat.py` `_doc_ly_do_moi_nhat`: sắp các dòng theo `khoa_sap_buoi` (cùng khoá với `COLLATE THU_TU_BUOI`), không theo chuỗi thường; `chu_nhat` đứng sau `thu_2` ở `ket_qua_ly_do.csv` và cột "Lý do". Lỗi do bản sửa FA-N1 gây ra (soát đêm 4).
