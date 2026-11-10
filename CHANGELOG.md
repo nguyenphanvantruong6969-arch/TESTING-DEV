@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-O1: lý do kết quả sắp theo thứ tự ngày (đêm 5)
+
+- `api_xuat.py` `_doc_ly_do_moi_nhat`: sắp các dòng theo `khoa_sap_buoi` (cùng khoá với `COLLATE THU_TU_BUOI`), không theo chuỗi thường; `chu_nhat` đứng sau `thu_2` ở `ket_qua_ly_do.csv` và cột "Lý do". Lỗi do bản sửa FA-N1 gây ra (soát đêm 4).
+- Test mới: 1 test trong `tests/test_fa_n1_ly_do_mot_phan.py` (đỏ trước khi sửa; đột biến bắt được). Vá luôn lỗ hổng FA-O2.
+
 ## 2026-11-09 — FA-10: mô phỏng so sánh chế độ cũ và FA-DAA, hành vi hai kỳ của D1 (đêm 4)
 
 - `du_lieu_test/mo_phong_fa_daa.py` (mới, không đụng phần mềm): cùng dữ liệu sinh có hạt giống, chạy chế độ cũ (điểm thi + hai quỹ) và `chay_fa_daa`; in bốn bảng: %NV1 / %top 2 / %không CLB, % dòng theo lý do, % thua bốc thăm theo hành vi (lười / thật thà / chiến lược), và bảng hai kỳ D1 (em xếp CLB Giới hạn hot nhất lên NV1 cố ý; không bù và có bù — bù chỉ mô phỏng bằng cách xếp em lên đầu bốc thăm kỳ 2). Mỗi bảng ghi "SỐ LIỆU MÔ PHỎNG"; KHÔNG có câu nhận định. D1 chưa cài vào phần mềm.

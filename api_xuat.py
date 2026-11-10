@@ -26,7 +26,7 @@ from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 from rbda_priority_pipeline import (
     dung_fa_daa,
-    BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton,
+    BUOI_MAC_DINH, dau_van_tay_du_lieu, diem_theo_nguoi, dung_wharton, khoa_sap_buoi,
 )
 import fa_bien_ban
 import fa_ly_do
@@ -1670,7 +1670,8 @@ class XuatKetQuaMixin:
                 "LEFT JOIN fa_nhom n ON n.run_id = l.run_id AND n.buoi = l.buoi "
                 " AND n.student_id = l.student_id AND n.club_id = l.club_id "
                 "WHERE l.run_id = ? AND l.buoi = ?", (run_id, buoi)).fetchall()
-        dong.sort(key=lambda r: (r[0], r[1], r[6] if r[6] is not None else 999, r[2]))
+        # FA-O1: buổi theo THỨ TỰ NGÀY (như COLLATE THU_TU_BUOI), không theo vần chữ cái
+        dong.sort(key=lambda r: (r[0], khoa_sap_buoi(r[1]), r[6] if r[6] is not None else 999, r[2]))
         return max(chon.values()), dong, thieu
 
     @staticmethod

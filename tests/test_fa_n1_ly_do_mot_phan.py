@@ -57,3 +57,22 @@ def test_khong_ngay_nao_co_ly_do_thi_van_bao_loi(api, tmp_path):
     assert api.run_pipeline(seed=3)["ok"]                      # chạy đủ, không FA
     ra = api.export_ly_do_csv(str(tmp_path / "d.csv"))
     assert not ra["ok"] and ma(ra["errors"]) == ["fa_chua_co_ly_do"]
+
+
+def test_ly_do_sap_theo_thu_tu_ngay_chu_nhat_cuoi_tuan(api, tmp_path):
+    """FA-O1: `chu_nhat` đứng SAU `thu_2` (như THU_TU_BUOI), cả ở tệp xuất lẫn cột "Lý do"."""
+    bat_fa(api)
+    dung_fa_clb(api, A=(3, "GIOI_HAN", None, None, None, "chu_nhat"),
+                B=(3, "GIOI_HAN", None, None, None, "thu_2"),
+                FA=(9, "TU_DO", None, None, None, "chu_nhat"),
+                FB=(9, "TU_DO", None, None, None, "thu_2"))
+    dung_hs_fa(api, "s1", "s2", nv={s: ["A", "FA", "B", "FB"] for s in ("s1", "s2")})
+    assert api.run_pipeline(seed=3)["ok"]
+    for ten in ("a.csv", "b.csv"):                              # cả khi chạy lại một phần
+        dong = _doc(api, tmp_path, ten)
+        for sid in ("s1", "s2"):
+            ngay = [d["buoi"] for d in dong if d["student_id"] == sid]
+            assert ngay and ngay == sorted(ngay, key=["thu_2", "chu_nhat"].index), (sid, ngay)
+        assert api.run_pipeline(seed=3, chi_buoi=["chu_nhat"])["ok"]
+    cau = api.get_ly_do_ket_qua()["data"]["cau"]
+    assert all(list(v) == ["thu_2", "chu_nhat"] for v in cau.values())
