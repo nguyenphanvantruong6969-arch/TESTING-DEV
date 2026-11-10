@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-1: điểm danh 3 buổi đầu, vắng 2/3 không phép thì giải phóng chỗ
+
+- Cờ mới `rules.fa_diem_danh` (mặc định TẮT, chỉ bật được khi `fa_daa` bật: mã lỗi `fa_tinh_nang_can_fa`); không thuộc luật xếp nên không vào `run_history.luat_xep` hay dấu vân tay.
+- `fa_sau_xep.py`: `can_giai_phong`, `NGUONG_VANG = 2`; `api_sau_xep.py` (mới, `SauXepMixin`): `get_diem_danh`, `luu_diem_danh` (đủ 2/3 buổi vắng không phép -> một dòng `release` trong `fa_dieu_chinh`, không sửa kết quả xếp), `export_diem_danh` (`diem_danh.xlsx`, mỗi CLB một trang, chữ an toàn cho Excel). Bảng mới `fa_diem_danh`.
+- Giao diện: khung `#diemDanhPanel` ở thẻ Chi tiết (tệp mới `js/10_theo_doi.js`), ô `wzFaDiemDanh` ở bước luật của trình tạo không gian làm việc; 4 mã lỗi mới.
+- Test mới (đỏ trước): `tests/test_fa_gap1_diem_danh.py` (10), `tests/test_giao_dien_fa_gap1_theo_doi.py` (3, Chromium).
+
 ## 2026-11-10 — GAP-0: nhật ký điều chỉnh sau khi xếp + hàm phát lại
 
 - `fa_sau_xep.py` (mới): `vi_tri_hien_tai` (hàm thuần: kết quả lần chạy gốc + điều chỉnh phát lại theo `id`; dòng của lần chạy cũ hay không khớp chỗ hiện tại bị bỏ và báo `lech`), `run_goc_theo_buoi`, `doc_vi_tri`, `ghi_dieu_chinh` (cách duy nhất ghi, chỉ INSERT).

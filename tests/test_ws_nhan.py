@@ -45,6 +45,9 @@ TRAN_MAC_DINH = {"pref_too_many": 10, "pref_too_many_buoi": 10,
 # Mã thêm SAU ảnh chụp ngoài nhóm ws_*: điểm theo người ở Sổ nhập (TASK 5); luật xếp, chấm
 # điểm theo người và cảnh báo sức khoẻ dữ liệu của chúng (TASK 6). Chỉ THÊM mã, không đổi mã cũ.
 MA_MOI_SAU_ANH_CHUP = {
+    # FA gaps (GAP-1, GAP-2): điểm danh, mời danh sách chờ.
+    "fa_tinh_nang_can_fa", "fa_diem_danh_chua_bat", "diem_danh_gia_tri_sai", "diem_danh_khong_thuoc_clb",
+    "moi_khong_con_cho",
     # FA-DAA (FA-1): thuộc tính CLB, giữ chỗ, cảnh báo nạp.
     "fa_loai_sai", "fa_diem_san_sai", "fa_toi_thieu_sai", "fa_suc_chua_phong_sai",
     "so_nhap_fa_loai_sai", "so_nhap_fa_diem_san_sai", "so_nhap_fa_toi_thieu_sai",

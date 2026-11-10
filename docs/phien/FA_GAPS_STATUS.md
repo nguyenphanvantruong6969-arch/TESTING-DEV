@@ -11,8 +11,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 ## Items
 | Code | Wave | State (TODO/DOING/DONE/BLOCKED/WAIT-TRUONG) | Commit | Note |
 |---|---|---|---|---|
-| GAP-0 | 1 | DONE | (next commit) | fa_dieu_chinh + vi_tri_hien_tai |
-| GAP-1 | 1 | TODO | | attendance |
+| GAP-0 | 1 | DONE | c6e0405 | fa_dieu_chinh + vi_tri_hien_tai |
+| GAP-1 | 1 | DONE | (next commit) | attendance |
 | GAP-2 | 1 | TODO | | waitlist invites |
 | GAP-3 | 2 | TODO | | appeals |
 | GAP-4 | 2 | TODO | | round 2 |
@@ -45,3 +45,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | father (SOLO) | F1 setup: branch from keen-ride 60f75a5; phase 1 done 7/7 (bao_cao_dem/2026-11-10_sua_nho.md) | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
 | 2026-11-10 | son (SOLO) | GAP-0: 16 tests red first, 2456 related passed, mutation caught x2, 60/60 | ok |
+| 2026-11-10 | son (SOLO) | GAP-1: 13 tests red first, 4768 related passed, UI 3 really ran, mutation caught x2, 60/60 | ok |
