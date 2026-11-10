@@ -2,7 +2,7 @@
 
 ## 2026-11-10 — AI-LOG: nhật ký AI tài khoản Truong
 
-- `docs/nhat_ky_ai/NHAT_KY_AI_TAI_KHOAN_TRUONG.md`: mục lục 106 phiên của Truong + 43 phiên do điều phối viên viết lời nhắn; lời nhắn nguyên văn chưa trích (giới hạn `list_events`, ghi rõ trong tệp).
+- `docs/nhat_ky_ai/NHAT_KY_AI_TAI_KHOAN_TRUONG.md`: 106 phiên cha của Truong, 43 phiên con lồng bên dưới 7 phiên cha; mới chép 4 lời nhắn nguyên văn (giới hạn `list_events`, ghi rõ trong tệp).
 
 ## 2026-11-10 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
 
