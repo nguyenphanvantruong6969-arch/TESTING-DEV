@@ -78,40 +78,47 @@ def ghi_xlsx(bg, duong):
     from openpyxl.styles import Font
     from openpyxl.styles import Alignment
 
+    from so_excel import lam_sach
+
     wb = Workbook()
     ws = wb.active
+    # SM-1: ký tự openpyxl cấm (dán từ Word, tệp .zip) bị bỏ như so_excel.Trang.o, không làm hỏng cả lần xuất
+
+    def them(hang):
+        ws.append([lam_sach(x) for x in hang])
+
     ws.title = "Biên bản bốc thăm"
     dam = Font(bold=True)
-    ws.append(["Biên bản bốc thăm"])
+    them(["Biên bản bốc thăm"])
     ws["A1"].font = Font(bold=True, size=14)
-    ws.append(["Kỳ", bg["ky"]])
-    ws.append(["Thời điểm xuất", bg["thoi_diem"]])
+    them(["Kỳ", bg["ky"]])
+    them(["Thời điểm xuất", bg["thoi_diem"]])
     if bg["fa_daa"]:
-        ws.append(["Chế độ", "xếp theo loại CLB và huy chương"])
+        them(["Chế độ", "xếp theo loại CLB và huy chương"])
     if not bg["ket_qua_con_khop"]:
-        ws.append(["CẢNH BÁO", "Dữ liệu đã sửa sau lần chạy này: dấu vân tay hiện tại khác dấu vân tay bên dưới. "
+        them(["CẢNH BÁO", "Dữ liệu đã sửa sau lần chạy này: dấu vân tay hiện tại khác dấu vân tay bên dưới. "
                    "Hãy chạy lại xếp rồi xuất biên bản mới."])
-    ws.append([])
-    ws.append(["Thứ tự buổi lễ"])
+    them([])
+    them(["Thứ tự buổi lễ"])
     ws.cell(ws.max_row, 1).font = dam
     for i, x in enumerate(THU_TU_LE, 1):
-        ws.append([i, x])
-    ws.append([])
-    ws.append(["Số liệu"])
+        them([i, x])
+    them([])
+    them(["Số liệu"])
     ws.cell(ws.max_row, 1).font = dam
-    ws.append(["Dấu vân tay dữ liệu", bg["dau_van_tay_du_lieu"]])
-    ws.append(["Hạt giống", bg["hat_giong"]])
-    ws.append(["Số học sinh có số bốc thăm", bg["so_hoc_sinh_co_stb"]])
-    ws.append(["SHA-256 của danh sách (mã học sinh, số bốc thăm) đã sắp xếp", bg["sha256_stb"]])
-    ws.append([])
-    ws.append(["Buổi", "Số học sinh", "Số dòng xếp"])
+    them(["Dấu vân tay dữ liệu", bg["dau_van_tay_du_lieu"]])
+    them(["Hạt giống", bg["hat_giong"]])
+    them(["Số học sinh có số bốc thăm", bg["so_hoc_sinh_co_stb"]])
+    them(["SHA-256 của danh sách (mã học sinh, số bốc thăm) đã sắp xếp", bg["sha256_stb"]])
+    them([])
+    them(["Buổi", "Số học sinh", "Số dòng xếp"])
     for c in ws[ws.max_row]:
         c.font = dam
     for b, v in bg["dem_theo_buoi"].items():
-        ws.append([str(b), v["n_hoc_sinh"], v["n_xep"]])
-    ws.append([])
-    ws.append([])
-    ws.append(["Quản trị viên (ký, ghi họ tên)", "", "Giáo viên chứng kiến (ký, ghi họ tên)"])
+        them([str(b), v["n_hoc_sinh"], v["n_xep"]])
+    them([])
+    them([])
+    them(["Quản trị viên (ký, ghi họ tên)", "", "Giáo viên chứng kiến (ký, ghi họ tên)"])
     ws.column_dimensions["A"].width = 46
     ws.column_dimensions["B"].width = 70
     ws.column_dimensions["C"].width = 40

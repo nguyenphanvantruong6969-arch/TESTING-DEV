@@ -54,7 +54,7 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - [x] FA-P1 lottery record Excel: formula guard (`_an_toan_cho_excel`)   - [x] FA-P2 on-site medals saved even if the operator switches student mid-save
 Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.md at repo root; order fixed):
-- [ ] SM-1 `ghi_xlsx` cleans forbidden characters   - [ ] FA-P3 `get_ly_do_ket_qua` returns + UI shows missing days
+- [x] SM-1 `ghi_xlsx` cleans forbidden characters   - [ ] FA-P3 `get_ly_do_ket_qua` returns + UI shows missing days
 - [ ] FA-P4 record days in day order   - [ ] FA-P6 missing-day warnings in day order   - [ ] FA-P5 html/xlsx same base name
 - [ ] SM-2 condition wait instead of fixed 800 ms   - [ ] FA-P7/SM-3 `kiem_nhanh --so-seed N>5` real seeds
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
@@ -149,3 +149,4 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 | 2026-11-10 | Sonnet (night 5) | Night 5 report 2026-11-10: 2/2 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-10_dem5.md | RUNNING line removed |
 | 2026-11-10 | Opus | Review night 5 (2 trung FA-P1/P2 fixed test-first, mutations caught; 5 nhỏ listed); soat-ma 4 tiers; PR #14 opened; CI fixes FA-CI1..3 | 3x20 seeds identical; Truong chose python-docx on Windows CI |
 | 2026-11-10 | Opus | Vision coverage brief (~70 % overall, ~85 % P1+P2); Truong chose the 8 small review fixes (7 items, FA-P7=SM-3); wrote LATEST_INSTRUCTION.md for his friend's Sonnet run | Docs only |
+| 2026-11-10 | Opus (SOLO, small fixes) | SM-1: ghi_xlsx cleans cells via so_excel.lam_sach; 2 tests red first; related 2035 passed/1 skipped (D1 marker); mutation caught; ruff clean | |

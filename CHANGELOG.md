@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — SM-1: biên bản Excel không hỏng vì ký tự điều khiển
+
+- `fa_bien_ban.py` (`ghi_xlsx`): mọi ô chữ đi qua `so_excel.lam_sach` (như `so_excel.Trang.o`). Tên workspace `"Kỳ\x01một"` trước đây làm `export_bien_ban_boc_tham` trả `error_exporting_csv` (IllegalCharacterError) và để lại tệp HTML; nay xuất đủ hai tệp. Chặn công thức FA-P1 giữ nguyên.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py` — `test_xlsx_bo_ky_tu_dieu_khien_ma_khong_hong`, `test_api_ten_workspace_co_ky_tu_dieu_khien_van_xuat_du_hai_tep`.
+
 ## 2026-11-10 — FA-KH: hướng dẫn mới nhất cho 7 lỗi nhỏ trước khi merge PR #14 (Truong yêu cầu)
 
 - `LATEST_INSTRUCTION.md` (mới, gốc repo): phần 1 tiếng Việt cho người chạy (5 bước, xử lý sự cố); phần 2 tiếng Anh cho Claude (Sonnet): SM-1, FA-P3, FA-P4, FA-P6, FA-P5, SM-2, FA-P7/SM-3 theo thứ tự, mỗi mục test đỏ trước, quy tắc dừng, báo cáo `docs/phien/bao_cao_dem/<ngày>_sua_nho.md`.

@@ -100,3 +100,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-CI1 (PR #14) | xong | 2026-11-10 | du_lieu_test/mo_phong_fa_daa.py, mau_forms_thi_clb/so_sanh_suc_chua.py, i18n_errors.py, i18n_loi.js, i18n.js, index.html, CHANGELOG.md | tests/test_mo_phong_fa_daa.py, test_fa_nhu_cau.py, test_van_phong_tu_nhien.py | CI: in UTF-8 trên Windows, câu chữ đúng luật văn phong |
 | FA-CI2 (PR #14) | xong | 2026-11-10 | tests/test_giao_dien_t3_l3.py, CHANGELOG.md | tests/test_giao_dien_t3_l3.py | Test T3-19 chờ đúng bảng CLB, hết chập chờn |
 | FA-CI3 (PR #14) | xong | 2026-11-10 | .github/workflows/tests.yml, CHANGELOG.md | (CI Windows) | CI Windows cài python-docx; 9 test .docx chạy thật |
+| SM-1 | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản Excel bỏ ký tự openpyxl cấm |

@@ -209,3 +209,39 @@ def test_api_xlsx_ten_workspace_khong_thanh_cong_thuc(api, tmp_path):
     xml = _xml_trang(ra["data"]["path_xlsx"])
     assert "<f>" not in xml and "<f " not in xml
     assert TEN_DOC in _o_xlsx(ra["data"]["path_xlsx"])
+
+
+# ----------------------------------------------------------------------------- SM-1: ký tự openpyxl cấm trong bản Excel
+
+TEN_KY_LA = "Kỳ\x01một"
+
+
+def test_xlsx_bo_ky_tu_dieu_khien_ma_khong_hong(tmp_path):
+    """SM-1: tên kỳ / tên buổi có ký tự điều khiển (dán từ Word, tệp .zip) không làm hỏng bản Excel; ký tự cấm bị bỏ
+    như `so_excel.lam_sach`, chữ còn lại giữ nguyên, chặn công thức (FA-P1) vẫn chạy."""
+    from openpyxl import load_workbook
+    d = str(tmp_path / "bb.xlsx")
+    dem = {"thu\x02_2": {"n_hoc_sinh": 1, "n_xep": 1}, "=1+1\x03": {"n_hoc_sinh": 1, "n_xep": 1}}
+    bb.ghi_xlsx(bb.tao_ban_ghi(TEN_KY_LA, "t", "d", 1, CAP, dem), d)
+    load_workbook(d)
+    o = _o_xlsx(d)
+    assert "Kỳmột" in o and "thu_2" in o and "=1+1" in o
+    xml = _xml_trang(d)
+    assert "<f>" not in xml and "<f " not in xml
+
+
+def test_api_ten_workspace_co_ky_tu_dieu_khien_van_xuat_du_hai_tep(api, tmp_path):
+    """SM-1 repro: tên workspace `"Kỳ\\x01một"` -> trước đây `error_exporting_csv` và `bb.html` nằm lại. Nay: ok,
+    có cả `.html` và `.xlsx`, tệp xlsx mở được bằng openpyxl."""
+    import os
+
+    import cau_hinh_ws as ch
+    from openpyxl import load_workbook
+    _dung(api)
+    ch.ghi_cau_hinh(api.db_path, {"name": TEN_KY_LA, "rules": {"fa_daa": True}})
+    assert api.run_pipeline(seed=11)["ok"]
+    ra = api.export_bien_ban_boc_tham(str(tmp_path / "bb.html"))
+    assert ra["ok"], ra
+    assert os.path.isfile(ra["data"]["path"]) and os.path.isfile(ra["data"]["path_xlsx"])
+    load_workbook(ra["data"]["path_xlsx"])
+    assert "Kỳmột" in _o_xlsx(ra["data"]["path_xlsx"])
