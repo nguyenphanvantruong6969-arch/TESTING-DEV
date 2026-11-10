@@ -5,6 +5,7 @@
 - `docs/nhat_ky_ai/NHAT_KY_AI.md` (mới, thay `NHAT_KY_AI_TAI_KHOAN_TRUONG.md` lấy từ lịch sử phiên): dựng CHỈ từ repo — 7 lời Truong lưu nguyên văn (kèm `FA_DAA_VISION.md`), 21 quyết định của Truong theo tiêu đề `CHANGELOG.md`, 12 luồng việc theo tệp bàn giao (phiên cha chép ô Session log, phiên con lồng bên dưới một dòng), bảng 70 phiên có dòng `Claude-Session` trong git, và phần trước lịch sử git. Không bình luận hay kết luận nghiên cứu.
 - `docs/nhat_ky_ai/dung_nhat_ky_ai.py` (mới): script dựng lại tệp trên; chạy hai lần cho cùng kết quả; câu nguyên văn được kiểm có trong tệp nguồn. Nằm trong `docs/` nên không tính vào độ phủ.
 - `docs/nhat_ky_ai/NHAT_KY_AI_DE_DOC.md` + `NHAT_KY_AI.docx` (Truong yêu cầu bản dễ đọc): tiếng Việt thường, bảng giải thích từ ngữ, 10 giai đoạn (mục tiêu / Truong quyết định / phiên chính / phiên phụ / kết quả), lời nguyên văn, giới hạn; Word A4 4 trang. `xuat_word.py` (mới) chuyển .md sang .docx có định dạng.
+- `docs/nhat_ky_ai/NHAT_KY_AI_DAY_DU.md` (mới, Truong yêu cầu bản vừa dễ đọc vừa đủ chi tiết): mục 1–6 là bản dễ đọc, mục 7 dựng tự động xếp toàn bộ chi tiết vào 10 giai đoạn (24 quyết định, 146 mục `CHANGELOG.md`, 160 dòng phiên chính/phụ, 70 phiên có lưu mã; không sót mục nào). `NHAT_KY_AI.docx` nay dựng từ bản này: A4, 21 trang.
 
 ## 2026-11-10 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
 

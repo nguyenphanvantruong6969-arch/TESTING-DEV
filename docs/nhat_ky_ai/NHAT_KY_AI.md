@@ -4,7 +4,7 @@
 - **Nguồn: CHỈ dữ liệu có trong repo này** — bảng *Session log* của các tệp bàn giao `docs/phien/claude__*.md`, `CHANGELOG.md`, lịch sử git (nội dung commit và dòng `Claude-Session`), các báo cáo trong `docs/phien/bao_cao_dem/` và `docs/ke_hoach/`. Không đọc lịch sử chat. Repo chứa việc của cả tài khoản Truong và tài khoản bạn cộng tác.
 - **Phiên cha** = phiên lập kế hoạch / điều phối / soát (Opus), nơi Truong giao việc và chốt quyết định. **Phiên con** = phiên làm theo kế hoạch (Sonnet), chỉ tóm tắt một dòng, không chép lời nhắn.
 - **Nguyên văn:** chỉ những chữ repo lưu đúng lời Truong (mục 1). Mọi chỗ khác là *theo ghi chép trong repo* (chép lại dòng ghi chép, có dẫn tệp), không phải lời nhắn nguyên văn. Không đoán, không viết thay.
-- **Phạm vi:** `CHANGELOG.md` từ 08/10/2026; lịch sử git từ 24/10/2026 (430 commit, 70 phiên có dòng `Claude-Session`). Việc trước đó (08–09/2026) chỉ có trong `BAN_GIAO.md` và `KE_HOACH_SUA_THIET_KE.md` (mục 5).
+- **Phạm vi:** `CHANGELOG.md` từ 08/10/2026; lịch sử git từ 24/10/2026 (433 commit, 70 phiên có dòng `Claude-Session`). Việc trước đó (08–09/2026) chỉ có trong `BAN_GIAO.md` và `KE_HOACH_SUA_THIET_KE.md` (mục 5).
 - Chỉ nêu sự việc; không có bình luận hay kết luận nghiên cứu (phần đó học sinh tự viết). Mọi số liệu kiểm thử là dữ liệu MÔ PHỎNG.
 - Dựng lại: `python docs/nhat_ky_ai/dung_nhat_ky_ai.py` (nên `git fetch origin` trước). Không có số liệu nào nhập tay.
 
@@ -23,6 +23,7 @@
 
 Các mục `CHANGELOG.md` có tiêu đề ghi Truong yêu cầu / duyệt / chọn / quyết định. Chép nguyên tiêu đề (ghi chép của AI trong repo, không phải lời nhắn nguyên văn).
 
+- 25/10/2026 — A13 Điểm Wharton: pipeline tự điền quỹ một CLB trong bộ nhớ (theo quyết định của Truong, cách A)
 - 03/11/2026 — T1a, T1b (nhánh `claude/epic-knuth-801pkw`; Truong duyệt, bỏ qua sổ đăng ký)
 - 03/11/2026 — T4-K3 (ngoài sổ, Truong duyệt 03/11/2026): skill `xu-li-raw-forms` đọc thư mục nhiều phần CSV
 - 04/11/2026 — T4-K1 (ngoài sổ, Truong duyệt 03/11/2026): cột `lop` tuỳ chọn từ `hoc_sinh` tới cột Lớp của Sổ
@@ -41,6 +42,7 @@ Các mục `CHANGELOG.md` có tiêu đề ghi Truong yêu cầu / duyệt / ch�
 - 05/11/2026 — T4M-Q1, T4M-Q2, T4M-Q3 (Truong duyệt 05/11/2026): chế độ "chỉ thi" của mẫu Microsoft Forms
 - 06/11/2026 — T4M-DEMO (Truong duyệt 06/11/2026): chạy thử trọn chuỗi bằng một lệnh
 - 06/11/2026 — T4M-NC: Truong duyệt vòng 2
+- 08/11/2026 — FA-KH (quyết định của Truong): ngoại lệ bất biến 2 cho huy chương mặc định, D11 không chặn
 - 08/11/2026 — FA-M3 (một phần, Truong duyệt): đặt huy chương trên đường B, đủ 6 cách đặt
 - 10/11/2026 — FA-9b: biên bản bốc thăm bản Excel (đêm 5, Truong duyệt)
 - 10/11/2026 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
@@ -349,7 +351,7 @@ Mục tiêu (theo tệp bàn giao): Implement Truong's FA-DAA vision (`docs/ke_h
 | o8eUqFKt | 09/11/2026 | 09/11/2026 | 9 | FA-KH, FA-SOAT3, FA-SOAT2 | 99d4724 8003e9a 9f740c2 |
 | ohi9Fo5P | 09/11/2026 | 09/11/2026 | 17 | FA-BC, FA-UI-5, FA-UI-4, FA-UI-3, FA-UI-2, FA-UI-1, FA-S10, FA-S11 | c962bb8 5bf7a8d 0c8e5f8 |
 | PgyEfvMe | 09/11/2026 | 09/11/2026 | 7 | FA-BC, FA-10, FA-9, FA-N3, FA-N4, FA-N2, FA-N1, FA-N0 | 1198ef5 6c7bf4d cf90452 |
-| 7JUvpaoF | 09/11/2026 | 09/11/2026 | 1 | FA-KH | 89e3e5c |
+| 7JUvpaoF | 09/11/2026 | 10/11/2026 | 4 | AI-LOG, FA-KH | c43d4d9 4adc3eb 1300e4a |
 | B56GWZ8J | 10/11/2026 | 10/11/2026 | 6 | FA-BC, FA-9b, FA-O1, FA-O0, FA-SOAT | b93b3d0 d9482a7 fff8df5 |
 | TsLFG9TZ | 10/11/2026 | 10/11/2026 | 7 | FA-CI3, FA-CI2, FA-CI1, FA-SOAT, FA-P2, FA-P1 | c6e5e6a a7e91e4 45d6c7a |
 | xW9hz2Sq | 10/11/2026 | 10/11/2026 | 2 | AI-LOG | 9644288 e6052ec |
