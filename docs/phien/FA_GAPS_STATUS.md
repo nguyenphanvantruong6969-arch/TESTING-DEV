@@ -25,7 +25,7 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-11 | 4 | DONE | cd1d694 | Power Apps autosave kit (D8 still open: kit only) |
 | GAP-12 | 4 | DONE | 9a93289 | simulation (code before test: deviation from S2.b, mutations caught x2) |
 | GAP-13 | 4 | DONE | 0bc53b1 | stable improvement cycles, measurement mode; spec edge rule corrected |
-| GAP-14 | 4 | WAIT-TRUONG | (next) | D1 memo written (docs/ke_hoach/FA_GAPS_D1_MEMO.md); decision is Truong's |
+| GAP-14 | 4 | WAIT-TRUONG | fc7afa8 | D1 memo written (docs/ke_hoach/FA_GAPS_D1_MEMO.md); decision is Truong's |
 
 ## Baseline
 - 2026-11-10: `kiem_nhanh --co-so origin/main --so-seed 20` 7/7, 60/60 identical (run at 9ce1be3, same code as 60f75a5); `tests/test_nhieu_buoi.py -k TestTrungKhit` 7 passed. SIMULATED data.

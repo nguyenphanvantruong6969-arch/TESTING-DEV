@@ -2,8 +2,8 @@
 
 ## 2026-11-10 — GAP-14: bản ghi nhớ D1 (ưu tiên bù), KHÔNG có mã
 
-- Mới : ba phương án A/B/C, rủi ro khuyến khích, bảng  đo bằng  (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.
-- Test: thêm 1 ca vào  (bản ghi nhớ có nhãn, có lệnh, số khớp lần chạy lại).
+- Mới `docs/ke_hoach/FA_GAPS_D1_MEMO.md`: ba phương án A/B/C, rủi ro khuyến khích, bảng `hai_ky` đo bằng `du_lieu_test/mo_phong_fa_daa.py --n 100 --so-seed 5 --hai-ky 15` (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.
+- Test: thêm 1 ca vào `tests/test_fa_gap12_mo_phong.py` (bản ghi nhớ có nhãn, có lệnh, số khớp lần chạy lại).
 
 ## 2026-11-10 — GAP-13: chu trình cải thiện ổn định, chế độ đo (không bảo đảm ổn định)
 
