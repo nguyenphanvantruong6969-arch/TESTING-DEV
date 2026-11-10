@@ -47,7 +47,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install "pytest>=8.0,<10" "pillow>=10.0,<13"
+          # python-docx: cac test sinh tep Forms (.docx) chay THAT tren Windows (PR #14), khong bo qua
+          pip install "pytest>=8.0,<10" "pillow>=10.0,<13" "python-docx>=1.1,<2"
 
       - name: Run test suite
         run: python -m pytest tests/ -q

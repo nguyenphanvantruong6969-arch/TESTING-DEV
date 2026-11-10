@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
+
+- `.github/workflows/tests.yml` job Windows và job test của `build-windows-exe.yml`: cài thêm `python-docx>=1.1,<2` (cùng ràng buộc với `requirements-dev.txt`). 9 test FA ghi tệp `.docx` (`test_fa_m2_forms_dang_ky.py`, `test_fa_m4_phan_tich.py`, `test_fa_m5_bo_dung.py`, `test_fa_n4_mot_de_khong_thi_lai.py`) chạy thật trên Windows thay vì đỏ `ModuleNotFoundError`; không test nào bị bỏ qua.
+
 ## 2026-11-10 — FA-CI2: test giao diện T3-19 hết chập chờn (CI Linux PR #14)
 
 - `tests/test_giao_dien_t3_l3.py` `test_tai_bang_theo_clb_va_theo_ma_co_tim`: chờ bảng hiện đúng số thành viên CLB A (lấy từ `get_danh_sach_clb`) thay vì chỉ chờ `#kqBang` hiện; bảng "theo lớp" vẽ trước vẫn hiện tới khi danh sách CLB về, nên test có lúc đếm 2 dòng cũ. Tái hiện bằng độ trễ 1,5 giây cho `get_danh_sach_clb`: test cũ đỏ, test mới xanh; 5 lần liền xanh. Lỗi có sẵn từ trước PR, không do FA-DAA.
