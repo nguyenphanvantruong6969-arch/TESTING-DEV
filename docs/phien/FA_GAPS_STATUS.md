@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T13:10Z session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
 RUNNING-SON: 2026-11-10T13:10Z wave 1 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-Current wave: 1 — son done, waiting for father review
+Current wave: 1 — GO
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -31,11 +31,16 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - 2026-11-10: `kiem_nhanh --co-so origin/main --so-seed 20` 7/7, 60/60 identical (run at 9ce1be3, same code as 60f75a5); `tests/test_nhieu_buoi.py -k TestTrungKhit` 7 passed. SIMULATED data.
 
 ## Coverage (vision §14 rows, % before → now)
-(filled after each wave)
+- P3 "Điểm danh, danh sách chờ, vòng 2, khảo sát tuần 3, khiếu nại": 0 % → 40 % (wave 1)
+- P3 "Ưu tiên bù, gợi ý số chỗ từ kỳ trước": 0 % (waves 3–4)
+- P3 "Module mô phỏng + chế độ so sánh": as before (wave 4)
+- P2 "… 3 câu phản hồi": phản hồi 0 % (wave 2)
 
 ## Waiting for Truong
 
 ## Review notes (newest last)
+- W1 review: GO. Nhỏ N1–N4 listed in bao_cao_dem/2026-11-10_fa_gaps_wave1.md (UI hides panel on any error; generic
+  save error code wording; old-run attendance not shown after rerun; redundant FREE guard in moi_tiep).
 - W1 decisions (SOLO): new module fa_sau_xep.py + mixin api_sau_xep.py; tables via DEFAULT_SCHEMA (init_db runs
   di_tru_schema each open); post-allocation flags only in MAC_DINH_TRUONG_HOC rules (never in LUAT_XEP_MAC_DINH →
   never in fingerprint); GAP-2 shares flag fa_diem_danh; kinds invite_offer/invite_expire added to G5 list; waitlist
@@ -47,3 +52,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | son (SOLO) | GAP-0: 16 tests red first, 2456 related passed, mutation caught x2, 60/60 | ok |
 | 2026-11-10 | son (SOLO) | GAP-1: 13 tests red first, 4768 related passed, UI 3 really ran, mutation caught x2, 60/60 | ok |
 | 2026-11-10 | son (SOLO) | GAP-2: 10 tests red first, 4636 related passed, UI 4 really ran, mutation caught x3, 60/60 | ok |
+| 2026-11-10 | father (SOLO) | F5 review wave 1: GO (0 cao/trung, 4 nhỏ); report bao_cao_dem/2026-11-10_fa_gaps_wave1.md | ok |
