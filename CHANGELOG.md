@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-CI1: sửa CI đỏ của PR #14 (Windows + văn phong)
+
+- `du_lieu_test/mo_phong_fa_daa.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`: `main` chuyển stdout/stderr sang UTF-8 (`reconfigure`, như `du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`); console Windows cp1252 làm hai script này ném `UnicodeEncodeError` khi in tiếng Việt. Tái hiện trên Linux bằng `PYTHONIOENCODING=cp1252` (4 đỏ trước, xanh sau).
+- `i18n_errors.py` (+ `i18n_loi.js` sinh lại): câu tiếng Anh của `bien_ban_chua_boc_tham` bỏ từ nội bộ "seed" (FA-9). `i18n.js`, `index.html`: nút biên bản ghi "bản in và Excel" / "printable page and Excel" thay chữ HOA "HTML" (FA-9, FA-9b). Cả hai do `tests/test_van_phong_tu_nhien.py` bắt.
+- Không test nào bị bỏ qua hay tắt.
+
 ## 2026-11-10 — FA-P2: nhập tại chỗ, huy chương mặc định vẫn lưu khi người nhập sang em khác giữa lúc lưu (soát đêm 5)
 
 - `js/04_nhap_tai_cho.js`: nút lưu nguyện vọng gọi `hcTheoNguyenVong` cả khi em vừa lưu không còn mở; `hcTheoNguyenVong` vẫn tính và gọi `submit_huy_chuong` cho đúng em đó, chỉ vẽ lại Bước 3 khi em đó còn mở; câu nhắc "đã chỉnh tay" của em đang mở không bị xoá. Trước đây em đó có nguyện vọng mà không có huy chương nào và lần chạy xếp sau không báo gì (FA-N2, đêm 4).

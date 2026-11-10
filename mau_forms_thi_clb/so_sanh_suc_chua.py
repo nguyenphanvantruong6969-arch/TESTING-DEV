@@ -34,6 +34,10 @@ def doc_clb(duong_dan):
 
 
 def main(argv=None):
+    # Cửa sổ lệnh / ống dẫn Windows mặc định cp1252: in tiếng Việt sẽ ném UnicodeEncodeError.
+    for _luong in (sys.stdout, sys.stderr):
+        if hasattr(_luong, "reconfigure"):
+            _luong.reconfigure(encoding="utf-8", errors="replace")
     argv = sys.argv[1:] if argv is None else argv
     if len(argv) != 2:
         print(__doc__)

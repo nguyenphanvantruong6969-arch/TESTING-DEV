@@ -692,7 +692,7 @@ MESSAGES = {
     },
     "bien_ban_chua_boc_tham": {
         "vi": "Chưa có biên bản bốc thăm vì chưa bốc thăm. Hãy chạy xếp một lần (hạt giống được khoá khi chạy) rồi xuất lại.",
-        "en": "There is no lottery record yet because no draw has happened. Run the allocation once (the seed is locked when it runs) and export again.",
+        "en": "There is no lottery record yet because no draw has happened. Run the allocation once (the draw is locked when it runs) and export again.",
     },
     "fa_can_diem_quyet_tam": {
         "vi": "Chưa bật được xếp theo loại CLB và huy chương vì điểm quyết tâm đang tắt. Huy chương dùng chung bảng điểm quyết tâm: hãy bật điểm quyết tâm (cần ưu tiên theo điểm thi và điểm tính riêng từng CLB) rồi thử lại.",

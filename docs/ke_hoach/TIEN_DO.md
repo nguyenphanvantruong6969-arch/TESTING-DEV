@@ -97,3 +97,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-9b (đêm 5) | xong | 2026-11-10 | fa_bien_ban.py, api_xuat.py, i18n.js, index.html, js/03_ket_qua.js, CHANGELOG.md | tests/test_fa_bien_ban.py, test_giao_dien_fa_ket_qua.py | Biên bản bốc thăm bản Excel |
 | FA-P1 (soát đêm 5) | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản Excel: tên kỳ / tên buổi không thành công thức |
 | FA-P2 (soát đêm 5) | xong | 2026-11-10 | js/04_nhap_tai_cho.js, CHANGELOG.md | tests/test_giao_dien_fa_n2_luu_mac_dinh.py | Huy chương mặc định vẫn lưu khi sang em khác giữa lúc lưu |
+| FA-CI1 (PR #14) | xong | 2026-11-10 | du_lieu_test/mo_phong_fa_daa.py, mau_forms_thi_clb/so_sanh_suc_chua.py, i18n_errors.py, i18n_loi.js, i18n.js, index.html, CHANGELOG.md | tests/test_mo_phong_fa_daa.py, test_fa_nhu_cau.py, test_van_phong_tu_nhien.py | CI: in UTF-8 trên Windows, câu chữ đúng luật văn phong |

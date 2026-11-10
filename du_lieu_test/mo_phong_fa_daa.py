@@ -261,6 +261,10 @@ def in_bang(ten, dong):
 
 
 def main(argv=None):
+    # Cửa sổ lệnh / ống dẫn Windows mặc định cp1252: in tiếng Việt sẽ ném UnicodeEncodeError.
+    for _luong in (sys.stdout, sys.stderr):
+        if hasattr(_luong, "reconfigure"):
+            _luong.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     ap.add_argument("--n", type=int, default=100)
     ap.add_argument("--so-seed", type=int, default=5)
