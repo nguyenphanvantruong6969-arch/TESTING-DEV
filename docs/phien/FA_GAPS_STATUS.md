@@ -12,8 +12,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | Code | Wave | State (TODO/DOING/DONE/BLOCKED/WAIT-TRUONG) | Commit | Note |
 |---|---|---|---|---|
 | GAP-0 | 1 | DONE | c6e0405 | fa_dieu_chinh + vi_tri_hien_tai |
-| GAP-1 | 1 | DONE | (next commit) | attendance |
-| GAP-2 | 1 | TODO | | waitlist invites |
+| GAP-1 | 1 | DONE | a10eee5+bb49d11 | attendance |
+| GAP-2 | 1 | DOING |  | waitlist invites |
 | GAP-3 | 2 | TODO | | appeals |
 | GAP-4 | 2 | TODO | | round 2 |
 | GAP-5 | 2 | TODO | | 3 feedback questions |

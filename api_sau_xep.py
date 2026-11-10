@@ -120,6 +120,7 @@ class SauXepMixin:
                     sx.ghi_dieu_chinh(cur, run, buoi, student_id, club_id, None, "release",
                                       actor="diem_danh", note="vang_2_3")
                     giai_phong = True
+                    sx.moi_tiep(cur, buoi, club_id)       # GAP-2: mời người đầu danh sách chờ
                 return _ok({"da_giai_phong": giai_phong or not con_la_thanh_vien})
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
@@ -163,3 +164,56 @@ class SauXepMixin:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    # GAP-2 -----------------------------------------------------------------------------------------------------------
+    def get_moi_cho_trong(self):
+        """GAP-2: mọi lời mời vào chỗ trống, mới nhất trước, kèm trạng thái CHO / NHAN / TU_CHOI / HET_HAN.
+        Cờ tắt -> {bat: False}."""
+        try:
+            if not self._co_diem_danh():
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                dc = sx.doc_dieu_chinh(cur)
+                vi_tri, _, _ = sx.doc_vi_tri(cur)
+                ten_hs = {r[0]: r[1] or "" for r in cur.execute("SELECT student_id, name FROM students")}
+                ten_clb = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+            tt = sx.trang_thai_moi(dc)
+            moi = [{"id": d["id"], "buoi": d["buoi"], "club_id": d["club_to"],
+                    "club_name": ten_clb.get(d["club_to"], d["club_to"]), "student_id": d["student_id"],
+                    "name": ten_hs.get(d["student_id"], ""),
+                    "club_hien_tai": vi_tri.get((d["student_id"], d["buoi"])) or "",
+                    "created_at": d["created_at"], "trang_thai": tt[d["id"]]}
+                   for d in sorted(dc, key=lambda x: -x["id"]) if d["kind"] == "invite_offer"]
+            return _ok({"bat": True, "moi": moi})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def tra_loi_moi(self, id_moi, ket_qua: str):
+        """GAP-2: trả lời một lời mời đang chờ: "nhan" (đổi chỗ), "tu_choi", "het_han". Sau đó mời người kế tiếp
+        (CLB vừa bỏ khi nhận; cùng CLB khi từ chối / hết hạn). Một giao dịch."""
+        try:
+            if not self._co_diem_danh():
+                return _fail(err("fa_diem_danh_chua_bat"))
+            if ket_qua not in sx.KIND_TRA_LOI:
+                return _fail(err("diem_danh_gia_tri_sai"))
+            with self._ket_noi_ghi() as cur:
+                vi_tri, _, run_goc = sx.doc_vi_tri(cur)
+                m = sx.moi_dang_cho(sx.doc_dieu_chinh(cur), run_goc).get(id_moi)
+                if m is None:
+                    return _fail(err("moi_khong_con_cho"))
+                hien = vi_tri.get((m["student_id"], m["buoi"]))
+                if ket_qua == "nhan":
+                    sx.ghi_dieu_chinh(cur, m["run_id_base"], m["buoi"], m["student_id"], hien, m["club_to"],
+                                      "invite_accept", actor="moi_cho")
+                    sx.moi_tiep(cur, m["buoi"], hien)
+                else:
+                    sx.ghi_dieu_chinh(cur, m["run_id_base"], m["buoi"], m["student_id"], hien, m["club_to"],
+                                      sx.KIND_TRA_LOI[ket_qua], actor="moi_cho")
+                    sx.moi_tiep(cur, m["buoi"], m["club_to"])
+                return _ok({"id": id_moi, "ket_qua": ket_qua})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_saving_preferences", detail=str(e)))

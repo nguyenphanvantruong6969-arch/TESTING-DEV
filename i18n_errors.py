@@ -714,6 +714,10 @@ MESSAGES = {
         "vi": "{person} {student_id} không thuộc {slot_l} {club_id} nên không điểm danh ở đó được.",
         "en": "{person} {student_id} is not in {slot_l} {club_id}, so attendance can't be recorded there.",
     },
+    "moi_khong_con_cho": {
+        "vi": "Lời mời này không còn chờ trả lời (đã được trả lời, hoặc kết quả xếp của buổi đó đã chạy lại).",
+        "en": "This invitation is no longer waiting for an answer (already answered, or that day was re-run).",
+    },
     "fa_ly_do_thieu_buoi": {
         "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",
         "en": "Session {buoi} has no reasons: its latest run did not use FA-DAA mode.",

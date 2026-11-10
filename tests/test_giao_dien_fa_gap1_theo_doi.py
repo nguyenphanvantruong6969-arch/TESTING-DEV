@@ -59,6 +59,7 @@ def test_co_tat_khong_co_khung_diem_danh(mo):
     page, _, loi = mo(_tat)
     page.wait_for_timeout(300)
     assert page.locator("#diemDanhPanel[hidden]").count() == 1
+    assert page.locator("#moiPanel[hidden]").count() == 1
     assert not loi, loi
 
 
@@ -96,4 +97,28 @@ def test_wizard_co_o_diem_danh_tat_san_va_luu_khi_bat(mo_trang):  # noqa: F811 (
     _cho_ten(page, "Đợt theo dõi")
     rules = api.get_workspace_config()["data"]["config"]["rules"]
     assert rules["fa_diem_danh"] is True and rules["fa_daa"] is True
+    assert not loi, loi
+
+
+def test_giai_phong_thi_hien_loi_moi_va_bam_nhan(mo):
+    """GAP-2: chỗ được giải phóng -> khung `#moiPanel` có một lời mời đang chờ; bấm "Nhận" -> trạng thái NHAN."""
+    page, api, loi = mo(_dung)
+    page.wait_for_selector("#diemDanhPanel:not([hidden])")
+    assert page.locator("#moiPanel:not([hidden])").count() == 1
+    page.select_option("#diemDanhClb", "G")
+    page.wait_for_function("() => document.querySelectorAll('#diemDanhBang tr').length === 2")
+    with api._ket_noi_doc() as cur:
+        vt, _, _ = sx.doc_vi_tri(cur)
+    em = sorted(s for (s, _), c in vt.items() if c == "G")[0]
+    for so in ("1", "2"):
+        page.select_option('#diemDanhBang select.dd-o[data-student-id="%s"][data-buoi-so="%s"]' % (em, so),
+                           "VANG_KHONG_PHEP")
+    nut = page.locator('#moiDanhSach button.moi-tra-loi[data-ket-qua="nhan"]')
+    nut.wait_for()
+    assert nut.count() == 1
+    nut.click()
+    page.wait_for_function("() => document.getElementById('moiDanhSach').textContent.includes('Đã nhận')")
+    assert page.locator("#moiDanhSach button.moi-tra-loi").count() == 0
+    with api._ket_noi_doc() as cur:
+        assert cur.execute("SELECT COUNT(*) FROM fa_dieu_chinh WHERE kind='invite_accept'").fetchone()[0] == 1
     assert not loi, loi

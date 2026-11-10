@@ -4,6 +4,9 @@
    GAP-1: điểm danh 3 buổi đầu. Khung `#diemDanhPanel` chỉ hiện khi `rules.fa_diem_danh` bật
    (get_diem_danh trả bat: false thì ẩn). Đổi một ô -> luu_diem_danh; đủ 2/3 buổi vắng không phép thì
    backend ghi một dòng giải phóng chỗ (không sửa kết quả xếp) và dòng hiện "Đã giải phóng chỗ".
+
+   GAP-2: lời mời vào chỗ trống. Khung `#moiPanel` liệt kê mọi lời mời (mới nhất trước); lời mời đang chờ có ba
+   nút Nhận / Từ chối / Hết hạn -> tra_loi_moi; backend tự mời người kế tiếp.
    ========================================================================== */
 
 const DD_TRANG_THAI = [["", ""], ["CO_MAT", "dd_co_mat"], ["VANG_CO_PHEP", "dd_vang_co_phep"],
@@ -73,10 +76,57 @@ function taiDiemDanh(clubId) {
     panel.hidden = !bat;
     if (!bat) return;
     veDiemDanh(res.data);
+  }).then(() => (el("diemDanhPanel").hidden ? (el("moiPanel").hidden = true) : taiMoi()));
+}
+
+function veMoi(ds) {
+  const ul = el("moiDanhSach");
+  clear(ul);
+  if (!ds.length) {
+    const li = document.createElement("li");
+    li.className = "hint";
+    li.textContent = t("moi_trong");
+    ul.appendChild(li);
+    return;
+  }
+  ds.forEach((m) => {
+    const li = document.createElement("li");
+    li.dataset.moiId = String(m.id);
+    li.textContent = t("moi_dong", { name: m.name, student_id: m.student_id, club: m.club_name,
+      buoi: nhanBuoi(m.buoi) }) + " — " + t("moi_trang_thai_" + m.trang_thai);
+    if (m.trang_thai === "CHO") {
+      [["nhan", "moi_nhan"], ["tu_choi", "moi_tu_choi"], ["het_han", "moi_het_han"]].forEach(([kq, khoa]) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn btn-ghost moi-tra-loi";
+        b.dataset.moiId = String(m.id);
+        b.dataset.ketQua = kq;
+        b.textContent = t(khoa);
+        li.append(" ", b);
+      });
+    }
+    ul.appendChild(li);
+  });
+}
+
+function taiMoi() {
+  return callApi("get_moi_cho_trong").then((res) => {
+    const bat = !!(res && res.ok && res.data.bat);
+    el("moiPanel").hidden = !bat;
+    if (bat) veMoi(res.data.moi);
   });
 }
 
 function khoiTaoTheoDoi() {
+  el("moiDanhSach").addEventListener("click", (e) => {
+    const b = e.target.closest("button.moi-tra-loi");
+    if (!b) return;
+    b.disabled = true;
+    callApi("tra_loi_moi", Number(b.dataset.moiId), b.dataset.ketQua).then((res) => {
+      if (!res.ok) showErrorToast(res.errors);
+      return taiDiemDanh();
+    });
+  });
   el("diemDanhClb").addEventListener("change", (e) => taiDiemDanh(e.target.value));
   el("diemDanhBang").addEventListener("change", (e) => {
     const s = e.target.closest("select.dd-o");
