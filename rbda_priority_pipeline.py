@@ -2056,6 +2056,21 @@ CREATE TABLE IF NOT EXISTS fa_diem_danh (
     PRIMARY KEY (run_id_base, buoi, club_id, student_id, buoi_so)
 );
 
+-- Khiếu nại lỗi dữ liệu (FA gaps, GAP-3): dữ liệu NHẬP; trang_thai đổi khi quản trị xử lý. Chấp nhận thì ghi thêm một
+-- dòng appeal_rerun trong fa_dieu_chinh; sửa dữ liệu rồi chạy lại như thường (hạt giống đã khoá), không sửa tay kết quả.
+CREATE TABLE IF NOT EXISTS fa_khieu_nai (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    buoi TEXT NOT NULL,
+    loai TEXT NOT NULL CHECK (loai = 'DATA_ERROR'),
+    ghi_chu TEXT,
+    run_id_base INTEGER NOT NULL,
+    trang_thai TEXT NOT NULL CHECK (trang_thai IN ('CHO', 'CHAP_NHAN', 'TU_CHOI')),
+    xu_ly_at TEXT,
+    xu_ly_ghi_chu TEXT
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

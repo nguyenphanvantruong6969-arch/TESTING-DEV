@@ -125,7 +125,7 @@ class SauXepMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_saving_preferences", detail=str(e)))
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
 
     def export_diem_danh(self, output_path: str = ""):
         """GAP-1: `diem_danh.xlsx` — mỗi CLB một trang: mã, họ tên, 3 buổi, số buổi vắng không phép, đã giải phóng."""
@@ -216,4 +216,122 @@ class SauXepMixin:
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
-            return _fail(err("error_saving_preferences", detail=str(e)))
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    # GAP-3 -----------------------------------------------------------------------------------------------------------
+    def _co_khieu_nai(self):
+        """(bật?, số ngày nhận khiếu nại)."""
+        luat = self._luat_nghiem()
+        return dung_fa_daa(luat) and luat.get("fa_khieu_nai") is True, luat.get("fa_khieu_nai_so_ngay",
+                                                                                sx.SO_NGAY_KHIEU_NAI)
+
+    COT_KHIEU_NAI = ("id", "created_at", "student_id", "buoi", "ghi_chu", "run_id_base", "trang_thai", "xu_ly_at",
+                     "xu_ly_ghi_chu")
+
+    def _doc_khieu_nai(self, cur):
+        ds = [dict(zip(self.COT_KHIEU_NAI, r)) for r in cur.execute(
+            "SELECT %s FROM fa_khieu_nai ORDER BY id DESC" % ", ".join(self.COT_KHIEU_NAI))]
+        anh = sx.anh_huong_sau_chay_lai(ds, sx.run_goc_theo_buoi(cur), sx.doc_dieu_chinh(cur))
+        for k in ds:
+            k.update(anh.get(k["id"], {"da_chay_lai": False, "dieu_chinh_cu": []}))
+        return ds
+
+    def gui_khieu_nai(self, student_id: str, buoi: str, ghi_chu: str = ""):
+        """GAP-3: gửi một khiếu nại lỗi dữ liệu cho (học sinh, buổi), trong hạn từ lúc công bố kết quả buổi đó."""
+        try:
+            bat, so_ngay = self._co_khieu_nai()
+            if not bat:
+                return _fail(err("fa_khieu_nai_chua_bat"))
+            with self._ket_noi_ghi() as cur:
+                run_goc = sx.run_goc_theo_buoi(cur)
+                co = cur.execute("SELECT 1 FROM match_results WHERE student_id = ? AND buoi = ?",
+                                 (student_id, buoi)).fetchone()
+                if not co or buoi not in run_goc:
+                    return _fail(err("khieu_nai_khong_hop_le", student_id=student_id, buoi=buoi))
+                run_at = cur.execute("SELECT run_at FROM run_history WHERE run_id = ?",
+                                     (run_goc[buoi],)).fetchone()[0]
+                luc = sx.bay_gio()
+                if not sx.trong_han_khieu_nai(run_at, luc, so_ngay):
+                    return _fail(err("khieu_nai_qua_han", so_ngay=so_ngay))
+                if cur.execute("SELECT 1 FROM fa_khieu_nai WHERE student_id = ? AND buoi = ? AND trang_thai = 'CHO'",
+                               (student_id, buoi)).fetchone():
+                    return _fail(err("khieu_nai_trung", student_id=student_id))
+                cur.execute("INSERT INTO fa_khieu_nai (created_at, student_id, buoi, loai, ghi_chu, run_id_base, "
+                            "trang_thai) VALUES (?, ?, ?, 'DATA_ERROR', ?, ?, 'CHO')",
+                            (luc.strftime("%Y-%m-%d %H:%M:%S"), student_id, buoi, str(ghi_chu or ""),
+                             run_goc[buoi]))
+                return _ok({"id": cur.lastrowid})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    def get_khieu_nai(self):
+        """GAP-3: mọi khiếu nại (mới nhất trước), kèm đã chạy lại chưa và các điều chỉnh của lần chạy cũ."""
+        try:
+            bat, so_ngay = self._co_khieu_nai()
+            if not bat:
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                ds = self._doc_khieu_nai(cur)
+                ten = {r[0]: r[1] or "" for r in cur.execute("SELECT student_id, name FROM students")}
+                ds_buoi = sorted(sx.run_goc_theo_buoi(cur), key=khoa_sap_buoi)
+            for k in ds:
+                k["name"] = ten.get(k["student_id"], "")
+            return _ok({"bat": True, "so_ngay": so_ngay, "ds_buoi": ds_buoi, "khieu_nai": ds})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def xu_ly_khieu_nai(self, id_kn, chap_nhan: bool, ghi_chu: str = ""):
+        """GAP-3: quản trị chấp nhận / từ chối. Chấp nhận ghi thêm một dòng `appeal_rerun`; sửa dữ liệu rồi chạy lại
+        như thường (hạt giống đã khoá) — hàm này không chạy xếp, không sửa kết quả."""
+        try:
+            bat, _ = self._co_khieu_nai()
+            if not bat:
+                return _fail(err("fa_khieu_nai_chua_bat"))
+            with self._ket_noi_ghi() as cur:
+                k = cur.execute("SELECT student_id, buoi, run_id_base, trang_thai FROM fa_khieu_nai WHERE id = ?",
+                                (id_kn,)).fetchone()
+                if not k or k[3] != "CHO":
+                    return _fail(err("khieu_nai_da_xu_ly"))
+                cur.execute("UPDATE fa_khieu_nai SET trang_thai = ?, xu_ly_at = ?, xu_ly_ghi_chu = ? WHERE id = ?",
+                            ("CHAP_NHAN" if chap_nhan else "TU_CHOI",
+                             sx.bay_gio().strftime("%Y-%m-%d %H:%M:%S"), str(ghi_chu or ""), id_kn))
+                if chap_nhan:
+                    vi_tri, _, _ = sx.doc_vi_tri(cur)
+                    hien = vi_tri.get((k[0], k[1]))
+                    sx.ghi_dieu_chinh(cur, k[2], k[1], k[0], hien, hien, "appeal_rerun", actor="khieu_nai",
+                                      note="khieu_nai:%d" % id_kn)
+                return _ok({"id": id_kn, "chap_nhan": bool(chap_nhan)})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    def export_khieu_nai(self, output_path: str = ""):
+        """GAP-3: `khieu_nai.csv` (UTF-8 có BOM, chặn công thức)."""
+        return self._khoa_xuat(self._export_khieu_nai_da_khoa, output_path)
+
+    def _export_khieu_nai_da_khoa(self, output_path: str = ""):
+        from api_chung import _ghi_csv
+        try:
+            bat, _ = self._co_khieu_nai()
+            if not bat:
+                return _fail(err("fa_khieu_nai_chua_bat"))
+            with self._ket_noi_doc() as cur:
+                ds = self._doc_khieu_nai(cur)
+            duong = self._duong_xuat(output_path, "khieu_nai.csv")
+            _ghi_csv(duong, ["id", "student_id", "buoi", "trang_thai", "created_at", "ghi_chu", "xu_ly_ghi_chu",
+                             "da_chay_lai", "dieu_chinh_cu"],
+                     [[k["id"], k["student_id"], k["buoi"], k["trang_thai"], k["created_at"], k["ghi_chu"] or "",
+                       k["xu_ly_ghi_chu"] or "", "1" if k["da_chay_lai"] else "0",
+                       ";".join(str(i) for i in k["dieu_chinh_cu"])] for k in sorted(ds, key=lambda x: x["id"])])
+            return _ok({"path": duong, "n_rows": len(ds)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))

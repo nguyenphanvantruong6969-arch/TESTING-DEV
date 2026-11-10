@@ -562,6 +562,29 @@
         </div>
       </div>
 
+      <!-- GAP-3: khieu nai loi du lieu (chi khi rules.fa_khieu_nai bat); js/10_theo_doi.js -->
+      <div class="panel" id="khieuNaiPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="kn_tieu_de">Khiếu nại lỗi dữ liệu</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnXuatKhieuNai" type="button" data-i18n="btn_xuat_khieu_nai">Xuất khiếu nại (CSV)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p class="hint" id="knGoiY"></p>
+          <div class="search-row">
+            <input type="text" id="knMa" class="text-input text-input-sm" data-i18n-placeholder="kn_ma" data-i18n-aria-label="kn_ma" placeholder="Mã học sinh">
+            <select id="knBuoi" class="text-input text-input-sm" data-i18n-aria-label="kn_buoi"></select>
+            <input type="text" id="knGhiChu" class="text-input" data-i18n-placeholder="kn_ghi_chu" data-i18n-aria-label="kn_ghi_chu" placeholder="Dữ liệu nào bị sai?">
+            <button class="btn btn-primary" id="btnGuiKhieuNai" type="button" data-i18n="kn_gui">Gửi khiếu nại</button>
+          </div>
+          <ul id="knDanhSach" class="moi-danh-sach"></ul>
+          <div id="knFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
       <div class="panel" id="dsXepPanel">
         <div class="panel-head">
           <div class="panel-head-trai">

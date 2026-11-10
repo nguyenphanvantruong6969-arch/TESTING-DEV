@@ -714,6 +714,30 @@ MESSAGES = {
         "vi": "{person} {student_id} không thuộc {slot_l} {club_id} nên không điểm danh ở đó được.",
         "en": "{person} {student_id} is not in {slot_l} {club_id}, so attendance can't be recorded there.",
     },
+    "loi_luu_sau_xep": {
+        "vi": "Không lưu được thay đổi sau khi xếp. Hãy thử lại.",
+        "en": "Couldn't save the after-allocation change. Try again.",
+    },
+    "fa_khieu_nai_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật nhận khiếu nại sau khi xếp.",
+        "en": "This workspace doesn't take appeals after allocation.",
+    },
+    "khieu_nai_khong_hop_le": {
+        "vi": "Không nhận được khiếu nại: không tìm thấy {person_l} {student_id} hoặc buổi {buoi} chưa có kết quả.",
+        "en": "Appeal not accepted: {person} {student_id} not found or session {buoi} has no result yet.",
+    },
+    "khieu_nai_qua_han": {
+        "vi": "Đã quá hạn khiếu nại ({so_ngay} ngày từ lúc công bố kết quả).",
+        "en": "The appeal window has closed ({so_ngay} days after results were published).",
+    },
+    "khieu_nai_trung": {
+        "vi": "{person} {student_id} đã có một khiếu nại đang chờ xử lý cho buổi này.",
+        "en": "{person} {student_id} already has an appeal waiting for this session.",
+    },
+    "khieu_nai_da_xu_ly": {
+        "vi": "Khiếu nại này đã được xử lý rồi.",
+        "en": "This appeal has already been handled.",
+    },
     "moi_khong_con_cho": {
         "vi": "Lời mời này không còn chờ trả lời (đã được trả lời, hoặc kết quả xếp của buổi đó đã chạy lại).",
         "en": "This invitation is no longer waiting for an answer (already answered, or that day was re-run).",

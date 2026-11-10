@@ -388,6 +388,7 @@ function wsWizardTuMau(mau, ten, buoc) {
     wharton: c.rules.wharton === true,
     faDaa: c.rules.fa_daa === true,
     faDiemDanh: c.rules.fa_diem_danh === true,
+    faKhieuNai: c.rules.fa_khieu_nai === true,
     tiersText: (c.rules.tiers || []).join("\n"),
   };
 }
@@ -420,6 +421,7 @@ function wsGomBuoc() {
     w.wharton = lay("wzWharton").checked;
     w.faDaa = lay("wzFaDaa").checked;
     w.faDiemDanh = lay("wzFaDiemDanh").checked;
+    w.faKhieuNai = lay("wzFaKhieuNai").checked;
     w.tiersText = lay("wzTiers").value;
   }
 }
@@ -499,6 +501,7 @@ function wsCfgTuWizard(w) {
       ...(w.faDaa === true ? { fa_daa: true } : {}),
       /* GAP-1: theo dõi sau khi xếp — chỉ gửi khi bật; cần fa_daa (backend: fa_tinh_nang_can_fa). */
       ...(w.faDiemDanh === true ? { fa_diem_danh: true } : {}),
+      ...(w.faKhieuNai === true ? { fa_khieu_nai: true } : {}),
     },
   };
 }
@@ -698,6 +701,8 @@ function wsBuoc3(hop) {
       checked: w.faDaa === true }), wsGoiYNgan("wzFaDaa", t("ws_r_fa_daa_ngan"), t("ws_r_fa_daa_ghi_chu"))),
     wsTruong("wzFaDiemDanh", "ws_r_fa_diem_danh", wsEl("input", { type: "checkbox", id: "wzFaDiemDanh",
       checked: w.faDiemDanh === true }), t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaKhieuNai", "ws_r_fa_khieu_nai", wsEl("input", { type: "checkbox", id: "wzFaKhieuNai",
+      checked: w.faKhieuNai === true }), t("ws_r_fa_diem_danh_ngan")),
     wsTruong("wzTiers", "ws_r_tiers", oTiers, t("ws_r_tiers_chi_strict")),
   );
 }
@@ -722,6 +727,7 @@ function wsBuoc4(hop) {
     hang(t("ws_r_wharton"), t(r.wharton ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvWharton"),
     hang(t("ws_r_fa_daa"), t(r.fa_daa ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaDaa"),
     hang(t("ws_r_fa_diem_danh"), t(r.fa_diem_danh ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaDiemDanh"),
+    hang(t("ws_r_fa_khieu_nai"), t(r.fa_khieu_nai ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaKhieuNai"),
     ...(r.tiers.length ? [hang(t("ws_r_tiers"), r.tiers.join(" › "), "rvTiers")] : []),
   ];
   hop.append(

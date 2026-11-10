@@ -211,3 +211,36 @@ def moi_tiep(cur, buoi: str, club_id: str) -> list:
         da_ghi.append(ghi_dieu_chinh(cur, run, buoi, sid, vi_tri.get((sid, buoi)), club_id, "invite_offer",
                                      actor="moi_cho"))
     return da_ghi
+
+
+# GAP-3 ---------------------------------------------------------------------------------------------------------------
+SO_NGAY_KHIEU_NAI = 3          # V§9.2: nhận khiếu nại trong 3 ngày từ lúc công bố (rules.fa_khieu_nai_so_ngay đổi được)
+
+
+def bay_gio() -> datetime.datetime:
+    """Đồng hồ của phần khiếu nại (test thay hàm này; không bao giờ sửa `run_history`)."""
+    return datetime.datetime.now()
+
+
+def _doc_gio(chu: str) -> datetime.datetime:
+    return datetime.datetime.strptime(str(chu)[:19].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+
+
+def trong_han_khieu_nai(run_at: str, luc: datetime.datetime, so_ngay: int) -> bool:
+    """Còn trong hạn khiếu nại: `luc` không quá `so_ngay` ngày sau `run_at` (lúc công bố = lúc chạy). Tính cả mốc."""
+    return luc - _doc_gio(run_at) <= datetime.timedelta(days=so_ngay)
+
+
+def anh_huong_sau_chay_lai(khieu_nai, run_goc: dict, dieu_chinh) -> dict:
+    """{id khiếu nại đã chấp nhận: {da_chay_lai, dieu_chinh_cu}}: buổi đó đã có lần chạy gốc MỚI hơn lần lúc khiếu nại
+    chưa, và các dòng điều chỉnh của lần chạy cũ (nay không còn áp dụng, phải xem lại). Hàm thuần."""
+    ra = {}
+    for k in khieu_nai:
+        if k["trang_thai"] != "CHAP_NHAN":
+            continue
+        moi = run_goc.get(k["buoi"])
+        da = moi is not None and moi != k["run_id_base"]
+        cu = sorted(d["id"] for d in dieu_chinh
+                    if d["run_id_base"] == k["run_id_base"] and d["buoi"] == k["buoi"]) if da else []
+        ra[k["id"]] = {"da_chay_lai": da, "dieu_chinh_cu": cu}
+    return ra

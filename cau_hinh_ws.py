@@ -73,11 +73,13 @@ MAC_DINH_TRUONG_HOC = {
         # FA gaps (sau khi xếp): mặc định TẮT, chỉ dùng được khi `fa_daa` bật. KHÔNG thuộc luật xếp
         # (`LUAT_XEP_MAC_DINH`), nên không bao giờ vào `run_history.luat_xep` hay dấu vân tay kết quả.
         "fa_diem_danh": False,      # GAP-1/GAP-2: điểm danh 3 buổi đầu + mời danh sách chờ
+        "fa_khieu_nai": False,      # GAP-3: khiếu nại lỗi dữ liệu trong hạn
+        "fa_khieu_nai_so_ngay": 3,  # GAP-3: số ngày nhận khiếu nại từ lúc công bố (1..14)
     },
 }
 
 # Các cờ sau khi xếp (FA gaps): bool, chỉ bật được khi `fa_daa` bật (`FaTinhNangCanFa`).
-CO_SAU_XEP = ("fa_diem_danh",)
+CO_SAU_XEP = ("fa_diem_danh", "fa_khieu_nai")
 
 
 def _tron_sau(mac_dinh: dict, ghi_de: dict) -> dict:
@@ -286,6 +288,10 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
             raise ValueError("%s phải là true hoặc false, nhận %r." % (khoa, luat[khoa]))
         if luat[khoa] and not bat_fa:
             raise FaTinhNangCanFa(khoa)
+
+    so_ngay = luat["fa_khieu_nai_so_ngay"]
+    if not _la_so_nguyen(so_ngay) or not 1 <= so_ngay <= 14:
+        raise ValueError("fa_khieu_nai_so_ngay phải là số nguyên từ 1 đến 14, nhận %r." % (so_ngay,))
 
     tiers = luat["tiers"]
     if not isinstance(tiers, list) or not all(isinstance(t, str) and t.strip() for t in tiers):
