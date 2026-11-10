@@ -395,3 +395,32 @@ def test_skill_khong_nam_trong_goi_zip_nguoi_dung():
     sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
     import dong_goi_skill
     assert "soat-ma" not in str(dong_goi_skill.GOI)
+
+
+# ----------------------------------------------------------------------------- FA-P7/SM-3: --so-seed N > 5 không bị cắt
+
+
+def test_danh_sach_seed_mac_dinh_giu_nguyen_nam_seed():
+    assert kn.danh_sach_seed(5) == (1, 7, 42, 99, 12345) == kn.SEED_MAC_DINH
+    assert kn.danh_sach_seed(2) == (1, 7)
+    assert kn.danh_sach_seed(0) == (1,)
+
+
+def test_danh_sach_seed_hai_muoi_la_hai_muoi_seed_khac_nhau_co_dinh():
+    ds = kn.danh_sach_seed(20)
+    assert len(ds) == 20 and len(set(ds)) == 20
+    assert ds[:5] == kn.SEED_MAC_DINH
+    assert ds == kn.danh_sach_seed(20)                     # tất định, không ngẫu nhiên
+
+
+def test_main_so_seed_hai_muoi_chay_hai_muoi_seed(monkeypatch):
+    nhan = {}
+
+    def gia_chay(goc, co_so, chi, bo_qua, seeds, *a, **k):
+        nhan["seeds"] = seeds
+        return {"ruff": (True, "")}
+    monkeypatch.setattr(kn, "chay", gia_chay)
+    assert kn.main(["--so-seed", "20", "--chi", "ruff"]) == 0
+    assert len(nhan["seeds"]) == 20
+    assert kn.main(["--chi", "ruff"]) == 0
+    assert tuple(nhan["seeds"]) == kn.SEED_MAC_DINH

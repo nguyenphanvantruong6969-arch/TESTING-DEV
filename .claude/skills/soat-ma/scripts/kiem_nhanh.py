@@ -48,6 +48,19 @@ CAM_EN = re.compile(r"\b(you|your|yours)\b", re.I)
 CAM_NOI_BO = re.compile(r"wharton", re.I)
 
 SEED_MAC_DINH = (1, 7, 42, 99, 12345)
+
+
+def danh_sach_seed(n):
+    """FA-P7/SM-3: `n` seed tất định. n ≤ 5 -> n seed đầu của SEED_MAC_DINH (mặc định đúng 5 seed cũ). n > 5 -> 5 seed
+    đó rồi thêm 2, 3, 4, … (bỏ số đã có) tới đủ n. Không ngẫu nhiên."""
+    n = max(1, int(n))
+    ds = list(SEED_MAC_DINH[:n])
+    k = 1
+    while len(ds) < n:
+        if k not in ds:
+            ds.append(k)
+        k += 1
+    return tuple(ds)
 BO_DU_LIEU_MAC_DINH = 3
 BANG_NHAT_KY = ("run_history", "wharton_nhat_ky")
 THU_MUC_BO_QUA = {".git", ".venv", ".venv_build", "build", "dist", "node_modules", "__pycache__",
@@ -450,7 +463,7 @@ def main(argv=None):
     p.add_argument("--co-so", default="main", help="nhánh/commit so trùng khít (mặc định: main)")
     p.add_argument("--chi", default="", help="chỉ chạy các mục này, cách nhau dấu phẩy")
     p.add_argument("--bo-qua", default="", help="bỏ các mục này (ghi rõ lý do trong báo cáo)")
-    p.add_argument("--so-seed", type=int, default=len(SEED_MAC_DINH), help="số seed (mặc định 5)")
+    p.add_argument("--so-seed", type=int, default=len(SEED_MAC_DINH), help="số seed (mặc định 5: 1, 7, 42, 99, 12345; N > 5 thêm 2, 3, 4, … tới đủ N)")
     ns = p.parse_args(argv)
     hop_le = {m for m, _ in MUC}
     chi = {x for x in ns.chi.split(",") if x}
@@ -458,7 +471,7 @@ def main(argv=None):
     la = (chi | bo_qua) - hop_le
     if la:
         p.error("mục lạ: %s (có: %s)" % (", ".join(sorted(la)), ", ".join(m for m, _ in MUC)))
-    seeds = SEED_MAC_DINH[:max(1, ns.so_seed)]
+    seeds = danh_sach_seed(ns.so_seed)
     ket_qua = chay(os.path.abspath(ns.goc), ns.co_so, chi, bo_qua, seeds)
     hong = [m for m, (dat, _) in ket_qua.items() if not dat]
     print("-" * 60)

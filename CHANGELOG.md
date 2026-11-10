@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P7/SM-3: kiem_nhanh --so-seed N > 5 chạy đủ N seed
+
+- `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: hàm mới `danh_sach_seed(n)` — n ≤ 5 lấy n seed đầu của `SEED_MAC_DINH` (không cờ: đúng 5 seed cũ); n > 5 thêm 2, 3, 4, … (bỏ số trùng) tới đủ n; tất định. `main` dùng hàm này; chữ trợ giúp ghi rõ luật. `--so-seed 20` nay in "60 ca (3 bộ × 20 seed) trùng khít" (trước đây cắt còn 15 ca).
+- Test mới (đỏ trước): `tests/test_skill_soat_ma.py` — 3 test (`danh_sach_seed` mặc định / 20 seed khác nhau / `main --so-seed 20`).
+
 ## 2026-11-10 — SM-2: test giao diện chờ điều kiện thật thay cho 800 ms cố định
 
 - `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (`test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc`): bỏ `wait_for_timeout(800)`; chờ lời gọi bị giữ của HS1 về xong rồi dò CSDL tới khi huy chương HS1 đã lưu (tối đa 5 s). Chỉ đổi test, không đổi mã ứng dụng. Chạy 5 lần liền: 5/5 đạt (mỗi lần 2 biến thể).
