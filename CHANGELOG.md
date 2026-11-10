@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-10 — AI-LOG: nhật ký AI tài khoản Truong
+
+- `docs/nhat_ky_ai/NHAT_KY_AI_TAI_KHOAN_TRUONG.md`: mục lục 106 phiên của Truong + 43 phiên do điều phối viên viết lời nhắn; lời nhắn nguyên văn chưa trích (giới hạn `list_events`, ghi rõ trong tệp).
+
 ## 2026-11-10 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
 
 - `.github/workflows/tests.yml` job Windows và job test của `build-windows-exe.yml`: cài thêm `python-docx>=1.1,<2` (cùng ràng buộc với `requirements-dev.txt`). 9 test FA ghi tệp `.docx` (`test_fa_m2_forms_dang_ky.py`, `test_fa_m4_phan_tich.py`, `test_fa_m5_bo_dung.py`, `test_fa_n4_mot_de_khong_thi_lai.py`) chạy thật trên Windows thay vì đỏ `ModuleNotFoundError`; không test nào bị bỏ qua.
