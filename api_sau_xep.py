@@ -552,3 +552,54 @@ class SauXepMixin:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    # GAP-8 -----------------------------------------------------------------------------------------------------------
+    def get_dashboard(self):
+        """GAP-8 (V§11): mọi chỉ số của bảng điều khiển quản trị. Chỉ đọc. FA tắt -> {bat: False}."""
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                du = sx.doc_du_lieu_dashboard(cur)
+            return _ok({"bat": True, "chi_so": sx.chi_so_dashboard(du)})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
+
+    def export_dashboard(self, output_path: str = ""):
+        """GAP-8: `dashboard.xlsx` một trang (Chỉ số, Giá trị, Mục tiêu, Đạt, Nguồn); thiếu dữ liệu ghi "chưa có dữ
+        liệu". Không có mã hay tên học sinh."""
+        return self._khoa_xuat(self._export_dashboard_da_khoa, output_path)
+
+    def _export_dashboard_da_khoa(self, output_path: str = ""):
+        from openpyxl import Workbook
+
+        from so_excel import Trang
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            with self._ket_noi_doc() as cur:
+                ds = sx.chi_so_dashboard(sx.doc_du_lieu_dashboard(cur))
+            wb = Workbook()
+            wb.active.title = "Dashboard"
+            t = Trang(wb.active)
+
+            def gt(c):
+                v = c["gia_tri"]
+                if v is None:
+                    return "chưa có dữ liệu"
+                return v if isinstance(v, int) else round(v, 3)
+            t.bang(["Chỉ số", "Giá trị", "Mục tiêu", "Đạt", "Nguồn"], [
+                [sx.TEN_CHI_SO_DASHBOARD[c["ma"]], gt(c), sx.MUC_TIEU_DASHBOARD[c["muc_tieu"]],
+                 "" if c["dat"] is None else ("Đạt" if c["dat"] else "Chưa đạt"), c["nguon"]] for c in ds])
+            t.xong()
+            duong = self._duong_xuat(output_path, "dashboard.xlsx")
+            wb.save(duong)
+            return _ok({"path": duong, "n_rows": len(ds)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))

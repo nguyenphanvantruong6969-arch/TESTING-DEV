@@ -361,3 +361,100 @@ def doc_tep_forms_phan_hoi(hang) -> list:
                     dong[ma] = v if v in MIEN_PHAN_HOI[ma] else None
             ra.append(dong)
     return ra
+
+
+# GAP-8 ---------------------------------------------------------------------------------------------------------------
+# Bảng điều khiển quản trị (V§11). CHỈ ĐỌC; mọi chỉ số là số liệu báo cáo, không bao giờ vào khoá ưu tiên (bất biến 2).
+# `gia_tri` None = chưa có dữ liệu (không bao giờ thay bằng 0). `muc_tieu` là mã (nhãn trong MUC_TIEU_DASHBOARD / i18n).
+LY_DO_SO_SANH = ("RESERVED", "SCORE", "MEDAL", "LOTTERY")
+MUC_TIEU_DASHBOARD = {
+    "bang_0": "0", "tang_so_ky_truoc": "Tăng so với kỳ trước", "theo_doi_giam": "Theo dõi; mục tiêu giảm",
+    "theo_doi": "Theo dõi", "it_nhat_50": "≥ 50 %", "tren_90": "> 90 %", "duoi_1_5": "< 1,5 điểm",
+    "tren_85": "> 85 %", "it_nhat_3_5": "≥ 3,5/5", "theo_doi_tang_manh": "Theo dõi (tăng mạnh → xem lại cơ chế)",
+}
+TEN_CHI_SO_DASHBOARD = {
+    "khong_co_clb": "Học sinh không có CLB", "ty_le_nv1": "Vào NV1", "ty_le_top2": "Vào 1 trong 2 NV đầu",
+    "ty_le_boc_tham": "Tỷ lệ quyết định bằng bốc thăm", "thua_boc_tham_1_lan": "Học sinh từng thua bốc thăm ≥ 1 lần",
+    "ty_le_dang_ky_3_ngay": "Tỷ lệ đăng ký sau 3 ngày", "ty_le_thu_thach_nghiem_tuc": "Làm thử thách nghiêm túc",
+    "do_lech_cham": "Độ lệch 2 người chấm", "ty_le_di_du_3_buoi": "Đi đủ 3 buổi đầu",
+    "hai_long_tb": "Hài lòng trung bình", "ty_le_hieu_ly_do": "Hiểu lý do kết quả",
+    "ty_le_doi_huy_chuong": "Tỷ lệ đổi huy chương khỏi mặc định",
+}
+
+
+def huy_chuong_mac_dinh(nguyen_vong, clubs: dict) -> dict:
+    """D2: {club_id: 60|30|10} cho ba CLB KHÔNG Tự do đầu tiên MỖI buổi theo thứ tự nguyện vọng. Chỉ để ĐO tỉ lệ đổi
+    (GAP-8, báo cáo), không bao giờ là khoá ưu tiên."""
+    ra, dem = {}, {}
+    for cid in dict.fromkeys(nguyen_vong or []):
+        c = clubs.get(cid)
+        if not c or c.get("loai") == "TU_DO":
+            continue
+        k = dem.get(c.get("buoi"), 0)
+        if k < 3:
+            ra[cid] = (60, 30, 10)[k]
+            dem[c.get("buoi")] = k + 1
+    return ra
+
+
+def chi_so_dashboard(du) -> list:
+    """`du` (xem `doc_du_lieu_dashboard`) -> [{ma, gia_tri, muc_tieu, dat, nguon}] theo thứ tự V§11. Hàm thuần."""
+    def chi_so(ma, gia_tri, muc_tieu, nguon, dat=None):
+        return {"ma": ma, "gia_tri": gia_tri, "muc_tieu": muc_tieu, "dat": None if gia_tri is None else dat,
+                "nguon": nguon}
+
+    khong = len({sid for (sid, _), cid in du["vi_tri"].items() if cid is None}) if du["vi_tri"] else None
+    co_cho = [r for r in du["ket_qua"] if r["club_id"]]
+    nv1 = _ty_le([1 if r["rank"] == 1 else 0 for r in co_cho])
+    top2 = _ty_le([1 if r["rank"] is not None and r["rank"] <= 2 else 0 for r in co_cho])
+    thua = [r for r in du["ly_do"] if r["outcome"] == "REJECTED" and r["reason"] in LY_DO_SO_SANH]
+    boc = _ty_le([1 if r["reason"] == "LOTTERY" else 0 for r in thua])
+    thua_boc = len({r["student_id"] for r in thua if r["reason"] == "LOTTERY"}) if du["ket_qua"] else None
+    dd: dict = {}
+    for r in du["diem_danh"]:
+        dd.setdefault((r["club_id"], r["student_id"], r["buoi"]), {})[r["buoi_so"]] = r["trang_thai"]
+    du_3 = [all(v == "CO_MAT" for v in m.values()) for m in dd.values() if len(m) == 3]
+    di_du = _ty_le([1 if x else 0 for x in du_3])
+    ph = tong_hop_phan_hoi(du["phan_hoi"], "ket_qua")
+    co_hc = [sid for sid, hc in du["huy_chuong"].items() if hc]
+    doi = _ty_le([1 if du["huy_chuong"][sid] != huy_chuong_mac_dinh(du["nguyen_vong"].get(sid), du["clubs"]) else 0
+                  for sid in sorted(co_hc)])
+    return [
+        chi_so("khong_co_clb", khong, "bang_0", "vi_tri", khong == 0),
+        chi_so("ty_le_nv1", nv1, "tang_so_ky_truoc", "match_results"),
+        chi_so("ty_le_top2", top2, "tang_so_ky_truoc", "match_results"),
+        chi_so("ty_le_boc_tham", boc, "theo_doi_giam", "fa_ly_do"),
+        chi_so("thua_boc_tham_1_lan", thua_boc, "theo_doi", "fa_ly_do"),
+        chi_so("ty_le_dang_ky_3_ngay", None, "it_nhat_50", "ngoai_kiosk"),
+        chi_so("ty_le_thu_thach_nghiem_tuc", None, "tren_90", "ngoai_kiosk"),
+        chi_so("do_lech_cham", None, "duoi_1_5", "ngoai_kiosk"),
+        chi_so("ty_le_di_du_3_buoi", di_du, "tren_85", "fa_diem_danh", di_du is not None and di_du > 0.85),
+        chi_so("hai_long_tb", ph["hai_long_tb"], "it_nhat_3_5", "fa_phan_hoi",
+               ph["hai_long_tb"] is not None and ph["hai_long_tb"] >= 3.5),
+        chi_so("ty_le_hieu_ly_do", ph["hieu_ly_do_ty_le"], "theo_doi", "fa_phan_hoi"),
+        chi_so("ty_le_doi_huy_chuong", doi, "theo_doi_tang_manh", "wharton_bids"),
+    ]
+
+
+def doc_du_lieu_dashboard(cur) -> dict:
+    """Đọc mọi nguồn cho `chi_so_dashboard`. Lý do và điểm danh chỉ của LẦN CHẠY GỐC mới nhất mỗi buổi. Chỉ SELECT."""
+    vi_tri, _, run_goc = doc_vi_tri(cur)
+    ket_qua = [{"student_id": r[0], "buoi": r[1], "club_id": r[2], "rank": r[3]} for r in cur.execute(
+        "SELECT student_id, buoi, club_id, rank_in_student_pref FROM match_results ORDER BY student_id, buoi")]
+    ly_do = [{"student_id": r[0], "outcome": r[1], "reason": r[2]} for r in cur.execute(
+        "SELECT student_id, outcome, reason, run_id, buoi FROM fa_ly_do ORDER BY run_id, buoi, student_id")
+        if run_goc.get(r[4]) == r[3]]
+    diem_danh = [{"club_id": r[0], "student_id": r[1], "buoi": r[2], "buoi_so": r[3], "trang_thai": r[4]}
+                 for r in cur.execute("SELECT club_id, student_id, buoi, buoi_so, trang_thai, run_id_base "
+                                      "FROM fa_diem_danh") if run_goc.get(r[2]) == r[5]]
+    phan_hoi = [dict(zip(COT_PHAN_HOI, r)) for r in cur.execute(
+        "SELECT %s FROM fa_phan_hoi ORDER BY id" % ", ".join(COT_PHAN_HOI))]
+    huy_chuong: dict = {}
+    for sid, cid, p in cur.execute("SELECT student_id, club_id, points FROM wharton_bids"):
+        huy_chuong.setdefault(sid, {})[cid] = p
+    nguyen_vong: dict = {}
+    for sid, cid in cur.execute("SELECT student_id, club_id FROM preferences ORDER BY student_id, rank"):
+        nguyen_vong.setdefault(sid, []).append(cid)
+    clubs = {r[0]: {"buoi": r[1] or "", "loai": r[2]} for r in cur.execute("SELECT club_id, buoi, loai FROM clubs")}
+    return {"vi_tri": vi_tri, "ket_qua": ket_qua, "ly_do": ly_do, "diem_danh": diem_danh, "phan_hoi": phan_hoi,
+            "huy_chuong": huy_chuong, "nguyen_vong": nguyen_vong, "clubs": clubs}

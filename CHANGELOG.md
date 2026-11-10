@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-8: bảng điều khiển quản trị (V§11), chỉ đọc
+
+- `fa_sau_xep.py`: `chi_so_dashboard` (hàm thuần, 12 chỉ số theo thứ tự V§11: không có CLB, NV1, top 2, tỉ lệ bốc thăm, số em từng thua bốc thăm, đăng ký sau 3 ngày, thử thách nghiêm túc, độ lệch chấm, đi đủ 3 buổi, hài lòng, hiểu lý do, đổi huy chương; `gia_tri` None = chưa có dữ liệu, không bao giờ thay bằng 0; ba chỉ số nằm ngoài kiosk ghi nguồn `ngoai_kiosk`), `doc_du_lieu_dashboard` (chỉ SELECT; lý do và điểm danh chỉ của lần chạy gốc mới nhất mỗi buổi), `huy_chuong_mac_dinh` (D2, chỉ để đo tỉ lệ đổi; không vào khoá ưu tiên).
+- `api_sau_xep.py`: `get_dashboard`, `export_dashboard` (`dashboard.xlsx` một trang: Chỉ số, Giá trị, Mục tiêu, Đạt, Nguồn; "chưa có dữ liệu"; không mã hay tên học sinh). Chỉ khi `rules.fa_daa` bật.
+- Giao diện: khung `#dashboardPanel` ở thẻ Quản lý (bảng `#dbBang`, nút `#btnXuatDashboard`), khoá i18n `db_*` vi + en.
+- Test mới (đỏ trước): `tests/test_fa_gap8_dashboard.py` (5), `tests/test_giao_dien_fa_gap8_dashboard.py` (2, Chromium).
+
 ## 2026-11-10 — GAP-7: gợi ý chỉ tiêu kỳ sau = NV1 kỳ này, chặn bởi giới hạn giáo viên
 
 - `fa_daa.py`: `goi_y_chi_tieu` (hàm thuần: `goi_y_ky_sau = min(nv1, gioi_han)`, chưa khai giới hạn thì = nv1; `ghi_chu` khong_co_nv1 / khong_gioi_han / chan_boi_gioi_han), `kiem_tang_tu_goi_y` (dùng lại `kiem_chi_tang`: chỉ được tăng từ gợi ý).

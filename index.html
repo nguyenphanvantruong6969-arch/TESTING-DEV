@@ -827,6 +827,26 @@
         <p class="view-desc" data-i18n="admin_desc">Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.</p>
       </header>
 
+      <!-- GAP-8 (V§11): bảng điều khiển quản trị, chỉ đọc; chỉ hiện khi FA-DAA bật (js/10_theo_doi.js taiDashboard). -->
+      <div class="panel" id="dashboardPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="db_tieu_de">Bảng điều khiển</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnXuatDashboard" type="button" data-i18n="btn_xuat_dashboard">Xuất bảng điều khiển (Excel)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <table class="data-table" id="dbBang">
+            <thead><tr><th data-i18n="db_cot_chi_so">Chỉ số</th><th data-i18n="db_cot_gia_tri">Giá trị</th>
+              <th data-i18n="db_cot_muc_tieu">Mục tiêu</th><th data-i18n="db_cot_dat">Đạt</th></tr></thead>
+            <tbody id="dbBangBody"></tbody>
+          </table>
+          <div id="dbFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
       <!-- Tab con của thẻ Quản lý (A13.5). Hai tab điểm (wh, dc) chỉ hiện khi bật điểm quyết tâm:
            js/05_quan_ly.js (capNhatTabConQl) bỏ thuộc tính hidden khi khối tương ứng hiện. -->
       <div class="ql-tabs" id="qlTabs" role="tablist" data-i18n-aria-label="ql_tab_nhom_aria" aria-label="Các mục của thẻ Quản lý">

@@ -16,6 +16,8 @@
    GAP-5/6: ba câu phản hồi một chạm ở thẻ "Kết quả" (`#phanHoiPanel`) và khung tổng hợp + nạp tệp Forms ở thẻ này
    (`#phanHoiTongPanel`).
 
+   GAP-8: bảng điều khiển quản trị (`#dashboardPanel`, thẻ Quản lý), chỉ đọc; thiếu dữ liệu ghi "chưa có dữ liệu".
+
    Mọi khung: `bat: false` -> ẩn; lời gọi lỗi (ok=false) -> ẩn VÀ báo lỗi (không im lặng).
    ========================================================================== */
 
@@ -309,8 +311,40 @@ function khoiTaoPhanHoi() {
   });
 }
 
+/* GAP-8: giá trị một chỉ số — tỉ lệ thành %, số đếm giữ nguyên, None -> "chưa có dữ liệu" (không bao giờ 0). */
+const DB_SO_DEM = ["khong_co_clb", "thua_boc_tham_1_lan"];
+function giaTriChiSo(c) {
+  if (c.gia_tri === null || c.gia_tri === undefined) return t("db_chua_co");
+  if (DB_SO_DEM.includes(c.ma)) return String(c.gia_tri);
+  if (c.ma === "hai_long_tb" || c.ma === "do_lech_cham") return c.gia_tri.toFixed(2);
+  return Math.round(c.gia_tri * 1000) / 10 + "%";
+}
+
+function taiDashboard() {
+  return callApi("get_dashboard").then((res) => {
+    if (!batKhung("dashboardPanel", res)) return;
+    const body = el("dbBangBody");
+    clear(body);
+    res.data.chi_so.forEach((c) => {
+      const tr = document.createElement("tr");
+      tr.dataset.ma = c.ma;
+      const dat = c.dat === null ? "" : t(c.dat ? "db_dat" : "db_chua_dat");
+      [t("db_" + c.ma), giaTriChiSo(c), t("db_mt_" + c.muc_tieu), dat].forEach((chu) => {
+        const td = document.createElement("td");
+        td.textContent = chu;
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  });
+}
+
 function khoiTaoTheoDoi() {
   khoiTaoPhanHoi();
+  el("btnXuatDashboard").addEventListener("click", () => {
+    chayXuat([["xuat_muc_dashboard", "export_dashboard", [""],
+      (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]], el("dbFeedback"));
+  });
   el("v2Buoi").addEventListener("change", (e) => {
     el("v2KetQua").textContent = "";
     taiVong2(e.target.value);
