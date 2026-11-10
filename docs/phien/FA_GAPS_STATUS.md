@@ -39,7 +39,7 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - §11 dashboard (not a §14 row): 0 % → 100 % of rows with kiosk data; 3 rows "chưa có dữ liệu" by design (GAP-8)
 
 ## Next step (exact, for the next session)
-1. ALL WAVES DONE. Final report: docs/phien/bao_cao_dem/2026-11-10_fa_gaps.md. Draft PR claude/fa-gaps → main (Truong merges).
+1. ALL WAVES DONE. Final report: docs/phien/bao_cao_dem/2026-11-10_fa_gaps.md. Draft PR #15 claude/fa-gaps → main (Truong merges).
 2. Only open item: GAP-14 / D1 decision (see Waiting for Truong).
 
 ## Waiting for Truong
