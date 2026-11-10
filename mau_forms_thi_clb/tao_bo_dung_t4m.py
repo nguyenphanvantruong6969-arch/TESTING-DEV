@@ -11,7 +11,7 @@ Ra (trong --ra):
     HUONG_DAN_IT.md    thứ tự dựng, mỗi bước một dòng pass/fail trỏ về R1..R38 và HDT §9
     README_BK1.md      mục lục của 01_lists, 02_app (do sinh_bk1)
 --fa-daa (FA-M5, TH): cột list ECA của FA-DAA đường A (`WP1..WP7` = huy chương, `HC_TuChinh`, `TrangThai` DRAFT/SUBMITTED, không `THIk`)
-    + `00_FA_DAA_GHI_CHU.md`; công thức Power Fx 02_app KHÔNG đổi (đặc tả màn FA ở `T4M_DAC_TA_SUA_APP.md` §12). Không cờ: như cũ.
+    + `00_FA_DAA_GHI_CHU.md` + `02_app/DangKyFA.txt` (GAP-11, màn FA theo `T4M_DAC_TA_SUA_APP.md` §12). Không cờ: như cũ.
 --zip: thêm `<--ra>.zip` NGOÀI thư mục (tên sắp xếp, giờ cố định: sinh lại cho cùng từng byte).
 
 Không sửa lõi, schema, hợp đồng CSV. Kiểm đề trước khi ghi: lỗi thì không ghi tệp nào.
@@ -44,7 +44,7 @@ Bộ này sinh list `ECA` theo cột của FA-DAA. Quyết định D8 (Power App
 | `HC_TuChinh` | không có | "Có" khi em tự chỉnh huy chương của ngày đó; rỗng = chưa chỉnh (bộ chuyển đổi tự điền mặc định khi `WP` cũng rỗng) |
 | `TrangThai` | Đang mở / Đã khóa | DRAFT (tự lưu, bộ chuyển đổi bỏ qua trừ khi `--nhan-ban-nhap`) / SUBMITTED / Đã khóa |
 
-- Màn hình đăng ký và widget huy chương: `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` §12 (R39 trở đi). Công thức Power Fx trong `02_app/` là của chế độ thường, chưa đổi cho FA.
+- Màn hình đăng ký và widget huy chương: `docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md` §12 (R39 trở đi). Công thức Power Fx của màn FA: `02_app/DangKyFA.txt` (GAP-11, GĐ); các tệp khác trong `02_app/` là của chế độ thường.
 - Chuyển đổi: `python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx --lists ECA.csv --ra ra/`.
 - Mỗi `Patch` của app ghi cột của MỘT dòng (một ngày); ước tính số yêu cầu mỗi em ở §12.2 của đặc tả (phải dưới 6.000 mỗi người mỗi 24 giờ).
 """

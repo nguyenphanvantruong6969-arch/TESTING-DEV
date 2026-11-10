@@ -11,7 +11,7 @@ import argparse
 import os
 import sys
 
-from . import cong_thuc, cot_lists, mau_csv, site_script
+from . import cong_thuc, cong_thuc_fa, cot_lists, mau_csv, site_script
 
 DONG_TH = "TH: chưa chạy trên Power Apps / SharePoint"
 
@@ -41,6 +41,8 @@ def ghi_tat_ca(ra, de, in_ra=print, fa=False):
     site_script.ghi(os.path.join(d_lists, "site_script_t4m.json"), in_ra, tat_ca)
     mau_csv.ghi_kiem_cot_eca(os.path.join(d_lists, "KIEM_COT_ECA.md"), fa)
     tep_app = cong_thuc.ghi(d_app, de)
+    if fa:                                   # GAP-11: màn đăng ký FA (đặc tả §12), chỉ ở bộ dựng --fa-daa
+        tep_app = sorted(tep_app + cong_thuc_fa.ghi_fa(d_app, de))
     with open(os.path.join(ra, "README_BK1.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write(_readme(sorted(tep_lists), tep_app))
     return (["01_lists/" + t for t in sorted(tep_lists)] + ["02_app/" + t for t in tep_app] + ["README_BK1.md"])

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-11: công thức Power Fx màn đăng ký FA, đường A (TH)
+
+- Mới `mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py`: `tao_dang_ky_fa` sinh `02_app/DangKyFA.txt` theo đặc tả §12 (R39–R54): xáo thứ tự CLB mỗi lần mở ngày (`Shuffle`), ▲▼ đổi chỗ, tối đa 7 không trùng, tối thiểu 3 (hoặc tất cả), cảnh báo thiếu CLB Tự do, tự lưu MỘT `Patch` đặt DRAFT sau mỗi thao tác (`TU_LUU`), nộp SUBMITTED có đọc lại khoá, widget huy chương (mặc định ba CLB không Tự do, tự cập nhật khi chưa chỉnh, giữ khi `HC_TuChinh = Có`, hoán đổi, không đặt vào Tự do, nhắc vàng ở Tuyển chọn). Lọc trên ECA/CLB qua `soat_loc_uy_quyen`.
+- `bo_dung_t4m/sinh_bk1.py`: chỉ khi `fa` mới ghi thêm tệp này (README liệt kê); bộ dựng mặc định giống từng byte (đã so với bản cũ). Ghi chú FA và đặc tả §12.5 cập nhật. Không chọn D8.
+- Test mới (đỏ trước): `tests/test_fa_gap11_cong_thuc_fa.py` (5).
+
 ## 2026-11-10 — GAP-8: bảng điều khiển quản trị (V§11), chỉ đọc
 
 - `fa_sau_xep.py`: `chi_so_dashboard` (hàm thuần, 12 chỉ số theo thứ tự V§11: không có CLB, NV1, top 2, tỉ lệ bốc thăm, số em từng thua bốc thăm, đăng ký sau 3 ngày, thử thách nghiêm túc, độ lệch chấm, đi đủ 3 buổi, hài lòng, hiểu lý do, đổi huy chương; `gia_tri` None = chưa có dữ liệu, không bao giờ thay bằng 0; ba chỉ số nằm ngoài kiosk ghi nguồn `ngoai_kiosk`), `doc_du_lieu_dashboard` (chỉ SELECT; lý do và điểm danh chỉ của lần chạy gốc mới nhất mỗi buổi), `huy_chuong_mac_dinh` (D2, chỉ để đo tỉ lệ đổi; không vào khoá ưu tiên).
