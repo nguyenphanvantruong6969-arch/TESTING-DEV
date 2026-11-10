@@ -56,11 +56,11 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- 2026-11-10 Sonnet night 5 DONE: 2/2, 0 blocked, no RUNNING lock. FA-O1 fff8df5, FA-9b d9482a7. Report: bao_cao_dem/2026-11-10_dem5.md.
-- Tests: related 2195 passed / 1 skipped incl. Chromium (really ran); ruff clean; kiem_nhanh 7/7. Full suite not run (CI).
-- Night 4 re-checked in depth by hand: no further reproducible bug beyond FA-O1. Not reproduced, left as notes: stale `huyChuongState` when switching student in `js/04_nhap_tai_cho.js`; `get_ly_do_ket_qua` ignores the missing-days list.
-- The scheduled tasks "FA-DAA vong soat"/"vong sua" still have NO repo source (fresh sessions saw an empty /home/user). Truong must attach repo + branch in the routines UI.
-- Next: Opus review night 5 (item unticked). Then PR to main for full CI (Truong). D8 waits for GĐ2.
+- 2026-11-10 Opus: review night 5 DONE (bao_cao_dem/2026-11-10_soat_dem5.md): 2 trung fixed (FA-P1 32cb8c8, FA-P2 399aafd), 5 nhỏ listed (FA-P3..P7). soat-ma 4 tiers: docs/ke_hoach/BAO_CAO_SOAT_MA_FA_DEM5.md (SM-1 nên sửa, SM-2/3 nhỏ). No trung/cao left.
+- Invariant 1: 3 datasets x 20 seeds identical to origin/main (60/60). kiem_nhanh 7/7. Note: `kiem_nhanh --so-seed N>5` silently caps at 5 (FA-P7); call `kiem_trung_khit(seeds=range(1,21))` directly.
+- PR #14 (claude/keen-ride-72sa7t -> main) open; Truong merges. CI fixes: FA-CI1 (UTF-8 console in two scripts + their CLI test, style wording), FA-CI2 (T3-19 UI test waited on stale table), FA-CI3 (python-docx on Windows CI, Truong's choice).
+- Branch also holds 6 AI-LOG commits from another session (docs/nhat_ky_ai/), rebased under ours without conflict.
+- Windows build workflow NOT run: manual only and it overwrites the public release "ban-moi-nhat"; Truong decides.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -73,11 +73,9 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-1. Night 5 implementer (Sonnet): `docs/phien/CHAY_DEM_FA_DAA.md` (night-5 version; night 4 is done). Truong was given a scheduled-task prompt "FA-DAA chay dem 4" (CRON_TZ=Asia/Ho_Chi_Minh 13 23,1,3 * * *, fresh Sonnet session per firing, self-disables when done) for his collaborator; this session created no task.
-2. Truong: OK to open a PR to main for the full CI suite + Windows build? GĐ2 -> D8. Night-3 questions: defaults in the night-3 review.
-3. Opus: review night 4 (auto task "FA-DAA soat dem 4" may do it): only when night 4 is finished (no RUNNING < 3 h, every night-4 item ticked or BLOCKED). Same method as bao_cao_dem/2026-11-09_soat_dem3.md: list bugs, do NOT fix; write bao_cao_dem/<date>_soat_dem4.md; plan §8 'Night 5' = that fix list only (no new features without Truong); turn CHAY_DEM_FA_DAA.md into the night-5 version; add Night 5 items to this Plan (or 'Night 5: nothing to do'); tick 'Opus review night 4'.
-4. Sonnet night 5 (auto task "FA-DAA chay dem 5"): runs only after step 3 released night 5.
-5. LOOP (supersedes the two tasks above if the collaborator creates it): "FA-DAA vong soat" (Opus, CRON_TZ=Asia/Ho_Chi_Minh 43 */2 * * *) reviews the latest finished night N and releases night N+1 = fix list only; "FA-DAA vong sua" (Sonnet, 13 1-23/2 * * *) runs the released night. Stops with "LOOP DONE: <reason>" in Current state when no trung/cao bug, N+1 > 8, or a fixed bug returns twice; then both tasks are disabled. Fixes only: no new features, invariants, D-decisions or scope changes without Truong. Prompt text was given to Truong in chat; no task created by this session.
+1. Watch PR #14 CI until green (Linux full + UI, Windows); fix red by reproducing, never skip a test. Do not merge.
+2. Truong: merge PR #14; decide FA-P3..P7, SM-1..SM-3 (all small); D8 after GĐ2; real Microsoft test with IT; attach repo to or disable the "FA-DAA vong soat"/"vong sua" tasks; D1 compensation in term 2.
+3. Loop status: LOOP DONE: no trung/cao bug after review night 5 (night 6 not needed).
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
@@ -147,3 +145,4 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 | 2026-11-10 | Sonnet (night 5) | FA-O1: reasons sorted with khoa_sap_buoi; test in test_fa_n1_ly_do_mot_phan.py red first; related 2135 passed/1 skipped; mutation caught; ruff clean | night 5 |
 | 2026-11-10 | Sonnet (night 5) | FA-9b: fa_bien_ban.ghi_xlsx + path_xlsx + button/i18n; 5 tests red first + Chromium check; 3 mutations caught (2 unit/API, 1 UI); related 2195 passed/1 skipped; ruff clean; kiem_nhanh 7/7 | night 5 |
 | 2026-11-10 | Sonnet (night 5) | Night 5 report 2026-11-10: 2/2 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-10_dem5.md | RUNNING line removed |
+| 2026-11-10 | Opus | Review night 5 (2 trung FA-P1/P2 fixed test-first, mutations caught; 5 nhỏ listed); soat-ma 4 tiers; PR #14 opened; CI fixes FA-CI1..3 | 3x20 seeds identical; Truong chose python-docx on Windows CI |
