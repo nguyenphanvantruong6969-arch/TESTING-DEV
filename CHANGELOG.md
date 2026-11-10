@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-2: mời học sinh đầu danh sách chờ vào chỗ được giải phóng
+
+- `fa_sau_xep.py`: `moi_dang_cho`, `trang_thai_moi`, `hang_cho` (hàm thuần; dùng `fa_ly_do.waitlist_pos` — thứ tự D4 đã tính sẵn; chỉ em thua ở CLB đó và xếp nó cao hơn CLB hiện tại, không đang có lời mời, chưa từ chối), `moi_tiep` (mời khi thành viên + lời mời đang chờ < chỉ tiêu; chỉ CLB Giới hạn / Tuyển chọn).
+- `api_sau_xep.py`: `get_moi_cho_trong`, `tra_loi_moi` (nhận / từ chối / hết hạn; mỗi bước một dòng `fa_dieu_chinh`; sau đó tự mời người kế tiếp). Giải phóng chỗ (GAP-1) tự gọi `moi_tiep`. Cùng cờ `rules.fa_diem_danh`.
+- Giao diện: khung `#moiPanel` (nút Nhận / Từ chối / Hết hạn). Mã lỗi mới `moi_khong_con_cho`.
+- Test mới (đỏ trước): `tests/test_fa_gap2_moi_cho.py` (9), thêm 1 test Chromium vào `tests/test_giao_dien_fa_gap1_theo_doi.py`.
+
 ## 2026-11-10 — GAP-1: điểm danh 3 buổi đầu, vắng 2/3 không phép thì giải phóng chỗ
 
 - Cờ mới `rules.fa_diem_danh` (mặc định TẮT, chỉ bật được khi `fa_daa` bật: mã lỗi `fa_tinh_nang_can_fa`); không thuộc luật xếp nên không vào `run_history.luat_xep` hay dấu vân tay.

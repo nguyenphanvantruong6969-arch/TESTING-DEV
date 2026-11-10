@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T13:10Z session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
 RUNNING-SON: 2026-11-10T13:10Z wave 1 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-Current wave: 1 — son running
+Current wave: 1 — son done, waiting for father review
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -13,7 +13,7 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 |---|---|---|---|---|
 | GAP-0 | 1 | DONE | c6e0405 | fa_dieu_chinh + vi_tri_hien_tai |
 | GAP-1 | 1 | DONE | a10eee5+bb49d11 | attendance |
-| GAP-2 | 1 | DOING |  | waitlist invites |
+| GAP-2 | 1 | DONE | 541f945+next | waitlist invites |
 | GAP-3 | 2 | TODO | | appeals |
 | GAP-4 | 2 | TODO | | round 2 |
 | GAP-5 | 2 | TODO | | 3 feedback questions |
@@ -46,3 +46,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
 | 2026-11-10 | son (SOLO) | GAP-0: 16 tests red first, 2456 related passed, mutation caught x2, 60/60 | ok |
 | 2026-11-10 | son (SOLO) | GAP-1: 13 tests red first, 4768 related passed, UI 3 really ran, mutation caught x2, 60/60 | ok |
+| 2026-11-10 | son (SOLO) | GAP-2: 10 tests red first, 4636 related passed, UI 4 really ran, mutation caught x3, 60/60 | ok |
