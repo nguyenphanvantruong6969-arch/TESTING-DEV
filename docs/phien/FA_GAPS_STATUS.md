@@ -1,6 +1,6 @@
 # FA gaps — status (single source of truth)
-RUNNING-FATHER: none
-RUNNING-SON: none
+RUNNING-FATHER: 2026-11-10T22:55Z solo
+RUNNING-SON: 2026-11-10T22:55Z wave 2 solo
 Current wave: 2 — son running (code for GAP-3..6 pushed; related suites NOT yet confirmed — see Next step)
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
