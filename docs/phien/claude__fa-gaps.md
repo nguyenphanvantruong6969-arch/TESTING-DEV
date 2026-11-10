@@ -14,19 +14,17 @@ Status: `docs/phien/FA_GAPS_STATUS.md`; specs: `docs/ke_hoach/FA_GAPS_KE_HOACH.m
 
 ## Plan (written by Opus; ticked by Sonnet)
 - [x] GAP-0 fa_dieu_chinh + vi_tri_hien_tai (w1)  - [x] GAP-1 attendance (w1)  - [x] GAP-2 waitlist invites (w1)
-- [ ] GAP-3 appeals (w2)  - [ ] GAP-4 round 2 (w2)  - [ ] GAP-5 feedback (w2)  - [ ] GAP-6 week-3 survey (w2)
-- [ ] GAP-7 next-term capacity (w3)  - [ ] GAP-8 admin dashboard (w3)  - [ ] GAP-9 two-grader deviation (w3)
-- [ ] GAP-10 reminders (w3)  - [ ] GAP-11 Power Apps kit (w4)  - [ ] GAP-12 simulation (w4)
-- [ ] GAP-13 improvement cycles (w4)  - [ ] GAP-14 D1 memo (w4)
+- [x] GAP-3 appeals (w2)  - [x] GAP-4 round 2 (w2)  - [x] GAP-5 feedback (w2)  - [x] GAP-6 week-3 survey (w2)
+- [x] GAP-7 next-term capacity (w3)  - [x] GAP-8 admin dashboard (w3)  - [x] GAP-9 two-grader deviation (w3)
+- [x] GAP-10 reminders (w3)  - [x] GAP-11 Power Apps kit (w4)  - [x] GAP-12 simulation (w4)
+- [x] GAP-13 improvement cycles (w4)  - [x] GAP-14 D1 memo (WAIT-TRUONG) (w4)
 
 ## Current state (overwrite each handoff)
-- Phase 1 (7 small fixes on claude/keen-ride-72sa7t) DONE: report docs/phien/bao_cao_dem/2026-11-10_sua_nho.md.
-- Wave 1 DONE + reviewed GO (bao_cao_dem/2026-11-10_fa_gaps_wave1.md): GAP-0 c6e0405, GAP-1 bb49d11, GAP-2 628cfb2.
-- Wave 2 coded and pushed (GAP-3 513711a; GAP-4/5/6 e76bf48); own tests + Chromium green, mutations caught;
-  GAP-3 broad suite confirmed (4791 passed, 0 failed); GAP-4/5/6 broad suite must be rerun. Items are DOING.
-- Wave 3 spec: DRAFT at the end of docs/ke_hoach/FA_GAPS_KE_HOACH.md (not yet "spec ready").
-- Tests: new files tests/test_fa_gap{0..6}_*.py, tests/test_giao_dien_fa_gap{1,3,4,5}_*.py; count in
-  CLAUDE_CHI_TIET.md = 238 test files.
+- Phase 1 DONE (bao_cao_dem/2026-11-10_sua_nho.md). Waves 1 and 2 reviewed GO (bao_cao_dem/..._wave1.md, _wave2.md).
+- Wave 3 (GAP-7, 8, 9, 10) and wave 4 (GAP-11, 12, 13; GAP-14 memo WAIT-TRUONG) coded, own tests + mutations green,
+  kiem_nhanh 7/7 60/60 after GAP-13. Broad suites running: wave-3 snapshot b0d832e, final HEAD 8069c08.
+- Remaining: confirm suites, write wave 3/4 review reports, F7 final report, ALL WAVES DONE, one draft PR.
+- Tests: new files up to tests/test_fa_gap13_vong_doi_cho.py; count in CLAUDE_CHI_TIET.md = 246 test files.
 
 ## Decisions and gotchas (keep short)
 - SOLO mode (START_HERE §2.2b). Post-allocation flags only in cau_hinh_ws.MAC_DINH_TRUONG_HOC["rules"] +
@@ -57,3 +55,4 @@ Status: `docs/phien/FA_GAPS_STATUS.md`; specs: `docs/ke_hoach/FA_GAPS_KE_HOACH.m
 | 2026-11-10 | Opus (SOLO, son hat) | GAP-1 done: attendance + release; 13 tests red first (3 Chromium); related 4768 passed/4 skipped (D1 marker, numpy, POSIX user); 2 mutations caught; 60/60 | |
 | 2026-11-10 | Opus (SOLO, son hat) | GAP-2 done: waitlist invites; 10 tests red first (1 Chromium); related 4636 passed/4 skipped; 3 mutations caught; 60/60 | |
 | 2026-11-10 | Opus (SOLO) | Phase 1 7/7; wave 1 done + GO; wave 2 coded (suites unconfirmed); wave-3 spec draft | context limit stop |
+| 2026-11-10 | Opus (SOLO) | Wave 2 suites + GO; waves 3–4 coded (GAP-7..14); GAP-13 spec edge rule corrected | suites running |
