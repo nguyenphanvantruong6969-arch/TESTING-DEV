@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
-RUNNING-FATHER: 2026-11-10T13:10Z session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-RUNNING-SON: 2026-11-10T13:10Z wave 2 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-Current wave: 2 — son running
+RUNNING-FATHER: none
+RUNNING-SON: none
+Current wave: 2 — son running (code for GAP-3..6 pushed; related suites NOT yet confirmed — see Next step)
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -14,10 +14,10 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-0 | 1 | DONE | c6e0405 | fa_dieu_chinh + vi_tri_hien_tai |
 | GAP-1 | 1 | DONE | a10eee5+bb49d11 | attendance |
 | GAP-2 | 1 | DONE | 541f945+next | waitlist invites |
-| GAP-3 | 2 | TODO | | appeals |
-| GAP-4 | 2 | TODO | | round 2 |
-| GAP-5 | 2 | TODO | | 3 feedback questions |
-| GAP-6 | 2 | TODO | | week-3 survey |
+| GAP-3 | 2 | DOING | 513711a | appeals |
+| GAP-4 | 2 | DOING | e76bf48 | round 2 |
+| GAP-5 | 2 | DOING | e76bf48 | 3 feedback questions |
+| GAP-6 | 2 | DOING | e76bf48 | week-3 survey |
 | GAP-7 | 3 | TODO | | next-term capacity |
 | GAP-8 | 3 | TODO | | admin dashboard |
 | GAP-9 | 3 | TODO | | two-grader deviation |
@@ -36,9 +36,21 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - P3 "Module mô phỏng + chế độ so sánh": as before (wave 4)
 - P2 "… 3 câu phản hồi": phản hồi 0 % (wave 2)
 
+## Next step (exact, for the next session)
+1. Role SOLO/son, wave 2: own tests of GAP-3..6 pass (9+4 UI, 7+2 UI, 7+3 UI, 4); mutations caught (2, 2, 1, 1).
+   Rerun the broad related suite once (≈25 min; same selection as in the log rows, plus tests grepping
+   tao_mau_forms/bieu_mau/01_khung) and `kiem_nhanh --so-seed 20`; fix reds; then bookkeeping per item (CHANGELOG,
+   TIEN_DO, handoff ticks) and set GAP-3..6 DONE; status "son done, waiting for father review".
+2. Father: F5 review of wave 2 (diff 9bb9deb..HEAD), report bao_cao_dem/<date>_fa_gaps_wave2.md, then finalise the
+   DRAFT wave-3 spec at the end of FA_GAPS_KE_HOACH.md (F2) and continue.
+
 ## Waiting for Truong
 
 ## Review notes (newest last)
+- W2 notes (SOLO son): GAP-4/5/6 share files, so they landed in ONE commit (e76bf48) instead of one per item (deviation
+  from S2.i). Spec deviations: `cho_con_lai` takes a 5th arg (clubs of the day); `tong_hop_phan_hoi(rows, loai)`;
+  round-2 "already run" = any round2 row of the base run+day (an all-skipped pass can be run again). W1 nhỏ N1
+  (panels hid on any error → now `batKhung` shows a toast) and N2 (new code `loi_luu_sau_xep`) fixed in GAP-3.
 - W2 decisions (SOLO): flags fa_khieu_nai, fa_vong_2, fa_phan_hoi (GAP-5 + GAP-6 share); appeal window int rule
   fa_khieu_nai_so_ngay (default 3, 1..14), clock via fa_sau_xep.bay_gio(); round 2 = one-pass serial dictatorship in
   the day's lottery order; Forms parts labelled TH.
@@ -57,3 +69,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | son (SOLO) | GAP-2: 10 tests red first, 4636 related passed, UI 4 really ran, mutation caught x3, 60/60 | ok |
 | 2026-11-10 | father (SOLO) | F5 review wave 1: GO (0 cao/trung, 4 nhỏ); report bao_cao_dem/2026-11-10_fa_gaps_wave1.md | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 2 (GAP-3..6) | ok |
+| 2026-11-10 | son (SOLO) | GAP-3..6 coded + own tests green; broad suites not confirmed; CONTEXT LIMIT stop | handoff |

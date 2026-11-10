@@ -321,3 +321,96 @@ Shared decisions for wave 2 (SOLO, safest option, recorded in status "Review not
 - Mutation: swap `con_di`/`muon_doi` columns in the importer → test 2 red.
 - Invariant check: 60/60.
 - Size: M
+
+<!-- DRAFT (not yet 'spec ready'): written by the SOLO father before the wave-2 review; the next father reviews and finalises it in F2. -->
+
+## Wave 3 — next-term capacity, admin dashboard, two-grader deviation, reminders (GAP-7, GAP-8, GAP-9, GAP-10)
+
+Shared decisions for wave 3 (SOLO, safest option, recorded in status "Review notes"):
+- GAP-7 and GAP-8 are read-only reports: no flag needed beyond `fa_daa` (they only read; the default UI shows nothing
+  new unless FA is on). No change to `run_rbda`/priority; metrics read data, never feed it back (invariant 2).
+- Teacher's per-club upper limit (GAP-7) lives in a NEW table `fa_gioi_han_gv(club_id TEXT PRIMARY KEY, gioi_han
+  INTEGER NOT NULL CHECK (gioi_han > 0))` (no change to `clubs`, so `_BANG_RANG_BUOC` and the CSV contract stay as
+  they are). Missing limit → no cap, and the row says so.
+- GAP-9 and GAP-10 are converter/docs tools under `mau_forms_thi_clb/` and `docs/he_sinh_thai/`, labelled **TH**.
+
+### GAP-7 Next-term capacity suggestion  (vision §10; parent registry item A13; wave 3)
+- Why: "gợi ý capacity kỳ sau = nhu cầu NV1 kỳ trước (chặn trên bởi giới hạn giáo viên khai)".
+- Flag: none new; available only when `fa_daa` is on (`fa_chua_bat` otherwise, as `export_bang_nhu_cau`).
+- Data: table `fa_gioi_han_gv` (above) in `DEFAULT_SCHEMA`.
+- Backend: `fa_daa.goi_y_chi_tieu(rows_nhu_cau, gioi_han) -> rows` (pure): each demand row gains `gioi_han` (or None)
+  and `goi_y_ky_sau = min(nv1, gioi_han)` (no limit → `nv1`); never below 1 when nv1 ≥ 1; nv1 = 0 → 0 with
+  `ghi_chu "khong_co_nv1"`. `fa_daa.kiem_tang_tu_goi_y(goi_y: {club: n}, khai: {club: n})` → reuse `kiem_chi_tang`
+  (only `GIAM_SUC_CHUA` matters): the teacher may only increase from the suggestion.
+  API: `luu_gioi_han_gv(club_id, gioi_han)` (int > 0, or None to clear; unknown club → `club_not_found`-style existing
+  code); `export_goi_y_chi_tieu(output_path="")` → `goi_y_chi_tieu.csv` columns `buoi, club_id, ten, loai, capacity,
+  nv1, gioi_han, goi_y_ky_sau, ghi_chu` (no student data); `kiem_chi_tieu_ky_sau(khai: dict)` → `{vi_pham: [...]}`.
+  `export_bang_nhu_cau`: add ONE trailing column `goi_y_ky_sau` (FA-only export, not the input CSV contract).
+- UI: in view-others `#xuatPanel` a button `#btnXuatGoiY` (shown only when FA on, like `btnXuatNhuCau`); i18n vi+en.
+- Tests first: `tests/test_fa_gap7_goi_y.py`: 1) pure `goi_y_chi_tieu`: cap, no cap, nv1 0; 2) API export columns and
+  values on a crafted dataset (NV1 G = 3, limit 2 → 2; T no limit → its nv1); 3) `export_bang_nhu_cau` has the new last
+  column, earlier columns unchanged; 4) `kiem_chi_tieu_ky_sau` flags a decrease below the suggestion, accepts an
+  increase; 5) FA off → `fa_chua_bat`; bad limit (0, "2", True) → error, nothing written.
+- Mutation: use `max` instead of `min` → test 1 red.
+- Invariant check: 60/60.
+- Size: M
+
+### GAP-8 Admin dashboard (§11 metrics)  (vision §11; parent registry item A13; wave 3)
+- Why: one screen with every §11 metric that has data; missing data shown as "chưa có dữ liệu", never invented.
+- Flag: none new; only when `fa_daa` is on.
+- Backend (`fa_sau_xep.py`): `chi_so_dashboard(du_lieu) -> [ {ma, gia_tri, muc_tieu, dat (bool|None), nguon} ]`
+  (pure; `gia_tri` None = chưa có dữ liệu). Metrics, in §11 order, with codes:
+  `khong_co_clb` (students with no seat on ≥1 day of the current placement `vi_tri`; target 0),
+  `ty_le_nv1`, `ty_le_top2` (base DA result `match_results.rank_in_student_pref` 1 / ≤ 2 over students with a seat),
+  `ty_le_boc_tham` (REJECTED rows of the latest base runs with reason LOTTERY ÷ all REJECTED with a comparison reason),
+  `thua_boc_tham_1_lan` (distinct students with ≥1 LOTTERY rejection), `ty_le_dang_ky_3_ngay` (None: kiosk has no
+  registration timeline), `ty_le_thu_thach_nghiem_tuc` (None: rush flags live in Forms), `do_lech_cham` (None in kiosk:
+  GAP-9 report), `ty_le_di_du_3_buoi` (students with 3 marks all CO_MAT ÷ students with 3 marks; None if none),
+  `hai_long_tb`, `ty_le_hieu_ly_do` (GAP-5 aggregate; None if no answers), `ty_le_doi_huy_chuong` (students whose
+  stored medals differ from the D2 default 60/30/10 on their first three non-FREE clubs per day ÷ students with
+  medals; reads preference ORDER for reporting only — never in a priority key).
+  `doc_du_lieu_dashboard(cur)` reads everything. API `get_dashboard()` → `{bat, chi_so}`; `export_dashboard(path)` →
+  `dashboard.xlsx` one sheet (Chỉ số, Giá trị, Mục tiêu, Đạt, Nguồn), "chưa có dữ liệu" for None. No student ids.
+- UI: view-admin panel `#dashboardPanel` (hidden when FA off) table `#dbBang` + button `#btnXuatDashboard`. i18n
+  vi+en per metric code (`db_<ma>`), `db_chua_co`, `db_dat`, `db_chua_dat`.
+- Tests first: `tests/test_fa_gap8_dashboard.py`: 1) FA off → `{bat: False}`; 2) crafted data: values for nv1/top2,
+  lottery share, students who lost a lottery, no-club count; 3) missing sources are None (not 0); 4) attendance and
+  feedback metrics after GAP-1/5 data; 5) medal change rate: one student changed, one default → 0.5; 6) export: every
+  None cell reads "chưa có dữ liệu", no student id strings. UI `tests/test_giao_dien_fa_gap8_dashboard.py`: 7) admin tab
+  shows the table with "chưa có dữ liệu" rows; FA off → hidden.
+- Mutation: count REJECTED rows of every run (not only latest base runs) → test 2 red.
+- Invariant check: 60/60; read-only (no INSERT/UPDATE in the new code).
+- Size: L
+
+### GAP-9 Two-grader deviation  (vision §7.4–7.5; parent registry item A13; wave 3)
+- Why: "Độ lệch 2 người chấm < 1,5 điểm"; mean > 1.5 → warn to fix the rubric.
+- Flag: none (converter tool, TH).
+- Backend (`mau_forms_thi_clb/phan_tich_cau_hoi.py`): `NGUONG_LECH_CHAM = 1.5`; `do_lech_cham(rows)` (pure) where rows
+  `[{club_id, cau, diem_1, diem_2}]` (`diem_2` None/"" → row skipped) → `{"theo_cau": [{club_id, cau, n,
+  lech_tb, co}], "theo_clb": [{club_id, n, lech_tb, co}]}` with `co = "LECH_CHAM"` when `lech_tb >= 1.5`;
+  `ghi_bao_cao(..., do_lech=None)` adds sheet "Độ lệch chấm" when given; CLI `phan_tich_cau_hoi.py lech TEP.csv --ra
+  BAO_CAO.xlsx` (CSV columns `ClubId, Cau, Diem1, Diem2`; missing `Diem2` column → message, exit 1).
+- Tests first: `tests/test_fa_gap9_lech_cham.py`: 1) pure: per question and per club means, flag at exactly 1.5,
+  rows without second score skipped; 2) report sheet present with the flag; existing sheets unchanged when `do_lech`
+  is None; 3) CLI happy path and missing-column exit 1.
+- Mutation: `>=` → `>` → test 1 red.
+- Size: S
+
+### GAP-10 Reminders  (vision §5.2; parent registry item A13; wave 3)
+- Why: reminders at open, −2 days, −3 hours; SELECTIVE not attempted ×2; < 50 % after 3 days → homeroom lists.
+- Flag: none (docs + generator, TH).
+- Docs: `docs/he_sinh_thai/T4M_FLOW_NHAC_HAN.md` (TH/GĐ labels like `T4M_FLOW_GUI_GVCN.md`): three scheduled flows
+  (standard connectors only), the SELECTIVE-not-attempted reminder twice, the 3-day rule; request budget: one email per
+  student per reminder → state the 6,000 requests/user/day limit and how to batch (per-class digest) when a run would
+  exceed it; link to `T4M_FLOW_GUI_GVCN.md` for sending homeroom lists.
+- Generator `mau_forms_thi_clb/danh_sach_chua_dang_ky.py`: `python danh_sach_chua_dang_ky.py DANH_SACH.csv DANG_KY.xlsx
+  --ra THU_MUC` (roster CSV `student_id, class_id, homeroom_email` (email optional); registration export = any
+  xlsx/csv with a `[student_id]` column per `bieu_mau.cau_ma_hoc_sinh`, or a plain `student_id` column). Writes one
+  `chua_dang_ky_<lớp>.csv` per class (student_id only, class), `tong_hop.csv` (class, n, registered, rate, flag
+  `DUOI_50` when < 50 %), prints the number of emails a homeroom send would need and warns when > 6,000. Pure parts:
+  `ty_le_dang_ky(roster, da_dang_ky)`; file names cleaned like `_ten_file_an_toan`.
+- Tests first: `tests/test_fa_gap10_nhac_han.py`: 1) pure rate per class and flag below 50 %; 2) CLI writes per-class
+  files with only unregistered students, `tong_hop.csv` values; 3) registration export with Forms-style title is read;
+  4) guide file exists, carries "TH" and "6.000", links the homeroom flow doc.
+- Mutation: `<` → `<=` on the 50 % rule → test 1 red (crafted exactly 50 %).
+- Size: M
