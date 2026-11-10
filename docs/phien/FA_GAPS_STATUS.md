@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T13:10Z session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
 RUNNING-SON: 2026-11-10T13:10Z wave 1 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-Current wave: 1 — spec needed
+Current wave: 1 — spec ready
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -36,6 +36,11 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 ## Waiting for Truong
 
 ## Review notes (newest last)
+- W1 decisions (SOLO): new module fa_sau_xep.py + mixin api_sau_xep.py; tables via DEFAULT_SCHEMA (init_db runs
+  di_tru_schema each open); post-allocation flags only in MAC_DINH_TRUONG_HOC rules (never in LUAT_XEP_MAC_DINH →
+  never in fingerprint); GAP-2 shares flag fa_diem_danh; kinds invite_offer/invite_expire added to G5 list; waitlist
+  reuses fa_ly_do.waitlist_pos (D4 already computed).
 
 ## Log (append only: date | role | what | result)
 | 2026-11-10 | father (SOLO) | F1 setup: branch from keen-ride 60f75a5; phase 1 done 7/7 (bao_cao_dem/2026-11-10_sua_nho.md) | ok |
+| 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
