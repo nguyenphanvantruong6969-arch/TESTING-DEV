@@ -135,3 +135,18 @@ def test_xuat_hai_trang_khong_co_ten(api, tmp_path):
     assert "Em s1" not in chu and "s1" in " ".join(
         str(c.value) for r in wb["Chi tiết"].iter_rows() for c in r if c.value is not None)
     assert "s1" not in " ".join(str(c.value) for r in wb["Tổng hợp"].iter_rows() for c in r if c.value is not None)
+
+
+def test_doc_tep_forms_bo_gia_tri_ngoai_mien():
+    """Tệp Forms bị sửa tay: mã ngoài miền (hài lòng 7, có/không 5, khó nhất lạ) thành None, không ghi số sai."""
+    from fa_sau_xep import doc_tep_forms_phan_hoi
+    dau = [bm.cau_ma_hoc_sinh(), bm.CAU_HAI_LONG, bm.CAU_HIEU_LY_DO, bm.CAU_KHO_NHAT, bm.CAU_CON_DI, bm.CAU_MUON_DOI]
+    ra = doc_tep_forms_phan_hoi([dau, ["s1", "7 (7)", "x (5)", "Khác (abc)", "x (2)", "Có (1)"],
+                                 ["s2", "0 (0)", "Có (1)", "(khong_co)", "Không (0)", "x (9)"]])
+    kq = {(d["student_id"], d["loai"]): d for d in ra}
+    a, b = kq[("s1", "ket_qua")], kq[("s1", "tuan_3")]
+    assert (a["hai_long"], a["hieu_ly_do"], a["kho_nhat"]) == (None, None, None)
+    assert (b["con_di"], b["muon_doi"]) == (None, 1)
+    c, d = kq[("s2", "ket_qua")], kq[("s2", "tuan_3")]
+    assert (c["hai_long"], c["hieu_ly_do"], c["kho_nhat"]) == (None, 1, "khong_co")
+    assert (d["con_di"], d["muon_doi"]) == (0, None)

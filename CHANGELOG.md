@@ -12,7 +12,8 @@
 - `fa_sau_xep.py`: `KHO_NHAT`, `tong_hop_phan_hoi`, `doc_tep_forms_phan_hoi` (đọc mã câu `[ma]` và mã lựa chọn `(ma)` từ tệp xuất Forms). `api_sau_xep.py`: `gui_phan_hoi`, `get_phan_hoi_tong_hop`, `nhap_phan_hoi_forms`, `export_phan_hoi` (`phan_hoi.xlsx`, không tên học sinh).
 - Forms: `bieu_mau.py` thêm phần phản hồi, `tao_mau_forms.py` cờ `--phan-hoi` (`sinh_phan_hoi`), nhãn TH.
 - Giao diện: khung `#phanHoiPanel` (bấm một lần mỗi câu), chữ hiển thị không xưng hô (đạt `chu_cam`). Mã lỗi mới `fa_phan_hoi_chua_bat`, `phan_hoi_gia_tri_sai`, `phan_hoi_tep_sai`.
-- Test mới (đỏ trước): `tests/test_fa_gap5_phan_hoi.py` (7), `tests/test_giao_dien_fa_gap5_phan_hoi.py` (3, Chromium).
+- Nhập tệp Forms: mã ngoài miền (`MIEN_PHAN_HOI`) đọc thành rỗng, không ghi số sai.
+- Test mới (đỏ trước): `tests/test_fa_gap5_phan_hoi.py` (8), `tests/test_giao_dien_fa_gap5_phan_hoi.py` (3, Chromium).
 
 ## 2026-11-10 — GAP-4: vòng 2 cho học sinh chưa có CLB mong muốn
 

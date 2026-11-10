@@ -293,6 +293,9 @@ MA_CAU_PHAN_HOI = {"hai_long": "ket_qua", "hieu_ly_do": "ket_qua", "kho_nhat": "
                    "con_di": "tuan_3", "muon_doi": "tuan_3"}
 _MA_CAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[([^\]]+)\]")
 _MA_LUA_CHON = re.compile(r"\(([A-Za-z0-9_]+)\)\s*$")
+# Miền hợp lệ của từng câu; mã ngoài miền (tệp bị sửa tay) đọc thành None, không ghi số sai.
+MIEN_PHAN_HOI = {"hai_long": {1, 2, 3, 4, 5}, "hieu_ly_do": {0, 1}, "con_di": {0, 1}, "muon_doi": {0, 1},
+                 "kho_nhat": set(KHO_NHAT)}
 
 
 def _ty_le(ds):
@@ -353,6 +356,8 @@ def doc_tep_forms_phan_hoi(hang) -> list:
             for ma, l in MA_CAU_PHAN_HOI.items():
                 if l == loai:
                     v = lay(d, ma)
-                    dong[ma] = v if ma == "kho_nhat" else (int(v) if v is not None and v.isdigit() else None)
+                    if ma != "kho_nhat":
+                        v = int(v) if v is not None and v.isdigit() else None
+                    dong[ma] = v if v in MIEN_PHAN_HOI[ma] else None
             ra.append(dong)
     return ra
