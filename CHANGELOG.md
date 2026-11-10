@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-13: chu trình cải thiện ổn định, chế độ đo (không bảo đảm ổn định)
+
+- Mới `fa_vong_doi_cho.py` (hàm thuần): `tim_chu_trinh`, `chay_chu_trinh` (Erdil & Ergin 2008: em có khoá tốt nhất — cho phép hoà — trong những em muốn CLB đó mới được nhận chỗ; chỉ thứ tự bốc thăm giữa các em hoà khoá bị bỏ qua), `khoa_tho_fa` (khoá FA không có bốc thăm: giữ chỗ, điểm, huy chương), `NHAN_KHONG_BAO_DAM`.
+- Cờ mới `rules.fa_vong_doi_cho` (mặc định TẮT, cần `fa_daa`; không vào dấu vân tay). `api_sau_xep.py`: `get_vong_doi_cho` CHỈ ĐỌC (không ghi `match_results` hay `fa_dieu_chinh`), trả các chu trình và số em được lợi kèm nhãn.
+- Mô phỏng: bảng `vong_doi_cho_theo_loai` (% em được lợi theo kiểu) chỉ trong `chay_mo_phong_day_du` (`--day-du`).
+- Spec sửa khi làm: điều kiện thừa "khoá không kém người đang giữ chỗ" làm chu trình không thể có với bốc thăm đơn (STB); đã bỏ, ghi trong `FA_GAPS_KE_HOACH.md`.
+- Test mới (đỏ trước): `tests/test_fa_gap13_vong_doi_cho.py` (5; có 200 ca ngẫu nhiên: không ai thiệt, sức chứa giữ nguyên, không cặp chặn với khoá tốt hơn hẳn).
+
 ## 2026-11-10 — GAP-12: mô phỏng đầy đủ — kiểu "tính toán", bảng cũ/mới theo kiểu (SỐ LIỆU MÔ PHỎNG)
 
 - `du_lieu_test/mo_phong_fa_daa.py`: `HANH_VI_DAY_DU` (thêm `tinh_toan`); `dang_ky(..., cat_ky_truoc=None)`: em tính toán xếp thật nhưng bỏ CLB Tuyển chọn khi điểm dưới mốc nhận thấp nhất kỳ trước (`_duoi_cat`) và đặt vàng vào CLB Giới hạn xếp cao nhất không quá tải kỳ trước; `cat_ky_truoc` (mốc mỗi CLB từ kỳ 1); `theo_loai` (kỳ 2, cùng dữ liệu cho hai chế độ: % NV1, top 2, không CLB theo chế độ × kiểu, % thua bốc thăm theo kiểu); `chay_mo_phong_day_du` và cờ `--day-du`. `sinh_du_lieu(..., hanh_vi=HANH_VI)`: mặc định rút ngẫu nhiên y như cũ, nên bảng FA-10 (`chay_mo_phong`) không đổi.

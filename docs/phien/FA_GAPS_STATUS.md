@@ -23,8 +23,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-9 | 3a | DONE | 6587a64 | two-grader deviation; 60/60 checked with wave 3a run |
 | GAP-10 | 3a | DONE | 3243c3a | reminders; 60/60 checked with wave 3a run |
 | GAP-11 | 4 | DONE | cd1d694 | Power Apps autosave kit (D8 still open: kit only) |
-| GAP-12 | 4 | DONE | (next) | simulation (code before test: deviation from S2.b, mutations caught x2) |
-| GAP-13 | 4 | TODO | | stable improvement cycles |
+| GAP-12 | 4 | DONE | 9a93289 | simulation (code before test: deviation from S2.b, mutations caught x2) |
+| GAP-13 | 4 | DONE | (next) | stable improvement cycles, measurement mode; spec edge rule corrected |
 | GAP-14 | 4 | TODO | | D1 memo |
 
 ## Baseline

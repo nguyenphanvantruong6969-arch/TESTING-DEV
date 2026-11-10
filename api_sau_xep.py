@@ -603,3 +603,43 @@ class SauXepMixin:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    # GAP-13 ----------------------------------------------------------------------------------------------------------
+    def get_vong_doi_cho(self, buoi: str = ""):
+        """GAP-13 (V§8.8): ĐO các chu trình cải thiện ổn định trên kết quả DA của `buoi` (mặc định buổi đầu). CHỈ ĐỌC:
+        không ghi kết quả hay điều chỉnh. Nhãn "không bảo đảm ổn định" (bất biến 8). Cờ `rules.fa_vong_doi_cho`."""
+        import fa_vong_doi_cho as vd
+        try:
+            luat = self._luat_nghiem()
+            if not (dung_fa_daa(luat) and luat.get("fa_vong_doi_cho") is True):
+                return _ok({"bat": False})
+            with self._ket_noi_doc() as cur:
+                clubs = {r[0]: {"loai": r[1], "diem_san": r[2], "buoi": r[3] or BUOI_MAC_DINH} for r in cur.execute(
+                    "SELECT club_id, loai, diem_san, buoi FROM clubs")}
+                ds_buoi = sorted({b for (b,) in cur.execute("SELECT DISTINCT buoi FROM match_results")},
+                                 key=khoa_sap_buoi)
+                buoi = buoi if buoi in ds_buoi else (ds_buoi[0] if ds_buoi else "")
+                asg = {r[0]: r[1] for r in cur.execute(
+                    "SELECT student_id, club_id FROM match_results WHERE buoi = ?", (buoi,))}
+                prefs: dict = {}
+                for sid, cid in cur.execute("SELECT student_id, club_id FROM preferences ORDER BY student_id, rank"):
+                    if cid in clubs and clubs[cid]["buoi"] == buoi:
+                        prefs.setdefault(sid, []).append(cid)
+                diem: dict = {}
+                for cid, sid, d in cur.execute(
+                        "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc JOIN club_test_selection t "
+                        "ON t.student_id = sc.student_id AND t.club_id = sc.club_id"):
+                    diem.setdefault(cid, {})[sid] = d
+                hc: dict = {}
+                for sid, cid, p in cur.execute("SELECT student_id, club_id, points FROM wharton_bids"):
+                    hc.setdefault(sid, {})[cid] = p
+                giu = cur.execute("SELECT club_id, student_id FROM giu_cho").fetchall()
+            khoa = vd.khoa_tho_fa(clubs, prefs, diem, hc, giu)
+            _, ds = vd.chay_chu_trinh(asg, prefs, khoa)
+            return _ok({"bat": True, "nhan": vd.NHAN_KHONG_BAO_DAM, "buoi": buoi, "ds_buoi": ds_buoi,
+                        "chu_trinh": [[{"student_id": s, "club_from": a, "club_to": b} for s, a, b in ct] for ct in ds],
+                        "so_em_loi": len({s for ct in ds for s, _, _ in ct})})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))

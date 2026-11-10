@@ -470,15 +470,16 @@ Shared decisions for wave 4 (SOLO, safest option):
   `tim_chu_trinh(assignment, prefs, khoa_tho)` → one cycle `[(sid, club_from, club_to)]` or [] where
   `khoa_tho[club][sid]` is the priority key WITHOUT the lottery part (smaller = better); edge s → club c of student t
   when s prefers c to own club and s's key at c equals the best key among students who prefer c to their own club
-  and is not worse than t's key (only lottery would separate them); `chay_chu_trinh(...)` repeats until none →
+  (ties allowed: only the lottery order among tied students is overridden). [Corrected during coding: the earlier
+  extra condition "not worse than t's key" makes cycles impossible under single tie-breaking.] `chay_chu_trinh(...)` repeats until none →
   (new assignment, list of cycles). API (read-only, `api_sau_xep.py`): `get_vong_doi_cho(buoi="")` → `{bat, nhan,
   chu_trinh, so_em_loi}`; never writes. Simulation (`mo_phong_fa_daa.py`): table `vong_doi_cho_theo_loai` (type ×
   pt_em_loi), only via `chay_mo_phong_day_du`.
 - Tests first: `tests/test_fa_gap13_vong_doi_cho.py`: 1) crafted 2-student swap with tied keys → one cycle, both
-  better; 2) different scores (non-tie) → no cycle; 3) result is still stable w.r.t. `khoa_tho` (no blocking pair
+  better; 2) a third student with a strictly better key also wants the seat → no cycle; 3) result is still stable w.r.t. `khoa_tho` (no blocking pair
   with strictly better key) on 200 random small cases; 4) flag default False, needs FA; API off → `{bat: False}`;
   on → label present, `match_results` and `fa_dieu_chinh` unchanged.
-- Mutation: allow a strictly worse key on the edge rule → test 2 red.
+- Mutation: drop the "best key" filter on the edge rule → test 2 red.
 - Invariant check: 60/60; read-only.
 - Size: M
 

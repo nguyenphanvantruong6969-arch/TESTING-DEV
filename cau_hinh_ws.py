@@ -77,11 +77,12 @@ MAC_DINH_TRUONG_HOC = {
         "fa_khieu_nai_so_ngay": 3,  # GAP-3: số ngày nhận khiếu nại từ lúc công bố (1..14)
         "fa_vong_2": False,         # GAP-4: vòng 2 cho học sinh chưa có CLB mong muốn
         "fa_phan_hoi": False,       # GAP-5/GAP-6: phản hồi 3 câu + khảo sát tuần 3 (kiosk, nhập từ Forms)
+        "fa_vong_doi_cho": False,   # GAP-13: đo chu trình cải thiện ổn định (chỉ đọc, "không bảo đảm ổn định")
     },
 }
 
 # Các cờ sau khi xếp (FA gaps): bool, chỉ bật được khi `fa_daa` bật (`FaTinhNangCanFa`).
-CO_SAU_XEP = ("fa_diem_danh", "fa_khieu_nai", "fa_vong_2", "fa_phan_hoi")
+CO_SAU_XEP = ("fa_diem_danh", "fa_khieu_nai", "fa_vong_2", "fa_phan_hoi", "fa_vong_doi_cho")
 
 
 def _tron_sau(mac_dinh: dict, ghi_de: dict) -> dict:

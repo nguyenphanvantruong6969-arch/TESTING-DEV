@@ -32,6 +32,7 @@ if _GOC not in sys.path:
     sys.path.insert(0, _GOC)
 
 import fa_daa  # noqa: E402
+import fa_vong_doi_cho as vd  # noqa: E402
 import rbda_priority_pipeline as rp  # noqa: E402
 
 NHAN = "SỐ LIỆU MÔ PHỎNG"
@@ -318,10 +319,35 @@ def theo_loai(n=100, so_seed=5, seed0=0, ti_le=(0.2, 0.4, 0.2, 0.2)):
         for (m, h), c in cong.items()]}
 
 
+def vong_doi_cho_theo_loai(n=100, so_seed=5, seed0=0, ti_le=(0.2, 0.4, 0.2, 0.2)):
+    """GAP-13, CHẾ ĐỘ ĐO: sau FA-DAA, % em (theo kiểu) được lợi nếu chạy các chu trình cải thiện ổn định
+    (`fa_vong_doi_cho`, chỉ vượt thứ tự bốc thăm). Nhãn "không bảo đảm ổn định": không phải đường xếp của phần mềm."""
+    loi, dem = {h: 0 for h in HANH_VI_DAY_DU}, {h: 0 for h in HANH_VI_DAY_DU}
+    for sd in range(seed0, seed0 + so_seed):
+        dl = sinh_du_lieu(n=n, seed=sd, ti_le=ti_le, hanh_vi=HANH_VI_DAY_DU)
+        pr, hu, tk, di = dang_ky(dl)
+        asg, _ = chay_fa(dl, pr, hu, tk, di, sd)
+        duoc = set()
+        for b in dl["ds_buoi"]:
+            pb = {s: [c for c in pr[s] if dl["buoi_cua"][c] == b] for s in dl["sids"]}
+            khoa = vd.khoa_tho_fa(dl["fa_clb"], pb, di, hu, [])
+            _, ds = vd.chay_chu_trinh({s: asg[s].get(b) for s in dl["sids"]}, pb, khoa)
+            duoc |= {s for ct in ds for s, _, _ in ct}
+        for s in dl["sids"]:
+            dem[dl["hs"][s]["hanh_vi"]] += 1
+            loi[dl["hs"][s]["hanh_vi"]] += s in duoc
+
+    def pt(a, b):
+        return round(100.0 * a / b, 1) if b else 0.0
+    return {"vong_doi_cho_theo_loai": [{"hanh_vi": h, "pt_em_loi": pt(loi[h], dem[h]),
+                                        "che_do": vd.NHAN_KHONG_BAO_DAM, "nhan": NHAN} for h in HANH_VI_DAY_DU]}
+
+
 def chay_mo_phong_day_du(n=100, so_seed=5, so_mau=15, n_hai_ky=60, seed0=0):
-    """`chay_mo_phong` (bảng FA-10, không đổi) + bảng GAP-12. Cùng tham số -> giống hệt."""
+    """`chay_mo_phong` (bảng FA-10, không đổi) + bảng GAP-12 và GAP-13. Cùng tham số -> giống hệt."""
     ra = chay_mo_phong(n=n, so_seed=so_seed, so_mau=so_mau, n_hai_ky=n_hai_ky, seed0=seed0)
     ra.update(theo_loai(n=n, so_seed=so_seed, seed0=seed0))
+    ra.update(vong_doi_cho_theo_loai(n=n, so_seed=so_seed, seed0=seed0))
     return ra
 
 
