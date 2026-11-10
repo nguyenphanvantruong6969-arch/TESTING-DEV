@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-6: khảo sát tuần 3 (2 câu) trên Forms
+
+- `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_tuan_3` (2 câu: còn đi sinh hoạt? muốn đổi CLB?); `mau_forms_thi_clb/tao_mau_forms.py`: `sinh_tuan_3`, cờ `--tuan-3` (dùng riêng, không ghép với cờ khác). Phần Microsoft ghi nhãn TH (chưa thử trên Microsoft thật).
+- Nhập: dùng chung `nhap_phan_hoi_forms` / `doc_tep_forms_phan_hoi` (bảng `fa_phan_hoi`, `loai = tuan_3`); tổng hợp `tong_hop_phan_hoi(rows, "tuan_3")`; xuất trong `phan_hoi.xlsx`. Cùng cờ `rules.fa_phan_hoi`.
+- Test mới (đỏ trước): `tests/test_fa_gap6_tuan_3.py` (4).
+
+## 2026-11-10 — GAP-5: 3 câu phản hồi sau khi xem kết quả (kiosk + Forms)
+
+- Cờ mới `rules.fa_phan_hoi` (mặc định TẮT, cần `fa_daa`). Bảng mới `fa_phan_hoi` (qua `DEFAULT_SCHEMA`).
+- `fa_sau_xep.py`: `KHO_NHAT`, `tong_hop_phan_hoi`, `doc_tep_forms_phan_hoi` (đọc mã câu `[ma]` và mã lựa chọn `(ma)` từ tệp xuất Forms). `api_sau_xep.py`: `gui_phan_hoi`, `get_phan_hoi_tong_hop`, `nhap_phan_hoi_forms`, `export_phan_hoi` (`phan_hoi.xlsx`, không tên học sinh).
+- Forms: `bieu_mau.py` thêm phần phản hồi, `tao_mau_forms.py` cờ `--phan-hoi` (`sinh_phan_hoi`), nhãn TH.
+- Giao diện: khung `#phanHoiPanel` (bấm một lần mỗi câu), chữ hiển thị không xưng hô (đạt `chu_cam`). Mã lỗi mới `fa_phan_hoi_chua_bat`, `phan_hoi_gia_tri_sai`, `phan_hoi_tep_sai`.
+- Test mới (đỏ trước): `tests/test_fa_gap5_phan_hoi.py` (7), `tests/test_giao_dien_fa_gap5_phan_hoi.py` (3, Chromium).
+
+## 2026-11-10 — GAP-4: vòng 2 cho học sinh chưa có CLB mong muốn
+
+- Cờ mới `rules.fa_vong_2` (mặc định TẮT, cần `fa_daa`).
+- `fa_sau_xep.py`: `can_vong_2`, `cho_con_lai` (chỗ còn = chỉ tiêu − thành viên hiện tại − lời mời đang chờ), `chay_vong_2` (một lượt chọn theo thứ tự bốc thăm của buổi; mỗi lần chọn một dòng `round2` trong `fa_dieu_chinh`, không sửa kết quả xếp). `api_sau_xep.py`: `get_vong_2`, `chay_vong_2_api`.
+- Giao diện: khung `#vong2Panel`. Mã lỗi mới `fa_vong_2_chua_bat`, `vong_2_da_chay`, `vong_2_lua_chon_sai`.
+- Test mới (đỏ trước): `tests/test_fa_gap4_vong_2.py` (7), `tests/test_giao_dien_fa_gap4_vong_2.py` (2, Chromium).
+
+## 2026-11-10 — GAP-3: khiếu nại lỗi dữ liệu trong hạn, chạy lại với seed đã khoá
+
+- Cờ mới `rules.fa_khieu_nai` (mặc định TẮT, cần `fa_daa`) và `rules.fa_khieu_nai_so_ngay` (số nguyên 1..14, mặc định 3). Bảng mới `fa_khieu_nai`.
+- `fa_sau_xep.py`: `SO_NGAY_KHIEU_NAI`, `bay_gio`, `trong_han_khieu_nai`, `anh_huong_sau_chay_lai` (liệt kê học sinh đổi chỗ và các điều chỉnh cũ cần soát lại, không bỏ âm thầm). `api_sau_xep.py`: `gui_khieu_nai`, `get_khieu_nai`, `xu_ly_khieu_nai` (chấp nhận ghi một dòng `appeal_rerun`; sửa dữ liệu rồi chạy lại toàn bộ pipeline với seed đã khoá, thêm dòng `run_history` mới), `export_khieu_nai` (`khieu_nai.csv`).
+- Giao diện: khung `#khieuNaiPanel`; lỗi khi mở khung nay hiện thông báo thay vì ẩn khung (W1 N1); mã lỗi chung mới `loi_luu_sau_xep` (W1 N2) và `fa_khieu_nai_chua_bat`, `khieu_nai_da_xu_ly`, `khieu_nai_khong_hop_le`, `khieu_nai_qua_han`, `khieu_nai_trung`.
+- Test mới (đỏ trước): `tests/test_fa_gap3_khieu_nai.py` (9), `tests/test_giao_dien_fa_gap3_khieu_nai.py` (4, Chromium).
+
 ## 2026-11-10 — GAP-2: mời học sinh đầu danh sách chờ vào chỗ được giải phóng
 
 - `fa_sau_xep.py`: `moi_dang_cho`, `trang_thai_moi`, `hang_cho` (hàm thuần; dùng `fa_ly_do.waitlist_pos` — thứ tự D4 đã tính sẵn; chỉ em thua ở CLB đó và xếp nó cao hơn CLB hiện tại, không đang có lời mời, chưa từ chối), `moi_tiep` (mời khi thành viên + lời mời đang chờ < chỉ tiêu; chỉ CLB Giới hạn / Tuyển chọn).
