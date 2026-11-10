@@ -60,6 +60,7 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
+- RUNNING: 2026-11-10T11:50Z sua-nho (SOLO session_01VfPzNrpxpetDBgbwqiigmr)
 - 2026-11-10 Opus: review night 5 DONE (bao_cao_dem/2026-11-10_soat_dem5.md): 2 trung fixed (FA-P1 32cb8c8, FA-P2 399aafd), 5 nhỏ listed (FA-P3..P7). soat-ma 4 tiers: docs/ke_hoach/BAO_CAO_SOAT_MA_FA_DEM5.md (SM-1 nên sửa, SM-2/3 nhỏ). No trung/cao left.
 - Invariant 1: 3 datasets x 20 seeds identical to origin/main (60/60). kiem_nhanh 7/7. Note: `kiem_nhanh --so-seed N>5` silently caps at 5 (FA-P7); call `kiem_trung_khit(seeds=range(1,21))` directly.
 - PR #14 (claude/keen-ride-72sa7t -> main) open; Truong merges. CI fixes: FA-CI1 (UTF-8 console in two scripts + their CLI test, style wording), FA-CI2 (T3-19 UI test waited on stale table), FA-CI3 (python-docx on Windows CI, Truong's choice).
