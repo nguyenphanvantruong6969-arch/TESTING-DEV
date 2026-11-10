@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-9: độ lệch giữa hai người chấm (TH)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `NGUONG_LECH_CHAM = 1.5`, `do_lech_cham(rows)` (hàm thuần: độ lệch tuyệt đối trung bình theo câu và theo CLB, cờ `LECH_CHAM` khi ≥ 1,5; dòng thiếu điểm người chấm 2 bị bỏ), `ghi_bao_cao(..., do_lech=None)` thêm trang "Độ lệch chấm" (các trang cũ giữ nguyên), lệnh `lech CHAM.csv --ra BAO_CAO.xlsx` (thiếu cột → báo, mã thoát 1).
+- Test mới (đỏ trước): `tests/test_fa_gap9_lech_cham.py` (3).
+
 ## 2026-11-10 — GAP-6: khảo sát tuần 3 (2 câu) trên Forms
 
 - `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_tuan_3` (2 câu: còn đi sinh hoạt? muốn đổi CLB?); `mau_forms_thi_clb/tao_mau_forms.py`: `sinh_tuan_3`, cờ `--tuan-3` (dùng riêng, không ghép với cờ khác). Phần Microsoft ghi nhãn TH (chưa thử trên Microsoft thật).

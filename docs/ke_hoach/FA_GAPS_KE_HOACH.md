@@ -327,6 +327,8 @@ Shared decisions for wave 2 (SOLO, safest option, recorded in status "Review not
 ## Wave 3 — next-term capacity, admin dashboard, two-grader deviation, reminders (GAP-7, GAP-8, GAP-9, GAP-10)
 
 Shared decisions for wave 3 (SOLO, safest option, recorded in status "Review notes"):
+- Split (F2 size rule, GAP-8 is L): **wave 3a** = GAP-7, GAP-9, GAP-10; **wave 3b** = GAP-8 alone (it reads GAP-9's
+  constant only for the label; its kiosk metric `do_lech_cham` stays None).
 - GAP-7 and GAP-8 are read-only reports: no flag needed beyond `fa_daa` (they only read; the default UI shows nothing
   new unless FA is on). No change to `run_rbda`/priority; metrics read data, never feed it back (invariant 2).
 - Teacher's per-club upper limit (GAP-7) lives in a NEW table `fa_gioi_han_gv(club_id TEXT PRIMARY KEY, gioi_han
