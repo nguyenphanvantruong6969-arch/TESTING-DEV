@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-10 — SM-2: test giao diện chờ điều kiện thật thay cho 800 ms cố định
+
+- `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (`test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc`): bỏ `wait_for_timeout(800)`; chờ lời gọi bị giữ của HS1 về xong rồi dò CSDL tới khi huy chương HS1 đã lưu (tối đa 5 s). Chỉ đổi test, không đổi mã ứng dụng. Chạy 5 lần liền: 5/5 đạt (mỗi lần 2 biến thể).
+
 ## 2026-11-10 — FA-P5: cặp biên bản HTML + Excel luôn cùng tên gốc
 
 - `api_xuat.py` (`_export_bien_ban_da_khoa`): chọn MỘT tên gốc cho cả cặp bằng `_duong_xuat(..., kem_duoi=(".xlsx",))`, đường Excel suy từ đường HTML. Thư mục đã có `bb.xlsx` -> `bb (2).html` + `bb (2).xlsx` (trước đây `bb.html` + `bb (2).xlsx`); không ghi đè tệp cũ.

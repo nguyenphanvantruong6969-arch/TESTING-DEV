@@ -6,6 +6,8 @@ huy chương (V§6.1, D2).
   * đã chỉnh tay -> giữ nguyên và hiện câu nhắc nhẹ.
 Không có suy diễn ở máy chủ: trình duyệt gọi `submit_huy_chuong`. Dữ liệu MÔ PHỎNG.
 """
+import time
+
 import pytest
 
 pytest.importorskip("playwright", reason="chưa cài playwright")
@@ -99,7 +101,7 @@ def test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc(mo, ham_giu):  # 
       window.__nha = [];
       window.pywebview = { api: new Proxy({}, { has: () => true, get: (_t, ten) => (...a) =>
         (ten === ham && a[0] === "HS1")
-          ? new Promise((ok) => window.__nha.push(() => ok(goc[ten](...a))))
+          ? new Promise((ok) => window.__nha.push(() => ok(goc[ten](...a).finally(() => { window.__xong = true; }))))
           : goc[ten](...a) }) };
     }""", ham_giu)
     page.locator("#btnSubmitPreferences").click()
@@ -109,7 +111,11 @@ def test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc(mo, ham_giu):  # 
     the.click()     # nguyện vọng còn "chưa lưu" khi lời gọi lưu chưa về: lần bấm 1 chỉ cảnh báo (roiDiNeuDuoc)
     _chon(page, "HS2")
     page.evaluate("() => window.__nha.forEach((f) => f())")
-    page.wait_for_timeout(800)
+    # SM-2: chờ ĐIỀU KIỆN thật (không chờ cố định): lời gọi bị giữ đã về, rồi huy chương HS1 đã vào CSDL (tối đa 5 s)
+    page.wait_for_function("() => window.__xong === true", timeout=5000)
+    het = time.monotonic() + 5
+    while _db(api) != {"S": 60, "G1": 30, "G2": 10} and time.monotonic() < het:
+        page.wait_for_timeout(50)
     assert _db(api) == {"S": 60, "G1": 30, "G2": 10}
     assert "HS2" in page.locator("#currentStudentLabel").inner_text()
     assert page.locator("#rankingList li").count() == 0               # HS2 chưa có nguyện vọng

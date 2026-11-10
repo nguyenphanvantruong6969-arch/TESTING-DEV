@@ -56,7 +56,7 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.md at repo root; order fixed):
 - [x] SM-1 `ghi_xlsx` cleans forbidden characters   - [x] FA-P3 `get_ly_do_ket_qua` returns + UI shows missing days
 - [x] FA-P4 record days in day order   - [x] FA-P6 missing-day warnings in day order   - [x] FA-P5 html/xlsx same base name
-- [ ] SM-2 condition wait instead of fixed 800 ms   - [ ] FA-P7/SM-3 `kiem_nhanh --so-seed N>5` real seeds
+- [x] SM-2 condition wait instead of fixed 800 ms   - [ ] FA-P7/SM-3 `kiem_nhanh --so-seed N>5` real seeds
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
@@ -154,3 +154,4 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P4: tao_ban_ghi sorts days with khoa_sap_buoi; 1 test red first (HTML + xlsx + hash unchanged); mutation caught; related passed; ruff clean | |
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P6: _doc_ly_do_moi_nhat sorts days with khoa_sap_buoi; 1 test red first (canh_bao + thieu_buoi); mutation caught; related passed; ruff clean | |
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P5: one base name for html+xlsx via _duong_xuat kem_duoi; repro test red first + empty-folder test; mutation caught; related passed; ruff clean | |
+| 2026-11-10 | Opus (SOLO, small fixes) | SM-2: condition wait (held call settled + DB poll ≤5 s) instead of 800 ms; 5/5 passed in Chromium; all FA UI tests passed | test-only |
