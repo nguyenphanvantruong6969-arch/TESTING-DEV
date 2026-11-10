@@ -416,3 +416,77 @@ Shared decisions for wave 3 (SOLO, safest option, recorded in status "Review not
   4) guide file exists, carries "TH" and "6.000", links the homeroom flow doc.
 - Mutation: `<` → `<=` on the 50 % rule → test 1 red (crafted exactly 50 %).
 - Size: M
+
+## Wave 4 — Power Apps kit, simulation, improvement cycles, D1 memo (GAP-11, GAP-12, GAP-13, GAP-14)
+
+Shared decisions for wave 4 (SOLO, safest option):
+- D8 is still OPEN (not "Forms only"), so GAP-11 is built (kit only, TH); it never chooses Power Apps vs Forms.
+- Simulation additions never change the existing FA-10 tables: new tables come from a NEW function and a NEW CLI flag
+  (rule 4: `du_lieu_test/` control modes keep reproducing old numbers).
+- GAP-13 is measurement mode only: it never writes `match_results`/`fa_dieu_chinh`; every output carries the label
+  "không bảo đảm ổn định" (invariant 8).
+
+### GAP-11 Path A autosave app: FA Power Fx formulas  (vision §5.1, §6.1; parent registry item FA-M5; wave 4)
+- Why: spec §12 (R39–R54) exists but `02_app/` still holds only normal-mode formulas ("chưa viết lại cho màn FA").
+- Flag: none (kit generator; `tao_bo_dung_t4m.py --fa-daa` only). Default kit byte-identical.
+- Backend: new `mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py`: `tao_dang_ky_fa(de)` → text of
+  "Control.Property = formula" blocks: `OnVisible` with `ClearCollect(colCLBNgau, Shuffle(...))` once per opening
+  (R39); ▲/▼ swap via `Patch` on `colXep` with first/last disabled (R40); max 7 + no duplicates (R41); min 3 (or all
+  if fewer) → `btnNop.DisplayMode` (R42); FREE warning label (R43); autosave ONE `Patch` with `TrangThai = "DRAFT"`
+  after each action (R44); submit `SUBMITTED` with a re-read lock check (R45, R46); medal widget: default = first
+  three non-FREE, auto-update while `HC_TuChinh` blank, keep once "Có", swap, never on FREE, gold-in-SELECTIVE hint
+  (R48–R52). `ghi_fa(ra_dir, de)` writes `02_app/DangKyFA.txt`. Every filter on ECA/BaiThi/CLB passes
+  `cong_thuc.soat_loc_uy_quyen`. `tao_bo_dung` calls it only when `fa=True`; GHI_CHU_FA no longer says "chưa đổi".
+- Tests first: `tests/test_fa_gap11_cong_thuc_fa.py`: 1) text has Shuffle, ▲/▼, "DRAFT", "SUBMITTED", "HC_TuChinh",
+  min-3 rule, FREE warning, gold-in-SELECTIVE hint, label TH; 2) delegation check returns []; 3) `--fa-daa` kit
+  contains `02_app/DangKyFA.txt`, default kit has no such file and is byte-identical to before; 4) same `de` → same
+  bytes.
+- Mutation: drop the `TrangThai = "DRAFT"` field from the autosave Patch → test 1 red.
+- Size: M
+
+### GAP-12 Simulation: calculating student + per-type tables  (vision §12; parent registry item FA-10; wave 4)
+- Why: §12 asks for a "tính toán" student (moves gold away from overcrowded clubs, learns from last term's cut-offs),
+  % lottery loss per type, and old-vs-new per type.
+- Backend (`du_lieu_test/mo_phong_fa_daa.py`): `HANH_VI_DAY_DU = HANH_VI + ("tinh_toan",)`;
+  `dang_ky(..., cat_ky_truoc=None)`: `tinh_toan` = truthful order, but (a) drops a SELECTIVE club when its own score is
+  below last term's cut score (`cat_ky_truoc[c]["diem"]`), (b) puts gold on its highest-ranked LIMITED club whose last
+  term was NOT over-subscribed (`cat_ky_truoc[c]["day"] is False`), else default. `cat_ky_truoc(dl, ly_do, asg)` →
+  per club {diem: min accepted score (SELECTIVE), day: had rejections}. `theo_loai(n, so_seed, seed0, ti_le)` → tables
+  `theo_loai_cu_moi` (che_do × hanh_vi: pt_nv1, pt_top2, pt_khong_clb, pt_thua_boc_tham) for 4 types, two terms
+  (term 2 uses term-1 cut-offs). `chay_mo_phong_day_du(...)` = `chay_mo_phong(...)` + that table; CLI `--day-du`.
+  `chay_mo_phong` output unchanged.
+- Tests first: `tests/test_fa_gap12_mo_phong.py`: 1) `chay_mo_phong` keys unchanged; `chay_mo_phong_day_du` adds
+  `theo_loai_cu_moi` with 2 modes × 4 types, label SỐ LIỆU MÔ PHỎNG; 2) deterministic by seed; 3) `tinh_toan`
+  drops a SELECTIVE club below last cut and moves gold off an over-subscribed club (crafted `cat_ky_truoc`);
+  4) no verdict words, no student ids; 5) CLI `--day-du` prints the new table.
+- Mutation: `<` → `<=` on the cut-score rule → test 3 red (crafted equal score).
+- Size: M
+
+### GAP-13 Stable improvement cycles (measurement mode)  (vision §8.8; Erdil & Ergin 2008; wave 4)
+- Why: lottery ties can leave Pareto-improving swaps that respect every non-lottery priority.
+- Flag: `rules.fa_vong_doi_cho` default False, needs `fa_daa` (`fa_tinh_nang_can_fa`), in `MAC_DINH_TRUONG_HOC`
+  rules + `CO_SAU_XEP` (never in the fingerprint).
+- Backend: new `fa_vong_doi_cho.py` (pure): `NHAN_KHONG_BAO_DAM = "không bảo đảm ổn định"`;
+  `tim_chu_trinh(assignment, prefs, khoa_tho)` → one cycle `[(sid, club_from, club_to)]` or [] where
+  `khoa_tho[club][sid]` is the priority key WITHOUT the lottery part (smaller = better); edge s → club c of student t
+  when s prefers c to own club and s's key at c equals the best key among students who prefer c to their own club
+  and is not worse than t's key (only lottery would separate them); `chay_chu_trinh(...)` repeats until none →
+  (new assignment, list of cycles). API (read-only, `api_sau_xep.py`): `get_vong_doi_cho(buoi="")` → `{bat, nhan,
+  chu_trinh, so_em_loi}`; never writes. Simulation (`mo_phong_fa_daa.py`): table `vong_doi_cho_theo_loai` (type ×
+  pt_em_loi), only via `chay_mo_phong_day_du`.
+- Tests first: `tests/test_fa_gap13_vong_doi_cho.py`: 1) crafted 2-student swap with tied keys → one cycle, both
+  better; 2) different scores (non-tie) → no cycle; 3) result is still stable w.r.t. `khoa_tho` (no blocking pair
+  with strictly better key) on 200 random small cases; 4) flag default False, needs FA; API off → `{bat: False}`;
+  on → label present, `match_results` and `fa_dieu_chinh` unchanged.
+- Mutation: allow a strictly worse key on the edge rule → test 2 red.
+- Invariant check: 60/60; read-only.
+- Size: M
+
+### GAP-14 D1 compensation memo  (vision §8.4, §13.12; wave 4)
+- Why: D1 (compensation credit) needs a Truong decision; this job supplies numbers, not a verdict.
+- NO CODE. Run `mo_phong_fa_daa.py` (hai_ky) with recorded parameters; write `docs/ke_hoach/FA_GAPS_D1_MEMO.md`
+  (≤ 1 page): options A/B/C, incentive risk, the measured table (SỐ LIỆU MÔ PHỎNG), what invariant-2 exception D1
+  would need, and the exact question. No interpretation for the student report. Status WAIT-TRUONG.
+- Tests: `tests/test_a13_12_tai_lieu.py`-style check is not needed; one assertion in `test_fa_gap12_mo_phong.py`
+  that the memo exists, carries "SỐ LIỆU MÔ PHỎNG" and the command used.
+- Size: S
