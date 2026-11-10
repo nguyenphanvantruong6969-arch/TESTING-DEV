@@ -54,11 +54,11 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-10 02:55Z sonnet-night-5 (manual, Truong asked)
-- 2026-11-10 night 4 REVIEWED (Sonnet session run by hand, not Opus; Truong asked): GO. 1 bug FA-O1 (reasons sorted as plain strings, `chu_nhat` before `thu_2`) rated `trung` by judgement + test gap FA-O2. Night 5 released = FA-O1 + FA-9b.
-- Tests: 2276 passed / 1 skipped / 0 failed (related, non-UI); Chromium 7 passed; kiem_nhanh 7/7; ruff clean. No code changed in this review.
-- The two scheduled tasks ("FA-DAA vong soat" Opus, "FA-DAA vong sua" Sonnet) fired but their fresh sessions had NO repo (empty /home/user) and stopped without writing. They need the repo + branch attached as source in the routines UI (create_trigger has no source field). Until then night 5 must be started by hand.
-- Next: Sonnet night 5 per `docs/phien/CHAY_DEM_FA_DAA.md`; then Opus review night 5. PR to main only after night 5 (Truong). D8 waits for GĐ2.
+- 2026-11-10 Sonnet night 5 DONE: 2/2, 0 blocked, no RUNNING lock. FA-O1 fff8df5, FA-9b d9482a7. Report: bao_cao_dem/2026-11-10_dem5.md.
+- Tests: related 2195 passed / 1 skipped incl. Chromium (really ran); ruff clean; kiem_nhanh 7/7. Full suite not run (CI).
+- Night 4 re-checked in depth by hand: no further reproducible bug beyond FA-O1. Not reproduced, left as notes: stale `huyChuongState` when switching student in `js/04_nhap_tai_cho.js`; `get_ly_do_ket_qua` ignores the missing-days list.
+- The scheduled tasks "FA-DAA vong soat"/"vong sua" still have NO repo source (fresh sessions saw an empty /home/user). Truong must attach repo + branch in the routines UI.
+- Next: Opus review night 5 (item unticked). Then PR to main for full CI (Truong). D8 waits for GĐ2.
 
 ## Decisions and gotchas (keep short)
 - D1..D12: table in plan §1 (revised by the council 08/11); night run uses the Default column.
@@ -144,3 +144,4 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 | 2026-11-10 | Sonnet (review, by hand) | Reviewed night 4: GO; repro FA-O1 (reason rows sort `chu_nhat` before `thu_2`); biên bản after partial run OK; related 2276 passed, Chromium 7, kiem_nhanh 7/7; wrote plan §8 and night-5 protocol; scheduled tasks found sourceless | Docs only; report bao_cao_dem/2026-11-10_soat_dem4.md |
 | 2026-11-10 | Sonnet (night 5) | FA-O1: reasons sorted with khoa_sap_buoi; test in test_fa_n1_ly_do_mot_phan.py red first; related 2135 passed/1 skipped; mutation caught; ruff clean | night 5 |
 | 2026-11-10 | Sonnet (night 5) | FA-9b: fa_bien_ban.ghi_xlsx + path_xlsx + button/i18n; 5 tests red first + Chromium check; 3 mutations caught (2 unit/API, 1 UI); related 2195 passed/1 skipped; ruff clean; kiem_nhanh 7/7 | night 5 |
+| 2026-11-10 | Sonnet (night 5) | Night 5 report 2026-11-10: 2/2 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-10_dem5.md | RUNNING line removed |
