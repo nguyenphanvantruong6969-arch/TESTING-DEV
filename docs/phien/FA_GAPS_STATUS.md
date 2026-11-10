@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T22:55Z solo
 RUNNING-SON: 2026-11-10T22:55Z wave 2 solo
-Current wave: 2 — son running (code for GAP-3..6 pushed; related suites NOT yet confirmed — see Next step)
+Current wave: 3 (3a GAP-7/9/10 + 3b GAP-8) — son done, waiting for father review (wave 2: GO; wave 4 in progress in parallel)
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -14,15 +14,15 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | GAP-0 | 1 | DONE | c6e0405 | fa_dieu_chinh + vi_tri_hien_tai |
 | GAP-1 | 1 | DONE | a10eee5+bb49d11 | attendance |
 | GAP-2 | 1 | DONE | 541f945+next | waitlist invites |
-| GAP-3 | 2 | DOING | 513711a | appeals |
-| GAP-4 | 2 | DOING | e76bf48 | round 2 |
-| GAP-5 | 2 | DOING | e76bf48 | 3 feedback questions |
-| GAP-6 | 2 | DOING | e76bf48 | week-3 survey |
+| GAP-3 | 2 | DONE | 513711a | appeals |
+| GAP-4 | 2 | DONE | e76bf48+b0d832e | round 2 |
+| GAP-5 | 2 | DONE | e76bf48+fixes | 3 feedback questions |
+| GAP-6 | 2 | DONE | e76bf48 | week-3 survey |
 | GAP-7 | 3a | DONE | 18fb8d7 | next-term capacity; 60/60 checked with wave 3a run |
 | GAP-8 | 3b | DONE | 6b0ce75 | admin dashboard |
 | GAP-9 | 3a | DONE | 6587a64 | two-grader deviation; 60/60 checked with wave 3a run |
 | GAP-10 | 3a | DONE | 3243c3a | reminders; 60/60 checked with wave 3a run |
-| GAP-11 | 4 | DONE | (next) | Power Apps autosave kit (D8 still open: kit only) |
+| GAP-11 | 4 | DONE | cd1d694 | Power Apps autosave kit (D8 still open: kit only) |
 | GAP-12 | 4 | TODO | | simulation |
 | GAP-13 | 4 | TODO | | stable improvement cycles |
 | GAP-14 | 4 | TODO | | D1 memo |
@@ -63,6 +63,10 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
   never in fingerprint); GAP-2 shares flag fa_diem_danh; kinds invite_offer/invite_expire added to G5 list; waitlist
   reuses fa_ly_do.waitlist_pos (D4 already computed).
 
+- W2 review: GO (bao_cao_dem/2026-11-10_fa_gaps_wave2.md); 3 trung fixed in-wave (chu_cam wording, dash, Forms domain).
+- W3 decisions (SOLO): split wave 3 into 3a (GAP-7, 9, 10) and 3b (GAP-8, size L); GAP-7 teacher limit in new table fa_gioi_han_gv; dashboard `khong_co_clb` is None before any run (never 0).
+- W4 decisions (SOLO): D8 still open → GAP-11 built as kit only; GAP-12/13 tables only via chay_mo_phong_day_du (old FA-10 tables unchanged); GAP-13 measurement mode only.
+
 ## Log (append only: date | role | what | result)
 | 2026-11-10 | father (SOLO) | F1 setup: branch from keen-ride 60f75a5; phase 1 done 7/7 (bao_cao_dem/2026-11-10_sua_nho.md) | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
@@ -73,3 +77,7 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | father (SOLO) | F2 spec wave 2 (GAP-3..6) | ok |
 | 2026-11-10 | son (SOLO) | GAP-3..6 coded + own tests green; broad suites not confirmed; CONTEXT LIMIT stop | handoff |
 | 2026-11-10 | son (SOLO) | GAP-3 broad suite on 513711a: 4791 passed / 4 skipped / 0 failed | ok |
+| 2026-11-10 | son (SOLO) | wave-2 broad suite on 8c4b37d: 5733 passed / 2 failed (wording) / 4 skipped; fixed, rerun green | ok |
+| 2026-11-10 | father (SOLO) | F5 review wave 2: GO; report bao_cao_dem/2026-11-10_fa_gaps_wave2.md | ok |
+| 2026-11-10 | son (SOLO) | GAP-9, GAP-10, GAP-7, GAP-8: tests red first, own + related green, UI really ran, mutations caught, 60/60 after GAP-7 | ok |
+| 2026-11-10 | son (SOLO) | GAP-11: kit formulas, default kit byte-identical, mutation caught | ok |
