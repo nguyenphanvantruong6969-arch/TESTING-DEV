@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-12: mô phỏng đầy đủ — kiểu "tính toán", bảng cũ/mới theo kiểu (SỐ LIỆU MÔ PHỎNG)
+
+- `du_lieu_test/mo_phong_fa_daa.py`: `HANH_VI_DAY_DU` (thêm `tinh_toan`); `dang_ky(..., cat_ky_truoc=None)`: em tính toán xếp thật nhưng bỏ CLB Tuyển chọn khi điểm dưới mốc nhận thấp nhất kỳ trước (`_duoi_cat`) và đặt vàng vào CLB Giới hạn xếp cao nhất không quá tải kỳ trước; `cat_ky_truoc` (mốc mỗi CLB từ kỳ 1); `theo_loai` (kỳ 2, cùng dữ liệu cho hai chế độ: % NV1, top 2, không CLB theo chế độ × kiểu, % thua bốc thăm theo kiểu); `chay_mo_phong_day_du` và cờ `--day-du`. `sinh_du_lieu(..., hanh_vi=HANH_VI)`: mặc định rút ngẫu nhiên y như cũ, nên bảng FA-10 (`chay_mo_phong`) không đổi.
+- Test mới: `tests/test_fa_gap12_mo_phong.py` (5; đột biến `<` → `<=` ở luật mốc và bỏ luật dời vàng đều bị bắt).
+
 ## 2026-11-10 — GAP-11: công thức Power Fx màn đăng ký FA, đường A (TH)
 
 - Mới `mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py`: `tao_dang_ky_fa` sinh `02_app/DangKyFA.txt` theo đặc tả §12 (R39–R54): xáo thứ tự CLB mỗi lần mở ngày (`Shuffle`), ▲▼ đổi chỗ, tối đa 7 không trùng, tối thiểu 3 (hoặc tất cả), cảnh báo thiếu CLB Tự do, tự lưu MỘT `Patch` đặt DRAFT sau mỗi thao tác (`TU_LUU`), nộp SUBMITTED có đọc lại khoá, widget huy chương (mặc định ba CLB không Tự do, tự cập nhật khi chưa chỉnh, giữ khi `HC_TuChinh = Có`, hoán đổi, không đặt vào Tự do, nhắc vàng ở Tuyển chọn). Lọc trên ECA/CLB qua `soat_loc_uy_quyen`.

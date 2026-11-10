@@ -36,11 +36,12 @@ import rbda_priority_pipeline as rp  # noqa: E402
 
 NHAN = "SỐ LIỆU MÔ PHỎNG"
 HANH_VI = ("luoi", "that_tha", "chien_luoc")
+HANH_VI_DAY_DU = HANH_VI + ("tinh_toan",)      # GAP-12: chỉ ở chay_mo_phong_day_du (--day-du)
 BUOI = ("thu_2", "thu_3")
 SO_MAU = 3                     # số huy chương mỗi buổi
 
 
-def sinh_du_lieu(n=100, seed=0, k=5, l_toi_da=4, ti_le=(0.3, 0.5, 0.2), so_buoi=2):
+def sinh_du_lieu(n=100, seed=0, k=5, l_toi_da=4, ti_le=(0.3, 0.5, 0.2), so_buoi=2, hanh_vi=HANH_VI):
     """Một trường mô phỏng: CLB, độ hot, học sinh với sở thích, năng lực, hành vi. Cùng (n, seed) -> giống hệt."""
     r = random.Random(seed)
     clubs, fa_clb, hot, buoi_cua = {}, {}, {}, {}
@@ -61,11 +62,17 @@ def sinh_du_lieu(n=100, seed=0, k=5, l_toi_da=4, ti_le=(0.3, 0.5, 0.2), so_buoi=
     sids = ["s%03d" % i for i in range(n)]
     hs = {}
     for s in sids:
-        hv = r.choices(HANH_VI, weights=ti_le)[0]
+        hv = r.choices(hanh_vi, weights=ti_le)[0]
         thich = {c: 0.6 * hot[c] + 0.4 * r.random() for c in clubs}
         hs[s] = {"hanh_vi": hv, "thich": thich, "nang_luc": r.gauss(0, 1), "nhieu": {c: r.uniform(-1, 1) for c in clubs}}
     return {"n": n, "seed": seed, "ds_buoi": ds_buoi, "clubs": clubs, "fa_clb": fa_clb, "hot": hot,
             "buoi_cua": buoi_cua, "sids": sids, "hs": hs, "l": l_toi_da}
+
+
+def _duoi_cat(dl, s, c, cat):
+    """GAP-12: CLB Tuyển chọn mà điểm của em thấp hơn hẳn điểm thấp nhất được nhận kỳ trước."""
+    d = (cat.get(c) or {}).get("diem")
+    return dl["fa_clb"][c]["loai"] == fa_daa.TUYEN_CHON and d is not None and _diem_thi(dl, s, c) < d
 
 
 def _diem_thi(dl, s, c):
@@ -73,9 +80,11 @@ def _diem_thi(dl, s, c):
     return int(min(10, max(0, round(5 + 2.5 * h["nang_luc"] + h["nhieu"][c]))))
 
 
-def dang_ky(dl, hanh_vi_ep=None, lech=None):
+def dang_ky(dl, hanh_vi_ep=None, lech=None, cat_ky_truoc=None):
     """Nguyện vọng + huy chương + điểm thi của mỗi em. `hanh_vi_ep` {s: hành vi} ghi đè; `lech` = tập em xếp CLB
-    Giới hạn hot nhất lên NV1 (D1)."""
+    Giới hạn hot nhất lên NV1 (D1). `cat_ky_truoc` (GAP-12, xem `cat_ky_truoc`): em `tinh_toan` xếp thật nhưng bỏ CLB
+    Tuyển chọn mà điểm của em DƯỚI điểm thấp nhất được nhận kỳ trước, và đặt vàng vào CLB Giới hạn xếp cao nhất
+    KHÔNG bị quá tải kỳ trước (không có thì mặc định). Không có `cat_ky_truoc`: như thật thà."""
     prefs, huy, ticks, diem = {}, {}, {c: [] for c in dl["clubs"]}, {c: {} for c in dl["clubs"]}
     lech = lech or set()
     for s in dl["sids"]:
@@ -84,6 +93,8 @@ def dang_ky(dl, hanh_vi_ep=None, lech=None):
         ds = []
         for b in dl["ds_buoi"]:
             cs = [c for c in dl["clubs"] if dl["buoi_cua"][c] == b]
+            if hv == "tinh_toan" and cat_ky_truoc:
+                cs = [c for c in cs if not _duoi_cat(dl, s, c, cat_ky_truoc)]
             khoa = (lambda c: -dl["hot"][c]) if hv == "luoi" else (lambda c: -h["thich"][c])
             top = sorted(cs, key=lambda c: (khoa(c), c))[:dl["l"]]
             if s in lech:
@@ -95,6 +106,12 @@ def dang_ky(dl, hanh_vi_ep=None, lech=None):
             mc = [c for c in top if dl["fa_clb"][c]["loai"] != fa_daa.TU_DO][:SO_MAU]
             if hv == "chien_luoc":
                 mc = sorted(mc, key=lambda c: (dl["hot"][c], c))
+            elif hv == "tinh_toan" and cat_ky_truoc:
+                vang = next((c for c in top if dl["fa_clb"][c]["loai"] == fa_daa.GIOI_HAN
+                             and (cat_ky_truoc.get(c) or {}).get("day") is False), None)
+                if vang is not None:
+                    mc = [vang] + [c for c in mc if c != vang]
+                    mc = mc[:SO_MAU]
             huy.setdefault(s, {}).update(dict(zip(mc, (60, 30, 10))))
         prefs[s] = ds
         for c in ds:
@@ -251,6 +268,63 @@ def chay_mo_phong(n=100, so_seed=5, so_mau=15, n_hai_ky=60, seed0=0):
     return ra
 
 
+# --------------------------------------------------------------------------- GAP-12: bảng theo kiểu học sinh, hai kỳ
+def cat_ky_truoc(dl, ly_do, asg, diem):
+    """{club_id: {diem, day}} của một kỳ: `diem` = điểm thấp nhất trong các em được nhận (chỉ CLB Tuyển chọn, None nếu
+    không ai), `day` = CLB có em bị từ chối vì so sánh (giữ chỗ / điểm / huy chương / bốc thăm)."""
+    ra = {c: {"diem": None, "day": False} for c in dl["clubs"]}
+    for s, theo in asg.items():
+        for c in theo.values():
+            if c and dl["fa_clb"][c]["loai"] == fa_daa.TUYEN_CHON and s in diem.get(c, {}):
+                d = diem[c][s]
+                ra[c]["diem"] = d if ra[c]["diem"] is None else min(ra[c]["diem"], d)
+    for r in ly_do:
+        if r["outcome"] == "REJECTED" and r["reason"] in fa_daa.MA_LY_DO_SO_SANH:
+            ra[r["club_id"]]["day"] = True
+    return ra
+
+
+def theo_loai(n=100, so_seed=5, seed0=0, ti_le=(0.2, 0.4, 0.2, 0.2)):
+    """Kỳ 1 mọi em đăng ký như thường; kỳ 2 em `tinh_toan` dùng mốc của kỳ 1. Đo KỲ 2, cùng dữ liệu cho cả hai chế độ:
+    % NV1, % top 2, % không CLB theo (chế độ × kiểu), % thua bốc thăm (chỉ FA; chế độ cũ không có lý do)."""
+    cong = {(m, h): dict(tong=0, nv1=0, top2=0, khong=0) for m in ("cu_diem_hai_quy", "fa_daa")
+            for h in HANH_VI_DAY_DU}
+    thua, dem = {h: 0 for h in HANH_VI_DAY_DU}, {h: 0 for h in HANH_VI_DAY_DU}
+    for sd in range(seed0, seed0 + so_seed):
+        dl = sinh_du_lieu(n=n, seed=sd, ti_le=ti_le, hanh_vi=HANH_VI_DAY_DU)
+        pr1, hu1, tk1, di1 = dang_ky(dl)
+        asg1, ly1 = chay_fa(dl, pr1, hu1, tk1, di1, sd)
+        cat = cat_ky_truoc(dl, ly1, asg1, di1)
+        pr, hu, tk, di = dang_ky(dl, cat_ky_truoc=cat)
+        sd2 = sd + 1000
+        for m, asg in (("cu_diem_hai_quy", chay_cu(dl, pr, tk, di, sd2)), ("fa_daa", None)):
+            ly = []
+            if asg is None:
+                asg, ly = chay_fa(dl, pr, hu, tk, di, sd2)
+            for h in HANH_VI_DAY_DU:
+                _dem_tc(dl, {s: asg[s] for s in dl["sids"] if dl["hs"][s]["hanh_vi"] == h}, cong[(m, h)])
+            if m == "fa_daa":
+                bi = {r["student_id"] for r in ly if r["reason"] == "LOTTERY" and r["outcome"] == "REJECTED"}
+                for s in dl["sids"]:
+                    dem[dl["hs"][s]["hanh_vi"]] += 1
+                    thua[dl["hs"][s]["hanh_vi"]] += s in bi
+
+    def pt(a, b):
+        return round(100.0 * a / b, 1) if b else 0.0
+    return {"theo_loai_cu_moi": [
+        {"che_do": m, "hanh_vi": h, "pt_nv1": pt(c["nv1"], c["tong"]), "pt_top2": pt(c["top2"], c["tong"]),
+         "pt_khong_clb": pt(c["khong"], c["tong"]),
+         "pt_thua_boc_tham": pt(thua[h], dem[h]) if m == "fa_daa" else None, "nhan": NHAN}
+        for (m, h), c in cong.items()]}
+
+
+def chay_mo_phong_day_du(n=100, so_seed=5, so_mau=15, n_hai_ky=60, seed0=0):
+    """`chay_mo_phong` (bảng FA-10, không đổi) + bảng GAP-12. Cùng tham số -> giống hệt."""
+    ra = chay_mo_phong(n=n, so_seed=so_seed, so_mau=so_mau, n_hai_ky=n_hai_ky, seed0=seed0)
+    ra.update(theo_loai(n=n, so_seed=so_seed, seed0=seed0))
+    return ra
+
+
 def in_bang(ten, dong):
     if not dong:
         return ""
@@ -269,8 +343,11 @@ def main(argv=None):
     ap.add_argument("--n", type=int, default=100)
     ap.add_argument("--so-seed", type=int, default=5)
     ap.add_argument("--hai-ky", type=int, default=15, help="số em mẫu mỗi seed cho bảng hai kỳ")
+    ap.add_argument("--day-du", action="store_true",
+                    help="thêm bảng GAP-12 (bốn kiểu học sinh, có kiểu tính toán; cũ và mới theo kiểu)")
     a = ap.parse_args(argv)
-    kq = chay_mo_phong(n=a.n, so_seed=a.so_seed, so_mau=a.hai_ky)
+    chay = chay_mo_phong_day_du if a.day_du else chay_mo_phong
+    kq = chay(n=a.n, so_seed=a.so_seed, so_mau=a.hai_ky)
     for ten, dong in kq.items():
         print(in_bang(ten, dong))
 

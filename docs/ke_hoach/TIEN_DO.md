@@ -119,3 +119,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | GAP-9 | xong | 2026-11-10 | mau_forms_thi_clb/phan_tich_cau_hoi.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap9_lech_cham.py | Độ lệch hai người chấm (TH) |
 | GAP-10 | xong | 2026-11-10 | mau_forms_thi_clb/danh_sach_chua_dang_ky.py (mới), docs/he_sinh_thai/T4M_FLOW_NHAC_HAN.md (mới), CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap10_nhac_han.py | Nhắc hạn + danh sách chưa đăng ký (TH) |
 | GAP-11 | xong | 2026-11-10 | mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py (mới), bo_dung_t4m/sinh_bk1.py, tao_bo_dung_t4m.py, docs/he_sinh_thai/T4M_DAC_TA_SUA_APP.md, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap11_cong_thuc_fa.py | Công thức Power Fx màn đăng ký FA (TH) |
+| GAP-12 | xong | 2026-11-10 | du_lieu_test/mo_phong_fa_daa.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap12_mo_phong.py | Mô phỏng: kiểu tính toán + bảng theo kiểu |
