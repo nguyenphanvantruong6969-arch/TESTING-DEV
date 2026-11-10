@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P1: biên bản bốc thăm bản Excel không nhận công thức (soát đêm 5)
+
+- `fa_bien_ban.py` `ghi_xlsx`: ô mà openpyxl hiểu là công thức (tên kỳ hay tên buổi mở đầu `=`, `+`, `-`, `@`) được ép về chữ, giữ nguyên văn (`data_type = "s"`, `quotePrefix`), như `so_excel.Trang.o`. Lỗi do FA-9b (đêm 5).
+- Test mới: 2 test trong `tests/test_fa_bien_ban.py` (đỏ trước: có thẻ `<f>`; đột biến bỏ dòng ép kiểu bắt được).
+
 ## 2026-11-10 — FA-9b: biên bản bốc thăm bản Excel (đêm 5, Truong duyệt)
 
 - `fa_bien_ban.py` `ghi_xlsx` (cùng bản ghi với HTML, không mã/tên học sinh); `api_xuat.py` `export_bien_ban_boc_tham` ghi thêm `.xlsx` cạnh `.html` (không ghi đè tệp cũ), trả `path_xlsx`; nút ở thẻ Kết quả báo cả hai tệp (`i18n.js`, `index.html`, `js/03_ket_qua.js`).

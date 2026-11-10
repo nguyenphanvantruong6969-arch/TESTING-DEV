@@ -172,3 +172,40 @@ def test_api_xlsx_khong_ghi_de_tep_cu(api, tmp_path):
     r1 = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))["data"]
     r2 = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))["data"]
     assert r1["path_xlsx"] != r2["path_xlsx"]
+
+
+# ----------------------------------------------------------------------------- FA-P1: chặn công thức trong bản Excel
+
+TEN_DOC = '=HYPERLINK("http://ke-xau.example","Bấm vào đây")'
+
+
+def _xml_trang(duong):
+    import zipfile
+    with zipfile.ZipFile(duong) as z:
+        return "".join(z.read(n).decode("utf-8") for n in z.namelist() if n.startswith("xl/worksheets/"))
+
+
+def test_xlsx_ten_ky_va_ten_buoi_khong_thanh_cong_thuc(tmp_path):
+    """FA-P1: tên workspace (ô "Kỳ") và tên buổi do người dùng đặt; `=`, `+`, `-`, `@` ở đầu không được thành công thức
+    (như `so_excel.Trang.o`), và chữ giữ nguyên văn."""
+    d = str(tmp_path / "bb.xlsx")
+    dem = {"=1+1": {"n_hoc_sinh": 1, "n_xep": 1}, "@a": {"n_hoc_sinh": 1, "n_xep": 1},
+           "+2": {"n_hoc_sinh": 1, "n_xep": 1}, "-x": {"n_hoc_sinh": 1, "n_xep": 1}}
+    bb.ghi_xlsx(bb.tao_ban_ghi(TEN_DOC, "t", "d", 1, CAP, dem), d)
+    xml = _xml_trang(d)
+    assert "<f>" not in xml and "<f " not in xml
+    o = _o_xlsx(d)
+    for chu in (TEN_DOC, "=1+1", "@a", "+2", "-x"):
+        assert chu in o, chu
+
+
+def test_api_xlsx_ten_workspace_khong_thanh_cong_thuc(api, tmp_path):
+    import cau_hinh_ws as ch
+    _dung(api)
+    ch.ghi_cau_hinh(api.db_path, {"name": TEN_DOC, "rules": {"fa_daa": True}})
+    assert api.run_pipeline(seed=11)["ok"]
+    ra = api.export_bien_ban_boc_tham(str(tmp_path / "bien_ban.html"))
+    assert ra["ok"], ra
+    xml = _xml_trang(ra["data"]["path_xlsx"])
+    assert "<f>" not in xml and "<f " not in xml
+    assert TEN_DOC in _o_xlsx(ra["data"]["path_xlsx"])

@@ -118,4 +118,8 @@ def ghi_xlsx(bg, duong):
     for row in ws.iter_rows():
         for c in row:
             c.alignment = Alignment(wrap_text=True, vertical="top", horizontal="left")
+            # FA-P1: tên kỳ / tên buổi do người dùng đặt; "=..." không được thành công thức (như so_excel.Trang.o)
+            if c.data_type == "f":
+                c.data_type = "s"
+                c.quotePrefix = True
     wb.save(duong)
