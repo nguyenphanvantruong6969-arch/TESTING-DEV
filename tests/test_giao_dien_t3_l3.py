@@ -106,7 +106,10 @@ def test_tai_bang_theo_clb_va_theo_ma_co_tim(mo):
     _mo_ket_qua(page, "clb")
     page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length === 2")
     page.select_option("#kqChonClb", "A")
-    page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+    # Bảng theo lớp vẽ trước vẫn hiện tới khi danh sách CLB A về: chờ đúng số thành viên A theo máy chủ
+    n_a = len(api.get_danh_sach_clb("A")["data"]["thanh_vien"])
+    page.wait_for_function("(n) => !document.getElementById('kqBang').hidden"
+                           " && document.querySelectorAll('#kqThan tr').length === n", arg=n_a)
     sl = page.evaluate("() => document.querySelectorAll('#kqThan tr').length")
     _bam_tai(page)
     tep = sorted(glob.glob(os.path.join(api.thu_muc_xuat, "*.xlsx")))

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-CI2: test giao diện T3-19 hết chập chờn (CI Linux PR #14)
+
+- `tests/test_giao_dien_t3_l3.py` `test_tai_bang_theo_clb_va_theo_ma_co_tim`: chờ bảng hiện đúng số thành viên CLB A (lấy từ `get_danh_sach_clb`) thay vì chỉ chờ `#kqBang` hiện; bảng "theo lớp" vẽ trước vẫn hiện tới khi danh sách CLB về, nên test có lúc đếm 2 dòng cũ. Tái hiện bằng độ trễ 1,5 giây cho `get_danh_sach_clb`: test cũ đỏ, test mới xanh; 5 lần liền xanh. Lỗi có sẵn từ trước PR, không do FA-DAA.
+
 ## 2026-11-10 — FA-CI1: sửa CI đỏ của PR #14 (Windows + văn phong)
 
 - `du_lieu_test/mo_phong_fa_daa.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`: `main` chuyển stdout/stderr sang UTF-8 (`reconfigure`, như `du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`); console Windows cp1252 làm hai script này ném `UnicodeEncodeError` khi in tiếng Việt. Tái hiện trên Linux bằng `PYTHONIOENCODING=cp1252` (4 đỏ trước, xanh sau).
