@@ -605,6 +605,29 @@ def bang_nhu_cau(clubs: dict, preferences: dict, tested_scores: dict, fa_clb: di
     return rows
 
 
+def goi_y_chi_tieu(rows, gioi_han: dict) -> list:
+    """GAP-7 (V§10): mỗi dòng bảng nhu cầu thêm `gioi_han` (giới hạn giáo viên khai, None = chưa khai) và
+    `goi_y_ky_sau = min(nv1, gioi_han)` (chưa khai -> nv1), `ghi_chu`: khong_co_nv1 | khong_gioi_han |
+    chan_boi_gioi_han | "". Số liệu báo cáo cho kỳ SAU, không bao giờ vào khoá ưu tiên. Không sửa đầu vào."""
+    ra = []
+    for r in rows:
+        gh = gioi_han.get(r["club_id"])
+        nv1 = r["nv1"]
+        goi_y = nv1 if gh is None else min(nv1, gh)
+        ghi = ("khong_co_nv1" if nv1 == 0 else "khong_gioi_han" if gh is None
+               else "chan_boi_gioi_han" if nv1 > gh else "")
+        ra.append({**r, "gioi_han": gh, "goi_y_ky_sau": goi_y, "ghi_chu": ghi})
+    return ra
+
+
+def kiem_tang_tu_goi_y(goi_y: dict, khai: dict) -> list:
+    """GAP-7: giáo viên chỉ được TĂNG từ gợi ý ({club_id: n} cả hai): vi phạm `GIAM_SUC_CHUA` của `kiem_chi_tang`.
+    CLB không có trong `khai` thì không xét."""
+    return [v for v in kiem_chi_tang({c: {"capacity": n} for c, n in goi_y.items() if c in khai},
+                                     {c: {"capacity": n} for c, n in khai.items()})
+            if v["loi"] == "GIAM_SUC_CHUA"]
+
+
 def kiem_chi_tang(truoc: dict, sau: dict) -> list:
     """So hai bản khai CLB {club_id: {capacity, loai}}; trả vi phạm: `GIAM_SUC_CHUA` (chỉ tiêu giảm),
     `DOI_LOAI` (loại đổi, hoặc bị bỏ sau khi đã đặt; đặt LẦN ĐẦU thì được), `MAT_CLB` (CLB biến mất).

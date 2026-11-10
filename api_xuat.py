@@ -1772,40 +1772,111 @@ class XuatKetQuaMixin:
         học sinh. Cần `rules.fa_daa` bật (`fa_chua_bat`)."""
         return self._khoa_xuat(self._export_bang_nhu_cau_da_khoa, output_path, buoi)
 
+    @staticmethod
+    def _bang_nhu_cau_goi_y(cur, buoi=None) -> list:
+        """Bảng nhu cầu (FA-7) kèm gợi ý chỉ tiêu kỳ sau (GAP-7, `fa_daa.goi_y_chi_tieu`). Chỉ đọc."""
+        import fa_daa
+        clubs, _hs, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
+        _, cap, _ = fa_daa.doc_du_lieu_fa(cur)
+        diem: dict = {}
+        for cid, sid, d in cur.execute(
+                "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
+                "JOIN club_test_selection t ON t.student_id = sc.student_id "
+                "AND t.club_id = sc.club_id"):
+            diem.setdefault(cid, {})[sid] = d
+        ten = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+        gioi_han = dict(cur.execute("SELECT club_id, gioi_han FROM fa_gioi_han_gv").fetchall())
+        rows = fa_daa.bang_nhu_cau(clubs, prefs, diem, clubs, cap, buoi=buoi, ten_clb=ten)
+        return fa_daa.goi_y_chi_tieu(rows, gioi_han)
+
     def _export_bang_nhu_cau_da_khoa(self, output_path: str = "", buoi: str = ""):
         import csv
-
-        import fa_daa
         try:
             if not dung_fa_daa(self._luat_nghiem()):
                 return _fail(err("fa_chua_bat"))
             with self._ket_noi_doc() as cur:
-                clubs, _hs, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
-                _, cap, _ = fa_daa.doc_du_lieu_fa(cur)
-                diem: dict = {}
-                for cid, sid, d in cur.execute(
-                        "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
-                        "JOIN club_test_selection t ON t.student_id = sc.student_id "
-                        "AND t.club_id = sc.club_id"):
-                    diem.setdefault(cid, {})[sid] = d
-                ten = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
-            rows = fa_daa.bang_nhu_cau(clubs, prefs, diem, clubs, cap, buoi=buoi or None,
-                                       ten_clb=ten)
+                rows = self._bang_nhu_cau_goi_y(cur, buoi or None)
             duong = self._duong_xuat(output_path, "bang_nhu_cau.csv")
             with open(duong, "w", newline="", encoding="utf-8-sig") as f:
                 w = csv.writer(f)
                 w.writerow(["buoi", "club_id", "ten", "loai", "capacity", "nv1", "so_ghi",
-                            "so_dat_san", "so_giu_cho"])
+                            "so_dat_san", "so_giu_cho", "goi_y_ky_sau"])
                 for r in rows:
                     w.writerow([r["buoi"], r["club_id"], r["ten"], r["loai"] or "", r["capacity"],
                                 r["nv1"], r["so_ghi"],
                                 "" if r["so_dat_san"] is None else r["so_dat_san"],
-                                r["so_giu_cho"]])
+                                r["so_giu_cho"], r["goi_y_ky_sau"]])
             return _ok({"path": duong, "n_rows": len(rows)})
         except LoiDuongXuat as e:
             return _fail(e.loi)
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    def export_goi_y_chi_tieu(self, output_path: str = ""):
+        """GAP-7 (V§10): `goi_y_chi_tieu.csv` — gợi ý chỉ tiêu kỳ sau = NV1 kỳ này, chặn trên bởi giới hạn giáo viên
+        khai (`luu_gioi_han_gv`). KHÔNG có dữ liệu học sinh. Cần `rules.fa_daa` (`fa_chua_bat`)."""
+        return self._khoa_xuat(self._export_goi_y_chi_tieu_da_khoa, output_path)
+
+    def _export_goi_y_chi_tieu_da_khoa(self, output_path: str = ""):
+        import csv
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            with self._ket_noi_doc() as cur:
+                rows = self._bang_nhu_cau_goi_y(cur)
+            duong = self._duong_xuat(output_path, "goi_y_chi_tieu.csv")
+            with open(duong, "w", newline="", encoding="utf-8-sig") as f:
+                w = csv.writer(f)
+                w.writerow(["buoi", "club_id", "ten", "loai", "capacity", "nv1", "gioi_han", "goi_y_ky_sau",
+                            "ghi_chu"])
+                for r in rows:
+                    w.writerow([r["buoi"], r["club_id"], r["ten"], r["loai"] or "", r["capacity"], r["nv1"],
+                                "" if r["gioi_han"] is None else r["gioi_han"], r["goi_y_ky_sau"], r["ghi_chu"]])
+            return _ok({"path": duong, "n_rows": len(rows)})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
+    @staticmethod
+    def _so_nguyen_duong(x) -> bool:
+        return isinstance(x, int) and not isinstance(x, bool) and x > 0
+
+    def luu_gioi_han_gv(self, club_id: str, gioi_han):
+        """GAP-7: giới hạn chỉ tiêu giáo viên khai cho MỘT CLB (số nguyên > 0; None = xoá). Chỉ dùng cho gợi ý kỳ sau,
+        không đổi chỉ tiêu hiện tại, không vào khoá ưu tiên."""
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            if gioi_han is not None and not self._so_nguyen_duong(gioi_han):
+                return _fail(err("gioi_han_gv_sai", value=repr(gioi_han)))
+            with self._ket_noi_ghi() as cur:
+                if not cur.execute("SELECT 1 FROM clubs WHERE club_id = ?", (club_id,)).fetchone():
+                    return _fail(err("club_not_found", club_id=club_id))
+                if gioi_han is None:
+                    cur.execute("DELETE FROM fa_gioi_han_gv WHERE club_id = ?", (club_id,))
+                else:
+                    cur.execute("INSERT INTO fa_gioi_han_gv (club_id, gioi_han) VALUES (?, ?) "
+                                "ON CONFLICT(club_id) DO UPDATE SET gioi_han = excluded.gioi_han", (club_id, gioi_han))
+            return _ok({"club_id": club_id, "gioi_han": gioi_han})
+        except Exception as e:
+            return _fail(err("loi_luu_sau_xep", detail=str(e)))
+
+    def kiem_chi_tieu_ky_sau(self, khai: dict):
+        """GAP-7: so chỉ tiêu giáo viên khai cho kỳ sau ({club_id: n}) với gợi ý: chỉ được tăng (vi phạm
+        `GIAM_SUC_CHUA`). Chỉ đọc."""
+        import fa_daa
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            if not isinstance(khai, dict) or not all(
+                    isinstance(n, int) and not isinstance(n, bool) and n >= 0 for n in khai.values()):
+                return _fail(err("gioi_han_gv_sai", value=repr(khai)))
+            with self._ket_noi_doc() as cur:
+                goi_y = {r["club_id"]: r["goi_y_ky_sau"] for r in self._bang_nhu_cau_goi_y(cur)}
+            return _ok({"vi_pham": fa_daa.kiem_tang_tu_goi_y(goi_y, khai)})
+        except Exception as e:
+            return _fail(err("error_reading_last_run", detail=str(e)))
 
     def _ket_qua_cu(self) -> bool:
         tt = self.get_trang_thai_ket_qua()

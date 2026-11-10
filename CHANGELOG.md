@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-7: gợi ý chỉ tiêu kỳ sau = NV1 kỳ này, chặn bởi giới hạn giáo viên
+
+- `fa_daa.py`: `goi_y_chi_tieu` (hàm thuần: `goi_y_ky_sau = min(nv1, gioi_han)`, chưa khai giới hạn thì = nv1; `ghi_chu` khong_co_nv1 / khong_gioi_han / chan_boi_gioi_han), `kiem_tang_tu_goi_y` (dùng lại `kiem_chi_tang`: chỉ được tăng từ gợi ý).
+- Bảng mới `fa_gioi_han_gv` (qua `DEFAULT_SCHEMA`; không đổi bảng `clubs`, hợp đồng CSV giữ nguyên).
+- `api_xuat.py`: `_bang_nhu_cau_goi_y` (chỉ đọc, dùng chung), `export_goi_y_chi_tieu` (`goi_y_chi_tieu.csv`, không dữ liệu học sinh), `luu_gioi_han_gv`, `kiem_chi_tieu_ky_sau`; `export_bang_nhu_cau` thêm MỘT cột cuối `goi_y_ky_sau` (tệp xuất FA, không phải CSV đầu vào). Chỉ khi `rules.fa_daa` bật; mã lỗi mới `gioi_han_gv_sai`.
+- Giao diện: nút `#btnXuatGoiY` ở khung xuất (chỉ hiện khi FA bật).
+- Test mới (đỏ trước): `tests/test_fa_gap7_goi_y.py` (7); thêm 1 test Chromium vào `tests/test_giao_dien_fa_ket_qua.py`.
+
 ## 2026-11-10 — GAP-10: nhắc hạn đăng ký + danh sách chưa đăng ký cho GVCN (TH)
 
 - Tài liệu mới `docs/he_sinh_thai/T4M_FLOW_NHAC_HAN.md`: ba lần nhắc (mở cổng, −2 ngày, −3 giờ) bằng email nhóm, nhắc riêng CLB Tuyển chọn chưa làm bài ×2, luật dưới 50 % sau 3 ngày → danh sách cho GVCN qua `T4M_FLOW_GUI_GVCN.md`, ước lượng theo giới hạn 6.000 yêu cầu/người/ngày. Nhãn TH/GĐ.

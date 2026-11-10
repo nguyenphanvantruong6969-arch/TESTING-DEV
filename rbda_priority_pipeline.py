@@ -2071,6 +2071,13 @@ CREATE TABLE IF NOT EXISTS fa_khieu_nai (
     xu_ly_ghi_chu TEXT
 );
 
+-- Giới hạn chỉ tiêu giáo viên khai (FA gaps, GAP-7, V§10): chỉ để GỢI Ý chỉ tiêu kỳ sau = min(NV1, giới hạn).
+-- Bảng riêng, không đổi bảng clubs (hợp đồng CSV giữ nguyên); không bao giờ vào khoá ưu tiên.
+CREATE TABLE IF NOT EXISTS fa_gioi_han_gv (
+    club_id TEXT PRIMARY KEY,
+    gioi_han INTEGER NOT NULL CHECK (gioi_han > 0)
+);
+
 -- Phản hồi của học sinh (FA gaps, GAP-5/GAP-6): 3 câu sau khi xem kết quả (loai ket_qua) và khảo sát tuần 3
 -- (loai tuan_3), từ kiosk hay nhập từ Forms. Lần trả lời sau cùng của mỗi em (theo loai) được tính. KHÔNG bao giờ đi
 -- vào khoá ưu tiên (bất biến 2).

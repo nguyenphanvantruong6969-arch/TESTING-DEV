@@ -374,6 +374,10 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không tìm thấy {person_l} {student_id}.",
     "en": "{person} {student_id} wasn't found."
   },
+  "gioi_han_gv_sai": {
+    "vi": "Giới hạn chỉ tiêu phải là số nguyên dương (nhận {value}).",
+    "en": "The capacity limit must be a positive whole number (got {value})."
+  },
   "club_not_found": {
     "vi": "Không tìm thấy {slot_sl} {club_id}.",
     "en": "{slot} {club_id} wasn't found."
