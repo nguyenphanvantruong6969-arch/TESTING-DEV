@@ -70,8 +70,14 @@ MAC_DINH_TRUONG_HOC = {
         # FA-DAA (mục A13, FA-1): mặc định TẮT ở mọi nơi. Bật cần `wharton` (huy chương dùng
         # `wharton_bids`), priority score / score+tier và per_slot.
         "fa_daa": False,
+        # FA gaps (sau khi xếp): mặc định TẮT, chỉ dùng được khi `fa_daa` bật. KHÔNG thuộc luật xếp
+        # (`LUAT_XEP_MAC_DINH`), nên không bao giờ vào `run_history.luat_xep` hay dấu vân tay kết quả.
+        "fa_diem_danh": False,      # GAP-1/GAP-2: điểm danh 3 buổi đầu + mời danh sách chờ
     },
 }
+
+# Các cờ sau khi xếp (FA gaps): bool, chỉ bật được khi `fa_daa` bật (`FaTinhNangCanFa`).
+CO_SAU_XEP = ("fa_diem_danh",)
 
 
 def _tron_sau(mac_dinh: dict, ghi_de: dict) -> dict:
@@ -107,6 +113,14 @@ def _nhan_thieu_en_lay_vi(goc: dict, da_tron: dict) -> None:
 
 class FaCanDiemQuyetTam(ValueError):
     """FA-N3: bật `fa_daa` khi `wharton` (điểm quyết tâm) đang tắt hoặc không dùng được."""
+
+
+class FaTinhNangCanFa(ValueError):
+    """FA gaps: bật một cờ sau khi xếp (`khoa`, xem `CO_SAU_XEP`) khi `fa_daa` chưa bật."""
+
+    def __init__(self, khoa):
+        super().__init__("%s chỉ dùng được khi fa_daa bật." % khoa)
+        self.khoa = khoa
 
 
 class NhanTrung(ValueError):
@@ -266,6 +280,12 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
         raise FaCanDiemQuyetTam(
             "fa_daa chỉ dùng được khi wharton bật (huy chương dùng bảng điểm Wharton) và "
             "priority là score hoặc score+tier, score_scope là per_slot.")
+
+    for khoa in CO_SAU_XEP:
+        if not isinstance(luat[khoa], bool):
+            raise ValueError("%s phải là true hoặc false, nhận %r." % (khoa, luat[khoa]))
+        if luat[khoa] and not bat_fa:
+            raise FaTinhNangCanFa(khoa)
 
     tiers = luat["tiers"]
     if not isinstance(tiers, list) or not all(isinstance(t, str) and t.strip() for t in tiers):

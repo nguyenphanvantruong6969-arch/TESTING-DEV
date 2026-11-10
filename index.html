@@ -520,6 +520,36 @@
         </div>
       </div>
 
+      <!-- GAP-1: diem danh 3 buoi dau (chi khi rules.fa_diem_danh bat); js/10_theo_doi.js -->
+      <div class="panel" id="diemDanhPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="dd_tieu_de">Điểm danh 3 buổi đầu</h2>
+          </div>
+          <div class="panel-actions">
+            <select id="diemDanhClb" class="text-input text-input-sm" data-i18n-aria-label="dd_chon_clb"></select>
+            <button class="btn btn-secondary" id="btnXuatDiemDanh" type="button" data-i18n="btn_xuat_diem_danh">Xuất điểm danh (Excel)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p class="hint" data-i18n="dd_goi_y">Vắng không phép 2 trong 3 buổi đầu thì chỗ được giải phóng.</p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th_student_id">Mã học sinh</th>
+                <th data-i18n="th_name">Họ tên</th>
+                <th class="dd-cot-buoi" data-so="1"></th>
+                <th class="dd-cot-buoi" data-so="2"></th>
+                <th class="dd-cot-buoi" data-so="3"></th>
+                <th data-i18n="dd_so_vang">Vắng không phép</th>
+              </tr>
+            </thead>
+            <tbody id="diemDanhBang"></tbody>
+          </table>
+          <div id="diemDanhFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
       <div class="panel" id="dsXepPanel">
         <div class="panel-head">
           <div class="panel-head-trai">
@@ -1041,6 +1071,7 @@
 <script src="js/07_ngon_ngu.js"></script>
 <script src="js/075_workspace.js"></script>
 <script src="js/09_the_xem.js"></script>
+<script src="js/10_theo_doi.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>

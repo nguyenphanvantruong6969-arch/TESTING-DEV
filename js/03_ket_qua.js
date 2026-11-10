@@ -837,6 +837,7 @@ function loadMatchResults(search) {
     el("btnXuatNhuCau").hidden = !fa;
     el("btnXuatBienBan").hidden = !fa;
     veCotLyDo(!!cauLyDo);
+    taiDiemDanh(); /* GAP-1: khung điểm danh (js/10_theo_doi.js) — tự ẩn khi cờ tắt */
     /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
     const thieu = fa && Array.isArray(lyDo.data.thieu_buoi) ? lyDo.data.thieu_buoi : [];
     const tbThieu = el("lyDoThieuBuoi");

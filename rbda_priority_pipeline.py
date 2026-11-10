@@ -2043,6 +2043,19 @@ CREATE TABLE IF NOT EXISTS fa_dieu_chinh (
     note TEXT
 );
 
+-- Điểm danh 3 buổi đầu (FA gaps, GAP-1): dữ liệu NHẬP (sửa được), theo lần chạy gốc của buổi. Vắng 2/3 buổi không
+-- phép -> một dòng release trong fa_dieu_chinh (không sửa match_results).
+CREATE TABLE IF NOT EXISTS fa_diem_danh (
+    run_id_base INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    buoi_so INTEGER NOT NULL CHECK (buoi_so BETWEEN 1 AND 3),
+    trang_thai TEXT NOT NULL CHECK (trang_thai IN ('CO_MAT', 'VANG_CO_PHEP', 'VANG_KHONG_PHEP')),
+    updated_at TEXT,
+    PRIMARY KEY (run_id_base, buoi, club_id, student_id, buoi_so)
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

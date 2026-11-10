@@ -698,6 +698,22 @@ MESSAGES = {
         "vi": "Chưa bật được xếp theo loại CLB và huy chương vì điểm quyết tâm đang tắt. Huy chương dùng chung bảng điểm quyết tâm: hãy bật điểm quyết tâm (cần ưu tiên theo điểm thi và điểm tính riêng từng CLB) rồi thử lại.",
         "en": "Club-type and medal mode can't be turned on because determination points are off. Medals use the same points table: turn determination points on (this needs score-based priority and per-club scores) and try again.",
     },
+    "fa_tinh_nang_can_fa": {
+        "vi": "Tính năng {khoa} chỉ bật được khi đã bật xếp theo loại {slot_l} và huy chương (FA-DAA). Hãy bật FA-DAA trước.",
+        "en": "Feature {khoa} can only be turned on with {slot_l}-type and medal mode (FA-DAA). Turn FA-DAA on first.",
+    },
+    "fa_diem_danh_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật điểm danh sau khi xếp.",
+        "en": "This workspace doesn't use attendance after allocation.",
+    },
+    "diem_danh_gia_tri_sai": {
+        "vi": "Giá trị điểm danh không hợp lệ: chỉ nhận lần sinh hoạt 1, 2, 3 và có mặt, vắng có phép, vắng không phép.",
+        "en": "Invalid attendance value: only meetings 1, 2, 3 and present, excused, unexcused are accepted.",
+    },
+    "diem_danh_khong_thuoc_clb": {
+        "vi": "{person} {student_id} không thuộc {slot_l} {club_id} nên không điểm danh ở đó được.",
+        "en": "{person} {student_id} is not in {slot_l} {club_id}, so attendance can't be recorded there.",
+    },
     "fa_ly_do_thieu_buoi": {
         "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",
         "en": "Session {buoi} has no reasons: its latest run did not use FA-DAA mode.",

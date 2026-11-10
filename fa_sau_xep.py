@@ -75,3 +75,34 @@ def ghi_dieu_chinh(cur, run_id_base, buoi, student_id, club_from, club_to, kind,
         (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), run_id_base, buoi, student_id, club_from, club_to,
          kind, actor or "", note or ""))
     return cur.lastrowid
+
+
+# GAP-1 ---------------------------------------------------------------------------------------------------------------
+TRANG_THAI_DIEM_DANH = ("CO_MAT", "VANG_CO_PHEP", "VANG_KHONG_PHEP")
+NGUONG_VANG = 2                 # vắng KHÔNG PHÉP từ 2 trong 3 buổi đầu -> giải phóng chỗ (V§9.3)
+
+
+def can_giai_phong(trang_thai_theo_buoi: dict) -> bool:
+    """{buoi_so: trang_thai} -> có phải giải phóng chỗ không."""
+    return sum(1 for v in trang_thai_theo_buoi.values() if v == "VANG_KHONG_PHEP") >= NGUONG_VANG
+
+
+def da_giai_phong_khoi(dieu_chinh, run_goc: dict, buoi: str, club_id: str) -> set:
+    """Học sinh đã bị giải phóng khỏi `club_id` ở `buoi` trong lần chạy gốc hiện tại."""
+    return {d["student_id"] for d in dieu_chinh
+            if d["kind"] == "release" and d["buoi"] == buoi and d["club_from"] == club_id
+            and d["run_id_base"] == run_goc.get(buoi)}
+
+
+def ten_trang_xlsx(ten: str, da_dung: set) -> str:
+    """Tên trang Excel hợp lệ: bỏ ký tự cấm, tối đa 31 ký tự, không trùng (thêm " (2)")."""
+    from so_excel import lam_sach
+    goc = "".join(ch for ch in (lam_sach(str(ten or "")) or "") if ch not in '/\\?*[]:').strip("' ") or "CLB"
+    goc = goc[:31]
+    ten_moi, n = goc, 2
+    while ten_moi.lower() in da_dung:
+        hau = " (%d)" % n
+        ten_moi = goc[:31 - len(hau)] + hau
+        n += 1
+    da_dung.add(ten_moi.lower())
+    return ten_moi
