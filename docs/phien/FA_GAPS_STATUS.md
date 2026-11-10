@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
-RUNNING-FATHER: 2026-11-10T22:55Z solo
-RUNNING-SON: 2026-11-10T22:55Z wave 2 solo
-Current wave: 4 — son done, waiting for father review (wave 3: GO)
+RUNNING-FATHER: none
+RUNNING-SON: none
+Current wave: ALL WAVES DONE (wave 4: GO; GAP-14 WAIT-TRUONG)
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -39,10 +39,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - §11 dashboard (not a §14 row): 0 % → 100 % of rows with kiosk data; 3 rows "chưa có dữ liệu" by design (GAP-8)
 
 ## Next step (exact, for the next session)
-1. Wait for / rerun the two broad suites: wave 3 snapshot b0d832e (log scratch full_w3) and final HEAD 8069c08 (full_w4):
-   `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers .venv/bin/python -m pytest -q -p no:cacheprovider -rfs tests` (~24 min).
-2. Fix reds (son hat), then write bao_cao_dem/2026-11-10_fa_gaps_wave3.md and _wave4.md (F5), then F7: final report
-   bao_cao_dem/2026-11-10_fa_gaps.md, status ALL WAVES DONE, ONE draft PR claude/fa-gaps → main.
+1. ALL WAVES DONE. Final report: docs/phien/bao_cao_dem/2026-11-10_fa_gaps.md. Draft PR claude/fa-gaps → main (Truong merges).
+2. Only open item: GAP-14 / D1 decision (see Waiting for Truong).
 
 ## Waiting for Truong
 - GAP-14 / D1: "Kỳ 2 dùng A (không bù), B (bù đầy đủ V§8.4) hay C (bù hẹp, chỉ CLB đã thua)? Nếu B hoặc C: đồng ý ghi ngoại lệ bất biến 2 (chỉ tầng bốc thăm, nguồn fa_ly_do LOTTERY ở NV1, mỗi credit một lần, tắt mặc định) không?" — xem docs/ke_hoach/FA_GAPS_D1_MEMO.md.
@@ -68,6 +66,8 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 
 - W3 review: GO (bao_cao_dem/2026-11-10_fa_gaps_wave3.md); 0 cao/trung.
 
+- W4 review: GO (bao_cao_dem/2026-11-10_fa_gaps_wave4.md); GAP-13 spec edge rule corrected during coding.
+
 ## Log (append only: date | role | what | result)
 | 2026-11-10 | father (SOLO) | F1 setup: branch from keen-ride 60f75a5; phase 1 done 7/7 (bao_cao_dem/2026-11-10_sua_nho.md) | ok |
 | 2026-11-10 | father (SOLO) | F2 spec wave 1 (GAP-0, 1, 2) | ok |
@@ -84,3 +84,5 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | son (SOLO) | GAP-11: kit formulas, default kit byte-identical, mutation caught | ok |
 | 2026-11-10 | son (SOLO) | wave-3 broad suite on b0d832e: 5763 passed / 0 failed / 4 skipped | ok |
 | 2026-11-10 | father (SOLO) | F5 review wave 3: GO; report bao_cao_dem/2026-11-10_fa_gaps_wave3.md | ok |
+| 2026-11-10 | son (SOLO) | final broad suite on 8069c08: 5774 passed / 0 failed / 4 skipped; kiem_nhanh 7/7 60/60 | ok |
+| 2026-11-10 | father (SOLO) | F5 wave 4 GO; F7 final report; ALL WAVES DONE | ok |
