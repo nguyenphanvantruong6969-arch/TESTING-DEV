@@ -258,3 +258,16 @@ minimal fix, FA off byte-identical.
 Defaults for the other night-3 questions (Truong may change before the run): medals are NOT forced to 3 (V§6.1
 allows fewer); the result column keeps every sentence of the day in list order; `fa_ly_do.py` wording keeps V§9.1.
 Not in night 4: attendance, appeals, round 2, D1 itself, any real-Microsoft test (needs IT, GĐ3).
+
+## 8. Night 5: night-4 review fix list + Excel lottery record (Opus role, 2026-11-10, after the night-4 review)
+
+Source: `docs/phien/bao_cao_dem/2026-11-10_soat_dem4.md`. Same rules as §6/§7: failing test that reproduces first,
+minimal fix, FA off byte-identical. Fixes only, plus ONE feature that Truong approved himself (FA-9b).
+
+| Code | Fix / build | kiem_nhan |
+|---|---|---|
+| FA-O1 | `_doc_ly_do_moi_nhat` (api_xuat.py): sort the reason rows by day with the SAME order as `ORDER BY buoi COLLATE THU_TU_BUOI` (use `rbda_priority_pipeline._so_sanh_buoi` / `functools.cmp_to_key`), then student, rank in list, club. Do not go back to a per-day SQL loop unless it is simpler | Test with clubs on `chu_nhat` and `thu_2`, full run: `ket_qua_ly_do.csv` rows of one student and the keys of `get_ly_do_ket_qua()["data"]["cau"][sid]` come out `thu_2` then `chu_nhat` (red before the fix). Keep the existing FA-N1 tests green. This also closes the test gap FA-O2 (the FA-N1 file uses only `thu_2`/`thu_3`) |
+| FA-9b | Excel version of the lottery record (Truong approved 2026-11-10): `export_bien_ban_boc_tham` also writes `bien_ban_boc_tham.xlsx` (openpyxl, already a dependency) with the SAME fields as the HTML record: term, time, data fingerprint, seed, SHA-256 of the sorted (student_id, stb_number) list, counts per day, signature lines. NO student id or name. The HTML stays. The answer gets a second `path_xlsx`; the admin button keeps one click and reports both files. Reuse `fa_bien_ban.tao_ban_ghi` (one record, two renderers); the Excel renderer is a pure function in `fa_bien_ban.py` | `tests/test_fa_bien_ban.py` additions: same data + seed -> same cells except the timestamp; the hash cell changes when one STB number changes; no student id in any cell; the xlsx opens with openpyxl and matches the HTML values; UI button still produces both files (Chromium) |
+
+Not in night 5: attendance, appeals, round 2, D1 itself, D8, real-Microsoft tests, any other new feature.
+Items not listed above that the review saw but did not reproduce are in the report and are NOT work for night 5.
