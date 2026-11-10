@@ -112,3 +112,25 @@ def test_nut_bien_ban_boc_tham_tao_tep_khong_co_ma_hoc_sinh(mo):
     for sid in ("s1", "s2", "s3", "s4"):
         assert sid not in h
     assert not loi, loi
+
+
+def _thieu(api):
+    from test_fa_n1_ly_do_mot_phan import _thieu_thu_2
+    _thieu_thu_2(api)
+
+
+def test_buoi_thieu_ly_do_co_mot_thong_bao(mo):
+    """FA-P3: một buổi chạy lại khi FA tắt -> MỘT thông báo trên bảng kết quả (mã `fa_ly_do_thieu_buoi`)."""
+    page, _, loi = mo(_thieu)
+    page.wait_for_selector("#lyDoThieuBuoi:not([hidden])", state="attached")   # bảng có thể đang thu gọn
+    chu = page.locator("#lyDoThieuBuoi").text_content()
+    assert "không có lý do" in chu and "Thứ 2" in chu, chu
+    assert page.locator("#lyDoThieuBuoi").count() == 1
+    assert not loi, loi
+
+
+def test_khong_thieu_buoi_thi_an_thong_bao(mo):
+    page, _, loi = mo(_fa)
+    page.wait_for_selector("#resultsTableBody td.cot-ly-do", state="attached")
+    assert page.locator("#lyDoThieuBuoi[hidden]").count() == 1
+    assert not loi, loi

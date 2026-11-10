@@ -76,3 +76,36 @@ def test_ly_do_sap_theo_thu_tu_ngay_chu_nhat_cuoi_tuan(api, tmp_path):
         assert api.run_pipeline(seed=3, chi_buoi=["chu_nhat"])["ok"]
     cau = api.get_ly_do_ket_qua()["data"]["cau"]
     assert all(list(v) == ["thu_2", "chu_nhat"] for v in cau.values())
+
+
+# ----------------------------------------------------------------------------- FA-P3: màn hình kết quả báo buổi thiếu lý do
+
+
+def _thieu_thu_2(api):
+    """Repro FA-P3: chạy FA đủ, chạy lại `thu_2` khi FA tắt, bật FA lại."""
+    _dung_hai_buoi(api)
+    assert api.run_pipeline(seed=3)["ok"]
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": False, "wharton": False}})
+    assert api.run_pipeline(seed=3, chi_buoi=["thu_2"])["ok"]
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": True, "wharton": True}})
+
+
+def test_get_ly_do_ket_qua_tra_buoi_thieu_ly_do(api):
+    _thieu_thu_2(api)
+    d = api.get_ly_do_ket_qua()["data"]
+    assert d["fa_bat"] is True
+    assert d["thieu_buoi"] == ["thu_2"]
+    assert all(set(v) == {"thu_3"} for v in d["cau"].values())
+
+
+def test_get_ly_do_ket_qua_khong_thieu_thi_danh_sach_rong(api):
+    _dung_hai_buoi(api)
+    assert api.run_pipeline(seed=3)["ok"]
+    assert api.get_ly_do_ket_qua()["data"]["thieu_buoi"] == []
+
+
+def test_get_ly_do_ket_qua_fa_tat_khong_doi(api):
+    _thieu_thu_2(api)
+    ch.ghi_cau_hinh(api.db_path, {"rules": {"fa_daa": False, "wharton": False}})
+    assert api.get_ly_do_ket_qua() == {"ok": True, "data": {"fa_bat": False, "run_id": None, "cau": {}},
+                                       "errors": []}

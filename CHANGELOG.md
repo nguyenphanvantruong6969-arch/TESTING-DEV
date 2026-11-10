@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P3: màn hình kết quả báo buổi thiếu lý do
+
+- `api_xuat.py` (`get_ly_do_ket_qua`): khi FA bật trả thêm khoá `thieu_buoi` (buổi mà lần chạy mới nhất không dùng FA, nên không có lý do); FA tắt trả y như cũ.
+- `index.html` + `js/03_ket_qua.js` (`loadMatchResults`): MỘT dòng thông báo `#lyDoThieuBuoi` trên bảng kết quả, chữ từ mã có sẵn `fa_ly_do_thieu_buoi` (không thêm câu mới); không thiếu buổi nào thì ẩn.
+- Test mới (đỏ trước): `tests/test_fa_n1_ly_do_mot_phan.py` (3 test API, có test FA tắt không đổi), `tests/test_giao_dien_fa_ket_qua.py` (2 test Chromium).
+
 ## 2026-11-10 — SM-1: biên bản Excel không hỏng vì ký tự điều khiển
 
 - `fa_bien_ban.py` (`ghi_xlsx`): mọi ô chữ đi qua `so_excel.lam_sach` (như `so_excel.Trang.o`). Tên workspace `"Kỳ\x01một"` trước đây làm `export_bien_ban_boc_tham` trả `error_exporting_csv` (IllegalCharacterError) và để lại tệp HTML; nay xuất đủ hai tệp. Chặn công thức FA-P1 giữ nguyên.

@@ -1683,7 +1683,8 @@ class XuatKetQuaMixin:
 
     def get_ly_do_ket_qua(self):
         """FA-UI-4: câu giải thích của lần chạy mới nhất cho thẻ kết quả: {fa_bat, run_id, cau: {mã HS:
-        {buổi: [câu theo thứ tự nguyện vọng]}}}. FA tắt -> fa_bat False, không đọc gì thêm."""
+        {buổi: [câu theo thứ tự nguyện vọng]}}, thieu_buoi: [buổi không có lý do, theo thứ tự ngày]} (FA-P3).
+        FA tắt -> fa_bat False, không đọc gì thêm."""
         try:
             try:
                 fa_bat = dung_fa_daa(self._luat_nghiem())
@@ -1692,11 +1693,12 @@ class XuatKetQuaMixin:
             if not fa_bat:
                 return _ok({"fa_bat": False, "run_id": None, "cau": {}})
             with self._ket_noi_doc() as cur:
-                run_id, dong, _thieu = self._doc_ly_do_moi_nhat(cur)
+                run_id, dong, thieu = self._doc_ly_do_moi_nhat(cur)
             cau = {}
             for r in dong:
                 cau.setdefault(r[0], {}).setdefault(r[1], []).append(self._cau_cua_dong(r))
-            return _ok({"fa_bat": True, "run_id": run_id, "cau": cau})
+            # FA-P3: buổi không có lý do (lần chạy mới nhất của buổi đó không FA) -> màn hình báo, không im lặng
+            return _ok({"fa_bat": True, "run_id": run_id, "cau": cau, "thieu_buoi": thieu})
         except Exception as e:
             return _fail(err("error_reading_last_run", detail=str(e)))
 

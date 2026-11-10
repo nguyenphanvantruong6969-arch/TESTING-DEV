@@ -837,6 +837,12 @@ function loadMatchResults(search) {
     el("btnXuatNhuCau").hidden = !fa;
     el("btnXuatBienBan").hidden = !fa;
     veCotLyDo(!!cauLyDo);
+    /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
+    const thieu = fa && Array.isArray(lyDo.data.thieu_buoi) ? lyDo.data.thieu_buoi : [];
+    const tbThieu = el("lyDoThieuBuoi");
+    tbThieu.textContent = thieu.length
+      ? trErr({ code: "fa_ly_do_thieu_buoi", params: { buoi: thieu } }) : "";
+    tbThieu.hidden = !thieu.length;
     napOLocLop(el("resultsLopLoc"), dsLop);
     const body = el("resultsTableBody");
     const empty = el("resultsEmptyState");
