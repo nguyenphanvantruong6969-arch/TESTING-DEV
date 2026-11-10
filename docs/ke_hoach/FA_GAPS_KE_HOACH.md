@@ -173,3 +173,151 @@ Shared decisions for wave 1 (SOLO, safest option, recorded in status "Review not
 - Invariant check: 60/60 identical; `compute_club_priority` untouched (no attendance/invite data read by it).
 - Out of scope: time-based automatic expiry, notifications to students, invites for FREE clubs.
 - Size: M
+
+## Wave 2 — appeals, round 2, feedback, week-3 survey (GAP-3, GAP-4, GAP-5, GAP-6)
+
+Shared decisions for wave 2 (SOLO, safest option, recorded in status "Review notes"):
+- Same pattern as wave 1: logic in `fa_sau_xep.py`, API in `api_sau_xep.py` (`SauXepMixin`), UI in `js/10_theo_doi.js`
+  (+ a results-tab panel for GAP-5), tables appended to `DEFAULT_SCHEMA`, flags only in `MAC_DINH_TRUONG_HOC["rules"]`
+  and in `cau_hinh_ws.CO_SAU_XEP` (bool, needs `fa_daa`, `FaTinhNangCanFa`).
+- New flags (all default False): `fa_khieu_nai` (GAP-3), `fa_vong_2` (GAP-4), `fa_phan_hoi` (GAP-5 kiosk screen +
+  GAP-6 import share it: both are student surveys).
+- Appeal window: constant `fa_sau_xep.SO_NGAY_KHIEU_NAI = 3`, overridable per workspace by the integer rule
+  `fa_khieu_nai_so_ngay` (default 3, allowed 1..14; non-int → `ValueError`). Only in `MAC_DINH_TRUONG_HOC`, never in
+  the fingerprint. "Publication" = `run_history.run_at` of the base run of that day. Clock read through
+  `fa_sau_xep.bay_gio()` (tests monkeypatch it; `run_history` is never updated).
+- Forms parts (GAP-5, GAP-6) are labelled **TH (untested on real Microsoft)** in generated guides and CHANGELOG.
+- Survey data never reaches `compute_club_priority` (invariant 2); exports of survey data carry student ids only in the
+  per-row sheet, never names.
+
+### GAP-3 Appeals (data errors only, 3-day window)  (vision §9.2; parent registry item A13; wave 2)
+- Why: "Gửi trong phần mềm; chỉ xét lỗi dữ liệu. Sửa dữ liệu → chạy lại thuật toán với cùng seed; không sửa tay kết quả."
+- Flag: `rules.fa_khieu_nai` default False (needs `fa_daa`); `rules.fa_khieu_nai_so_ngay` int 1..14 default 3.
+- Data: table `fa_khieu_nai` (`id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, student_id TEXT NOT
+  NULL, buoi TEXT NOT NULL, loai TEXT NOT NULL CHECK (loai = 'DATA_ERROR'), ghi_chu TEXT, run_id_base INTEGER NOT NULL,
+  trang_thai TEXT NOT NULL CHECK (trang_thai IN ('CHO','CHAP_NHAN','TU_CHOI')), xu_ly_at TEXT, xu_ly_ghi_chu TEXT)`.
+  Status changes are UPDATEs of `trang_thai` (input data, not the audit log). Acceptance also writes one
+  `fa_dieu_chinh` row kind `appeal_rerun` (club_from = club_to = current club, note = appeal id) as the audit trace.
+- Backend (`fa_sau_xep.py`): `bay_gio()`; `trong_han_khieu_nai(run_at: str, bay_gio: datetime, so_ngay) -> bool`
+  (pure; `run_at` in `run_history` format; inclusive of exactly `so_ngay` days); `anh_huong_sau_chay_lai(khieu_nai_rows,
+  run_goc, dieu_chinh)` (pure) → for each accepted appeal whose day now has a newer base run: `{"id", "student_id",
+  "buoi", "da_chay_lai": True, "dieu_chinh_cu": [ids of adjustments of the old base run of that day]}`; not rerun yet →
+  `da_chay_lai: False`.
+  API: `gui_khieu_nai(student_id, buoi, ghi_chu)`: flag off → `fa_khieu_nai_chua_bat`; unknown student / day without a
+  result → `khieu_nai_khong_hop_le`; window passed → `khieu_nai_qua_han` (params `so_ngay`); an open (CHO) appeal for
+  the same student+day → `khieu_nai_trung`; ok → `{id}`. `get_khieu_nai()` → `{bat, so_ngay, khieu_nai: [{id,
+  student_id, name, buoi, ghi_chu, trang_thai, created_at, xu_ly_ghi_chu, da_chay_lai, dieu_chinh_cu}]}` newest first.
+  `xu_ly_khieu_nai(id, chap_nhan: bool, ghi_chu="")`: not CHO → `khieu_nai_da_xu_ly`; accept → status CHAP_NHAN +
+  `appeal_rerun` row. The admin then fixes the data and runs the pipeline as usual (`run_pipeline`, locked seed); no
+  code path here runs the pipeline or edits `match_results`.
+  `export_khieu_nai(output_path="")` → `khieu_nai.csv` via `_ghi_csv_an_toan`-style writer (UTF-8 BOM, formula guard
+  `_an_toan_cho_excel`): `id, student_id, buoi, trang_thai, created_at, ghi_chu, xu_ly_ghi_chu, da_chay_lai,
+  dieu_chinh_cu` (ids joined by `;`).
+- UI: panel `#khieuNaiPanel` in view-others (hidden when off): form `#knMa`, `#knBuoi` (select of days), `#knGhiChu`,
+  `#btnGuiKhieuNai`; list `#knDanhSach` with `button.kn-xu-ly[data-kn-id][data-chap-nhan="1|0"]` for CHO rows, a
+  "đã chạy lại" tag when `da_chay_lai`; `#btnXuatKhieuNai`. i18n vi+en: `kn_tieu_de`, `kn_goi_y` ({n} days), `kn_ma`,
+  `kn_buoi`, `kn_ghi_chu`, `kn_gui`, `kn_chap_nhan`, `kn_tu_choi`, `kn_trang_thai_CHO|CHAP_NHAN|TU_CHOI`,
+  `kn_da_chay_lai`, `kn_can_chay_lai`, `btn_xuat_khieu_nai`, `xuat_muc_khieu_nai`, `ws_r_fa_khieu_nai`. Error codes:
+  `fa_khieu_nai_chua_bat`, `khieu_nai_khong_hop_le`, `khieu_nai_qua_han`, `khieu_nai_trung`, `khieu_nai_da_xu_ly`.
+  Wizard checkbox `wzFaKhieuNai` (sent only when checked), review row `rvFaKhieuNai`.
+- Tests first: `tests/test_fa_gap3_khieu_nai.py`: 1) flag rules (needs FA; `fa_khieu_nai_so_ngay` 0 / "3" →
+  `ws_du_lieu_sai`); 2) off → `{"bat": False}` and `fa_khieu_nai_chua_bat`; 3) `trong_han_khieu_nai` boundaries (2 d
+  23 h in, 3 d 0 h in, 3 d 1 min out); 4) send within window (monkeypatched `bay_gio`) ok, after window
+  `khieu_nai_qua_han`, duplicate open → `khieu_nai_trung`, unknown student → `khieu_nai_khong_hop_le`;
+  5) accept → status + one `appeal_rerun` row; second decision → `khieu_nai_da_xu_ly`; 6) after a release (GAP-1)
+  and acceptance, a rerun of that day with the locked seed → `da_chay_lai` True and `dieu_chinh_cu` lists the release
+  id; `run_history` grew by exactly one row; seed unchanged (`stb_lock.seed`); 7) export csv columns and a note
+  `"=1+1"` written guarded. UI (`tests/test_giao_dien_fa_gap3_khieu_nai.py`): 8) send an appeal from the form → row
+  appears with CHO; click accept → CHAP_NHAN; flag off → panel hidden.
+- Mutation: `trong_han_khieu_nai` `<=` → `<` → test 3 red; skip the duplicate check → test 4 red.
+- Invariant check: 60/60; `run_pipeline` untouched; `match_results` never written by GAP-3 code.
+- Out of scope: automatic data fixing, notifications.
+- Size: L
+
+### GAP-4 Round 2  (vision §9.3, §8.7; parent registry item A13; wave 2)
+- Why: "Vòng 2: học sinh chưa có CLB mong muốn được chọn trong các chỗ còn trống."
+- Flag: `rules.fa_vong_2` default False (needs `fa_daa`).
+- Data: `fa_dieu_chinh` rows kind `round2` (actor `vong_2`). One pass per (base run, day): a second call →
+  `vong_2_da_chay`.
+- Backend (`fa_sau_xep.py`): `can_vong_2(vi_tri, nguyen_vong, buoi)` (pure) → students of that day whose current club
+  is None or not in their own preference list (fallback); `cho_con_lai(vi_tri, suc_chua, dang_moi, buoi)` (pure) →
+  `{club_id: free seats}` = capacity − current members − pending offers, only clubs of that day, > 0;
+  `chay_vong_2(thu_tu, chon, con_lai)` (pure serial dictatorship) → `[(sid, club_id)]`: students in `thu_tu` order
+  (lottery order of the day), each takes the first club of `chon[sid]` that still has a seat; a student without a
+  usable pick is skipped. Lottery order of the day = `sinh_stb_theo_buoi(stb_goc, days, seed, "stb_ngay")[buoi]`
+  ascending (seed from `stb_lock`), same as the run; tie → student_id.
+  API `get_vong_2(buoi="")` → `{bat, buoi, ds_buoi, da_chay, hoc_sinh: [{student_id, name, club_hien_tai}] in lottery
+  order, cho_con_lai: [{club_id, name, con}]}`; `chay_vong_2_api(buoi, chon: {sid: [club_id, ...]})` → validates flag
+  (`fa_vong_2_chua_bat`), unknown student/club or club of another day → `vong_2_lua_chon_sai`, already run →
+  `vong_2_da_chay`; writes one `round2` row per placed student (club_from = current) and returns `{xep: [{student_id,
+  club_id}], bo_qua: [student_id]}`.
+- UI: panel `#vong2Panel` (view-others): select `#v2Buoi`, a row per eligible student with `<select class="v2-chon"
+  data-student-id>` (options = clubs with free seats, plus "—"), button `#btnChayVong2`; result text `#v2KetQua`.
+  i18n vi+en: `v2_tieu_de`, `v2_goi_y`, `v2_chay`, `v2_da_chay`, `v2_ket_qua` ({n}, {m}), `v2_khong_chon`,
+  `ws_r_fa_vong_2`. Errors: `fa_vong_2_chua_bat`, `vong_2_lua_chon_sai`, `vong_2_da_chay`. Wizard `wzFaVong2`,
+  `rvFaVong2`.
+- Tests first: `tests/test_fa_gap4_vong_2.py`: 1) flag rules; 2) pure `chay_vong_2`: order respected, seat counts
+  respected, skip when no seat; 3) pure `can_vong_2`: fallback student included, student in own NV excluded;
+  4) API end-to-end: a student placed by fallback into FREE T while LIMITED G has a free seat (capacity 3, 2 applicants
+  ranking only G... crafted so G has free seats) → round 2 pick G → `doc_vi_tri` shows G; second call →
+  `vong_2_da_chay`; `match_results`, `run_history` unchanged; 5) pick of a club with no seat → skipped, listed in
+  `bo_qua`. UI (`tests/test_giao_dien_fa_gap4_vong_2.py`): 6) panel lists the eligible student, choose G, click run →
+  `#v2KetQua` shows 1 placed; flag off → hidden.
+- Mutation: ignore seat count in `chay_vong_2` → test 2 red; drop the "already run" check → test 4 red.
+- Invariant check: 60/60.
+- Out of scope: multiple passes, student self-service.
+- Size: M
+
+### GAP-5 Three one-tap feedback questions  (vision §9.1; parent registry item A13; wave 2)
+- Why: "Ngay dưới kết quả: 3 câu, mỗi câu 1 chạm – hài lòng 1–5; hiểu vì sao có/không; phần nào khó nhất".
+- Flag: `rules.fa_phan_hoi` default False (needs `fa_daa`). Forms part is TH.
+- Data: table `fa_phan_hoi` (`id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT NOT NULL, student_id TEXT NOT
+  NULL, nguon TEXT NOT NULL CHECK (nguon IN ('kiosk','forms')), loai TEXT NOT NULL CHECK (loai IN ('ket_qua','tuan_3')),
+  hai_long INTEGER CHECK (hai_long BETWEEN 1 AND 5), hieu_ly_do INTEGER CHECK (hieu_ly_do IN (0,1)), kho_nhat TEXT
+  CHECK (kho_nhat IN ('chon_clb','xep_thu_tu','huy_chuong','thu_thach','khong_co')), con_di INTEGER CHECK (con_di IN
+  (0,1)), muon_doi INTEGER CHECK (muon_doi IN (0,1)))`. Last answer per (student, loai) counts.
+- Backend: `fa_sau_xep.KHO_NHAT = ("chon_clb","xep_thu_tu","huy_chuong","thu_thach","khong_co")`;
+  `tong_hop_phan_hoi(rows) -> {n, hai_long_tb, hai_long_dem {1..5}, hieu_ly_do_ty_le, kho_nhat_dem, con_di_ty_le,
+  muon_doi_ty_le}` (pure; last answer per student+loai; empty → n 0 and None rates).
+  API `gui_phan_hoi(student_id, hai_long, hieu_ly_do, kho_nhat)` (flag off → `fa_phan_hoi_chua_bat`; bad values →
+  `phan_hoi_gia_tri_sai`; unknown student → `student_not_found`); `get_phan_hoi_tong_hop()` → `{bat, ket_qua: {...},
+  tuan_3: {...}}`; `nhap_phan_hoi_forms(file_base64)` (same transport as `import_so_nhap`) reads a Forms xlsx export (header row 1) by exact question titles from
+  `bieu_mau` (`CAU_HAI_LONG`, `CAU_HIEU_LY_DO`, `CAU_KHO_NHAT`, `CAU_CON_DI`, `CAU_MUON_DOI`, plus the student-id
+  title of `cau_ma_hoc_sinh()`); rows with unknown student ids are skipped and counted; detects feedback vs week-3 by
+  which titles exist; returns `{n_ket_qua, n_tuan_3, bo_qua}`; nothing matches → `phan_hoi_tep_sai`.
+  `export_phan_hoi(output_path="")` → `phan_hoi.xlsx`: sheet "Tổng hợp" (aggregates, no ids), sheet "Chi tiết"
+  (student_id, loai, nguon, answers, created_at; no names).
+- Forms (TH): `mau_forms_thi_clb/bieu_mau.py` constants above + `cac_phan_phan_hoi()` (student id + 3 choice
+  questions); `tao_mau_forms.py --phan-hoi [--ra DIR]` writes `NHAP_FORMS_PHAN_HOI.docx` + `CAI_DAT_FORMS_PHAN_HOI.md`
+  (TH label, settings: one response, required), byte-identical when rerun; exclusive with other modes.
+- UI: in view-results a panel `#phanHoiPanel` (hidden when flag off): `#phMa` (student id), buttons
+  `button.ph-hai-long[data-gia-tri=1..5]`, `button.ph-hieu[data-gia-tri=1|0]`, `button.ph-kho[data-gia-tri=<code>]`
+  (one tap each, `aria-pressed`), `#btnGuiPhanHoi`, `#phKetQua`. Admin part in view-others: panel `#phanHoiTongPanel` (hidden when off) with the summary
+  `#phTongHop`, export button `#btnXuatPhanHoi`, and import: hidden `<input type="file" id="phTep" accept=".xlsx">` +
+  button `#btnNhapPhanHoi` → FileReader → `bufferSangBase64` → `nhap_phan_hoi_forms`; result text `#phNhapKetQua`. i18n vi+en for every label; errors
+  `fa_phan_hoi_chua_bat`, `phan_hoi_gia_tri_sai`, `phan_hoi_tep_sai`. Wizard `wzFaPhanHoi`, `rvFaPhanHoi`.
+- Tests first: `tests/test_fa_gap5_phan_hoi.py`: 1) flag rules; 2) send valid → stored, aggregate n=1; resend → last
+  answer counts; bad values → `phan_hoi_gia_tri_sai`; 3) pure aggregate on crafted rows; 4) Forms generator `--phan-hoi`
+  writes both files, rerun byte-identical, docx contains the 3 titles and TH label in the md; 5) importer on a crafted
+  xlsx (titles from `bieu_mau`) imports 2 rows, skips 1 unknown id; wrong file → `phan_hoi_tep_sai`; 6) export: two
+  sheets, no student names anywhere. UI (`tests/test_giao_dien_fa_gap5_phan_hoi.py`): 7) tap 4, "có", "huy_chuong",
+  send → `#phKetQua` ok text and DB row; flag off → panel hidden.
+- Mutation: aggregate counts all answers instead of the last per student → test 3 red.
+- Invariant check: 60/60.
+- Size: L
+
+### GAP-6 Week-3 survey  (vision §9.3; parent registry item A13; wave 2)
+- Why: "Tuần 3: thông báo 2 câu – Em còn đi CLB không?, Em muốn đổi không?"
+- Flag: `rules.fa_phan_hoi` (shared with GAP-5). TH.
+- Data: `fa_phan_hoi` rows `loai = 'tuan_3'` (`con_di`, `muon_doi`).
+- Backend: Forms generator `tao_mau_forms.py --tuan-3` writes `NHAP_FORMS_TUAN_3.docx` + `CAI_DAT_FORMS_TUAN_3.md`
+  (student id + 2 yes/no questions; TH label; byte-identical rerun); `bieu_mau.cac_phan_tuan_3()`. Import through the
+  same `nhap_phan_hoi_forms` (GAP-5); aggregate `tuan_3` in `get_phan_hoi_tong_hop`; export sheet "Tuần 3" in
+  `phan_hoi.xlsx` (rates + per-row with student_id only).
+- UI: none beyond GAP-5's import/export buttons (the summary line shows week-3 rates when present).
+- Tests first: `tests/test_fa_gap6_tuan_3.py`: 1) generator writes both files, rerun identical, md has TH; 2) import a
+  crafted week-3 xlsx → `n_tuan_3` 2, aggregate rates; 3) export has sheet "Tuần 3" with the rates; 4) a file holding
+  both feedback and week-3 titles imports both kinds.
+- Mutation: swap `con_di`/`muon_doi` columns in the importer → test 2 red.
+- Invariant check: 60/60.
+- Size: M

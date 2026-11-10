@@ -1,7 +1,7 @@
 # FA gaps — status (single source of truth)
 RUNNING-FATHER: 2026-11-10T13:10Z session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-RUNNING-SON: 2026-11-10T13:10Z wave 1 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
-Current wave: 1 — GO
+RUNNING-SON: 2026-11-10T13:10Z wave 2 session_01VfPzNrpxpetDBgbwqiigmr (SOLO)
+Current wave: 2 — son running
 son session: solo   re-dispatches this wave: 0   fix waves this wave: 0
 
 Mode: SOLO (START_HERE.md §2.2b) — one session plays father and son; never asks; technical choices = safest option that
@@ -39,6 +39,9 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 ## Waiting for Truong
 
 ## Review notes (newest last)
+- W2 decisions (SOLO): flags fa_khieu_nai, fa_vong_2, fa_phan_hoi (GAP-5 + GAP-6 share); appeal window int rule
+  fa_khieu_nai_so_ngay (default 3, 1..14), clock via fa_sau_xep.bay_gio(); round 2 = one-pass serial dictatorship in
+  the day's lottery order; Forms parts labelled TH.
 - W1 review: GO. Nhỏ N1–N4 listed in bao_cao_dem/2026-11-10_fa_gaps_wave1.md (UI hides panel on any error; generic
   save error code wording; old-run attendance not shown after rerun; redundant FREE guard in moi_tiep).
 - W1 decisions (SOLO): new module fa_sau_xep.py + mixin api_sau_xep.py; tables via DEFAULT_SCHEMA (init_db runs
@@ -53,3 +56,4 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 | 2026-11-10 | son (SOLO) | GAP-1: 13 tests red first, 4768 related passed, UI 3 really ran, mutation caught x2, 60/60 | ok |
 | 2026-11-10 | son (SOLO) | GAP-2: 10 tests red first, 4636 related passed, UI 4 really ran, mutation caught x3, 60/60 | ok |
 | 2026-11-10 | father (SOLO) | F5 review wave 1: GO (0 cao/trung, 4 nhỏ); report bao_cao_dem/2026-11-10_fa_gaps_wave1.md | ok |
+| 2026-11-10 | father (SOLO) | F2 spec wave 2 (GAP-3..6) | ok |
