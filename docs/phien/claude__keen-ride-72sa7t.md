@@ -60,11 +60,9 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
-- RUNNING: 2026-11-10T11:50Z sua-nho (SOLO session_01VfPzNrpxpetDBgbwqiigmr)
-- 2026-11-10 Opus: review night 5 DONE (bao_cao_dem/2026-11-10_soat_dem5.md): 2 trung fixed (FA-P1 32cb8c8, FA-P2 399aafd), 5 nhỏ listed (FA-P3..P7). soat-ma 4 tiers: docs/ke_hoach/BAO_CAO_SOAT_MA_FA_DEM5.md (SM-1 nên sửa, SM-2/3 nhỏ). No trung/cao left.
-- Invariant 1: 3 datasets x 20 seeds identical to origin/main (60/60). kiem_nhanh 7/7. Note: `kiem_nhanh --so-seed N>5` silently caps at 5 (FA-P7); call `kiem_trung_khit(seeds=range(1,21))` directly.
-- PR #14 (claude/keen-ride-72sa7t -> main) open; Truong merges. CI fixes: FA-CI1 (UTF-8 console in two scripts + their CLI test, style wording), FA-CI2 (T3-19 UI test waited on stale table), FA-CI3 (python-docx on Windows CI, Truong's choice).
-- Branch also holds 6 AI-LOG commits from another session (docs/nhat_ky_ai/), rebased under ours without conflict.
+- 2026-11-10 Opus (SOLO): 7 pre-merge small fixes DONE, 0 blocked: SM-1 1b54051, FA-P3 62d4afb, FA-P4 73b7db7, FA-P6 51eb613, FA-P5 229acb0, SM-2 2794310 (5/5 passed), FA-P7/SM-3 9ce1be3. Report: bao_cao_dem/2026-11-10_sua_nho.md.
+- Tests: related set per item (TestTrungKhit + wharton_pipeline + all test_fa_* + test_giao_dien_fa_* in real Chromium) up to 2151 passed / 1 skipped (D1 deferral marker); ruff clean. kiem_nhanh --so-seed 20: 7/7, 60/60 identical to origin/main (SIMULATED data).
+- PR #14 (claude/keen-ride-72sa7t -> main) open; Truong merges. Phase 2 (INSTRUCTION_FILL_GAPS.md) runs on claude/fa-gaps.
 - Windows build workflow NOT run: manual only and it overwrites the public release "ban-moi-nhat"; Truong decides.
 
 ## Decisions and gotchas (keep short)
@@ -78,10 +76,8 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
-0. Run LATEST_INSTRUCTION.md (7 pre-merge small fixes, Sonnet, Truong's friend starts it). It supersedes CHAY_DEM_FA_DAA.md.
-1. Watch PR #14 CI until green (Linux full + UI, Windows); fix red by reproducing, never skip a test. Do not merge.
-2. Truong: merge PR #14; D8 after GĐ2; real Microsoft test with IT; attach repo to or disable the "FA-DAA vong soat"/"vong sua" tasks; D1 compensation in term 2.
-3. Loop status: LOOP DONE: no trung/cao bug after review night 5 (night 6 not needed).
+1. Watch PR #14 CI until green.
+2. Truong merges.
 
 ## Files touched
 - docs/ke_hoach/FA_DAA_VISION.md (Truong's vision, verbatim); docs/ke_hoach/FA_DAA_KE_HOACH.md (plan, item specs)
@@ -156,3 +152,4 @@ Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P5: one base name for html+xlsx via _duong_xuat kem_duoi; repro test red first + empty-folder test; mutation caught; related passed; ruff clean | |
 | 2026-11-10 | Opus (SOLO, small fixes) | SM-2: condition wait (held call settled + DB poll ≤5 s) instead of 800 ms; 5/5 passed in Chromium; all FA UI tests passed | test-only |
 | 2026-11-10 | Opus (SOLO, small fixes) | FA-P7/SM-3: danh_sach_seed(n) deterministic; 3 tests red first; mutation caught; --so-seed 20 -> 60/60 identical, 7/7 | |
+| 2026-11-10 | Opus (SOLO, small fixes) | Small-fix report: 7/7 done, 0 blocked; --so-seed 20 60/60 identical; report docs/phien/bao_cao_dem/2026-11-10_sua_nho.md | RUNNING line removed |
