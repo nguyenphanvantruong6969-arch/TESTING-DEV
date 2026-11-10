@@ -96,3 +96,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-O1 (đêm 5) | xong | 2026-11-10 | api_xuat.py, CHANGELOG.md | tests/test_fa_n1_ly_do_mot_phan.py | Lý do kết quả sắp theo thứ tự ngày (chu_nhat cuối tuần) |
 | FA-9b (đêm 5) | xong | 2026-11-10 | fa_bien_ban.py, api_xuat.py, i18n.js, index.html, js/03_ket_qua.js, CHANGELOG.md | tests/test_fa_bien_ban.py, test_giao_dien_fa_ket_qua.py | Biên bản bốc thăm bản Excel |
 | FA-P1 (soát đêm 5) | xong | 2026-11-10 | fa_bien_ban.py, CHANGELOG.md | tests/test_fa_bien_ban.py | Biên bản Excel: tên kỳ / tên buổi không thành công thức |
+| FA-P2 (soát đêm 5) | xong | 2026-11-10 | js/04_nhap_tai_cho.js, CHANGELOG.md | tests/test_giao_dien_fa_n2_luu_mac_dinh.py | Huy chương mặc định vẫn lưu khi sang em khác giữa lúc lưu |

@@ -74,3 +74,43 @@ def test_da_chinh_tay_thi_giu_nguyen_va_nhac(mo):  # noqa: F811
     assert _db(api) == {"G2": 60, "G1": 10}                                 # giữ nguyên phần còn lại
     assert page.locator("#hcNhacDaChinh").is_visible()
     assert not loi, loi
+
+
+# ----------------------------------------------------------------------------- FA-P2: đổi em giữa lúc lưu
+
+def _hai_em(api, bat=True):
+    dung_fa_clb(api, T=(30, "TU_DO"), S=(5, "TUYEN_CHON", 5), G1=(5, "GIOI_HAN"), G2=(5, "GIOI_HAN"))
+    dung_hs_fa(api, "HS1", "HS2")
+    if bat:
+        bat_fa(api)
+    return api
+
+
+@pytest.mark.parametrize("ham_giu", ["submit_preferences", "get_student_entry_state"])
+def test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc(mo, ham_giu):  # noqa: F811
+    """FA-P2: người nhập lưu nguyện vọng của HS1 rồi bấm ngay sang HS2 khi lời gọi `ham_giu` của HS1 chưa về. HS1 vẫn
+    phải có huy chương mặc định (FA-N2); màn hình HS2 không bị vẽ lại bằng dữ liệu HS1."""
+    page, api, loi = mo(du_lieu=_hai_em)
+    _chon(page, "HS1")
+    for cid in ("T", "S", "G1", "G2"):
+        page.locator('#rankingSourceGrid .option-row[data-club-id="%s"]' % cid).click()
+    page.evaluate("""(ham) => {   /* giữ lời gọi `ham` của HS1 tới khi thả; bọc cả Proxy của cầu nối */
+      const goc = window.pywebview.api;
+      window.__nha = [];
+      window.pywebview = { api: new Proxy({}, { has: () => true, get: (_t, ten) => (...a) =>
+        (ten === ham && a[0] === "HS1")
+          ? new Promise((ok) => window.__nha.push(() => ok(goc[ten](...a))))
+          : goc[ten](...a) }) };
+    }""", ham_giu)
+    page.locator("#btnSubmitPreferences").click()
+    page.wait_for_function("() => window.__nha.length >= 1")
+    the = page.locator('#studentSearchResults .hs-card[data-student-id="HS2"]')
+    the.click()
+    the.click()     # nguyện vọng còn "chưa lưu" khi lời gọi lưu chưa về: lần bấm 1 chỉ cảnh báo (roiDiNeuDuoc)
+    _chon(page, "HS2")
+    page.evaluate("() => window.__nha.forEach((f) => f())")
+    page.wait_for_timeout(800)
+    assert _db(api) == {"S": 60, "G1": 30, "G2": 10}
+    assert "HS2" in page.locator("#currentStudentLabel").inner_text()
+    assert page.locator("#rankingList li").count() == 0               # HS2 chưa có nguyện vọng
+    assert not loi, loi

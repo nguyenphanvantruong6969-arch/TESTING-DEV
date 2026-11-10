@@ -356,11 +356,14 @@ function initFallbackHandlers() {
           daLuuNv = chup;
           if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
-          if (hcTruoc && hcTruoc.bat && !hcTruoc.khoa) {
-            hcTheoNguyenVong(sid, nvTruoc, chup, hcTruoc);   /* FA-N2 (V§6.1, D2) */
-          } else {
-            lamMoiBuoc3(true);        /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
-          }
+        }
+        /* FA-P2: huy chuong cua em `sid` van luu khi nguoi nhap da sang em khac (chi khong ve lai) */
+        if (hcTruoc && hcTruoc.bat && !hcTruoc.khoa) {
+          hcTheoNguyenVong(sid, nvTruoc, chup, hcTruoc);   /* FA-N2 (V§6.1, D2) */
+        } else if (conMo) {
+          lamMoiBuoc3(true);        /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+        }
+        if (conMo) {
           feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
         }
         loadFallbackStudentList(); // cap nhat the "n nguyen vong" trong danh sach
@@ -969,10 +972,12 @@ function hcCoDatNhu(daLuu, macDinh, dsClb) {
 }
 
 function hcTheoNguyenVong(sid, nvTruoc, nvMoi, hcTruoc) {
+  /* FA-P2: van tinh va luu cho `sid` khi nguoi nhap da sang em khac; chi ve lai Buoc 3 khi `sid` con mo */
+  const veLai = () => { if (sid === currentFallbackStudent) lamMoiBuoc3(true); };
   callApi("get_student_entry_state", sid).then((res) => {
-    if (!res.ok || sid !== currentFallbackStudent) return;
+    if (!res.ok) return;
     const hc = res.data.huy_chuong;
-    if (!hc || !hc.bat || hc.khoa) { lamMoiBuoc3(true); return; }
+    if (!hc || !hc.bat || hc.khoa) { veLai(); return; }
     /* Ban do ngay/loai chi co CLB dang trong nguyen vong: gop ban CU de loc dung ca danh sach cu. */
     const gop = {
       buoi_cua_clb: Object.assign({}, hcTruoc.buoi_cua_clb, hc.buoi_cua_clb),
@@ -999,10 +1004,11 @@ function hcTheoNguyenVong(sid, nvTruoc, nvMoi, hcTruoc) {
         Object.keys(md).forEach((d) => { moi[md[d]] = Number(d); });
       }
     });
-    hcNhacSid = nhac ? sid : null;
+    if (nhac) hcNhacSid = sid;
+    else if (hcNhacSid === sid) hcNhacSid = null;           /* khong xoa cau nhac cua em dang mo khac */
     const doi = JSON.stringify(Object.entries(moi).sort()) !== JSON.stringify(Object.entries(hc.da_luu).sort());
-    if (!doi) { lamMoiBuoc3(true); return; }
-    callApi("submit_huy_chuong", sid, moi).then(() => lamMoiBuoc3(true));
+    if (!doi) { veLai(); return; }
+    callApi("submit_huy_chuong", sid, moi).then(veLai);
   });
 }
 

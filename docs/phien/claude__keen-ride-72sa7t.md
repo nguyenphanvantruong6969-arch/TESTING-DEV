@@ -52,7 +52,7 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 - [x] FA-O1 reasons sorted by day order (THU_TU_BUOI, chu_nhat last)   - [x] FA-9b Excel version of the lottery record (Truong approved)
 - [x] Opus review night 5 (2026-11-10: NEEDS FIX; 2 trung FA-P1, FA-P2 + 5 nhỏ; report bao_cao_dem/2026-11-10_soat_dem5.md)
 Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
-- [x] FA-P1 lottery record Excel: formula guard (`_an_toan_cho_excel`)   - [ ] FA-P2 on-site medals saved even if the operator switches student mid-save
+- [x] FA-P1 lottery record Excel: formula guard (`_an_toan_cho_excel`)   - [x] FA-P2 on-site medals saved even if the operator switches student mid-save
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)

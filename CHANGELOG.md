@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P2: nhập tại chỗ, huy chương mặc định vẫn lưu khi người nhập sang em khác giữa lúc lưu (soát đêm 5)
+
+- `js/04_nhap_tai_cho.js`: nút lưu nguyện vọng gọi `hcTheoNguyenVong` cả khi em vừa lưu không còn mở; `hcTheoNguyenVong` vẫn tính và gọi `submit_huy_chuong` cho đúng em đó, chỉ vẽ lại Bước 3 khi em đó còn mở; câu nhắc "đã chỉnh tay" của em đang mở không bị xoá. Trước đây em đó có nguyện vọng mà không có huy chương nào và lần chạy xếp sau không báo gì (FA-N2, đêm 4).
+- Test mới: 2 ca Chromium trong `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (giữ `submit_preferences` hay `get_student_entry_state` của em trước; đỏ trước; 2 đột biến bắt được; 5 lần liền không chập chờn).
+
 ## 2026-11-10 — FA-P1: biên bản bốc thăm bản Excel không nhận công thức (soát đêm 5)
 
 - `fa_bien_ban.py` `ghi_xlsx`: ô mà openpyxl hiểu là công thức (tên kỳ hay tên buổi mở đầu `=`, `+`, `-`, `@`) được ép về chữ, giữ nguyên văn (`data_type = "s"`, `quotePrefix`), như `so_excel.Trang.o`. Lỗi do FA-9b (đêm 5).
