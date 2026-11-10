@@ -53,6 +53,10 @@ Night 5 — fix list + Excel lottery record (released 2026-11-10; spec plan §8;
 - [x] Opus review night 5 (2026-11-10: NEEDS FIX; 2 trung FA-P1, FA-P2 + 5 nhỏ; report bao_cao_dem/2026-11-10_soat_dem5.md)
 Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - [x] FA-P1 lottery record Excel: formula guard (`_an_toan_cho_excel`)   - [x] FA-P2 on-site medals saved even if the operator switches student mid-save
+Pre-merge small fixes (Truong chose 2026-11-10; instruction: LATEST_INSTRUCTION.md at repo root; order fixed):
+- [ ] SM-1 `ghi_xlsx` cleans forbidden characters   - [ ] FA-P3 `get_ly_do_ket_qua` returns + UI shows missing days
+- [ ] FA-P4 record days in day order   - [ ] FA-P6 missing-day warnings in day order   - [ ] FA-P5 html/xlsx same base name
+- [ ] SM-2 condition wait instead of fixed 800 ms   - [ ] FA-P7/SM-3 `kiem_nhanh --so-seed N>5` real seeds
 - [ ] DEFERRED to term 2: D1 compensation credit — needs FA-10 incentive measurement + Truong's exception to invariant 2
 
 ## Current state (overwrite each handoff)
@@ -73,20 +77,17 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 - Gotchas: test-file count in CLAUDE_CHI_TIET.md; False rule keys omitted from fingerprint; sanity needs augmented lists.
 
 ## Next steps (ordered)
+0. Run LATEST_INSTRUCTION.md (7 pre-merge small fixes, Sonnet, Truong's friend starts it). It supersedes CHAY_DEM_FA_DAA.md.
 1. Watch PR #14 CI until green (Linux full + UI, Windows); fix red by reproducing, never skip a test. Do not merge.
-2. Truong: merge PR #14; decide FA-P3..P7, SM-1..SM-3 (all small); D8 after GĐ2; real Microsoft test with IT; attach repo to or disable the "FA-DAA vong soat"/"vong sua" tasks; D1 compensation in term 2.
+2. Truong: merge PR #14; D8 after GĐ2; real Microsoft test with IT; attach repo to or disable the "FA-DAA vong soat"/"vong sua" tasks; D1 compensation in term 2.
 3. Loop status: LOOP DONE: no trung/cao bug after review night 5 (night 6 not needed).
 
 ## Files touched
-- docs/ke_hoach/FA_DAA_VISION.md: Truong's vision, copied verbatim into the repo
-- docs/ke_hoach/FA_DAA_KE_HOACH.md: implementation plan and item specs
+- docs/ke_hoach/FA_DAA_VISION.md (Truong's vision, verbatim); docs/ke_hoach/FA_DAA_KE_HOACH.md (plan, item specs)
 - docs/phien/CHAY_DEM_FA_DAA.md: single entry file for the night run
-- docs/phien/claude__keen-ride-72sa7t.md: this handoff
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: FA-KH planning entry + FA-1..FA-8 entries
 - Code (night 1): fa_daa.py, fa_ly_do.py, mau_forms_thi_clb/so_sanh_suc_chua.py; edits in api.py, api_nhap.py, api_quan_ly.py, api_xuat.py, cau_hinh_ws.py, rbda_priority_pipeline.py, so_nhap.py, i18n_errors.py (+ i18n_loi.js); tests/test_fa_*.py and tests/_fa.py
-
-- docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md, 2026-11-09_soat_dem3.md: Opus reviews of nights 2 and 3 (fix lists)
-- docs/ke_hoach/FA_DAA_KE_HOACH.md §6, §7: night-3 and night-4 specs
+- LATEST_INSTRUCTION.md (repo root): latest run instruction (7 pre-merge small fixes); reviews in docs/phien/bao_cao_dem/
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -146,3 +147,4 @@ Review-5 fixes (Opus, Truong asked; trung only, fix-list order):
 | 2026-11-10 | Sonnet (night 5) | FA-9b: fa_bien_ban.ghi_xlsx + path_xlsx + button/i18n; 5 tests red first + Chromium check; 3 mutations caught (2 unit/API, 1 UI); related 2195 passed/1 skipped; ruff clean; kiem_nhanh 7/7 | night 5 |
 | 2026-11-10 | Sonnet (night 5) | Night 5 report 2026-11-10: 2/2 done, 0 blocked; report in docs/phien/bao_cao_dem/2026-11-10_dem5.md | RUNNING line removed |
 | 2026-11-10 | Opus | Review night 5 (2 trung FA-P1/P2 fixed test-first, mutations caught; 5 nhỏ listed); soat-ma 4 tiers; PR #14 opened; CI fixes FA-CI1..3 | 3x20 seeds identical; Truong chose python-docx on Windows CI |
+| 2026-11-10 | Opus | Vision coverage brief (~70 % overall, ~85 % P1+P2); Truong chose the 8 small review fixes (7 items, FA-P7=SM-3); wrote LATEST_INSTRUCTION.md for his friend's Sonnet run | Docs only |

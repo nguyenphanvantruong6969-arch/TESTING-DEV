@@ -1,5 +1,7 @@
 # Chạy đêm FA-DAA — tệp DUY NHẤT cần đưa cho Claude (ĐÊM 5: sửa lỗi soát đêm 4 + biên bản bốc thăm bản Excel)
 
+> **Superseded for the next run by `LATEST_INSTRUCTION.md` (repo root, 2026-11-10: 7 pre-merge small fixes).** Kept as the history of nights 1–5.
+
 > Đêm 1 đến đêm 4 đã xong và đã được soát (GO). Báo cáo trong `docs/phien/bao_cao_dem/` (`*_soat_dem4.md` là bản soát
 > mới nhất). Giao thức các đêm trước nằm trong lịch sử git của tệp này (commit a80e626, 3e7d8a7, c962bb8, 89e3e5c).
 

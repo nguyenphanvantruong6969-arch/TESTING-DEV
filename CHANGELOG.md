@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-KH: hướng dẫn mới nhất cho 7 lỗi nhỏ trước khi merge PR #14 (Truong yêu cầu)
+
+- `LATEST_INSTRUCTION.md` (mới, gốc repo): phần 1 tiếng Việt cho người chạy (5 bước, xử lý sự cố); phần 2 tiếng Anh cho Claude (Sonnet): SM-1, FA-P3, FA-P4, FA-P6, FA-P5, SM-2, FA-P7/SM-3 theo thứ tự, mỗi mục test đỏ trước, quy tắc dừng, báo cáo `docs/phien/bao_cao_dem/<ngày>_sua_nho.md`.
+- `docs/phien/claude__keen-ride-72sa7t.md`: thêm mục Plan "Pre-merge small fixes"; `docs/phien/CHAY_DEM_FA_DAA.md`: dòng trỏ sang tệp mới. Chỉ tài liệu, không đổi mã.
+
 ## 2026-11-10 — AI-LOG: nhật ký AI chỉ từ dữ liệu trong repo (Truong yêu cầu)
 
 - `docs/nhat_ky_ai/NHAT_KY_AI.md` (mới, thay `NHAT_KY_AI_TAI_KHOAN_TRUONG.md` lấy từ lịch sử phiên): dựng CHỈ từ repo — 7 lời Truong lưu nguyên văn (kèm `FA_DAA_VISION.md`), 21 quyết định của Truong theo tiêu đề `CHANGELOG.md`, 12 luồng việc theo tệp bàn giao (phiên cha chép ô Session log, phiên con lồng bên dưới một dòng), bảng 70 phiên có dòng `Claude-Session` trong git, và phần trước lịch sử git. Không bình luận hay kết luận nghiên cứu.
