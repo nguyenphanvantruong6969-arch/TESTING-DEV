@@ -31,20 +31,18 @@ Branch base: origin/claude/keen-ride-72sa7t @ 60f75a5 (PR #14 not merged yet).
 - 2026-11-10: `kiem_nhanh --co-so origin/main --so-seed 20` 7/7, 60/60 identical (run at 9ce1be3, same code as 60f75a5); `tests/test_nhieu_buoi.py -k TestTrungKhit` 7 passed. SIMULATED data.
 
 ## Coverage (vision §14 rows, % before → now)
-- P3 "Điểm danh, danh sách chờ, vòng 2, khảo sát tuần 3, khiếu nại": 0 % → 40 % (wave 1)
-- P3 "Ưu tiên bù, gợi ý số chỗ từ kỳ trước": 0 % (waves 3–4)
-- P3 "Module mô phỏng + chế độ so sánh": as before (wave 4)
-- P2 "… 3 câu phản hồi": phản hồi 0 % (wave 2)
+- P1 "… tự lưu, nhắc hạn, tối thiểu 3 NV, huy chương mặc định": kit/docs only before → Power Fx formulas (GAP-11, TH) + reminder flow guide and lists (GAP-10, TH); real Microsoft test still open
+- P2 "… 3 câu phản hồi": 0 % → 100 % (GAP-5: kiosk + Forms TH)
+- P3 "Điểm danh, danh sách chờ, vòng 2, khảo sát tuần 3, khiếu nại": 0 % → 100 % (GAP-1..4, 6)
+- P3 "Ưu tiên bù, gợi ý số chỗ từ kỳ trước": 0 % → 50 % (GAP-7 done; D1 = memo, WAIT-TRUONG)
+- P3 "Module mô phỏng + chế độ so sánh": FA-10 base → 100 % of the §12 list (GAP-12 calculating student, per-type tables)
+- §11 dashboard (not a §14 row): 0 % → 100 % of rows with kiosk data; 3 rows "chưa có dữ liệu" by design (GAP-8)
 
 ## Next step (exact, for the next session)
-1. Role SOLO/son, wave 2: own tests of GAP-3..6 pass (9+4 UI, 7+2 UI, 7+3 UI, 4); mutations caught (2, 2, 1, 1).
-   GAP-3 broad suite CONFIRMED on snapshot 513711a: 4791 passed, 4 skipped (D1 marker, numpy x2, POSIX user), 0 failed.
-   GAP-4/5/6 (snapshot e76bf48): broad suite result lost at context stop →
-   Rerun the broad related suite once (≈25 min; same selection as in the log rows, plus tests grepping
-   tao_mau_forms/bieu_mau/01_khung) and `kiem_nhanh --so-seed 20`; fix reds; then bookkeeping per item (CHANGELOG,
-   TIEN_DO, handoff ticks) and set GAP-3..6 DONE; status "son done, waiting for father review".
-2. Father: F5 review of wave 2 (diff 9bb9deb..HEAD), report bao_cao_dem/<date>_fa_gaps_wave2.md, then finalise the
-   DRAFT wave-3 spec at the end of FA_GAPS_KE_HOACH.md (F2) and continue.
+1. Wait for / rerun the two broad suites: wave 3 snapshot b0d832e (log scratch full_w3) and final HEAD 8069c08 (full_w4):
+   `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers .venv/bin/python -m pytest -q -p no:cacheprovider -rfs tests` (~24 min).
+2. Fix reds (son hat), then write bao_cao_dem/2026-11-10_fa_gaps_wave3.md and _wave4.md (F5), then F7: final report
+   bao_cao_dem/2026-11-10_fa_gaps.md, status ALL WAVES DONE, ONE draft PR claude/fa-gaps → main.
 
 ## Waiting for Truong
 - GAP-14 / D1: "Kỳ 2 dùng A (không bù), B (bù đầy đủ V§8.4) hay C (bù hẹp, chỉ CLB đã thua)? Nếu B hoặc C: đồng ý ghi ngoại lệ bất biến 2 (chỉ tầng bốc thăm, nguồn fa_ly_do LOTTERY ở NV1, mỗi credit một lần, tắt mặc định) không?" — xem docs/ke_hoach/FA_GAPS_D1_MEMO.md.
