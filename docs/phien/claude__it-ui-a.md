@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: DONE_M7
+STATUS: RUNNING (green loop round 1 -> FIX-1)
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -42,7 +42,7 @@ All numbers SIMULATED; all Forms work TH.
   (only `docProps/core.xml` timestamp of the default-mode xlsx differs; unzipped content otherwise equal).
 - FAILED `tests/test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien`:
   `i18n_errors.forms_thieu_email [vi] gạch ngang nối câu: 'Thiếu danh sách email - mã học sinh. Hãy nạp tệp này trước.'`
-- CI run 43025992926: see FIX-1.
+- CI run 43025992926: cancelled by the next push (round already red locally); FIX-1 delegated.
 
 ## Waiting for Truong
 - (none)
