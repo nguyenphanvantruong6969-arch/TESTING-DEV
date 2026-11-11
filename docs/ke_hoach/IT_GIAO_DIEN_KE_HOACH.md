@@ -4,6 +4,8 @@
 > Forms), IT tự chọn; **mọi việc phải làm được bằng giao diện, không kỹ thuật** (không Python, không dòng lệnh, không
 > sửa JSON); không cần Post scores nhưng học sinh vẫn làm bài thi; đường Google chưa quyết → **không đụng**.
 > Nhãn **TH** = chưa thử trên Microsoft thật. Mọi số liệu test là **MÔ PHỎNG**.
+> **Chạy song song 3 phiên:** `docs/ke_hoach/it_ui_song_song/PROMPT_A.md`, `PROMPT_B.md`, `PROMPT_C.md` (chia việc,
+> chủ sở hữu tệp, điểm đồng bộ G0, tích hợp). Khi chạy song song, ba tệp đó thắng tệp này ở chỗ khác nhau.
 > Spec below is in English (implementer: Sonnet). Locate code by FUNCTION NAME (`grep -n "def <name>" <file>`).
 
 ## 0. Rules for the implementer (read first)
