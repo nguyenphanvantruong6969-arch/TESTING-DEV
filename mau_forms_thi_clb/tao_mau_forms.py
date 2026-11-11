@@ -664,6 +664,7 @@ def sinh_moi_clb(de, thu_muc):
 
 TIEN_TO_DOCX_DANG_KY = "NHAP_FORMS_DANG_KY_"
 TEN_CAI_DAT_DANG_KY = "CAI_DAT_FORMS_DANG_KY.md"
+TEN_DOCX_DANG_KY_TAT_CA = TIEN_TO_DOCX_DANG_KY + "TAT_CA.docx"      # FA-M2b: một biểu mẫu cho mọi ngày
 
 
 def de_theo_so_nhap_clb(de, duong_so_nhap):
@@ -679,8 +680,10 @@ def de_theo_so_nhap_clb(de, duong_so_nhap):
     return de2, canh_bao
 
 
-def ghi_cai_dat_dang_ky(de):
-    """CAI_DAT_FORMS_DANG_KY.md: hướng dẫn dựng tay biểu mẫu đăng ký đường B (TH: chưa thử trên Forms thật)."""
+def ghi_cai_dat_dang_ky(de, mot_bieu_mau=False):
+    """CAI_DAT_FORMS_DANG_KY.md: hướng dẫn dựng tay biểu mẫu đăng ký đường B (TH: chưa thử trên Forms thật).
+
+    `mot_bieu_mau=True` (FA-M2b): một biểu mẫu cho mọi ngày. False: đúng như trước (mỗi ngày một biểu mẫu)."""
     L = []
     w = L.append
     w("# Biểu mẫu đăng ký nguyện vọng — đường B, Microsoft Forms (FA-M2)")
@@ -689,7 +692,10 @@ def ghi_cai_dat_dang_ky(de):
     w("> Forms không có cách tạo biểu mẫu bằng chương trình: dựng tay theo tệp này. Chưa có quyết định D8")
     w("> (Power Apps hay Forms); đường nào được chọn, tài liệu này chỉ mô tả đường B.")
     w("")
-    w("Mỗi ngày một biểu mẫu (%d biểu mẫu). Không có câu Ranking: mỗi ngày ba câu chọn riêng, bắt buộc," % len(de["buoi"]))
+    if mot_bieu_mau:
+        w("MỘT biểu mẫu cho mọi ngày (%d ngày). Không có câu Ranking: mỗi ngày ba câu chọn riêng, bắt buộc," % len(de["buoi"]))
+    else:
+        w("Mỗi ngày một biểu mẫu (%d biểu mẫu). Không có câu Ranking: mỗi ngày ba câu chọn riêng, bắt buộc," % len(de["buoi"]))
     w("tên \"Nguyện vọng 1\", \"Nguyện vọng 2\", \"Nguyện vọng 3\" (ngày có ít hơn ba CLB thì ít câu hơn). Hai câu huy")
     w("chương không bắt buộc; mặc định huy chương theo thứ tự nguyện vọng (vàng NV1, bạc NV2, đồng NV3, CLB Tự do không nhận).")
     w("")
@@ -697,19 +703,40 @@ def ghi_cai_dat_dang_ky(de):
     w("")
     w("> %s" % bm.CAU_HUONG_DAN_DANG_KY)
     w("")
-    for b in de["buoi"]:
-        w("## %s — tệp `%s%s.docx`" % (b["ten"], TIEN_TO_DOCX_DANG_KY, b["ma"]))
+    if mot_bieu_mau:
+        w("## Một biểu mẫu cho mọi buổi — tệp `%s`" % TEN_DOCX_DANG_KY_TAT_CA)
+        w("")
+        w("- Học sinh chỉ nhận MỘT đường dẫn. Phần thông tin học sinh xuất hiện một lần, sau đó mỗi ngày có phần Nguyện vọng")
+        w("  và phần Huy chương (thẻ câu vẫn là `[<buổi>-nv1..3]`, `[<buổi>-vang]`, `[<buổi>-doi]`).")
+        w("- Ba câu Nguyện vọng của MỌI ngày đều bắt buộc.")
+        w("- Nộp lại: phiếu mới thay toàn bộ phiếu cũ của em, cho mọi ngày (bộ chuyển đổi giữ phiếu CUỐI của mỗi ngày).")
+        w("- Bật \"Allow respondents to edit their responses\" nếu tổ chức của em cho phép (TH: chưa thử).")
+        w("- Xuất MỘT tệp Excel (Responses → Open in Excel) rồi đưa tệp đó cho `--dang-ky` của bộ chuyển đổi.")
         w("")
         w("| Phần | Tên phần | Câu hỏi | Kiểu | Bắt buộc |")
         w("|---|---|---|---|---|")
         so = 0
-        for i, (ten, cac_cau) in enumerate(bm.cac_phan_fa(de, b["ma"]), 1):
+        for i, (ten, cac_cau) in enumerate(bm.cac_phan_fa_gop(de), 1):
             for j, (td, loai, lc, bb) in enumerate(cac_cau):
                 so += 1
                 w("| %s | %s | %d · `[%s]` | %s | %s |" % (
                     i if j == 0 else "", ten if j == 0 else "", so, bm.ma_cua_cau(td),
                     "Text" if loai == "text" else "Choice (%d lựa chọn)" % len(lc), "✅" if bb else "—"))
         w("")
+    else:
+        for b in de["buoi"]:
+            w("## %s — tệp `%s%s.docx`" % (b["ten"], TIEN_TO_DOCX_DANG_KY, b["ma"]))
+            w("")
+            w("| Phần | Tên phần | Câu hỏi | Kiểu | Bắt buộc |")
+            w("|---|---|---|---|---|")
+            so = 0
+            for i, (ten, cac_cau) in enumerate(bm.cac_phan_fa(de, b["ma"]), 1):
+                for j, (td, loai, lc, bb) in enumerate(cac_cau):
+                    so += 1
+                    w("| %s | %s | %d · `[%s]` | %s | %s |" % (
+                        i if j == 0 else "", ten if j == 0 else "", so, bm.ma_cua_cau(td),
+                        "Text" if loai == "text" else "Choice (%d lựa chọn)" % len(lc), "✅" if bb else "—"))
+            w("")
     w("Sau khi Quick Import, kiểm lại từng câu: câu nguyện vọng chọn **Required**, hai câu huy chương **tắt** Required.")
     w("")
     w("## Settings (mọi biểu mẫu)")
@@ -735,8 +762,15 @@ def ghi_cai_dat_dang_ky(de):
     return "\n".join(L)
 
 
-def sinh_dang_ky(de, thu_muc):
-    """Ghi hướng dẫn và mỗi ngày một .docx Quick Import vào `thu_muc`. Trả danh sách đường dẫn đã ghi."""
+def sinh_dang_ky(de, thu_muc, mot_bieu_mau=False):
+    """Ghi hướng dẫn và .docx Quick Import vào `thu_muc`. Trả danh sách đường dẫn đã ghi.
+
+    Mặc định: mỗi ngày một .docx. `mot_bieu_mau=True` (FA-M2b): MỘT .docx cho mọi ngày; vượt trần câu của Forms thì
+    ném LoiDeThi và không ghi gì. Mỗi chế độ xoá tệp .docx cũ của chế độ kia."""
+    if mot_bieu_mau and bm.dem_cau_fa_gop(de) > bm.TRAN_CAU_MOI_BIEU_MAU:
+        raise bm.LoiDeThi("biểu mẫu đăng ký gộp có %d câu, vượt trần %d câu của một biểu mẫu Forms — "
+                          "bỏ --mot-bieu-mau (mỗi ngày một biểu mẫu) hoặc giảm số ngày/CLB"
+                          % (bm.dem_cau_fa_gop(de), bm.TRAN_CAU_MOI_BIEU_MAU))
     os.makedirs(thu_muc, exist_ok=True)
     for ten in os.listdir(thu_muc):
         if ten.startswith(TIEN_TO_DOCX_DANG_KY) and ten.endswith(".docx"):
@@ -744,8 +778,13 @@ def sinh_dang_ky(de, thu_muc):
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_DANG_KY)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
-        f.write(ghi_cai_dat_dang_ky(de))
+        f.write(ghi_cai_dat_dang_ky(de, mot_bieu_mau=True) if mot_bieu_mau else ghi_cai_dat_dang_ky(de))
     ra.append(duong)
+    if mot_bieu_mau:
+        duong = os.path.join(thu_muc, TEN_DOCX_DANG_KY_TAT_CA)
+        ghi_docx_chi_thi(de, duong, phan=bm.cac_phan_fa_gop(de), hau_to=" — đăng ký tất cả các buổi")
+        ra.append(duong)
+        return ra
     for b in de["buoi"]:
         duong = os.path.join(thu_muc, "%s%s.docx" % (TIEN_TO_DOCX_DANG_KY, b["ma"]))
         ghi_docx_chi_thi(de, duong, phan=bm.cac_phan_fa(de, b["ma"]), hau_to=" — đăng ký %s" % b["ten"])
@@ -897,6 +936,8 @@ def main(argv=None):
                     help="mỗi CLB có đề một biểu mẫu riêng, không câu cổng (+ CLB.csv cho list CLB)")
     ap.add_argument("--fa-daa", action="store_true",
                     help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
+    ap.add_argument("--mot-bieu-mau", action="store_true",
+                    help="chỉ với --fa-daa (FA-M2b, TH): MỘT biểu mẫu đăng ký cho mọi ngày thay vì mỗi ngày một biểu mẫu")
     ap.add_argument("--bien-the", action="store_true",
                     help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
     ap.add_argument("--phan-hoi", action="store_true",
@@ -918,6 +959,8 @@ def main(argv=None):
         ap.error("--tuan-3 là một chế độ riêng, không dùng chung với chế độ khác")
     if a.phan_hoi and (a.fa_daa or a.moi_clb or a.chi_thi or a.bien_the):
         ap.error("--phan-hoi là một chế độ riêng, không dùng chung với chế độ khác")
+    if a.mot_bieu_mau and not a.fa_daa:
+        ap.error("--mot-bieu-mau chỉ dùng cùng --fa-daa")
     if a.so_nhap_clb and not a.fa_daa:
         ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
     try:
@@ -944,9 +987,9 @@ def main(argv=None):
                     return 1
                 for _d, _e, nd in canh_bao:
                     print("CẢNH BÁO: " + nd, file=sys.stderr)
-            ra = sinh_dang_ky(de, a.ra)
+            ra = sinh_dang_ky(de, a.ra, mot_bieu_mau=a.mot_bieu_mau)
             print("Đã sinh mẫu Forms đăng ký FA-DAA (TH): %d biểu mẫu (%s)."
-                  % (len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))
+                  % (1 if a.mot_bieu_mau else len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))
             return 0
         if a.moi_clb:
             ra = sinh_moi_clb(de, a.ra)

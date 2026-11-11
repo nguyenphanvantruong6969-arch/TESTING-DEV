@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-11-11 — FA-M2b: MỘT biểu mẫu đăng ký cho mọi ngày, đường B (TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_fa_gop(de)` (phần thông tin một lần + mỗi ngày phần Nguyện vọng và phần Huy chương, đúng thứ tự `de["buoi"]`, chữ từng câu giống hệt `cac_phan_fa`) và `dem_cau_fa_gop(de)`.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `sinh_dang_ky(de, thu_muc, mot_bieu_mau=False)` ghi MỘT tệp `NHAP_FORMS_DANG_KY_TAT_CA.docx` (mỗi chế độ xoá tệp .docx cũ của chế độ kia; vượt `TRAN_CAU_MOI_BIEU_MAU` thì `LoiDeThi`, không ghi gì); `ghi_cai_dat_dang_ky(de, mot_bieu_mau=False)` thêm mục "Một biểu mẫu cho mọi buổi"; cờ `--mot-bieu-mau` (chỉ với `--fa-daa`, ngược lại `ap.error`).
+- Bộ chuyển đổi `doc_dang_ky_fa_forms`: KHÔNG đổi (test chứng minh một tệp gộp cho cùng kết quả hai tệp từng ngày; nộp lại: phiếu cuối thắng mỗi ngày).
+- Mặc định không đổi: `--fa-daa`, `--phan-hoi`, `--tuan-3` ra tệp giống từng byte so với trước (`diff -r`).
+- Test mới (đỏ trước): `tests/test_fa_m2b_mot_bieu_mau.py` (13; đột biến bỏ một ngày khỏi `cac_phan_fa_gop` làm 5 ca đỏ).
+- Tài liệu: `docs/ke_hoach/FA_DAA_KE_HOACH.md` §4 (cột đường B). Không chọn D8.
+
 ## 2026-11-10 — GAP-14: bản ghi nhớ D1 (ưu tiên bù), KHÔNG có mã
 
 - Mới `docs/ke_hoach/FA_GAPS_D1_MEMO.md`: ba phương án A/B/C, rủi ro khuyến khích, bảng `hai_ky` đo bằng `du_lieu_test/mo_phong_fa_daa.py --n 100 --so-seed 5 --hai-ky 15` (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.

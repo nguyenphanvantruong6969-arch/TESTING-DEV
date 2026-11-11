@@ -258,6 +258,20 @@ def cac_phan_fa(de, ma_buoi):
     ]
 
 
+def cac_phan_fa_gop(de):
+    """FA-M2b (TH): MỘT biểu mẫu đăng ký cho mọi ngày: phần thông tin một lần, rồi mỗi ngày (theo thứ tự `de["buoi"]`)
+    phần Nguyện vọng và phần Huy chương. Chữ từng câu giống hệt `cac_phan_fa` (thẻ `[<buổi>-nvK]` ... không đổi)."""
+    phan = [cac_phan_fa(de, de["buoi"][0]["ma"])[0]] if de["buoi"] else []
+    for b in de["buoi"]:
+        phan += cac_phan_fa(de, b["ma"])[1:]
+    return phan
+
+
+def dem_cau_fa_gop(de):
+    """Tổng số câu của biểu mẫu đăng ký gộp (Forms tính cả câu thông tin)."""
+    return sum(len(c) for _, c in cac_phan_fa_gop(de))
+
+
 # ------------------------------------------- GAP-5 (TH): ba câu phản hồi sau khi xem kết quả (V§9.1)
 # Mã trong "[…]" và "(…)" khớp `fa_sau_xep.MA_CAU_PHAN_HOI` / `KHO_NHAT` (bộ nhập của kiosk đọc theo mã).
 CAU_HAI_LONG = "[hai_long] Em hài lòng với kết quả xếp CLB đến mức nào?"

@@ -122,3 +122,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | GAP-12 | xong | 2026-11-10 | du_lieu_test/mo_phong_fa_daa.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap12_mo_phong.py | Mô phỏng: kiểu tính toán + bảng theo kiểu |
 | GAP-13 | xong | 2026-11-10 | fa_vong_doi_cho.py (mới), api_sau_xep.py, cau_hinh_ws.py, du_lieu_test/mo_phong_fa_daa.py, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_gap13_vong_doi_cho.py | Chu trình cải thiện ổn định (chế độ đo) |
 | GAP-14 | chờ Truong | 2026-11-10 | docs/ke_hoach/FA_GAPS_D1_MEMO.md (mới), CHANGELOG.md | tests/test_fa_gap12_mo_phong.py (1 ca) | Bản ghi nhớ D1, không mã |
+| FA-M2b (gộp Forms, TH) | xong | 2026-11-11 | mau_forms_thi_clb/bieu_mau.py, mau_forms_thi_clb/tao_mau_forms.py, docs/ke_hoach/FA_DAA_KE_HOACH.md, CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_m2b_mot_bieu_mau.py (13 ca) | Một biểu mẫu đăng ký cho mọi ngày (`--fa-daa --mot-bieu-mau`); mặc định giống từng byte |
