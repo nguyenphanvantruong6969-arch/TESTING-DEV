@@ -73,4 +73,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Opus (forms-gop) | No-human-input runbook TU_DONG.md (SOLO / DIEU_PHOI) + AUTO mode in PROMPT_A/B/C | docs only |
 | 2026-11-11 | Opus (forms-gop) | TU_DONG.md: role CHU_TRI (Opus delegates to Sonnet, reviews) + green loop until full suite, coverage, CI and Windows build pass | docs only |
 | 2026-11-11 | Opus (forms-gop) | PROMPT_A/B/C rebuilt: each pasted into an Opus lead that delegates to Sonnet coders and runs its own green loop; A integrates + final green loop | docs only |
-| 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE DONE (hash in git log) | merged it-ui-a; 161 related passed (UI ran, 0 skipped); kiem_nhanh 7/7; ruff clean; B/C not merged |
+| 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE DONE 739736e | merged it-ui-a; 161 related passed (UI ran, 0 skipped); kiem_nhanh 7/7; ruff clean; B/C not merged |
