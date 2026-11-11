@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: RUNNING (G0)
+STATUS: RUNNING (FA-M7)
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -31,6 +31,8 @@ All numbers SIMULATED; all Forms work TH.
 
 ## Decisions and gotchas (keep short)
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1 on this branch (venv, `playwright==1.63.0`, unshallow, `origin/main`).
+- G0 review notes: `fa_duong` lives in `MAC_DINH_TRUONG_HOC.rules` (not in `LUAT_XEP_MAC_DINH`, so not in
+  `run_history.luat_xep`); tab wraps `window.wsApDungCauHinh` to follow `FA_BAT`.
 - UI tests: prefix `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`; skipped != passed.
 
 ## Waiting for Truong
