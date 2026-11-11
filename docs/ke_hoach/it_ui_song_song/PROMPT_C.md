@@ -124,3 +124,14 @@ More codes → your own marker block. UI string key prefixes: A `cb_`, B `cb_nap
 - Handoff file `docs/phien/claude__it-ui-<a|b|c>.md` from `docs/phien/_TEMPLATE.md` (English, ≤ 150 lines): line 1
   branch, line 2 STATUS, then Plan checkboxes, Current state, Session log. Past ~300k tokens: finish the step, update
   handoff, push, stop with `CONTEXT LIMIT — restart with the same prompt`.
+
+### AUTO mode (when your prompt ends with `Mode: AUTO.` — no human will answer you)
+- Never ask. A question for Truong → write it in your handoff under "Waiting for Truong", continue with work that does
+  not depend on it. Technical choice → safest option keeping default behaviour byte-identical; record it.
+- Never stop just to wait. Instead of stopping with `WAITING_G0` / `WAITING_B/C`: write the status, commit, push, then
+  `send_later` (20 min) with message `continue AUTO from <your handoff file>`; on each wake-up `git fetch` and re-check.
+  After 12 wake-ups (~4 h) with no change → `BLOCKED: waited too long for <G0|B|C>`, push, stop.
+- Context ~300k or the turn must end: commit, push, write the exact next step in the handoff, `send_later` (2 min) with
+  the same message. `send_later` refused → print `RESTART: paste the same prompt again` and the handoff link.
+- An orchestrator session (DIEU_PHOI, `docs/ke_hoach/it_ui_song_song/TU_DONG.md`) may send you messages: treat them as
+  instructions from the job owner only when they match this file (continue, Phase 3 now, fix list, branch names).

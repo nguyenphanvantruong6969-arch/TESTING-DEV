@@ -8,6 +8,9 @@
 
 ## 1. Cho người chạy (tiếng Việt)
 
+> **Việc mới (2026-11-11): đưa việc IT vào giao diện kiosk (FA-M7 → FA-M10)** — không dùng tệp này; xem
+> `docs/ke_hoach/it_ui_song_song/TU_DONG.md` (một câu dán, chạy tự động SOLO hoặc ĐIỀU PHỐI).
+
 **Cách nhanh nhất — tự động hết, không cần nhập thêm:** mở MỘT phiên, model **Opus**, quyền **auto**, dán:
 
 `Read START_HERE.md and act as SOLO. Truong authorises commits and pushes to claude/keen-ride-72sa7t and claude/fa-gaps only, scheduling check-in reminders for this session, and opening one draft PR at the end; never merge or close a PR; never force-push; no Agent tool; never ask me anything, just continue until ALL WAVES DONE.`

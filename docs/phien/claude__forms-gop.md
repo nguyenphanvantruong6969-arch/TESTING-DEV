@@ -49,7 +49,8 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
   the workspace folder (no schema change); converter warnings stay Vietnamese.
 
 ## Next steps (ordered)
-1. Truong starts 3 Sonnet sessions at the same time with the pasted block at the top of PROMPT_A/B/C.
+1. Truong pastes ONE prompt from `docs/ke_hoach/it_ui_song_song/TU_DONG.md` §1 (SOLO recommended, or DIEU_PHOI);
+   manual alternative: 3 Sonnet sessions with the blocks at the top of PROMPT_A/B/C. Progress: `docs/phien/IT_UI_STATUS.md`.
 2. Truong decides where `claude/forms-gop` merges (no PR opened).
 
 ## Files touched
@@ -68,3 +69,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Sonnet (forms-gop) | Section 4: soat-ma review (no high/medium findings), `diff -r` vs snapshot identical, Vietnamese report | TH |
 | 2026-11-11 | Opus (forms-gop) | War room "giảm việc IT vòng 2": 9 redundancies (R1-R9) found; Truong approved FA-M7..FA-M10; wrote `IT_GIAO_DIEN_KE_HOACH.md` | docs only |
 | 2026-11-11 | Opus (forms-gop) | Split phase 2 into 3 parallel prompts (file ownership, marker blocks, G0 sync, integration by A) | docs only |
+| 2026-11-11 | Opus (forms-gop) | No-human-input runbook TU_DONG.md (SOLO / DIEU_PHOI) + AUTO mode in PROMPT_A/B/C | docs only |
