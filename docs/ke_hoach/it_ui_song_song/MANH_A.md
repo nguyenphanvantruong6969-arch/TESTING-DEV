@@ -1,3 +1,5 @@
+Đã gộp vào CHANGELOG/TIEN_DO/CLAUDE_CHI_TIET/hướng dẫn ở bước INTEGRATE (2026-11-11).
+
 # Mảnh A — FA-M7 (một nguồn cho CLB và đề thi) — A gộp vào CHANGELOG / TIEN_DO / hướng dẫn ở Phase 3
 
 TH = CHƯA thử trên Microsoft / Google thật. Mọi số liệu trong test là MÔ PHỎNG.

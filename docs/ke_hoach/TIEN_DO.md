@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-M7 (+ G0) (IT giao diện, TH) | xong | 2026-11-11 | forms_dot.py, api_forms.py, api_forms_nap.py, api_forms_bo.py, mau_forms_thi_clb/so_de_thi.py, js/11_chuan_bi.js, index.html, i18n.js, i18n_errors.py, kiosk.spec, CHANGELOG.md | tests/test_fa_m7_dong_goi.py, test_fa_m7_duong.py, test_fa_m7_nguon_mot_lan.py, test_giao_dien_fa_m7_the.py, test_giao_dien_fa_m7_nguon.py | Thẻ "Chuẩn bị đợt" bước 1 (CLB) và 2 (Đề thi). FA-M9, FA-M8, FA-M10 CHƯA làm: hai cộng tác viên B/C không chạy (nhánh không được đẩy lên). |
 | FA-SOAT3 (soát đêm 3, Truong yêu cầu 09/11/2026) | xong (GO, chưa sửa lỗi) | 2026-11-09 | docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md, docs/ke_hoach/FA_DAA_KE_HOACH.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/claude__keen-ride-72sa7t.md, CHANGELOG.md | — (chỉ tài liệu) | Đêm 4: FA-N1..N4, FA-9, FA-10 |
 | FA-UI-5 (FA-DAA đêm 3) | xong | 2026-11-09 | HUONG_DAN_SU_DUNG.md, tests/test_fa_m6_tai_lieu.py, CHANGELOG.md | 1 ca trong tests/test_fa_m6_tai_lieu.py | Mục 15 hướng dẫn |
 | FA-UI-4 (FA-DAA đêm 3) | xong | 2026-11-09 | api_xuat.py, index.html, js/03_ket_qua.js, i18n.js, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_giao_dien_fa_ket_qua.py (3 ca) | Câu lý do + 2 nút xuất khi FA bật |

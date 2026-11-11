@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-11 — FA-M7 (+ G0): thẻ "Chuẩn bị đợt", CLB nhập một lần, đề thi trong một tệp Excel (TH = chưa thử trên Microsoft thật)
+
+- Gộp từ `claude/it-ui-a` (nền G0 + FA-M7). FA-M8, FA-M9, FA-M10 CHƯA làm (hai cộng tác viên B và C không chạy).
+- G0 (nền): `forms_dot.py` (đường dẫn thuần của đợt, mọi tệp nằm trong `forms/` cạnh app.db), `api_forms.py` (`FormsMixin`: `get_fa_duong`, `dat_fa_duong`, lưu `rules.fa_duong` A/B, không thuộc luật xếp), hai tệp rỗng `api_forms_nap.py` / `api_forms_bo.py` (dành cho FA-M9/FA-M10/FA-M8), `kiosk.spec` (hiddenimports cho `mau_forms_thi_clb`), thẻ "Chuẩn bị đợt" (chỉ hiện khi FA-DAA bật), `js/11_chuan_bi.js` + hai tệp JS rỗng, khối đánh dấu và mã lỗi dùng chung (vi + en).
+- FA-M7: bước "1. CLB" (`nap_phieu_clb`: nạp tệp xuất Phiếu thiết lập CLB, ghi `forms/SO_NHAP_CLB_CLB.xlsx`, không ghi app.db) và bước "2. Đề thi" (`tai_mau_de_thi` ghi `MAU_DE_THI_KIOSK.xlsx`; `nap_de_thi` đọc, gom MỌI lỗi một lần, lỗi thì không ghi gì, thành công ghi `forms/de_thi.json`); `get_forms_buoc_12` trả trạng thái để vẽ lại thẻ. Mô-đun mới `mau_forms_thi_clb/so_de_thi.py`. `chuyen_phieu_clb.chuyen_phieu` trả thêm khoá `kq`; đầu ra dòng lệnh không đổi. FIX1: `loai` của CLB đi theo sang `de_thi.json` để CLB Tự do không vào câu huy chương vàng; sửa chữ lỗi `forms_thieu_email` (hết gạch ngang nối câu).
+- Tệp chính: `forms_dot.py`, `api_forms.py`, `api_forms_nap.py`, `api_forms_bo.py`, `mau_forms_thi_clb/so_de_thi.py`, `mau_forms_thi_clb/chuyen_phieu_clb.py`, `js/11_chuan_bi.js`, `js/12_chuan_bi_nap.js`, `js/13_chuan_bi_bo.js`, `index.html`, `i18n.js`, `i18n_errors.py`, `i18n_loi.js`, `kiosk.spec`, `api.py`.
+- Test mới (đỏ trước): `tests/test_fa_m7_dong_goi.py`, `tests/test_fa_m7_duong.py`, `tests/test_giao_dien_fa_m7_the.py` (G0); `tests/test_fa_m7_nguon_mot_lan.py` (18 ca), `tests/test_giao_dien_fa_m7_nguon.py` (3 ca Chromium).
+- Đột biến đã chạy: bỏ phép đối chiếu CLB của đề thi với bước 1 (`if ma not in theo_ma` -> `if False and ...`) làm 3 ca đỏ; khôi phục thì 18/18 xanh.
+- Mặc định không đổi: không đụng lõi DA, schema, cột CSV; kết quả xếp không đổi (bước này không ghi app.db); đầu ra các lệnh `tao_mau_forms.py` giống từng byte.
+
 ## 2026-11-11 — FA-M6b: MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu (TH = chưa thử trên Microsoft thật)
 
 - `mau_forms_thi_clb/bieu_mau.py`: `CAU_CO_SAI`, `LUA_CHON_CO_SAI`, `CAU_KN_BUOI`, `CAU_KN_GHI_CHU`, `cac_phan_sau_ket_qua(de)` (phần 1: mã học sinh + 3 câu phản hồi + `[co_sai]`; phần 2: `[kn_buoi]` hộp chọn nhiều + `[kn_ghi_chu]`). `cac_phan_phan_hoi()` giữ nguyên.

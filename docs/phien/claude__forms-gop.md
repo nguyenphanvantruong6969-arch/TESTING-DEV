@@ -16,19 +16,18 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - Phase 2 (Truong approved 2026-11-11, "giảm việc IT vòng 2"): every IT step in the kiosk UI, both paths A/B, no CLI.
   Spec: `docs/ke_hoach/IT_GIAO_DIEN_KE_HOACH.md`. Parallel mode (Truong, 2026-11-11): 3 independent Sonnet sessions
   with `docs/ke_hoach/it_ui_song_song/PROMPT_A|B|C.md` (A: G0 + FA-M7 + integration here; B: FA-M9 + FA-M10; C: FA-M8).
-- [ ] FA-M7: groundwork (`api_forms.py`, `kiosk.spec`, tab "Chuẩn bị đợt", path choice) + one source for clubs/exams
-- [ ] FA-M9: drop Forms/List exports into the kiosk (auto-detect file kind + variant, confirm buttons, same import path)
-- [ ] FA-M8: "Tạo bộ biểu mẫu" button (zip per path, Phiếu CLB docx, no answer ticking on Forms, XEM_LAI_DAP_AN.xlsx)
-- [ ] FA-M10: after-allocation buttons (KetQua List CSV with email, who has not registered, List diff)
+- [x] FA-M7 (+ G0): groundwork (`api_forms.py`, `kiosk.spec`, tab "Chuẩn bị đợt", path choice) + one source for clubs/exams
+- [ ] FA-M9: drop Forms/List exports into the kiosk (auto-detect file kind + variant, confirm buttons, same import path) — NOT DONE — worker B/C BLOCKED (branch never pushed)
+- [ ] FA-M8: "Tạo bộ biểu mẫu" button (zip per path, Phiếu CLB docx, no answer ticking on Forms, XEM_LAI_DAP_AN.xlsx) — NOT DONE — worker B/C BLOCKED (branch never pushed)
+- [ ] FA-M10: after-allocation buttons (KetQua List CSV with email, who has not registered, List diff) — NOT DONE — worker B/C BLOCKED (branch never pushed)
 - [ ] Phase 2 finish: soat-ma, snapshot diff, report `docs/phien/bao_cao_dem/<date>_it_giao_dien.md`
 
 ## Current state (overwrite each handoff)
-- Done: FA-M2b (commit 56fa911) and FA-M6b (code, API, UI, generator, tests, docs). Related tests: 2384 passed, 1 skipped
-  (D1 deferral, not UI); Chromium UI tests really ran. `kiem_nhanh --co-so origin/main --so-seed 20` = 7/7, 60/60 identical.
-  `diff -r` of `--fa-daa`, `--phan-hoi`, `--tuan-3` vs the step-1.0 snapshot: identical. ruff clean.
-- Section 4 done: report written, soat-ma found nothing high/medium.
-- Open problems: none.
-- Phase 2: plan + 3 parallel prompts written, no code yet. Workers push to `claude/it-ui-a|b|c`; A integrates here.
+- Merged `origin/claude/it-ui-a` (G0 + FA-M7, GREEN on its branch) into this branch (no conflicts); bookkeeping folded in
+  (CHANGELOG, TIEN_DO, CLAUDE_CHI_TIET, HUONG_DAN_SU_DUNG §16, T4M note); report `docs/phien/bao_cao_dem/2026-11-11_it_giao_dien.md`.
+- NOT DONE: FA-M9, FA-M8, FA-M10 (workers B/C never pushed). Kiosk tab "Chuẩn bị đợt" has steps 1-2 only.
+- Full-suite/CI numbers: see `docs/phien/IT_UI_STATUS.md` (the lead owns it).
+- Open problems: none in the merged code.
 
 ## Decisions and gotchas (keep short)
 - `tests/conftest.py` pre-creates a fake dir `TaiXuong_gia` in `tmp_path`: tests that list a folder must ignore it.
@@ -49,6 +48,7 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
   the workspace folder (no schema change); converter warnings stay Vietnamese.
 
 ## Next steps (ordered)
+0. Re-run PROMPT_B / PROMPT_C (they branch from this branch, now with G0 + FA-M7) or SOLO FA-M9 -> FA-M8 -> FA-M10.
 1. Truong pastes the CHU_TRI prompt from `docs/ke_hoach/it_ui_song_song/TU_DONG.md` §1 into an Opus session (Opus
    delegates every task to Sonnet, then loops until all tests + CI are green; SOLO / DIEU_PHOI are fallbacks);
    manual alternative: 3 Sonnet sessions with the blocks at the top of PROMPT_A/B/C. Progress: `docs/phien/IT_UI_STATUS.md`.
@@ -73,3 +73,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Opus (forms-gop) | No-human-input runbook TU_DONG.md (SOLO / DIEU_PHOI) + AUTO mode in PROMPT_A/B/C | docs only |
 | 2026-11-11 | Opus (forms-gop) | TU_DONG.md: role CHU_TRI (Opus delegates to Sonnet, reviews) + green loop until full suite, coverage, CI and Windows build pass | docs only |
 | 2026-11-11 | Opus (forms-gop) | PROMPT_A/B/C rebuilt: each pasted into an Opus lead that delegates to Sonnet coders and runs its own green loop; A integrates + final green loop | docs only |
+| 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE DONE (hash in git log) | merged it-ui-a; 161 related passed (UI ran, 0 skipped); kiem_nhanh 7/7; ruff clean; B/C not merged |

@@ -25,6 +25,7 @@
 13. [Giới hạn đã biết](#13-giới-hạn-đã-biết)
 14. [Điểm quyết tâm (tuỳ chọn)](#14-điểm-quyết-tâm-tuỳ-chọn)
 15. [Xếp theo loại CLB và huy chương (tuỳ chọn)](#15-xếp-theo-loại-clb-và-huy-chương-tuỳ-chọn)
+16. [Chuẩn bị đợt](#16-chuẩn-bị-đợt)
 
 ---
 
@@ -1147,6 +1148,26 @@ sinh đó, không có mã hay tên học sinh nào khác. Bấm **Xuất lý do 
 Bấm **Xuất bảng nhu cầu (CSV)** để ghi `bang_nhu_cau.csv`: mỗi CLB có số học sinh xếp đầu tiên, số học sinh có
 CLB trong nguyện vọng, số đạt điểm sàn, chỉ tiêu và số giữ chỗ. Tệp không có mã hay tên học sinh nên gửi cho
 giáo viên xét chỉ tiêu được.
+
+
+---
+
+## 16. Chuẩn bị đợt
+
+Thẻ **Chuẩn bị đợt** giúp chuẩn bị một đợt đăng ký bằng biểu mẫu (Forms) mà không phải gõ lệnh. Thẻ chỉ hiện khi chế độ xếp theo huy chương (mục 15) đang bật. Chưa thử trên Microsoft hay Google thật.
+
+**Chọn đường A hoặc B.** Đường A: học sinh đăng ký ngay trong phần mềm. Đường B: học sinh đăng ký bằng biểu mẫu. Chọn một đường ở đầu thẻ; phần mềm nhớ lựa chọn. Kết quả xếp không đổi theo đường.
+
+**Bước 1. CLB.** Bấm "Nạp tệp xuất Phiếu thiết lập CLB" rồi chọn tệp Excel xuất từ biểu mẫu Phiếu thiết lập CLB. Phần mềm hiện bảng CLB (tên, buổi, loại, chỉ tiêu), lỗi và cảnh báo. Còn lỗi thì bước chưa xong: sửa tệp rồi nạp lại. CLB chỉ nhập một lần, ở đây.
+
+**Bước 2. Đề thi.**
+1. Bấm "Tải tệp đề mẫu": tệp đã điền sẵn các CLB của bước 1, nằm trong thư mục Tải xuống.
+2. Gõ câu hỏi vào trang De_thi, mỗi dòng một câu, đủ bốn lựa chọn, đáp án là a, b, c hoặc d. Cột de để trống là đề A; có thể thêm đề B, C cùng số câu. CLB không có câu hỏi nào là CLB không thi.
+3. Bấm "Nạp tệp đề". Có lỗi thì phần mềm liệt kê hết một lần và chưa lưu gì: sửa tệp rồi nạp lại.
+
+Nạp lại bước 1 với CLB khác thì bước 2 báo đề cũ không khớp: tải lại mẫu và nạp lại đề.
+
+**Bước 3 đến 5 (tạo bộ biểu mẫu, nạp bài làm, việc sau khi xếp) CHƯA có trong phần mềm.** Hiện vẫn làm bằng lệnh theo `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md`; nhờ nhân viên IT của trường.
 
 ---
 
