@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: WAITING_B/C
+STATUS: GREEN
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -22,14 +22,15 @@ All numbers SIMULATED; all Forms work TH.
       with `ghi_mau_kiosk`, `doc_so_de_thi`; tests `tests/test_fa_m7_nguon_mot_lan.py` + API + UI; mutation recorded);
       bookkeeping only into `docs/ke_hoach/it_ui_song_song/MANH_A.md`
 - [x] Green loop on `claude/it-ui-a` (lead) — GREEN in round 2
-- [ ] INTEGRATE (Phase 3, on `claude/forms-gop`)
+- [ ] INTEGRATE (Phase 3, on `claude/forms-gop`) — A only; B/C BLOCKED (never pushed after 4 h wait)
 - [ ] Green loop on `claude/forms-gop` + FINISH (plan §7 report, `docs/phien/IT_UI_STATUS.md` = `IT-UI GREEN`)
 
 ## Current state (overwrite each handoff)
-- G0 + FA-M7 done and reviewed; green loop on `claude/it-ui-a` GREEN in round 2 (details below).
-- Waiting for B and C (Phase 3). At 18:12 UTC neither `origin/claude/it-ui-b` nor `origin/claude/it-ui-c` exists.
-  Lead checks every 20 min (`send_later`); 12 wake-ups with no change -> B/C count as BLOCKED (not merged), then
-  integrate A alone into `claude/forms-gop` and run the green loop there.
+- Worker A branch work done: G0 + FA-M7 reviewed, green loop GREEN (round 2). Line 2 = GREEN for this branch.
+- Phase 3: waited 12 wake-ups (18:33–22:36 UTC, ~4 h); `claude/it-ui-b` and `claude/it-ui-c` were never pushed (no
+  new `claude/*` ref at all). Per AUTO rules B and C = `BLOCKED: waited too long for B and C`; NOT merged; FA-M8,
+  FA-M9, FA-M10 count as not done. INTEGRATE of A alone into `claude/forms-gop` delegated to a Sonnet coder; status
+  of the whole job lives in `docs/phien/IT_UI_STATUS.md` on `claude/forms-gop`.
 
 ## Decisions and gotchas (keep short)
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1 on this branch (venv, `playwright==1.63.0`, unshallow, `origin/main`).
@@ -76,3 +77,4 @@ All numbers SIMULATED; all Forms work TH.
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8yVQTjim3hxvfMDWv FA-M7-FIX1 DONE 414a94c | loai carried into de_thi.json; 2 tests red→green; related 99 passed; kiem_nhanh 7/7 |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn6pDja9nUgPuhpnPyu FIX-1 DONE db76ea9 | test_van_phong_tu_nhien red→green (not pre-existing: G0 text); 101 related passed; ruff clean; kiem_nhanh 7/7 |
 | 2026-11-11 | Opus lead | Green loop on claude/it-ui-a GREEN (round 2); now WAITING_B/C | CI 43047307624, build 43035758322 |
+| 2026-11-11 | Opus lead | Phase 3 wait ended (12 wake-ups, no B/C); B, C BLOCKED; INTEGRATE A alone | |
