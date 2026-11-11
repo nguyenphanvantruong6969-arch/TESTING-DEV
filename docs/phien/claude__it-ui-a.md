@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: RUNNING (green loop round 1 -> FIX-1)
+STATUS: RUNNING (green loop round 2: waiting for CI Linux job)
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -43,6 +43,14 @@ All numbers SIMULATED; all Forms work TH.
 - FAILED `tests/test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien`:
   `i18n_errors.forms_thieu_email [vi] gạch ngang nối câu: 'Thiếu danh sách email - mã học sinh. Hãy nạp tệp này trước.'`
 - CI run 43025992926: cancelled by the next push (round already red locally); FIX-1 delegated.
+
+## Green loop round 2 (claude/it-ui-a @ 5ead67e, after FIX-1 db76ea9)
+- Local: 5861 passed, 0 failed, 4 skipped (none UI), coverage 93.35 %, ruff clean, `kiem_nhanh --so-seed 20` 7/7, 60/60.
+- Windows build run 43035758322: SUCCESS (exe builds with `mau_forms_thi_clb` inside; NOTE: this workflow also uploads
+  to the shared release `ban-moi-nhat`, so that release now holds this branch's build).
+- CI Tests run 43035270644: lint SUCCESS, "Bo test (Windows)" SUCCESS; Linux job failed twice (attempts 1 and 2) in
+  step "Cai Chromium cho Playwright": runner apt `Temporary failure resolving 'azure.archive.ubuntu.com'` (GitHub
+  infra, no test ran). Not a code failure; retried on the next HEAD (this handoff commit, code unchanged).
 
 ## Waiting for Truong
 - (none)
