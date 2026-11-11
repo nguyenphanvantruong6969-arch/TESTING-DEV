@@ -36,6 +36,14 @@ All numbers SIMULATED; all Forms work TH.
   `run_history.luat_xep`); tab wraps `window.wsApDungCauHinh` to follow `FA_BAT`.
 - UI tests: prefix `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`; skipped != passed.
 
+## Green loop round 1 (claude/it-ui-a @ 80aa188)
+- Local full suite: 1 failed, 5860 passed, 4 skipped (none UI: D1 deferral, 2x numpy missing locally, POSIX user),
+  coverage 93.35 % (>= 85). ruff clean. `kiem_nhanh --so-seed 20` 7/7, 60/60. Generator snapshot vs BASE: identical
+  (only `docProps/core.xml` timestamp of the default-mode xlsx differs; unzipped content otherwise equal).
+- FAILED `tests/test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien`:
+  `i18n_errors.forms_thieu_email [vi] gạch ngang nối câu: 'Thiếu danh sách email - mã học sinh. Hãy nạp tệp này trước.'`
+- CI run 43025992926: see FIX-1.
+
 ## Waiting for Truong
 - (none)
 
