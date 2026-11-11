@@ -13,6 +13,13 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - [x] FA-M2b: combined registration form (layout, generator, guide, tests, docs)
 - [x] FA-M6b: combined "after results" form (layout, generator, reader, API, UI, tests, docs)
 - [x] Section 4: soat-ma, diff -r vs snapshot, report `docs/phien/bao_cao_dem/<date>_forms_gop.md`
+- Phase 2 (Truong approved 2026-11-11, "giảm việc IT vòng 2"): every IT step in the kiosk UI, both paths A/B, no CLI.
+  Spec: `docs/ke_hoach/IT_GIAO_DIEN_KE_HOACH.md` (follow exactly; order below).
+- [ ] FA-M7: groundwork (`api_forms.py`, `kiosk.spec`, tab "Chuẩn bị đợt", path choice) + one source for clubs/exams
+- [ ] FA-M9: drop Forms/List exports into the kiosk (auto-detect file kind + variant, confirm buttons, same import path)
+- [ ] FA-M8: "Tạo bộ biểu mẫu" button (zip per path, Phiếu CLB docx, no answer ticking on Forms, XEM_LAI_DAP_AN.xlsx)
+- [ ] FA-M10: after-allocation buttons (KetQua List CSV with email, who has not registered, List diff)
+- [ ] Phase 2 finish: soat-ma, snapshot diff, report `docs/phien/bao_cao_dem/<date>_it_giao_dien.md`
 
 ## Current state (overwrite each handoff)
 - Done: FA-M2b (commit 56fa911) and FA-M6b (code, API, UI, generator, tests, docs). Related tests: 2384 passed, 1 skipped
@@ -20,6 +27,7 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
   `diff -r` of `--fa-daa`, `--phan-hoi`, `--tuan-3` vs the step-1.0 snapshot: identical. ruff clean.
 - Section 4 done: report written, soat-ma found nothing high/medium.
 - Open problems: none.
+- Phase 2: plan written (`IT_GIAO_DIEN_KE_HOACH.md`), no code yet. Next session = Sonnet, starts at FA-M7.
 
 ## Decisions and gotchas (keep short)
 - `tests/conftest.py` pre-creates a fake dir `TaiXuong_gia` in `tmp_path`: tests that list a folder must ignore it.
@@ -35,9 +43,13 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - No separate kiosk user guide documents the feedback panel; docs updated in `FA_SAU_XEP.md` (3.5, 4). The generated
   `CAI_DAT_FORMS_PHAN_HOI.md` was left untouched on purpose (`--phan-hoi` must stay byte-identical).
 - The plan's step "lock" in LATEST_INSTRUCTION §2 refers to the keen-ride handoff; not used here.
+- Phase 2 decisions (Truong): keep both paths, IT chooses; everything via UI (non-technical); no Post scores, students
+  still take the quiz; Google path undecided -> untouched. Opus: kiosk UI covers FA-DAA only; email stays in files in
+  the workspace folder (no schema change); converter warnings stay Vietnamese.
 
 ## Next steps (ordered)
-1. Truong decides where `claude/forms-gop` merges (no PR opened). Questions are in the report.
+1. Sonnet: implement Phase 2 per `docs/ke_hoach/IT_GIAO_DIEN_KE_HOACH.md`, FA-M7 first.
+2. Truong decides where `claude/forms-gop` merges (no PR opened).
 
 ## Files touched
 - mau_forms_thi_clb/bieu_mau.py, mau_forms_thi_clb/tao_mau_forms.py: FA-M2b layout + generator
@@ -53,3 +65,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Sonnet (forms-gop) | FA-M2b: tests red first (13), `cac_phan_fa_gop`, `sinh_dang_ky(mot_bieu_mau)`, `--mot-bieu-mau`; mutation (drop a day) caught by 5 tests; `diff -r` vs snapshot identical | TH |
 | 2026-11-11 | Sonnet (forms-gop) | FA-M6b: tests red first (22 + 2 UI), reader, API refactor + `nhap_sau_ket_qua_forms`, generator, UI button; mutations (Forms time -> import time; ignore co_sai) caught | TH |
 | 2026-11-11 | Sonnet (forms-gop) | Section 4: soat-ma review (no high/medium findings), `diff -r` vs snapshot identical, Vietnamese report | TH |
+| 2026-11-11 | Opus (forms-gop) | War room "giảm việc IT vòng 2": 9 redundancies (R1-R9) found; Truong approved FA-M7..FA-M10; wrote `IT_GIAO_DIEN_KE_HOACH.md` | docs only |
