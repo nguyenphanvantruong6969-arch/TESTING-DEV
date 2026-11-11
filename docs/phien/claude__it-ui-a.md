@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: RUNNING (green loop round 2: waiting for CI Linux job)
+STATUS: WAITING_B/C
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -21,14 +21,15 @@ All numbers SIMULATED; all Forms work TH.
 - [x] FA-M7: plan §2 (`nap_phieu_clb`, `tai_mau_de_thi`, `nap_de_thi` in `api_forms.py`; `mau_forms_thi_clb/so_de_thi.py`
       with `ghi_mau_kiosk`, `doc_so_de_thi`; tests `tests/test_fa_m7_nguon_mot_lan.py` + API + UI; mutation recorded);
       bookkeeping only into `docs/ke_hoach/it_ui_song_song/MANH_A.md`
-- [ ] Green loop on `claude/it-ui-a` (lead)
+- [x] Green loop on `claude/it-ui-a` (lead) — GREEN in round 2
 - [ ] INTEGRATE (Phase 3, on `claude/forms-gop`)
 - [ ] Green loop on `claude/forms-gop` + FINISH (plan §7 report, `docs/phien/IT_UI_STATUS.md` = `IT-UI GREEN`)
 
 ## Current state (overwrite each handoff)
-- G0 (c7b5d1d) and FA-M7 (d5a303e + FA-M7-FIX1 414a94c: `loai` carried into forms/de_thi.json) done, lead review PASS:
-  166 related tests passed (Chromium really ran), ruff clean, `kiem_nhanh` 7/7, mutation recorded in MANH_A.md.
-- Now: green loop round 1 on `claude/it-ui-a` (lead). B and C branches not on origin yet (13:05 UTC).
+- G0 + FA-M7 done and reviewed; green loop on `claude/it-ui-a` GREEN in round 2 (details below).
+- Waiting for B and C (Phase 3). At 18:12 UTC neither `origin/claude/it-ui-b` nor `origin/claude/it-ui-c` exists.
+  Lead checks every 20 min (`send_later`); 12 wake-ups with no change -> B/C count as BLOCKED (not merged), then
+  integrate A alone into `claude/forms-gop` and run the green loop there.
 
 ## Decisions and gotchas (keep short)
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1 on this branch (venv, `playwright==1.63.0`, unshallow, `origin/main`).
@@ -52,6 +53,15 @@ All numbers SIMULATED; all Forms work TH.
   step "Cai Chromium cho Playwright": runner apt `Temporary failure resolving 'azure.archive.ubuntu.com'` (GitHub
   infra, no test ran). Not a code failure; retried on the next HEAD (this handoff commit, code unchanged).
 
+## Green loop round 2 — RESULT: GREEN
+- CI Tests run 43047307624 (attempt 4) on 85f422d: SUCCESS — lint, "Bo test (Windows)", "Bo test day du + giao dien
+  that (Linux)" incl. "Soat khong co test giao dien nao bi bo qua".
+  https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/actions/runs/43047307624
+  (attempts 1–3 + run 43035270644 x2: Linux job died in "Cai Chromium cho Playwright", runner apt DNS outage; reruns only.)
+- Windows build: https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/actions/runs/43035758322 SUCCESS (5ead67e;
+  later commits are handoff-only).
+- Local: 5861 passed, 0 failed, coverage 93.35 %, ruff clean, `kiem_nhanh --so-seed 20` 7/7 60/60, generator snapshot identical.
+
 ## Waiting for Truong
 - (none)
 
@@ -65,3 +75,4 @@ All numbers SIMULATED; all Forms work TH.
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8yVQTjim3hxvfMDWv FA-M7 DONE d5a303e | tests: m7_nguon_mot_lan 18 + giao_dien_fa_m7_nguon 3 red→green; mutation (drop club cross-check) 3 red; kiem_nhanh 7/7; ruff clean |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8yVQTjim3hxvfMDWv FA-M7-FIX1 DONE 414a94c | loai carried into de_thi.json; 2 tests red→green; related 99 passed; kiem_nhanh 7/7 |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn6pDja9nUgPuhpnPyu FIX-1 DONE db76ea9 | test_van_phong_tu_nhien red→green (not pre-existing: G0 text); 101 related passed; ruff clean; kiem_nhanh 7/7 |
+| 2026-11-11 | Opus lead | Green loop on claude/it-ui-a GREEN (round 2); now WAITING_B/C | CI 43047307624, build 43035758322 |
