@@ -862,6 +862,57 @@
       ws_v_max_choices: "Số lựa chọn tối đa phải là số nguyên từ 1 đến 20.",
       ws_v_max_tests: "Số mục dự thi tối đa phải là số nguyên từ 0 đến 20, hoặc tích \"Không giới hạn\".",
       ws_v_tiers: "Danh sách nhóm có hai dòng trùng nhau.",
+
+      /* === A: FA-M7 G0 === */
+      nav_chuan_bi: "Chuẩn bị đợt",
+      cb_title: "Chuẩn bị đợt",
+      cb_desc: "Đi lần lượt từng bước: danh sách CLB, đề thi, bộ biểu mẫu, rồi nạp kết quả vào phần mềm.",
+      cb_can_fa: "Thẻ này chỉ dùng khi bật xếp theo loại CLB và huy chương: bật ở bước Luật khi tạo không gian làm việc.",
+      cb_duong_title: "Chọn đường làm việc",
+      cb_duong_hint: "Hai đường cho cùng một kết quả xếp. Chọn một lần cho cả đợt; không ảnh hưởng thuật toán.",
+      cb_duong_a: "Đường A: Power Apps + List",
+      cb_duong_a_ghi: "Học sinh nhập qua ứng dụng; dữ liệu đi qua danh sách (List).",
+      cb_duong_b: "Đường B: chỉ Forms",
+      cb_duong_b_ghi: "Học sinh chỉ dùng biểu mẫu; kết quả xuất ra tệp rồi nạp vào đây.",
+      cb_buoc_1_tieu_de: "1. Câu lạc bộ",
+      cb_buoc_2_tieu_de: "2. Đề thi",
+      cb_buoc_3_tieu_de: "3. Tạo bộ biểu mẫu",
+      cb_buoc_4_tieu_de: "4. Nạp kết quả từ biểu mẫu",
+      cb_buoc_5_tieu_de: "5. Nhập vào phần mềm",
+      cb_buoc_trong: "Chưa có gì ở bước này.",
+      cb_duong_da_luu: "Đã lưu đường {duong}.",
+      cb_b1_ghi: "Nạp tệp Excel xuất từ biểu mẫu Phiếu thiết lập CLB. CLB chỉ nhập một lần, ở đây; bước này chưa ghi gì vào dữ liệu xếp.",
+      cb_b1_nut: "Nạp tệp xuất Phiếu thiết lập CLB",
+      cb_b1_chua: "Chưa nạp tệp.",
+      cb_b1_xanh: "Đã nạp {n} CLB ({loai}).",
+      cb_b1_do: "Đã nạp {n} CLB ({loai}) nhưng còn lỗi cần xem.",
+      cb_b1_loi: "Lỗi (CLB bị bỏ qua)",
+      cb_b1_canh_bao: "Cảnh báo",
+      cb_b1_chan: "Kiểm trước khi mở cổng",
+      cb_cot_ten: "Tên CLB",
+      cb_cot_buoi: "Buổi",
+      cb_cot_loai: "Loại",
+      cb_cot_chi_tieu: "Chỉ tiêu",
+      cb_b2_ghi: "Tải tệp đề mẫu (đã điền sẵn CLB của bước 1), nhập câu hỏi vào trang De_thi, rồi nạp lại. Một tệp là nguồn duy nhất của đề; không sửa tay tệp đề trong thư mục dữ liệu.",
+      cb_b2_tai_mau: "Tải tệp đề mẫu",
+      cb_b2_nap: "Nạp tệp đề",
+      cb_b2_mau_ghi: "Đã ghi tệp mẫu: {path}",
+      cb_b2_chua: "Chưa nạp đề.",
+      cb_b2_can_b1: "Làm bước 1 trước: đề thi cần danh sách CLB.",
+      cb_b2_xanh: "Đã nạp đề: {thi} CLB có thi, {cau} câu hỏi (CLB không có câu nào là không thi).",
+      cb_b2_cu: "Đề đã nạp không khớp CLB hiện tại của bước 1. Tải lại tệp mẫu và nạp lại đề.",
+      cb_b2_do: "Tệp đề có {n} lỗi, chưa ghi gì. Sửa rồi nạp lại:",
+      /* === end A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === B: FA-M9/M10 — add below === */
+      /* === end B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === C: FA-M8 — add below === */
+      /* === end C === */
     },
 
     en: {
@@ -1707,6 +1758,57 @@
       ws_v_max_choices: "Most choices must be a whole number from 1 to 20.",
       ws_v_max_tests: "Most tested places must be a whole number from 0 to 20, or tick \"No limit\".",
       ws_v_tiers: "The group list has two identical lines.",
+
+      /* === A: FA-M7 G0 === */
+      nav_chuan_bi: "Prepare round",
+      cb_title: "Prepare the round",
+      cb_desc: "Go step by step: the club list, the exam, the form set, then load the results into the software.",
+      cb_can_fa: "This tab is only used with {slot_l}-type and medal mode on: turn it on in the Rules step when creating a workspace.",
+      cb_duong_title: "Choose a path",
+      cb_duong_hint: "Both paths give the same allocation. Choose once for the whole round; it does not affect the algorithm.",
+      cb_duong_a: "Path A: Power Apps + List",
+      cb_duong_a_ghi: "Students enter data through the app; data goes through a list.",
+      cb_duong_b: "Path B: Forms only",
+      cb_duong_b_ghi: "Students only use forms; results are exported to files and loaded here.",
+      cb_buoc_1_tieu_de: "1. Clubs",
+      cb_buoc_2_tieu_de: "2. Exam",
+      cb_buoc_3_tieu_de: "3. Build the form set",
+      cb_buoc_4_tieu_de: "4. Load form results",
+      cb_buoc_5_tieu_de: "5. Import into the software",
+      cb_buoc_trong: "Nothing in this step yet.",
+      cb_duong_da_luu: "Path {duong} saved.",
+      cb_b1_ghi: "Load the Excel export of the club setup form. Clubs are entered once, here; this step doesn't write anything to the allocation data yet.",
+      cb_b1_nut: "Load club setup form export",
+      cb_b1_chua: "No file loaded yet.",
+      cb_b1_xanh: "{n} clubs loaded ({loai}).",
+      cb_b1_do: "{n} clubs loaded ({loai}) but some problems need a look.",
+      cb_b1_loi: "Errors (club skipped)",
+      cb_b1_canh_bao: "Warnings",
+      cb_b1_chan: "Checks before opening the gate",
+      cb_cot_ten: "Club name",
+      cb_cot_buoi: "Session",
+      cb_cot_loai: "Type",
+      cb_cot_chi_tieu: "Quota",
+      cb_b2_ghi: "Download the exam template (clubs from step 1 already filled in), type the questions on the De_thi sheet, then load it back. One file is the only source of the exam; don't edit the exam file in the data folder by hand.",
+      cb_b2_tai_mau: "Download exam template",
+      cb_b2_nap: "Load exam file",
+      cb_b2_mau_ghi: "Template written: {path}",
+      cb_b2_chua: "No exam loaded yet.",
+      cb_b2_can_b1: "Do step 1 first: the exam needs the club list.",
+      cb_b2_xanh: "Exam loaded: {thi} clubs with an exam, {cau} questions (a club with no questions has no exam).",
+      cb_b2_cu: "The loaded exam doesn't match the clubs of step 1. Download the template again and reload the exam.",
+      cb_b2_do: "The exam file has {n} problems and nothing was saved. Fix them and load it again:",
+      /* === end A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === B: FA-M9/M10 — add below === */
+      /* === end B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === C: FA-M8 — add below === */
+      /* === end C === */
     },
   };
 

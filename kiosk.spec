@@ -38,10 +38,23 @@ datas = [
     ("logo.png", "."),
     ("logo.ico", "."),
     ("assets/fonts", "assets/fonts"),
+    # FA-M7: de_thi.json mac dinh duoc `bieu_mau` doc luc chay tu thu muc cua no.
+    ("mau_forms_thi_clb/de_thi.json", "mau_forms_thi_clb"),
 ]
 
 binaries = []
 hiddenimports = ["webview", "openpyxl"]
+
+# FA-M7: cac mo-dun cua mau_forms_thi_clb/ ma api_forms*.py va forms_dot.py nap qua nap_mau_forms()
+# (them duong vao sys.path luc chay, nen phan tich tinh khong thay): khai bao ro, kem goi bo_dung_t4m.
+MO_DUN_FORMS = [
+    "bieu_mau", "so_de_thi", "tao_mau_forms", "chuyen_forms_sang_phan_mem", "chuyen_phieu_clb",
+    "phan_tich_cau_hoi", "danh_sach_chua_dang_ky", "doi_chieu_lists", "ghep_ket_qua_email",
+    "tao_bo_dung_t4m", "bo_dung_t4m", "bo_dung_t4m.bang_flow", "bo_dung_t4m.cong_thuc",
+    "bo_dung_t4m.cong_thuc_fa", "bo_dung_t4m.cot_lists", "bo_dung_t4m.huong_dan_it",
+    "bo_dung_t4m.mau_csv", "bo_dung_t4m.sinh_bk1", "bo_dung_t4m.site_script",
+]
+hiddenimports += MO_DUN_FORMS
 
 # openpyxl doc file .xlsx nguoi dung tha vao. No import dong mot so
 # module con (reader/writer theo dinh dang), nen khai bao ro de
@@ -84,7 +97,7 @@ else:
 
 a = Analysis(
     ["main.py"],
-    pathex=[],
+    pathex=["mau_forms_thi_clb"],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,

@@ -267,7 +267,7 @@ def test_thanh_ben_sau_khi_gop_va_bao_chua_co_ket_qua(mo):
     nut = page.evaluate("""() => Array.from(document.querySelectorAll('.nav-item'))
         .map(n => [n.dataset.tab, n.querySelector('.nav-icon').textContent])""")
     assert nut == [["pipeline", "01"], ["results", "02"], ["others", "03"],
-                   ["fallback", "04"], ["admin", "05"], ["scoring", "06"]]
+                   ["fallback", "04"], ["admin", "05"], ["scoring", "06"], ["chuan_bi", "07"]]
     for tang1 in ("lop", "clb", "ma"):
         _mo_ket_qua(page, tang1)
         page.wait_for_function("() => !document.getElementById('kqRong').hidden")

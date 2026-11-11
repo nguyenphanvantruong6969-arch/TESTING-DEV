@@ -77,6 +77,8 @@ MAC_DINH_TRUONG_HOC = {
         "fa_khieu_nai_so_ngay": 3,  # GAP-3: số ngày nhận khiếu nại từ lúc công bố (1..14)
         "fa_vong_2": False,         # GAP-4: vòng 2 cho học sinh chưa có CLB mong muốn
         "fa_phan_hoi": False,       # GAP-5/GAP-6: phản hồi 3 câu + khảo sát tuần 3 (kiosk, nhập từ Forms)
+        "fa_duong": None,           # FA-M7: đường chuẩn bị đợt "A" (Power Apps + List) / "B" (chỉ Forms); None = chưa chọn.
+                                    # KHÔNG thuộc luật xếp, không vào `run_history.luat_xep`.
         "fa_vong_doi_cho": False,   # GAP-13: đo chu trình cải thiện ổn định (chỉ đọc, "không bảo đảm ổn định")
     },
 }
@@ -291,6 +293,9 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
             raise ValueError("%s phải là true hoặc false, nhận %r." % (khoa, luat[khoa]))
         if luat[khoa] and not bat_fa:
             raise FaTinhNangCanFa(khoa)
+
+    if luat["fa_duong"] not in (None, "A", "B"):
+        raise ValueError("fa_duong phải là null, \"A\" hoặc \"B\", nhận %r." % (luat["fa_duong"],))
 
     so_ngay = luat["fa_khieu_nai_so_ngay"]
     if not _la_so_nguyen(so_ngay) or not 1 <= so_ngay <= 14:

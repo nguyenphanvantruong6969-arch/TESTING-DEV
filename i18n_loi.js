@@ -1153,5 +1153,57 @@ window.I18N_ERROR_MESSAGES = {
   "ws_loi_khong_ro": {
     "vi": "Không thực hiện được thao tác với không gian làm việc. Hãy thử lại.",
     "en": "Couldn't complete the workspace operation. Try again."
+  },
+  "forms_duong_chua_chon": {
+    "vi": "Chưa chọn đường chuẩn bị đợt. Hãy chọn đường A hoặc đường B.",
+    "en": "No preparation path chosen. Choose path A or path B."
+  },
+  "forms_chua_co_clb": {
+    "vi": "Chưa nạp danh sách CLB của đợt. Hãy làm bước 1 (nạp tệp Phiếu thiết lập CLB) trước.",
+    "en": "The club list for this round hasn't been loaded. Do step 1 (load the club setup form file) first."
+  },
+  "forms_chua_co_de": {
+    "vi": "Chưa nạp đề thi của đợt. Hãy làm bước 2 (nạp tệp đề) trước.",
+    "en": "The exam for this round hasn't been loaded. Do step 2 (load the exam file) first."
+  },
+  "phieu_clb_tep_sai": {
+    "vi": "Tệp Phiếu thiết lập CLB không đọc được hoặc sai dạng.",
+    "en": "The club setup form file can't be read or has the wrong format."
+  },
+  "de_thi_tep_sai": {
+    "vi": "Tệp đề thi không đọc được hoặc sai dạng.",
+    "en": "The exam file can't be read or has the wrong format."
+  },
+  "forms_khong_chuyen_duoc": {
+    "vi": "Không chuyển được dữ liệu từ biểu mẫu sang phần mềm.",
+    "en": "Couldn't convert the form data for the software."
+  },
+  "forms_tep_khong_nhan_ra": {
+    "vi": "Không nhận ra tệp \"{ten}\" là tệp xuất của biểu mẫu nào. Hãy kiểm tra lại tệp.",
+    "en": "Couldn't tell which form's export \"{ten}\" is. Check the file."
+  },
+  "forms_tep_sai_duong": {
+    "vi": "Tệp \"{ten}\" không dùng cho đường {duong}. Hãy kiểm tra đã chọn đúng đường chưa.",
+    "en": "File \"{ten}\" isn't used on path {duong}. Check that the right path is chosen."
+  },
+  "forms_tep_sau_ket_qua": {
+    "vi": "Tệp \"{ten}\" là biểu mẫu Sau khi xem kết quả, không nạp ở bước này. Hãy nạp nó ở khung Phản hồi sau khi xếp.",
+    "en": "File \"{ten}\" is the After-results form; it isn't loaded in this step. Load it in the Feedback panel after allocation."
+  },
+  "forms_can_chon_de": {
+    "vi": "Tệp \"{ten}\" cần biết đề thi. Hãy chọn đề rồi nạp lại.",
+    "en": "File \"{ten}\" needs to know which exam it belongs to. Choose the exam and load it again."
+  },
+  "forms_thieu_email": {
+    "vi": "Thiếu danh sách email và mã học sinh. Hãy nạp tệp này trước.",
+    "en": "The email-to-student-ID list is missing. Load that file first."
+  },
+  "forms_thieu_danh_sach_lop": {
+    "vi": "Thiếu danh sách lớp để tạo bộ biểu mẫu.",
+    "en": "The class list needed to build the form set is missing."
+  },
+  "forms_tao_bo_loi": {
+    "vi": "Không tạo được bộ biểu mẫu.",
+    "en": "Couldn't build the form set."
   }
 };
