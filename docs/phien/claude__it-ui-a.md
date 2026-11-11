@@ -56,3 +56,4 @@ All numbers SIMULATED; all Forms work TH.
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn85Pq2YHSsR4JaidNW G0 DONE c7b5d1d | tests: m7_dong_goi, m7_duong, giao_dien_fa_m7_the red→green; kiem_nhanh 7/7 (60/60); ruff clean |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8yVQTjim3hxvfMDWv FA-M7 DONE d5a303e | tests: m7_nguon_mot_lan 18 + giao_dien_fa_m7_nguon 3 red→green; mutation (drop club cross-check) 3 red; kiem_nhanh 7/7; ruff clean |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8yVQTjim3hxvfMDWv FA-M7-FIX1 DONE 414a94c | loai carried into de_thi.json; 2 tests red→green; related 99 passed; kiem_nhanh 7/7 |
+| 2026-11-11 | Sonnet coder | CODER session_01TGThn6pDja9nUgPuhpnPyu FIX-1 DONE db76ea9 | test_van_phong_tu_nhien red→green (not pre-existing: G0 text); 101 related passed; ruff clean; kiem_nhanh 7/7 |
