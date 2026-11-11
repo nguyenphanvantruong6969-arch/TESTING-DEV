@@ -9,7 +9,7 @@
 ## 1. Cho người chạy (tiếng Việt)
 
 > **Việc mới (2026-11-11): đưa việc IT vào giao diện kiosk (FA-M7 → FA-M10)** — không dùng tệp này; xem
-> `docs/ke_hoach/it_ui_song_song/TU_DONG.md` (một câu dán, chạy tự động SOLO hoặc ĐIỀU PHỐI).
+> `docs/ke_hoach/it_ui_song_song/TU_DONG.md` (một câu dán vào phiên Opus: Opus giao việc cho Sonnet, lặp tới khi mọi test xanh).
 
 **Cách nhanh nhất — tự động hết, không cần nhập thêm:** mở MỘT phiên, model **Opus**, quyền **auto**, dán:
 

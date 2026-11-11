@@ -5,43 +5,36 @@
 
 ## 1. Cho Truong (tiếng Việt)
 
-Mở **MỘT** phiên Claude Code trên kho `testing-dev`, quyền **auto**, rồi dán **một** trong hai câu. Sau đó không cần làm
-gì nữa. Phiên tự làm, tự soát, tự hẹn giờ quay lại khi phải chờ hoặc khi đầy ngữ cảnh. Chỉ khi phiên in `RESTART`
-thì dán lại đúng câu cũ.
+**Cách chính (Truong chốt 2026-11-11): Opus chủ trì, giao việc cho Sonnet, xong thì lặp tới khi mọi test xanh.**
+Mở **MỘT** phiên Claude Code trên kho `testing-dev`, **chọn model Opus**, quyền **auto**, dán đúng câu dưới, gửi. Không
+cần nhập gì nữa. Phiên Opus tự tạo phiên Sonnet cho từng mục, tự soát, tự sửa, tự hẹn giờ quay lại, rồi chạy vòng
+"xanh": toàn bộ test + độ phủ ≥ 85 % + CI trên GitHub + bản build Windows, lặp sửa tới khi tất cả đạt.
 
-| Cách | Model | Nhanh/chậm | Rủi ro | Câu dán |
-|---|---|---|---|---|
-| **SOLO** (khuyên dùng) | Opus | Chậm hơn (một phiên làm lần lượt) | Thấp: một nhánh, không phải gộp | câu 1 |
-| **ĐIỀU PHỐI** | Opus | Nhanh hơn (3 phiên con chạy song song) | Cao hơn: gộp 3 nhánh, cần quyền tạo phiên | câu 2 |
-
-Câu 1 — SOLO:
 ```text
-Read docs/ke_hoach/it_ui_song_song/TU_DONG.md and act as SOLO. Truong authorises commits and pushes to claude/forms-gop only, scheduling check-in reminders for this session, and triggering the Windows build workflow once; never open, merge or close a PR; never force-push; no Agent tool; never ask me anything, just continue until IT-UI DONE.
+Read docs/ke_hoach/it_ui_song_song/TU_DONG.md and act as CHU_TRI. Truong authorises, for this job only: creating Sonnet worker sessions and sending them messages (if that is refused: the Agent tool with model sonnet), scheduling check-in reminders for this session, commits and pushes to claude/forms-gop only, running the full test suite, and triggering the Windows build workflow; never open, merge or close a PR; never force-push; never touch main; never ask me anything; loop until IT-UI GREEN.
 ```
 
-Câu 2 — ĐIỀU PHỐI:
-```text
-Read docs/ke_hoach/it_ui_song_song/TU_DONG.md and act as DIEU_PHOI. Truong authorises creating three worker sessions (Sonnet) for this job, sending them messages, scheduling check-in reminders for this session, commits and pushes to claude/forms-gop and claude/it-ui-a, claude/it-ui-b, claude/it-ui-c only, and triggering the Windows build workflow once; never open, merge or close a PR; never force-push; no Agent tool; never ask me anything, just continue until IT-UI DONE.
-```
+Kết thúc khi `docs/phien/IT_UI_STATUS.md` trên `claude/forms-gop` ghi **`IT-UI GREEN`** kèm link báo cáo. Chỉ khi phiên
+in `RESTART` mới dán lại đúng câu cũ. Câu hỏi để lại cho Truong (không chặn việc): mục "Waiting for Truong".
 
-Kết thúc khi tệp `docs/phien/IT_UI_STATUS.md` trên `claude/forms-gop` ghi **`IT-UI DONE`** và có link báo cáo.
-Câu hỏi Claude để lại cho Truong nằm ở mục "Waiting for Truong" của tệp đó (không chặn công việc).
+Cách dự phòng (vẫn tự động): `act as SOLO` (một phiên tự làm hết) hoặc `act as DIEU_PHOI` (ba phiên con song song) —
+xem §2.2, §2.3; câu dán giống câu trên, thay `CHU_TRI` và bỏ phần "creating Sonnet worker sessions".
 
 ## 2. For Claude (English)
 
-### 2.1 Common rules (both roles)
-- `CLAUDE.md` wins on invariants 1–8. Truong explicitly allows, for THIS job only: one session playing planner, coder
-  and reviewer (overrides rule 11), and never asking (overrides rule 7 "stop and ask": write the question under
+### 2.1 Common rules (every role)
+- `CLAUDE.md` wins on invariants 1–8. Truong explicitly allows, for THIS job only: (SOLO only) one session playing planner,
+  coder and reviewer (overrides rule 11; CHU_TRI and DIEU_PHOI keep it: Opus plans/reviews, Sonnet codes), and never asking (overrides rule 7 "stop and ask": write the question under
   "Waiting for Truong", mark the item `WAIT-TRUONG`, continue with items that do not depend on it).
 - A choice between technical options → the safest one that keeps default behaviour byte-identical; record it under
   "Decisions" in the status file.
 - **Status file** `docs/phien/IT_UI_STATUS.md` on `claude/forms-gop` (create at start, English, ≤ 150 lines):
-  line 1 `Mode: SOLO|DIEU_PHOI`, line 2 lock `RUNNING <role> <session id> <UTC time>`, line 3 `STATUS: …`, then
+  line 1 `Mode: CHU_TRI|SOLO|DIEU_PHOI`, line 2 lock `RUNNING <role> <session id> <UTC time>`, line 3 `STATUS: …`, then
   `Current step`, `Decisions`, `Waiting for Truong`, `Children` (DIEU_PHOI only), `Log` (append only).
   Re-read it before every step: work must never depend on chat memory.
 - **Lock:** at start `git fetch origin claude/forms-gop`; if the status file has a lock from ANOTHER session younger
-  than 3 h and STATUS is not DONE → print `IT-UI is RUNNING in another session` and stop. Otherwise write your lock.
-- **Never end the turn early.** Commit + push after every item and every review. Long context is summarised
+  than 3 h and STATUS is not `IT-UI GREEN` / `IT-UI RED` → print `IT-UI is RUNNING in another session` and stop. Otherwise write your lock.
+- **Never end the turn early.** Commit + push after every item and every review (CHU_TRI: only while no worker runs). Long context is summarised
   automatically. If the turn must end (tool budget, error, waiting, context ~300k): commit, push, write the exact next
   step in the status file, then `send_later` (2 min when not waiting; 20 min when waiting for children) with message
   `continue as <ROLE> from docs/phien/IT_UI_STATUS.md`. If `send_later` is refused, print
@@ -67,7 +60,9 @@ Câu hỏi Claude để lại cho Truong nằm ở mục "Waiting for Truong" c�
    (FA-M9, FA-M8 depend on FA-M7; FA-M10 depends on FA-M9).
 5. Finish = PROMPT_A Phase 3 minus the merges: all related tests, `kiem_nhanh --co-so origin/main --so-seed 20` 60/60,
    snapshot `diff -r` identical, `soat-ma` on `git diff d083aeb..HEAD`, report
-   `docs/phien/bao_cao_dem/<date>_it_giao_dien.md` (plan §7), status `IT-UI DONE`, push, verify remote HEAD.
+   `docs/phien/bao_cao_dem/<date>_it_giao_dien.md` (plan §7), push.
+6. Then run the green loop of §2.4 T3 yourself (you are the fixer; fix rules T3 d and guards T3 e apply) until
+   `IT-UI GREEN` (or `IT-UI RED` by the guards).
 
 ### 2.3 Role DIEU_PHOI — one Opus session runs three Sonnet workers
 1. Lock + status file as in 2.1. Create three sessions with `create_session`: model = Sonnet (latest id), repo
@@ -83,4 +78,75 @@ Câu hỏi Claude để lại cho Truong nằm ở mục "Waiting for Truong" c�
 4. When A reports DONE → **review with fresh eyes** on `claude/forms-gop`: `git diff d083aeb..HEAD`, rerun the related
    tests yourself (Chromium must really run), `kiem_nhanh --so-seed 20` 60/60, snapshot diff, `soat-ma` 4 tiers.
    NEEDS-FIX → `send_message` the owning worker the list (max 2 rounds), then fix the rest yourself on `claude/forms-gop`.
-5. GO → status `IT-UI DONE`, report link, push. Do not archive child sessions (Truong decides).
+5. GO → run the green loop of §2.4 T3 (delegate `FIX-N` to worker A via `send_message`, or a new Sonnet session)
+   until `IT-UI GREEN` (or `IT-UI RED` by the guards); report link, push. Do not archive child sessions.
+
+### 2.4 Role CHU_TRI — Opus plans, delegates EVERY code change to Sonnet, reviews, then loops until green
+Opus never edits code or tests itself (rule 11), except as the last fallback below. Opus writes only the status file.
+**T0 Setup.** `get_session` (no id): `session_context.model` must be an Opus model; if not, write
+`WARNING: chủ trì không phải Opus (<model>)` at the top of the status file and continue. Lock + status file (§2.1),
+`Mode: CHU_TRI`. Record `BASE = <current HEAD of origin/claude/forms-gop>`. Env setup exactly as
+`LATEST_INSTRUCTION.md` PART 2 §1 (venv, `playwright==1.63.0`, unshallow, `origin/main`), branch `claude/forms-gop`.
+**Snapshots** are always rebuilt from `BASE` in a worktree (`git worktree add <scratch>/base $BASE`) by running the
+generator modes of plan §0 and the converter commands of PROMPT_B there, so every session can re-create them.
+**T1 Delegate, one task at a time** (sequential, one branch, no merges). Tasks in order:
+`G0` (PROMPT_A job 1) → `FA-M7` (plan §2 + PROMPT_A job 2) → `FA-M9` (plan §3 + PROMPT_B FA-M9 parts) →
+`FA-M8` (plan §4 + PROMPT_C) → `FA-M10` (plan §5 + PROMPT_B FA-M10 parts) → `FINISH` (plan §7 report).
+For each task send the worker prompt (§2.5) with `<TASK>` filled in:
+1. `create_session`: model = latest Sonnet id, repo `https://github.com/nguyenphanvantruong6969-arch/testing-dev`,
+   `source_revision` `claude/forms-gop`, same permission mode as yours, title `IT-UI <TASK>`. Record the id.
+   Wait with `send_later` check-ins every 20 min (never `sleep`): done ⇔ the status-file Log on `origin/claude/forms-gop`
+   has `WORKER … <TASK> DONE`. `get_session` failed / idle without that line → `send_message`
+   `continue <TASK> from docs/phien/IT_UI_STATUS.md` (max 3), then a NEW worker session for the same task.
+2. `create_session` refused → Agent tool, `model: "sonnet"`, `run_in_background: false`, same prompt.
+3. Both refused → do the task yourself under SOLO rules (§2.2) and record `fallback: SOLO for <TASK>`.
+While a worker runs, do not commit or push (avoid races); keep notes in your scratchpad.
+**T2 Review each task with fresh eyes** (only spec + `git diff <task start>..HEAD`, never memory): rerun its tests
+(Chromium really runs), check its mutation was recorded, `soat-ma` tiers on that diff, `kiem_nhanh` 7/7.
+NEEDS-FIX → send the numbered fix list to the same worker (`send_message`, or a new Agent call), max 3 rounds, then
+`BLOCKED <TASK>: <reason>` and continue with tasks that do not depend on it (M8, M9 need M7; M10 needs M9).
+**T3 Green loop ("VÒNG XANH")** — starts after `FINISH` (or after every non-blocked task is done). One round:
+a. `git pull --rebase`. Local gate, all must pass:
+   - `ruff check .`
+   - full suite with coverage, in the background (`run_in_background`, ~25–40 min):
+     `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers .venv/bin/python -m pytest -q -rs --cov --cov-report=term` → 0 failed,
+     0 errors, total coverage ≥ `fail_under` in `pyproject.toml` (85), and NO `SKIPPED` line for `tests/test_giao_dien_*`;
+   - `kiem_nhanh.py --co-so origin/main --so-seed 20` → 7/7, 60/60;
+   - snapshot `diff -r` vs `BASE` for every existing generator/converter mode → identical.
+b. Gate green → push, then wait for GitHub Actions *Tests (rbda-kiosk)* on that exact HEAD (`actions_list` /
+   `actions_get`, check-ins every 15 min): every job green (Linux full + UI, ruff, Windows tests). Then trigger
+   *Build Windows executable (rbda-kiosk)* (`actions_run_trigger`, ref `claude/forms-gop`) and wait until it is green.
+   No GitHub Actions access → record `CI: not checked (<reason>)` and treat the local gate as final.
+c. Anything red → collect the exact failing test ids, messages and CI logs (`get_job_logs`), write them under
+   `Green loop round N` in the status file, delegate ONE task `FIX-N` to Sonnet (T1 mechanics) with that list. Then
+   review it (T2) and start the next round.
+d. Fix rules for every worker (put them in the `FIX-N` prompt): reproduce the failure first and show it red; minimal
+   fix of the cause; **never** skip, xfail, delete, loosen or rewrite the expectation of a test to make it pass, never
+   lower `fail_under`, never edit snapshot/byte-identical expectations, never touch DA core or schema. Low coverage →
+   add real tests for the new code. A failure that also fails on `origin/main` is still fixed (Truong: every test
+   green); record it as `pre-existing`. A test that passes on rerun → run it 3× more; inconsistent = flaky → fix the
+   flakiness (waits, ordering), never retry-until-pass.
+e. Guards so the loop always ends: same failing set in 2 consecutive rounds → Opus writes a root-cause analysis and a
+   precise fix spec before the next `FIX`; 3 identical rounds or 8 rounds in total → stop with
+   `IT-UI RED: <failing ids>` + the analysis + one question per failure under "Waiting for Truong", push, last line the
+   status link.
+f. All of a and b green in the same round → update the report (`docs/phien/bao_cao_dem/<date>_it_giao_dien.md`): passed
+   count, coverage %, 60/60, CI run links, Windows build result; status `IT-UI GREEN`; push; verify remote HEAD =
+   local HEAD; last line = report link.
+
+### 2.5 Worker prompt (Sonnet; CHU_TRI fills `<TASK>` and, for FIX tasks, appends the failure list)
+```text
+Read CLAUDE.md, then docs/phien/IT_UI_STATUS.md, then docs/ke_hoach/it_ui_song_song/TU_DONG.md section 2.6. You are a Sonnet worker. Your task: <TASK>. Mode: AUTO. Truong authorises commits and pushes to claude/forms-gop only; no PR; no Agent tool; never ask. When done, append "WORKER <your session id> <TASK> DONE <short hash>" to the Log of docs/phien/IT_UI_STATUS.md, commit, push, and stop.
+```
+
+### 2.6 Worker rules
+- WHAT to build: the task's sources named in §2.4 T1 (plan section + the PROMPT_A/B/C "Your job" part). Ignore the
+  parallel-only parts (separate branches, file ownership, marker blocks, `MANH_*.md`, G0 merge, WAITING states):
+  everything is on `claude/forms-gop`; bookkeeping (CHANGELOG, TIEN_DO, CLAUDE_CHI_TIET, user guides) directly.
+- Env: `LATEST_INSTRUCTION.md` PART 2 §1 (venv, playwright 1.63.0, `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`).
+- Per task: tests red first → minimal code → related tests (UI really run) → mutation → bookkeeping → `ruff check .`
+  → `kiem_nhanh` 7/7 → `git pull --rebase origin claude/forms-gop` → commit (message starts with the task code) → push.
+- AUTO rules of PROMPT_A/B/C apply (never ask; questions under "Waiting for Truong"; safest technical choice).
+- Context ~300k: write the exact next step under "Current step" in the status file, commit, push, stop; CHU_TRI starts a
+  fresh worker. Never edit the lock line or another task's log lines.
+
