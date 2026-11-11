@@ -42,3 +42,4 @@ All numbers SIMULATED; all Forms work TH.
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-11 | Opus lead | Branch + handoff created, BASE recorded | |
+| 2026-11-11 | Sonnet coder | CODER session_01TGThn85Pq2YHSsR4JaidNW G0 DONE c7b5d1d | tests: m7_dong_goi, m7_duong, giao_dien_fa_m7_the red→green; kiem_nhanh 7/7 (60/60); ruff clean |
