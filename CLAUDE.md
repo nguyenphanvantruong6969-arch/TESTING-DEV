@@ -20,6 +20,7 @@
 ## Invariants — NEVER break
 1. Default config gives results BYTE-IDENTICAL to before the change (same data, same seed): compare every `match_results` row, 3 datasets × 20 seeds. Every new parameter defaults to the old behaviour.
 2. `compute_club_priority` never receives preference rank or a previous session's outcome (anti-endogeneity); new criteria may not read them either.
+   **Exception (Truong, 2026-11-08, FA-DAA D2):** DEFAULT medals may be derived from rank order, at the registration layer only, and ONLY if every student can override medal placement (path A swap UI; path B two optional Forms questions — gold placement, and swap silver/bronze — giving all 6 placements; test `tests/test_fa_m3_huy_chuong_b.py`). Reason: CADA-style separate signal (Abdulkadiroğlu, Che & Yasuda 2015) keeps rank reporting truthful given the medals the student keeps. The priority key still reads stored medals, never rank.
 3. STB lottery: locked after the first run, a locked seed gives the same numbers, generated with crc32 (never `hash()`), late arrivals inserted uniformly at random while keeping existing students' relative order.
 4. `run_history` is never overwritten or deleted; every run appends a row.
 5. Pipeline order: backup → validate → lock seed/STB → solve → sanity/verify → write in ONE transaction → export; rollback on error.

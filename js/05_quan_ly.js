@@ -36,6 +36,8 @@ let TRAN_NGUYEN_VONG_MOI_BUOI = 10;
 /* Diem quyet tam co bat khong, theo cau hinh da tai (wsApDungCauHinh, js/075). null = chua biet
    (chua tai xong cau hinh): luc do cu hoi API nhu truoc. false = khong goi API diem quyet tam nao. */
 let WHARTON_BAT = null;
+/* FA-UI: true khi workspace bật xếp theo loại CLB và huy chương (`rules.fa_daa`); đặt ở wsApDungCauHinh. */
+let FA_BAT = false;
 let TRAN_CLB_THI_MOI_BUOI = 5;
 
 /* Buoi cua mot CLB, tra tu danh sach da nap san — khong goi them API. */
@@ -393,6 +395,8 @@ function loadAdminClubs() {
     document.querySelectorAll("#view-admin .cot-buoi").forEach((o) => {
       o.hidden = !nhieuBuoi;
     });
+    const coFa = res.data.some((c) => "loai" in c);
+    veCotFaBangClb(coFa);
     res.data.forEach((c) => {
       const tr = document.createElement("tr");
       tr.dataset.clubId = c.club_id;
@@ -403,7 +407,7 @@ function loadAdminClubs() {
       tr.innerHTML =
         `<td>${esc(c.club_id)}</td><td>${esc(c.name)}</td><td>${esc(c.capacity)}</td>` +
         `<td>${esc(c.reserve_capacity)}</td><td>${esc(c.reserve_group || "—")}</td>` +
-        `<td class="cot-buoi">${esc(nhanBuoi(c.buoi))}</td><td></td>`;
+        `<td class="cot-buoi">${esc(nhanBuoi(c.buoi))}</td>` + (coFa ? oFaClb(c) : "") + `<td></td>`;
       const delBtn = document.createElement("button");
       delBtn.className = "btn-icon-danger";
       delBtn.dataset.originalLabel = t("btn_delete");
@@ -431,6 +435,32 @@ function loadAdminClubs() {
       body.appendChild(tr);
     });
   });
+}
+
+/* FA-UI-2: năm cột FA (Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, Giữ chỗ) CHỈ khi workspace bật FA —
+   list_clubs_admin chỉ gửi các khoá này khi bật. Tắt thì gỡ hẳn, bảng đúng như cũ. */
+const COT_FA_CLB = ["th_fa_loai", "th_fa_diem_san", "th_fa_toi_thieu", "th_fa_suc_chua_phong", "th_fa_giu_cho"];
+
+function veCotFaBangClb(coFa) {
+  const hang = el("adminClubTableBody").closest("table").querySelector("thead tr");
+  hang.querySelectorAll(".cot-fa").forEach((o) => o.remove());
+  if (!coFa) return;
+  const cuoi = hang.lastElementChild;
+  COT_FA_CLB.forEach((khoa) => {
+    const th = document.createElement("th");
+    th.className = "cot-fa";
+    th.dataset.i18n = khoa;
+    th.textContent = t(khoa);
+    hang.insertBefore(th, cuoi);
+  });
+}
+
+function oFaClb(c) {
+  const so = (v) => (v === null || v === undefined || v === "" ? "—" : esc(v));
+  const loai = c.loai ? t("fa_loai_" + c.loai) : "—";
+  return `<td class="cot-fa">${esc(loai)}</td><td class="cot-fa">${so(c.diem_san)}</td>` +
+    `<td class="cot-fa">${so(c.so_toi_thieu)}</td><td class="cot-fa">${so(c.suc_chua_phong)}</td>` +
+    `<td class="cot-fa">${esc(c.n_giu_cho || 0)}</td>`;
 }
 
 /* Lưu / xoá CLB đổi cả danh sách buổi, bảng tải theo buổi và lịch tuần (A13.12, 3.10). */

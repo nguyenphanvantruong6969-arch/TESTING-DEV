@@ -811,12 +811,38 @@ function loadSuatDuTru() {
   });
 }
 
+/* FA-UI-4: cột "Lý do" (câu giải thích của lần chạy mới nhất) và hai nút xuất CHỈ khi FA bật; tắt thì
+   gỡ hẳn cột, ẩn nút — trang như cũ. */
+function veCotLyDo(coLyDo) {
+  const hang = el("resultsTableBody").closest("table").querySelector("thead tr");
+  hang.querySelectorAll(".cot-ly-do").forEach((o) => o.remove());
+  if (!coLyDo) return;
+  const th = document.createElement("th");
+  th.className = "cot-ly-do";
+  th.dataset.i18n = "th_ly_do";
+  th.textContent = t("th_ly_do");
+  hang.appendChild(th);
+}
+
 function loadMatchResults(search) {
   Promise.all([
     callApiMoiNhat("ket_qua", "get_match_results", search || "",
       lopLocThamSo(el("resultsLopLoc")), el("resultsSapXep").value),
     layDsLop(),
-  ]).then(([res, dsLop]) => {
+    callApi("get_ly_do_ket_qua"),
+  ]).then(([res, dsLop, lyDo]) => {
+    const fa = lyDo && lyDo.ok && lyDo.data.fa_bat;
+    const cauLyDo = fa && lyDo.data.run_id !== null ? lyDo.data.cau : null;
+    el("btnXuatLyDo").hidden = !fa;
+    el("btnXuatNhuCau").hidden = !fa;
+    el("btnXuatBienBan").hidden = !fa;
+    veCotLyDo(!!cauLyDo);
+    /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
+    const thieu = fa && Array.isArray(lyDo.data.thieu_buoi) ? lyDo.data.thieu_buoi : [];
+    const tbThieu = el("lyDoThieuBuoi");
+    tbThieu.textContent = thieu.length
+      ? trErr({ code: "fa_ly_do_thieu_buoi", params: { buoi: thieu } }) : "";
+    tbThieu.hidden = !thieu.length;
     napOLocLop(el("resultsLopLoc"), dsLop);
     const body = el("resultsTableBody");
     const empty = el("resultsEmptyState");
@@ -888,7 +914,9 @@ function loadMatchResults(search) {
         `${hsDaChon.has(r.student_id) ? " checked" : ""} aria-label="${esc(r.student_id)}"></td>` +
         `<td>${esc(r.student_id)}</td><td>${esc(r.name)}</td><td>${esc(r.class_id || "")}</td>` +
         `<td class="cot-buoi">${esc(r.caTuan ? t("ca_tuan") : nhanBuoi(r.buoi))}</td><td>${clubCell}</td>` +
-        `<td>${esc(tierLabel)}</td><td>${esc(r.rank_in_student_pref ?? "—")}</td>`;
+        `<td>${esc(tierLabel)}</td><td>${esc(r.rank_in_student_pref ?? "—")}</td>` +
+        (cauLyDo ? `<td class="cot-ly-do">${esc(r.caTuan ? ""
+          : ((cauLyDo[r.student_id] || {})[r.buoi] || []).join(" "))}</td>` : "");
       /* An o buoi NGAY TREN dong vua ve. Vong an `.cot-buoi` o tren chay
          TRUOC khi cac dong nay ton tai, nen truoc day o tieu de "Buoi" an
          ma o du lieu van hien — truong mot buoi thay moi cot lech sang
@@ -998,6 +1026,19 @@ function initResultsHandlers() {
   ["resultsLopLoc", "resultsSapXep"].forEach((id) => {
     el(id).addEventListener("change", () => loadMatchResults(el("resultsSearch").value));
   });
+  el("btnXuatLyDo").addEventListener("click", () => {
+    chayXuat([["xuat_muc_ly_do", "export_ly_do_csv", [""],
+      (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
+  });
+  el("btnXuatBienBan").addEventListener("click", () => {
+    chayXuat([["xuat_muc_bien_ban", "export_bien_ban_boc_tham", [""],
+      (d) => t("xuat_kq_bien_ban", { n: d.n_hoc_sinh, path: d.path, path_xlsx: d.path_xlsx })]]);
+  });
+  el("btnXuatNhuCau").addEventListener("click", () => {
+    chayXuat([["xuat_muc_nhu_cau", "export_bang_nhu_cau", [""],
+      (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
+  });
+
   el("btnXuatTheoLop").addEventListener("click", () => {
     chayXuat([["xuat_muc_theo_lop", "export_theo_lop", [""],
       (d) => t("xuat_kq_theo_lop", { n: d.n_tep, path: d.thu_muc })]]);

@@ -13,6 +13,7 @@ import re
 from api_chung import (
     _now,
 )
+import fa_daa
 import so_nhap
 from api_workspace import CauHinhHong, loi_cau_hinh
 from i18n_errors import err
@@ -26,6 +27,7 @@ from rbda_priority_pipeline import (
     WHARTON_TU_DIEN_MOT_CLB,
     diem_wharton_hieu_luc,
     doc_du_lieu_wharton,
+    dung_fa_daa,
     dung_wharton,
     khoa_uu_tien_wharton,
     kiem_ho_so_wharton,
@@ -157,7 +159,20 @@ class QuanLyMixin:
                     "SELECT club_id, name, capacity, reserve_capacity, "
                     "reserve_group, buoi FROM clubs ORDER BY COALESCE(buoi, '') COLLATE THU_TU_BUOI, club_id"
                 ).fetchall()
-            return _ok([dict(r) for r in rows])
+                ra = [dict(r) for r in rows]
+                # FA-UI-2: thuộc tính FA chỉ khi bật (tắt: phản hồi như cũ, bảng như cũ).
+                try:
+                    fa_bat = dung_fa_daa(self._luat_nghiem())
+                except Exception:
+                    fa_bat = False
+                if fa_bat:
+                    fa = {r[0]: r[1:] for r in cur.execute(
+                        "SELECT c.club_id, c.loai, c.diem_san, c.so_toi_thieu, c.suc_chua_phong, "
+                        " (SELECT COUNT(*) FROM giu_cho g WHERE g.club_id = c.club_id) FROM clubs c")}
+                    for c in ra:
+                        (c["loai"], c["diem_san"], c["so_toi_thieu"], c["suc_chua_phong"],
+                         c["n_giu_cho"]) = fa[c["club_id"]]
+            return _ok(ra)
         except Exception as e:
             return _fail(err("error_reading_club_list", detail=str(e)))
 
@@ -281,6 +296,7 @@ class QuanLyMixin:
                     "ORDER BY student_id", (club_id,))]
                 cu_w = {sid: self._doc_diem_wharton_cua_em(cur, sid) for sid in bi_anh_huong}
                 cur.execute("DELETE FROM wharton_bids WHERE club_id = ?", (club_id,))
+                cur.execute("DELETE FROM giu_cho WHERE club_id = ?", (club_id,))
                 for sid in bi_anh_huong:
                     self._ghi_nhat_ky_wharton(
                         cur, "quan_ly", "xoa_theo_clb", sid, cu_w[sid],
@@ -535,6 +551,10 @@ class QuanLyMixin:
             # Đọc cấu hình TRƯỚC khi mở kết nối đọc; chỉ để HIỂN THỊ nên đọc kiểu không nghiêm
             # (cấu hình hỏng thì coi như tắt, màn hình vẫn mở được như trước).
             bat_wharton = dung_wharton(self._cfg_ws()["rules"])
+            try:                                 # FA-UI-3: chỉ để HIỂN THỊ, cấu hình hỏng thì coi như tắt
+                bat_fa = bat_wharton and dung_fa_daa(self._cfg_ws()["rules"])
+            except Exception:
+                bat_fa = False
             with self._ket_noi_doc() as cur:
                 student = cur.execute(
                     "SELECT student_id, name, class_id FROM students WHERE student_id = ?",
@@ -566,6 +586,8 @@ class QuanLyMixin:
                 }
                 if bat_wharton:
                     du_lieu["wharton"] = self._trang_thai_wharton(cur, student_id, tested, prefs)
+                if bat_fa:
+                    du_lieu["huy_chuong"] = self._trang_thai_huy_chuong(cur, student_id, prefs)
                 return _ok(du_lieu)
         except Exception as e:
             return _fail(err("error_reading_student_state", detail=str(e)))
@@ -1016,6 +1038,22 @@ class QuanLyMixin:
             "ds_buoi": sap_buoi({buoi.get(c, BUOI_MAC_DINH) for c in prefs}),
         }
 
+    @staticmethod
+    def _trang_thai_huy_chuong(cur, student_id: str, prefs: list) -> dict:
+        """FA-UI-3: khoá `huy_chuong` của `get_student_entry_state` (chỉ khi FA bật). `da_luu` là huy
+        chương ĐÃ LƯU {club_id: 60|30|10}; mặc định theo thứ tự (D2) do màn hình điền, chưa ghi gì."""
+        da_luu = {r[0]: r[1] for r in cur.execute(
+            "SELECT club_id, points FROM wharton_bids WHERE student_id = ? ORDER BY club_id", (student_id,))}
+        clb = {r[0]: (r[1] or BUOI_MAC_DINH, r[2]) for r in cur.execute("SELECT club_id, buoi, loai FROM clubs")}
+        return {
+            "bat": True,
+            "khoa": QuanLyMixin._wharton_dang_khoa(cur),
+            "da_luu": da_luu,
+            "loai_cua_clb": {c: clb.get(c, (None, None))[1] for c in prefs},
+            "buoi_cua_clb": {c: clb.get(c, (BUOI_MAC_DINH, None))[0] for c in prefs},
+            "ds_buoi": sap_buoi({clb.get(c, (BUOI_MAC_DINH, None))[0] for c in prefs}),
+        }
+
     def submit_wharton(self, student_id: str, w1: dict, w2: dict):
         """BƯỚC 3 (điểm Wharton) — học sinh chia hai quỹ điểm cho các CLB trong nguyện vọng.
 
@@ -1189,6 +1227,46 @@ class QuanLyMixin:
             return _ok({"student_id": student_id, "n_rows": n_dong})
         except Exception as e:
             return _fail(err("error_wharton_quan_ly", detail=str(e)))
+
+    def submit_huy_chuong(self, student_id: str, huy_chuong: dict):
+        """FA-DAA (FA-3): học sinh đặt huy chương {club_id: 60 | 30 | 10} cho nguyện vọng của mình.
+
+        KIỂM Ở SERVER (`kiem_ho_so_huy_chuong`): giá trị, trùng giá trị trong buổi, CLB nằm trong
+        nguyện vọng và không phải Tự do. Sai thì không ghi gì. Thay TOÀN BỘ huy chương cũ của em;
+        ghi vào `wharton_bids` (tier = 1 với CLB Tuyển chọn, 2 với CLB khác — FA bỏ qua `tier`) và
+        một dòng `wharton_nhat_ky`. Đang khoá điểm thì từ chối (`wharton_da_khoa`), như Wharton.
+        """
+        try:
+            luat = self._luat_nghiem()           # đọc TRƯỚC khi mở giao dịch ghi
+            if not dung_fa_daa(luat):
+                return _fail(err("fa_chua_bat"))
+            if not isinstance(huy_chuong, dict):
+                return _fail(err("error_saving_wharton", detail="huy_chuong phai la dict"))
+            with self._ket_noi_ghi() as cur:
+                if self._wharton_dang_khoa(cur):
+                    return _fail(err("wharton_da_khoa"))
+                if not cur.execute("SELECT 1 FROM students WHERE student_id = ?",
+                                   (student_id,)).fetchone():
+                    return _fail(err("student_not_found", student_id=student_id))
+                clubs, _, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
+                loi = fa_daa.kiem_ho_so_huy_chuong(
+                    {student_id: prefs.get(student_id, [])}, {student_id: dict(huy_chuong)}, clubs)
+                if loi:
+                    return _fail(loi)
+                cu = self._doc_diem_wharton_cua_em(cur, student_id)
+                cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
+                dong = [(student_id, cid, 1 if clubs[cid].get("loai") == fa_daa.TUYEN_CHON else 2,
+                         diem) for cid, diem in sorted(huy_chuong.items())]
+                cur.executemany("INSERT INTO wharton_bids (student_id, club_id, tier, points) "
+                                "VALUES (?, ?, ?, ?)", dong)
+                moi = self._doc_diem_wharton_cua_em(cur, student_id)
+                if moi != cu:
+                    self._ghi_nhat_ky_wharton(cur, "kiosk", "luu", student_id, cu, moi)
+                return _ok({"student_id": student_id, "n_saved": len(dong)})
+        except CauHinhHong as e:
+            return _fail(loi_cau_hinh(e))
+        except Exception as e:
+            return _fail(err("error_saving_wharton", detail=str(e)))
 
     def _luu_wharton(self, student_id: str, w1: dict, w2: dict, nguon: str):
         """Lõi lưu điểm Wharton của một em, dùng chung cho kiosk (`submit_wharton`) và thẻ Quản lý
@@ -1582,6 +1660,7 @@ class QuanLyMixin:
                 cur.execute("DELETE FROM wharton_bids WHERE student_id = ?", (student_id,))
                 if self._co_diem(cu_w):
                     self._ghi_nhat_ky_wharton(cur, "quan_ly", "xoa_mot_em", student_id, cu_w, None)
+                cur.execute("DELETE FROM giu_cho WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_test_selection WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM preferences WHERE student_id = ?", (student_id,))
                 cur.execute("DELETE FROM club_scores WHERE student_id = ?", (student_id,))
@@ -1606,9 +1685,9 @@ class QuanLyMixin:
 
     # Xoá theo đúng thứ tự phụ thuộc: bảng con trước, students sau cùng.
     _RESET_BANG = {
-        "hoc_sinh": ["wharton_bids", "match_results", "club_scores", "preferences",
+        "hoc_sinh": ["giu_cho", "wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students"],
-        "tat_ca":   ["wharton_bids", "match_results", "club_scores", "preferences",
+        "tat_ca":   ["giu_cho", "wharton_bids", "match_results", "club_scores", "preferences",
                      "club_test_selection", "students", "clubs"],
     }
 
@@ -1649,6 +1728,8 @@ class QuanLyMixin:
                 }
                 # Điểm Wharton chỉ hiện trong báo cáo khi có dòng bị xoá: Wharton tắt thì phản
                 # hồi y hệt trước vòng 2.
+                if not da_xoa.get("giu_cho"):
+                    da_xoa.pop("giu_cho", None)      # FA-1: chỉ hiện khi có dòng bị xoá
                 if not da_xoa.get("wharton_bids"):
                     da_xoa.pop("wharton_bids", None)
                 else:

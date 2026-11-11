@@ -25,10 +25,12 @@ def _xml_choice(ten_list, c):
         "TRUE" if c.bat_buoc else "FALSE", "".join("<CHOICE>%s</CHOICE>" % escape(v) for v in c.lua_chon))
 
 
-def tao_site_script():
-    """Mức trên cùng chỉ có createSPList; addSPField / addSPFieldXml là hành động CON (subactions) của list."""
+def tao_site_script(tat_ca=None):
+    """Mức trên cùng chỉ có createSPList; addSPField / addSPFieldXml là hành động CON (subactions) của list.
+
+    `tat_ca` (FA-M5): {tên list: [cột]}; None = `cot_lists.TAT_CA` (đầu ra như cũ)."""
     hanh_dong = []
-    for ten_list, cot in cot_lists.TAT_CA.items():
+    for ten_list, cot in (tat_ca or cot_lists.TAT_CA).items():
         con = []
         for c in cot:
             if c.kieu == "Choice":
@@ -56,8 +58,8 @@ def kiem_so_hanh_dong(n, in_ra=print):
               "template); Invoke-SPOSiteDesign (đồng bộ) sẽ từ chối." % (n, TRAN_DONG_BO))
 
 
-def ghi(duong, in_ra=print):
-    ss = tao_site_script()
+def ghi(duong, in_ra=print, tat_ca=None):
+    ss = tao_site_script(tat_ca)
     kiem_so_hanh_dong(dem_hanh_dong(ss), in_ra)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
         json.dump(ss, f, ensure_ascii=False, indent=2)

@@ -1,5 +1,312 @@
 # CHANGELOG
 
+## 2026-11-10 — FA-P7/SM-3: kiem_nhanh --so-seed N > 5 chạy đủ N seed
+
+- `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: hàm mới `danh_sach_seed(n)` — n ≤ 5 lấy n seed đầu của `SEED_MAC_DINH` (không cờ: đúng 5 seed cũ); n > 5 thêm 2, 3, 4, … (bỏ số trùng) tới đủ n; tất định. `main` dùng hàm này; chữ trợ giúp ghi rõ luật. `--so-seed 20` nay in "60 ca (3 bộ × 20 seed) trùng khít" (trước đây cắt còn 15 ca).
+- Test mới (đỏ trước): `tests/test_skill_soat_ma.py` — 3 test (`danh_sach_seed` mặc định / 20 seed khác nhau / `main --so-seed 20`).
+
+## 2026-11-10 — SM-2: test giao diện chờ điều kiện thật thay cho 800 ms cố định
+
+- `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (`test_sang_em_khac_giua_luc_luu_van_luu_huy_chuong_em_truoc`): bỏ `wait_for_timeout(800)`; chờ lời gọi bị giữ của HS1 về xong rồi dò CSDL tới khi huy chương HS1 đã lưu (tối đa 5 s). Chỉ đổi test, không đổi mã ứng dụng. Chạy 5 lần liền: 5/5 đạt (mỗi lần 2 biến thể).
+
+## 2026-11-10 — FA-P5: cặp biên bản HTML + Excel luôn cùng tên gốc
+
+- `api_xuat.py` (`_export_bien_ban_da_khoa`): chọn MỘT tên gốc cho cả cặp bằng `_duong_xuat(..., kem_duoi=(".xlsx",))`, đường Excel suy từ đường HTML. Thư mục đã có `bb.xlsx` -> `bb (2).html` + `bb (2).xlsx` (trước đây `bb.html` + `bb (2).xlsx`); không ghi đè tệp cũ.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py` — `test_api_html_va_xlsx_cung_ten_goc_khi_da_co_tep_xlsx`, `test_api_thu_muc_trong_thi_ten_goc_giu_nguyen`.
+
+## 2026-11-10 — FA-P6: cảnh báo buổi thiếu lý do theo thứ tự ngày
+
+- `api_xuat.py` (`_doc_ly_do_moi_nhat`): `tat_ca_buoi` sắp bằng `khoa_sap_buoi`, nên cảnh báo `fa_ly_do_thieu_buoi` của `export_ly_do_csv` và `thieu_buoi` (FA-P3) liệt kê `thu_2` trước `chu_nhat`.
+- Test mới (đỏ trước): `tests/test_fa_n1_ly_do_mot_phan.py::test_buoi_thieu_ly_do_theo_thu_tu_ngay`.
+
+## 2026-11-10 — FA-P4: biên bản bốc thăm liệt kê buổi theo thứ tự ngày
+
+- `fa_bien_ban.py` (`tao_ban_ghi`): `dem_theo_buoi` sắp bằng `khoa_sap_buoi` (như FA-O1), nên `thu_2` đứng trước `chu_nhat` ở cả bản HTML lẫn Excel; mã băm và số liệu không đổi.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py::test_bien_ban_buoi_theo_thu_tu_ngay_ca_html_lan_xlsx`.
+
+## 2026-11-10 — FA-P3: màn hình kết quả báo buổi thiếu lý do
+
+- `api_xuat.py` (`get_ly_do_ket_qua`): khi FA bật trả thêm khoá `thieu_buoi` (buổi mà lần chạy mới nhất không dùng FA, nên không có lý do); FA tắt trả y như cũ.
+- `index.html` + `js/03_ket_qua.js` (`loadMatchResults`): MỘT dòng thông báo `#lyDoThieuBuoi` trên bảng kết quả, chữ từ mã có sẵn `fa_ly_do_thieu_buoi` (không thêm câu mới); không thiếu buổi nào thì ẩn.
+- Test mới (đỏ trước): `tests/test_fa_n1_ly_do_mot_phan.py` (3 test API, có test FA tắt không đổi), `tests/test_giao_dien_fa_ket_qua.py` (2 test Chromium).
+
+## 2026-11-10 — SM-1: biên bản Excel không hỏng vì ký tự điều khiển
+
+- `fa_bien_ban.py` (`ghi_xlsx`): mọi ô chữ đi qua `so_excel.lam_sach` (như `so_excel.Trang.o`). Tên workspace `"Kỳ\x01một"` trước đây làm `export_bien_ban_boc_tham` trả `error_exporting_csv` (IllegalCharacterError) và để lại tệp HTML; nay xuất đủ hai tệp. Chặn công thức FA-P1 giữ nguyên.
+- Test mới (đỏ trước): `tests/test_fa_bien_ban.py` — `test_xlsx_bo_ky_tu_dieu_khien_ma_khong_hong`, `test_api_ten_workspace_co_ky_tu_dieu_khien_van_xuat_du_hai_tep`.
+
+## 2026-11-10 — FA-KH: hướng dẫn mới nhất cho 7 lỗi nhỏ trước khi merge PR #14 (Truong yêu cầu)
+
+- `LATEST_INSTRUCTION.md` (mới, gốc repo): phần 1 tiếng Việt cho người chạy (5 bước, xử lý sự cố); phần 2 tiếng Anh cho Claude (Sonnet): SM-1, FA-P3, FA-P4, FA-P6, FA-P5, SM-2, FA-P7/SM-3 theo thứ tự, mỗi mục test đỏ trước, quy tắc dừng, báo cáo `docs/phien/bao_cao_dem/<ngày>_sua_nho.md`.
+- `docs/phien/claude__keen-ride-72sa7t.md`: thêm mục Plan "Pre-merge small fixes"; `docs/phien/CHAY_DEM_FA_DAA.md`: dòng trỏ sang tệp mới. Chỉ tài liệu, không đổi mã.
+
+## 2026-11-10 — AI-LOG: nhật ký AI chỉ từ dữ liệu trong repo (Truong yêu cầu)
+
+- `docs/nhat_ky_ai/NHAT_KY_AI.md` (mới, thay `NHAT_KY_AI_TAI_KHOAN_TRUONG.md` lấy từ lịch sử phiên): dựng CHỈ từ repo — 7 lời Truong lưu nguyên văn (kèm `FA_DAA_VISION.md`), 21 quyết định của Truong theo tiêu đề `CHANGELOG.md`, 12 luồng việc theo tệp bàn giao (phiên cha chép ô Session log, phiên con lồng bên dưới một dòng), bảng 70 phiên có dòng `Claude-Session` trong git, và phần trước lịch sử git. Không bình luận hay kết luận nghiên cứu.
+- `docs/nhat_ky_ai/dung_nhat_ky_ai.py` (mới): script dựng lại tệp trên; chạy hai lần cho cùng kết quả; câu nguyên văn được kiểm có trong tệp nguồn. Nằm trong `docs/` nên không tính vào độ phủ.
+- `docs/nhat_ky_ai/NHAT_KY_AI_DE_DOC.md` + `NHAT_KY_AI.docx` (Truong yêu cầu bản dễ đọc): tiếng Việt thường, bảng giải thích từ ngữ, 10 giai đoạn (mục tiêu / Truong quyết định / phiên chính / phiên phụ / kết quả), lời nguyên văn, giới hạn; Word A4 4 trang. `xuat_word.py` (mới) chuyển .md sang .docx có định dạng.
+- `docs/nhat_ky_ai/NHAT_KY_AI_DAY_DU.md` (mới, Truong yêu cầu bản vừa dễ đọc vừa đủ chi tiết): mục 1–6 là bản dễ đọc, mục 7 dựng tự động xếp toàn bộ chi tiết vào 10 giai đoạn (24 quyết định, 146 mục `CHANGELOG.md`, 160 dòng phiên chính/phụ, 70 phiên có lưu mã; không sót mục nào). `NHAT_KY_AI.docx` nay dựng từ bản này: A4, 21 trang.
+
+## 2026-11-10 — FA-CI3: CI Windows cài python-docx (PR #14, Truong chọn)
+
+- `.github/workflows/tests.yml` job Windows và job test của `build-windows-exe.yml`: cài thêm `python-docx>=1.1,<2` (cùng ràng buộc với `requirements-dev.txt`). 9 test FA ghi tệp `.docx` (`test_fa_m2_forms_dang_ky.py`, `test_fa_m4_phan_tich.py`, `test_fa_m5_bo_dung.py`, `test_fa_n4_mot_de_khong_thi_lai.py`) chạy thật trên Windows thay vì đỏ `ModuleNotFoundError`; không test nào bị bỏ qua.
+
+## 2026-11-10 — FA-CI2: test giao diện T3-19 hết chập chờn (CI Linux PR #14)
+
+- `tests/test_giao_dien_t3_l3.py` `test_tai_bang_theo_clb_va_theo_ma_co_tim`: chờ bảng hiện đúng số thành viên CLB A (lấy từ `get_danh_sach_clb`) thay vì chỉ chờ `#kqBang` hiện; bảng "theo lớp" vẽ trước vẫn hiện tới khi danh sách CLB về, nên test có lúc đếm 2 dòng cũ. Tái hiện bằng độ trễ 1,5 giây cho `get_danh_sach_clb`: test cũ đỏ, test mới xanh; 5 lần liền xanh. Lỗi có sẵn từ trước PR, không do FA-DAA.
+
+## 2026-11-10 — FA-CI1: sửa CI đỏ của PR #14 (Windows + văn phong)
+
+- `du_lieu_test/mo_phong_fa_daa.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`: `main` chuyển stdout/stderr sang UTF-8 (`reconfigure`, như `du_lieu_test/sinh_du_lieu_diem_quyet_tam.py`); console Windows cp1252 làm hai script này ném `UnicodeEncodeError` khi in tiếng Việt. Tái hiện trên Linux bằng `PYTHONIOENCODING=cp1252` (4 đỏ trước, xanh sau).
+- `tests/test_mo_phong_fa_daa.py` `test_chay_dong_lenh`: đọc đầu ra script bằng `encoding="utf-8"` (như `test_fa_nhu_cau.py`); trên Windows bảng mã mặc định cp1252 làm `stdout` thành `None`. Tái hiện bằng `LC_ALL=C PYTHONUTF8=0 PYTHONCOERCECLOCALE=0`: đỏ trước, xanh sau.
+- `i18n_errors.py` (+ `i18n_loi.js` sinh lại): câu tiếng Anh của `bien_ban_chua_boc_tham` bỏ từ nội bộ "seed" (FA-9). `i18n.js`, `index.html`: nút biên bản ghi "bản in và Excel" / "printable page and Excel" thay chữ HOA "HTML" (FA-9, FA-9b). Cả hai do `tests/test_van_phong_tu_nhien.py` bắt.
+- Không test nào bị bỏ qua hay tắt.
+
+## 2026-11-10 — FA-P2: nhập tại chỗ, huy chương mặc định vẫn lưu khi người nhập sang em khác giữa lúc lưu (soát đêm 5)
+
+- `js/04_nhap_tai_cho.js`: nút lưu nguyện vọng gọi `hcTheoNguyenVong` cả khi em vừa lưu không còn mở; `hcTheoNguyenVong` vẫn tính và gọi `submit_huy_chuong` cho đúng em đó, chỉ vẽ lại Bước 3 khi em đó còn mở; câu nhắc "đã chỉnh tay" của em đang mở không bị xoá. Trước đây em đó có nguyện vọng mà không có huy chương nào và lần chạy xếp sau không báo gì (FA-N2, đêm 4).
+- Test mới: 2 ca Chromium trong `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (giữ `submit_preferences` hay `get_student_entry_state` của em trước; đỏ trước; 2 đột biến bắt được; 5 lần liền không chập chờn).
+
+## 2026-11-10 — FA-P1: biên bản bốc thăm bản Excel không nhận công thức (soát đêm 5)
+
+- `fa_bien_ban.py` `ghi_xlsx`: ô mà openpyxl hiểu là công thức (tên kỳ hay tên buổi mở đầu `=`, `+`, `-`, `@`) được ép về chữ, giữ nguyên văn (`data_type = "s"`, `quotePrefix`), như `so_excel.Trang.o`. Lỗi do FA-9b (đêm 5).
+- Test mới: 2 test trong `tests/test_fa_bien_ban.py` (đỏ trước: có thẻ `<f>`; đột biến bỏ dòng ép kiểu bắt được).
+
+## 2026-11-10 — FA-9b: biên bản bốc thăm bản Excel (đêm 5, Truong duyệt)
+
+- `fa_bien_ban.py` `ghi_xlsx` (cùng bản ghi với HTML, không mã/tên học sinh); `api_xuat.py` `export_bien_ban_boc_tham` ghi thêm `.xlsx` cạnh `.html` (không ghi đè tệp cũ), trả `path_xlsx`; nút ở thẻ Kết quả báo cả hai tệp (`i18n.js`, `index.html`, `js/03_ket_qua.js`).
+- Test mới: 5 test trong `tests/test_fa_bien_ban.py` (đỏ trước; 3 đột biến bắt được) + kiểm tệp .xlsx trong test Chromium của `tests/test_giao_dien_fa_ket_qua.py`.
+
+## 2026-11-10 — FA-O1: lý do kết quả sắp theo thứ tự ngày (đêm 5)
+
+- `api_xuat.py` `_doc_ly_do_moi_nhat`: sắp các dòng theo `khoa_sap_buoi` (cùng khoá với `COLLATE THU_TU_BUOI`), không theo chuỗi thường; `chu_nhat` đứng sau `thu_2` ở `ket_qua_ly_do.csv` và cột "Lý do". Lỗi do bản sửa FA-N1 gây ra (soát đêm 4).
+- Test mới: 1 test trong `tests/test_fa_n1_ly_do_mot_phan.py` (đỏ trước khi sửa; đột biến bắt được). Vá luôn lỗ hổng FA-O2.
+
+## 2026-11-09 — FA-10: mô phỏng so sánh chế độ cũ và FA-DAA, hành vi hai kỳ của D1 (đêm 4)
+
+- `du_lieu_test/mo_phong_fa_daa.py` (mới, không đụng phần mềm): cùng dữ liệu sinh có hạt giống, chạy chế độ cũ (điểm thi + hai quỹ) và `chay_fa_daa`; in bốn bảng: %NV1 / %top 2 / %không CLB, % dòng theo lý do, % thua bốc thăm theo hành vi (lười / thật thà / chiến lược), và bảng hai kỳ D1 (em xếp CLB Giới hạn hot nhất lên NV1 cố ý; không bù và có bù — bù chỉ mô phỏng bằng cách xếp em lên đầu bốc thăm kỳ 2). Mỗi bảng ghi "SỐ LIỆU MÔ PHỎNG"; KHÔNG có câu nhận định. D1 chưa cài vào phần mềm.
+- Test mới: `tests/test_mo_phong_fa_daa.py` (9).
+
+## 2026-11-09 — FA-9: biên bản bốc thăm có người chứng kiến (đêm 4)
+
+- `fa_bien_ban.py` (mới, hàm thuần): `sha256_stb`, `tao_ban_ghi`, `html_bien_ban`. `api_xuat.py` `export_bien_ban_boc_tham` → `bien_ban_boc_tham.html` (kỳ, thời điểm, dấu vân tay dữ liệu, hạt giống, SHA-256 danh sách (mã HS, số bốc thăm) đã sắp, số liệu từng buổi, thứ tự buổi lễ, dòng ký; không tên/mã học sinh; cảnh báo nếu dữ liệu đã sửa sau lần chạy). Chỉ đọc, không đổi schema/CSV. `i18n_errors.py` + `i18n_loi.js`: `bien_ban_chua_boc_tham`. Nút "Xuất biên bản bốc thăm" ở thẻ Kết quả (chỉ khi FA bật): `index.html`, `js/03_ket_qua.js`, `i18n.js`.
+- Test mới: `tests/test_fa_bien_ban.py` (9) + 1 test Chromium trong `tests/test_giao_dien_fa_ket_qua.py`.
+
+## 2026-11-09 — FA-N4: cảnh báo CLB chỉ có một đề thì không thi lại được (đêm 4)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: em bị gắn cờ làm quá nhanh ở CLB chỉ có một đề → cảnh báo "không có đề thi lại; giữ điểm bài đầu" (thay câu hứa thi lại). `mau_forms_thi_clb/tao_mau_forms.py`: `CAI_DAT_FORMS_BIEN_THE.md` có thêm dòng nói rõ. CLB có từ hai đề: không đổi.
+- Test mới: `tests/test_fa_n4_mot_de_khong_thi_lai.py` (3).
+
+## 2026-11-09 — FA-N3: câu báo rõ khi bật FA mà tắt điểm quyết tâm (đêm 4)
+
+- `cau_hinh_ws.py` `FaCanDiemQuyetTam(ValueError)`, `api_workspace.py` bắt riêng, `i18n_errors.py` + `i18n_loi.js`: mã `fa_can_diem_quyet_tam` (song ngữ) thay lỗi chung `ws_du_lieu_sai` ở bước luật (tạo và sửa cấu hình). Lỗi luật khác vẫn là lỗi chung.
+- Test mới: `tests/test_fa_n3_loi_diem_quyet_tam.py` (5); sửa kỳ vọng `tests/test_giao_dien_fa_cai_dat.py` (câu mới) và danh sách mã mới `tests/test_ws_nhan.py`.
+
+## 2026-11-09 — FA-N2: màn nhập tại chỗ lưu huy chương mặc định và đi theo thứ tự mới (đêm 4)
+
+- `js/04_nhap_tai_cho.js` (`hcTheoNguyenVong`), `index.html` (`hcNhacDaChinh`), `i18n.js` (`hc_nhac_da_chinh`): sau khi lưu nguyện vọng ở workspace FA, mỗi ngày: chưa có huy chương → lưu mặc định D2; huy chương = mặc định của thứ tự cũ và thứ tự đổi → lưu mặc định mới; đã chỉnh tay → giữ nguyên + câu nhắc. Chỉ gọi `submit_huy_chuong`; không suy diễn ở máy chủ, không đổi schema.
+- Test mới: `tests/test_giao_dien_fa_n2_luu_mac_dinh.py` (3, Chromium chạy thật).
+
+## 2026-11-09 — FA-N1: lý do theo từng buổi sau khi chạy lại một phần (đêm 4)
+
+- `api_xuat.py` `_doc_ly_do_moi_nhat`: mỗi buổi lấy lý do của lần chạy mới nhất CÓ chạy buổi đó (`run_history.buoi_da_chay`); buổi mà lần đó không phải FA thì bỏ và báo `canh_bao` (`fa_ly_do_thieu_buoi`); chỉ lỗi `fa_chua_co_ly_do` khi không buổi nào có lý do. `i18n_errors.py` + `i18n_loi.js`: mã mới.
+- Test mới: `tests/test_fa_n1_ly_do_mot_phan.py` (3). FA tắt: không đổi.
+
+## 2026-11-09 — FA-SOAT3: soát đêm 3 và mở đêm 4 (chỉ tài liệu, chưa sửa lỗi)
+
+- `docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md`: kết luận GO; FA-N1 (chạy lại một ngày làm mất lý do của ngày khác, đã tái hiện), FA-N2 (màn nhập tại chỗ không lưu huy chương mặc định, đã tái hiện), FA-N3, FA-N4.
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §7: spec đêm 4 (FA-N1..N4, FA-9, FA-10). `docs/phien/CHAY_DEM_FA_DAA.md`: giao thức đêm 4. `docs/phien/claude__keen-ride-72sa7t.md`: Plan đêm 4.
+
+## 2026-11-09 — FA-UI-5: mục hướng dẫn sử dụng "Xếp theo loại CLB và huy chương" (đêm 3, chỉ tài liệu)
+
+- `HUONG_DAN_SU_DUNG.md` §15 (mới) + mục lục: bật ở bước luật (cần điểm quyết tâm), bốn cột mới của Sổ nhập và trang Giữ chỗ, bước huy chương, cột Lý do và `ket_qua_ly_do.csv`, `bang_nhu_cau.csv`.
+- Test mới (trong tệp cũ): `tests/test_fa_m6_tai_lieu.py` `test_fa_ui_5_huong_dan_su_dung_co_muc_xep_theo_loai_clb`.
+
+## 2026-11-09 — FA-UI-4: câu lý do ở thẻ kết quả và hai nút xuất (đêm 3)
+
+- `api_xuat.py`: `get_ly_do_ket_qua` (mới: câu giải thích của lần chạy mới nhất theo học sinh và buổi; FA tắt thì `fa_bat` false); `_doc_ly_do_moi_nhat` và `_cau_cua_dong` dùng chung với `_export_ly_do_da_khoa` (cùng kết quả như trước).
+- `index.html`, `js/03_ket_qua.js` (`veCotLyDo`): cột "Lý do" và nút `#btnXuatLyDo` (`export_ly_do_csv`), `#btnXuatNhuCau` (`export_bang_nhu_cau`) chỉ khi FA bật; tắt thì không cột, nút ẩn. `i18n.js`: chữ vi + en.
+- Test mới: `tests/test_giao_dien_fa_ket_qua.py` (3 ca Chromium). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 221 tệp test.
+
+## 2026-11-09 — FA-UI-3: bước "Huy chương" ở màn nhập tại chỗ (đêm 3)
+
+- `api_quan_ly.py`: `get_student_entry_state` thêm khoá `huy_chuong` khi FA bật (`_trang_thai_huy_chuong`: huy chương đã lưu, loại và buổi của từng CLB trong nguyện vọng, khoá). Tắt: phản hồi như cũ.
+- `index.html`, `js/04_nhap_tai_cho.js` (`renderHuyChuongStep`, `hcDoi`, `hcCapNhatNhac`, `hcThuThap`): FA bật thì bước 3 là ba ô vàng / bạc / đồng mỗi ngày thay cho điểm quyết tâm; điền sẵn theo thứ tự nguyện vọng, bỏ CLB Tự do (D2, chỉ ở lớp đăng ký); chọn CLB đang có huy chương khác thì đổi chỗ (đủ 6 cách đặt); câu nhắc V§6.1 khi vàng ở CLB Tuyển chọn; lưu qua `submit_huy_chuong`, lỗi server hiện ra. `i18n.js`: chữ vi + en.
+- Test mới: `tests/test_giao_dien_fa_huy_chuong.py` (5 ca Chromium). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 220 tệp test.
+
+## 2026-11-09 — FA-UI-2: cột FA trong bảng CLB ở thẻ Quản lý (đêm 3)
+
+- `api_quan_ly.py` (`list_clubs_admin`): khi FA bật, mỗi CLB thêm `loai`, `diem_san`, `so_toi_thieu`, `suc_chua_phong`, `n_giu_cho`; tắt thì phản hồi như cũ.
+- `js/05_quan_ly.js` (`veCotFaBangClb`, `oFaClb`): năm cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, Giữ chỗ chỉ khi có dữ liệu FA; tắt thì không thêm phần tử nào. `i18n.js`: `th_fa_*`, `fa_loai_*` (vi + en).
+- Test mới: `tests/test_giao_dien_fa_quan_ly.py` (3 ca Chromium). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 219 tệp test.
+
+## 2026-11-09 — FA-UI-1: công tắc "Xếp theo loại CLB và huy chương" khi tạo không gian làm việc (đêm 3)
+
+- `js/075_workspace.js`: bước luật có ô `#wzFaDaa` (tắt sẵn, lấy theo mẫu), hàng xem lại `#rvFaDaa`; chỉ gửi `rules.fa_daa: true` khi bật (tắt: cấu hình gửi đi như cũ); bật mà tắt điểm quyết tâm thì backend từ chối bằng lỗi sẵn có `ws_du_lieu_sai`, hiện trên màn hình. `wsApDungCauHinh` đặt `FA_BAT` (khai báo ở `js/05_quan_ly.js`) cho các màn FA sau.
+- `i18n.js`: `ws_r_fa_daa`, `ws_r_fa_daa_ngan`, `ws_r_fa_daa_ghi_chu` (vi + en). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 218 tệp test.
+- Test mới: `tests/test_giao_dien_fa_cai_dat.py` (5 ca Chromium, đều chạy thật).
+
+## 2026-11-09 — FA-S10: sửa dòng đường B trong bảng D8 (đêm 3, chỉ tài liệu)
+
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §4: đường B ghi "huy chương theo thứ tự + câu vàng và câu đổi bạc/đồng (đủ 6 cách đặt)" thay cho "không đổi được". Không đổi mã.
+
+## 2026-11-09 — FA-S11: ghép email với mã học sinh cho list KetQua (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`): ghi thêm `EMAIL_MA_HS.csv` (Email, student_id; dữ liệu cá nhân, chỉ trên máy IT).
+- `mau_forms_thi_clb/ghep_ket_qua_email.py` (mới): `ket_qua_ly_do.csv` + `EMAIL_MA_HS.csv` -> `KETQUA_NHAP_LIST.csv` với các cột list `KetQua`; em thiếu email: cảnh báo, dòng vẫn ghi, Email rỗng.
+- `docs/he_sinh_thai/FA_SAU_XEP.md` §2: cách ghép mới, cột `Email` "Lấy từ". `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 217 tệp test.
+- Test mới: `tests/test_fa_s11_ghep_email.py` (4 ca).
+
+## 2026-11-09 — FA-S6: bộ sinh biểu mẫu đăng ký đọc Loại CLB từ Sổ nhập CLB (đêm 3, TH)
+
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--fa-daa --so-nhap-clb <Sổ nhập CLB của FA-M1>` đọc Loại bằng `chuyen_forms_sang_phan_mem.doc_clb_fa` (`de_theo_so_nhap_clb`); CLB Tự do không có trong câu vàng; hướng dẫn ghi Loại lấy từ sổ. `--so-nhap-clb` chỉ dùng cùng `--fa-daa`. Không có cờ: tệp sinh ra giống hệt từng byte (đã so `diff -r` trước/sau).
+- Test mới (trong tệp cũ): `tests/test_fa_m2_forms_dang_ky.py` `test_fa_s6_so_nhap_clb_bo_clb_tu_do_khoi_cau_vang`, `test_fa_s6_so_nhap_clb_chi_dung_cung_fa_daa`.
+
+## 2026-11-09 — FA-S4: báo khi không đọc được giờ làm bài (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`_thoi_gian_lam_bai`): nhận ô `datetime` và chữ ISO; trả thêm số phiếu không đọc được (không đoán thứ tự ngày/tháng). `chuyen_fa_daa` thêm MỘT cảnh báo mỗi tệp kèm số phiếu đó.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` `test_fa_s4_thoi_gian_iso_va_datetime_doc_duoc_dang_khac_dem_loi`, `test_fa_s4_mot_canh_bao_moi_tep_kem_so_phieu`.
+
+## 2026-11-09 — FA-S2: bỏ câu theo từng đề (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `bo_cau` khoá `(CLB, đề, số câu)`; CLI `--bo-cau CLB-DE-SO` (ví dụ `C3-B-4`, hàm `_doc_bo_cau`); dạng cũ `CLB-SO` chỉ nhận khi CLB có một đề, nếu không là lỗi nêu các đề (`_chuan_bo_cau`). Bỏ câu 4 đề B không đổi điểm đề A.
+- `mau_forms_thi_clb/tao_mau_forms.py`: dòng hướng dẫn `--bo-cau` trong `CAI_DAT_FORMS_BIEN_THE.md` (chỉ chế độ `--bien-the`).
+- `tests/test_fa_m4_phan_tich.py`: 3 ca mới `test_fa_s2_*`; ca cũ `test_bo_cau_cham_lai_cho_moi_hoc_sinh` dùng dạng mới (CLB có hai đề).
+
+## 2026-11-09 — FA-S5: cảnh báo khi em làm sai đề được giao (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (`chuyen_fa_daa`, khi có `--bien-the-tep`): bài làm đề khác đề giao (`chon_bien_the`, hoặc `chon_bien_the_thi_lai` với bài thi lại hợp lệ) -> một cảnh báo nêu email, CLB, đề đã làm và đề giao; vẫn giữ điểm.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` `test_fa_s5_lam_sai_de_duoc_giao_thi_canh_bao_giu_diem`; thêm một dòng kiểm vào ca thi lại FA-S1.
+
+## 2026-11-09 — FA-S1: bài thi lại chỉ tính khi lần đầu bị gắn cờ và đúng đề thi lại (đêm 3, TH)
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: `--fa-daa` giữ mọi bài của một CLB rồi `_tach_lan_dau` chọn "bài lần đầu" theo đề giao (`chon_bien_the`), không theo thứ tự tệp; trung vị D9 chỉ trên bài lần đầu; bài lần hai thay bài lần đầu CHỈ khi lần đầu bị cờ quá nhanh và bài lần hai là đề `chon_bien_the_thi_lai`; mọi bài lần hai khác: không tính + cảnh báo. Chế độ mặc định (không `--fa-daa`) giữ "giữ bài đầu", đường mã không đổi.
+- Test mới (trong tệp cũ): `tests/test_fa_m4_phan_tich.py` 3 ca `test_fa_s1_*` (thi lại hợp lệ, lần hai không cờ bị bỏ, đảo thứ tự tệp cho cùng kết quả).
+
+## 2026-11-09 — FA-S3: cân bằng đề không dịch điểm khi một phía có ít bài (đêm 3, TH)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py` (`so_sanh_bien_the`): `N_NHO` (chỉ báo, không dịch) khi đề này HOẶC phần còn lại có ít hơn `N_TOI_THIEU` bài.
+- `tests/test_fa_m4_phan_tich.py`: ca mới `test_fa_s3_mot_phia_nho_thi_khong_dich_ca_hai_de`; ca cũ `test_d11_de_it_hon_5_em_chi_bao_khong_bao_gio_chinh` đổi kỳ vọng của đề A sang `N_NHO` (đúng theo spec §6.2).
+
+## 2026-11-09 — FA-S7, FA-S9: xuất lý do chỉ của lần chạy mới nhất; test rollback bảng FA (đêm 3)
+
+- `api_xuat.py` (`_export_ly_do_da_khoa`): lấy lần chạy mới nhất trong `run_history`; lần đó không có lý do FA thì trả `fa_chua_co_ly_do` (không xuất lý do của lần FA cũ hơn).
+- FA-S9 (chỉ test): lỗi ném sau lần ghi FA cuối -> `fa_nhom`, `fa_ly_do`, `match_results`, `run_history` giữ nguyên.
+- Test mới (trong tệp cũ): `tests/test_fa_ly_do.py` `test_fa_s7_xuat_ly_do_chi_lay_lan_chay_moi_nhat`, `test_fa_s9_chay_hong_sau_khi_ghi_fa_rollback_ca_hai_bang`.
+
+## 2026-11-09 — FA-S8: nhập CSV CLB khi FA tắt giữ nguyên dòng (đêm 3)
+
+- `api_nhap.py` (`import_clubs_csv`): FA tắt thì không đọc cột FA nữa (ô loại sai không còn làm bỏ dòng); dòng vẫn được tạo, một cảnh báo `fa_cot_bo_qua`. FA bật: như cũ.
+- Test mới (trong tệp cũ): `tests/test_fa_du_lieu.py` `test_fa_s8_csv_fa_tat_bo_cot_fa_giu_dong`, `test_fa_s8_csv_fa_bat_giu_hanh_vi_cu`.
+
+## 2026-11-09 — FA-SOAT2: soát đêm 2 và mở đêm 3 (chỉ tài liệu, chưa sửa lỗi)
+
+- `docs/phien/bao_cao_dem/2026-11-09_soat_dem2.md`: kết luận GO; danh sách sửa FA-S1..FA-S11 (6 lỗi mới của bộ chuyển đổi / bộ sinh, 4 phát hiện còn mở của soát đêm 1, 1 chỗ hở email ↔ mã học sinh). Theo yêu cầu của Truong: chưa sửa.
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md` §6: spec đêm 3 (sửa lỗi rồi FA-UI-1..5). `docs/phien/CHAY_DEM_FA_DAA.md`: giao thức đêm 3. `docs/phien/claude__keen-ride-72sa7t.md`: Plan đêm 3.
+
+## 2026-11-09 — FA-M6: Tài liệu sau khi xếp (kết quả, phản hồi, khiếu nại, nhắc hạn, điểm danh) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `docs/he_sinh_thai/FA_SAU_XEP.md` (mới, chỉ tài liệu): `ket_qua_ly_do.csv` -> list `KetQua` (cách C; IT ghép email), màn kết quả và ba nút phản hồi -> list `PhanHoi`, Forms khiếu nại (3 ngày, chỉ lỗi dữ liệu, chạy lại cùng seed) và khảo sát tuần 3, flow nhắc (mở cổng, -2 ngày, -3 giờ, NOT_ATTEMPTED hai lần, dưới 50 % sau 3 ngày -> GVCN), phép tính hạn mức 6.000 (mỗi em một thư chạm hạn mức; gửi lô Bcc 50 người ≈ 225 yêu cầu), list `DiemDanh` với cột tính `GiaiPhong`, xuất danh sách chờ; bảng kiểm K1..K14 (TH). Không nói đường nào nên chọn (D8 mở).
+- Test mới: `tests/test_fa_m6_tai_lieu.py` (6 ca: cột CSV khớp mã xuất `api_xuat.py`, đủ tên list/biểu mẫu/flow, phép tính, nhãn TH, không dữ liệu thật). Không đổi mã.
+
+## 2026-11-09 — FA-M5: Đặc tả Power Apps v2 (đường A) và cột list FA-DAA (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `T4M_DAC_TA_SUA_APP.md` §12 (mới): màn đăng ký v2 (xáo `Shuffle()`, ▲▼, tự lưu `Patch` DRAFT, tối thiểu 3, cảnh báo thiếu CLB Tự do, nhãn thẻ, Nộp SUBMITTED, ước tính số yêu cầu so với 6.000) và widget huy chương (mặc định theo thứ tự, tự cập nhật khi chưa chỉnh tay, hoán đổi, vàng vào Tuyển chọn có nhắc); yêu cầu R39 đến R54, tất cả TH; không nói đường nào nên chọn (D8 mở).
+- `bo_dung_t4m`: `cot_lists.ECA_FA` / `TAT_CA_FA` (`WP1..WP7` = huy chương, `HC_TuChinh`, `TrangThai` DRAFT/SUBMITTED/Đã khóa, không `THIk`); `site_script`, `mau_csv`, `sinh_bk1`, `tao_bo_dung_t4m.py --fa-daa` (+ `00_FA_DAA_GHI_CHU.md`). Không cờ: bộ dựng cho ra đúng như trước (`diff -r` giống hệt).
+- `tests/test_t4m_bo_dung_bk34.py`: test "nhắc mọi R1 đến R38" chỉ đếm R1..R38 (R39 trở đi thuộc bộ FA).
+- Test mới: `tests/test_fa_m5_bo_dung.py` (10 ca). Công thức Power Fx `02_app/` chưa viết lại cho màn FA.
+
+## 2026-11-09 — FA-M4: Đề biến thể, phân tích câu hỏi và cân bằng điểm giữa các đề (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `chon_bien_the` (crc32(email) % n), `kiem_bien_the`, `phan_tich_cau` (V§7.5: % đúng, độ phân biệt 1/3 trên - 1/3 dưới, cờ PHAN_BIET_AM / QUA_DE / QUA_KHO), `so_sanh_bien_the` (D11: ngưỡng z·√(s²/n+s²/n), z = 1,96 hoặc 2,39; n < 5 chỉ báo; vượt ngưỡng thì dịch về trung bình chung; làm tròn nửa lên, kẹp 0-10), lệnh `chia` (Email -> đề giao, đề thi lại).
+- `tao_mau_forms.py --bien-the`: mỗi CLB có `de_thi_bien_the` (đề B, C trong de_thi.json) sinh một biểu mẫu cho từng đề + `CAI_DAT_FORMS_BIEN_THE.md` (time limit BẬT, xáo câu và lựa chọn BẬT). Lệch so với bảng việc: phần hướng dẫn nằm ở tệp riêng này, không chèn vào `CAI_DAT_FORMS_CHI_THI.md`, để chế độ `--chi-thi` vẫn giống hệt từng byte khi không có cờ.
+- `chuyen_forms_sang_phan_mem.py --fa-daa`: `--bien-the-tep`, `--ap-dung-dieu-chinh`, `--giu-diem-goc`, `--bo-cau`; có chênh lệch ngoài ngưỡng thì ghi `DIEU_CHINH_BAN_DE.xlsx` rồi dừng (mã thoát 3) tới khi admin chọn một cờ; luôn ghi `PHAN_TICH_CAU_HOI.xlsx`.
+- Không cờ: `--chi-thi`, `--moi-clb` (sinh tệp) và chế độ mặc định của bộ chuyển đổi cho ra đúng như trước (so bằng `diff -r` và so nội dung ô).
+- Test mới: `tests/test_fa_m4_phan_tich.py` (24 ca).
+
+## 2026-11-09 — FA-M3: Bộ chuyển đổi chế độ FA-DAA (đường A và đường B) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx (--dang-ky FORMS... | --lists LIST.csv) [bài thi...]`: Loại CLB, chỉ tiêu, điểm sàn, giữ chỗ lấy từ Sổ nhập CLB của FA-M1; đường B đọc biểu mẫu FA-M2 và nối `dat_huy_chuong_duong_b` (không đổi hành vi, 19 test cũ xanh); đường A (`doc_lists(fa=True)`) bỏ dòng DRAFT (trừ `--nhan-ban-nhap`), lấy lần lưu cuối, điền huy chương mặc định khi ô trống và HC_TuChinh không đặt; bỏ nguyện vọng trùng và báo; điểm thi quy về nguyên 0-10 (D7, tính bằng phân số); em xếp CLB Tuyển chọn mà chưa thi -> cảnh báo NOT_ATTEMPTED; làm bài dưới 1/3 trung vị -> cờ (D9, chỉ báo); soát huy chương bằng `fa_daa.kiem_ho_so_huy_chuong`; không soát hai quỹ 100 điểm cũ.
+- Không cờ: `doc_lists`, `phan_tich_chi_thi`, `ghi_tep_phan_mem` giữ hành vi cũ (nội dung ô SO_NHAP_CLB.xlsx và BANG_DIEM.xlsx của một lần chạy mặc định giống hệt trước thay đổi).
+- Test mới: `tests/test_fa_m3_chuyen.py` (25 ca). Chưa thử trên Forms/Lists thật (TH).
+
+## 2026-11-09 — FA-M2: Biểu mẫu đăng ký đường B (--fa-daa) (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `bieu_mau.cac_phan_fa`, `tao_mau_forms.py --fa-daa`: mỗi ngày một biểu mẫu đăng ký (không câu Ranking; `[<buổi>-nv1..3]` bắt buộc, `[<buổi>-vang]` và `[<buổi>-doi]` tuỳ chọn, có đáp án \"giữ mặc định\" vì Forms không bỏ chọn được), `NHAP_FORMS_DANG_KY_<buổi>.docx` và `CAI_DAT_FORMS_DANG_KY.md` (một dòng mô tả V§5.1, cài đặt, giới hạn đường B). Không nói đường nào được khuyên dùng (D8 còn mở).
+- Không cờ: `--chi-thi` và `--moi-clb` sinh ra tệp giống hệt từng byte so với trước thay đổi (so bằng `diff -r`). `ghi_docx_chi_thi` thêm hai tham số tuỳ chọn.
+- Test mới: `tests/test_fa_m2_forms_dang_ky.py` (10 ca).
+
+## 2026-11-09 — FA-M1: Phiếu thiết lập CLB trên Forms và bộ chuyển đổi (đêm 2, TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/chuyen_phieu_clb.py`: Excel xuất từ Phiếu thiết lập CLB -> `SO_NHAP_CLB.xlsx` (cột Loại, Điểm sàn, Tối thiểu, Sức chứa phòng, sheet Giữ chỗ) + `BAO_CAO_PHIEU_CLB.md`; phân loại V§4.1, nộp nhiều lần lấy phiếu cuối, CLB chưa nộp phiếu -> Giới hạn với chỉ tiêu kỳ trước (`--ky-truoc`), kiểm trước bằng `fa_daa.kiem_truoc_fa`.
+- `PHIEU_THIET_LAP_CLB.md`: hướng dẫn dựng Forms bằng tay (Forms không có API tạo biểu mẫu).
+- Test mới: `tests/test_fa_m1_phieu_clb.py` (17 ca). Không đổi mã kiosk, lược đồ hay CSV.
+
+## 2026-11-09 — FA-SOAT: Opus soát đêm 1 (mục cha A13)
+
+- `tests/test_van_phong_tu_nhien.py`: thêm `DAA` vào `VIET_TAT` (tên chế độ FA-DAA là chữ viết tắt, như `DA`, `RB`). Bốn thông báo lỗi mới của đêm 1 (`fa_cot_bo_qua`, `fa_giu_cho_bo_qua`, `fa_chua_bat`, `fa_chua_co_ly_do`) làm test này đỏ; đêm 1 không chạy lại nó sau khi thêm mã lỗi.
+- Báo cáo soát: `docs/phien/bao_cao_dem/2026-11-09_soat_dem1.md`. Không có test mới.
+
+## 2026-11-09 — FA-4 đến FA-8: chạy FA-DAA, đóng CLB thiếu người, lý do, bảng nhu cầu, tính chất V§13 (mục cha A13, A5, A6, C3, Z6)
+
+(Bốn mục dùng chung `fa_daa.py`, `api.py`, `i18n_errors.py` nên đi cùng một commit.)
+
+- **FA-4** `fa_daa.chay_fa_daa`: CLB Tự do không giới hạn trong bộ nhớ; lọc Tuyển chọn theo điểm sàn (`NOT_ATTEMPTED` / `BELOW_PASS`); bỏ điểm thi ở CLB Giới hạn; giữ chỗ bằng suất dự trữ mềm; phương án dự phòng (CLB Tự do ít người nhất, theo thứ tự STB của buổi); chia nhóm phòng (`fa_nhom`, chỉ thêm). Lõi `run_rbda_nhieu_buoi` không đổi; `api.py` gọi lớp bọc khi FA bật và chạy hai chốt (sanity, ổn định) trên đầu vào đã chuẩn bị, không ghi danh sách tăng cường vào `preferences`.
+- **FA-5** đóng CLB thiếu người: mỗi vòng một CLB (thiếu nhiều nhất trước; hoà: ít người hơn, rồi mã), chạy lại cùng STB; `dong_cua`, `CLUB_CLOSED`, cảnh báo `fa_clb_dong_thieu_nguoi` (nói rõ là xấp xỉ).
+- **FA-6** `ly_do_ket_qua` (RESERVED / SCORE / MEDAL / LOTTERY / BELOW_PASS / NOT_ATTEMPTED / CLUB_CLOSED, điểm chuẩn, danh sách chờ theo D4, lỗi ổn định thì ném ValueError); bảng `fa_ly_do` (chỉ thêm); `fa_ly_do.py` (mẫu câu V§9.1, không có mã học sinh khác, không hứa ưu tiên bù); `export_ly_do_csv` → `ket_qua_ly_do.csv`.
+- **FA-7** `bang_nhu_cau`, `export_bang_nhu_cau` (không có mã hay tên học sinh), `kiem_chi_tang` và `mau_forms_thi_clb/so_sanh_suc_chua.py` (từ chối giảm chỉ tiêu và đổi loại).
+- **FA-8** `tests/test_fa_tinh_chat.py`: 200 bộ nhỏ ngẫu nhiên cho V§13.1-13.9, 13.11 (13.12 bỏ qua có lý do: D1 hoãn).
+- Tệp mới: `fa_ly_do.py`, `mau_forms_thi_clb/so_sanh_suc_chua.py`. Bảng mới `fa_nhom`, `fa_ly_do` (CREATE TABLE IF NOT EXISTS, không đổi bảng cũ). Test mới: `tests/test_fa_chay.py`, `test_fa_toi_thieu.py`, `test_fa_ly_do.py`, `test_fa_nhu_cau.py`, `test_fa_tinh_chat.py`. `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 210 tệp test, hàng mới cho `fa_daa.py` / `fa_ly_do.py`.
+
+## 2026-11-09 — FA-3: huy chương một quỹ (mục cha A13)
+
+- `fa_daa.py`: `kiem_ho_so_huy_chuong` (giá trị 60 / 30 / 10 đúng kiểu số nguyên, mỗi giá trị một lần mỗi buổi, mỗi CLB một huy chương, CLB trong nguyện vọng và không phải Tự do; ít hơn 3 huy chương hợp lệ), `diem_huy_chuong_hieu_luc` (một quỹ, bỏ qua `tier`, không đọc thứ hạng nguyện vọng).
+- `api_quan_ly.py`: `submit_huy_chuong(student_id, huy_chuong)` (kiểm ở server, thay toàn bộ huy chương cũ của em, ghi `wharton_bids` + `wharton_nhat_ky`, tôn trọng khoá điểm). `api.py`: khi FA bật, hồ sơ huy chương được kiểm thay hồ sơ 100 điểm (chặn chạy, báo cáo sức khoẻ) và huy chương làm `diem_wharton` của lần chạy.
+- `i18n_errors.py` (+ `i18n_loi.js`): 5 mã mới. `tests/test_fa_huy_chuong.py` (mới, 20 ca); `tests/test_ws_nhan.py`; `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 205 tệp test.
+
+## 2026-11-09 — FA-2: kiểm trước khi chạy FA-DAA (mục cha A5)
+
+- `fa_daa.py`: `kiem_truoc_fa` (mỗi buổi có CLB Tự do; mọi CLB có loại; Giới hạn / Tuyển chọn có chỉ tiêu; Tuyển chọn có điểm sàn; giữ chỗ không vượt chỉ tiêu; giữ chỗ cho học sinh lạ / em không xếp CLB đó chỉ là cảnh báo và không được tính), `giu_cho_hop_le`, `chi_loi_chan`, `doc_du_lieu_fa`, `kiem_fa_tu_csdl`.
+- `api.py`: bước kiểm dữ liệu của `_run_pipeline_da_khoa` và `get_data_health_report` gọi kiểm FA khi `fa_daa` bật (lỗi chặn dừng trước khi bốc hay khoá số, không ghi gì); hồ sơ 100 điểm của Wharton không áp khi FA bật.
+- `so_nhap.py`: kiểu CLB và `kiem_thuoc_tinh` chuyển vào đây (skill đóng gói của so_nhap chạy một mình); `fa_daa.py` nhập lại.
+- `i18n_errors.py` (+ `i18n_loi.js`): 7 mã `fa_*` mới. `tests/test_fa_kiem_truoc.py` (mới, 15 ca); `tests/test_ws_nhan.py`: thêm mã vào danh sách mã mới; `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 204 tệp test.
+
+## 2026-11-09 — FA-1: mô hình dữ liệu FA-DAA (mục cha A13)
+
+- Luật `rules.fa_daa` (mặc định TẮT; bật cần `wharton`): `cau_hinh_ws.py`, `rbda_priority_pipeline.py` (`dung_fa_daa`, khoá bỏ khỏi `run_history.luat_xep` và dấu vân tay khi tắt; khi bật, dấu vân tay gồm kiểu CLB + giữ chỗ).
+- `clubs` thêm bốn cột `loai`, `diem_san`, `so_toi_thieu`, `suc_chua_phong` (`di_tru_schema` idempotent, sao lưu trước); bảng mới `giu_cho(club_id, student_id)`; xoá CLB / học sinh / dữ liệu dọn cả `giu_cho`.
+- Sổ nhập: cột CLB tuỳ chọn Loại / Điểm sàn / Tối thiểu / Sức chứa phòng và sheet tuỳ chọn "Giữ chỗ" (đọc, ghi, nạp); CSV CLB nhận bốn cột cùng tên khoá. Không có cột thì giống từng byte như cũ; FA tắt thì bỏ qua kèm cảnh báo `fa_cot_bo_qua` / `fa_giu_cho_bo_qua`. Mã lỗi mới trong `i18n_errors.py` (đã chạy `tao_i18n_js.py`).
+- Module mới `fa_daa.py` (kiểu CLB, `kiem_thuoc_tinh`, ghi thuộc tính, `thay_giu_cho`).
+- `tests/test_fa_du_lieu.py` (mới, viết trước); `tests/test_rang_buoc_csdl.py`: hàm trợ giúp `_ha_cap` chọn đúng cột của lược đồ cũ (bảng `clubs` nay có thêm cột). `docs/ke_hoach/CLAUDE_CHI_TIET.md`: 203 tệp test.
+
+## 2026-11-08 — FA-KH: báo cáo đêm tự đẩy lên GitHub
+
+- `docs/phien/CHAY_DEM_FA_DAA.md` mục E: phiên chạy đêm ghi `docs/phien/bao_cao_dem/<ngày>.md` (tiếng Việt, dễ hiểu), commit, push, kiểm push đã tới GitHub, in link. Không đổi mã.
+
+## 2026-11-08 — FA-M3 (một phần, Truong duyệt): đặt huy chương trên đường B, đủ 6 cách đặt
+
+- `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py`: hàm mới `dat_huy_chuong_duong_b` (mặc định theo thứ tự nguyện vọng, câu tuỳ chọn đặt vàng, câu tuỳ chọn đổi bạc/đồng; giá trị không dùng được thì giữ mặc định và báo). Chưa nối vào luồng chuyển (việc của FA-M3, đêm 2); đầu ra hiện có không đổi.
+- `tests/test_fa_m3_huy_chuong_b.py` (19 ca, viết trước, đỏ rồi xanh; đột biến tắt bước đổi bạc/đồng làm 8 ca đỏ).
+- `CLAUDE.md`: ghi chú ngoại lệ bất biến 2 nay đạt trọn điều kiện "mọi học sinh đổi được". `docs/ke_hoach/FA_DAA_KE_HOACH.md` D12, FA-M2, FA-M3; `docs/ke_hoach/CLAUDE_CHI_TIET.md` 202 tệp test.
+
+## 2026-11-08 — FA-KH (quyết định của Truong): ngoại lệ bất biến 2 cho huy chương mặc định, D11 không chặn
+
+- `CLAUDE.md`: ghi ngoại lệ bất biến 2 (huy chương mặc định theo thứ tự nguyện vọng, chỉ ở tầng đăng ký và chỉ khi học sinh đổi được; lý do: tín hiệu riêng kiểu CADA giữ khai thật thứ tự).
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: D2 (ngoại lệ), D11 (ngưỡng theo cỡ mẫu, tự điều chỉnh theo chênh lệch trung bình, admin xác nhận, không chặn), D12 (đường B thêm câu tuỳ chọn đặt huy chương vàng), FA-UI, FA-M2, FA-M3, FA-M4.
+- `docs/phien/claude__keen-ride-72sa7t.md`: quyết định mới. Không đổi mã; D1 vẫn hoãn.
+
+## 2026-11-08 — FA-KH (sửa sau soát hội đồng): D1, D3, D4, D5, D9, D11, D12, FA-9
+
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: D1 sửa lý do (không phá ổn định; vấn đề là động cơ giữa các kỳ, cần mô phỏng trước kỳ 2); D3 đóng CLB thiếu nhiều nhất trước; D4 danh sách chờ Tuyển chọn điểm → huy chương → bốc thăm, Giới hạn huy chương → bốc thăm, chỉ em xếp CLB đó cao hơn; D5 không làm hạt giống công khai, FA-9 thành biên bản bốc thăm có giáo viên chứng kiến; D9 bật giới hạn thời gian Forms, cờ < 1/3 trung vị; D11 so điểm trung bình giữa các bản đề; D12 đường B không dùng câu Ranking, 3 câu chọn NV1–3, huy chương gán theo thứ tự.
+- `docs/phien/claude__keen-ride-72sa7t.md`, `docs/phien/CHAY_DEM_FA_DAA.md`: cập nhật theo các quyết định trên. Không đổi mã.
+
+## 2026-11-08 — FA-KH: kế hoạch triển khai FA-DAA và tệp chạy đêm (chỉ tài liệu)
+
+- `docs/ke_hoach/FA_DAA_VISION.md`: vision của Truong (chép nguyên văn).
+- `docs/ke_hoach/FA_DAA_KE_HOACH.md`: kế hoạch theo mục FA-0..FA-10, FA-UI, FA-M1..M6; mục cha A13, A5, A6, C3, Z6, A2, T4M-NC; quyết định D1..D10 (D1 ưu tiên bù CHẶN vì bất biến 2).
+- `docs/phien/CHAY_DEM_FA_DAA.md`: tệp duy nhất cho phiên chạy đêm; `docs/phien/claude__keen-ride-72sa7t.md`: bàn giao nhánh.
+- Không đổi mã, schema, hợp đồng CSV; không test mới.
+
 ## 2026-11-06 — T4M-NC: sửa CI đỏ của PR #13 (3 nguyên nhân do nhánh)
 
 - `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`: `docs/ke_hoach/CLAUDE_CHI_TIET.md` bản đồ mã ghi 194 tệp test, thực tế 201; cập nhật 201 tệp, 3.645 ca.
@@ -101,7 +408,7 @@ Không có mã. `docs/he_sinh_thai/T4M_MICROSOFT.md` (mới), ghi rõ "Bản nh�
 Thêm công cụ đo; không đụng mã sản phẩm, schema hay hợp đồng CSV. Mọi số liệu là MÔ PHỎNG; không có nhận xét.
 - `du_lieu_test/do_t4m_thi.py` (mới): 3 bộ giả (120 / 500 / 1.500 học sinh, hạt giống sinh cố định) x 20 hạt giống STB x 2 điều kiện (A không điểm thi, danh sách dự tuyển giữ nguyên; B có điểm thi như `de_thi.json`). Dữ liệu dựng bằng đúng chuỗi T4M (Lists giả → Forms giả → `--chi-thi` → `import_so_nhap`), đọc MỘT lần; mỗi lần chạy gọi `generate_stb_lottery`, `run_rbda_nhieu_buoi` (tham số như `api.run_pipeline`) và `verify_stability_tuan`. Chỉ số: tỉ lệ nguyện vọng 1 / top-3, số em chưa có CLB (tổng và theo buổi), tỉ lệ suất Tầng 1 về nhóm điểm cao nhất, số cặp phá vỡ, thời gian. `--nhanh` (lưới nhỏ cho test; bắt buộc kèm `--ra`, `--tai-lieu`). Cả lưới đủ chạy ~30 giây.
 - `docs/he_sinh_thai/T4M_DO_MO_PHONG.md` (sinh ra): phương pháp, tham số, bảng trung bình / nhỏ nhất / lớn nhất, nhãn MÔ PHỎNG ở mọi tiêu đề bảng, lệnh tái lập. `du_lieu_test/ket_qua_t4m/`: CSV từng lần chạy và theo buổi.
-- Sửa sau soát: bảng 2 ghi 15 CLB có đề thi, đúng là 10 (chỉ sai số đếm; điều kiện B vốn đã Tầng 1 đúng 10 CLB có `de_thi`); bảng 3 trở đi không đổi trừ số giây. Thêm test canh điều này (9 ca).
+- Sửa sau soát: bảng 2 ghi 15 CLB có đề thi, đúng là 10 (chỉ sai số đếm; điều kiện B vốn đã Tầng 1 đúng 10 CLB có `de_thi`); bảng 3 trở đi không đổi trừ số giây. Thêm test canh điều này (10 ca).
 - Test mới (viết trước): `tests/test_do_t4m_thi.py` (8 ca): điều kiện A và B trùng khít từng byte với `PipelineAPI.run_pipeline`; tất định; không cặp phá vỡ; nhãn MÔ PHỎNG và không có mục nhận xét. Thử gây hỏng: bỏ danh sách dự tuyển ở điều kiện A làm kết quả không còn phụ thuộc hạt giống — đã bị bắt.
 
 ## 2026-11-06 — T4M-Q1b-b (bổ sung của điều phối vào T4M-Q1b): `--co-so` cho `--chi-thi`

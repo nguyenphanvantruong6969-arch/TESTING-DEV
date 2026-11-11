@@ -578,7 +578,8 @@ def diem_wharton_hieu_luc(
 # thi, chỉ là luật nhập liệu). Bằng giá trị này = phần mềm trường học cũ. `wharton` (mục A13)
 # mặc định TẮT ở tầng thuật toán (mặc định BẬT là của cau_hinh_ws, A13.13); xem `dung_wharton` và `_luat_de_ghi_hoac_bam`.
 LUAT_XEP_MAC_DINH = {"priority": "score", "tier_mode": "reserve",
-                     "score_scope": "per_slot", "tiers": [], "wharton": False}
+                     "score_scope": "per_slot", "tiers": [], "wharton": False,
+                     "fa_daa": False}
 
 
 def luat_xep_cua(rules) -> dict:
@@ -614,6 +615,21 @@ def dung_wharton(rules) -> bool:
     return bat
 
 
+def dung_fa_daa(rules) -> bool:
+    """Workspace có dùng FA-DAA (mục A13, FA-1) không? Mặc định TẮT.
+
+    Bật được khi `wharton` bật (xem `dung_wharton`, ném ValueError nếu tổ hợp sai): huy chương
+    dùng bảng `wharton_bids`.
+    """
+    luat = luat_xep_cua(rules)
+    bat = luat["fa_daa"]
+    if not isinstance(bat, bool):
+        raise ValueError("rules.fa_daa phai la true hoac false, nhan %r" % (bat,))
+    if bat and not dung_wharton(rules):
+        raise ValueError("rules.fa_daa chi dung duoc khi rules.wharton bat")
+    return bat
+
+
 def _luat_de_ghi_hoac_bam(luat: dict) -> dict:
     """Bản của luật hiệu lực để GHI (`run_history.luat_xep`) hoặc BĂM (dấu vân tay).
 
@@ -621,8 +637,9 @@ def _luat_de_ghi_hoac_bam(luat: dict) -> dict:
     (nhóm xếp cứng, điểm theo người…) phải giữ nguyên từng byte chuỗi đã ghi và dấu vân tay,
     nếu không mọi kết quả cũ của chúng tự báo "đã cũ" chỉ vì có thêm một khoá luôn bằng False.
     """
-    if luat.get("wharton") is False:
-        return {k: v for k, v in luat.items() if k != "wharton"}
+    bo = [k for k in ("wharton", "fa_daa") if luat.get(k) is False]
+    if bo:
+        return {k: v for k, v in luat.items() if k not in bo}
     return luat
 
 
@@ -1795,7 +1812,13 @@ _BANG_RANG_BUOC = {
     reserve_capacity INTEGER NOT NULL DEFAULT 0
         CHECK (reserve_capacity >= 0 AND reserve_capacity <= capacity),
     reserve_group TEXT,         -- nhóm được ưu tiên dự trữ cho club này, NULL = không có dự trữ
-    buoi TEXT                   -- buổi sinh hoạt. NULL = BUOI_MAC_DINH (trường chỉ có một buổi)
+    buoi TEXT,                  -- buổi sinh hoạt. NULL = BUOI_MAC_DINH (trường chỉ có một buổi)
+    -- FA-DAA (FA-1): chỉ có nghĩa khi rules.fa_daa bật; NULL = hành vi cũ. Kiểm giá trị trong mã
+    -- (fa_daa.kiem_thuoc_tinh), không thêm CHECK.
+    loai TEXT,                  -- 'TU_DO' | 'GIOI_HAN' | 'TUYEN_CHON'
+    diem_san INTEGER,           -- điểm sàn 0-10 (TUYEN_CHON)
+    so_toi_thieu INTEGER,       -- số thành viên tối thiểu (FA-5)
+    suc_chua_phong INTEGER      -- sức chứa một phòng (chia nhóm CLB tự do, FA-4)
 """,
     "club_test_selection": """
     student_id TEXT NOT NULL REFERENCES students (student_id),
@@ -1962,6 +1985,45 @@ CREATE TABLE IF NOT EXISTS wharton_nhat_ky (
     student_id TEXT,                -- NULL cho thao tác cả bảng (khoá, mở khoá, xoá tất cả)
     cu_json TEXT,                   -- {"w1": {...}, "w2": {...}} trước thao tác, hoặc NULL
     moi_json TEXT                   -- sau thao tác, hoặc NULL
+);
+
+-- Giữ chỗ (FA-DAA, FA-1): học sinh được giữ chỗ ở CLB. Bảng MỚI hoàn toàn như wharton_bids:
+-- CREATE TABLE IF NOT EXISTS đã đủ cho CSDL cũ, không vào _BANG_RANG_BUOC.
+CREATE TABLE IF NOT EXISTS giu_cho (
+    club_id TEXT NOT NULL REFERENCES clubs (club_id),
+    student_id TEXT NOT NULL REFERENCES students (student_id),
+    PRIMARY KEY (club_id, student_id)
+);
+
+-- Nhóm phòng của CLB Tự do (FA-DAA, FA-4): CHỈ GHI THÊM, như run_history (không khoá ngoại: là dấu vết
+-- của từng lần chạy). CREATE TABLE IF NOT EXISTS đã đủ cho CSDL cũ.
+CREATE TABLE IF NOT EXISTS fa_nhom (
+    run_id INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    group_no INTEGER NOT NULL CHECK (group_no >= 1),
+    PRIMARY KEY (run_id, buoi, student_id)
+);
+
+-- Lý do kết quả của FA-DAA (FA-6): CHỈ GHI THÊM, như run_history; không khoá ngoại (dấu vết từng lần
+-- chạy). `outcome`: ACCEPTED | REJECTED | REMOVED | FALLBACK. `reason`: mã lý do (xem fa_daa.ly_do_ket_qua).
+CREATE TABLE IF NOT EXISTS fa_ly_do (
+    run_id INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    rank_in_list INTEGER,
+    outcome TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    cut_score REAL,
+    cut_medal INTEGER,
+    cut_stb INTEGER,
+    waitlist_pos INTEGER,
+    diem_em REAL,
+    n_hoa INTEGER,
+    k_cho INTEGER,
+    PRIMARY KEY (run_id, buoi, student_id, club_id)
 );
 
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
@@ -2336,7 +2398,47 @@ def di_tru_schema(db_path: str) -> list[str]:
             da_lam.append("rang_buoc")
     except Exception:
         pass
+
+    # FA-1: bốn cột FA của `clubs` (NULL với mọi dòng cũ = hành vi cũ). Chạy SAU bước dựng lại
+    # bảng: khuôn mới đã có sẵn bốn cột, nên CSDL vừa được dựng lại (và đã sao lưu) không bị sao
+    # lưu thêm lần nữa; chỉ CSDL không dựng lại (đã có ràng buộc, hoặc dữ liệu chưa sạch) mới
+    # ALTER, và khi đó sao lưu trước.
+    da_lam.extend(_them_cot_fa_cho_clb(db_path))
     return da_lam
+
+
+def _them_cot_fa_cho_clb(db_path: str) -> list[str]:
+    """ALTER TABLE clubs ADD COLUMN cho bốn cột FA còn thiếu; sao lưu trước. Idempotent."""
+    conn = connect_db(db_path)
+    try:
+        cur = conn.cursor()
+        if not cur.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'clubs'"
+                           ).fetchone():
+            return []
+        thieu = [(c, k) for c, k in (("loai", "TEXT"), ("diem_san", "INTEGER"),
+                                     ("so_toi_thieu", "INTEGER"), ("suc_chua_phong", "INTEGER"))
+                 if not _co_cot(cur, "clubs", c)]
+        if not thieu:
+            return []
+        try:
+            if cur.execute("SELECT 1 FROM clubs LIMIT 1").fetchone() \
+                    or cur.execute("SELECT 1 FROM students LIMIT 1").fetchone():
+                import datetime
+                import sqlite3
+                ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                dich = sqlite3.connect("%s.bak-%s" % (db_path, ts))
+                try:
+                    conn.backup(dich)
+                finally:
+                    dich.close()
+        except Exception:
+            pass        # như sao_luu_truoc_khi_sua: không để lỗi sao lưu chặn mở workspace
+        for c, k in thieu:
+            cur.execute("ALTER TABLE clubs ADD COLUMN %s %s" % (c, k))
+        conn.commit()
+        return ["clubs." + c for c, _ in thieu]
+    finally:
+        conn.close()
 
 
 # Khoá chính của các bảng nối là (student_id, club_id), nên tra theo
@@ -2474,6 +2576,13 @@ def dau_van_tay_du_lieu(cur, rules=None) -> str:
     if dung_wharton(rules):
         cac_phan.append(("wharton", "SELECT student_id, club_id, tier, points FROM wharton_bids "
                                     "ORDER BY student_id, club_id"))
+    # FA-DAA chỉ vào dấu vân tay khi BẬT (kiểu CLB, điểm sàn, tối thiểu, sức chứa phòng, giữ chỗ).
+    if dung_fa_daa(rules):
+        cac_phan.append(("fa_clb", "SELECT club_id, COALESCE(loai, ''), COALESCE(diem_san, -1), "
+                                   "COALESCE(so_toi_thieu, -1), COALESCE(suc_chua_phong, -1) "
+                                   "FROM clubs ORDER BY club_id"))
+        cac_phan.append(("fa_giu_cho", "SELECT club_id, student_id FROM giu_cho "
+                                       "ORDER BY club_id, student_id"))
     for ten, sql in cac_phan:
         h.update(("\x1e" + ten).encode("utf-8"))
         for row in cur.execute(sql):
@@ -2866,6 +2975,7 @@ def seed_sample_data(
     cur = conn.cursor()
     # Con trước, cha sau — khoá ngoại chặn xoá students/clubs khi còn dòng
     # trỏ tới chúng. Cùng thứ tự với `PipelineAPI._RESET_BANG`.
+    cur.execute("DELETE FROM giu_cho")
     cur.execute("DELETE FROM wharton_bids")
     cur.execute("DELETE FROM match_results")
     cur.execute("DELETE FROM club_scores")

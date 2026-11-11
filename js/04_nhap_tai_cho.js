@@ -181,6 +181,7 @@ function loadFallbackTab() {
 
 function boChonHocSinhDuPhong() {
   currentFallbackStudent = null;
+  hcNhacSid = null;
   currentRanking = [];
   daLuuThi = [];
   daLuuNv = [];
@@ -314,6 +315,21 @@ function initFallbackHandlers() {
     });
   });
 
+  el("btnSubmitHuyChuong").addEventListener("click", () => {
+    if (!currentFallbackStudent || !huyChuongState) return;
+    const sid = currentFallbackStudent;
+    khiBan(el("btnSubmitHuyChuong"), () => callApi("submit_huy_chuong", sid, hcThuThap())).then((res) => {
+      if (sid !== currentFallbackStudent) return;
+      if (res.ok) {
+        feedback(el("huyChuongFeedback"), t("feedback_huy_chuong_saved"), false);
+        lamMoiBuoc3(false);
+      } else {
+        /* Server moi la noi quyet dinh: chi bao loi, khong sua lua chon o day. */
+        feedbackErrors(el("huyChuongFeedback"), res.errors);
+      }
+    });
+  });
+
   el("btnClearRanking").addEventListener("click", () => {
     currentRanking = [];
     renderRankingList();
@@ -329,6 +345,8 @@ function initFallbackHandlers() {
        lúc chờ thì CLB đó vẫn là "chưa lưu" (A13.12, soát nhập 2.3). */
     const sid = currentFallbackStudent;
     const chup = currentRanking.slice();
+    const nvTruoc = daLuuNv.slice();                       /* FA-N2: thu tu da luu TRUOC lan luu nay */
+    const hcTruoc = huyChuongState ? huyChuongState.huy_chuong : null;
     const lop = lopKioskDeGui();
     if (lop === undefined) { feedback(el("preferencesFeedback"), t("kiosk_lop_nhac"), true); return; }
     khiBan(el("btnSubmitPreferences"), () => callApi("submit_preferences", sid, chup, lop)).then((res) => {
@@ -338,7 +356,14 @@ function initFallbackHandlers() {
           daLuuNv = chup;
           if (lop !== null) daLuuLop = lop;
           veDauChuaLuu();
-          lamMoiBuoc3(true);          /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+        }
+        /* FA-P2: huy chuong cua em `sid` van luu khi nguoi nhap da sang em khac (chi khong ve lai) */
+        if (hcTruoc && hcTruoc.bat && !hcTruoc.khoa) {
+          hcTheoNguyenVong(sid, nvTruoc, chup, hcTruoc);   /* FA-N2 (V§6.1, D2) */
+        } else if (conMo) {
+          lamMoiBuoc3(true);        /* bo mot CLB khoi nguyen vong la xoa diem Wharton cua no */
+        }
+        if (conMo) {
           feedback(el("preferencesFeedback"), t("feedback_preferences_saved", { n: res.data.n_ranked }), false);
         }
         loadFallbackStudentList(); // cap nhat the "n nguyen vong" trong danh sach
@@ -810,7 +835,8 @@ function renderWhartonStep(state, giu) {
   const w = state && state.wharton;
   clear(body);
   capNhatKhoaNguyenVong(w);
-  if (!w || !w.bat) {
+  /* FA-UI-3: workspace bật xếp theo loại CLB và huy chương -> bước "Huy chương" thay bước này. */
+  if (renderHuyChuongStep(state) || !w || !w.bat) {
     whartonState = null;
     daLuuWharton = "";
     hop.hidden = true;
@@ -833,9 +859,179 @@ function renderWhartonStep(state, giu) {
   hop.hidden = !body.querySelector(".wh-khung");
 }
 
+/* ------------------------------------------------------------------ *
+ * FA-UI-3: BUOC 3 "HUY CHUONG" (vang 60, bac 30, dong 10 moi ngay)
+ * ------------------------------------------------------------------ */
+const HC_DIEM = [60, 30, 10];
+let huyChuongState = null;   // state cua em dang mo khi FA bat; null = FA tat
+
+/* Mac dinh D2 (chi o lop dang ky, em doi duoc): theo thu tu nguyen vong, bo CLB Tu do. */
+function hcMacDinh(dsClb) {
+  const ra = {};
+  dsClb.slice(0, 3).forEach((cid, i) => { ra[HC_DIEM[i]] = cid; });
+  return ra;
+}
+
+/* Ve buoc huy chuong; tra true khi FA bat (da ve), false khi tat (an buoc). */
+function renderHuyChuongStep(state) {
+  const hop = el("fbHuyChuongStep");
+  const body = el("fbHuyChuongBody");
+  const hc = state && state.huy_chuong;
+  clear(body);
+  if (!hc || !hc.bat) {
+    huyChuongState = null;
+    hop.hidden = true;
+    return false;
+  }
+  huyChuongState = state;
+  const ten = (cid) => {
+    const club = currentClubs.find((c) => c.club_id === cid);
+    return club ? club.name : cid;
+  };
+  (hc.ds_buoi || []).forEach((buoi) => {
+    const dsClb = (state.ranked_clubs || []).filter((cid) =>
+      hc.buoi_cua_clb[cid] === buoi && hc.loai_cua_clb[cid] !== "TU_DO");
+    if (!dsClb.length) return;
+    const daLuu = {};
+    dsClb.forEach((cid) => { if (cid in hc.da_luu) daLuu[hc.da_luu[cid]] = cid; });
+    const dat = Object.keys(daLuu).length ? daLuu : hcMacDinh(dsClb);
+    const khung = document.createElement("div");
+    khung.className = "hc-khung";
+    khung.dataset.buoi = buoi;
+    if ((hc.ds_buoi || []).length > 1) {
+      const h = document.createElement("h4");
+      h.textContent = nhanBuoi(buoi);
+      khung.appendChild(h);
+    }
+    HC_DIEM.forEach((diem) => {
+      const nhan = document.createElement("label");
+      nhan.className = "hc-dong";
+      const chu = document.createElement("span");
+      chu.textContent = t("hc_ten_" + diem);
+      const chon = document.createElement("select");
+      chon.className = "hc-chon text-input";
+      chon.dataset.diem = String(diem);
+      chon.dataset.buoi = buoi;
+      chon.disabled = !!hc.khoa;
+      [["", t("hc_khong_dat")], ...dsClb.map((cid) => [cid, ten(cid)])].forEach(([v, txt]) => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = txt;
+        chon.appendChild(o);
+      });
+      chon.value = dat[diem] || "";
+      chon.dataset.cu = chon.value;
+      chon.addEventListener("change", () => hcDoi(khung, chon));
+      nhan.append(chu, chon);
+      khung.appendChild(nhan);
+    });
+    body.appendChild(khung);
+  });
+  el("fbHuyChuongKhoa").hidden = !hc.khoa;
+  el("btnSubmitHuyChuong").disabled = !!hc.khoa;
+  hcCapNhatNhac();
+  hop.hidden = !body.querySelector(".hc-khung");
+  return true;
+}
+
+/* Chon mot CLB dang co huy chuong khac (cung ngay) thi hai huy chuong doi cho. */
+function hcDoi(khung, chon) {
+  const moi = chon.value;
+  if (moi) {
+    khung.querySelectorAll("select.hc-chon").forEach((o) => {
+      if (o !== chon && o.value === moi) {
+        o.value = chon.dataset.cu;
+        o.dataset.cu = o.value;
+      }
+    });
+  }
+  chon.dataset.cu = moi;
+  hcCapNhatNhac();
+}
+
+/* FA-N2 (V§6.1, D2): sau khi LUU nguyen vong, giu huy chuong khop thu tu. Moi ngay:
+   - chua co huy chuong nao da luu (em luoi)            -> luu mac dinh cua thu tu MOI;
+   - huy chuong da luu = mac dinh cua thu tu CU (chua chinh tay) va thu tu doi -> luu mac dinh moi;
+   - da chinh tay va thu tu doi                         -> giu nguyen, hien cau nhac nhe.
+   Chi goi submit_huy_chuong (may chu van kiem moi thu); khong suy dien o may chu. */
+let hcNhacSid = null;   // em dang can cau nhac "da chinh tay"
+
+function hcDanhSachNgay(nv, hc, buoi) {
+  return nv.filter((cid) => hc.buoi_cua_clb[cid] === buoi && hc.loai_cua_clb[cid] !== "TU_DO");
+}
+
+function hcCoDatNhu(daLuu, macDinh, dsClb) {
+  /* daLuu {cid: diem} so voi macDinh {diem: cid}, chi xet cac CLB cua ngay (dsClb). */
+  const a = {};
+  dsClb.forEach((cid) => { if (cid in daLuu) a[cid] = daLuu[cid]; });
+  const b = {};
+  Object.keys(macDinh).forEach((d) => { b[macDinh[d]] = Number(d); });
+  const ka = Object.keys(a).sort();
+  const kb = Object.keys(b).sort();
+  return ka.length === kb.length && ka.every((k, i) => k === kb[i] && a[k] === b[k]);
+}
+
+function hcTheoNguyenVong(sid, nvTruoc, nvMoi, hcTruoc) {
+  /* FA-P2: van tinh va luu cho `sid` khi nguoi nhap da sang em khac; chi ve lai Buoc 3 khi `sid` con mo */
+  const veLai = () => { if (sid === currentFallbackStudent) lamMoiBuoc3(true); };
+  callApi("get_student_entry_state", sid).then((res) => {
+    if (!res.ok) return;
+    const hc = res.data.huy_chuong;
+    if (!hc || !hc.bat || hc.khoa) { veLai(); return; }
+    /* Ban do ngay/loai chi co CLB dang trong nguyen vong: gop ban CU de loc dung ca danh sach cu. */
+    const gop = {
+      buoi_cua_clb: Object.assign({}, hcTruoc.buoi_cua_clb, hc.buoi_cua_clb),
+      loai_cua_clb: Object.assign({}, hcTruoc.loai_cua_clb, hc.loai_cua_clb),
+    };
+    const dsBuoi = Array.from(new Set([...(hcTruoc.ds_buoi || []), ...(hc.ds_buoi || [])]));
+    const moi = Object.assign({}, hc.da_luu);              /* sau khi luu, may chu da bo CLB bi go */
+    let nhac = false;
+    dsBuoi.forEach((buoi) => {
+      const dsMoi = hcDanhSachNgay(nvMoi, gop, buoi);
+      const dsCu = hcDanhSachNgay(nvTruoc, gop, buoi);
+      const daLuuCu = hcTruoc.da_luu || {};
+      const coLuuCu = dsCu.some((cid) => cid in daLuuCu);
+      const doiThuTu = dsMoi.join(",") !== dsCu.join(",");
+      let macDinhMoi = false;
+      if (!coLuuCu) macDinhMoi = dsMoi.length > 0 && !dsMoi.some((cid) => cid in moi);
+      else if (doiThuTu) {
+        if (hcCoDatNhu(daLuuCu, hcMacDinh(dsCu), dsCu)) macDinhMoi = true;
+        else nhac = true;
+      }
+      if (macDinhMoi) {
+        dsMoi.forEach((cid) => { delete moi[cid]; });
+        const md = hcMacDinh(dsMoi);
+        Object.keys(md).forEach((d) => { moi[md[d]] = Number(d); });
+      }
+    });
+    if (nhac) hcNhacSid = sid;
+    else if (hcNhacSid === sid) hcNhacSid = null;           /* khong xoa cau nhac cua em dang mo khac */
+    const doi = JSON.stringify(Object.entries(moi).sort()) !== JSON.stringify(Object.entries(hc.da_luu).sort());
+    if (!doi) { veLai(); return; }
+    callApi("submit_huy_chuong", sid, moi).then(veLai);
+  });
+}
+
+/* V§6.1: vang o CLB Tuyen chon thi nhac huy chuong chi dung khi bang diem va da vuot diem san. */
+function hcCapNhatNhac() {
+  const hc = huyChuongState && huyChuongState.huy_chuong;
+  const co = !!hc && Array.from(document.querySelectorAll('#fbHuyChuongBody select.hc-chon[data-diem="60"]'))
+    .some((o) => o.value && hc.loai_cua_clb[o.value] === "TUYEN_CHON");
+  el("hcNhacTuyenChon").hidden = !co;
+  el("hcNhacDaChinh").hidden = hcNhacSid !== currentFallbackStudent || !currentFallbackStudent;
+}
+
+function hcThuThap() {
+  const ra = {};
+  document.querySelectorAll("#fbHuyChuongBody select.hc-chon").forEach((o) => {
+    if (o.value) ra[o.value] = Number(o.dataset.diem);
+  });
+  return ra;
+}
+
 /* Hoi lai server roi ve lai Buoc 3: sau khi luu Buoc 1 / 2 / 3. `giuGoDo` = giu chu dang go. */
 function lamMoiBuoc3(giuGoDo) {
-  if (!currentFallbackStudent || !whartonState) return;
+  if (!currentFallbackStudent || (!whartonState && !huyChuongState)) return;
   const sid = currentFallbackStudent;
   callApi("get_student_entry_state", sid).then((res) => {
     if (!res.ok || sid !== currentFallbackStudent) return;

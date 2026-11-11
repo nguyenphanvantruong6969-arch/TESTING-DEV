@@ -61,6 +61,15 @@ NHAT_KY = [Cot("ClubId", "ClubId", "Text", (), True, "T2-CLB01"),
 # Thứ tự tạo list cố định (đầu ra phải giống từng byte).
 TAT_CA = {"ECA": ECA, "CLB": CLB, "BaiThi": BAI_THI, "NHAT_KY_DA_LAM": NHAT_KY}
 
+# FA-M5 (TH): list ECA cho FA-DAA đường A (đặc tả `T4M_DAC_TA_SUA_APP.md` §12). Thay hai quỹ điểm quyết tâm bằng huy chương MỘT quỹ:
+# `WPk` = 60 / 30 / 10 hoặc rỗng; `HC_TuChinh` = "Có" khi em tự chỉnh huy chương của ngày đó; `TrangThai` có DRAFT (tự lưu,
+# bộ chuyển đổi bỏ qua) và SUBMITTED. Không còn `THIk` (em xếp CLB Tuyển chọn nào thì phải thi CLB đó; chưa thi = NOT_ATTEMPTED).
+TRANG_THAI_FA = ("DRAFT", "SUBMITTED", "Đã khóa")
+ECA_FA = ([c for c in ECA if c.ten not in {"THI%d" % k for k in range(1, SO_NV + 1)} | {"TrangThai"}]
+          + [Cot("HC_TuChinh", "HC_TuChinh", "Text", (), False, "Có"),
+             Cot("TrangThai", "TrangThai", "Choice", TRANG_THAI_FA, True, "SUBMITTED")])
+TAT_CA_FA = dict(TAT_CA, ECA=ECA_FA)
+
 
 def guid_cot(ten_list, ten_cot):
     """GUID cố định của cột: uuid5(NAMESPACE_URL, "rbda-t4m/<list>/<cột>"). Chạy lại không thêm cột lần hai."""

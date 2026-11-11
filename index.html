@@ -330,6 +330,9 @@
         <div class="search-row">
           <button class="btn btn-primary" id="btnXuatTuyChon" data-i18n="btn_xuat_tuy_chon">Xuất kết quả (Excel)</button>
           <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
+          <button class="btn btn-secondary" id="btnXuatLyDo" type="button" hidden data-i18n="btn_xuat_ly_do">Xuất lý do kết quả (CSV)</button>
+          <button class="btn btn-secondary" id="btnXuatNhuCau" type="button" hidden data-i18n="btn_xuat_nhu_cau">Xuất bảng nhu cầu (CSV)</button>
+          <button class="btn btn-secondary" id="btnXuatBienBan" type="button" hidden data-i18n="btn_xuat_bien_ban">Xuất biên bản bốc thăm (bản in và Excel)</button>
         </div>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
@@ -543,6 +546,8 @@
             <button class="btn btn-secondary" id="btnXuatHsDaChon" disabled data-i18n="btn_xuat_hs_da_chon">Xuất CSV học sinh đã chọn</button>
             <button class="btn btn-ghost" id="btnBoChonHs" disabled data-i18n="btn_bo_chon_hs">Bỏ chọn</button>
           </div>
+          <!-- FA-P3: buoi khong co ly do (lan chay moi nhat cua buoi do khong FA); 03_ket_qua.js dien chu -->
+          <div class="canh-bao-vang" id="lyDoThieuBuoi" role="status" hidden></div>
           <table class="data-table">
             <thead>
               <tr>
@@ -654,6 +659,16 @@
             <button class="btn btn-primary" id="btnSubmitWharton" data-i18n="btn_save_wharton">Lưu điểm quyết tâm</button>
             <span class="chua-luu" id="chuaLuuWharton" hidden data-i18n="fallback_chua_luu">• Chưa lưu</span>
             <span class="save-feedback" role="status" aria-live="polite" id="whartonFeedback"></span>
+          </div>
+          <div class="fallback-step" id="fbHuyChuongStep" hidden>
+            <h3 data-i18n="fallback_step3_hc_title">Bước 3. Huy chương</h3>
+            <p class="hint-text" data-i18n="fallback_step3_hc_hint">Mỗi ngày có ba huy chương vàng, bạc, đồng, đã điền sẵn theo thứ tự nguyện vọng. Chọn CLB khác cho một huy chương thì hai huy chương đổi chỗ. CLB Tự do không nhận huy chương.</p>
+            <p class="wh-khoa-ghi-chu" id="fbHuyChuongKhoa" role="status" hidden data-i18n="hc_da_khoa_kiosk">Huy chương đang khoá vì đã chạy xếp. Nhờ người quản lý mở khoá ở thẻ Quản lý nếu cần sửa.</p>
+            <div id="fbHuyChuongBody"></div>
+            <p class="hint-text" id="hcNhacTuyenChon" hidden data-i18n="hc_nhac_tuyen_chon">Huy chương ở CLB Tuyển chọn chỉ được tính khi bằng điểm, và chỉ khi đã vượt điểm sàn.</p>
+            <p class="hint-text" id="hcNhacDaChinh" role="status" hidden data-i18n="hc_nhac_da_chinh">Huy chương đã được chỉnh bằng tay nên được giữ nguyên. Xem lại cho hợp với thứ tự mới nếu cần.</p>
+            <button class="btn btn-primary" id="btnSubmitHuyChuong" data-i18n="btn_save_huy_chuong">Lưu huy chương</button>
+            <span class="save-feedback" role="status" aria-live="polite" id="huyChuongFeedback"></span>
           </div>
         </div>
       </div>

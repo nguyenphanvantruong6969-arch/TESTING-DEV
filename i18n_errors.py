@@ -582,6 +582,130 @@ MESSAGES = {
         "vi": "{student_id}: có điểm quyết tâm ở cột {cot} nhưng ô nguyện vọng cạnh đó để trống. Điểm này chưa được lưu.",
         "en": "{student_id}: there are commitment points in column {cot} but the preference cell next to it is empty. Those points weren't saved.",
     },
+    # --- FA-DAA (FA-1): thuộc tính CLB, giữ chỗ ---
+    "fa_loai_sai": {
+        "vi": "Loại CLB \"{loai}\" không hợp lệ. Chỉ nhận Tự do, Giới hạn hoặc Tuyển chọn.",
+        "en": "Club type \"{loai}\" isn't valid. Use Free, Limited or Selective.",
+    },
+    "fa_diem_san_sai": {
+        "vi": "Điểm sàn \"{diem_san}\" không hợp lệ: phải là số nguyên từ 0 đến 10.",
+        "en": "Pass mark \"{diem_san}\" isn't valid: it must be a whole number from 0 to 10.",
+    },
+    "fa_toi_thieu_sai": {
+        "vi": "Số thành viên tối thiểu \"{so_toi_thieu}\" không hợp lệ: phải là số nguyên từ 0 trở lên.",
+        "en": "Minimum members \"{so_toi_thieu}\" isn't valid: it must be a whole number, 0 or more.",
+    },
+    "fa_suc_chua_phong_sai": {
+        "vi": "Sức chứa phòng \"{suc_chua_phong}\" không hợp lệ: phải là số nguyên lớn hơn 0.",
+        "en": "Room capacity \"{suc_chua_phong}\" isn't valid: it must be a whole number above 0.",
+    },
+    "so_nhap_fa_loai_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Loại \"{gia_tri}\" không hợp lệ. Chỉ nhận Tự do, Giới hạn hoặc Tuyển chọn.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): type \"{gia_tri}\" isn't valid. Use Free, Limited or Selective.",
+    },
+    "so_nhap_fa_diem_san_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Điểm sàn \"{gia_tri}\" phải là số nguyên từ 0 đến 10.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): pass mark \"{gia_tri}\" must be a whole number from 0 to 10.",
+    },
+    "so_nhap_fa_toi_thieu_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Tối thiểu \"{gia_tri}\" phải là số nguyên từ 0 trở lên.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): minimum \"{gia_tri}\" must be a whole number, 0 or more.",
+    },
+    "so_nhap_fa_suc_chua_phong_sai": {
+        "vi": "Sheet \"{sheet}\", dòng {dong} ({ten}): Sức chứa phòng \"{gia_tri}\" phải là số nguyên lớn hơn 0.",
+        "en": "Sheet \"{sheet}\", row {dong} ({ten}): room capacity \"{gia_tri}\" must be a whole number above 0.",
+    },
+    "csv_club_fa_invalid": {
+        "vi": "Dòng {line} bị bỏ qua vì cột {reason} không hợp lệ (loại CLB, điểm sàn, tối thiểu hoặc sức chứa phòng).",
+        "en": "Line {line} was skipped because column {reason} isn't valid (club type, pass mark, minimum or room capacity).",
+    },
+    "fa_cot_bo_qua": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA: {n} CLB có cột loại / điểm sàn / tối thiểu / sức chứa phòng đã được bỏ qua phần đó, không lưu.",
+        "en": "This workspace doesn't use FA-DAA yet: the type / pass mark / minimum / room capacity columns of {n} club(s) were skipped and not saved.",
+    },
+    "fa_giu_cho_bo_qua": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA: {n} dòng giữ chỗ trong sổ đã được bỏ qua, không lưu.",
+        "en": "This workspace doesn't use FA-DAA yet: {n} reserved-seat row(s) in the file were skipped and not saved.",
+    },
+    "so_nhap_fa_giu_cho_khong_ton_tai": {
+        "vi": "{n} dòng giữ chỗ bị bỏ qua vì CLB hoặc học sinh không có trong phần mềm (ví dụ: {vi_du}).",
+        "en": "{n} reserved-seat row(s) were skipped because the club or student isn't in the app (for example: {vi_du}).",
+    },
+    # --- FA-DAA (FA-2): kiểm trước khi chạy ---
+    "fa_thieu_clb_tu_do": {
+        "vi": "Buổi \"{buoi}\" chưa có CLB loại Tự do. Mỗi buổi cần ít nhất một CLB Tự do để nhận học sinh chưa có chỗ.",
+        "en": "Session \"{buoi}\" has no Free club. Each session needs at least one Free club to take students without a seat.",
+    },
+    "fa_clb_thieu_loai": {
+        "vi": "CLB {club_id} chưa có loại (Tự do, Giới hạn hoặc Tuyển chọn).",
+        "en": "Club {club_id} has no type yet (Free, Limited or Selective).",
+    },
+    "fa_clb_thieu_suc_chua": {
+        "vi": "CLB {club_id} (Giới hạn hoặc Tuyển chọn) cần chỉ tiêu lớn hơn 0.",
+        "en": "Club {club_id} (Limited or Selective) needs a seat count above 0.",
+    },
+    "fa_clb_thieu_diem_san": {
+        "vi": "CLB {club_id} (Tuyển chọn) chưa có điểm sàn.",
+        "en": "Club {club_id} (Selective) has no pass mark yet.",
+    },
+    "fa_giu_cho_vuot_suc_chua": {
+        "vi": "CLB {club_id} giữ chỗ cho {n} học sinh, nhiều hơn chỉ tiêu {suc_chua}.",
+        "en": "Club {club_id} reserves seats for {n} students, more than its {suc_chua} seats.",
+    },
+    "fa_giu_cho_hoc_sinh_la": {
+        "vi": "Giữ chỗ ở CLB {club_id} cho {student_id} bị bỏ qua vì không có học sinh này.",
+        "en": "The reserved seat at club {club_id} for {student_id} was ignored because that student doesn't exist.",
+    },
+    "fa_giu_cho_khong_xep_clb": {
+        "vi": "Giữ chỗ ở CLB {club_id} cho {student_id} bị bỏ qua vì học sinh chưa xếp CLB này trong nguyện vọng.",
+        "en": "The reserved seat at club {club_id} for {student_id} was ignored because the student didn't rank this club.",
+    },
+    # --- FA-DAA (FA-3): huy chương ---
+    "fa_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật chế độ FA-DAA, nên chưa nhận huy chương.",
+        "en": "This workspace doesn't use FA-DAA yet, so medals can't be saved.",
+    },
+    "fa_huy_chuong_gia_tri_sai": {
+        "vi": "{student_id}: huy chương ở CLB {club_id} có giá trị {gia_tri}; chỉ nhận vàng (60), bạc (30) hoặc đồng (10).",
+        "en": "{student_id}: the medal at club {club_id} has value {gia_tri}; only gold (60), silver (30) or bronze (10) are allowed.",
+    },
+    "fa_huy_chuong_trung_gia_tri": {
+        "vi": "{student_id}: buổi {buoi} có hai CLB cùng huy chương {gia_tri}. Mỗi loại huy chương chỉ dùng một lần mỗi buổi.",
+        "en": "{student_id}: session {buoi} has two clubs with the same medal ({gia_tri}). Each medal can be used once per session.",
+    },
+    "fa_huy_chuong_ngoai_nguyen_vong": {
+        "vi": "{student_id}: huy chương đặt ở CLB {club_id} nhưng CLB này không nằm trong nguyện vọng.",
+        "en": "{student_id}: a medal is placed on club {club_id} but that club isn't in the student's choices.",
+    },
+    "fa_huy_chuong_clb_tu_do": {
+        "vi": "{student_id}: CLB {club_id} là CLB Tự do nên không nhận huy chương.",
+        "en": "{student_id}: club {club_id} is a Free club, so it can't take a medal.",
+    },
+    # --- FA-DAA (FA-4): chạy ---
+    "fa_diem_bo_qua": {
+        "vi": "CLB {club_id} (Giới hạn) không xét điểm thi: {n} điểm thi đã được bỏ qua khi xếp.",
+        "en": "Club {club_id} (Limited) doesn't use test scores: {n} score(s) were ignored when allocating.",
+    },
+    "fa_clb_dong_thieu_nguoi": {
+        "vi": "CLB {club_id} (buổi {buoi}) đã đóng vì chỉ có {thanh_vien} thành viên, thiếu {thieu} so với mức tối thiểu. Đóng CLB thiếu người là cách xấp xỉ, không bảo đảm khai thật nguyện vọng là tối ưu.",
+        "en": "Club {club_id} (session {buoi}) was closed because it had only {thanh_vien} members, {thieu} short of its minimum. Closing under-filled clubs is an approximation and doesn't guarantee that ranking truthfully is optimal.",
+    },
+    "bien_ban_chua_boc_tham": {
+        "vi": "Chưa có biên bản bốc thăm vì chưa bốc thăm. Hãy chạy xếp một lần (hạt giống được khoá khi chạy) rồi xuất lại.",
+        "en": "There is no lottery record yet because no draw has happened. Run the allocation once (the draw is locked when it runs) and export again.",
+    },
+    "fa_can_diem_quyet_tam": {
+        "vi": "Chưa bật được xếp theo loại CLB và huy chương vì điểm quyết tâm đang tắt. Huy chương dùng chung bảng điểm quyết tâm: hãy bật điểm quyết tâm (cần ưu tiên theo điểm thi và điểm tính riêng từng CLB) rồi thử lại.",
+        "en": "Club-type and medal mode can't be turned on because determination points are off. Medals use the same points table: turn determination points on (this needs score-based priority and per-club scores) and try again.",
+    },
+    "fa_ly_do_thieu_buoi": {
+        "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",
+        "en": "Session {buoi} has no reasons: its latest run did not use FA-DAA mode.",
+    },
+    "fa_chua_co_ly_do": {
+        "vi": "Chưa có lý do kết quả. Hãy bật chế độ FA-DAA và chạy xếp trước.",
+        "en": "No result reasons yet. Turn on FA-DAA mode and run the allocation first.",
+    },
     "csv_wp_bo_qua": {
         "vi": "Không gian làm việc này chưa bật điểm quyết tâm: {n} ô điểm quyết tâm trong tệp đã được bỏ qua, không lưu.",
         "en": "This workspace doesn't use commitment points yet: {n} commitment points cell(s) in the file were skipped and not saved.",

@@ -35,6 +35,7 @@ tệp đó, hai tệp kia vẫn sinh.
 """
 
 import argparse
+import copy
 import csv
 import io
 import os
@@ -379,7 +380,7 @@ TEN_CAI_DAT_CHI_THI = "CAI_DAT_FORMS_CHI_THI.md"
 _GIO_ZIP = (2026, 1, 1, 0, 0, 0)
 
 
-def ghi_docx_chi_thi(de, duong, buoi=None):
+def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
     """Quick Import cho chế độ chỉ thi; giống hệt từng byte khi đầu vào không đổi."""
     from docx import Document
     from docx.shared import Pt
@@ -397,9 +398,9 @@ def ghi_docx_chi_thi(de, duong, buoi=None):
         r = p.add_run(chu)
         r.bold, r.font.size = dam, Pt(co)
 
-    dong(de["tieu_de"] + " — bài thi", co=16, dam=True, sau=10)
+    dong(de["tieu_de"] + hau_to, co=16, dam=True, sau=10)
     so = 0
-    for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=buoi), 1):
+    for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=buoi) if phan is None else phan, 1):
         dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
         for tieu_de, _loai, lua_chon, _bb in cac_cau:
             so += 1
@@ -659,19 +660,242 @@ def sinh_moi_clb(de, thu_muc):
     return ra
 
 
+# ------------------------------------------- FA-M2 (TH): đăng ký đường B, mỗi ngày một biểu mẫu
+
+TIEN_TO_DOCX_DANG_KY = "NHAP_FORMS_DANG_KY_"
+TEN_CAI_DAT_DANG_KY = "CAI_DAT_FORMS_DANG_KY.md"
+
+
+def de_theo_so_nhap_clb(de, duong_so_nhap):
+    """FA-S6: bản sao `de` có `loai` của từng CLB lấy từ Sổ nhập CLB của FA-M1 (`doc_clb_fa` của bộ chuyển đổi).
+    Trả (de mới, cảnh báo); `de` gốc không đổi."""
+    import chuyen_forms_sang_phan_mem as cv
+    clb_fa, _giu, canh_bao = cv.doc_clb_fa(duong_so_nhap, de)
+    de2 = copy.deepcopy(de)
+    for c in de2["cau_lac_bo"]:
+        if clb_fa.get(c["club_id"], {}).get("loai"):
+            c["loai"] = clb_fa[c["club_id"]]["loai"]
+    de2["_loai_tu_so_nhap"] = True
+    return de2, canh_bao
+
+
+def ghi_cai_dat_dang_ky(de):
+    """CAI_DAT_FORMS_DANG_KY.md: hướng dẫn dựng tay biểu mẫu đăng ký đường B (TH: chưa thử trên Forms thật)."""
+    L = []
+    w = L.append
+    w("# Biểu mẫu đăng ký nguyện vọng — đường B, Microsoft Forms (FA-M2)")
+    w("")
+    w("> **TH = CHƯA thử trên Microsoft thật.** Tệp này do `tao_mau_forms.py --fa-daa` sinh từ `de_thi.json`; đừng sửa tay.")
+    w("> Forms không có cách tạo biểu mẫu bằng chương trình: dựng tay theo tệp này. Chưa có quyết định D8")
+    w("> (Power Apps hay Forms); đường nào được chọn, tài liệu này chỉ mô tả đường B.")
+    w("")
+    w("Mỗi ngày một biểu mẫu (%d biểu mẫu). Không có câu Ranking: mỗi ngày ba câu chọn riêng, bắt buộc," % len(de["buoi"]))
+    w("tên \"Nguyện vọng 1\", \"Nguyện vọng 2\", \"Nguyện vọng 3\" (ngày có ít hơn ba CLB thì ít câu hơn). Hai câu huy")
+    w("chương không bắt buộc; mặc định huy chương theo thứ tự nguyện vọng (vàng NV1, bạc NV2, đồng NV3, CLB Tự do không nhận).")
+    w("")
+    w("## Mô tả biểu mẫu (dán một dòng này vào ô Description)")
+    w("")
+    w("> %s" % bm.CAU_HUONG_DAN_DANG_KY)
+    w("")
+    for b in de["buoi"]:
+        w("## %s — tệp `%s%s.docx`" % (b["ten"], TIEN_TO_DOCX_DANG_KY, b["ma"]))
+        w("")
+        w("| Phần | Tên phần | Câu hỏi | Kiểu | Bắt buộc |")
+        w("|---|---|---|---|---|")
+        so = 0
+        for i, (ten, cac_cau) in enumerate(bm.cac_phan_fa(de, b["ma"]), 1):
+            for j, (td, loai, lc, bb) in enumerate(cac_cau):
+                so += 1
+                w("| %s | %s | %d · `[%s]` | %s | %s |" % (
+                    i if j == 0 else "", ten if j == 0 else "", so, bm.ma_cua_cau(td),
+                    "Text" if loai == "text" else "Choice (%d lựa chọn)" % len(lc), "✅" if bb else "—"))
+        w("")
+    w("Sau khi Quick Import, kiểm lại từng câu: câu nguyện vọng chọn **Required**, hai câu huy chương **tắt** Required.")
+    w("")
+    w("## Settings (mọi biểu mẫu)")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Who can fill out this form | **Only people in my organization** | Học sinh đăng nhập tài khoản trường |")
+    w("| **Record name** | **BẬT** | Cột **Email** của tệp xuất là khoá của học sinh |")
+    w("| One response per person | **TẮT** | Em được nộp lại đến hết hạn; bộ chuyển đổi lấy phiếu **cuối cùng** của mỗi email |")
+    w("| Shuffle questions | **TẮT** | Thứ tự \"Nguyện vọng 1, 2, 3\" phải giữ nguyên |")
+    w("| Shuffle options (câu nguyện vọng) | **BẬT** nếu Forms cho (TH) | Mỗi em thấy thứ tự CLB khác nhau, giảm thiên lệch vị trí |")
+    w("| Start date / End date | Đặt đủ cả hai | Hết hạn tự khoá; hạn đăng ký mở ít nhất 5 ngày |")
+    w("")
+    w("## Giới hạn của đường B (so với ứng dụng)")
+    w("")
+    w("- Không tự lưu nháp; không có nút ▲▼; Forms không chặn chọn trùng CLB giữa ba câu (bộ chuyển đổi bỏ trùng và báo).")
+    w("- Forms không bỏ chọn được đáp án: câu huy chương có sẵn đáp án \"%s\" / \"%s\"; bộ chuyển đổi đổi chúng thành ô trống." % (bm.GIU_MAC_DINH_VANG, bm.DOI_KHONG))
+    if de.get("_loai_tu_so_nhap"):
+        w("- Loại CLB lấy từ Sổ nhập CLB (`--so-nhap-clb`): câu vàng không liệt kê CLB Tự do.")
+    else:
+        w("- Nếu `de_thi.json` chưa ghi `loai` của CLB, câu vàng liệt kê cả CLB Tự do; chọn nhầm thì bộ chuyển đổi giữ mặc định và báo.")
+    w("")
+    return "\n".join(L)
+
+
+def sinh_dang_ky(de, thu_muc):
+    """Ghi hướng dẫn và mỗi ngày một .docx Quick Import vào `thu_muc`. Trả danh sách đường dẫn đã ghi."""
+    os.makedirs(thu_muc, exist_ok=True)
+    for ten in os.listdir(thu_muc):
+        if ten.startswith(TIEN_TO_DOCX_DANG_KY) and ten.endswith(".docx"):
+            os.remove(os.path.join(thu_muc, ten))
+    ra = []
+    duong = os.path.join(thu_muc, TEN_CAI_DAT_DANG_KY)
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_dang_ky(de))
+    ra.append(duong)
+    for b in de["buoi"]:
+        duong = os.path.join(thu_muc, "%s%s.docx" % (TIEN_TO_DOCX_DANG_KY, b["ma"]))
+        ghi_docx_chi_thi(de, duong, phan=bm.cac_phan_fa(de, b["ma"]), hau_to=" — đăng ký %s" % b["ten"])
+        ra.append(duong)
+    return ra
+
+
+# ------------------------------------------- FA-M4 (TH): mỗi CLB Tuyển chọn có 2-3 đề biến thể
+
+TIEN_TO_DOCX_BIEN_THE = "NHAP_FORMS_BIEN_THE_"
+TEN_CAI_DAT_BIEN_THE = "CAI_DAT_FORMS_BIEN_THE.md"
+
+
+def ghi_cai_dat_bien_the(de, co):
+    """CAI_DAT_FORMS_BIEN_THE.md (TH: chưa thử trên Forms thật). `co`: các CLB có `de_thi_bien_the`."""
+    import phan_tich_cau_hoi as pt
+    L = []
+    w = L.append
+    w("# Đề biến thể cho CLB Tuyển chọn trên Microsoft Forms (FA-M4)")
+    w("")
+    w("> **TH = CHƯA thử trên Microsoft thật.** Tệp do `tao_mau_forms.py --bien-the` sinh từ `de_thi.json` (khoá `de_thi_bien_the`"
+      " của CLB: các đề B, C; đề A là `de_thi`). Đừng sửa tay.")
+    w("")
+    w("Mỗi CLB có 2 đề (3 đề chỉ khi rất nhiều em thi) **cùng số câu và cùng cơ cấu độ khó**. Mỗi đề là MỘT biểu mẫu riêng, "
+      "không câu cổng (như chế độ `--moi-clb`); thẻ câu vẫn là `[<club_id>-<số câu>]` ở mọi đề.")
+    w("")
+    w("## Chia đề cho học sinh")
+    w("")
+    w("Đề của một em = `crc32(email) % số đề` (`zlib.crc32`, chữ thường). Lập bảng đề cho từng em, gồm cả đề khi thi lại:")
+    w("")
+    w("```bash")
+    w("python mau_forms_thi_clb/phan_tich_cau_hoi.py chia DANH_SACH.csv --so-bien-the 2 --ra DE_CUA_EM.csv")
+    w("```")
+    w("")
+    w("`DANH_SACH.csv` có cột Email; kết quả có Email, DeGiao, DeThiLai. Gửi mỗi em đường dẫn đúng đề của em.")
+    w("")
+    w("## Từng biểu mẫu")
+    w("")
+    w("| CLB | Đề | Số câu | Tệp Quick Import |")
+    w("|---|---|---|---|")
+    for c in co:
+        for k, qs in enumerate(pt.cac_bien_the(c)):
+            w("| %s | %s | %d | `%s%s_%s.docx` |" % (c["name"], pt.CHU_BIEN_THE[k], len(qs), TIEN_TO_DOCX_BIEN_THE,
+                                                     c["club_id"], pt.CHU_BIEN_THE[k]))
+    w("")
+    w("Sau Quick Import, đặt đáp án đúng và điểm **%s** mỗi câu như hướng dẫn của `CAI_DAT_FORMS_CHI_THI.md`." % bm.ghi_so(de["diem_moi_cau"]))
+    w("")
+    w("## Settings (mọi biểu mẫu đề thi)")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Time limit | **BẬT** (đặt số phút cho cả bài) | Hết giờ Forms tự nộp (D9); thay cho giới hạn từng câu mà Forms không có |")
+    w("| Shuffle questions | **BẬT** | Mỗi em một thứ tự câu; biểu mẫu này không rẽ nhánh nên không hỏng gì |")
+    w("| Shuffle options | **BẬT** | Chấm theo nội dung lựa chọn, không theo vị trí |")
+    w("| Record name | **BẬT** | Cột Email là khoá ghép với danh sách đăng ký |")
+    w("| One response per person | **BẬT** | Chỉ một lần làm; thi lại là một biểu mẫu KHÁC (đề khác) |")
+    w("| Show results automatically | **TẮT** | Tránh em làm trước chuyền đáp án |")
+    w("")
+    w("## Sau khi thi")
+    w("")
+    w("```bash")
+    w("python mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py --fa-daa --so-nhap-clb SO_NHAP_CLB.xlsx \\")
+    w("    --lists DANH_SACH_DANG_KY.csv --ra ra/ THI_clb_A.xlsx THI_clb_B.xlsx --bien-the-tep THI_clb_B.xlsx=B")
+    w("```")
+    w("")
+    w("- `PHAN_TICH_CAU_HOI.xlsx`: mỗi câu % đúng và độ phân biệt (1/3 điểm cao - 1/3 điểm thấp). Cờ `PHAN_BIET_AM` (< 0), "
+      "`QUA_DE` (> 90 %), `QUA_KHO` (< 20 %). Admin xác nhận bỏ một câu lỗi thì chạy lại với `--bo-cau <club_id>-<đề>-<số câu>` (ví dụ `clb_covua-B-3`; CLB chỉ có một đề: `clb_covua-3`): chấm lại cho mọi em làm đề đó.")
+    w("- `DIEU_CHINH_BAN_DE.xlsx` (D11): so trung bình từng đề với các đề còn lại trên thang 0-10 chưa làm tròn. Ngưỡng "
+      "= z × √(s²/n + s²/n), z = 1,96 (2 đề) hoặc 2,39 (3 đề). Đề dưới 5 bài chỉ báo, không bao giờ chỉnh. Chỉ khi vượt ngưỡng thì "
+      "đề đó được dịch (trung bình chung − trung bình đề), rồi làm tròn nửa lên và kẹp 0-10.")
+    w("- Khi có chênh lệch, bộ chuyển đổi **không** ghi Sổ nhập tới khi admin chọn: `--ap-dung-dieu-chinh` (dịch điểm) hoặc "
+      "`--giu-diem-goc` (giữ điểm đã chấm). Luôn có cách đi tiếp, không có gì chặn cứng. Không lệch thì không cần cờ.")
+    w("- Em làm bài dưới 1/3 thời gian trung vị của CLB bị gắn cờ (chỉ báo); admin cho thi lại bằng đề `DeThiLai`.")
+    w("- CLB chỉ có MỘT đề (không có đề B) thì em bị gắn cờ không thi lại được: thi lại phải bằng đề khác. "
+      "Bộ chuyển đổi báo \"không có đề thi lại\" và giữ điểm bài đầu; muốn cho thi lại thì thêm đề B cho CLB đó.")
+    w("")
+    return "\n".join(L)
+
+
+def sinh_bien_the(de, thu_muc):
+    """Ghi hướng dẫn và mỗi (CLB, đề) một .docx Quick Import. Lỗi đề (số câu, độ khó, quá 3 đề) hoặc không CLB nào có đề
+    biến thể thì ném LoiDeThi và không ghi gì."""
+    import phan_tich_cau_hoi as pt
+    co = [c for c in de["cau_lac_bo"] if c.get("de_thi_bien_the")]
+    if not co:
+        raise bm.LoiDeThi("de_thi.json không CLB nào có de_thi_bien_the (các đề B, C của CLB)")
+    loi = [x for c in co for x in pt.kiem_bien_the(c)]
+    if loi:
+        raise bm.LoiDeThi("de_thi.json sai:\n  - " + "\n  - ".join(loi))
+    os.makedirs(thu_muc, exist_ok=True)
+    for ten in os.listdir(thu_muc):
+        if ten.startswith(TIEN_TO_DOCX_BIEN_THE) and ten.endswith(".docx"):
+            os.remove(os.path.join(thu_muc, ten))
+    ra = []
+    duong = os.path.join(thu_muc, TEN_CAI_DAT_BIEN_THE)
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_bien_the(de, co))
+    ra.append(duong)
+    for c in co:
+        for k, qs in enumerate(pt.cac_bien_the(c)):
+            duong = os.path.join(thu_muc, "%s%s_%s.docx" % (TIEN_TO_DOCX_BIEN_THE, c["club_id"], pt.CHU_BIEN_THE[k]))
+            ghi_docx_chi_thi(de, duong, phan=bm.cac_phan_moi_clb(de, dict(c, de_thi=qs)),
+                             hau_to=" — %s, đề %s" % (c["name"], pt.CHU_BIEN_THE[k]))
+            ra.append(duong)
+    return ra
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--chi-thi", action="store_true",
                     help="chế độ chỉ thi: bỏ câu Ranking và ô mã HS (nguyện vọng ở ứng dụng đăng ký)")
     ap.add_argument("--moi-clb", action="store_true",
                     help="mỗi CLB có đề một biểu mẫu riêng, không câu cổng (+ CLB.csv cho list CLB)")
+    ap.add_argument("--fa-daa", action="store_true",
+                    help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
+    ap.add_argument("--bien-the", action="store_true",
+                    help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
+    ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
+                    help="chỉ với --fa-daa: Sổ nhập CLB (FA-M1) để biết Loại; CLB Tự do không có trong câu vàng")
     ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
     ap.add_argument("--de", default=bm.DE_THI_MAC_DINH, help="de_thi.json")
     a = ap.parse_args(argv)
     if a.moi_clb and a.chi_thi:
         ap.error("--moi-clb và --chi-thi là hai chế độ khác nhau, chọn một")
+    if a.fa_daa and (a.moi_clb or a.chi_thi):
+        ap.error("--fa-daa là một chế độ riêng, không dùng chung với --chi-thi hay --moi-clb")
+    if a.bien_the and (a.fa_daa or a.moi_clb or a.chi_thi):
+        ap.error("--bien-the là một chế độ riêng, không dùng chung với --fa-daa, --chi-thi hay --moi-clb")
+    if a.so_nhap_clb and not a.fa_daa:
+        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
     try:
         de = bm.doc_de_thi(a.de)
+        if a.bien_the:
+            ra = sinh_bien_the(de, a.ra)
+            print("Đã sinh mẫu Forms đề biến thể (TH): %d tệp (%s)." % (len(ra), ", ".join(os.path.basename(x) for x in ra)))
+            return 0
+        if a.fa_daa:
+            if a.so_nhap_clb:
+                import chuyen_forms_sang_phan_mem as cv
+                try:
+                    de, canh_bao = de_theo_so_nhap_clb(de, a.so_nhap_clb)
+                except cv.LoiTepXuat as e:
+                    print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
+                    return 1
+                for _d, _e, nd in canh_bao:
+                    print("CẢNH BÁO: " + nd, file=sys.stderr)
+            ra = sinh_dang_ky(de, a.ra)
+            print("Đã sinh mẫu Forms đăng ký FA-DAA (TH): %d biểu mẫu (%s)."
+                  % (len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))
+            return 0
         if a.moi_clb:
             ra = sinh_moi_clb(de, a.ra)
             print("Đã sinh mẫu Forms mỗi CLB một biểu mẫu: %d biểu mẫu (%s)."

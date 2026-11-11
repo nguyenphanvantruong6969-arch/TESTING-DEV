@@ -45,6 +45,25 @@ TRAN_MAC_DINH = {"pref_too_many": 10, "pref_too_many_buoi": 10,
 # Mã thêm SAU ảnh chụp ngoài nhóm ws_*: điểm theo người ở Sổ nhập (TASK 5); luật xếp, chấm
 # điểm theo người và cảnh báo sức khoẻ dữ liệu của chúng (TASK 6). Chỉ THÊM mã, không đổi mã cũ.
 MA_MOI_SAU_ANH_CHUP = {
+    # FA-DAA (FA-1): thuộc tính CLB, giữ chỗ, cảnh báo nạp.
+    "fa_loai_sai", "fa_diem_san_sai", "fa_toi_thieu_sai", "fa_suc_chua_phong_sai",
+    "so_nhap_fa_loai_sai", "so_nhap_fa_diem_san_sai", "so_nhap_fa_toi_thieu_sai",
+    "so_nhap_fa_suc_chua_phong_sai", "csv_club_fa_invalid", "fa_cot_bo_qua",
+    "fa_giu_cho_bo_qua", "so_nhap_fa_giu_cho_khong_ton_tai",
+    # FA-2: kiểm trước khi chạy.
+    "fa_thieu_clb_tu_do", "fa_clb_thieu_loai", "fa_clb_thieu_suc_chua", "fa_clb_thieu_diem_san",
+    "fa_giu_cho_vuot_suc_chua", "fa_giu_cho_hoc_sinh_la", "fa_giu_cho_khong_xep_clb",
+    # FA-N1, FA-N3 (đêm 4).
+    "fa_ly_do_thieu_buoi", "fa_can_diem_quyet_tam", "bien_ban_chua_boc_tham",
+    # FA-3: huy chương.
+    "fa_chua_bat", "fa_huy_chuong_gia_tri_sai", "fa_huy_chuong_trung_gia_tri",
+    "fa_huy_chuong_ngoai_nguyen_vong", "fa_huy_chuong_clb_tu_do",
+    # FA-4: chạy.
+    "fa_diem_bo_qua",
+    # FA-5: đóng CLB thiếu người.
+    "fa_clb_dong_thieu_nguoi",
+    # FA-6: lý do kết quả.
+    "fa_chua_co_ly_do",
     "so_nhap_diem_ca_nhan_sai", "scoring_not_per_person", "health_person_score_none",
     "health_person_score_missing", "health_tier_missing", "health_tiers_empty",
     # Vòng sửa lỗi cuối: điểm theo CLB sai chế độ (chấm tay, CSV, cột trong sổ).
