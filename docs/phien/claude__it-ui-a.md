@@ -16,7 +16,7 @@ source for clubs and exams), then green loop, then Phase 3 integration of `claud
 All numbers SIMULATED; all Forms work TH.
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [ ] G0: PROMPT_A "Your job" 1 exactly (tests first: `tests/test_fa_m7_dong_goi.py`, `tests/test_fa_m7_duong.py`,
+- [x] G0: PROMPT_A "Your job" 1 exactly (tests first: `tests/test_fa_m7_dong_goi.py`, `tests/test_fa_m7_duong.py`,
       `tests/test_giao_dien_fa_m7_the.py`; nav-count UI tests updated; `kiem_nhanh` 7/7; commit message `FA-M7 G0: ...`)
 - [ ] FA-M7: plan §2 (`nap_phieu_clb`, `tai_mau_de_thi`, `nap_de_thi` in `api_forms.py`; `mau_forms_thi_clb/so_de_thi.py`
       with `ghi_mau_kiosk`, `doc_so_de_thi`; tests `tests/test_fa_m7_nguon_mot_lan.py` + API + UI; mutation recorded);
@@ -26,7 +26,8 @@ All numbers SIMULATED; all Forms work TH.
 - [ ] Green loop on `claude/forms-gop` + FINISH (plan §7 report, `docs/phien/IT_UI_STATUS.md` = `IT-UI GREEN`)
 
 ## Current state (overwrite each handoff)
-- Branch created from BASE. G0 delegated to a Sonnet coder.
+- G0 done and pushed (commit `FA-M7 G0: ...`). Next: FA-M7 (plan §2). `so_de_thi.py` is a docstring-only placeholder.
+- `rules.fa_duong` default None added to `cau_hinh_ws.MAC_DINH_TRUONG_HOC`; not in luat_xep. FA tab hook wraps `wsApDungCauHinh` from `js/11_chuan_bi.js` (no edit to other workers' JS).
 
 ## Decisions and gotchas (keep short)
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1 on this branch (venv, `playwright==1.63.0`, unshallow, `origin/main`).

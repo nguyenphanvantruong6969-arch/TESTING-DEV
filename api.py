@@ -71,6 +71,9 @@ from rbda_priority_pipeline import (
 
 from api_bao_cao import BaoCaoMixin
 from api_cham_diem import ChamDiemMixin
+from api_forms import FormsMixin
+from api_forms_bo import FormsBoMixin
+from api_forms_nap import FormsNapMixin
 from api_nhap import NhapDuLieuMixin
 from api_quan_ly import QuanLyMixin
 from api_sau_xep import SauXepMixin
@@ -87,7 +90,8 @@ from api_xuat import XuatKetQuaMixin
 # `api.connect_db`, `api.run_rbda_nhieu_buoi`... để giả lập sự cố, và phép
 # thay đó chỉ có tác dụng với mã nằm trong CHÍNH tệp này.
 class PipelineAPI(NhapDuLieuMixin, ChamDiemMixin, BaoCaoMixin,
-                  XuatKetQuaMixin, QuanLyMixin, SauXepMixin, WorkspaceMixin):
+                  XuatKetQuaMixin, QuanLyMixin, SauXepMixin, WorkspaceMixin,
+                  FormsMixin, FormsNapMixin, FormsBoMixin):
     def __init__(self, db_path: str, thu_muc_xuat: str = "",
                  thu_muc_goc_ws: str = None, ws_da_chon: bool = True):
         self.db_path = db_path
