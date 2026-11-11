@@ -39,3 +39,6 @@ gõ câu hỏi vào trang De_thi (mỗi dòng một câu, đủ bốn lựa ch�
 thêm đề B, C cùng số câu), rồi bấm "Nạp tệp đề". Có lỗi thì phần mềm liệt kê hết một lần và chưa lưu gì; sửa tệp rồi nạp lại.
 CLB không có câu hỏi nào là CLB không thi. Nếu sau này nạp lại bước 1 với CLB khác, bước 2 báo đề cũ không khớp: tải lại mẫu
 và nạp lại đề.
+
+## FA-M7-FIX1
+`doc_so_de_thi` chép `loai` của CLB bước 1 sang `cau_lac_bo` của `de_thi.json` (không có `loai` thì không thêm khoá), để `bieu_mau.cac_phan_fa` loại CLB Tự do khỏi câu huy chương vàng. Test: `test_nap_de_thi_giu_loai_clb_va_tu_do_khong_vao_cau_vang_fa`, `test_clb_khong_co_loai_thi_de_thi_khong_them_khoa_loai`; `test_de_thi_json_dot_giong_mac_dinh_khi_cung_noi_dung` mở rộng (khẳng định `loai` đi theo). Đỏ trước khi sửa (2 ca), xanh sau.

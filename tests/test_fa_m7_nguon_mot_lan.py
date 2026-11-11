@@ -311,5 +311,31 @@ def test_de_thi_json_dot_giong_mac_dinh_khi_cung_noi_dung(api, tmp_path):
     kq = api.nap_de_thi(_b64(p))
     assert kq["ok"], kq
     moi = forms_dot.doc_de_dot(api.db_path)
-    assert json.dumps(moi["cau_lac_bo"], sort_keys=True) == json.dumps(
+    assert all("loai" in c for c in moi["cau_lac_bo"])       # loại của bước 1 đi theo sang de_thi.json
+    assert json.dumps([{k: v for k, v in c.items() if k != "loai"} for c in moi["cau_lac_bo"]],
+                      sort_keys=True) == json.dumps(
         copy.deepcopy(DE_MAC_DINH["cau_lac_bo"]), sort_keys=True)
+
+
+def test_nap_de_thi_giu_loai_clb_va_tu_do_khong_vao_cau_vang_fa(api, tmp_path):
+    """`loai` của bước 1 phải sang de_thi.json: bieu_mau.cac_phan_fa dựa vào nó để loại CLB Tự do khỏi câu huy chương vàng."""
+    so_nhap_ = __import__("so_nhap")
+    clubs = [dict(_clb("clb_td", "CLB Tự do"), loai=so_nhap_.TU_DO),
+             dict(_clb("clb_gh", "CLB Giới hạn"), loai=so_nhap_.GIOI_HAN),
+             dict(_clb("clb_tc", "CLB Tuyển chọn"), loai=so_nhap_.TUYEN_CHON, diem_san=5)]
+    so_nhap_.ghi_so_nhap(forms_dot.duong_so_nhap_clb_dot(api.db_path), clubs=clubs)
+    kq = api.nap_de_thi(_b64(_mau(tmp_path, clubs)))
+    assert kq["ok"], kq
+    de = forms_dot.doc_de_dot(api.db_path)
+    assert {c["club_id"]: c.get("loai") for c in de["cau_lac_bo"]} == {
+        "clb_td": so_nhap_.TU_DO, "clb_gh": so_nhap_.GIOI_HAN, "clb_tc": so_nhap_.TUYEN_CHON}
+    cau_vang = next(c for ten, ds in bieu_mau.cac_phan_fa(de, "thu_2") for c in ds if "-vang]" in c[0])
+    lua_chon = " | ".join(cau_vang[2])               # câu vàng chỉ liệt kê CLB không Tự do
+    assert "clb_td" not in lua_chon
+    assert "clb_gh" in lua_chon and "clb_tc" in lua_chon
+
+
+def test_clb_khong_co_loai_thi_de_thi_khong_them_khoa_loai(tmp_path):
+    clubs = [_clb("clb_a", "CLB A")]
+    de, loi = so_de_thi.doc_so_de_thi(_mau(tmp_path, clubs), clubs)
+    assert loi == [] and "loai" not in de["cau_lac_bo"][0]

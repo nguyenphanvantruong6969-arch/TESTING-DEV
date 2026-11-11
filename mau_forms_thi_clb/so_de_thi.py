@@ -197,6 +197,8 @@ def doc_so_de_thi(duong, clubs):
         moi = {"club_id": ma, "name": c["name"], "buoi": c.get("buoi") or "",
                "capacity": c["capacity"], "reserve_capacity": c.get("reserve_capacity") or 0,
                "reserve_group": c.get("reserve_group") or "", "de_thi": []}
+        if c.get("loai"):                                # bieu_mau.cac_phan_fa loại CLB Tự do khỏi câu huy chương vàng
+            moi["loai"] = c["loai"]
         theo_de = bai.get(ma, {})
         co = [d for d in CHU_DE if d in theo_de]
         if ma not in co_loi and co:
