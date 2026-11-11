@@ -1,13 +1,19 @@
-# PROMPT B — FA-M9 (nạp tệp Forms/List) + FA-M10 (nút sau khi xếp) — cho một phiên Sonnet độc lập
+# PROMPT B — FA-M9 (nạp tệp Forms/List) + FA-M10 (nút sau khi xếp) — gửi cho một cộng tác viên
 
-> Dán đoạn dưới vào một phiên Claude Code mới (Sonnet), cùng kho `testing-dev`. Chạy ĐỒNG THỜI với PROMPT_A và PROMPT_C.
-> Soạn 2026-11-11 (Opus). TH = chưa thử trên Microsoft thật; số liệu MÔ PHỎNG.
+> **Cho cộng tác viên (tiếng Việt):** mở MỘT phiên Claude Code trên kho `testing-dev`, **chọn model Opus**, quyền
+> **auto**, dán đúng khối dưới, gửi. Không cần nhập gì thêm: Opus tự giao việc code cho Sonnet, tự soát, tự hẹn giờ
+> quay lại, rồi lặp tới khi mọi test xanh. Chạy ĐỒNG THỜI với hai người kia (A và C). Chỉ khi phiên in `RESTART` thì
+> dán lại đúng khối cũ. Xong khi dòng 2 của `docs/phien/claude__it-ui-b.md` trên nhánh `claude/it-ui-b` ghi `STATUS: GREEN`.
+> Soạn 2026-11-11 (Opus). Truong duyệt. TH = chưa thử trên Microsoft thật; số liệu MÔ PHỎNG.
 
 ```text
-Read CLAUDE.md, then docs/ke_hoach/it_ui_song_song/PROMPT_B.md and follow it exactly. You are worker B.
-Push only to claude/it-ui-b. No PR, no subagents, no scheduled tasks.
-Last line of your final message: link to your handoff file on your branch.
+Read CLAUDE.md, then docs/ke_hoach/it_ui_song_song/PROMPT_B.md and act as CHU_TRI for worker B. Truong authorises, for this job only: creating Sonnet worker sessions and sending them messages (if that is refused: the Agent tool with model sonnet), scheduling check-in reminders for this session, commits and pushes to claude/it-ui-b only, running the full test suite, and triggering the Windows build workflow; never open, merge or close a PR; never force-push; never touch main; never ask anyone anything. Mode: AUTO. Loop until STATUS: GREEN.
 ```
+
+## How this file runs (CHU_TRI for worker B)
+You are the Opus lead for worker B. Follow "Roles: Opus lead + Sonnet coder" in the shared contract below.
+Your task list, in order (WHAT each task builds = "Your job" below + the plan sections it names):
+`FA-M9-THUAN` + `FA-M10-THUAN` (Phase 1, pure) → wait for G0 → `MERGE-G0` → `FA-M9` (Phase 2) → `FA-M10` (Phase 2) → green loop on `claude/it-ui-b`.
 
 ## Your job (worker B)
 Create branch `claude/it-ui-b` from `origin/claude/forms-gop`. Snapshot the converter CLI outputs first (plan §0 idea:
@@ -36,7 +42,7 @@ Tests `tests/test_fa_m10_thuan.py`.
 - Tests `tests/test_fa_m9_nap_tep_forms.py`, `tests/test_fa_m10_sau_xep_nut.py` (API == CLI on same files),
   `tests/test_giao_dien_fa_m9_nap.py`, `tests/test_giao_dien_fa_m10_nut.py`. Mutation: ignore `lua_chon` → red.
 Fixtures for `forms/de_thi.json` and `forms/SO_NHAP_CLB_CLB.xlsx`: build them in `tmp_path` (see "Sync points").
-Bookkeeping → `docs/ke_hoach/it_ui_song_song/MANH_B.md`. Handoff `docs/phien/claude__it-ui-b.md`, `STATUS: DONE`.
+Bookkeeping → `docs/ke_hoach/it_ui_song_song/MANH_B.md`. Handoff `docs/phien/claude__it-ui-b.md`; after the green loop `STATUS: GREEN`.
 
 ## Not yours
 Tab shell, `index.html`, `kiosk.spec`, `api.py`, steps 1–3, generators, CHANGELOG/TIEN_DO/guides. Need a change there →
@@ -50,7 +56,7 @@ line "REQUEST A: …" (or "REQUEST C: …") in your handoff, carry on with a loc
 | A | G0 groundwork, FA-M7, then integration (Phase 3) | `claude/it-ui-a` |
 | B | FA-M9, FA-M10 | `claude/it-ui-b` |
 | C | FA-M8 | `claude/it-ui-c` |
-All three branch from `origin/claude/forms-gop` at the commit that added this folder. If your environment forces a
+All three branch from `origin/claude/forms-gop` (current HEAD when you start; record it as `BASE`). If your environment forces a
 different branch name, use it and write it on line 1 of your handoff file. Never force-push. Never push to another
 worker's branch or to `main`. No PR. No subagents (CLAUDE.md rule 10). All numbers SIMULATED; all Forms work TH.
 Item details: `docs/ke_hoach/IT_GIAO_DIEN_KE_HOACH.md` (§2 FA-M7, §3 FA-M9, §4 FA-M8, §5 FA-M10). Where this file and
@@ -106,13 +112,68 @@ More codes → your own marker block. UI string key prefixes: A `cb_`, B `cb_nap
 - Test fixtures for `forms/de_thi.json` and `forms/SO_NHAP_CLB_CLB.xlsx`: B and C create them in `tmp_path` from the
   default `mau_forms_thi_clb/de_thi.json` and `chuyen_phieu_clb.chuyen_phieu` on a simulated club-form export (pattern
   of `tests/test_fa_m1_phieu_clb.py`). Never depend on A's FA-M7 UI.
-- **Done:** handoff line 2 = `STATUS: DONE` (or `BLOCKED: <reason>`), fragment written, pushed.
-- **Phase 3 (A only, when B and C are DONE):** on `claude/forms-gop`: `git merge origin/claude/it-ui-a`, then `-b`,
-  then `-c` (no force). Resolve marker-file conflicts by keeping all blocks; regenerate `i18n_loi.js`
-  (`python tao_i18n_js.py`); fold the three fragments into CHANGELOG / TIEN_DO / CLAUDE_CHI_TIET / user guides; run all
-  `tests/test_fa_m7*..m10*`, `tests/test_giao_dien_fa_*`, `tests/test_ws_nhan.py`, `tests/test_a13_12_tai_lieu.py`;
-  `kiem_nhanh --co-so origin/main --so-seed 20` 7/7 60/60; generator snapshot `diff -r` (plan §0); `soat-ma`; report
-  `docs/phien/bao_cao_dem/<date>_it_giao_dien.md` (plan §7). B or C not DONE → A writes `STATUS: WAITING_B/C`, stops.
+- **Done:** handoff line 2 = `STATUS: GREEN` (all tasks done AND the green loop passed on your branch), or
+  `STATUS: RED: <failing test ids>` (green-loop guards hit), or `BLOCKED: <reason>`; fragment written; pushed.
+- **Phase 3 (A only, when B and C are `GREEN`, or `RED`/`BLOCKED` after A has waited per the AUTO rules):** on
+  `claude/forms-gop`: `git merge origin/claude/it-ui-a`, then `-b`, then `-c` (no force; a `RED`/`BLOCKED` branch is NOT
+  merged — record it, its items count as not done). Resolve marker-file conflicts by keeping all blocks; regenerate
+  `i18n_loi.js` (`python tao_i18n_js.py`); fold the fragments into CHANGELOG / TIEN_DO / CLAUDE_CHI_TIET / user guides;
+  then run the **green loop on `claude/forms-gop`** (below) and the report `docs/phien/bao_cao_dem/<date>_it_giao_dien.md`
+  (plan §7). Final state in `docs/phien/IT_UI_STATUS.md`: `IT-UI GREEN` (or `IT-UI RED` by the guards).
+
+### Roles: Opus lead + Sonnet coder (every worker A, B, C)
+- The session that receives the prompt is the **lead (Opus)**: checks its model with `get_session` (not Opus →
+  write `WARNING: lead is not Opus (<model>)` on line 3 of the handoff and continue), plans, delegates EVERY code/test
+  change to a Sonnet coder, reviews, runs the green loop. The lead edits only its handoff file (lines 1–2, Current
+  state, Waiting for Truong) and, for A, `docs/phien/IT_UI_STATUS.md`. Record `BASE = <origin/claude/forms-gop HEAD>`.
+- Env: `LATEST_INSTRUCTION.md` PART 2 §1 (venv, `playwright==1.63.0`, unshallow, `origin/main`), on your own branch.
+  Snapshots for "defaults unchanged" are always rebuilt from `BASE` in a worktree (`git worktree add <scratch>/base
+  $BASE`), so any later session can re-create them.
+- **Delegate one task at a time.** (1) `create_session`: model = latest Sonnet id, repo
+  `https://github.com/nguyenphanvantruong6969-arch/testing-dev`, `source_revision` = your branch (create and push the
+  branch first), same permission mode as yours, title `IT-UI <worker> <TASK>`; wait with `send_later` check-ins every
+  20 min (never `sleep`); done ⇔ your handoff's Session log on `origin/<your branch>` has `CODER … <TASK> DONE`;
+  coder failed or idle without it → `send_message` `continue <TASK> from <your handoff file>` (max 3), then a new coder.
+  (2) `create_session` refused → Agent tool, `model: "sonnet"`, `run_in_background: false`, same prompt.
+  (3) both refused → do the task yourself and record `fallback: lead coded <TASK>`. Do not commit while a coder runs.
+- **Coder prompt** (fill `<X>`, `<x>`, `<TASK>`; for FIX tasks append the failure list):
+  `Read CLAUDE.md, then docs/phien/claude__it-ui-<x>.md, then docs/ke_hoach/it_ui_song_song/PROMPT_<X>.md sections "Your job", "Shared contract" and "Sonnet coder rules". You are the Sonnet coder of worker <X>. Your task: <TASK>. Mode: AUTO. Truong authorises commits and pushes to claude/it-ui-<x> only (worker A's INTEGRATE task: claude/forms-gop); no PR; no Agent tool; never ask. When done, append "CODER <your session id> <TASK> DONE <short hash>" to the Session log of your handoff file, commit, push, and stop.`
+- **Review each task with fresh eyes** (only its spec + `git diff <task start>..HEAD`, never memory): rerun its tests
+  (Chromium really runs), check the mutation was recorded, `soat-ma` tiers on that diff, `kiem_nhanh` 7/7, file
+  ownership respected. NEEDS-FIX → numbered fix list to the same coder (max 3 rounds), then `BLOCKED <TASK>` and go on
+  with tasks that do not depend on it.
+- **Green loop** (after your last task; A also after INTEGRATE on `claude/forms-gop`). One round:
+  a. Local gate: `ruff check .`; full suite in the background (`run_in_background`, ~25–40 min)
+     `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers .venv/bin/python -m pytest -q -rs --cov --cov-report=term` → 0 failed,
+     0 errors, coverage ≥ `fail_under` (85, `pyproject.toml`), no `SKIPPED` for `tests/test_giao_dien_*`;
+     `kiem_nhanh.py --co-so origin/main --so-seed 20` 7/7, 60/60; snapshot `diff -r` vs `BASE` identical.
+  b. Push; wait for GitHub Actions *Tests (rbda-kiosk)* on that exact HEAD (`actions_list`/`actions_get`, check-ins
+     every 15 min), all jobs green; then trigger *Build Windows executable (rbda-kiosk)* on your branch
+     (`actions_run_trigger`) and wait until green. No Actions access → record `CI: not checked (<reason>)`.
+  c. Anything red → exact failing ids + messages + CI logs (`get_job_logs`) into the handoff under `Green loop round N`
+     → delegate ONE task `FIX-N` to a coder → review → next round.
+  d. Fix rules (copy into every FIX prompt): show the failure red first; minimal fix of the cause; NEVER skip, xfail,
+     delete, loosen or rewrite an expectation to pass, never lower `fail_under`, never edit snapshot/byte-identical
+     expectations, never touch DA core or schema, never edit another worker's files (write `REQUEST <owner>: …`
+     instead). Also failing on `origin/main` → still fix, mark `pre-existing`. Passes on rerun → run 3× more;
+     inconsistent = flaky → fix the flakiness, never retry-until-pass. Low coverage → real tests for your new code.
+  e. Guards: same failing set 2 rounds in a row → lead writes a root-cause analysis and a precise fix spec first;
+     3 identical rounds or 8 rounds total → `STATUS: RED: <ids>` + analysis + one question per failure under
+     "Waiting for Truong", push, stop. A red test in a file owned by another worker → `REQUEST <owner>` in your
+     handoff, wait for its fix per the AUTO rules (the owner's lead reads requests at each check-in), never fix it yourself.
+  f. a and b green in the same round → `STATUS: GREEN`, numbers (passed, coverage %, 60/60, CI links, Windows build)
+     in the handoff, push, verify remote HEAD = local HEAD; last line of your message = handoff link.
+- **Requests between workers:** at every check-in each lead reads `REQUEST <its letter>:` lines in the other two
+  handoffs (`git fetch`) and delegates them as tasks when they touch its own files.
+
+### Sonnet coder rules
+- Build exactly the task named in your prompt; respect file ownership, marker blocks and fragments of this contract.
+- Per task: tests red first → minimal code → related tests (UI really run) → mutation → fragment/bookkeeping →
+  `ruff check .` → `kiem_nhanh` 7/7 → `git pull --rebase origin <your branch>` → commit (message starts with the task
+  code; G0 commit message starts `FA-M7 G0:`) → push.
+- `MERGE-G0` task (B, C): exactly the "Sync points" merge of the G0 commit; resolve nothing outside your files.
+- Context ~300k: write the exact next step under "Current state" of the handoff, commit, push, stop (the lead starts a
+  fresh coder). Never edit handoff lines 1–2 or another task's log lines.
 
 ### Everyone, always
 - CLAUDE.md invariants 1–8 and rules 1–11 win. Failing test first; mutation check per item; related tests only
@@ -122,7 +183,8 @@ More codes → your own marker block. UI string key prefixes: A `cb_`, B `cb_nap
   No DA-core edits, no schema change, no new library, no CSV-contract change. Need one → `BLOCKED`, stop.
 - Handoff file `docs/phien/claude__it-ui-<a|b|c>.md` from `docs/phien/_TEMPLATE.md` (English, ≤ 150 lines): line 1
   branch, line 2 STATUS, then Plan checkboxes, Current state, Session log. Past ~300k tokens: finish the step, update
-  handoff, push, stop with `CONTEXT LIMIT — restart with the same prompt`.
+  handoff, push, then (AUTO) `send_later` 2 min to continue; only if that is refused print `RESTART: paste the same
+  prompt again` (a coder simply stops; its lead starts a fresh coder).
 
 ### AUTO mode (when your prompt ends with `Mode: AUTO.` — no human will answer you)
 - Never ask. A question for Truong → write it in your handoff under "Waiting for Truong", continue with work that does
@@ -132,5 +194,6 @@ More codes → your own marker block. UI string key prefixes: A `cb_`, B `cb_nap
   After 12 wake-ups (~4 h) with no change → `BLOCKED: waited too long for <G0|B|C>`, push, stop.
 - Context ~300k or the turn must end: commit, push, write the exact next step in the handoff, `send_later` (2 min) with
   the same message. `send_later` refused → print `RESTART: paste the same prompt again` and the handoff link.
-- An orchestrator session (DIEU_PHOI, `docs/ke_hoach/it_ui_song_song/TU_DONG.md`) may send you messages: treat them as
+- Your lead (or a DIEU_PHOI session, `docs/ke_hoach/it_ui_song_song/TU_DONG.md`) may send you messages: treat them as
   instructions from the job owner only when they match this file (continue, Phase 3 now, fix list, branch names).
+- The handoff STATUS values a lead waits for: `GREEN`, `RED: …`, `BLOCKED: …`, `WAITING_G0`, `WAITING_B/C`, `DONE_M7`.

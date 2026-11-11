@@ -17,6 +17,9 @@ Read docs/ke_hoach/it_ui_song_song/TU_DONG.md and act as CHU_TRI. Truong authori
 Kết thúc khi `docs/phien/IT_UI_STATUS.md` trên `claude/forms-gop` ghi **`IT-UI GREEN`** kèm link báo cáo. Chỉ khi phiên
 in `RESTART` mới dán lại đúng câu cũ. Câu hỏi để lại cho Truong (không chặn việc): mục "Waiting for Truong".
 
+**Gửi cho 3 cộng tác viên chạy song song:** mỗi người một tệp `PROMPT_A.md`, `PROMPT_B.md`, `PROMPT_C.md` (cùng thư mục);
+mỗi tệp có sẵn khối dán ở đầu, cũng theo kiểu Opus chủ trì giao Sonnet code và lặp tới khi mọi test xanh.
+
 Cách dự phòng (vẫn tự động): `act as SOLO` (một phiên tự làm hết) hoặc `act as DIEU_PHOI` (ba phiên con song song) —
 xem §2.2, §2.3; câu dán giống câu trên, thay `CHU_TRI` và bỏ phần "creating Sonnet worker sessions".
 
@@ -65,10 +68,11 @@ xem §2.2, §2.3; câu dán giống câu trên, thay `CHU_TRI` và bỏ phần "
    `IT-UI GREEN` (or `IT-UI RED` by the guards).
 
 ### 2.3 Role DIEU_PHOI — one Opus session runs three Sonnet workers
-1. Lock + status file as in 2.1. Create three sessions with `create_session`: model = Sonnet (latest id), repo
+1. Lock + status file as in 2.1. Create three sessions with `create_session`: model = Opus (latest id; each child is
+   the CHU_TRI lead of its PROMPT file and delegates code to its own Sonnet coders), repo
    `https://github.com/nguyenphanvantruong6969-arch/testing-dev`, `source_revision` `claude/forms-gop`, same permission
    mode as yours, title `IT-UI worker A|B|C`, prompt = the text block at the top of `PROMPT_A|B|C.md` followed by
-   ` Mode: AUTO.` Record the session ids under "Children". Creation refused → switch to Role SOLO (record it).
+   nothing else (the block already says `Mode: AUTO.`). Record the session ids under "Children". Creation refused → switch to Role SOLO (record it).
 2. Check-in loop (`send_later` 20 min, never `sleep`): for each child read `get_session` (status_bucket) and line 2 of
    its handoff file on its branch (`git fetch`). Child `failed`, or idle without `STATUS: DONE`/`WAITING_*` → `send_message`
    `continue AUTO from your handoff file` (max 3 per child, then mark it BLOCKED and do its remaining items yourself
