@@ -2925,6 +2925,13 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
   border: 1px solid var(--line, #d0d7de); border-radius: 8px; cursor: pointer; }
 .cb-duong input { margin-top: 4px; }
 .cb-buoc { margin-top: 4px; }
+.cb-trang-thai { margin: 8px 0; padding: 8px 12px; border-radius: 6px; font-weight: 600; }
+.cb-trang-thai[data-trang-thai="chua"] { background: var(--paper-raised, #f4f4f2); color: var(--ink, #222); }
+.cb-trang-thai[data-trang-thai="xanh"] { background: var(--moss-soft); color: #20452f; }
+.cb-trang-thai[data-trang-thai="do"] { background: var(--rust-soft); color: var(--rust-text); }
+.cb-trang-thai[data-trang-thai="cu"] { background: var(--paper-raised, #f4f4f2); color: var(--rust-text); }
+.cb-nut-hang { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.cb-dong-loi { margin: 6px 0 0 18px; padding: 0; }
 #view-chuan_bi .panel { margin-bottom: 16px; }
 /* === end A === */
 
