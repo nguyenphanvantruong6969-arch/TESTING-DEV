@@ -1195,7 +1195,7 @@ window.I18N_ERROR_MESSAGES = {
     "en": "File \"{ten}\" needs to know which exam it belongs to. Choose the exam and load it again."
   },
   "forms_thieu_email": {
-    "vi": "Thiếu danh sách email - mã học sinh. Hãy nạp tệp này trước.",
+    "vi": "Thiếu danh sách email và mã học sinh. Hãy nạp tệp này trước.",
     "en": "The email-to-student-ID list is missing. Load that file first."
   },
   "forms_thieu_danh_sach_lop": {
