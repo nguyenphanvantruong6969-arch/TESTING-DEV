@@ -367,6 +367,7 @@ function loadAdminTab(giuTrang) {
   loadReserveGroupOptions();
   loadBuoiOptions();
   loadTaiTheoBuoi();
+  taiDashboard(); /* GAP-8 (js/10_theo_doi.js): tự ẩn khi FA tắt */
   if (!giuTrang) adminStudentPage = 1;
   callApi("get_last_run_info").then((res) => {
     adminCoKetQua = !!(res.ok && res.data);

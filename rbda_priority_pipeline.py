@@ -2026,6 +2026,74 @@ CREATE TABLE IF NOT EXISTS fa_ly_do (
     PRIMARY KEY (run_id, buoi, student_id, club_id)
 );
 
+-- Nhật ký điều chỉnh sau khi xếp (FA gaps, GAP-0): CHỈ GHI THÊM, như run_history; không khoá ngoại (dấu vết).
+-- Kết quả DA (match_results) không bao giờ bị sửa tại chỗ: chỗ hiện tại = lần chạy gốc + các dòng này phát lại theo
+-- id (fa_sau_xep.vi_tri_hien_tai). Ghi duy nhất qua fa_sau_xep.ghi_dieu_chinh.
+CREATE TABLE IF NOT EXISTS fa_dieu_chinh (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    run_id_base INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    club_from TEXT,
+    club_to TEXT,
+    kind TEXT NOT NULL CHECK (kind IN ('release', 'invite_offer', 'invite_accept', 'invite_decline',
+                                       'invite_expire', 'round2', 'appeal_rerun')),
+    actor TEXT,
+    note TEXT
+);
+
+-- Điểm danh 3 buổi đầu (FA gaps, GAP-1): dữ liệu NHẬP (sửa được), theo lần chạy gốc của buổi. Vắng 2/3 buổi không
+-- phép -> một dòng release trong fa_dieu_chinh (không sửa match_results).
+CREATE TABLE IF NOT EXISTS fa_diem_danh (
+    run_id_base INTEGER NOT NULL,
+    buoi TEXT NOT NULL,
+    club_id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    buoi_so INTEGER NOT NULL CHECK (buoi_so BETWEEN 1 AND 3),
+    trang_thai TEXT NOT NULL CHECK (trang_thai IN ('CO_MAT', 'VANG_CO_PHEP', 'VANG_KHONG_PHEP')),
+    updated_at TEXT,
+    PRIMARY KEY (run_id_base, buoi, club_id, student_id, buoi_so)
+);
+
+-- Khiếu nại lỗi dữ liệu (FA gaps, GAP-3): dữ liệu NHẬP; trang_thai đổi khi quản trị xử lý. Chấp nhận thì ghi thêm một
+-- dòng appeal_rerun trong fa_dieu_chinh; sửa dữ liệu rồi chạy lại như thường (hạt giống đã khoá), không sửa tay kết quả.
+CREATE TABLE IF NOT EXISTS fa_khieu_nai (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    buoi TEXT NOT NULL,
+    loai TEXT NOT NULL CHECK (loai = 'DATA_ERROR'),
+    ghi_chu TEXT,
+    run_id_base INTEGER NOT NULL,
+    trang_thai TEXT NOT NULL CHECK (trang_thai IN ('CHO', 'CHAP_NHAN', 'TU_CHOI')),
+    xu_ly_at TEXT,
+    xu_ly_ghi_chu TEXT
+);
+
+-- Giới hạn chỉ tiêu giáo viên khai (FA gaps, GAP-7, V§10): chỉ để GỢI Ý chỉ tiêu kỳ sau = min(NV1, giới hạn).
+-- Bảng riêng, không đổi bảng clubs (hợp đồng CSV giữ nguyên); không bao giờ vào khoá ưu tiên.
+CREATE TABLE IF NOT EXISTS fa_gioi_han_gv (
+    club_id TEXT PRIMARY KEY,
+    gioi_han INTEGER NOT NULL CHECK (gioi_han > 0)
+);
+
+-- Phản hồi của học sinh (FA gaps, GAP-5/GAP-6): 3 câu sau khi xem kết quả (loai ket_qua) và khảo sát tuần 3
+-- (loai tuan_3), từ kiosk hay nhập từ Forms. Lần trả lời sau cùng của mỗi em (theo loai) được tính. KHÔNG bao giờ đi
+-- vào khoá ưu tiên (bất biến 2).
+CREATE TABLE IF NOT EXISTS fa_phan_hoi (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    nguon TEXT NOT NULL CHECK (nguon IN ('kiosk', 'forms')),
+    loai TEXT NOT NULL CHECK (loai IN ('ket_qua', 'tuan_3')),
+    hai_long INTEGER CHECK (hai_long BETWEEN 1 AND 5),
+    hieu_ly_do INTEGER CHECK (hieu_ly_do IN (0, 1)),
+    kho_nhat TEXT CHECK (kho_nhat IN ('chon_clb', 'xep_thu_tu', 'huy_chuong', 'thu_thach', 'khong_co')),
+    con_di INTEGER CHECK (con_di IN (0, 1)),
+    muon_doi INTEGER CHECK (muon_doi IN (0, 1))
+);
+
 -- Khoá điểm Wharton (A13.3): RIÊNG, không dính stb_lock. Lần chạy phân bổ thành công khi Wharton
 -- bật thì khoá; mở lại bằng mo_khoa_wharton. Chỉ có dòng khi Wharton từng bật và chạy.
 CREATE TABLE IF NOT EXISTS wharton_lock (

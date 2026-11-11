@@ -387,6 +387,10 @@ function wsWizardTuMau(mau, ten, buoc) {
     scoreScope: c.rules.score_scope,
     wharton: c.rules.wharton === true,
     faDaa: c.rules.fa_daa === true,
+    faDiemDanh: c.rules.fa_diem_danh === true,
+    faKhieuNai: c.rules.fa_khieu_nai === true,
+    faVong2: c.rules.fa_vong_2 === true,
+    faPhanHoi: c.rules.fa_phan_hoi === true,
     tiersText: (c.rules.tiers || []).join("\n"),
   };
 }
@@ -418,6 +422,10 @@ function wsGomBuoc() {
     w.scoreScope = lay("wzScoreScope").value;
     w.wharton = lay("wzWharton").checked;
     w.faDaa = lay("wzFaDaa").checked;
+    w.faDiemDanh = lay("wzFaDiemDanh").checked;
+    w.faKhieuNai = lay("wzFaKhieuNai").checked;
+    w.faVong2 = lay("wzFaVong2").checked;
+    w.faPhanHoi = lay("wzFaPhanHoi").checked;
     w.tiersText = lay("wzTiers").value;
   }
 }
@@ -495,6 +503,11 @@ function wsCfgTuWizard(w) {
       /* FA-UI-1: chỉ gửi khi bật (tắt = như cũ). Không tự khoá theo điểm quyết tâm: backend từ chối
          bằng lỗi sẵn có (ws_du_lieu_sai) và lỗi hiện trên màn hình. */
       ...(w.faDaa === true ? { fa_daa: true } : {}),
+      /* GAP-1: theo dõi sau khi xếp — chỉ gửi khi bật; cần fa_daa (backend: fa_tinh_nang_can_fa). */
+      ...(w.faDiemDanh === true ? { fa_diem_danh: true } : {}),
+      ...(w.faKhieuNai === true ? { fa_khieu_nai: true } : {}),
+      ...(w.faVong2 === true ? { fa_vong_2: true } : {}),
+      ...(w.faPhanHoi === true ? { fa_phan_hoi: true } : {}),
     },
   };
 }
@@ -692,6 +705,14 @@ function wsBuoc3(hop) {
       "wzWharton", t("ws_r_wharton_ngan"), t("ws_r_wharton_ghi_chu"))),
     wsTruong("wzFaDaa", "ws_r_fa_daa", wsEl("input", { type: "checkbox", id: "wzFaDaa",
       checked: w.faDaa === true }), wsGoiYNgan("wzFaDaa", t("ws_r_fa_daa_ngan"), t("ws_r_fa_daa_ghi_chu"))),
+    wsTruong("wzFaDiemDanh", "ws_r_fa_diem_danh", wsEl("input", { type: "checkbox", id: "wzFaDiemDanh",
+      checked: w.faDiemDanh === true }), t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaKhieuNai", "ws_r_fa_khieu_nai", wsEl("input", { type: "checkbox", id: "wzFaKhieuNai",
+      checked: w.faKhieuNai === true }), t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaVong2", "ws_r_fa_vong_2", wsEl("input", { type: "checkbox", id: "wzFaVong2",
+      checked: w.faVong2 === true }), t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaPhanHoi", "ws_r_fa_phan_hoi", wsEl("input", { type: "checkbox", id: "wzFaPhanHoi",
+      checked: w.faPhanHoi === true }), t("ws_r_fa_diem_danh_ngan")),
     wsTruong("wzTiers", "ws_r_tiers", oTiers, t("ws_r_tiers_chi_strict")),
   );
 }
@@ -715,6 +736,10 @@ function wsBuoc4(hop) {
     hang(t("ws_r_score_scope"), t(r.score_scope === "per_person" ? "ws_r_ss_per_person" : "ws_r_ss_per_slot"), "rvScoreScope"),
     hang(t("ws_r_wharton"), t(r.wharton ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvWharton"),
     hang(t("ws_r_fa_daa"), t(r.fa_daa ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaDaa"),
+    hang(t("ws_r_fa_diem_danh"), t(r.fa_diem_danh ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaDiemDanh"),
+    hang(t("ws_r_fa_khieu_nai"), t(r.fa_khieu_nai ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaKhieuNai"),
+    hang(t("ws_r_fa_vong_2"), t(r.fa_vong_2 ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaVong2"),
+    hang(t("ws_r_fa_phan_hoi"), t(r.fa_phan_hoi ? "ws_r_wharton_bat" : "ws_r_wharton_tat"), "rvFaPhanHoi"),
     ...(r.tiers.length ? [hang(t("ws_r_tiers"), r.tiers.join(" › "), "rvTiers")] : []),
   ];
   hop.append(

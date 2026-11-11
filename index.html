@@ -276,6 +276,41 @@
           </table>
         </div>
       </div>
+      <!-- GAP-5: ba cau phan hoi mot cham (chi khi rules.fa_phan_hoi bat); js/10_theo_doi.js -->
+      <div class="panel" id="phanHoiPanel" hidden>
+        <div class="panel-head"><h2 data-i18n="ph_tieu_de">Ý kiến về kết quả xếp CLB</h2></div>
+        <div class="panel-body">
+          <div class="search-row">
+            <label class="lop-nhan" for="phMa" data-i18n="kn_ma">Mã học sinh</label>
+            <input type="text" id="phMa" class="text-input text-input-sm">
+          </div>
+          <p data-i18n="ph_cau_hai_long">Mức hài lòng với kết quả (1 = rất không hài lòng, 5 = rất hài lòng)</p>
+          <div class="kq-seg ph-nhom" role="group" data-i18n-aria-label="ph_cau_hai_long">
+            <button type="button" class="kq-seg-nut ph-hai-long" data-gia-tri="1" aria-pressed="false">1</button>
+            <button type="button" class="kq-seg-nut ph-hai-long" data-gia-tri="2" aria-pressed="false">2</button>
+            <button type="button" class="kq-seg-nut ph-hai-long" data-gia-tri="3" aria-pressed="false">3</button>
+            <button type="button" class="kq-seg-nut ph-hai-long" data-gia-tri="4" aria-pressed="false">4</button>
+            <button type="button" class="kq-seg-nut ph-hai-long" data-gia-tri="5" aria-pressed="false">5</button>
+          </div>
+          <p data-i18n="ph_cau_hieu">Đã rõ lý do được xếp như vậy chưa?</p>
+          <div class="kq-seg ph-nhom" role="group" data-i18n-aria-label="ph_cau_hieu">
+            <button type="button" class="kq-seg-nut ph-hieu" data-gia-tri="1" aria-pressed="false" data-i18n="ph_co">Có</button>
+            <button type="button" class="kq-seg-nut ph-hieu" data-gia-tri="0" aria-pressed="false" data-i18n="ph_khong">Không</button>
+          </div>
+          <p data-i18n="ph_cau_kho">Phần nào khó nhất?</p>
+          <div class="kq-seg ph-nhom" role="group" data-i18n-aria-label="ph_cau_kho">
+            <button type="button" class="kq-seg-nut ph-kho" data-gia-tri="chon_clb" aria-pressed="false" data-i18n="ph_kho_chon_clb">Chọn CLB</button>
+            <button type="button" class="kq-seg-nut ph-kho" data-gia-tri="xep_thu_tu" aria-pressed="false" data-i18n="ph_kho_xep_thu_tu">Xếp thứ tự</button>
+            <button type="button" class="kq-seg-nut ph-kho" data-gia-tri="huy_chuong" aria-pressed="false" data-i18n="ph_kho_huy_chuong">Huy chương</button>
+            <button type="button" class="kq-seg-nut ph-kho" data-gia-tri="thu_thach" aria-pressed="false" data-i18n="ph_kho_thu_thach">Thử thách</button>
+            <button type="button" class="kq-seg-nut ph-kho" data-gia-tri="khong_co" aria-pressed="false" data-i18n="ph_kho_khong_co">Không có</button>
+          </div>
+          <div class="search-row">
+            <button class="btn btn-primary" id="btnGuiPhanHoi" type="button" data-i18n="ph_gui">Gửi</button>
+          </div>
+          <div id="phKetQua" class="save-feedback" role="status"></div>
+        </div>
+      </div>
     </section>
 
     <!-- ---------- TAB 3: DỮ LIỆU KHÁC (phần còn lại của thẻ Kết quả cũ) ---------- -->
@@ -332,6 +367,7 @@
           <button class="btn btn-secondary" id="btnXuatTheoLop" type="button" data-i18n="btn_xuat_theo_lop">Xuất theo {cohort_l}</button>
           <button class="btn btn-secondary" id="btnXuatLyDo" type="button" hidden data-i18n="btn_xuat_ly_do">Xuất lý do kết quả (CSV)</button>
           <button class="btn btn-secondary" id="btnXuatNhuCau" type="button" hidden data-i18n="btn_xuat_nhu_cau">Xuất bảng nhu cầu (CSV)</button>
+          <button class="btn btn-secondary" id="btnXuatGoiY" type="button" hidden data-i18n="btn_xuat_goi_y">Xuất gợi ý chỉ tiêu kỳ sau (CSV)</button>
           <button class="btn btn-secondary" id="btnXuatBienBan" type="button" hidden data-i18n="btn_xuat_bien_ban">Xuất biên bản bốc thăm (bản in và Excel)</button>
         </div>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
@@ -520,6 +556,116 @@
         </div>
       </div>
 
+      <!-- GAP-1: diem danh 3 buoi dau (chi khi rules.fa_diem_danh bat); js/10_theo_doi.js -->
+      <div class="panel" id="diemDanhPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="dd_tieu_de">Điểm danh 3 buổi đầu</h2>
+          </div>
+          <div class="panel-actions">
+            <select id="diemDanhClb" class="text-input text-input-sm" data-i18n-aria-label="dd_chon_clb"></select>
+            <button class="btn btn-secondary" id="btnXuatDiemDanh" type="button" data-i18n="btn_xuat_diem_danh">Xuất điểm danh (Excel)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p class="hint" data-i18n="dd_goi_y">Vắng không phép 2 trong 3 buổi đầu thì chỗ được giải phóng.</p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th_student_id">Mã học sinh</th>
+                <th data-i18n="th_name">Họ tên</th>
+                <th class="dd-cot-buoi" data-so="1"></th>
+                <th class="dd-cot-buoi" data-so="2"></th>
+                <th class="dd-cot-buoi" data-so="3"></th>
+                <th data-i18n="dd_so_vang">Vắng không phép</th>
+              </tr>
+            </thead>
+            <tbody id="diemDanhBang"></tbody>
+          </table>
+          <div id="diemDanhFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
+      <!-- GAP-2: moi danh sach cho vao cho trong (chi khi rules.fa_diem_danh bat); js/10_theo_doi.js -->
+      <div class="panel" id="moiPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="moi_tieu_de">Mời vào chỗ trống</h2>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul id="moiDanhSach" class="moi-danh-sach"></ul>
+        </div>
+      </div>
+
+      <!-- GAP-3: khieu nai loi du lieu (chi khi rules.fa_khieu_nai bat); js/10_theo_doi.js -->
+      <div class="panel" id="khieuNaiPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="kn_tieu_de">Khiếu nại lỗi dữ liệu</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnXuatKhieuNai" type="button" data-i18n="btn_xuat_khieu_nai">Xuất khiếu nại (CSV)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p class="hint" id="knGoiY"></p>
+          <div class="search-row">
+            <input type="text" id="knMa" class="text-input text-input-sm" data-i18n-placeholder="kn_ma" data-i18n-aria-label="kn_ma" placeholder="Mã học sinh">
+            <select id="knBuoi" class="text-input text-input-sm" data-i18n-aria-label="kn_buoi"></select>
+            <input type="text" id="knGhiChu" class="text-input" data-i18n-placeholder="kn_ghi_chu" data-i18n-aria-label="kn_ghi_chu" placeholder="Dữ liệu nào bị sai?">
+            <button class="btn btn-primary" id="btnGuiKhieuNai" type="button" data-i18n="kn_gui">Gửi khiếu nại</button>
+          </div>
+          <ul id="knDanhSach" class="moi-danh-sach"></ul>
+          <div id="knFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
+      <!-- GAP-4: vong 2 (chi khi rules.fa_vong_2 bat); js/10_theo_doi.js -->
+      <div class="panel" id="vong2Panel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="v2_tieu_de">Vòng 2</h2>
+          </div>
+          <div class="panel-actions">
+            <select id="v2Buoi" class="text-input text-input-sm" data-i18n-aria-label="kn_buoi"></select>
+            <button class="btn btn-primary" id="btnChayVong2" type="button" data-i18n="v2_chay">Chạy vòng 2</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p class="hint" data-i18n="v2_goi_y">Học sinh chưa có CLB mong muốn chọn trong các chỗ còn trống, lần lượt theo thứ tự bốc thăm. Chỉ chạy một lượt.</p>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="th_student_id">Mã học sinh</th>
+                <th data-i18n="th_name">Họ tên</th>
+                <th data-i18n="v2_chon">Chọn</th>
+              </tr>
+            </thead>
+            <tbody id="v2Bang"></tbody>
+          </table>
+          <div id="v2KetQua" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
+      <!-- GAP-5/6: tong hop phan hoi + nap tu Forms (chi khi rules.fa_phan_hoi bat); js/10_theo_doi.js -->
+      <div class="panel" id="phanHoiTongPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="ph_tong_tieu_de">Phản hồi của học sinh</h2>
+          </div>
+          <div class="panel-actions">
+            <input type="file" id="phTep" accept=".xlsx" hidden>
+            <button class="btn btn-secondary" id="btnNhapPhanHoi" type="button" data-i18n="ph_nhap">Nạp từ Forms (Excel)</button>
+            <button class="btn btn-secondary" id="btnXuatPhanHoi" type="button" data-i18n="ph_xuat">Xuất phản hồi (Excel)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p id="phTongHop"></p>
+          <div id="phNhapKetQua" class="save-feedback" role="status"></div>
+        </div>
+      </div>
+
       <div class="panel" id="dsXepPanel">
         <div class="panel-head">
           <div class="panel-head-trai">
@@ -680,6 +826,26 @@
         <h1 data-i18n="admin_title">Quản lý</h1>
         <p class="view-desc" data-i18n="admin_desc">Thêm hoặc sửa CLB, chỉ tiêu và suất ưu tiên. Nhóm ưu tiên của học sinh chỉ được hưởng suất khi cùng nhãn với CLB.</p>
       </header>
+
+      <!-- GAP-8 (V§11): bảng điều khiển quản trị, chỉ đọc; chỉ hiện khi FA-DAA bật (js/10_theo_doi.js taiDashboard). -->
+      <div class="panel" id="dashboardPanel" hidden>
+        <div class="panel-head">
+          <div class="panel-head-trai">
+            <h2 data-i18n="db_tieu_de">Bảng điều khiển</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary" id="btnXuatDashboard" type="button" data-i18n="btn_xuat_dashboard">Xuất bảng điều khiển (Excel)</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <table class="data-table" id="dbBang">
+            <thead><tr><th data-i18n="db_cot_chi_so">Chỉ số</th><th data-i18n="db_cot_gia_tri">Giá trị</th>
+              <th data-i18n="db_cot_muc_tieu">Mục tiêu</th><th data-i18n="db_cot_dat">Đạt</th></tr></thead>
+            <tbody id="dbBangBody"></tbody>
+          </table>
+          <div id="dbFeedback" class="save-feedback" role="status"></div>
+        </div>
+      </div>
 
       <!-- Tab con của thẻ Quản lý (A13.5). Hai tab điểm (wh, dc) chỉ hiện khi bật điểm quyết tâm:
            js/05_quan_ly.js (capNhatTabConQl) bỏ thuộc tính hidden khi khối tương ứng hiện. -->
@@ -1041,6 +1207,7 @@
 <script src="js/07_ngon_ngu.js"></script>
 <script src="js/075_workspace.js"></script>
 <script src="js/09_the_xem.js"></script>
+<script src="js/10_theo_doi.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>

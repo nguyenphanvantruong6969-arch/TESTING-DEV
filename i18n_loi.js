@@ -374,6 +374,10 @@ window.I18N_ERROR_MESSAGES = {
     "vi": "Không tìm thấy {person_l} {student_id}.",
     "en": "{person} {student_id} wasn't found."
   },
+  "gioi_han_gv_sai": {
+    "vi": "Giới hạn chỉ tiêu phải là số nguyên dương (nhận {value}).",
+    "en": "The capacity limit must be a positive whole number (got {value})."
+  },
   "club_not_found": {
     "vi": "Không tìm thấy {slot_sl} {club_id}.",
     "en": "{slot} {club_id} wasn't found."
@@ -657,6 +661,74 @@ window.I18N_ERROR_MESSAGES = {
   "fa_can_diem_quyet_tam": {
     "vi": "Chưa bật được xếp theo loại CLB và huy chương vì điểm quyết tâm đang tắt. Huy chương dùng chung bảng điểm quyết tâm: hãy bật điểm quyết tâm (cần ưu tiên theo điểm thi và điểm tính riêng từng CLB) rồi thử lại.",
     "en": "Club-type and medal mode can't be turned on because determination points are off. Medals use the same points table: turn determination points on (this needs score-based priority and per-club scores) and try again."
+  },
+  "fa_tinh_nang_can_fa": {
+    "vi": "Tính năng {khoa} chỉ bật được khi đã bật xếp theo loại {slot_l} và huy chương (FA-DAA). Hãy bật FA-DAA trước.",
+    "en": "Feature {khoa} can only be turned on with {slot_l}-type and medal mode (FA-DAA). Turn FA-DAA on first."
+  },
+  "fa_diem_danh_chua_bat": {
+    "vi": "Không gian làm việc này chưa bật điểm danh sau khi xếp.",
+    "en": "This workspace doesn't use attendance after allocation."
+  },
+  "diem_danh_gia_tri_sai": {
+    "vi": "Giá trị điểm danh không hợp lệ: chỉ nhận lần sinh hoạt 1, 2, 3 và có mặt, vắng có phép, vắng không phép.",
+    "en": "Invalid attendance value: only meetings 1, 2, 3 and present, excused, unexcused are accepted."
+  },
+  "diem_danh_khong_thuoc_clb": {
+    "vi": "{person} {student_id} không thuộc {slot_l} {club_id} nên không điểm danh ở đó được.",
+    "en": "{person} {student_id} is not in {slot_l} {club_id}, so attendance can't be recorded there."
+  },
+  "loi_luu_sau_xep": {
+    "vi": "Không lưu được thay đổi sau khi xếp. Hãy thử lại.",
+    "en": "Couldn't save the after-allocation change. Try again."
+  },
+  "fa_vong_2_chua_bat": {
+    "vi": "Không gian làm việc này chưa bật vòng 2 sau khi xếp.",
+    "en": "This workspace doesn't use a second round after allocation."
+  },
+  "vong_2_lua_chon_sai": {
+    "vi": "Lựa chọn vòng 2 không hợp lệ: {person_l} {student_id} không cần vòng 2, hoặc {slot_l} {club_id} không thuộc buổi này.",
+    "en": "Invalid second-round choice: {person} {student_id} doesn't need round 2, or {slot_l} {club_id} isn't in this session."
+  },
+  "vong_2_da_chay": {
+    "vi": "Vòng 2 của buổi này đã chạy rồi (chỉ chạy một lượt).",
+    "en": "Round 2 for this session has already run (it runs once)."
+  },
+  "fa_phan_hoi_chua_bat": {
+    "vi": "Không gian làm việc này chưa bật phản hồi của {person_pl}.",
+    "en": "This workspace doesn't collect {person} feedback."
+  },
+  "phan_hoi_gia_tri_sai": {
+    "vi": "Câu trả lời phản hồi không hợp lệ: hài lòng từ 1 đến 5, hiểu lý do có hoặc không, và một phần khó nhất trong danh sách.",
+    "en": "Invalid feedback answer: satisfaction 1 to 5, understood yes or no, and one hardest part from the list."
+  },
+  "phan_hoi_tep_sai": {
+    "vi": "Tệp này không phải tệp xuất của biểu mẫu phản hồi (không thấy cột mã {person_l} và câu hỏi phản hồi).",
+    "en": "This file isn't an export of the feedback form (no {person} ID column or feedback question)."
+  },
+  "fa_khieu_nai_chua_bat": {
+    "vi": "Không gian làm việc này chưa bật nhận khiếu nại sau khi xếp.",
+    "en": "This workspace doesn't take appeals after allocation."
+  },
+  "khieu_nai_khong_hop_le": {
+    "vi": "Không nhận được khiếu nại: không tìm thấy {person_l} {student_id} hoặc buổi {buoi} chưa có kết quả.",
+    "en": "Appeal not accepted: {person} {student_id} not found or session {buoi} has no result yet."
+  },
+  "khieu_nai_qua_han": {
+    "vi": "Đã quá hạn khiếu nại ({so_ngay} ngày từ lúc công bố kết quả).",
+    "en": "The appeal window has closed ({so_ngay} days after results were published)."
+  },
+  "khieu_nai_trung": {
+    "vi": "{person} {student_id} đã có một khiếu nại đang chờ xử lý cho buổi này.",
+    "en": "{person} {student_id} already has an appeal waiting for this session."
+  },
+  "khieu_nai_da_xu_ly": {
+    "vi": "Khiếu nại này đã được xử lý rồi.",
+    "en": "This appeal has already been handled."
+  },
+  "moi_khong_con_cho": {
+    "vi": "Lời mời này không còn chờ trả lời (đã được trả lời, hoặc kết quả xếp của buổi đó đã chạy lại).",
+    "en": "This invitation is no longer waiting for an answer (already answered, or that day was re-run)."
   },
   "fa_ly_do_thieu_buoi": {
     "vi": "Buổi {buoi} không có lý do: lần chạy gần nhất của buổi đó không dùng chế độ FA-DAA.",

@@ -266,5 +266,5 @@ List `CLB_GIA` (hoặc `CLB`) cần thêm các cột lấy từ Phiếu thiết 
 ### 12.5 Còn mở
 
 - **D8** (đường A hay B) chờ cuộc họp GĐ2; bộ dựng và đặc tả này chỉ để sẵn.
-- Tên cột thật của `CLB_GIA` và quyền sửa app (NC-01, NC-02): HỎI-IT. Công thức Power Fx trong bộ dựng (`02_app/`) vẫn của chế độ thường, chưa viết lại cho màn FA.
+- Tên cột thật của `CLB_GIA` và quyền sửa app (NC-01, NC-02): HỎI-IT. Công thức Power Fx của màn FA: `02_app/DangKyFA.txt` do `tao_bo_dung_t4m.py --fa-daa` sinh (GAP-11, 10/11/2026; GĐ, TH: chưa dán thử vào app thật); các tệp khác trong `02_app/` vẫn của chế độ thường.
 - Dòng `DRAFT` còn sót sau hạn: bộ chuyển đổi bỏ qua (em coi như không đăng ký, theo V§8.6 thành CLB Tự do); có nên giữ làm mặc định hay không là câu hỏi cho Truong.

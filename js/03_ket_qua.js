@@ -835,8 +835,10 @@ function loadMatchResults(search) {
     const cauLyDo = fa && lyDo.data.run_id !== null ? lyDo.data.cau : null;
     el("btnXuatLyDo").hidden = !fa;
     el("btnXuatNhuCau").hidden = !fa;
+    el("btnXuatGoiY").hidden = !fa; /* GAP-7 */
     el("btnXuatBienBan").hidden = !fa;
     veCotLyDo(!!cauLyDo);
+    taiDiemDanh(); /* GAP-1: khung điểm danh (js/10_theo_doi.js) — tự ẩn khi cờ tắt */
     /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
     const thieu = fa && Array.isArray(lyDo.data.thieu_buoi) ? lyDo.data.thieu_buoi : [];
     const tbThieu = el("lyDoThieuBuoi");
@@ -1036,6 +1038,11 @@ function initResultsHandlers() {
   });
   el("btnXuatNhuCau").addEventListener("click", () => {
     chayXuat([["xuat_muc_nhu_cau", "export_bang_nhu_cau", [""],
+      (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
+  });
+
+  el("btnXuatGoiY").addEventListener("click", () => {
+    chayXuat([["xuat_muc_goi_y", "export_goi_y_chi_tieu", [""],
       (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
   });
 

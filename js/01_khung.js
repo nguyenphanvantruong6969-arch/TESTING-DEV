@@ -15,7 +15,10 @@
    tep js/ nap SAU tep nay, nen luc dong nay chay chung chua ton tai. */
 const TAB_LOADERS = {
   pipeline: () => loadPipelineTab(),
-  results: () => loadKetQuaTab(),
+  results: () => {
+    loadKetQuaTab();
+    taiPhanHoi(); /* GAP-5: ba câu phản hồi (js/10_theo_doi.js) — tự ẩn khi cờ tắt */
+  },
   others: () => loadResultsTab(),
   fallback: () => loadFallbackTab(),
   admin: () => loadAdminTab(),

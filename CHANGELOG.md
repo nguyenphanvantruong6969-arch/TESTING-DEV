@@ -1,5 +1,105 @@
 # CHANGELOG
 
+## 2026-11-10 — GAP-14: bản ghi nhớ D1 (ưu tiên bù), KHÔNG có mã
+
+- Mới `docs/ke_hoach/FA_GAPS_D1_MEMO.md`: ba phương án A/B/C, rủi ro khuyến khích, bảng `hai_ky` đo bằng `du_lieu_test/mo_phong_fa_daa.py --n 100 --so-seed 5 --hai-ky 15` (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.
+- Test: thêm 1 ca vào `tests/test_fa_gap12_mo_phong.py` (bản ghi nhớ có nhãn, có lệnh, số khớp lần chạy lại).
+
+## 2026-11-10 — GAP-13: chu trình cải thiện ổn định, chế độ đo (không bảo đảm ổn định)
+
+- Mới `fa_vong_doi_cho.py` (hàm thuần): `tim_chu_trinh`, `chay_chu_trinh` (Erdil & Ergin 2008: em có khoá tốt nhất — cho phép hoà — trong những em muốn CLB đó mới được nhận chỗ; chỉ thứ tự bốc thăm giữa các em hoà khoá bị bỏ qua), `khoa_tho_fa` (khoá FA không có bốc thăm: giữ chỗ, điểm, huy chương), `NHAN_KHONG_BAO_DAM`.
+- Cờ mới `rules.fa_vong_doi_cho` (mặc định TẮT, cần `fa_daa`; không vào dấu vân tay). `api_sau_xep.py`: `get_vong_doi_cho` CHỈ ĐỌC (không ghi `match_results` hay `fa_dieu_chinh`), trả các chu trình và số em được lợi kèm nhãn.
+- Mô phỏng: bảng `vong_doi_cho_theo_loai` (% em được lợi theo kiểu) chỉ trong `chay_mo_phong_day_du` (`--day-du`).
+- Spec sửa khi làm: điều kiện thừa "khoá không kém người đang giữ chỗ" làm chu trình không thể có với bốc thăm đơn (STB); đã bỏ, ghi trong `FA_GAPS_KE_HOACH.md`.
+- Test mới (đỏ trước): `tests/test_fa_gap13_vong_doi_cho.py` (5; có 200 ca ngẫu nhiên: không ai thiệt, sức chứa giữ nguyên, không cặp chặn với khoá tốt hơn hẳn).
+
+## 2026-11-10 — GAP-12: mô phỏng đầy đủ — kiểu "tính toán", bảng cũ/mới theo kiểu (SỐ LIỆU MÔ PHỎNG)
+
+- `du_lieu_test/mo_phong_fa_daa.py`: `HANH_VI_DAY_DU` (thêm `tinh_toan`); `dang_ky(..., cat_ky_truoc=None)`: em tính toán xếp thật nhưng bỏ CLB Tuyển chọn khi điểm dưới mốc nhận thấp nhất kỳ trước (`_duoi_cat`) và đặt vàng vào CLB Giới hạn xếp cao nhất không quá tải kỳ trước; `cat_ky_truoc` (mốc mỗi CLB từ kỳ 1); `theo_loai` (kỳ 2, cùng dữ liệu cho hai chế độ: % NV1, top 2, không CLB theo chế độ × kiểu, % thua bốc thăm theo kiểu); `chay_mo_phong_day_du` và cờ `--day-du`. `sinh_du_lieu(..., hanh_vi=HANH_VI)`: mặc định rút ngẫu nhiên y như cũ, nên bảng FA-10 (`chay_mo_phong`) không đổi.
+- Test mới: `tests/test_fa_gap12_mo_phong.py` (5; đột biến `<` → `<=` ở luật mốc và bỏ luật dời vàng đều bị bắt).
+
+## 2026-11-10 — GAP-11: công thức Power Fx màn đăng ký FA, đường A (TH)
+
+- Mới `mau_forms_thi_clb/bo_dung_t4m/cong_thuc_fa.py`: `tao_dang_ky_fa` sinh `02_app/DangKyFA.txt` theo đặc tả §12 (R39–R54): xáo thứ tự CLB mỗi lần mở ngày (`Shuffle`), ▲▼ đổi chỗ, tối đa 7 không trùng, tối thiểu 3 (hoặc tất cả), cảnh báo thiếu CLB Tự do, tự lưu MỘT `Patch` đặt DRAFT sau mỗi thao tác (`TU_LUU`), nộp SUBMITTED có đọc lại khoá, widget huy chương (mặc định ba CLB không Tự do, tự cập nhật khi chưa chỉnh, giữ khi `HC_TuChinh = Có`, hoán đổi, không đặt vào Tự do, nhắc vàng ở Tuyển chọn). Lọc trên ECA/CLB qua `soat_loc_uy_quyen`.
+- `bo_dung_t4m/sinh_bk1.py`: chỉ khi `fa` mới ghi thêm tệp này (README liệt kê); bộ dựng mặc định giống từng byte (đã so với bản cũ). Ghi chú FA và đặc tả §12.5 cập nhật. Không chọn D8.
+- Test mới (đỏ trước): `tests/test_fa_gap11_cong_thuc_fa.py` (5).
+
+## 2026-11-10 — GAP-8: bảng điều khiển quản trị (V§11), chỉ đọc
+
+- `fa_sau_xep.py`: `chi_so_dashboard` (hàm thuần, 12 chỉ số theo thứ tự V§11: không có CLB, NV1, top 2, tỉ lệ bốc thăm, số em từng thua bốc thăm, đăng ký sau 3 ngày, thử thách nghiêm túc, độ lệch chấm, đi đủ 3 buổi, hài lòng, hiểu lý do, đổi huy chương; `gia_tri` None = chưa có dữ liệu, không bao giờ thay bằng 0; ba chỉ số nằm ngoài kiosk ghi nguồn `ngoai_kiosk`), `doc_du_lieu_dashboard` (chỉ SELECT; lý do và điểm danh chỉ của lần chạy gốc mới nhất mỗi buổi), `huy_chuong_mac_dinh` (D2, chỉ để đo tỉ lệ đổi; không vào khoá ưu tiên).
+- `api_sau_xep.py`: `get_dashboard`, `export_dashboard` (`dashboard.xlsx` một trang: Chỉ số, Giá trị, Mục tiêu, Đạt, Nguồn; "chưa có dữ liệu"; không mã hay tên học sinh). Chỉ khi `rules.fa_daa` bật.
+- Giao diện: khung `#dashboardPanel` ở thẻ Quản lý (bảng `#dbBang`, nút `#btnXuatDashboard`), khoá i18n `db_*` vi + en.
+- Test mới (đỏ trước): `tests/test_fa_gap8_dashboard.py` (5), `tests/test_giao_dien_fa_gap8_dashboard.py` (2, Chromium).
+
+## 2026-11-10 — GAP-7: gợi ý chỉ tiêu kỳ sau = NV1 kỳ này, chặn bởi giới hạn giáo viên
+
+- `fa_daa.py`: `goi_y_chi_tieu` (hàm thuần: `goi_y_ky_sau = min(nv1, gioi_han)`, chưa khai giới hạn thì = nv1; `ghi_chu` khong_co_nv1 / khong_gioi_han / chan_boi_gioi_han), `kiem_tang_tu_goi_y` (dùng lại `kiem_chi_tang`: chỉ được tăng từ gợi ý).
+- Bảng mới `fa_gioi_han_gv` (qua `DEFAULT_SCHEMA`; không đổi bảng `clubs`, hợp đồng CSV giữ nguyên).
+- `api_xuat.py`: `_bang_nhu_cau_goi_y` (chỉ đọc, dùng chung), `export_goi_y_chi_tieu` (`goi_y_chi_tieu.csv`, không dữ liệu học sinh), `luu_gioi_han_gv`, `kiem_chi_tieu_ky_sau`; `export_bang_nhu_cau` thêm MỘT cột cuối `goi_y_ky_sau` (tệp xuất FA, không phải CSV đầu vào). Chỉ khi `rules.fa_daa` bật; mã lỗi mới `gioi_han_gv_sai`.
+- Giao diện: nút `#btnXuatGoiY` ở khung xuất (chỉ hiện khi FA bật).
+- Test mới (đỏ trước): `tests/test_fa_gap7_goi_y.py` (7); thêm 1 test Chromium vào `tests/test_giao_dien_fa_ket_qua.py`.
+
+## 2026-11-10 — GAP-10: nhắc hạn đăng ký + danh sách chưa đăng ký cho GVCN (TH)
+
+- Tài liệu mới `docs/he_sinh_thai/T4M_FLOW_NHAC_HAN.md`: ba lần nhắc (mở cổng, −2 ngày, −3 giờ) bằng email nhóm, nhắc riêng CLB Tuyển chọn chưa làm bài ×2, luật dưới 50 % sau 3 ngày → danh sách cho GVCN qua `T4M_FLOW_GUI_GVCN.md`, ước lượng theo giới hạn 6.000 yêu cầu/người/ngày. Nhãn TH/GĐ.
+- Công cụ mới `mau_forms_thi_clb/danh_sach_chua_dang_ky.py`: `ty_le_dang_ky` (hàm thuần, cờ `DUOI_50` khi < 50 %), `doc_da_dang_ky` (cột "[student_id] …" của Forms hoặc `student_id`), ghi `chua_dang_ky_<lớp>.csv` (chỉ mã + lớp) và `tong_hop.csv`; in số email cần và cảnh báo khi vượt 6.000.
+- Test mới (đỏ trước): `tests/test_fa_gap10_nhac_han.py` (4).
+
+## 2026-11-10 — GAP-9: độ lệch giữa hai người chấm (TH)
+
+- `mau_forms_thi_clb/phan_tich_cau_hoi.py`: `NGUONG_LECH_CHAM = 1.5`, `do_lech_cham(rows)` (hàm thuần: độ lệch tuyệt đối trung bình theo câu và theo CLB, cờ `LECH_CHAM` khi ≥ 1,5; dòng thiếu điểm người chấm 2 bị bỏ), `ghi_bao_cao(..., do_lech=None)` thêm trang "Độ lệch chấm" (các trang cũ giữ nguyên), lệnh `lech CHAM.csv --ra BAO_CAO.xlsx` (thiếu cột → báo, mã thoát 1).
+- Test mới (đỏ trước): `tests/test_fa_gap9_lech_cham.py` (3).
+
+## 2026-11-10 — GAP-6: khảo sát tuần 3 (2 câu) trên Forms
+
+- `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_tuan_3` (2 câu: còn đi sinh hoạt? muốn đổi CLB?); `mau_forms_thi_clb/tao_mau_forms.py`: `sinh_tuan_3`, cờ `--tuan-3` (dùng riêng, không ghép với cờ khác). Phần Microsoft ghi nhãn TH (chưa thử trên Microsoft thật).
+- Nhập: dùng chung `nhap_phan_hoi_forms` / `doc_tep_forms_phan_hoi` (bảng `fa_phan_hoi`, `loai = tuan_3`); tổng hợp `tong_hop_phan_hoi(rows, "tuan_3")`; xuất trong `phan_hoi.xlsx`. Cùng cờ `rules.fa_phan_hoi`.
+- Test mới (đỏ trước): `tests/test_fa_gap6_tuan_3.py` (4).
+
+## 2026-11-10 — GAP-5: 3 câu phản hồi sau khi xem kết quả (kiosk + Forms)
+
+- Cờ mới `rules.fa_phan_hoi` (mặc định TẮT, cần `fa_daa`). Bảng mới `fa_phan_hoi` (qua `DEFAULT_SCHEMA`).
+- `fa_sau_xep.py`: `KHO_NHAT`, `tong_hop_phan_hoi`, `doc_tep_forms_phan_hoi` (đọc mã câu `[ma]` và mã lựa chọn `(ma)` từ tệp xuất Forms). `api_sau_xep.py`: `gui_phan_hoi`, `get_phan_hoi_tong_hop`, `nhap_phan_hoi_forms`, `export_phan_hoi` (`phan_hoi.xlsx`, không tên học sinh).
+- Forms: `bieu_mau.py` thêm phần phản hồi, `tao_mau_forms.py` cờ `--phan-hoi` (`sinh_phan_hoi`), nhãn TH.
+- Giao diện: khung `#phanHoiPanel` (bấm một lần mỗi câu), chữ hiển thị không xưng hô (đạt `chu_cam`). Mã lỗi mới `fa_phan_hoi_chua_bat`, `phan_hoi_gia_tri_sai`, `phan_hoi_tep_sai`.
+- Nhập tệp Forms: mã ngoài miền (`MIEN_PHAN_HOI`) đọc thành rỗng, không ghi số sai.
+- Test mới (đỏ trước): `tests/test_fa_gap5_phan_hoi.py` (8), `tests/test_giao_dien_fa_gap5_phan_hoi.py` (3, Chromium).
+
+## 2026-11-10 — GAP-4: vòng 2 cho học sinh chưa có CLB mong muốn
+
+- Cờ mới `rules.fa_vong_2` (mặc định TẮT, cần `fa_daa`).
+- `fa_sau_xep.py`: `can_vong_2`, `cho_con_lai` (chỗ còn = chỉ tiêu − thành viên hiện tại − lời mời đang chờ), `chay_vong_2` (một lượt chọn theo thứ tự bốc thăm của buổi; mỗi lần chọn một dòng `round2` trong `fa_dieu_chinh`, không sửa kết quả xếp). `api_sau_xep.py`: `get_vong_2`, `chay_vong_2_api`.
+- Giao diện: khung `#vong2Panel`. Mã lỗi mới `fa_vong_2_chua_bat`, `vong_2_da_chay`, `vong_2_lua_chon_sai`.
+- Test mới (đỏ trước): `tests/test_fa_gap4_vong_2.py` (7), `tests/test_giao_dien_fa_gap4_vong_2.py` (2, Chromium).
+
+## 2026-11-10 — GAP-3: khiếu nại lỗi dữ liệu trong hạn, chạy lại với seed đã khoá
+
+- Cờ mới `rules.fa_khieu_nai` (mặc định TẮT, cần `fa_daa`) và `rules.fa_khieu_nai_so_ngay` (số nguyên 1..14, mặc định 3). Bảng mới `fa_khieu_nai`.
+- `fa_sau_xep.py`: `SO_NGAY_KHIEU_NAI`, `bay_gio`, `trong_han_khieu_nai`, `anh_huong_sau_chay_lai` (liệt kê học sinh đổi chỗ và các điều chỉnh cũ cần soát lại, không bỏ âm thầm). `api_sau_xep.py`: `gui_khieu_nai`, `get_khieu_nai`, `xu_ly_khieu_nai` (chấp nhận ghi một dòng `appeal_rerun`; sửa dữ liệu rồi chạy lại toàn bộ pipeline với seed đã khoá, thêm dòng `run_history` mới), `export_khieu_nai` (`khieu_nai.csv`).
+- Giao diện: khung `#khieuNaiPanel`; lỗi khi mở khung nay hiện thông báo thay vì ẩn khung (W1 N1); mã lỗi chung mới `loi_luu_sau_xep` (W1 N2) và `fa_khieu_nai_chua_bat`, `khieu_nai_da_xu_ly`, `khieu_nai_khong_hop_le`, `khieu_nai_qua_han`, `khieu_nai_trung`.
+- Test mới (đỏ trước): `tests/test_fa_gap3_khieu_nai.py` (9), `tests/test_giao_dien_fa_gap3_khieu_nai.py` (4, Chromium).
+
+## 2026-11-10 — GAP-2: mời học sinh đầu danh sách chờ vào chỗ được giải phóng
+
+- `fa_sau_xep.py`: `moi_dang_cho`, `trang_thai_moi`, `hang_cho` (hàm thuần; dùng `fa_ly_do.waitlist_pos` — thứ tự D4 đã tính sẵn; chỉ em thua ở CLB đó và xếp nó cao hơn CLB hiện tại, không đang có lời mời, chưa từ chối), `moi_tiep` (mời khi thành viên + lời mời đang chờ < chỉ tiêu; chỉ CLB Giới hạn / Tuyển chọn).
+- `api_sau_xep.py`: `get_moi_cho_trong`, `tra_loi_moi` (nhận / từ chối / hết hạn; mỗi bước một dòng `fa_dieu_chinh`; sau đó tự mời người kế tiếp). Giải phóng chỗ (GAP-1) tự gọi `moi_tiep`. Cùng cờ `rules.fa_diem_danh`.
+- Giao diện: khung `#moiPanel` (nút Nhận / Từ chối / Hết hạn). Mã lỗi mới `moi_khong_con_cho`.
+- Test mới (đỏ trước): `tests/test_fa_gap2_moi_cho.py` (9), thêm 1 test Chromium vào `tests/test_giao_dien_fa_gap1_theo_doi.py`.
+
+## 2026-11-10 — GAP-1: điểm danh 3 buổi đầu, vắng 2/3 không phép thì giải phóng chỗ
+
+- Cờ mới `rules.fa_diem_danh` (mặc định TẮT, chỉ bật được khi `fa_daa` bật: mã lỗi `fa_tinh_nang_can_fa`); không thuộc luật xếp nên không vào `run_history.luat_xep` hay dấu vân tay.
+- `fa_sau_xep.py`: `can_giai_phong`, `NGUONG_VANG = 2`; `api_sau_xep.py` (mới, `SauXepMixin`): `get_diem_danh`, `luu_diem_danh` (đủ 2/3 buổi vắng không phép -> một dòng `release` trong `fa_dieu_chinh`, không sửa kết quả xếp), `export_diem_danh` (`diem_danh.xlsx`, mỗi CLB một trang, chữ an toàn cho Excel). Bảng mới `fa_diem_danh`.
+- Giao diện: khung `#diemDanhPanel` ở thẻ Chi tiết (tệp mới `js/10_theo_doi.js`), ô `wzFaDiemDanh` ở bước luật của trình tạo không gian làm việc; 4 mã lỗi mới.
+- Test mới (đỏ trước): `tests/test_fa_gap1_diem_danh.py` (10), `tests/test_giao_dien_fa_gap1_theo_doi.py` (3, Chromium).
+
+## 2026-11-10 — GAP-0: nhật ký điều chỉnh sau khi xếp + hàm phát lại
+
+- `fa_sau_xep.py` (mới): `vi_tri_hien_tai` (hàm thuần: kết quả lần chạy gốc + điều chỉnh phát lại theo `id`; dòng của lần chạy cũ hay không khớp chỗ hiện tại bị bỏ và báo `lech`), `run_goc_theo_buoi`, `doc_vi_tri`, `ghi_dieu_chinh` (cách duy nhất ghi, chỉ INSERT).
+- `rbda_priority_pipeline.py` (`DEFAULT_SCHEMA`): bảng mới `fa_dieu_chinh` chỉ ghi thêm; CSDL cũ nhận bảng khi mở (`init_db`). `match_results`/`run_history` không bị sửa.
+- `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: `BANG_NHAT_KY` thêm `fa_dieu_chinh`.
+- Test mới (đỏ trước): `tests/test_fa_gap0_dieu_chinh.py` (16 ca).
+
 ## 2026-11-10 — FA-P7/SM-3: kiem_nhanh --so-seed N > 5 chạy đủ N seed
 
 - `.claude/skills/soat-ma/scripts/kiem_nhanh.py`: hàm mới `danh_sach_seed(n)` — n ≤ 5 lấy n seed đầu của `SEED_MAC_DINH` (không cờ: đúng 5 seed cũ); n > 5 thêm 2, 3, 4, … (bỏ số trùng) tới đủ n; tất định. `main` dùng hàm này; chữ trợ giúp ghi rõ luật. `--so-seed 20` nay in "60 ca (3 bộ × 20 seed) trùng khít" (trước đây cắt còn 15 ca).

@@ -258,6 +258,39 @@ def cac_phan_fa(de, ma_buoi):
     ]
 
 
+# ------------------------------------------- GAP-5 (TH): ba câu phản hồi sau khi xem kết quả (V§9.1)
+# Mã trong "[…]" và "(…)" khớp `fa_sau_xep.MA_CAU_PHAN_HOI` / `KHO_NHAT` (bộ nhập của kiosk đọc theo mã).
+CAU_HAI_LONG = "[hai_long] Em hài lòng với kết quả xếp CLB đến mức nào?"
+CAU_HIEU_LY_DO = "[hieu_ly_do] Em có hiểu vì sao mình được xếp như vậy không?"
+CAU_KHO_NHAT = "[kho_nhat] Phần nào khó nhất với em?"
+LUA_CHON_HAI_LONG = ["1 — Rất không hài lòng (1)", "2 (2)", "3 (3)", "4 (4)", "5 — Rất hài lòng (5)"]
+LUA_CHON_CO_KHONG = ["Có (1)", "Không (0)"]
+LUA_CHON_KHO_NHAT = ["Chọn CLB (chon_clb)", "Xếp thứ tự nguyện vọng (xep_thu_tu)", "Đặt huy chương (huy_chuong)",
+                     "Bài thử thách (thu_thach)", "Không có phần nào khó (khong_co)"]
+
+
+def cac_phan_phan_hoi():
+    """GAP-5 (TH): bố cục biểu mẫu phản hồi: mã học sinh + 3 câu một chạm, đều bắt buộc."""
+    return [("Phản hồi sau khi xem kết quả", [
+        (cau_ma_hoc_sinh(), "text", [], True),
+        (CAU_HAI_LONG, "choice", list(LUA_CHON_HAI_LONG), True),
+        (CAU_HIEU_LY_DO, "choice", list(LUA_CHON_CO_KHONG), True),
+        (CAU_KHO_NHAT, "choice", list(LUA_CHON_KHO_NHAT), True)])]
+
+
+# ------------------------------------------- GAP-6 (TH): khảo sát tuần 3 (V§9.3)
+CAU_CON_DI = "[con_di] Em còn đi sinh hoạt CLB của mình không?"
+CAU_MUON_DOI = "[muon_doi] Em có muốn đổi sang CLB khác không?"
+
+
+def cac_phan_tuan_3():
+    """GAP-6 (TH): bố cục khảo sát tuần 3: mã học sinh + 2 câu có/không, đều bắt buộc."""
+    return [("Khảo sát tuần 3", [
+        (cau_ma_hoc_sinh(), "text", [], True),
+        (CAU_CON_DI, "choice", list(LUA_CHON_CO_KHONG), True),
+        (CAU_MUON_DOI, "choice", list(LUA_CHON_CO_KHONG), True)])]
+
+
 def cac_phan_moi_clb(de, clb):
     """T4M-Q4a: bố cục biểu mẫu của MỘT CLB: một phần, các câu đề thi, KHÔNG câu cổng.
 

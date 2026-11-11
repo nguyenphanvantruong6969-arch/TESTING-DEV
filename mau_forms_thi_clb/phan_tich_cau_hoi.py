@@ -8,6 +8,8 @@ Phần tính toán thuần (không đọc tệp Forms): bộ chuyển đổi `ch
   * `so_sanh_bien_the(diem)` (D11, không bao giờ chặn): ngưỡng z*sqrt(s_v²/n_v + s_o²/n_o) với z = 1,96 (2 đề) hoặc
     2,39 (3 đề); đề n < 5 chỉ báo, không chỉnh; vượt ngưỡng thì dịch (trung bình chung - trung bình đề).
     Admin xác nhận bằng `--ap-dung-dieu-chinh` hoặc `--giu-diem-goc` của bộ chuyển đổi.
+  * `do_lech_cham(rows)` (GAP-9, V§7.4): độ lệch tuyệt đối trung bình giữa hai người chấm theo câu và theo CLB;
+    trung bình >= 1,5 điểm -> cờ LECH_CHAM (nên sửa thang chấm). Lệnh `lech TEP.csv --ra BAO_CAO.xlsx`.
 
 Dữ liệu trong test là MÔ PHỎNG.
 """
@@ -20,6 +22,7 @@ TRAN_BIEN_THE = 3
 N_TOI_THIEU = 5                           # D11: đề ít hơn 5 bài chỉ báo
 Z_THEO_SO_DE = {2: 1.96, 3: 2.39}         # 3 đề: Bonferroni cho 3 phép so sánh
 NGUONG_QUA_DE, NGUONG_QUA_KHO = 0.9, 0.2
+NGUONG_LECH_CHAM = 1.5                    # GAP-9 (V§7.4): độ lệch 2 người chấm phải < 1,5 điểm
 
 
 def chon_bien_the(email, n):
@@ -138,8 +141,40 @@ def diem_dieu_chinh(diem_tho, dich):
     return int(min(10, max(0, (x + Fraction(1, 2)) // 1)))
 
 
-def ghi_bao_cao(duong, hang_cau=None, so_sanh_theo_clb=None):
-    """Ghi xlsx: sheet "Câu hỏi" (V§7.5) và/hoặc sheet "Cân bằng đề" (D11). Cờ viết bằng mã, người đọc xem hướng dẫn."""
+def _so(x):
+    """Điểm đọc được (số hoặc chữ số) -> float; rỗng / None / không đọc được -> None."""
+    if x is None or isinstance(x, bool):
+        return None
+    try:
+        v = float(str(x).strip().replace(",", "."))
+    except ValueError:
+        return None
+    return v if math.isfinite(v) else None
+
+
+def do_lech_cham(rows):
+    """GAP-9. `rows`: [{club_id, cau, diem_1, diem_2}]; dòng thiếu một trong hai điểm bị bỏ. Trả
+    {"theo_cau": [{club_id, cau, n, lech_tb, co}], "theo_clb": [{club_id, n, lech_tb, co}]}, sắp theo mã;
+    co = "LECH_CHAM" khi lech_tb >= NGUONG_LECH_CHAM, không thì "". Hàm thuần."""
+    cau, clb = {}, {}
+    for r in rows:
+        a, b = _so(r.get("diem_1")), _so(r.get("diem_2"))
+        if a is None or b is None:
+            continue
+        d = abs(a - b)
+        cau.setdefault((str(r["club_id"]), str(r["cau"])), []).append(d)
+        clb.setdefault(str(r["club_id"]), []).append(d)
+
+    def dong(x):
+        tb = _tb(x)
+        return {"n": len(x), "lech_tb": tb, "co": "LECH_CHAM" if tb >= NGUONG_LECH_CHAM else ""}
+    return {"theo_cau": [{"club_id": k[0], "cau": k[1], **dong(v)} for k, v in sorted(cau.items())],
+            "theo_clb": [{"club_id": k, **dong(v)} for k, v in sorted(clb.items())]}
+
+
+def ghi_bao_cao(duong, hang_cau=None, so_sanh_theo_clb=None, do_lech=None):
+    """Ghi xlsx: sheet "Câu hỏi" (V§7.5), "Cân bằng đề" (D11) và/hoặc "Độ lệch chấm" (GAP-9). Cờ viết bằng mã, người
+    đọc xem hướng dẫn."""
     from openpyxl import Workbook
     wb = Workbook()
     wb.remove(wb.active)
@@ -158,22 +193,42 @@ def ghi_bao_cao(duong, hang_cau=None, so_sanh_theo_clb=None):
                 ws.append([clb, bt, o["n"]] + [None if o[k] is None else round(o[k], 3) for k in
                                                 ("trung_binh", "trung_binh_con_lai", "chenh_lech", "nguong")]
                           + [o["ly_do"], round(o["dich"], 3)])
+    if do_lech is not None:
+        ws = wb.create_sheet("Độ lệch chấm")
+        ws.append(["CLB", "Câu", "Số bài", "Lệch trung bình", "Cờ"])
+        for r in do_lech["theo_cau"]:
+            ws.append([r["club_id"], r["cau"], r["n"], round(r["lech_tb"], 3), r["co"]])
+        for r in do_lech["theo_clb"]:
+            ws.append([r["club_id"], "(cả CLB)", r["n"], round(r["lech_tb"], 3), r["co"]])
     wb.save(duong)
 
 
 def main(argv=None):
     """`python phan_tich_cau_hoi.py chia DANH_SACH.csv --so-bien-the 2 --ra DE_CUA_EM.csv`: cột Email -> Email, DeGiao,
-    DeThiLai (A/B/C), để gửi đúng đường dẫn biểu mẫu cho từng em."""
+    DeThiLai (A/B/C), để gửi đúng đường dẫn biểu mẫu cho từng em.
+    `python phan_tich_cau_hoi.py lech CHAM.csv --ra BAO_CAO.xlsx` (GAP-9): cột ClubId, Cau, Diem1, Diem2 -> sheet
+    "Độ lệch chấm"."""
     import argparse
     import csv
     ap = argparse.ArgumentParser(description=main.__doc__.split("\n")[0])
-    ap.add_argument("lenh", choices=["chia"])
-    ap.add_argument("tep", help="CSV có cột Email")
+    ap.add_argument("lenh", choices=["chia", "lech"])
+    ap.add_argument("tep", help="CSV có cột Email (chia) hoặc ClubId, Cau, Diem1, Diem2 (lech)")
     ap.add_argument("--so-bien-the", type=int, default=2, choices=[1, 2, 3])
     ap.add_argument("--ra", required=True)
     a = ap.parse_args(argv)
     with open(a.tep, encoding="utf-8-sig", newline="") as f:
         dong = list(csv.DictReader(f))
+    if a.lenh == "lech":
+        thieu = [c for c in ("ClubId", "Cau", "Diem1", "Diem2") if not dong or c not in dong[0]]
+        if thieu:
+            print("tệp thiếu cột: %s" % ", ".join(thieu), file=sys.stderr)
+            return 1
+        kq = do_lech_cham([{"club_id": r["ClubId"], "cau": r["Cau"], "diem_1": r["Diem1"], "diem_2": r["Diem2"]}
+                           for r in dong])
+        ghi_bao_cao(a.ra, do_lech=kq)
+        n_co = sum(1 for r in kq["theo_cau"] if r["co"])
+        print("Độ lệch chấm: %d câu, %d câu lệch >= %s điểm -> %s" % (len(kq["theo_cau"]), n_co, NGUONG_LECH_CHAM, a.ra))
+        return 0
     if not dong or "Email" not in dong[0]:
         print("tệp phải có cột Email", file=sys.stderr)
         return 1

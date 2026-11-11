@@ -65,7 +65,8 @@ def test_fa_tat_khong_cot_khong_nut(mo):
     page, _, loi = mo(_khong_fa)
     page.wait_for_timeout(500)
     assert page.locator("#view-others .cot-ly-do").count() == 0
-    assert page.locator("#btnXuatLyDo").is_hidden() and page.locator("#btnXuatNhuCau").is_hidden()
+    assert page.locator("#btnXuatLyDo").is_hidden() and page.locator("#btnXuatNhuCau").is_hidden() \
+        and page.locator("#btnXuatGoiY").is_hidden()
     assert page.locator("#btnXuatBienBan").is_hidden()
     assert not loi, loi
 
@@ -92,6 +93,19 @@ def test_hai_nut_xuat_tao_tep(mo):
     txt = page.locator("#xuatFeedback").inner_text()
     duong = [w for w in txt.split() if w.endswith(".csv")]
     assert duong and all(os.path.exists(d.strip(".,;")) for d in duong), txt
+    assert not loi, loi
+
+
+def test_nut_goi_y_chi_tieu_ky_sau_tao_tep(mo):
+    """GAP-7: nút xuất gợi ý chỉ tiêu kỳ sau (chỉ khi FA bật)."""
+    page, _, loi = mo(_fa)
+    page.wait_for_selector("#btnXuatGoiY:not([hidden])")
+    page.locator("#btnXuatGoiY").click()
+    page.wait_for_function("() => document.getElementById('xuatFeedback').textContent.includes('goi_y_chi_tieu.csv')")
+    txt = page.locator("#xuatFeedback").inner_text()
+    duong = [w.strip(".,;") for w in txt.split() if "goi_y_chi_tieu.csv" in w]
+    assert duong and os.path.exists(duong[0]), txt
+    assert open(duong[0], encoding="utf-8-sig").readline().strip().endswith("goi_y_ky_sau,ghi_chu")
     assert not loi, loi
 
 
