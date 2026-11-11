@@ -12,14 +12,13 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 ## Plan (written by Opus; ticked by Sonnet)
 - [x] FA-M2b: combined registration form (layout, generator, guide, tests, docs)
 - [x] FA-M6b: combined "after results" form (layout, generator, reader, API, UI, tests, docs)
-- [ ] Section 4: soat-ma, diff -r vs snapshot, report `docs/phien/bao_cao_dem/<date>_forms_gop.md`
+- [x] Section 4: soat-ma, diff -r vs snapshot, report `docs/phien/bao_cao_dem/<date>_forms_gop.md`
 
 ## Current state (overwrite each handoff)
 - Done: FA-M2b (commit 56fa911) and FA-M6b (code, API, UI, generator, tests, docs). Related tests: 2384 passed, 1 skipped
   (D1 deferral, not UI); Chromium UI tests really ran. `kiem_nhanh --co-so origin/main --so-seed 20` = 7/7, 60/60 identical.
   `diff -r` of `--fa-daa`, `--phan-hoi`, `--tuan-3` vs the step-1.0 snapshot: identical. ruff clean.
-- In progress: plan section 4 (soat-ma review on `git diff origin/claude/fa-gaps..HEAD`, report in
-  `docs/phien/bao_cao_dem/2026-11-11_forms_gop.md`, verify remote HEAD = local HEAD).
+- Section 4 done: report written, soat-ma found nothing high/medium.
 - Open problems: none.
 
 ## Decisions and gotchas (keep short)
@@ -38,7 +37,7 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - The plan's step "lock" in LATEST_INSTRUCTION §2 refers to the keen-ride handoff; not used here.
 
 ## Next steps (ordered)
-1. Plan section 4: soat-ma, snapshot diff, Vietnamese report, push, verify remote HEAD = local HEAD.
+1. Truong decides where `claude/forms-gop` merges (no PR opened). Questions are in the report.
 
 ## Files touched
 - mau_forms_thi_clb/bieu_mau.py, mau_forms_thi_clb/tao_mau_forms.py: FA-M2b layout + generator
@@ -53,3 +52,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 |---|---|---|---|
 | 2026-11-11 | Sonnet (forms-gop) | FA-M2b: tests red first (13), `cac_phan_fa_gop`, `sinh_dang_ky(mot_bieu_mau)`, `--mot-bieu-mau`; mutation (drop a day) caught by 5 tests; `diff -r` vs snapshot identical | TH |
 | 2026-11-11 | Sonnet (forms-gop) | FA-M6b: tests red first (22 + 2 UI), reader, API refactor + `nhap_sau_ket_qua_forms`, generator, UI button; mutations (Forms time -> import time; ignore co_sai) caught | TH |
+| 2026-11-11 | Sonnet (forms-gop) | Section 4: soat-ma review (no high/medium findings), `diff -r` vs snapshot identical, Vietnamese report | TH |
