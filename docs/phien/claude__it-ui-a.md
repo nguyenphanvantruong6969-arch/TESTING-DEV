@@ -1,5 +1,5 @@
 Branch: claude/it-ui-a
-STATUS: RUNNING (FA-M7)
+STATUS: DONE_M7
 Lead: Opus CHU_TRI session_01TGThn5vxmXkqyACZzBpJCq (model claude-opus-5-5). BASE = fe373493223aeadf9e0b20cb88260d80eaad74a0
 
 # Branch handoff: claude/it-ui-a
@@ -26,9 +26,9 @@ All numbers SIMULATED; all Forms work TH.
 - [ ] Green loop on `claude/forms-gop` + FINISH (plan §7 report, `docs/phien/IT_UI_STATUS.md` = `IT-UI GREEN`)
 
 ## Current state (overwrite each handoff)
-- G0 and FA-M7 coded (tests: m7_nguon_mot_lan 18, giao_dien_fa_m7_nguon 3; mutation recorded in MANH_A.md). Next (lead): green loop on `claude/it-ui-a`, then wait for B and C, then INTEGRATE.
-- Bookkeeping for Phase 3 is in `docs/ke_hoach/it_ui_song_song/MANH_A.md`; CLAUDE_CHI_TIET.md already updated (254 test files, code-map row). Re-count test files after merging B and C.
-- New API: `nap_phieu_clb`, `get_forms_buoc_12`, `tai_mau_de_thi`, `nap_de_thi`; `chuyen_phieu` now also returns `kq`. No new error codes.
+- G0 (c7b5d1d) and FA-M7 (d5a303e + FA-M7-FIX1 414a94c: `loai` carried into forms/de_thi.json) done, lead review PASS:
+  166 related tests passed (Chromium really ran), ruff clean, `kiem_nhanh` 7/7, mutation recorded in MANH_A.md.
+- Now: green loop round 1 on `claude/it-ui-a` (lead). B and C branches not on origin yet (13:05 UTC).
 
 ## Decisions and gotchas (keep short)
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1 on this branch (venv, `playwright==1.63.0`, unshallow, `origin/main`).
