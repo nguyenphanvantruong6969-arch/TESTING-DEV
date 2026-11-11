@@ -1156,7 +1156,7 @@ giáo viên xét chỉ tiêu được.
 
 Thẻ **Chuẩn bị đợt** giúp chuẩn bị một đợt đăng ký bằng biểu mẫu (Forms) mà không phải gõ lệnh. Thẻ chỉ hiện khi chế độ xếp theo huy chương (mục 15) đang bật. Chưa thử trên Microsoft hay Google thật.
 
-**Chọn đường A hoặc B.** Đường A: học sinh đăng ký ngay trong phần mềm. Đường B: học sinh đăng ký bằng biểu mẫu. Chọn một đường ở đầu thẻ; phần mềm nhớ lựa chọn. Kết quả xếp không đổi theo đường.
+**Chọn đường A hoặc B.** Đường A: Power Apps + danh sách (List): học sinh nhập qua ứng dụng, dữ liệu đi qua danh sách (List), phần mềm chỉ nạp vào. Đường B: chỉ Forms: học sinh chỉ dùng biểu mẫu, kết quả xuất ra tệp rồi nạp vào phần mềm. Chọn một đường ở đầu thẻ; phần mềm nhớ lựa chọn. Kết quả xếp không đổi theo đường.
 
 **Bước 1. CLB.** Bấm "Nạp tệp xuất Phiếu thiết lập CLB" rồi chọn tệp Excel xuất từ biểu mẫu Phiếu thiết lập CLB. Phần mềm hiện bảng CLB (tên, buổi, loại, chỉ tiêu), lỗi và cảnh báo. Còn lỗi thì bước chưa xong: sửa tệp rồi nạp lại. CLB chỉ nhập một lần, ở đây.
 
