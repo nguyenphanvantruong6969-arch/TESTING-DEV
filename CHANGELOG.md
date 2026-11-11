@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-11 — FA-M6b: MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu (TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/bieu_mau.py`: `CAU_CO_SAI`, `LUA_CHON_CO_SAI`, `CAU_KN_BUOI`, `CAU_KN_GHI_CHU`, `cac_phan_sau_ket_qua(de)` (phần 1: mã học sinh + 3 câu phản hồi + `[co_sai]`; phần 2: `[kn_buoi]` hộp chọn nhiều + `[kn_ghi_chu]`). `cac_phan_phan_hoi()` giữ nguyên.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--sau-ket-qua` (riêng một chế độ, báo lỗi nếu dùng chung chế độ khác) ghi `NHAP_FORMS_SAU_KET_QUA.docx` + `CAI_DAT_FORMS_SAU_KET_QUA.md` (rẽ nhánh `[co_sai]`, bật Multiple answers cho `[kn_buoi]`, Settings, hạn 3 ngày, nộp muộn -> giáo viên chủ nhiệm, xuất và nạp). Docx Quick Import không phân biệt kiểu câu: câu `[kn_buoi]` phải bật "Multiple answers" tay (ghi trong hướng dẫn).
+- `fa_sau_xep.py`: `doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> (yeu_cau, bo_qua)` (hàm thuần; chỉ dòng `co_sai` = 1; mỗi (học sinh, buổi) một yêu cầu; giờ Forms từ "Completion time"/"Thời gian hoàn thành", dự phòng "Start time"; thiếu cột `[co_sai]` -> ValueError). `doc_tep_forms_phan_hoi` KHÔNG đổi (đọc tệp gộp, cột thừa bỏ qua).
+- `api_sau_xep.py`: tách `_chen_phan_hoi` và `_them_khieu_nai` dùng chung (đầu ra `nhap_phan_hoi_forms`, `gui_khieu_nai` giữ nguyên); mới `nhap_sau_ket_qua_forms(file_base64)`: một giao dịch, hạn khiếu nại theo giờ Forms, lỗi từng khiếu nại (`khieu_nai_qua_han`, `khieu_nai_trung`, `khieu_nai_khong_hop_le`) được BÁO không làm hỏng lần nạp, hai cờ tắt -> `fa_sau_ket_qua_chua_bat`, một cờ tắt -> phần kia bị bỏ qua kèm cảnh báo.
+- `i18n_errors.py` (+ `i18n_loi.js`, `tests/test_ws_nhan.py`): mã mới `fa_sau_ket_qua_chua_bat`, `khieu_nai_khong_co_gio_forms`. UI: nút "Nạp biểu mẫu Sau khi xem kết quả" ở khung Phản hồi (`index.html`, `js/10_theo_doi.js`, `i18n.js` vi + en).
+- Test mới (đỏ trước): `tests/test_fa_m6b_sau_ket_qua.py` (22), `tests/test_giao_dien_fa_m6b_sau_ket_qua.py` (2, Chromium). Đột biến: dùng giờ nạp thay giờ Forms -> 2 ca đỏ; bỏ lọc `co_sai` -> 1 ca đỏ.
+- Tài liệu: `docs/he_sinh_thai/FA_SAU_XEP.md` (mục 3.5 và mục 4). `--phan-hoi` và hướng dẫn của nó giữ nguyên từng byte.
+
 ## 2026-11-11 — FA-M2b: MỘT biểu mẫu đăng ký cho mọi ngày, đường B (TH = chưa thử trên Microsoft thật)
 
 - `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_fa_gop(de)` (phần thông tin một lần + mỗi ngày phần Nguyện vọng và phần Huy chương, đúng thứ tự `de["buoi"]`, chữ từng câu giống hệt `cac_phan_fa`) và `dem_cau_fa_gop(de)`.

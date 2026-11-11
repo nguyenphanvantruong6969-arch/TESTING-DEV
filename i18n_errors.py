@@ -742,6 +742,14 @@ MESSAGES = {
         "vi": "Câu trả lời phản hồi không hợp lệ: hài lòng từ 1 đến 5, hiểu lý do có hoặc không, và một phần khó nhất trong danh sách.",
         "en": "Invalid feedback answer: satisfaction 1 to 5, understood yes or no, and one hardest part from the list.",
     },
+    "fa_sau_ket_qua_chua_bat": {
+        "vi": "Không gian làm việc này chưa bật nhận phản hồi cũng như khiếu nại sau khi xếp, nên chưa nạp được biểu mẫu Sau khi xem kết quả.",
+        "en": "This workspace collects neither feedback nor appeals after allocation, so the after-results form can't be loaded.",
+    },
+    "khieu_nai_khong_co_gio_forms": {
+        "vi": "Tệp không có giờ hoàn thành của Forms, nên hạn khiếu nại được tính theo lúc nạp tệp.",
+        "en": "The file has no Forms completion time, so the appeal deadline was checked against the time of import.",
+    },
     "phan_hoi_tep_sai": {
         "vi": "Tệp này không phải tệp xuất của biểu mẫu phản hồi (không thấy cột mã {person_l} và câu hỏi phản hồi).",
         "en": "This file isn't an export of the feedback form (no {person} ID column or feedback question).",

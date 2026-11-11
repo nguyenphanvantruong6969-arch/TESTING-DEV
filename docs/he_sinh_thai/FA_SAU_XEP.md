@@ -41,6 +41,7 @@ Số dòng: tới khoảng 1.000 em × 5 ngày × số CLB em ghi (tối đa 7 m
    - "Phần nào khó nhất?" chọn CLB / xếp thứ tự / huy chương / thử thách / không có (`KhoNhat`).
 3. Mỗi chạm là một `Patch` lên cùng dòng `PhanHoi` (3 yêu cầu mỗi em): rất nhỏ so với 6.000 (mục 7). Sửa câu trả lời trước hạn đóng phản hồi được.
 4. Nếu chưa có app v2: GVCN nhận tệp theo lớp và chuyển lý do cho em; 3 câu phản hồi chuyển sang Forms một trang (cùng ba câu, Record name BẬT).
+5. **Đường B, một biểu mẫu thay hai (FA-M6b, TH — chưa thử trên Microsoft Forms thật):** nếu cả phản hồi và khiếu nại đều chạy trên Forms, dùng MỘT biểu mẫu "Sau khi xem kết quả" thay cho biểu mẫu phản hồi và biểu mẫu khiếu nại riêng: `python mau_forms_thi_clb/tao_mau_forms.py --sau-ket-qua` ghi `NHAP_FORMS_SAU_KET_QUA.docx` và `CAI_DAT_FORMS_SAU_KET_QUA.md` (rẽ nhánh `[co_sai]`: Không → kết thúc; Có → phần báo lỗi dữ liệu theo buổi). Ở kiosk, nút **Nạp biểu mẫu Sau khi xem kết quả** (khung "Phản hồi của học sinh", thẻ "Chi tiết và xuất tệp") nạp một tệp Excel xuất từ biểu mẫu đó: phản hồi vào bảng phản hồi, khiếu nại vào danh sách khiếu nại, trong một lần ghi. Nút "Nạp từ Forms" cũ vẫn dùng được cho biểu mẫu ba câu riêng.
 
 ## 4. Khiếu nại (3 ngày) trên Forms
 
@@ -48,6 +49,7 @@ Số dòng: tới khoảng 1.000 em × 5 ngày × số CLB em ghi (tối đa 7 m
 - Câu hỏi: mã học sinh (tự điền từ Email nếu có), buổi, CLB, **loại lỗi dữ liệu** (nhập sai nguyện vọng / điểm thử thách ghi sai / mất bài thi / lỗi hệ thống / khác), mô tả, ảnh tuỳ chọn. Câu đầu biểu mẫu: chỉ xét **lỗi dữ liệu**, không xét "em thấy bất công".
 - Xử lý: admin xem từng phiếu; nếu đúng là lỗi dữ liệu thì sửa dữ liệu rồi chạy lại thuật toán với **cùng seed** (số bốc thăm đã khoá); không sửa tay kết quả. Mỗi lần chạy lại thêm một dòng `run_history` (không ghi đè). Sau 3 ngày không nhận phiếu mới.
 - Chưa có chỗ nhập khiếu nại trong kiosk (tầm nhìn nói "trong phần mềm"; chưa làm, nằm ngoài FA-M6).
+- **Một biểu mẫu thay hai (FA-M6b, TH):** thay biểu mẫu khiếu nại riêng bằng nhánh khiếu nại của biểu mẫu "Sau khi xem kết quả" (mục 3.5): chỉ lỗi dữ liệu, chọn một hoặc nhiều buổi, mỗi em một phiếu, mở 3 ngày từ lúc công bố. Hạn khiếu nại tính theo giờ hoàn thành do Forms ghi, nên admin nạp muộn vẫn công bằng. Nộp muộn hoặc nộp lần hai: em báo giáo viên chủ nhiệm, admin nhập tay ở mục Khiếu nại của kiosk.
 
 ## 5. Khảo sát tuần 3 trên Forms
 

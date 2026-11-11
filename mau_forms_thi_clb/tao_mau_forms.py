@@ -921,6 +921,88 @@ def sinh_phan_hoi(de, thu_muc):
                          [bm.CAU_HAI_LONG, bm.CAU_HIEU_LY_DO, bm.CAU_KHO_NHAT])
 
 
+TEN_DOCX_SAU_KET_QUA = "NHAP_FORMS_SAU_KET_QUA.docx"
+TEN_CAI_DAT_SAU_KET_QUA = "CAI_DAT_FORMS_SAU_KET_QUA.md"
+
+
+def ghi_cai_dat_sau_ket_qua(de):
+    """CAI_DAT_FORMS_SAU_KET_QUA.md (FA-M6b, TH: chưa thử trên Forms thật). Quick Import không cài được rẽ nhánh và
+    kiểu hộp chọn nhiều, nên hướng dẫn nêu từng bước tay."""
+    phan = bm.cac_phan_sau_ket_qua(de)
+    L = []
+    w = L.append
+    w("# Biểu mẫu \"Sau khi xem kết quả\" — một biểu mẫu: 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu (FA-M6b)")
+    w("")
+    w("> **TH — CHƯA thử trên Microsoft Forms thật.** Sinh từ `tao_mau_forms.py --sau-ket-qua`; đừng sửa tay.")
+    w("")
+    w("Một đường dẫn cho học sinh thay cho hai biểu mẫu (phản hồi, khiếu nại). Phần 1 có ba câu phản hồi và câu "
+      "`[co_sai]`; chỉ em chọn \"Có (1)\" mới sang phần 2 để báo lỗi dữ liệu của từng buổi.")
+    w("")
+    w("## Cài đặt")
+    w("")
+    w("1. Nhập `%s` bằng Quick Import (%d phần, %d câu hỏi)." % (
+        TEN_DOCX_SAU_KET_QUA, len(phan), sum(len(c) for _, c in phan)))
+    w("2. Quick Import không đặt được rẽ nhánh và kiểu câu, nên làm tay hai việc dưới đây.")
+    w("")
+    w("### Rẽ nhánh (Branching)")
+    w("")
+    w("- Chỉ câu `[co_sai]` (câu cuối của phần 1) cần rẽ nhánh. Mở menu của câu đó → Branching options.")
+    w("- Đáp án \"Không (0)\" → **End of form** (em xong, không phải đọc phần 2).")
+    w("- Đáp án \"Có (1)\" → phần 2 \"%s\"." % phan[1][0])
+    w("- Không đặt rẽ nhánh ở câu nào khác.")
+    w("")
+    w("### Câu `[kn_buoi]`")
+    w("")
+    w("- Bật **Multiple answers** (cho em chọn nhiều buổi) và **Required**. Quick Import chỉ tạo câu một lựa chọn.")
+    w("- Mỗi lựa chọn có dạng \"<tên buổi> (<mã buổi>)\"; giữ nguyên phần trong ngoặc tròn.")
+    w("")
+    w("## Settings")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Who can fill out this form | **Only people in my organization** | Học sinh đăng nhập tài khoản trường |")
+    w("| **Record name** | **BẬT** | Cột Email của tệp xuất cho biết ai trả lời |")
+    w("| **One response per person** | **BẬT** | Mỗi em một phiếu; khiếu nại nhiều buổi dùng hộp chọn nhiều của `[kn_buoi]` |")
+    w("| Start date / End date | Mở lúc công bố kết quả, đóng sau **3 ngày** | Khớp hạn khiếu nại của kiosk (`fa_khieu_nai_so_ngay`, mặc định 3); "
+      "đổi số ngày ở kiosk thì đổi ngày đóng theo |")
+    w("| Shuffle questions | **TẮT** | `[co_sai]` phải là câu cuối của phần 1 |")
+    w("")
+    w("- Nộp muộn, hoặc nộp lần hai (biểu mẫu chỉ cho một lần): em báo giáo viên chủ nhiệm; admin nhập tay ở kiosk bằng "
+      "mục Khiếu nại có sẵn (ô mã học sinh, buổi, ghi chú).")
+    w("- Chỉ nhận **lỗi dữ liệu** (sai mã, sai điểm, thiếu nguyện vọng). Không nhận khiếu nại về kết quả bốc thăm.")
+    w("")
+    w("## Xuất và nạp vào kiosk")
+    w("")
+    w("1. Forms: Responses → **Open in Excel** → lưu tệp .xlsx.")
+    w("2. Kiosk: thẻ \"Chi tiết và xuất tệp\" → khung \"Phản hồi của học sinh\" → nút **Nạp biểu mẫu Sau khi xem kết quả**.")
+    w("3. Một lần nạp ghi cả phản hồi và khiếu nại; nếu có lỗi giữa chừng thì không ghi gì. Hạn khiếu nại tính theo giờ hoàn "
+      "thành do Forms ghi (cột Completion time), nên nạp muộn vẫn công bằng; tệp không có cột đó thì tính theo lúc nạp và có cảnh báo.")
+    w("4. Cần bật `fa_phan_hoi` và/hoặc `fa_khieu_nai` ở không gian làm việc; tắt một cái thì phần đó bị bỏ qua kèm cảnh báo.")
+    w("5. Giữ nguyên phần `[mã]` đầu mỗi câu và phần `(mã)` cuối mỗi lựa chọn: kiosk đọc theo các mã đó.")
+    w("")
+    w("## Câu hỏi")
+    w("")
+    for i, (ten, cac_cau) in enumerate(phan, 1):
+        w("**Phần %d — %s**" % (i, ten))
+        w("")
+        for td, loai, lc, bb in cac_cau:
+            kieu = {"text": "Text", "checkbox": "Choice, nhiều đáp án"}.get(loai, "Choice (%d lựa chọn)" % len(lc))
+            w("- `[%s]` · %s · %s" % (bm.ma_cua_cau(td), kieu, "bắt buộc" if bb else "không bắt buộc"))
+        w("")
+    return "\n".join(L)
+
+
+def sinh_sau_ket_qua(de, thu_muc):
+    """FA-M6b (TH): biểu mẫu "Sau khi xem kết quả" — .docx Quick Import + hướng dẫn rẽ nhánh. Sinh lại ra tệp giống từng byte."""
+    os.makedirs(thu_muc, exist_ok=True)
+    duong_md = os.path.join(thu_muc, TEN_CAI_DAT_SAU_KET_QUA)
+    with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_sau_ket_qua(de))
+    duong_docx = os.path.join(thu_muc, TEN_DOCX_SAU_KET_QUA)
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_sau_ket_qua(de), hau_to=" — sau khi xem kết quả")
+    return [duong_md, duong_docx]
+
+
 def sinh_tuan_3(de, thu_muc):
     """GAP-6 (TH): biểu mẫu khảo sát tuần 3."""
     return _ghi_khao_sat(de, thu_muc, "NHAP_FORMS_TUAN_3.docx", "CAI_DAT_FORMS_TUAN_3.md",
@@ -942,6 +1024,8 @@ def main(argv=None):
                     help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
     ap.add_argument("--phan-hoi", action="store_true",
                     help="GAP-5 (TH): biểu mẫu 3 câu phản hồi sau khi xem kết quả")
+    ap.add_argument("--sau-ket-qua", action="store_true",
+                    help="FA-M6b (TH): MỘT biểu mẫu \"Sau khi xem kết quả\" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu")
     ap.add_argument("--tuan-3", action="store_true",
                     help="GAP-6 (TH): biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
     ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
@@ -959,6 +1043,8 @@ def main(argv=None):
         ap.error("--tuan-3 là một chế độ riêng, không dùng chung với chế độ khác")
     if a.phan_hoi and (a.fa_daa or a.moi_clb or a.chi_thi or a.bien_the):
         ap.error("--phan-hoi là một chế độ riêng, không dùng chung với chế độ khác")
+    if a.sau_ket_qua and (a.phan_hoi or a.tuan_3 or a.fa_daa or a.chi_thi or a.moi_clb or a.bien_the):
+        ap.error("--sau-ket-qua là một chế độ riêng, không dùng chung với chế độ khác")
     if a.mot_bieu_mau and not a.fa_daa:
         ap.error("--mot-bieu-mau chỉ dùng cùng --fa-daa")
     if a.so_nhap_clb and not a.fa_daa:
@@ -968,6 +1054,10 @@ def main(argv=None):
         if a.tuan_3:
             ra = sinh_tuan_3(de, a.ra)
             print("Đã sinh mẫu Forms khảo sát tuần 3 (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            return 0
+        if a.sau_ket_qua:
+            ra = sinh_sau_ket_qua(de, a.ra)
+            print("Đã sinh mẫu Forms Sau khi xem kết quả (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
             return 0
         if a.phan_hoi:
             ra = sinh_phan_hoi(de, a.ra)

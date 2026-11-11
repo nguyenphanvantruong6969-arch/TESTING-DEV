@@ -292,6 +292,27 @@ def cac_phan_phan_hoi():
         (CAU_KHO_NHAT, "choice", list(LUA_CHON_KHO_NHAT), True)])]
 
 
+# ------------------------------------------- FA-M6b (TH): MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại
+# Mã `[co_sai]`, `[kn_buoi]`, `[kn_ghi_chu]` khớp `fa_sau_xep.doc_tep_forms_khieu_nai`; lựa chọn kết thúc bằng "(mã)".
+CAU_CO_SAI = "[co_sai] Em có thấy thông tin của em trong kết quả bị sai không? (ví dụ sai mã, sai điểm, thiếu nguyện vọng)"
+LUA_CHON_CO_SAI = ["Không (0)", "Có (1)"]
+CAU_KN_BUOI = "[kn_buoi] Buổi nào có thông tin bị sai?"
+CAU_KN_GHI_CHU = "[kn_ghi_chu] Em mô tả ngắn chỗ sai"
+
+
+def cac_phan_sau_ket_qua(de):
+    """FA-M6b (TH): bố cục biểu mẫu "Sau khi xem kết quả": phần 1 = mã học sinh + 3 câu phản hồi + `[co_sai]` (bắt buộc);
+    phần 2 (chỉ khi `[co_sai]` = Có, rẽ nhánh cài tay) = `[kn_buoi]` (hộp chọn nhiều, mọi buổi) + `[kn_ghi_chu]`.
+    Loại 'checkbox' chỉ để mô tả: Quick Import không phân biệt, hướng dẫn bảo bật "Multiple answers"."""
+    p1 = cac_phan_phan_hoi()[0][1] + [(CAU_CO_SAI, "choice", list(LUA_CHON_CO_SAI), True)]
+    return [
+        ("Phản hồi sau khi xem kết quả", p1),
+        ("Báo lỗi dữ liệu (khiếu nại, chỉ lỗi dữ liệu)", [
+            (CAU_KN_BUOI, "checkbox", ["%s (%s)" % (b["ten"], b["ma"]) for b in de["buoi"]], True),
+            (CAU_KN_GHI_CHU, "text", [], True)]),
+    ]
+
+
 # ------------------------------------------- GAP-6 (TH): khảo sát tuần 3 (V§9.3)
 CAU_CON_DI = "[con_di] Em còn đi sinh hoạt CLB của mình không?"
 CAU_MUON_DOI = "[muon_doi] Em có muốn đổi sang CLB khác không?"
