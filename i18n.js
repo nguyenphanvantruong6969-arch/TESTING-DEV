@@ -912,6 +912,15 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === C: FA-M8 — add below === */
+      cb_bo_ghi: "Tạo một lần cả bộ biểu mẫu cho đường đã chọn, rồi nén thành một tệp zip ở thư mục Tải xuống. Bộ này không dặn đặt đáp án trên Forms: phần mềm tự chấm từ tệp đề; tệp XEM_LAI_DAP_AN.xlsx để người soát đề đối chiếu. (TH = chưa thử trên Microsoft thật.)",
+      cb_bo_can_duong: "Hãy chọn đường A hoặc B ở phía trên trước.",
+      cb_bo_can_de: "Hãy nạp đề thi ở bước 2 trước.",
+      cb_bo_mot: "Một biểu mẫu cho mọi buổi",
+      cb_bo_bien_the: "Hai đề cho CLB Tuyển chọn",
+      cb_bo_bien_the_khong: "Đề hiện tại không có CLB nào có đề biến thể, nên tuỳ chọn này đang tắt.",
+      cb_bo_nut: "Tạo bộ biểu mẫu",
+      cb_bo_xong: "Đã tạo bộ biểu mẫu ({n} tệp): {ten}",
+      cb_bo_mo: "Mở thư mục",
       /* === end C === */
     },
 
@@ -1808,6 +1817,15 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === C: FA-M8 — add below === */
+      cb_bo_ghi: "Build the whole form set for the chosen path in one go and pack it into one zip file in the Downloads folder. The set does not ask for answers to be set on Forms: the software grades from the exam file; XEM_LAI_DAP_AN.xlsx is for whoever reviews the exam. (TH = not tried on real Microsoft.)",
+      cb_bo_can_duong: "Choose path A or B above first.",
+      cb_bo_can_de: "Load the exam in step 2 first.",
+      cb_bo_mot: "One form for every session",
+      cb_bo_bien_the: "Two exams for Selective clubs",
+      cb_bo_bien_the_khong: "The current exam has no club with exam variants, so this option is off.",
+      cb_bo_nut: "Build the form set",
+      cb_bo_xong: "Form set built ({n} files): {ten}",
+      cb_bo_mo: "Open folder",
       /* === end C === */
     },
   };

@@ -2943,4 +2943,7 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 /* (spacer: unchanged line between marker blocks) */
 
 /* === C: FA-M8 — add below === */
+.cb-bo-tuy-chon-hang { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0; }
+.cb-bo-tuy-chon { display: inline-flex; align-items: center; gap: 4px; }
+.cb-bo-tuy-chon input:disabled + span { opacity: 0.55; }
 /* === end C === */

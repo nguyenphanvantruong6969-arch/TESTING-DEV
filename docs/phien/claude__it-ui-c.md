@@ -19,7 +19,7 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
       `tao_bo_bieu_mau`, `ghi_zip_bo` in `mau_forms_thi_clb/tao_mau_forms.py` / `bieu_mau.py`;
       `tests/test_fa_m8_bo_bieu_mau.py`; mutation (R3); snapshot diff identical
 - [x] MERGE-G0: no-op (BASE already contains G0 c7b5d1d/d731a3d via INTEGRATE 47ab08b)
-- [ ] FA-M8 (Phase 2): `api_forms_bo.py` (`FormsBoMixin.tao_bo_bieu_mau_api`), step 3 UI in `js/13_chuan_bi_bo.js`,
+- [x] FA-M8 (Phase 2): `api_forms_bo.py` (`FormsBoMixin.tao_bo_bieu_mau_api`), step 3 UI in `js/13_chuan_bi_bo.js`,
       `cb_bo_*` keys in C marker blocks; `tests/test_fa_m8_api.py`, `tests/test_giao_dien_fa_m8_bo.py`; mutation;
       fragment `docs/ke_hoach/it_ui_song_song/MANH_C.md` (incl. snapshot `diff -r` result)
 - [ ] Green loop on claude/it-ui-c
