@@ -21,6 +21,10 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - [ ] FA-M8: "Tạo bộ biểu mẫu" button (zip per path, Phiếu CLB docx, no answer ticking on Forms, XEM_LAI_DAP_AN.xlsx) — NOT DONE — worker B/C BLOCKED (branch never pushed)
 - [ ] FA-M10: after-allocation buttons (KetQua List CSV with email, who has not registered, List diff) — NOT DONE — worker B/C BLOCKED (branch never pushed)
 - [ ] Phase 2 finish: soat-ma, snapshot diff, report `docs/phien/bao_cao_dem/<date>_it_giao_dien.md`
+- Fixes after the 2026-11-12 novice walkthrough (spec: `docs/ke_hoach/FORMS_GOP_SUA_KE_HOACH.md`; D1–D4 approved 2026-11-12):
+  - [ ] Wave 1: FG-1 (toggle after-results flags on open workspace), FG-3 (reload adds nothing), FG-4 (busy button)
+  - [ ] Wave 2: FG-5 (ID case/space match), FG-6 (one-unit counts, lists), FG-2 (FA preview warnings + FA sample)
+  - [ ] Wave 3: FG-7 (after-results form: real days, title, help), FG-8 (wording, wizard), FG-9 (small UX)
 
 ## Current state (overwrite each handoff)
 - Merged `origin/claude/it-ui-a` (G0 + FA-M7, GREEN on its branch) into this branch (no conflicts); bookkeeping folded in
@@ -53,6 +57,8 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
    delegates every task to Sonnet, then loops until all tests + CI are green; SOLO / DIEU_PHOI are fallbacks);
    manual alternative: 3 Sonnet sessions with the blocks at the top of PROMPT_A/B/C. Progress: `docs/phien/IT_UI_STATUS.md`.
 2. Truong decides where `claude/forms-gop` merges (no PR opened).
+3. Fix plan FG-1…FG-9 (`FORMS_GOP_SUA_KE_HOACH.md`, D1–D4 approved): Sonnet does step 0 (re-check every finding on
+   current HEAD; the walkthrough ran on a8e8f32, before FA-M7..FA-M10), then wave 1 (FG-1, FG-3, FG-4).
 
 ## Files touched
 - mau_forms_thi_clb/bieu_mau.py, mau_forms_thi_clb/tao_mau_forms.py: FA-M2b layout + generator
@@ -75,3 +81,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Opus (forms-gop) | PROMPT_A/B/C rebuilt: each pasted into an Opus lead that delegates to Sonnet coders and runs its own green loop; A integrates + final green loop | docs only |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE DONE 739736e | merged it-ui-a; 161 related passed (UI ran, 0 skipped); kiem_nhanh 7/7; ruff clean; B/C not merged |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE-FIX1 DONE 9ac0998 | HUONG_DAN §16 path A/B meaning fixed; 92 doc tests passed; ruff clean; kiem_nhanh 7/7 |
+| 2026-11-12 | Opus (forms-gop) | Novice walkthrough + senior review (18 findings, browser mode, SIMULATED data); fix plan FG-1…FG-9 written | D1–D4 approved (all Recommended) |
