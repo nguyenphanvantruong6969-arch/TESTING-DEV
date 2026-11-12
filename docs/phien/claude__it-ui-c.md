@@ -35,8 +35,21 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 running (local full suite + CI on pushed HEAD).
-- Known red outside C files: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` (see Decisions).
+- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 RED (2 tests) -> FIX-1 delegated.
+
+## Green loop round 1 (HEAD 5f3de9b)
+- Local: 2 failed, 5905 passed, 4 skipped (none `test_giao_dien_*`), coverage 93.44 %; ruff clean;
+  kiem_nhanh --so-seed 20 7/7, 60/60; snapshot 8 modes identical.
+- CI Tests run 43157769145: lint green; Linux 2 failed / 5906 passed (cov 93.43 %); Windows 2 failed / 5403 passed.
+  Same two failures everywhere:
+  1. `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` — AssertionError ('254', 257):
+     `CLAUDE_CHI_TIET.md` "Bản đồ mã" row `tests/` says 254 files, branch has 257 (3 new C test files).
+  2. `tests/test_giao_dien_tieng_viet_sach.py::test_khong_con_chu_zip_trong_chu_hien_thi[i18n.js]` — vi key
+     `cb_bo_ghi` contains the word "zip"; Vietnamese UI must say "tệp nén" (see `ws_btn_xuat` etc.).
+- Fix spec FIX-1: (1) in `docs/ke_hoach/CLAUDE_CHI_TIET.md` change ONLY the number 254 -> 257 in the `tests/` row
+  (deliberate ownership deviation, see Decisions; note it in MANH_C.md "Phase 3: recount"); (2) reword vi `cb_bo_ghi`
+  (C marker block of `i18n.js`) with "tệp nén" instead of "zip"; check every other vi `cb_bo_*` string and the
+  user-guide paragraph of `MANH_C.md` for the same word. No test change.
 
 ## Decisions and gotchas (keep short)
 - IT_UI_STATUS: A integrated alone into forms-gop (C was BLOCKED then). Truong re-ran PROMPT_C; C branches from the
@@ -65,3 +78,4 @@ CODER session_01YVAytyhzs8uR54cjoTQrMS FA-M8-THUAN DONE c9550fa
 CODER session_01YVAyu3iuHSR5HxZvebVahw FA-M8 DONE 57f4631
 | 2026-11-12 | opus lead | review FA-M8 57f4631..959eca9: PASS | 143 related passed (Chromium ran, 0 skipped); ruff clean; snapshot 8 modes identical; UI mutation (always mot_bieu_mau:true) re-done by lead -> red; kiem_nhanh --so-seed 20 7/7, 60/60; ownership OK (no edits outside C files/markers) |
 | 2026-11-12 | opus lead | green loop round 1 started | |
+| 2026-11-12 | opus lead | green loop round 1: RED (2 ids, same local/CI Linux/CI Windows) | FIX-1 delegated |
