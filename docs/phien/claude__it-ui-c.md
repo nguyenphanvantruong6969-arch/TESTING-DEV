@@ -35,9 +35,8 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- FA-M8-THUAN done and reviewed (PASS). Next: FA-M8 Phase 2 delegated to a fresh Sonnet coder.
-- Known red outside C files: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` (test-file count
-  in A-owned `docs/ke_hoach/CLAUDE_CHI_TIET.md`). Lead decision: handled in the green loop (see Decisions).
+- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 running (local full suite + CI on pushed HEAD).
+- Known red outside C files: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` (see Decisions).
 
 ## Decisions and gotchas (keep short)
 - IT_UI_STATUS: A integrated alone into forms-gop (C was BLOCKED then). Truong re-ran PROMPT_C; C branches from the
@@ -64,3 +63,5 @@ CODER session_01YVAytyhzs8uR54cjoTQrMS FA-M8-THUAN DONE c9550fa
 | 2026-11-12 | opus lead | review FA-M8-THUAN c9550fa: PASS | 278 related passed; ruff clean; snapshot 8 modes vs BASE identical (xlsx/docx compared without core.xml); mutation re-done by lead -> R3 test red; kiem_nhanh 7/7; ownership OK |
 | 2026-11-12 | sonnet coder | FA-M8 Phase 2: `api_forms_bo.py` (`get_bo_bieu_mau`, `tao_bo_bieu_mau_api`), `js/13_chuan_bi_bo.js` (bước 3), `cb_bo_*` (i18n.js vi+en, khối C), CSS khối C; tests/test_fa_m8_api.py (12), tests/test_giao_dien_fa_m8_bo.py (6 Chromium, chạy 3 lần xanh); MANH_C.md | Mutation: (1) tao_bo_bieu_mau dap_an_tren_forms=True -> API `test_r3_so_voi_dap_an_tren_forms_true` RED (1 failed, 11 passed); (2) API bỏ qua mot_bieu_mau -> `test_mot_bieu_mau_theo_tuy_chon` RED; (3) UI luôn gửi mot_bieu_mau true -> `test_bo_tich_mot_bieu_mau_doi_bo` RED; restored. Snapshot 8 chế độ BASE 5196217 vs nhánh: `diff -rq` rỗng, 23 tệp. Related: 130 passed (ws_nhan, fa_m8, fa_m7, i18n) + UI m7 6 passed + m8 6 passed; ruff sạch; kiem_nhanh 7/7. Không mã lỗi mới nên i18n_loi.js không đổi. Test-file count trên nhánh = 257 (C +3). test_a13_12 đỏ đã biết, để lead. Ghi chú: API đường A bỏ qua mot_bieu_mau (UI tắt ô); REQUEST A: none. |
 CODER session_01YVAyu3iuHSR5HxZvebVahw FA-M8 DONE 57f4631
+| 2026-11-12 | opus lead | review FA-M8 57f4631..959eca9: PASS | 143 related passed (Chromium ran, 0 skipped); ruff clean; snapshot 8 modes identical; UI mutation (always mot_bieu_mau:true) re-done by lead -> red; kiem_nhanh --so-seed 20 7/7, 60/60; ownership OK (no edits outside C files/markers) |
+| 2026-11-12 | opus lead | green loop round 1 started | |
