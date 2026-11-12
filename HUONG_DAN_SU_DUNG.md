@@ -1167,7 +1167,24 @@ Thẻ **Chuẩn bị đợt** giúp chuẩn bị một đợt đăng ký bằng 
 
 Nạp lại bước 1 với CLB khác thì bước 2 báo đề cũ không khớp: tải lại mẫu và nạp lại đề.
 
-**Bước 3 đến 5 (tạo bộ biểu mẫu, nạp bài làm, việc sau khi xếp) CHƯA có trong phần mềm.** Hiện vẫn làm bằng lệnh theo `docs/he_sinh_thai/T4M_VAN_HANH_MOT_DOT.md`; nhờ nhân viên IT của trường.
+**Chuẩn bị đợt — bước 3: Tạo bộ biểu mẫu.** Sau khi đã chọn đường A hoặc B và nạp đề thi ở bước 2, bấm "Tạo bộ biểu mẫu". Phần mềm làm sẵn mọi
+biểu mẫu cần cho đợt (phiếu thiết lập CLB, phiếu đăng ký, bài thi, biểu mẫu sau khi xem kết quả, khảo sát tuần 3), kèm tệp "00_DOC_TRUOC.md"
+cho biết nên làm theo thứ tự nào, rồi nén tất cả vào một tệp nén trong thư mục Tải xuống; bấm "Mở thư mục" để tìm tệp. Có hai ô chọn: "Một biểu
+mẫu cho mọi buổi" (tích sẵn, học sinh chỉ điền một phiếu đăng ký) và "Hai đề cho CLB Tuyển chọn" (chỉ bật khi đề thi của đợt có CLB dùng hai đề).
+Bộ này không dặn đặt đáp án đúng trên Forms: phần mềm tự chấm từ tệp đề thi; tệp "XEM_LAI_DAP_AN.xlsx" chỉ để người soát đề đọc lại đáp án. Phần Forms chưa được thử trên Microsoft thật, nên hãy tạo thử một biểu mẫu trước khi gửi cho học sinh.
+
+**Chuẩn bị đợt — bước 4 "Nạp kết quả từ biểu mẫu".** Chọn đường A hoặc B ở đầu thẻ, rồi kéo thả các tệp tải từ biểu mẫu vào
+khung: đường A cần MỘT tệp CSV xuất từ List và các tệp Excel bài thi; đường B cần các tệp Excel biểu mẫu đăng ký và các tệp
+Excel bài thi. Phần mềm tự nhận loại từng tệp và đoán đề A / B / C của tệp bài thi; nếu đoán sai hoặc không đoán được, chọn đề
+ở ô cạnh tệp. Bấm "Chuyển thành Sổ nhập": nếu điểm giữa các đề lệch quá mức ngẫu nhiên, phần mềm dừng và hỏi dịch điểm về
+trung bình chung hay giữ điểm đã chấm; câu hỏi bị gắn cờ có thể tick "Bỏ câu này" rồi bấm "Chấm lại". Xem bản xem trước, giữ
+BẬT "Dùng điểm quyết tâm" ở Cài đặt xếp, rồi bấm "Nhập sổ". Chuyển đổi chưa ghi gì vào dữ liệu xếp cho tới khi bấm "Nhập sổ".
+
+**Chuẩn bị đợt — bước 5 "Sau khi xếp".** Sau khi xếp xong, ba nút giúp người phụ trách (IT). Tệp tạo ra nằm trong thư mục Tải xuống
+và không bao giờ ghi đè tệp cũ. (1) "Xuất KETQUA_NHAP_LIST.csv": ghép email của từng em với kết quả và lý do của lần xếp mới nhất, để nạp
+vào List KetQua; cần đã nạp tệp ở bước 4. (2) "Ai chưa đăng ký": chọn tệp CSV danh sách lớp (có cột student_id và class_id); phần mềm ghi
+một tệp cho mỗi lớp còn em chưa đăng ký, kèm bảng tổng hợp tỉ lệ từng lớp, để gửi giáo viên chủ nhiệm. (3) "Đối chiếu hai lần xuất List"
+(chỉ đường A): chọn tệp CSV List lần trước và lần này; báo cáo Excel liệt kê học sinh mới, học sinh rút, học sinh đổi nguyện vọng, lớp hoặc cơ sở.
 
 ---
 

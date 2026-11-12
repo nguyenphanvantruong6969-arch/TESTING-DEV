@@ -1,6 +1,6 @@
 # T4M. Vận hành một đợt xếp CLB (cho nhân viên IT của trường)
 
-> **Ghi chú (2026-11-11, TH):** hai bước "CLB" và "Đề thi" nay làm trong phần mềm, thẻ "Chuẩn bị đợt" (FA-M7). Các lệnh Python bên dưới vẫn cần cho đến khi FA-M8, FA-M9, FA-M10 xong (chưa làm).
+> **Ghi chú (2026-11-11, TH):** mọi bước của IT nay làm trong phần mềm, thẻ "Chuẩn bị đợt" (FA-M7 → FA-M10): CLB, đề thi, tạo bộ biểu mẫu, nạp tệp Forms/List, việc sau khi xếp. Các lệnh Python bên dưới chỉ dành cho người phát triển. Vẫn phải làm tay trên Forms: Quick Import và rẽ nhánh (Microsoft không có API).
 
 Mã việc: T4M-VH (06/11/2026). Chỉ tài liệu. Nhãn: **ĐXM** = có nguồn đã mở; **TH** = chưa thử, cần chạy thật; **HỎI-IT** = chờ trường trả lời.
 Một đợt = một lần học sinh đăng ký (tối đa 7 nguyện vọng mỗi ngày, tick CLB muốn thi, điểm quyết tâm trong app ECA) + làm bài thi CLB (Microsoft Forms) → xếp → trả kết quả theo lớp.
