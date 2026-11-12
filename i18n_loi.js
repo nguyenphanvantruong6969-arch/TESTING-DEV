@@ -1205,5 +1205,21 @@ window.I18N_ERROR_MESSAGES = {
   "forms_tao_bo_loi": {
     "vi": "Không tạo được bộ biểu mẫu.",
     "en": "Couldn't build the form set."
+  },
+  "forms_thieu_tep_nap": {
+    "vi": "Chưa có tệp nào để nạp. Hãy thả các tệp xuất từ biểu mẫu vào khung.",
+    "en": "There are no files to load yet. Drop the files exported from the forms into the box."
+  },
+  "forms_thieu_tep_dang_ky": {
+    "vi": "Chưa có tệp đăng ký cho đường {duong}: đường A cần tệp CSV từ List, đường B cần tệp Excel từ biểu mẫu đăng ký.",
+    "en": "No registration file for path {duong}: path A needs the CSV from the List, path B needs the registration form's Excel file."
+  },
+  "forms_nhieu_tep_list": {
+    "vi": "Đường A chỉ nạp MỘT tệp CSV từ List. Hãy bỏ bớt tệp.",
+    "en": "Path A loads ONE CSV file from the List. Remove the extra files."
+  },
+  "forms_chua_chuyen_tep": {
+    "vi": "Chưa chuyển tệp nào thành Sổ nhập. Hãy nạp tệp ở bước 4 trước.",
+    "en": "No files have been converted into an input workbook yet. Load the files in step 4 first."
   }
 };

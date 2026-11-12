@@ -18,13 +18,13 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
 - [x] SNAPSHOT: converter CLI outputs from BASE worktree (demo_t4m --day-du + an FA-DAA set) into scratch
 - [x] FA-M9-THUAN: `nhan_dien_tep`, `doan_bien_the`, data-returning wrapper; `tests/test_fa_m9_thuan.py`; mutation
 - [x] FA-M10-THUAN: callable functions in ghep_ket_qua_email / danh_sach_chua_dang_ky / doi_chieu_lists; `tests/test_fa_m10_thuan.py`
-- [ ] MERGE-G0 (no-op: BASE already contains G0)
-- [ ] FA-M9: `api_forms_nap.py` + step 4 UI in `js/12_chuan_bi_nap.js`; 3 test files; mutation (ignore lua_chon)
+- [x] MERGE-G0 (no-op: BASE already contains G0)
+- [x] FA-M9: `api_forms_nap.py` + step 4 UI in `js/12_chuan_bi_nap.js`; 3 test files; mutation (ignore lua_chon)
 - [ ] FA-M10: `api_forms_nap.py` + step 5 UI; test files; fragment `docs/ke_hoach/it_ui_song_song/MANH_B.md`
 - [ ] Green loop on claude/it-ui-b
 
 ## Current state (overwrite each handoff)
-- Phase 1 (pure) done: FA-M9-THUAN + FA-M10-THUAN committed. Next: MERGE-G0 (A's G0 commit, grep `^FA-M7 G0:` on origin/claude/it-ui-a), then FA-M9 Phase 2.
+- Phase 1 (pure) done: FA-M9-THUAN + FA-M10-THUAN committed. FA-M9 Phase 2 done (API + step 4 UI + tests + fragment MANH_B.md). Next: FA-M10 Phase 2 (`xuat_ket_qua_list`, `ai_chua_dang_ky`, `doi_chieu_hai_lan` + step 5 UI + tests; append to MANH_B.md).
 - API building blocks for Phase 2 (all in mau_forms_thi_clb/): `chuyen_forms_sang_phan_mem.nhan_dien_tep(ten, tieu_de)`, `doan_bien_the(de, tieu_de)`,
   `chuyen_fa_daa_du_lieu(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx, lists, quiz_xlsx, bien_the_tep, lua_chon)` -> trang_thai xong|cho_xac_nhan|loi
   (`lua_chon` = {dieu_chinh: ap_dung|giu, bo_cau: [(clb, de, so)]}); `kq['cau_co_co']` lists flagged questions;
@@ -47,3 +47,4 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
 | 2026-11-12 | sonnet-5-5 coder | SNAPSHOT (53 files) + FA-M9-THUAN (22 tests) + FA-M10-THUAN (7 tests); mutations red | kiem_nhanh 7/7, ruff clean |
 CODER session_01VfPzNtVpSjz7Hctw7iV7Z7 FA-M9-THUAN DONE 568bd20
 CODER session_01VfPzNtVpSjz7Hctw7iV7Z7 FA-M10-THUAN DONE 194d5de
+| 2026-11-12 | sonnet-5-5 coder | FA-M9: api_forms_nap.py (nhan_dien_tep_forms, chuyen_tep_forms, get_forms_nap, lay_so_nhap_nap) + step 4 UI; 19 API + 4 Chromium tests green; mutation ignore lua_chon -> 3 red | kiem_nhanh 7/7, ruff clean |

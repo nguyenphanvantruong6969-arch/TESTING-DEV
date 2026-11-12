@@ -2938,6 +2938,10 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 /* (spacer: unchanged line between marker blocks) */
 
 /* === B: FA-M9/M10 — add below === */
+.cb-nap-tha { margin: 8px 0; }
+.cb-nap-tep-loi td { color: var(--rust-text); }
+.cb-nap-bo-cau { list-style: none; margin: 6px 0; padding: 0; }
+.cb-nap-xac-nhan { margin: 8px 0; }
 /* === end B === */
 
 /* (spacer: unchanged line between marker blocks) */
