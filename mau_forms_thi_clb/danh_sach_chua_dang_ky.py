@@ -84,28 +84,27 @@ def _ghi(duong, dau, dong):
         w.writerows(dong)
 
 
-def main(argv=None):
-    """Danh sách chưa đăng ký theo lớp + bảng tổng hợp tỉ lệ (GAP-10, TH)."""
-    import argparse
-    ap = argparse.ArgumentParser(description=main.__doc__)
-    ap.add_argument("danh_sach", help="CSV: student_id, class_id[, homeroom_email]")
-    ap.add_argument("dang_ky", help="tệp xuất đăng ký (.xlsx hoặc .csv) có cột [student_id]")
-    ap.add_argument("--ra", required=True, help="thư mục ghi")
-    a = ap.parse_args(argv)
-    with open(a.danh_sach, encoding="utf-8-sig", newline="") as f:
+class LoiDanhSach(ValueError):
+    """Danh sách lớp thiếu cột student_id, class_id (khác lỗi của tệp đăng ký)."""
+
+
+def chua_dang_ky(duong_danh_sach, duong_dang_ky, thu_muc_ra):
+    """FA-M10 (TH): làm đúng việc của `main` nhưng trả DỮ LIỆU: {"lop": ty_le_dang_ky(...), "tep": [đường dẫn đã ghi],
+    "n_email": số lớp còn em chưa đăng ký, "n_duoi": số lớp dưới ngưỡng, "vuot_gioi_han": bool}.
+
+    Danh sách thiếu cột -> `LoiDanhSach`; tệp đăng ký không đọc được -> ValueError (chưa ghi gì)."""
+    with open(duong_danh_sach, encoding="utf-8-sig", newline="") as f:
         roster = [r for r in csv.DictReader(f) if _chu(r.get("student_id"))]
     if not roster or "class_id" not in roster[0]:
-        print("danh sách phải có cột student_id, class_id", file=sys.stderr)
-        return 1
+        raise LoiDanhSach("danh sách phải có cột student_id, class_id")
     roster = [{"student_id": _chu(r["student_id"]), "class_id": _chu(r["class_id"])} for r in roster]
     try:
-        da = doc_da_dang_ky(a.dang_ky)
-    except (ValueError, OSError) as e:
-        print("tệp đăng ký: %s" % e, file=sys.stderr)
-        return 1
+        da = doc_da_dang_ky(duong_dang_ky)
+    except OSError as e:                                  # như CLI cũ: chỉ lỗi tệp ĐĂNG KÝ được báo gọn
+        raise ValueError(str(e)) from e
     kq = ty_le_dang_ky(roster, da)
-    os.makedirs(a.ra, exist_ok=True)
-    da_dung = set()
+    os.makedirs(thu_muc_ra, exist_ok=True)
+    da_dung, tep = set(), []
     for r in kq:
         if not r["chua"]:
             continue
@@ -114,14 +113,34 @@ def main(argv=None):
         while ten.lower() in da_dung:
             ten, k = "%s_%d" % (goc, k), k + 1
         da_dung.add(ten.lower())
-        _ghi(os.path.join(a.ra, "chua_dang_ky_%s.csv" % ten), ["student_id", "class_id"],
-             [[s, r["class_id"]] for s in r["chua"]])
-    _ghi(os.path.join(a.ra, "tong_hop.csv"), ["class_id", "n", "da_dang_ky", "ty_le", "co"],
+        tep.append(os.path.join(thu_muc_ra, "chua_dang_ky_%s.csv" % ten))
+        _ghi(tep[-1], ["student_id", "class_id"], [[s, r["class_id"]] for s in r["chua"]])
+    tep.append(os.path.join(thu_muc_ra, "tong_hop.csv"))
+    _ghi(tep[-1], ["class_id", "n", "da_dang_ky", "ty_le", "co"],
          [[r["class_id"], r["n"], r["da_dang_ky"], round(r["ty_le"], 3), r["co"]] for r in kq])
     n_email = sum(1 for r in kq if r["chua"])
-    n_duoi = sum(1 for r in kq if r["co"])
-    print("%d lớp, %d lớp dưới 50 %%; gửi GVCN cần %d email -> %s" % (len(kq), n_duoi, n_email, a.ra))
-    if n_email > GIOI_HAN_YEU_CAU_NGAY:
+    return {"lop": kq, "tep": tep, "n_email": n_email, "n_duoi": sum(1 for r in kq if r["co"]),
+            "vuot_gioi_han": n_email > GIOI_HAN_YEU_CAU_NGAY}
+
+
+def main(argv=None):
+    """Danh sách chưa đăng ký theo lớp + bảng tổng hợp tỉ lệ (GAP-10, TH)."""
+    import argparse
+    ap = argparse.ArgumentParser(description=main.__doc__)
+    ap.add_argument("danh_sach", help="CSV: student_id, class_id[, homeroom_email]")
+    ap.add_argument("dang_ky", help="tệp xuất đăng ký (.xlsx hoặc .csv) có cột [student_id]")
+    ap.add_argument("--ra", required=True, help="thư mục ghi")
+    a = ap.parse_args(argv)
+    try:
+        kq = chua_dang_ky(a.danh_sach, a.dang_ky, a.ra)
+    except LoiDanhSach as e:
+        print(e, file=sys.stderr)
+        return 1
+    except ValueError as e:
+        print("tệp đăng ký: %s" % e, file=sys.stderr)
+        return 1
+    print("%d lớp, %d lớp dưới 50 %%; gửi GVCN cần %d email -> %s" % (len(kq["lop"]), kq["n_duoi"], kq["n_email"], a.ra))
+    if kq["vuot_gioi_han"]:
         print("CẢNH BÁO: VƯỢT %d yêu cầu/người/ngày của Power Automate: chia làm nhiều ngày hoặc gộp theo khối "
               "(xem T4M_FLOW_NHAC_HAN.md)." % GIOI_HAN_YEU_CAU_NGAY)
     return 0
