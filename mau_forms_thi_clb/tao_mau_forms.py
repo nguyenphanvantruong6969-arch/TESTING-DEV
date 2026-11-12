@@ -40,6 +40,7 @@ import csv
 import io
 import os
 import random
+import shutil
 import sys
 import zipfile
 from datetime import datetime, timedelta
@@ -99,7 +100,22 @@ def _bang_dap_an(w, de, cac_clb):
         w("")
 
 
-def ghi_cai_dat(de):
+# FA-M8 / R3 (TH): kiosk chấm bài từ tệp đề thi, nên Forms không cần giữ đáp án (`dap_an_tren_forms=False`).
+DONG_DU_PHONG_KHONG_DAP_AN = ("> **TH — dự phòng:** nếu Forms từ chối bật **Time limit** khi chưa có đáp án, đánh dấu "
+                              "đáp án đúng và điểm như hướng dẫn trước đây (đáp án ở `XEM_LAI_DAP_AN.xlsx`).")
+
+
+def _khoi_khong_dap_an(w):
+    """Đoạn thay cho phần "đặt đáp án và điểm" khi `dap_an_tren_forms=False`. Không in bảng đáp án cho IT."""
+    w("**Không** đặt đáp án đúng và điểm trên Forms: kiosk **tự chấm** theo tệp đề thi (`de_thi.json`).")
+    w("Chỉ giữ chế độ Quiz khi cần **Time limit** (hết giờ Forms tự nộp); **Show results automatically = TẮT**.")
+    w("Giáo viên kiểm đáp án ở `XEM_LAI_DAP_AN.xlsx` trước khi gửi đường dẫn cho học sinh.")
+    w("")
+    w(DONG_DU_PHONG_KHONG_DAP_AN)
+    w("")
+
+
+def ghi_cai_dat(de, dap_an_tren_forms=True):
     phan = bm.cac_phan(de)
     so_cau = sum(len(c) for _, c in phan)
     n_thi = len(bm.clb_co_thi(de))
@@ -152,15 +168,18 @@ def ghi_cai_dat(de):
     w("")
     w("## 4. Đáp án và điểm (chế độ Quiz)")
     w("")
-    w("Chỉ cần nếu tạo dạng **Quiz**. Mỗi câu đề thi: bấm vào đáp án đúng →")
-    w("dấu ✔ **Correct answer**, ô **Points** = **%s**. Câu cổng, câu nguyện vọng,"
-      % bm.ghi_so(de["diem_moi_cau"]))
-    w("mã và tên học sinh: **không** cho điểm.")
-    w("")
-    w("Bộ chuyển đổi **chấm lại** theo chính bảng này, và báo nếu điểm Forms")
-    w("chấm lệch — tức là có câu tick nhầm đáp án trên Forms.")
-    w("")
-    _bang_dap_an(w, de, bm.clb_co_thi(de))
+    if dap_an_tren_forms:
+        w("Chỉ cần nếu tạo dạng **Quiz**. Mỗi câu đề thi: bấm vào đáp án đúng →")
+        w("dấu ✔ **Correct answer**, ô **Points** = **%s**. Câu cổng, câu nguyện vọng,"
+          % bm.ghi_so(de["diem_moi_cau"]))
+        w("mã và tên học sinh: **không** cho điểm.")
+        w("")
+        w("Bộ chuyển đổi **chấm lại** theo chính bảng này, và báo nếu điểm Forms")
+        w("chấm lệch — tức là có câu tick nhầm đáp án trên Forms.")
+        w("")
+        _bang_dap_an(w, de, bm.clb_co_thi(de))
+    else:
+        _khoi_khong_dap_an(w)
     w("## 5. Settings")
     w("")
     w("| Cài đặt | Giá trị | Vì sao |")
@@ -424,7 +443,7 @@ def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
             zout.writestr(zi, zin.read(ten))
 
 
-def ghi_cai_dat_chi_thi(de, nhom):
+def ghi_cai_dat_chi_thi(de, nhom, dap_an_tren_forms=True):
     """CAI_DAT_FORMS_CHI_THI.md. nhom: kết quả bm.chia_theo_buoi."""
     tong = bm.dem_cau(de, chi_thi=True)
     n_thi = len(bm.clb_co_thi(de))
@@ -474,12 +493,15 @@ def ghi_cai_dat_chi_thi(de, nhom):
         w("")
         w("### Đáp án và điểm (chế độ Quiz)")
         w("")
-        w("Quick Import **không mang đáp án**. Mỗi câu đề thi: bấm vào đáp án đúng → **Correct answer**,")
-        w("ô **Points** = **%s**. Câu cổng: không cho điểm. Bộ chuyển đổi **chấm lại** theo bảng này và"
-          % bm.ghi_so(de["diem_moi_cau"]))
-        w("báo nếu điểm Forms lệch (tick nhầm).")
-        w("")
-        _bang_dap_an(w, de, [c for c in bm.clb_co_thi(de) if c["buoi"] in ma_buoi])
+        if dap_an_tren_forms:
+            w("Quick Import **không mang đáp án**. Mỗi câu đề thi: bấm vào đáp án đúng → **Correct answer**,")
+            w("ô **Points** = **%s**. Câu cổng: không cho điểm. Bộ chuyển đổi **chấm lại** theo bảng này và"
+              % bm.ghi_so(de["diem_moi_cau"]))
+            w("báo nếu điểm Forms lệch (tick nhầm).")
+            w("")
+            _bang_dap_an(w, de, [c for c in bm.clb_co_thi(de) if c["buoi"] in ma_buoi])
+        else:
+            _khoi_khong_dap_an(w)
     w("## Settings (mọi biểu mẫu)")
     w("")
     w("| Cài đặt | Giá trị | Vì sao |")
@@ -495,7 +517,7 @@ def ghi_cai_dat_chi_thi(de, nhom):
     return "\n".join(L)
 
 
-def sinh_chi_thi(de, thu_muc):
+def sinh_chi_thi(de, thu_muc, dap_an_tren_forms=True):
     """Ghi các tệp chế độ chỉ thi vào `thu_muc`. Trả danh sách đường dẫn đã ghi.
 
     Tệp NHAP_FORMS_CHI_THI*.docx cũ bị xoá trước (lần trước có thể đã tách, lần này không).
@@ -508,7 +530,7 @@ def sinh_chi_thi(de, thu_muc):
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_CHI_THI)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
-        f.write(ghi_cai_dat_chi_thi(de, nhom))
+        f.write(ghi_cai_dat_chi_thi(de, nhom, dap_an_tren_forms=dap_an_tren_forms))
     ra.append(duong)
     for k, ma_buoi in enumerate(nhom, 1):
         duong = os.path.join(thu_muc, TEN_DOCX_CHI_THI + (".docx" if len(nhom) == 1 else "_%d.docx" % k))
@@ -588,7 +610,7 @@ def ghi_clb_csv(de, duong):
             w.writerow([c["club_id"], c["name"], bm.ten_buoi(de, c["buoi"]), ""])
 
 
-def ghi_cai_dat_moi_clb(de):
+def ghi_cai_dat_moi_clb(de, dap_an_tren_forms=True):
     """CAI_DAT_FORMS_MOI_CLB.md: những gì Quick Import không mang theo, cho từng biểu mẫu."""
     co_thi = bm.clb_co_thi(de)
     L = []
@@ -612,11 +634,14 @@ def ghi_cai_dat_moi_clb(de):
     w("")
     w("## Đáp án và điểm (chế độ Quiz)")
     w("")
-    w("Quick Import **không mang đáp án**. Mỗi câu: bấm vào đáp án đúng → **Correct answer**, ô **Points** =")
-    w("**%s**. Bộ chuyển đổi **chấm lại** theo bảng này và báo nếu điểm Forms lệch (tick nhầm)."
-      % bm.ghi_so(de["diem_moi_cau"]))
-    w("")
-    _bang_dap_an(w, de, co_thi)
+    if dap_an_tren_forms:
+        w("Quick Import **không mang đáp án**. Mỗi câu: bấm vào đáp án đúng → **Correct answer**, ô **Points** =")
+        w("**%s**. Bộ chuyển đổi **chấm lại** theo bảng này và báo nếu điểm Forms lệch (tick nhầm)."
+          % bm.ghi_so(de["diem_moi_cau"]))
+        w("")
+        _bang_dap_an(w, de, co_thi)
+    else:
+        _khoi_khong_dap_an(w)
     w("## Settings (mọi biểu mẫu)")
     w("")
     w("| Cài đặt | Giá trị | Vì sao |")
@@ -634,7 +659,7 @@ def ghi_cai_dat_moi_clb(de):
     return "\n".join(L)
 
 
-def sinh_moi_clb(de, thu_muc):
+def sinh_moi_clb(de, thu_muc, dap_an_tren_forms=True):
     """Ghi các tệp chế độ mỗi-CLB-một-biểu-mẫu vào `thu_muc`. Trả danh sách đường dẫn đã ghi.
 
     Kiểm đề trước khi ghi: lỗi thì không ghi gì. Tệp NHAP_FORMS_MOI_CLB_*.docx cũ bị xoá trước
@@ -648,7 +673,7 @@ def sinh_moi_clb(de, thu_muc):
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_MOI_CLB)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
-        f.write(ghi_cai_dat_moi_clb(de))
+        f.write(ghi_cai_dat_moi_clb(de, dap_an_tren_forms=dap_an_tren_forms))
     ra.append(duong)
     duong = os.path.join(thu_muc, TEN_CLB_CSV)
     ghi_clb_csv(de, duong)
@@ -798,7 +823,7 @@ TIEN_TO_DOCX_BIEN_THE = "NHAP_FORMS_BIEN_THE_"
 TEN_CAI_DAT_BIEN_THE = "CAI_DAT_FORMS_BIEN_THE.md"
 
 
-def ghi_cai_dat_bien_the(de, co):
+def ghi_cai_dat_bien_the(de, co, dap_an_tren_forms=True):
     """CAI_DAT_FORMS_BIEN_THE.md (TH: chưa thử trên Forms thật). `co`: các CLB có `de_thi_bien_the`."""
     import phan_tich_cau_hoi as pt
     L = []
@@ -830,8 +855,11 @@ def ghi_cai_dat_bien_the(de, co):
             w("| %s | %s | %d | `%s%s_%s.docx` |" % (c["name"], pt.CHU_BIEN_THE[k], len(qs), TIEN_TO_DOCX_BIEN_THE,
                                                      c["club_id"], pt.CHU_BIEN_THE[k]))
     w("")
-    w("Sau Quick Import, đặt đáp án đúng và điểm **%s** mỗi câu như hướng dẫn của `CAI_DAT_FORMS_CHI_THI.md`." % bm.ghi_so(de["diem_moi_cau"]))
-    w("")
+    if dap_an_tren_forms:
+        w("Sau Quick Import, đặt đáp án đúng và điểm **%s** mỗi câu như hướng dẫn của `CAI_DAT_FORMS_CHI_THI.md`." % bm.ghi_so(de["diem_moi_cau"]))
+        w("")
+    else:
+        _khoi_khong_dap_an(w)
     w("## Settings (mọi biểu mẫu đề thi)")
     w("")
     w("| Cài đặt | Giá trị | Vì sao |")
@@ -864,7 +892,7 @@ def ghi_cai_dat_bien_the(de, co):
     return "\n".join(L)
 
 
-def sinh_bien_the(de, thu_muc):
+def sinh_bien_the(de, thu_muc, dap_an_tren_forms=True):
     """Ghi hướng dẫn và mỗi (CLB, đề) một .docx Quick Import. Lỗi đề (số câu, độ khó, quá 3 đề) hoặc không CLB nào có đề
     biến thể thì ném LoiDeThi và không ghi gì."""
     import phan_tich_cau_hoi as pt
@@ -881,7 +909,7 @@ def sinh_bien_the(de, thu_muc):
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_BIEN_THE)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
-        f.write(ghi_cai_dat_bien_the(de, co))
+        f.write(ghi_cai_dat_bien_the(de, co, dap_an_tren_forms=dap_an_tren_forms))
     ra.append(duong)
     for c in co:
         for k, qs in enumerate(pt.cac_bien_the(c)):
@@ -1008,6 +1036,246 @@ def sinh_tuan_3(de, thu_muc):
     return _ghi_khao_sat(de, thu_muc, "NHAP_FORMS_TUAN_3.docx", "CAI_DAT_FORMS_TUAN_3.md",
                          bm.cac_phan_tuan_3(), " — khảo sát tuần 3", "Khảo sát tuần 3 (2 câu)",
                          [bm.CAU_CON_DI, bm.CAU_MUON_DOI])
+
+
+# ------------------------------------------- FA-M8 (TH): bộ biểu mẫu một lần bấm (R3 + R8 + R9)
+
+TEN_DOCX_PHIEU_CLB = "NHAP_FORMS_PHIEU_CLB.docx"
+TEN_CAI_DAT_PHIEU_CLB = "CAI_DAT_FORMS_PHIEU_CLB.md"
+TEN_XEM_LAI_DAP_AN = "XEM_LAI_DAP_AN.xlsx"
+TEN_DOC_TRUOC = "00_DOC_TRUOC.md"
+THU_MUC_PHIEU_CLB = "01_phieu_clb"
+THU_MUC_DANG_KY = "02_dang_ky"                      # đường B
+THU_MUC_BO_DUNG = "02_bo_dung_t4m"                  # đường A
+THU_MUC_BAI_THI = "03_bai_thi"
+THU_MUC_BIEN_THE = "03b_bai_thi_bien_the"
+THU_MUC_SAU_KET_QUA = "04_sau_ket_qua"
+THU_MUC_TUAN_3 = "05_khao_sat_tuan_3"
+_MUC_CUA_BO = (TEN_DOC_TRUOC, TEN_XEM_LAI_DAP_AN, THU_MUC_PHIEU_CLB, THU_MUC_DANG_KY, THU_MUC_BO_DUNG,
+               THU_MUC_BAI_THI, THU_MUC_BIEN_THE, THU_MUC_SAU_KET_QUA, THU_MUC_TUAN_3)
+# Kiểu câu trong Forms của từng câu phiếu CLB (theo thứ tự `bm.TIEU_DE_PHIEU_CLB`); Quick Import chỉ tạo Text/Choice.
+_KIEU_PHIEU_CLB = ["Văn bản", "Lựa chọn", "Văn bản", "Văn bản", "Lựa chọn", "Số", "Văn bản", "Số", "Số", "Lựa chọn",
+                   "Lựa chọn", "Số nguyên 1–10", "Văn bản dài", "Văn bản dài"]
+
+
+def ghi_cai_dat_phieu_clb(de):
+    """CAI_DAT_FORMS_PHIEU_CLB.md (R9, TH: chưa thử trên Forms thật): dựng tay phiếu thiết lập CLB."""
+    phan = bm.cac_phan_phieu_clb()
+    kieu = dict(zip(bm.TIEU_DE_PHIEU_CLB, _KIEU_PHIEU_CLB))
+    ten = {i: p[0] for i, p in enumerate(phan, 1)}
+    L = []
+    w = L.append
+    w("# Phiếu thiết lập CLB trên Microsoft Forms (FA-M1, R9) — \"%s\"" % de["tieu_de"])
+    w("")
+    w("> **TH = CHƯA thử trên Microsoft thật.** Tệp này do `tao_mau_forms.py` sinh; đừng sửa tay. Mỗi giáo viên phụ trách CLB nộp "
+      "một phiếu cho mỗi CLB. Tên câu hỏi **giữ đúng từng chữ**: bộ chuyển đổi đọc theo tiêu đề cột của tệp xuất.")
+    w("")
+    w("## Cài đặt")
+    w("")
+    w("1. Forms > tạo từ tệp Quick Import `%s` (%d phần, %d câu). Quick Import chỉ tạo câu văn bản và câu lựa chọn." % (
+        TEN_DOCX_PHIEU_CLB, len(phan), len(bm.TIEU_DE_PHIEU_CLB)))
+    w("2. Đổi kiểu câu theo bảng dưới (Số, Văn bản dài); đặt bắt buộc như cột \"Bắt buộc\".")
+    w("3. Làm tay **hai chỗ rẽ nhánh** (Forms rẽ nhánh theo một câu lựa chọn tại một thời điểm).")
+    w("")
+    w("## Câu hỏi")
+    w("")
+    w("| Phần | Tên câu hỏi (= tiêu đề cột) | Kiểu trong Forms | Bắt buộc |")
+    w("|---|---|---|---|")
+    for i, (ten_phan, cac_cau) in enumerate(phan, 1):
+        for j, (td, _loai, _lc, bb) in enumerate(cac_cau):
+            w("| %s | %s | %s | %s |" % ("%d — %s" % (i, ten_phan) if j == 0 else "", td, kieu[td], "Có" if bb else "Không"))
+    w("")
+    w("## Rẽ nhánh (làm tay)")
+    w("")
+    w("1. Câu \"%s\" → **…** → **Add branching**:" % bm.TIEU_DE_PHIEU_CLB[4])
+    w("   - \"Có\" → **Go to** phần 3 \"%s\".  - \"Không\" → **Go to** phần 4 \"%s\"." % (ten[3], ten[4]))
+    w("   - Cuối phần 3 đặt **Go to** phần 5 \"%s\" (không để Forms chảy sang phần 4)." % ten[5])
+    w("2. Câu \"%s\" → **Add branching**:" % bm.TIEU_DE_PHIEU_CLB[9])
+    w("   - \"Có\" → **Go to** phần 6 \"%s\".  - \"Không\" → **Go to** phần 7 \"%s\"." % (ten[6], ten[7]))
+    w("")
+    w("## Settings")
+    w("")
+    w("| Cài đặt | Giá trị | Vì sao |")
+    w("|---|---|---|")
+    w("| Who can fill out this form | **Only people in my organization** | Chỉ giáo viên của trường |")
+    w("| One response per person | **TẮT** | Mỗi giáo viên có thể phụ trách nhiều CLB, mỗi CLB một phiếu |")
+    w("| Shuffle questions | **TẮT** | Rẽ nhánh theo thứ tự phần |")
+    w("")
+    w("## Xuất và chuyển sang Sổ nhập")
+    w("")
+    w("1. Forms: Responses → **Open in Excel** → lưu tệp .xlsx.")
+    w("2. `python mau_forms_thi_clb/chuyen_phieu_clb.py PHIEU_CLB.xlsx --ra ra/` → `SO_NHAP_CLB.xlsx` và `BAO_CAO_PHIEU_CLB.md` "
+      "(quy tắc phân loại: `PHIEU_THIET_LAP_CLB.md` §3).")
+    w("")
+    return "\n".join(L)
+
+
+def sinh_phieu_clb(de, thu_muc):
+    """R9 (TH): phiếu thiết lập CLB — .docx Quick Import + hướng dẫn. Trả danh sách đường dẫn đã ghi."""
+    os.makedirs(thu_muc, exist_ok=True)
+    duong_md = os.path.join(thu_muc, TEN_CAI_DAT_PHIEU_CLB)
+    with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ghi_cai_dat_phieu_clb(de))
+    duong_docx = os.path.join(thu_muc, TEN_DOCX_PHIEU_CLB)
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_phieu_clb(), hau_to=" — phiếu thiết lập CLB")
+    return [duong_md, duong_docx]
+
+
+def _cac_de_cua_clb(clb):
+    """[(chữ đề, các câu)] — đề A là `de_thi`, đề B, C là `de_thi_bien_the`."""
+    return [("ABC"[k], qs) for k, qs in enumerate([clb["de_thi"]] + list(clb.get("de_thi_bien_the") or []))]
+
+
+def ghi_xem_lai_dap_an(de, duong):
+    """XEM_LAI_DAP_AN.xlsx (R3): mỗi câu một dòng (CLB, đề, câu, nội dung, đáp án đúng), mọi đề kể cả biến thể.
+    Giáo viên kiểm trước khi gửi đường dẫn; thay cho phép đối chiếu cũ giữa điểm Forms và điểm chấm lại."""
+    import openpyxl
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Đáp án"
+    ws.append(["CLB", "Mã CLB", "Đề", "Câu", "Nội dung câu", "Đáp án đúng"])
+    for clb in bm.clb_co_thi(de):
+        for chu, qs in _cac_de_cua_clb(clb):
+            for i, q in enumerate(qs, 1):
+                ws.append([clb["name"], clb["club_id"], chu, i, q["cau"],
+                           "%s. %s" % (CHU_CAI[q["dap_an"]].upper(), q["lua_chon"][q["dap_an"]])])
+    wb.save(duong)
+    return duong
+
+
+def _tat_ca_tep(thu_muc):
+    ds = []
+    for goc, _d, tep in os.walk(thu_muc):
+        ds += [os.path.relpath(os.path.join(goc, t), thu_muc).replace(os.sep, "/") for t in tep]
+    return sorted(ds)
+
+
+def _ghi_doc_truoc(de, duong, ra, tham_so, canh_bao):
+    """00_DOC_TRUOC.md: thứ tự IT dựng các biểu mẫu."""
+    a = tham_so["duong"] == "A"
+    L = []
+    w = L.append
+    w("# Đọc trước — bộ biểu mẫu \"%s\" (đường %s)" % (de["tieu_de"], tham_so["duong"]))
+    w("")
+    w("> **TH = CHƯA thử trên Microsoft thật.** Bộ này do kiosk sinh; số liệu trong đề là MÔ PHỎNG. Forms không có cách tạo "
+      "biểu mẫu bằng chương trình: dựng tay theo từng tệp `CAI_DAT_*.md`.")
+    w("")
+    w("**Không đặt đáp án và điểm trên Forms**: kiosk tự chấm theo tệp đề thi. Giáo viên đối chiếu đáp án ở `%s` "
+      "trước khi gửi đường dẫn cho học sinh." % TEN_XEM_LAI_DAP_AN)
+    w("")
+    w("## Thứ tự dựng")
+    w("")
+    w("1. `%s/` — Phiếu thiết lập CLB (giáo viên phụ trách CLB nộp; kết quả đi qua `chuyen_phieu_clb.py`)." % THU_MUC_PHIEU_CLB)
+    if a:
+        w("2. `%s/` — bộ dựng T4M cho IT (SharePoint List, Power Apps, Power Automate; biểu mẫu thi nằm trong `04_forms/`). "
+          "Mở `HUONG_DAN_IT.md` và làm theo." % THU_MUC_BO_DUNG)
+    else:
+        w("2. `%s/` — biểu mẫu đăng ký nguyện vọng (%s)." % (
+            THU_MUC_DANG_KY, "một biểu mẫu cho mọi buổi" if tham_so["mot_bieu_mau"] else "mỗi buổi một biểu mẫu"))
+        w("3. `%s/` — biểu mẫu bài thi, mỗi CLB có đề một biểu mẫu (không câu cổng)." % THU_MUC_BAI_THI)
+        if tham_so["bien_the"]:
+            w("   - `%s/` — CLB có đề biến thể (đề B, C): dùng tệp ở đây thay cho tệp cùng CLB trong `%s/`."
+              % (THU_MUC_BIEN_THE, THU_MUC_BAI_THI))
+    w("%d. `%s/` — biểu mẫu \"Sau khi xem kết quả\" (làm sau khi công bố kết quả)." % (3 if a else 4, THU_MUC_SAU_KET_QUA))
+    w("%d. `%s/` — khảo sát tuần 3." % (4 if a else 5, THU_MUC_TUAN_3))
+    w("")
+    w("Tệp `%s` chỉ dành cho giáo viên, không đưa cho học sinh." % TEN_XEM_LAI_DAP_AN)
+    if canh_bao:
+        w("")
+        w("## Cảnh báo từ Sổ nhập CLB")
+        w("")
+        for _d, _e, nd in canh_bao:
+            w("- %s" % nd)
+    w("")
+    w("## Tệp trong bộ (%d)" % len(ra))
+    w("")
+    for x in sorted(ra):
+        w("- `%s`" % x)
+    w("")
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(L))
+
+
+# Câu trong HUONG_DAN_IT.md của bộ dựng T4M dặn đặt đáp án: R3 đổi thành "không đặt" (tệp đó không thuộc mã này).
+_DAN_DAP_AN_BO_DUNG = "đáp án đúng và điểm mỗi câu;"
+_DAN_KHONG_DAP_AN_BO_DUNG = "KHÔNG đặt đáp án và điểm (kiosk tự chấm; kiểm ở `XEM_LAI_DAP_AN.xlsx`);"
+
+
+def tao_bo_bieu_mau(de, thu_muc, duong="B", mot_bieu_mau=True, bien_the=False, so_nhap_clb=None):
+    """FA-M8 (TH): ghi MỘT bộ biểu mẫu cho đường `duong` ("A" bộ dựng T4M, "B" Forms) vào `thu_muc`; trả danh sách tệp
+    (đường dẫn tương đối, dấu "/", đã sắp). R3: hướng dẫn không dặn đặt đáp án trên Forms (`dap_an_tren_forms=False`)
+    và có `XEM_LAI_DAP_AN.xlsx`. Kiểm đề trước khi ghi: lỗi thì ném LoiDeThi và không ghi gì. Mục cũ của bộ (do lần
+    trước, kể cả đường kia) bị xoá trước; tệp khác trong `thu_muc` không đụng tới.
+
+    Đường B: `mot_bieu_mau` (một biểu mẫu đăng ký cho mọi buổi) và `so_nhap_clb` (lấy Loại CLB từ Sổ nhập, như
+    `--so-nhap-clb`). Đường A: gọi `tao_bo_dung_t4m.tao_bo_dung(fa=True)`. `bien_the`: thêm đề B, C của CLB có đề biến thể."""
+    import phan_tich_cau_hoi as pt
+    if duong not in ("A", "B"):
+        raise ValueError("duong phải là 'A' hoặc 'B', nhận %r" % (duong,))
+    _kiem_moi_clb(de)
+    co_bt = [c for c in de["cau_lac_bo"] if c.get("de_thi_bien_the")]
+    if bien_the:
+        if not co_bt:
+            raise bm.LoiDeThi("de_thi.json không CLB nào có de_thi_bien_the (các đề B, C của CLB)")
+        loi = [x for c in co_bt for x in pt.kiem_bien_the(c)]
+        if loi:
+            raise bm.LoiDeThi("de_thi.json sai:\n  - " + "\n  - ".join(loi))
+    de_dang_ky, canh_bao = de, []
+    if duong == "B":
+        if mot_bieu_mau and bm.dem_cau_fa_gop(de) > bm.TRAN_CAU_MOI_BIEU_MAU:
+            raise bm.LoiDeThi("biểu mẫu đăng ký gộp có %d câu, vượt trần %d câu của một biểu mẫu Forms — "
+                              "chọn mỗi buổi một biểu mẫu" % (bm.dem_cau_fa_gop(de), bm.TRAN_CAU_MOI_BIEU_MAU))
+        if so_nhap_clb:
+            import chuyen_forms_sang_phan_mem as cv
+            try:
+                de_dang_ky, canh_bao = de_theo_so_nhap_clb(de, so_nhap_clb)
+            except cv.LoiTepXuat as e:
+                raise bm.LoiDeThi(str(e)) from e
+    thu_muc = os.path.abspath(thu_muc)
+    os.makedirs(thu_muc, exist_ok=True)
+    for ten in _MUC_CUA_BO:
+        d = os.path.join(thu_muc, ten)
+        if os.path.isdir(d):
+            shutil.rmtree(d)
+        elif os.path.exists(d):
+            os.remove(d)
+
+    def con(ten):
+        return os.path.join(thu_muc, ten)
+
+    sinh_phieu_clb(de, con(THU_MUC_PHIEU_CLB))
+    if duong == "A":
+        import tao_bo_dung_t4m as kit
+        kit.tao_bo_dung(de, con(THU_MUC_BO_DUNG), fa=True, in_ra=lambda *_a, **_k: None)
+        cai_dat = os.path.join(con(THU_MUC_BO_DUNG), "04_forms", TEN_CAI_DAT_MOI_CLB)
+        with open(cai_dat, "w", encoding="utf-8", newline="\n") as f:
+            f.write(ghi_cai_dat_moi_clb(de, dap_an_tren_forms=False))
+        huong_dan = os.path.join(con(THU_MUC_BO_DUNG), kit.TEN_HUONG_DAN)
+        with open(huong_dan, encoding="utf-8", newline="") as f:
+            chu = f.read()
+        with open(huong_dan, "w", encoding="utf-8", newline="") as f:
+            f.write(chu.replace(_DAN_DAP_AN_BO_DUNG, _DAN_KHONG_DAP_AN_BO_DUNG))
+    else:
+        sinh_dang_ky(de_dang_ky, con(THU_MUC_DANG_KY), mot_bieu_mau=mot_bieu_mau)
+        sinh_moi_clb(de, con(THU_MUC_BAI_THI), dap_an_tren_forms=False)
+    if bien_the:
+        sinh_bien_the(de, con(THU_MUC_BIEN_THE), dap_an_tren_forms=False)
+    sinh_sau_ket_qua(de, con(THU_MUC_SAU_KET_QUA))
+    sinh_tuan_3(de, con(THU_MUC_TUAN_3))
+    ghi_xem_lai_dap_an(de, con(TEN_XEM_LAI_DAP_AN))
+    # 00_DOC_TRUOC.md liệt kê cả các tệp khác nên ghi sau cùng (nó tự thêm vào danh sách của chính nó).
+    ra = [x for x in _tat_ca_tep(thu_muc) if x.split("/")[0] in _MUC_CUA_BO] + [TEN_DOC_TRUOC]
+    _ghi_doc_truoc(de, con(TEN_DOC_TRUOC), ra,
+                   {"duong": duong, "mot_bieu_mau": mot_bieu_mau, "bien_the": bien_the}, canh_bao)
+    return sorted(set(ra))
+
+
+def ghi_zip_bo(thu_muc, duong_zip):
+    """Nén bộ biểu mẫu `thu_muc` thành `duong_zip` (nằm NGOÀI thư mục): tên sắp xếp, giờ và quyền cố định.
+    Dùng lại `tao_bo_dung_t4m.ghi_zip`."""
+    import tao_bo_dung_t4m as kit
+    kit.ghi_zip(thu_muc, duong_zip)
+    return duong_zip
 
 
 def main(argv=None):

@@ -326,6 +326,40 @@ def cac_phan_tuan_3():
         (CAU_MUON_DOI, "choice", list(LUA_CHON_CO_KHONG), True)])]
 
 
+# ------------------------------------------- FA-M8 / R9 (TH): phiếu thiết lập CLB (PHIEU_THIET_LAP_CLB.md §1)
+# Tên câu hỏi GIỮ ĐÚNG TỪNG CHỮ: `chuyen_phieu_clb.doc_phieu_clb` đọc theo tiêu đề cột (test so với `TIEU_DE_PHIEU` của nó).
+TIEU_DE_PHIEU_CLB = [
+    "Tên CLB", "Buổi", "Giờ", "Địa điểm",
+    "Mở thêm nhóm được nếu đông không? (Có/Không)", "Số chỗ tối đa", "Lý do giới hạn",
+    "Sức chứa mỗi nhóm", "Số thành viên tối thiểu",
+    "Cần kỹ năng tối thiểu không? (Có/Không)", "Loại thử thách", "Mốc tối thiểu (thang 10)",
+    "Bảng tiêu chí", "Giữ chỗ (mã học sinh, cách nhau dấu phẩy)",
+]
+BUOI_PHIEU_CLB = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"]
+LOAI_THU_THACH_PHIEU_CLB = ["Trắc nghiệm", "Video", "Ảnh"]
+
+
+def cac_phan_phieu_clb():
+    """Bố cục phiếu thiết lập CLB: bảy phần; hai chỗ rẽ nhánh (sau câu "Mở thêm nhóm…" và sau câu "Cần kỹ năng…").
+
+    [(tên phần, [(tiêu đề, loại, lựa chọn, bắt buộc)])]; loại 'text' hoặc 'choice'. Kiểu thật trong Forms
+    (Số, Văn bản dài) do hướng dẫn nêu, vì Quick Import chỉ tạo câu văn bản và câu lựa chọn."""
+    t = dict(zip(["ten", "buoi", "gio", "dia_diem", "mo", "cho", "ly_do", "phong", "toi_thieu", "can", "loai",
+                  "moc", "tieu_chi", "giu"], TIEU_DE_PHIEU_CLB))
+    co_khong = ["Có", "Không"]
+    return [
+        ("Thông tin CLB", [(t["ten"], "text", [], True), (t["buoi"], "choice", list(BUOI_PHIEU_CLB), True),
+                           (t["gio"], "text", [], False), (t["dia_diem"], "text", [], False)]),
+        ("Mở thêm nhóm", [(t["mo"], "choice", list(co_khong), True)]),
+        ("Nhánh Có — sức chứa mỗi nhóm", [(t["phong"], "text", [], True)]),
+        ("Nhánh Không — số chỗ tối đa", [(t["cho"], "text", [], True), (t["ly_do"], "text", [], True)]),
+        ("Thành viên và kỹ năng", [(t["toi_thieu"], "text", [], True), (t["can"], "choice", list(co_khong), True)]),
+        ("Thử thách đầu vào", [(t["loai"], "choice", list(LOAI_THU_THACH_PHIEU_CLB), True),
+                               (t["moc"], "text", [], True), (t["tieu_chi"], "text", [], True)]),
+        ("Giữ chỗ", [(t["giu"], "text", [], False)]),
+    ]
+
+
 def cac_phan_moi_clb(de, clb):
     """T4M-Q4a: bố cục biểu mẫu của MỘT CLB: một phần, các câu đề thi, KHÔNG câu cổng.
 

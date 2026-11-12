@@ -15,7 +15,7 @@ FA-M8: "Tạo bộ biểu mẫu" button (step 3 of the kiosk tab "Chuẩn bị �
 All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
 
 ## Plan (written by lead; ticked by Sonnet)
-- [ ] FA-M8-THUAN (Phase 1, pure): `sinh_phieu_clb`, `dap_an_tren_forms=True` on guide writers, `ghi_xem_lai_dap_an`,
+- [x] FA-M8-THUAN (Phase 1, pure): `sinh_phieu_clb`, `dap_an_tren_forms=True` on guide writers, `ghi_xem_lai_dap_an`,
       `tao_bo_bieu_mau`, `ghi_zip_bo` in `mau_forms_thi_clb/tao_mau_forms.py` / `bieu_mau.py`;
       `tests/test_fa_m8_bo_bieu_mau.py`; mutation (R3); snapshot diff identical
 - [x] MERGE-G0: no-op (BASE already contains G0 c7b5d1d/d731a3d via INTEGRATE 47ab08b)
@@ -35,7 +35,7 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- Branch created from BASE, handoff written. Next: delegate FA-M8-THUAN to a Sonnet coder.
+- FA-M8-THUAN done (pure functions + tests). Next: lead review, then FA-M8 Phase 2 (api_forms_bo.py, js/13_chuan_bi_bo.js, cb_bo_* keys, fragment MANH_C.md).
 
 ## Decisions and gotchas (keep short)
 - IT_UI_STATUS: A integrated alone into forms-gop (C was BLOCKED then). Truong re-ran PROMPT_C; C branches from the
@@ -51,3 +51,5 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-12 | opus lead | branch created from BASE 5196217, handoff written | |
+| 2026-11-12 | sonnet coder | FA-M8-THUAN: `bm.TIEU_DE_PHIEU_CLB`/`cac_phan_phieu_clb`; in tao_mau_forms.py `sinh_phieu_clb`, `ghi_cai_dat_phieu_clb`, `dap_an_tren_forms` (default True) on ghi_cai_dat/_chi_thi/_moi_clb/_bien_the + sinh_chi_thi/moi_clb/bien_the, `ghi_xem_lai_dap_an`, `tao_bo_bieu_mau`, `ghi_zip_bo`; tests/test_fa_m8_bo_bieu_mau.py (28 passed) | snapshot from BASE 5196217 (8 modes; --bien-the with a 2-club variant de_thi built in scratch): `diff -r` differs ONLY in default-mode MAU_XUAT_TU_FORMS.xlsx + NHAP_FORMS_THI_CLB.docx = docProps/core.xml timestamp noise; content with core.xml excluded identical (24 files, 0 diffs). Mutation: tao_bo_bieu_mau passing dap_an_tren_forms=True -> `test_bo_khong_co_dap_an_tren_forms_o_moi_huong_dan` RED (1 failed, 27 passed), restored -> 28 passed. Related tests 228 passed; ruff clean; kiem_nhanh 7/7. KNOWN: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` red (CLAUDE_CHI_TIET.md says 254 test files, now 255) -> A must bump count at integration (fragment, not my file). Path-A kit: HUONG_DAN_IT.md sentence patched by str.replace after tao_bo_dung (tao_bo_dung_t4m.py not owned by C). REQUEST A: none blocking. |
+CODER session_01YVAytyhzs8uR54cjoTQrMS FA-M8-THUAN DONE (hash below in commit)
