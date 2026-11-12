@@ -22,6 +22,16 @@
 
 ## 2. Research goals (priority order)
 
+**Priority rule (Truong, 2026-11-12): important things first.**
+- Rank work by "harm to real students this semester if wrong". Highest: anything that can place a student
+  wrongly, unfairly or unexplainably in the FA-DAA run. Lowest: other sectors, scale, polish.
+- Do goals strictly in order G-A → G-C → G-D → G-B → G-E → G-F. Start a later goal only when Truong asks.
+- Inside a goal, report the top 3 findings first (severity: high / medium / low), then stop and ask before
+  going deeper. No finding without evidence (proof sketch, counterexample or simulated table).
+- Inside G-A, check in this order: (1) wrapper steps that move real students (FREE fallback + rerun,
+  club-closing loop D3, SELECTIVE filtering, reserved seats); (2) medal strategy gap lazy vs strategic;
+  (3) ties from integer scores.
+
 ### G-A. Audit the current mechanism for hidden weaknesses (highest value, needed before real use)
 Questions:
 1. Does FA-DAA keep stability and strategy-proofness *given medals* with all its wrapper steps: SELECTIVE
@@ -97,7 +107,9 @@ Do not upload `app.db`, real student lists or anything with personal data.
 **Session 1 — mechanism audit (G-A):**
 ```
 Read docs/fable/01_PROJECT_CONTEXT.md and docs/fable/02_FABLE_BRIEF.md, then CLAUDE.md.
-Work on goal G-A only. I want to know where FA-DAA could fail stability, truthfulness or fairness
+Work on goal G-A only, most important things first (section 2 priority rule): give me your top 3
+findings by severity, then stop and ask before going deeper.
+I want to know where FA-DAA could fail stability, truthfulness or fairness
 before we use it with real students this semester. For each wrapper step in chay_fa_daa, give a proof
 sketch or a smallest counterexample, and the property test that would catch it. Measure how much a
 strategic medal placement gains over the default, by behaviour type, with mo_phong_fa_daa.py.
