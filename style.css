@@ -2942,6 +2942,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .cb-nap-tep-loi td { color: var(--rust-text); }
 .cb-nap-bo-cau { list-style: none; margin: 6px 0; padding: 0; }
 .cb-nap-xac-nhan { margin: 8px 0; }
+.cb-nap5-phan { margin: 12px 0; padding-bottom: 8px; }
+.cb-nap5-chon { display: block; margin: 6px 0; }
 /* === end B === */
 
 /* (spacer: unchanged line between marker blocks) */

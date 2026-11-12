@@ -258,3 +258,101 @@ class FormsNapMixin:
             else:
                 du["loi_xem_truoc"] = xt["errors"]
         return _ok(du)
+
+    # ------------------------------------------------------------------
+    # FA-M10 — nút sau khi xếp (bước 5). Đầu ra rơi vào `thu_muc_tai_ve()` (qua `_duong_xuat`, không ghi đè).
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _ghi_tam(thu_muc, ten, du_lieu):
+        p = os.path.join(thu_muc, ten)
+        with open(p, "wb") as f:
+            f.write(du_lieu)
+        return p
+
+    def xuat_ket_qua_list(self):
+        """`KETQUA_NHAP_LIST.csv` (cho List KetQua): các dòng của `export_ly_do_csv` ghép email bằng
+        `ghep_ket_qua_email.ghep` với `forms/nap/EMAIL_MA_HS.csv`. Thiếu tệp email -> `forms_thieu_email`
+        (chạy bước 4 trước). Trả {path, n_rows, canh_bao: [chuỗi], canh_bao_ly_do: [err]}."""
+        import ghep_ket_qua_email as gk
+        duong, loi = self._duong_forms()
+        if loi:
+            return _fail(loi)
+        email = forms_dot.duong_email_ma_hs(self.db_path)
+        if not os.path.isfile(email):
+            return _fail(err("forms_thieu_email"))
+        with tempfile.TemporaryDirectory(dir=forms_dot.thu_muc_nap(self.db_path)) as tam:
+            ly_do = self.export_ly_do_csv(os.path.join(tam, "ket_qua_ly_do.csv"))
+            if not ly_do["ok"]:
+                return ly_do
+            try:
+                ra = self._duong_xuat("", "KETQUA_NHAP_LIST.csv")
+                canh_bao = gk.ghep(ly_do["data"]["path"], email, ra)
+            except Exception as e:
+                return _fail(err("forms_khong_chuyen_duoc", detail=str(e)))
+        return _ok({"path": ra, "n_rows": ly_do["data"]["n_rows"], "canh_bao": canh_bao,
+                    "canh_bao_ly_do": ly_do["data"].get("canh_bao", [])})
+
+    def ai_chua_dang_ky(self, file_base64):
+        """Danh sách chưa đăng ký theo lớp: `file_base64` = CSV danh sách lớp (student_id, class_id); dùng mã học sinh đã đăng ký của lần nạp
+        cuối ở bước 4 (`EMAIL_MA_HS.csv`). Ghi vào thư mục `chua_dang_ky/` trong Tải xuống (một tệp mỗi lớp còn em chưa đăng ký +
+        `tong_hop.csv`). Trả {thu_muc, tep: [tên], n_lop, n_duoi, n_email, vuot_gioi_han}."""
+        import danh_sach_chua_dang_ky as ds
+        duong, loi = self._duong_forms()
+        if loi:
+            return _fail(loi)
+        dk = forms_dot.duong_email_ma_hs(self.db_path)       # (Email, student_id) của lần nạp cuối ở bước 4
+        if not os.path.isfile(dk):
+            return _fail(err("forms_thieu_email"))
+        try:
+            du_lieu = base64.b64decode(file_base64 or "", validate=False)
+        except Exception:
+            du_lieu = b""
+        if not du_lieu:
+            return _fail(err("xlsx_empty"))
+        with tempfile.TemporaryDirectory(dir=forms_dot.thu_muc_nap(self.db_path)) as tam:
+            ds_lop = self._ghi_tam(tam, "danh_sach_lop.csv", du_lieu)
+            try:
+                ra = self._duong_xuat("", "chua_dang_ky")
+                kq = ds.chua_dang_ky(ds_lop, dk, ra)
+            except ds.LoiDanhSach as e:
+                return _fail(err("forms_thieu_danh_sach_lop", detail=str(e)))
+            except Exception as e:
+                return _fail(err("forms_khong_chuyen_duoc", detail=str(e)))
+        return _ok({"thu_muc": ra, "tep": [os.path.basename(p) for p in kq["tep"]], "n_lop": len(kq["lop"]),
+                    "n_duoi": kq["n_duoi"], "n_email": kq["n_email"], "vuot_gioi_han": kq["vuot_gioi_han"]})
+
+    def doi_chieu_hai_lan(self, cu_base64, moi_base64):
+        """Đối chiếu hai lần xuất List (CSV cũ + mới) -> `DOI_CHIEU_LIST.xlsx` trong Tải xuống. Trả {path, dem: {loai: n},
+        n_clb_la}. Tệp thiếu cột bắt buộc -> `forms_khong_chuyen_duoc`, không ghi gì."""
+        import chuyen_forms_sang_phan_mem as cv
+        import doi_chieu_lists as dc
+        duong, loi = self._duong_forms()
+        if loi:
+            return _fail(loi)
+        try:
+            de = forms_dot.doc_de_dot(self.db_path)
+        except FileNotFoundError:
+            return _fail(err("forms_chua_co_de"))
+        except Exception as e:
+            return _fail(err("de_thi_tep_sai", detail=str(e)))
+        try:
+            cu = base64.b64decode(cu_base64 or "", validate=False)
+            moi = base64.b64decode(moi_base64 or "", validate=False)
+        except Exception:
+            cu = moi = b""
+        if not cu or not moi:
+            return _fail(err("xlsx_empty"))
+        with tempfile.TemporaryDirectory(dir=forms_dot.thu_muc_nap(self.db_path)) as tam:
+            p_cu = self._ghi_tam(tam, "cu.csv", cu)
+            p_moi = self._ghi_tam(tam, "moi.csv", moi)
+            try:
+                kq = dc.doi_chieu(p_cu, p_moi, de)
+            except (cv.LoiTepXuat, ValueError) as e:
+                return _fail(err("forms_khong_chuyen_duoc", detail=str(e)))
+            try:
+                ra = self._duong_xuat("", "DOI_CHIEU_LIST.xlsx")
+                dc.ghi_bao_cao(kq, ra)
+            except Exception as e:
+                return _fail(err("forms_khong_chuyen_duoc", detail=str(e)))
+        return _ok({"path": ra, "dem": {k: sum(1 for m in kq["muc"] if m["loai"] == k) for k in dc.LOAI},
+                    "n_clb_la": kq["n_clb_la"]})

@@ -1,6 +1,6 @@
-# Mảnh B — FA-M9 (nạp tệp Forms / List) — A gộp vào CHANGELOG / TIEN_DO / hướng dẫn ở Phase 3
+# Mảnh B — FA-M9 (nạp tệp Forms / List) + FA-M10 (nút sau khi xếp) — A gộp vào CHANGELOG / TIEN_DO / hướng dẫn ở Phase 3
 
-TH = CHƯA thử trên Microsoft thật. Mọi số liệu trong test là MÔ PHỎNG. (FA-M10 sẽ thêm phần riêng ở dưới.)
+TH = CHƯA thử trên Microsoft thật. Mọi số liệu trong test là MÔ PHỎNG. (Phần FA-M10 ở cuối tệp.)
 
 ## CHANGELOG (văn bản mục)
 **FA-M9 — Nạp tệp Forms / List ngay trong phần mềm (thẻ "Chuẩn bị đợt", bước 4).**
@@ -39,3 +39,39 @@ Excel bài thi. Phần mềm tự nhận loại từng tệp và đoán đề A 
 ở ô cạnh tệp. Bấm "Chuyển thành Sổ nhập": nếu điểm giữa các đề lệch quá mức ngẫu nhiên, phần mềm dừng và hỏi dịch điểm về
 trung bình chung hay giữ điểm đã chấm; câu hỏi bị gắn cờ có thể tick "Bỏ câu này" rồi bấm "Chấm lại". Xem bản xem trước, giữ
 BẬT "Dùng điểm quyết tâm" ở Cài đặt xếp, rồi bấm "Nhập sổ". Chuyển đổi chưa ghi gì vào dữ liệu xếp cho tới khi bấm "Nhập sổ".
+
+---
+# FA-M10 — ba nút sau khi xếp (bước 5)
+
+## CHANGELOG (văn bản mục)
+**FA-M10 — Ba nút "Sau khi xếp" ngay trong phần mềm (thẻ "Chuẩn bị đợt", bước 5).** TH = chưa thử trên Microsoft thật.
+- `api_forms_nap.py`: `xuat_ket_qua_list()` (các dòng `export_ly_do_csv` ghép email bằng `ghep_ket_qua_email.ghep` với
+  `forms/nap/EMAIL_MA_HS.csv` -> `KETQUA_NHAP_LIST.csv`; thiếu tệp email -> `forms_thieu_email`; không để lại `ket_qua_ly_do.csv`),
+  `ai_chua_dang_ky(file_base64)` (CSV danh sách lớp + mã học sinh đã đăng ký ở lần nạp cuối của bước 4 -> thư mục `chua_dang_ky/`:
+  mỗi lớp còn em chưa đăng ký một tệp + `tong_hop.csv`), `doi_chieu_hai_lan(cu_base64, moi_base64)` (-> `DOI_CHIEU_LIST.xlsx`, đề lấy
+  từ `forms/de_thi.json`). Mọi tệp ra rơi vào `thu_muc_tai_ve()` qua `_duong_xuat`: không ghi đè tệp cũ (`x (2)`), lỗi thì không ghi gì.
+  Dùng lại hàm sẵn có (`ghep`, `chua_dang_ky`, `doi_chieu` + `ghi_bao_cao`); dòng lệnh y hệt (API == CLI, so từng byte / từng ô).
+- Giao diện `js/12_chuan_bi_nap.js` (bước 5): ba khối — nút "Xuất KETQUA_NHAP_LIST.csv"; ô chọn CSV danh sách lớp + nút "Tạo danh sách
+  chưa đăng ký" (khoá tới khi chọn tệp; cảnh báo vượt giới hạn Power Automate); hai ô chọn CSV cũ / mới + nút "Đối chiếu" (CHỈ đường A).
+  Chuỗi `cb_nap_s5_*` (vi + en). Không mã lỗi mới (dùng `forms_thieu_email`, `forms_thieu_danh_sach_lop`, `forms_khong_chuyen_duoc`...).
+- Tệp test mới: `tests/test_fa_m10_sau_xep_nut.py` (8 ca API), `tests/test_giao_dien_fa_m10_nut.py` (5 ca Chromium).
+- Đột biến đã chạy: (1) API ghi thêm ký tự vào `KETQUA_NHAP_LIST.csv` -> `test_xuat_ket_qua_list_bang_cli_cung_tep` đỏ; (2) giao diện bỏ điều kiện
+  "đã chọn tệp" của nút "Ai chưa đăng ký" -> `test_nut_ai_chua_dang_ky_khoa_den_khi_chon_tep_roi_ghi_thu_muc` đỏ; khôi phục -> xanh.
+- Mặc định không đổi: không đụng lõi DA, schema, cột CSV; ba tập lệnh dòng lệnh không đổi.
+
+## TIEN_DO (một dòng)
+| FA-M10 | Ba nút sau khi xếp ở bước 5 (xuất kết quả List, ai chưa đăng ký, đối chiếu hai lần xuất) | xong trên `claude/it-ui-b`; TH | `tests/test_fa_m10_thuan.py`, `tests/test_fa_m10_sau_xep_nut.py`, `tests/test_giao_dien_fa_m10_nut.py` |
+
+## CLAUDE_CHI_TIET (bản đồ mã)
+- `api_forms_nap.py` — thêm `xuat_ket_qua_list`, `ai_chua_dang_ky`, `doi_chieu_hai_lan` (FA-M10)
+- `js/12_chuan_bi_nap.js` — bước 5 (khối IIFE thứ hai)
+- Số tệp test mới của B (cả M9 + M10): 6 (`test_fa_m9_thuan`, `test_fa_m9_nap_tep_forms`, `test_giao_dien_fa_m9_nap`, `test_fa_m10_thuan`,
+  `test_fa_m10_sau_xep_nut`, `test_giao_dien_fa_m10_nut`). Lưu ý: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`
+  đỏ cho tới khi A cập nhật số tệp test trong bản đồ mã (đang ghi 254; B không sửa tệp đó).
+
+## HUONG_DAN_SU_DUNG (đoạn cho người dùng)
+**Chuẩn bị đợt — bước 5 "Sau khi xếp".** Sau khi xếp xong, ba nút giúp người phụ trách (IT). Tệp tạo ra nằm trong thư mục Tải xuống
+và không bao giờ ghi đè tệp cũ. (1) "Xuất KETQUA_NHAP_LIST.csv": ghép email của từng em với kết quả và lý do của lần xếp mới nhất, để nạp
+vào List KetQua; cần đã nạp tệp ở bước 4. (2) "Ai chưa đăng ký": chọn tệp CSV danh sách lớp (có cột student_id và class_id); phần mềm ghi
+một tệp cho mỗi lớp còn em chưa đăng ký, kèm bảng tổng hợp tỉ lệ từng lớp, để gửi giáo viên chủ nhiệm. (3) "Đối chiếu hai lần xuất List"
+(chỉ đường A): chọn tệp CSV List lần trước và lần này; báo cáo Excel liệt kê học sinh mới, học sinh rút, học sinh đổi nguyện vọng, lớp hoặc cơ sở.
