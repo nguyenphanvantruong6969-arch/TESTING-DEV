@@ -1,5 +1,5 @@
 Branch: claude/it-ui-b
-STATUS: IN_PROGRESS
+STATUS: BLOCKED: waited too long for A (only failure: tests/test_a13_12_tai_lieu.py code-map test-file count 254 vs 260 in A-owned CLAUDE_CHI_TIET.md)
 WARNING: lead is not Opus (claude-sonnet-5-5)
 Lead: CHU_TRI session_01VfPzNuCMVqq71ep3pTUA9K. BASE = 51962176a71456ca0417a3ce97da360227f8a7a7 (origin/claude/forms-gop HEAD, already holds G0 + FA-M7, so MERGE-G0 is a no-op)
 
@@ -64,3 +64,4 @@ CODER session_01VfPzNs495e7jDUEqWPy8jf FA-M9 DONE 934d031
 | 2026-11-12 | sonnet-5-5 coder | FA-M10: xuat_ket_qua_list, ai_chua_dang_ky, doi_chieu_hai_lan + step 5 UI; 8 API + 5 Chromium tests green; 2 mutations red | ruff clean |
 CODER session_01VfPzNtKmTt9VD3XNUQbYRG FA-M10 DONE b43953c
 CODER session_01VfPzNveb6btV2ocn7yNVEo FIX-1 DONE e7c5a1f
+| 2026-11-12 | sonnet-5-5 lead | 12 wake-ups (07:00-10:57 UTC) waiting for A; forms-gop/it-ui-a unchanged (254) -> BLOCKED | Windows build not triggered (CI not green). All other checks green: 5926 passed on Linux CI, cov 93.42 %, kiem_nhanh 7/7 60/60 |
