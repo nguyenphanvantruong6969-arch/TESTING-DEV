@@ -912,7 +912,7 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === C: FA-M8 — add below === */
-      cb_bo_ghi: "Tạo một lần cả bộ biểu mẫu cho đường đã chọn, rồi nén thành một tệp zip ở thư mục Tải xuống. Bộ này không dặn đặt đáp án trên Forms: phần mềm tự chấm từ tệp đề; tệp XEM_LAI_DAP_AN.xlsx để người soát đề đối chiếu. (TH = chưa thử trên Microsoft thật.)",
+      cb_bo_ghi: "Tạo một lần cả bộ biểu mẫu cho đường đã chọn, rồi nén thành một tệp nén ở thư mục Tải xuống. Bộ này không dặn đặt đáp án trên Forms: phần mềm tự chấm từ tệp đề; tệp XEM_LAI_DAP_AN.xlsx để người soát đề đối chiếu. (TH = chưa thử trên Microsoft thật.)",
       cb_bo_can_duong: "Hãy chọn đường A hoặc B ở phía trên trước.",
       cb_bo_can_de: "Hãy nạp đề thi ở bước 2 trước.",
       cb_bo_mot: "Một biểu mẫu cho mọi buổi",

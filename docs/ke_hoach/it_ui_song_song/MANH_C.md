@@ -33,12 +33,12 @@ TH = CHƯA thử trên Microsoft / Google thật. Mọi số liệu trong test l
 | `api_forms_bo.py`, `js/13_chuan_bi_bo.js` | Bước 3 thẻ "Chuẩn bị đợt" (FA-M8, TH): `FormsBoMixin.get_bo_bieu_mau` · `tao_bo_bieu_mau_api` (gọi `tao_mau_forms.tao_bo_bieu_mau` + `ghi_zip_bo`; ghi `forms/bieu_mau/`, zip ở Tải xuống; không ghi app.db) |
 | `mau_forms_thi_clb/tao_mau_forms.py` (thêm) | `sinh_phieu_clb` · `ghi_xem_lai_dap_an` · `tao_bo_bieu_mau` · `ghi_zip_bo`; `dap_an_tren_forms` (mặc định True) trên các hàm ghi hướng dẫn |
 Số tệp test: C thêm **3** tệp (`test_fa_m8_bo_bieu_mau.py`, `test_fa_m8_api.py`, `test_giao_dien_fa_m8_bo.py`); trên nhánh C đếm được 257
-(`ls tests/test_*.py | wc -l`). Phase 3: đếm lại sau khi gộp A, B, C.
+(`ls tests/test_*.py | wc -l`). Phase 3: đếm lại sau khi gộp A, B, C. Phase 3: recount — FIX-1 đã sửa DUY NHẤT số 254 → 257 ở hàng `tests/` của CLAUDE_CHI_TIET.md (lệch quyền sở hữu có chủ đích, lead A đang tạm dừng); A đếm lại sau khi gộp.
 
 ## HUONG_DAN_SU_DUNG (đoạn cho người dùng)
 **Chuẩn bị đợt — bước 3: Tạo bộ biểu mẫu.** Sau khi đã chọn đường A hoặc B và nạp đề thi ở bước 2, bấm "Tạo bộ biểu mẫu". Phần mềm làm sẵn mọi
 biểu mẫu cần cho đợt (phiếu thiết lập CLB, phiếu đăng ký, bài thi, biểu mẫu sau khi xem kết quả, khảo sát tuần 3), kèm tệp "00_DOC_TRUOC.md"
-cho biết nên làm theo thứ tự nào, rồi nén tất cả vào một tệp zip trong thư mục Tải xuống; bấm "Mở thư mục" để tìm tệp. Có hai ô chọn: "Một biểu
+cho biết nên làm theo thứ tự nào, rồi nén tất cả vào một tệp nén trong thư mục Tải xuống; bấm "Mở thư mục" để tìm tệp. Có hai ô chọn: "Một biểu
 mẫu cho mọi buổi" (tích sẵn, học sinh chỉ điền một phiếu đăng ký) và "Hai đề cho CLB Tuyển chọn" (chỉ bật khi đề thi của đợt có CLB dùng hai đề).
 Bộ này không dặn đặt đáp án đúng trên Forms: phần mềm tự chấm từ tệp đề thi; tệp "XEM_LAI_DAP_AN.xlsx" chỉ để người soát đề đọc lại đáp án.
 Phần Forms chưa được thử trên Microsoft thật, nên hãy tạo thử một biểu mẫu trước khi gửi cho học sinh.

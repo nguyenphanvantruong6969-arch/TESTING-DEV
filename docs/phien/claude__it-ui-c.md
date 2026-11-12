@@ -79,3 +79,5 @@ CODER session_01YVAyu3iuHSR5HxZvebVahw FA-M8 DONE 57f4631
 | 2026-11-12 | opus lead | review FA-M8 57f4631..959eca9: PASS | 143 related passed (Chromium ran, 0 skipped); ruff clean; snapshot 8 modes identical; UI mutation (always mot_bieu_mau:true) re-done by lead -> red; kiem_nhanh --so-seed 20 7/7, 60/60; ownership OK (no edits outside C files/markers) |
 | 2026-11-12 | opus lead | green loop round 1 started | |
 | 2026-11-12 | opus lead | green loop round 1: RED (2 ids, same local/CI Linux/CI Windows) | FIX-1 delegated |
+| 2026-11-12 | sonnet coder | FIX-1: (1) CLAUDE_CHI_TIET.md hàng `tests/` 254→257 (lệch quyền sở hữu có chủ đích, ghi ở MANH_C.md); (2) vi `cb_bo_ghi` "tệp zip"→"tệp nén" (i18n.js), đoạn hướng dẫn MANH_C.md cùng sửa | Đỏ trước (2 failed), sau: 2 test + 3 lần chạy lại = 4/4 xanh; test_giao_dien_fa_m8_bo + tieng_viet_sach + a13_12 + fa_m8 api/thuan = 62 passed; ruff sạch; kiem_nhanh --co-so BASE --so-seed 20 7/7, 60/60. Lưu ý: venv mới phải cài requirements-dev.txt (pillow, python-docx) mới có test xanh. |
+CODER session_01YVAytyhzs8uR54cjoTQrMS FIX-1 DONE 9e16ba0
