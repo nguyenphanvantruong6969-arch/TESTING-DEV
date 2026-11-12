@@ -39,7 +39,7 @@
 8. Trước khi push: chạy skill `soat-ma` (`.claude/skills/soat-ma/`): `kiem_nhanh.py`, then the four tiers in `SKILL.md`; report only unless asked to fix.
 9. **Branch handoff**: `docs/phien/<branch, "/"→"__">.md` (from `docs/phien/_TEMPLATE.md`, English, ≤150 lines). Past ~400k tokens of context, finish the current turn, write state there, stop (Stop hook `.claude/hooks/handoff_khi_day_ngu_canh.py` reminds).
 10. **No subagents / Agent tool** unless Truong says so explicitly; use Read/Grep/Bash directly.
-11. **Model roles** (one session each, bridged by the handoff file): Opus plans (Plan section; first Opus session of a new branch creates the handoff file with Goal + Plan), Sonnet codes and ticks the Plan, Haiku only reads/searches/summarises, never edits.
+11. **Model roles** (one session each, bridged by the handoff file): Opus plans (Plan section; first Opus session of a new branch creates the handoff file with Goal + Plan), Sonnet codes and ticks the Plan, Haiku only reads/searches/summarises, never edits. Fable researches (Truong, 2026-11-12): reads code and docs, runs simulations in `du_lieu_test/` or a scratch folder, writes memos under `docs/fable/`; never edits production code (brief: `docs/fable/02_FABLE_BRIEF.md`).
 
 ## Academic integrity (student project)
 - All verification numbers are SIMULATED data; never present them as a real survey.

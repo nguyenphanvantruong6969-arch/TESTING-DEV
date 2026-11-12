@@ -5,6 +5,7 @@
 - `docs/fable/01_PROJECT_CONTEXT.md` (mới): tóm tắt toàn dự án cho AI đọc (bài toán, RB-DA, lớp FA-DAA, chương trình, bất biến, số liệu MÔ PHỎNG, điểm yếu, thứ tự đọc).
 - `docs/fable/02_FABLE_BRIEF.md` (mới): luật nền, 6 mục tiêu nghiên cứu G-A…G-F theo ưu tiên, sản phẩm cần giao, cách chạy phiên Fable, ba câu lệnh dán sẵn.
 - Chỉ tài liệu; không đổi mã, không test mới.
+- `CLAUDE.md` quy tắc 11: thêm vai trò Fable (nghiên cứu, không sửa mã sản xuất), Truong duyệt 12/11/2026.
 
 ## 2026-11-12 — FA-M8, FA-M9, FA-M10: bước 3–5 của thẻ "Chuẩn bị đợt" (TH = chưa thử trên Microsoft thật)
 

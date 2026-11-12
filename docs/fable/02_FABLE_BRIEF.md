@@ -17,8 +17,8 @@
 - Check every citation (authors, year, title) against Crossref/arXiv before relying on it; the project's
   literature list contains known errors. Correct spelling: Gale–Shapley.
 - No subagents unless Truong says so. Reply to Truong in Vietnamese; files in English.
-- Note: `CLAUDE.md` rule 11 defines roles for Opus/Sonnet/Haiku only. Treat Fable as a planner-level
-  research role (reads, simulates in a scratch folder, writes memos), not as an editor of production code.
+- Role (`CLAUDE.md` rule 11, Truong 2026-11-12): Fable researches — reads code and docs, runs simulations
+  in `du_lieu_test/` or a scratch folder, writes memos under `docs/fable/`; never edits production code.
 
 ## 2. Research goals (priority order)
 
