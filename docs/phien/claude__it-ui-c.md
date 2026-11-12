@@ -35,7 +35,7 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 RED (2 tests) -> FIX-1 delegated.
+- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 RED (2 tests) -> FIX-1 done (b641d89), reviewed PASS. Green loop round 2 running.
 
 ## Green loop round 1 (HEAD 5f3de9b)
 - Local: 2 failed, 5905 passed, 4 skipped (none `test_giao_dien_*`), coverage 93.44 %; ruff clean;
@@ -81,3 +81,4 @@ CODER session_01YVAyu3iuHSR5HxZvebVahw FA-M8 DONE 57f4631
 | 2026-11-12 | opus lead | green loop round 1: RED (2 ids, same local/CI Linux/CI Windows) | FIX-1 delegated |
 | 2026-11-12 | sonnet coder | FIX-1: (1) CLAUDE_CHI_TIET.md hàng `tests/` 254→257 (lệch quyền sở hữu có chủ đích, ghi ở MANH_C.md); (2) vi `cb_bo_ghi` "tệp zip"→"tệp nén" (i18n.js), đoạn hướng dẫn MANH_C.md cùng sửa | Đỏ trước (2 failed), sau: 2 test + 3 lần chạy lại = 4/4 xanh; test_giao_dien_fa_m8_bo + tieng_viet_sach + a13_12 + fa_m8 api/thuan = 62 passed; ruff sạch; kiem_nhanh --co-so BASE --so-seed 20 7/7, 60/60. Lưu ý: venv mới phải cài requirements-dev.txt (pillow, python-docx) mới có test xanh. |
 CODER session_01YVAytyhzs8uR54cjoTQrMS FIX-1 DONE 9e16ba0
+| 2026-11-12 | opus lead | review FIX-1 b641d89: PASS (coder log line above has wrong session id/hash; real: session_01YVAytyWT5up1scxVFbRakd, b641d89) | 2 ids now pass + test_giao_dien_fa_m8_bo (22 passed); ruff clean; kiem_nhanh 7/7; CLAUDE_CHI_TIET diff = one number only. Green loop round 2 started |
