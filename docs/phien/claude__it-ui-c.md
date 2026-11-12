@@ -1,5 +1,5 @@
 Branch: claude/it-ui-c
-STATUS: IN_PROGRESS
+STATUS: GREEN
 Lead: CHU_TRI session_01YVAytz6NWHWLMW8oSuiyFi (Opus). BASE = 51962176a71456ca0417a3ce97da360227f8a7a7 (origin/claude/forms-gop HEAD; already holds G0 + FA-M7, so MERGE-G0 is a no-op)
 
 # Branch handoff: claude/it-ui-c
@@ -22,7 +22,7 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
 - [x] FA-M8 (Phase 2): `api_forms_bo.py` (`FormsBoMixin.tao_bo_bieu_mau_api`), step 3 UI in `js/13_chuan_bi_bo.js`,
       `cb_bo_*` keys in C marker blocks; `tests/test_fa_m8_api.py`, `tests/test_giao_dien_fa_m8_bo.py`; mutation;
       fragment `docs/ke_hoach/it_ui_song_song/MANH_C.md` (incl. snapshot `diff -r` result)
-- [ ] Green loop on claude/it-ui-c
+- [x] Green loop on claude/it-ui-c (GREEN in round 2)
 
 ## Snapshot (defaults unchanged)
 Rebuild from BASE in a worktree, never from the working branch:
@@ -35,7 +35,18 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- FA-M8-THUAN and FA-M8 done and reviewed (PASS). Green loop round 1 RED (2 tests) -> FIX-1 done (b641d89), reviewed PASS. Green loop round 2 running.
+- DONE. FA-M8-THUAN, FA-M8, FIX-1 reviewed PASS; green loop GREEN in round 2 on HEAD b31ffb4. Fragment
+  `docs/ke_hoach/it_ui_song_song/MANH_C.md` ready for A's Phase 3 (fold + recount test files after merging B and C).
+
+## Green loop round 2 (HEAD b31ffb4) — GREEN
+- Local: 5907 passed, 0 failed, 4 skipped (none `test_giao_dien_*`: D1 deferred, numpy x2, POSIX user), coverage
+  93.44 % (fail_under 85); ruff clean; kiem_nhanh --co-so origin/main --so-seed 20 7/7, 60/60 identical;
+  generator snapshot 8 modes vs BASE 5196217 identical (xlsx/docx compared without docProps/core.xml).
+- CI Tests run 43164264450: Lint, Linux (full suite + real UI, "no UI test skipped" step), Windows: all success.
+  https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/actions/runs/43164264450
+- Windows build run 43171635413 (Windows suite + PyInstaller build + release upload): success.
+  https://github.com/nguyenphanvantruong6969-arch/TESTING-DEV/actions/runs/43171635413
+  Note: the build workflow uploads to the shared release `ban-moi-nhat` whatever branch it runs on.
 
 ## Green loop round 1 (HEAD 5f3de9b)
 - Local: 2 failed, 5905 passed, 4 skipped (none `test_giao_dien_*`), coverage 93.44 %; ruff clean;
@@ -65,7 +76,11 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 - Path B quizzes use `sinh_moi_clb` (one form per club, no gate), same as the path-A kit's `04_forms/`.
 
 ## Waiting for Truong
-- (none)
+- Ownership deviation to confirm: FIX-1 changed ONE number (254 -> 257, test-file count) in A-owned
+  `docs/ke_hoach/CLAUDE_CHI_TIET.md`, because A's lead is paused and the count test must pass on this branch.
+  Phase 3 must recount after merging B and C.
+- Minor wording (not a test failure): vi `cb_bo_ghi` now reads "nén thành một tệp nén" (repetitive); can be polished
+  at integration, e.g. "rồi gói lại thành một tệp nén".
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -82,3 +97,4 @@ CODER session_01YVAyu3iuHSR5HxZvebVahw FA-M8 DONE 57f4631
 | 2026-11-12 | sonnet coder | FIX-1: (1) CLAUDE_CHI_TIET.md hàng `tests/` 254→257 (lệch quyền sở hữu có chủ đích, ghi ở MANH_C.md); (2) vi `cb_bo_ghi` "tệp zip"→"tệp nén" (i18n.js), đoạn hướng dẫn MANH_C.md cùng sửa | Đỏ trước (2 failed), sau: 2 test + 3 lần chạy lại = 4/4 xanh; test_giao_dien_fa_m8_bo + tieng_viet_sach + a13_12 + fa_m8 api/thuan = 62 passed; ruff sạch; kiem_nhanh --co-so BASE --so-seed 20 7/7, 60/60. Lưu ý: venv mới phải cài requirements-dev.txt (pillow, python-docx) mới có test xanh. |
 CODER session_01YVAytyhzs8uR54cjoTQrMS FIX-1 DONE 9e16ba0
 | 2026-11-12 | opus lead | review FIX-1 b641d89: PASS (coder log line above has wrong session id/hash; real: session_01YVAytyWT5up1scxVFbRakd, b641d89) | 2 ids now pass + test_giao_dien_fa_m8_bo (22 passed); ruff clean; kiem_nhanh 7/7; CLAUDE_CHI_TIET diff = one number only. Green loop round 2 started |
+| 2026-11-12 | opus lead | green loop round 2 GREEN on b31ffb4 (local, CI 43164264450, Windows build 43171635413) | STATUS: GREEN |
