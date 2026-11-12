@@ -59,6 +59,7 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 2. Truong decides where `claude/forms-gop` merges (no PR opened).
 3. Fix plan FG-1…FG-9 (`FORMS_GOP_SUA_KE_HOACH.md`, D1–D4 approved): Sonnet does step 0 (re-check every finding on
    current HEAD; the walkthrough ran on a8e8f32, before FA-M7..FA-M10), then wave 1 (FG-1, FG-3, FG-4).
+   Autonomous: paste the block of `docs/ke_hoach/FG_TU_DONG.md` §1 into an Opus session (branch `claude/fg-sua`).
 
 ## Files touched
 - mau_forms_thi_clb/bieu_mau.py, mau_forms_thi_clb/tao_mau_forms.py: FA-M2b layout + generator

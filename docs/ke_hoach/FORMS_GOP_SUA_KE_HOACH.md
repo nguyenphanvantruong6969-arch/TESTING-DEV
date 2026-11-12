@@ -9,7 +9,8 @@
 ## 0. Rules for the implementer (read first)
 - `CLAUDE.md` wins on invariants 1–8 and rules 1–11. No Agent tool. Rule 2: failing test first, minimal code, then
   related tests only. One commit per item code (`FG-n: …`).
-- **Branch:** `claude/forms-gop` only. Never force-push. Do NOT open, merge or close any PR.
+- **Branch:** `claude/forms-gop` for manual runs; the autonomous run (`docs/ke_hoach/FG_TU_DONG.md`) uses
+  `claude/fg-sua` and its own merge rule. Never force-push. Do NOT open, merge or close any PR.
 - **Default unchanged (invariant 1):** after each wave run `kiem_nhanh.py --co-so origin/main --so-seed 20` → 7/7,
   60/60 identical. No item touches `run_rbda`, `run_rbda_nhieu_buoi`, `club_choice_function`,
   `compute_club_priority`, `verify_stability`, the STB lottery or `run_history`.
