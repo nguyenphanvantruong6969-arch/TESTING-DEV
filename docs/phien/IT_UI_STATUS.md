@@ -25,8 +25,8 @@ STATUS: IT-UI PAUSED (green loop round 1 on claude/forms-gop not finished)
 | Worker | Branch | Items | State |
 |---|---|---|---|
 | A | `claude/it-ui-a` | G0, FA-M7 | GREEN (CI run 43047307624, Windows build 43035758322) |
-| B | `claude/it-ui-b` | FA-M9, FA-M10 | BLOCKED: waited too long (branch never pushed; 12 checks 18:33–22:36 UTC) |
-| C | `claude/it-ui-c` | FA-M8 | BLOCKED: waited too long (branch never pushed; 12 checks 18:33–22:36 UTC) |
+| B | `claude/it-ui-b` | FA-M9, FA-M10 | Code done (started late, from 5196217). BLOCKED 2026-11-12 10:57: only failure = code-map test-file count 254 vs 260 in A-owned `CLAUDE_CHI_TIET.md`; suite 5925 passed, coverage 93 %; lead ran on Sonnet, not Opus |
+| C | `claude/it-ui-c` | FA-M8 | GREEN 2026-11-12 07:55 (CI + Windows build green); edited the same count line (254→257) |
 
 ## Decisions
 - B and C not merged (AUTO rule: RED/BLOCKED branches are not merged; their items count as not done).
@@ -34,11 +34,14 @@ STATUS: IT-UI PAUSED (green loop round 1 on claude/forms-gop not finished)
 - The Windows build workflow uploads to the shared release `ban-moi-nhat` whatever branch it runs on.
 
 ## Waiting for Truong
-- Workers B and C never started (no branch pushed). Re-run PROMPT_B / PROMPT_C (they branch from `claude/forms-gop`,
-  which will then already contain G0 + FA-M7), or run TU_DONG SOLO for FA-M9 → FA-M8 → FA-M10?
+- B and C finished AFTER A integrated alone; neither is merged into `claude/forms-gop`. B is BLOCKED only on an
+  A-owned doc count (deadlock: B waited for A, A is paused). Proposal: integrate B and C now on `claude/forms-gop`,
+  recount test files in `CLAUDE_CHI_TIET.md` (fixes B's failure and C's 257), regenerate `i18n_loi.js`, fold
+  `MANH_B.md`/`MANH_C.md`, then the green loop until `IT-UI GREEN`. Waiting for Truong's go.
 
 ## Log (append only)
 - 2026-11-11 11:52 A started; G0 c7b5d1d, FA-M7 d5a303e + 414a94c, FIX-1 db76ea9; it-ui-a GREEN 18:12.
 - 2026-11-11 22:36 wait for B/C ended; INTEGRATE A alone.
 - 2026-11-11 23:13 INTEGRATE + INTEGRATE-FIX1 reviewed; green loop round 1 started on 1c52030.
 - 2026-11-12 00:00 PAUSED by Truong; scheduled check-ins deleted, local suite stopped.
+- 2026-11-12 11:20 status refresh (Opus planner session): C GREEN, B BLOCKED on A-owned count; both unmerged; still PAUSED.
