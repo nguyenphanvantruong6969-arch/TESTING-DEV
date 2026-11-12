@@ -38,8 +38,19 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
   current forms-gop HEAD (includes G0 + FA-M7 + integration), so no G0 wait.
 - Env setup: `LATEST_INSTRUCTION.md` PART 2 §1. UI tests: `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`; skipped != passed.
 
+## Green loop round 1 (claude/it-ui-b @ fbbb823)
+- Local full suite: 1 failed, 5925 passed, 4 skipped (none UI: D1 deferral, 2x numpy missing, POSIX user), coverage 93 %.
+  ruff clean. `kiem_nhanh --so-seed 20` 7/7, 60/60. Snapshot vs BASE: identical per coder (53 files, 0 diffs; only i18n strings changed since).
+- CI Tests run 43159448923 on fbbb823: lint SUCCESS; Windows 1 failed/5420 passed; Linux 1 failed/5926 passed, coverage 93.42 %.
+- The ONLY failure everywhere: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` ('254', 260): the code-map
+  row for `tests/` in `docs/ke_hoach/CLAUDE_CHI_TIET.md` (owner A) says 254 files; B added 6 (test_fa_m9_thuan, test_fa_m10_thuan,
+  test_fa_m9_nap_tep_forms, test_giao_dien_fa_m9_nap, test_fa_m10_sau_xep_nut, test_giao_dien_fa_m10_nut) -> 260.
+  Not a code bug; an artifact of the file-ownership split (the contract says A folds the count at integration).
+- Windows build NOT triggered (step b: only after CI Tests green on this HEAD).
+- Waiting for A (AUTO rule): REQUEST A already above. Not fixing it myself (fix rules: never edit another worker's files).
+
 ## Waiting for Truong
-- (none)
+- Worker A is PAUSED (IT_UI_STATUS), so nobody will update the 254 in CLAUDE_CHI_TIET.md. Allow worker B to change that one number to 260 (one-line edit, will be re-folded by A at integration)? Until answered B stays at line 2 STATUS IN_PROGRESS, waiting per AUTO rules.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
