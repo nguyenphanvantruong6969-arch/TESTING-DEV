@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-12 — DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026): tệp bối cảnh dự án + tệp giao việc cho Fable
+
+- `docs/fable/01_PROJECT_CONTEXT.md` (mới): tóm tắt toàn dự án cho AI đọc (bài toán, RB-DA, lớp FA-DAA, chương trình, bất biến, số liệu MÔ PHỎNG, điểm yếu, thứ tự đọc).
+- `docs/fable/02_FABLE_BRIEF.md` (mới): luật nền, 6 mục tiêu nghiên cứu G-A…G-F theo ưu tiên, sản phẩm cần giao, cách chạy phiên Fable, ba câu lệnh dán sẵn.
+- Chỉ tài liệu; không đổi mã, không test mới.
+
 ## 2026-11-12 — FA-M8, FA-M9, FA-M10: bước 3–5 của thẻ "Chuẩn bị đợt" (TH = chưa thử trên Microsoft thật)
 
 - INTEGRATE-2: gộp `claude/it-ui-b` (FA-M9, FA-M10) và `claude/it-ui-c` (FA-M8) vào `claude/forms-gop` (gộp sạch, khối đánh dấu không xung đột); đếm lại số tệp test trong bản đồ mã (263) — lỗi duy nhất của nhánh B.
