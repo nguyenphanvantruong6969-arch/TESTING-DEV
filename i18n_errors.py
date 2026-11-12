@@ -1277,8 +1277,8 @@ MESSAGES = {
         "en": "No registration file for path {duong}: path A needs the CSV from the List, path B needs the registration form's Excel file.",
     },
     "forms_nhieu_tep_list": {
-        "vi": "Đường A chỉ nạp MỘT tệp CSV từ List. Hãy bỏ bớt tệp.",
-        "en": "Path A loads ONE CSV file from the List. Remove the extra files.",
+        "vi": "Đường A chỉ nạp một tệp CSV từ List. Hãy bỏ bớt tệp.",
+        "en": "Path A loads only one CSV file from the List. Remove the extra files.",
     },
     "forms_chua_chuyen_tep": {
         "vi": "Chưa chuyển tệp nào thành Sổ nhập. Hãy nạp tệp ở bước 4 trước.",
