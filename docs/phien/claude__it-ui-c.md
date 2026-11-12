@@ -35,7 +35,9 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 `docProps/core.xml` timestamp (compare xlsx by unzipped content except core.xml), `.docx` likewise.
 
 ## Current state (overwrite each handoff)
-- FA-M8-THUAN done (pure functions + tests). Next: lead review, then FA-M8 Phase 2 (api_forms_bo.py, js/13_chuan_bi_bo.js, cb_bo_* keys, fragment MANH_C.md).
+- FA-M8-THUAN done and reviewed (PASS). Next: FA-M8 Phase 2 delegated to a fresh Sonnet coder.
+- Known red outside C files: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` (test-file count
+  in A-owned `docs/ke_hoach/CLAUDE_CHI_TIET.md`). Lead decision: handled in the green loop (see Decisions).
 
 ## Decisions and gotchas (keep short)
 - IT_UI_STATUS: A integrated alone into forms-gop (C was BLOCKED then). Truong re-ran PROMPT_C; C branches from the
@@ -43,6 +45,12 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 - Worker B is running in parallel on `claude/it-ui-b` (same BASE). Stay inside C files + C marker blocks.
 - Env: `LATEST_INSTRUCTION.md` PART 2 §1 on THIS branch. UI tests: `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`;
   skipped != passed.
+
+- Test-file count (`CLAUDE_CHI_TIET.md` "Bản đồ mã" row `tests/`): A's lead is PAUSED (IT_UI_STATUS), so a
+  `REQUEST A` cannot be served before integration. Lead decision (AUTO, safest): in the green loop, bump ONLY that
+  number on this branch, recorded as a deliberate ownership deviation; at Phase 3 A must recount after merging B and C
+  (expected one-line conflict, resolve by recounting `tests/test_*.py`).
+- Path B quizzes use `sinh_moi_clb` (one form per club, no gate), same as the path-A kit's `04_forms/`.
 
 ## Waiting for Truong
 - (none)
@@ -53,3 +61,4 @@ Then the same loop from the branch into `$S/sau/`, and `diff -r $S/truoc $S/sau`
 | 2026-11-12 | opus lead | branch created from BASE 5196217, handoff written | |
 | 2026-11-12 | sonnet coder | FA-M8-THUAN: `bm.TIEU_DE_PHIEU_CLB`/`cac_phan_phieu_clb`; in tao_mau_forms.py `sinh_phieu_clb`, `ghi_cai_dat_phieu_clb`, `dap_an_tren_forms` (default True) on ghi_cai_dat/_chi_thi/_moi_clb/_bien_the + sinh_chi_thi/moi_clb/bien_the, `ghi_xem_lai_dap_an`, `tao_bo_bieu_mau`, `ghi_zip_bo`; tests/test_fa_m8_bo_bieu_mau.py (28 passed) | snapshot from BASE 5196217 (8 modes; --bien-the with a 2-club variant de_thi built in scratch): `diff -r` differs ONLY in default-mode MAU_XUAT_TU_FORMS.xlsx + NHAP_FORMS_THI_CLB.docx = docProps/core.xml timestamp noise; content with core.xml excluded identical (24 files, 0 diffs). Mutation: tao_bo_bieu_mau passing dap_an_tren_forms=True -> `test_bo_khong_co_dap_an_tren_forms_o_moi_huong_dan` RED (1 failed, 27 passed), restored -> 28 passed. Related tests 228 passed; ruff clean; kiem_nhanh 7/7. KNOWN: `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` red (CLAUDE_CHI_TIET.md says 254 test files, now 255) -> A must bump count at integration (fragment, not my file). Path-A kit: HUONG_DAN_IT.md sentence patched by str.replace after tao_bo_dung (tao_bo_dung_t4m.py not owned by C). REQUEST A: none blocking. |
 CODER session_01YVAytyhzs8uR54cjoTQrMS FA-M8-THUAN DONE c9550fa
+| 2026-11-12 | opus lead | review FA-M8-THUAN c9550fa: PASS | 278 related passed; ruff clean; snapshot 8 modes vs BASE identical (xlsx/docx compared without core.xml); mutation re-done by lead -> R3 test red; kiem_nhanh 7/7; ownership OK |
