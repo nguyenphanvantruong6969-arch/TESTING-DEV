@@ -83,3 +83,4 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE DONE 739736e | merged it-ui-a; 161 related passed (UI ran, 0 skipped); kiem_nhanh 7/7; ruff clean; B/C not merged |
 | 2026-11-11 | Sonnet coder | CODER session_01TGThn8TcYiUVHyfRHBD82v INTEGRATE-FIX1 DONE 9ac0998 | HUONG_DAN §16 path A/B meaning fixed; 92 doc tests passed; ruff clean; kiem_nhanh 7/7 |
 | 2026-11-12 | Opus (forms-gop) | Novice walkthrough + senior review (18 findings, browser mode, SIMULATED data); fix plan FG-1…FG-9 written | D1–D4 approved (all Recommended) |
+| 2026-11-12 | Opus (forms-gop) | INTEGRATE-2: merged it-ui-b/c, fold, FIX-1 via Sonnet; full suite + CI + Windows build green -> IT-UI GREEN | 5972 passed, cov 93.52 %, 60/60 |

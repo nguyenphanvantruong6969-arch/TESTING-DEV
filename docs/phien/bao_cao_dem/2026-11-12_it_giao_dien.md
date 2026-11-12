@@ -24,7 +24,7 @@
 - Vòng 1 có 1 ca hỏng (bản đồ mã ghi tên hàm mà test tài liệu không thấy được); Sonnet sửa (FIX-1, chỉ bỏ dấu backtick, không đổi test), vòng 2 xanh.
 - `kiem_nhanh --co-so origin/main --so-seed 20`: 7/7, **60/60 ca trùng khít**. `ruff check .` sạch.
 - Đầu ra bộ sinh biểu mẫu (7 chế độ) và bộ chuyển đổi (3 bộ demo, so từng ô) giống hệt bản gốc `fe37349`.
-- CI *Tests (rbda-kiosk)* run 43231302370: **xanh**. Bản build Windows run 43239577277: đang chạy (cập nhật ở lần đẩy sau).
+- CI *Tests (rbda-kiosk)* run 43231302370: **xanh**. Bản build Windows run 43239577277: **xanh** (bộ test trên Windows đạt, PyInstaller đóng gói có `mau_forms_thi_clb`, đã đăng lên Releases `ban-moi-nhat`).
 
 ## Ghi nhận
 - Ba người chạy lệch giờ: A chờ 4 giờ rồi ghép riêng phần của mình; B và C chạy sau, B bị kẹt vì chờ A sửa một con số trong tệp thuộc quyền A. Lần sau: cho phép người ghép sửa con số bản đồ mã, hoặc chạy CHU_TRI một phiên.
