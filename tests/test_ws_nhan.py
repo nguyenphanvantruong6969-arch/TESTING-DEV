@@ -63,6 +63,7 @@ MA_MOI_SAU_ANH_CHUP = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-A: add below ===
+    "fa_clb_tuyen_chon_chua_co_diem",
     # === end SG-A ===
 
     # (spacer: unchanged line between marker blocks)

@@ -1273,5 +1273,9 @@ window.I18N_ERROR_MESSAGES = {
   "forms_chua_chuyen_tep": {
     "vi": "Chưa chuyển tệp nào thành Sổ nhập. Hãy nạp tệp ở bước 4 trước.",
     "en": "No files have been converted into an input workbook yet. Load the files in step 4 first."
+  },
+  "fa_clb_tuyen_chon_chua_co_diem": {
+    "vi": "CLB {club_id} (Tuyển chọn) có {so_dang_ky} học sinh đăng ký ({so_nv1} học sinh xếp làm nguyện vọng 1) nhưng chưa có điểm của học sinh nào, nên tất cả sẽ bị loại. Hãy nhập điểm cho CLB này ở thẻ Nhập điểm, hoặc đổi CLB sang loại Giới hạn.",
+    "en": "Club {club_id} (Selective) has {so_dang_ky} applicants ({so_nv1} with it as first choice) but no scores at all, so every one of them would be removed. Enter scores for this club in the Scores tab, or change the club to Limited."
   }
 };

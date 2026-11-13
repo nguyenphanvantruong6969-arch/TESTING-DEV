@@ -109,7 +109,8 @@ def giu_cho_hop_le(clubs: dict, giu_cho, students: dict, preferences=None) -> se
     return ra
 
 
-def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> list:
+def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None,
+                  tested_scores=None) -> list:
     """Kiểm dữ liệu FA trước khi chạy; trả danh sách `err(...)` (rỗng = hợp lệ).
 
     `clubs` {club_id: {buoi, capacity, loai, diem_san, ...}}, `giu_cho` [(club_id, student_id)],
@@ -118,6 +119,11 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> lis
     GIOI_HAN / TUYEN_CHON có sức chứa > 0; TUYEN_CHON có điểm sàn; số giữ chỗ dùng được của một
     CLB không quá sức chứa. CẢNH BÁO (`MA_CANH_BAO`): giữ chỗ cho học sinh không có, hoặc em
     không xếp CLB đó — không tính vào số giữ chỗ. Thứ tự lỗi cố định, không phụ thuộc thứ tự dict.
+
+    SG-1 (C3): khi biết CẢ `preferences` lẫn `tested_scores` {club_id: {student_id: điểm}}, CLB
+    TUYEN_CHON có người xếp trong nguyện vọng mà KHÔNG em nào có điểm là lỗi CHẶN
+    `fa_clb_tuyen_chon_chua_co_diem` {club_id, so_dang_ky, so_nv1} (mọi người đăng ký sẽ bị loại).
+    Thiếu một trong hai tham số thì bỏ kiểm này (hành vi cũ).
     """
     loi = []
     cac_buoi = sorted({c.get("buoi") or BUOI_MAC_DINH for c in clubs.values()})
@@ -135,6 +141,12 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> lis
                 loi.append(err("fa_clb_thieu_suc_chua", club_id=cid))
         if loai == TUYEN_CHON and c.get("diem_san") is None:
             loi.append(err("fa_clb_thieu_diem_san", club_id=cid))
+        if loai == TUYEN_CHON and preferences is not None and tested_scores is not None:
+            dang_ky = [s for s in sorted(preferences, key=str) if cid in (preferences[s] or [])]
+            if dang_ky and not tested_scores.get(cid):
+                loi.append(err("fa_clb_tuyen_chon_chua_co_diem", club_id=cid,
+                               so_dang_ky=len(dang_ky),
+                               so_nv1=sum(1 for s in dang_ky if preferences[s][0] == cid)))
     cap = sorted(set(giu_cho), key=lambda p: (str(p[0]), str(p[1])))
     dung_duoc = giu_cho_hop_le(clubs, cap, students, preferences)
     for c, s in cap:
@@ -191,7 +203,12 @@ def kiem_fa_tu_csdl(cur) -> list:
     Dùng chung cho lần chạy xếp (bước kiểm dữ liệu) và báo cáo sức khoẻ dữ liệu: cùng số, cùng em."""
     clubs, students, prefs = doc_clubs_va_nguyen_vong(cur)
     _, cap, huy = doc_du_lieu_fa(cur)
-    return kiem_truoc_fa(clubs, cap, students, prefs) + kiem_ho_so_huy_chuong(prefs, huy, clubs)
+    diem: dict = {}
+    for cid, sid, d in cur.execute("SELECT club_id, student_id, score FROM club_scores "
+                                   "ORDER BY club_id, student_id"):
+        diem.setdefault(cid, {})[sid] = d
+    return (kiem_truoc_fa(clubs, cap, students, prefs, diem)
+            + kiem_ho_so_huy_chuong(prefs, huy, clubs))
 
 
 # ---------------------------------------------------------------------------

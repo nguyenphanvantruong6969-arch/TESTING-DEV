@@ -1348,6 +1348,10 @@ MESSAGES = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-A: add below ===
+    "fa_clb_tuyen_chon_chua_co_diem": {
+        "vi": "CLB {club_id} (Tuyển chọn) có {so_dang_ky} học sinh đăng ký ({so_nv1} học sinh xếp làm nguyện vọng 1) nhưng chưa có điểm của học sinh nào, nên tất cả sẽ bị loại. Hãy nhập điểm cho CLB này ở thẻ Nhập điểm, hoặc đổi CLB sang loại Giới hạn.",
+        "en": "Club {club_id} (Selective) has {so_dang_ky} applicants ({so_nv1} with it as first choice) but no scores at all, so every one of them would be removed. Enter scores for this club in the Scores tab, or change the club to Limited.",
+    },
     # === end SG-A ===
 
     # (spacer: unchanged line between marker blocks)
