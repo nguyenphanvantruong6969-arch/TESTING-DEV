@@ -997,6 +997,8 @@
       clb_khong_gioi_han_cho: "không giới hạn chỗ",
       clb_tu_do_lap: "{n} {person_l} · không giới hạn chỗ",
       clb_tu_do_lap_nhieu: "{n} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb: "{x} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_l} · không giới hạn chỗ",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */
@@ -1988,6 +1990,8 @@
       clb_khong_gioi_han_cho: "no seat limit",
       clb_tu_do_lap: "{n} {person_l} · no seat limit",
       clb_tu_do_lap_nhieu: "{n} {person_pl} · no seat limit",
+      clb_tu_do_theo_clb: "{x} {person_l} · no seat limit",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_pl} · no seat limit",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */

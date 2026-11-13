@@ -233,7 +233,7 @@ class XuatKetQuaMixin:
             dong_clb = bao["clb"][2]
             t.dong("Số {slot_l}", len(dong_clb))
             t.dong("Chỗ đã xếp", sum(d[6] or 0 for d in dong_clb))
-            t.dong("Tổng sức chứa", sum(d[7] or 0 for d in dong_clb))
+            t.dong("Tổng sức chứa", sum(d[7] for d in dong_clb if isinstance(d[7], (int, float))))
         if "nv" in bao and bao["nv"][2]:
             dau = bao["nv"][2][0]
             if dau[0] == "Nguyện vọng 1":
@@ -320,8 +320,11 @@ class XuatKetQuaMixin:
             phan = [ten, t.n("Mã {slot_sl}: ") + str(c["club_id"])]
             if du["nhieu_buoi"]:
                 phan.append(t.n("{session}: ") + str(c.get("buoi")))
-            phan.append("Đã xếp %d/%d chỗ" % (c.get("matched") or 0,
-                                              c.get("capacity") or 0))
+            if c.get("tu_do"):      # CLB Tự do: chỉ tiêu lưu chỉ là số tạm, không in "x/y"
+                phan.append("Đã xếp %d · không giới hạn chỗ" % (c.get("matched") or 0))
+            else:
+                phan.append("Đã xếp %d/%d chỗ" % (c.get("matched") or 0,
+                                                  c.get("capacity") or 0))
             t.khoi(" · ".join(phan), len(cot))
             t.bang(cot, [
                 [i, r["student_id"], r["ho_ten"] or "", r["lop"] or "",
@@ -717,7 +720,8 @@ class XuatKetQuaMixin:
                              # Day la CHU (mot o ghep nhieu CLB), nen ke ca
                              # ban so=True cung viet so kieu Viet.
                              _so_vn(k["ti_le_choi"])
-                             if k["ti_le_choi"] is not None else "không có chỗ")
+                             if k["ti_le_choi"] is not None
+                             else "không giới hạn chỗ" if k.get("tu_do") else "không có chỗ")
                 for k in e["da_khai"]) or "(chưa khai nguyện vọng nào)"
 
         ra = {}
@@ -730,9 +734,11 @@ class XuatKetQuaMixin:
                 "Trong đó diện dự trữ", "Chỉ tiêu dự trữ"],
                 [[c.get("buoi"), c.get("club_id"), c.get("name"),
                   c.get("so_dang_ky"), c.get("so_dat_nv1"),
-                  ti_le_choi(c.get("ti_le_choi")),
-                  c.get("matched"), c.get("capacity") or 0,
-                  phan_tram(c.get("matched") or 0, c.get("capacity") or 0),
+                  "" if c.get("tu_do") else ti_le_choi(c.get("ti_le_choi")),
+                  c.get("matched"),
+                  "không giới hạn chỗ" if c.get("tu_do") else c.get("capacity") or 0,
+                  "" if c.get("tu_do")
+                  else phan_tram(c.get("matched") or 0, c.get("capacity") or 0),
                   c.get("matched_reserve"), c.get("reserve_capacity")]
                  for c in lap["data"]])
 

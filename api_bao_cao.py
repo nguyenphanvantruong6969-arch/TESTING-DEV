@@ -130,7 +130,8 @@ class BaoCaoMixin:
                 # cho" khac han "thua cho", va 0 o cot nay doc ra nghia
                 # nguoc hang.
                 d["ti_le_choi"] = (
-                    round(d["so_dang_ky"] / suc, 2) if suc else None)
+                    round(d["so_dang_ky"] / suc, 2)
+                    if suc and not d["tu_do"] else None)
                 ra.append(d)
             return _ok(ra)
         except Exception as e:
@@ -375,7 +376,7 @@ class BaoCaoMixin:
         try:
             with self._ket_noi_doc() as cur:
                 clb = cur.execute(
-                    "SELECT club_id, name, capacity, reserve_capacity, "
+                    "SELECT club_id, name, capacity, reserve_capacity, loai, "
                     "       COALESCE(buoi, ?) AS buoi "
                     "FROM clubs WHERE club_id = ?",
                     (BUOI_MAC_DINH, club_id),
@@ -396,6 +397,7 @@ class BaoCaoMixin:
                 "club_name": clb["name"],
                 "buoi": clb["buoi"],
                 "capacity": clb["capacity"],
+                "tu_do": clb["loai"] == TU_DO,
                 "thanh_vien": [dict(r) for r in rows],
             })
         except Exception as e:
@@ -505,6 +507,7 @@ class BaoCaoMixin:
                         "ten_clb": r["ten_clb"],
                         "buoi": r["buoi"],
                         "ti_le_choi": (choi.get(r["club_id"]) or {}).get("ti_le_choi"),
+                        "tu_do": bool((choi.get(r["club_id"]) or {}).get("tu_do")),
                     })
 
             ds = []

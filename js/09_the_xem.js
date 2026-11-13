@@ -272,7 +272,9 @@ function veKqTheoClb() {
     }));
     if (!hang.length) { kqBaoRong("members_rong"); return; }
     kqVeBang([t("th_student_id"), t("th_name"), t("th_cohort")], hang,
-      t("members_dem", { x: hang.length, y: d.capacity }), 3, 2);
+      d.tu_do
+        ? t(hang.length === 1 ? "clb_tu_do_theo_clb" : "clb_tu_do_theo_clb_nhieu", { x: hang.length })
+        : t("members_dem", { x: hang.length, y: d.capacity }), 3, 2);
   });
 }
 

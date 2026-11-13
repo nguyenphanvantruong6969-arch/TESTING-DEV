@@ -69,6 +69,7 @@ def test_clb_tu_do_khong_phan_tram(mo):
     g = page.locator('#clbBody tr[data-clb="G"]')
     lap = t.locator(".clb-lap").inner_text()
     assert "12" in lap and "không giới hạn chỗ" in lap
+    assert "học sinh" in lap                         # danh từ theo từ vựng workspace, không bỏ trống
     assert "%" not in lap and t.locator(".fill-track").count() == 0
     assert "không giới hạn chỗ" in t.locator(".clb-chi-tieu").inner_text()
     assert "%" in g.locator(".clb-lap").inner_text() and g.locator(".fill-track").count() == 1
@@ -87,4 +88,42 @@ def test_khong_fa_van_co_phan_tram(mo):
     page, loi = mo(_khong_fa)
     assert "%" in page.locator('#clbBody tr[data-clb="A"] .clb-lap').inner_text()
     assert page.locator("#clbBody .clb-lap", has_text="không giới hạn").count() == 0
+    assert not loi
+
+
+def test_clb_tu_do_tieng_anh(mo):
+    page, loi = mo(_fa)
+    page.evaluate("window.I18N.setLang('en')")
+    page.wait_for_function("document.documentElement.lang === 'en'")
+    page.wait_for_function(
+        "() => document.querySelector('#clbBody tr[data-clb=\"T\"] .clb-lap').textContent.includes('no seat limit')")
+    lap = page.locator('#clbBody tr[data-clb="T"] .clb-lap').inner_text()
+    assert "12 students" in lap and "%" not in lap
+    assert not loi
+
+
+def _theo_clb(page, ma):
+    page.locator('.nav-item[data-tab="results"]').click()
+    page.wait_for_selector("#view-results.is-active")
+    page.locator('#kqTang1 [data-kq="clb"]').click()
+    page.wait_for_function("() => document.querySelectorAll('#kqChonClb option').length > 1")
+    page.select_option("#kqChonClb", ma)
+    page.wait_for_function("() => !document.getElementById('kqBang').hidden")
+    return page.locator("#kqDem")
+
+
+def test_theo_clb_tu_do_khong_ghi_tren_chi_tieu(mo):
+    page, loi = mo(_fa)
+    dem = _theo_clb(page, "T")
+    page.wait_for_function("() => document.getElementById('kqDem').textContent.includes('không giới hạn chỗ')")
+    van = dem.inner_text()
+    assert "12" in van and "học sinh" in van and "/5" not in van
+    assert not loi
+
+
+def test_theo_clb_khong_fa_giu_nguyen(mo):
+    page, loi = mo(_khong_fa)
+    dem = _theo_clb(page, "A")
+    page.wait_for_function("() => document.getElementById('kqDem').textContent.includes('/5')")
+    assert dem.inner_text() == "Đã xếp 1/5 chỗ"
     assert not loi

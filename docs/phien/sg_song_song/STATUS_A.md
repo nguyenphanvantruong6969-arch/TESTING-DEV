@@ -29,6 +29,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 
 ## For Truong
 - SG-3 academic check (FA NV1 numbers possibly computed from trimmed-list rank): `du_lieu_test/mo_phong_fa_daa.py` + FA_DAA_VISION.md line ~206 (63 % top-2): NOT affected (true preference `thich`, only `assignment` used). 48 %→79 % (docs/fable/01_PROJECT_CONTEXT.md, 02_FABLE_BRIEF.md, FA_DAA_VISION.md ~360) and 29 %→47 % (GIAM_MAY_RUI_KE_HOACH.md): generating script not found, cannot confirm they are FA numbers; please check. FA_GAPS_KE_HOACH.md ~366 only describes the dashboard (no number). Other pre-scan files: no FA NV1 number. `du_lieu_test/bao_cao_phan_bo.py` reads stored rank: affected only if run with FA on. Any past FA run's `ket_qua_phan_bo.csv`/dashboard NV1 is affected.
+- SG-10: `get_tai_theo_buoi` (bảng tải trước khi chạy) vẫn cộng sức chứa lưu của CLB Tự do vào `tong_cho` / `ti_le_choi` từng buổi (theo lời lead: để nguyên).
 
 ## Log
 2026-11-13T12:54Z LEAD session_01TGThn8FotZk5dp89pKN66o SETUP lead-is-opus ba4b207

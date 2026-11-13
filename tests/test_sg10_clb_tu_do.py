@@ -39,3 +39,59 @@ def test_khong_fa_khong_co_tu_do(api):
     api.create_or_update_club("clb_a", "CLB A", capacity=2)
     ds = api.get_club_fill_stats()["data"]
     assert ds and all(c["tu_do"] is False for c in ds)
+
+
+def _dung_fa_hai_clb(api):
+    """12 em: 6 khai G (chỉ tiêu 3), 6 khai T (Tự do, chỉ tiêu lưu 5). G có người khai -> ti_le_choi có số."""
+    bat_fa(api)
+    dung_fa_clb(api, G=(3, "GIOI_HAN"), T=(5, "TU_DO"))
+    ids = [f"HS{i:03d}" for i in range(1, 13)]
+    dung_hs_fa(api, *ids, nv={i: (["G", "T"] if n < 6 else ["T"]) for n, i in enumerate(ids)})
+    assert api.run_pipeline(seed=7)["ok"]
+
+
+def test_ti_le_choi_none_cho_clb_tu_do(api):
+    _dung_fa_hai_clb(api)
+    m = _theo_ma(api)
+    assert m["T"]["ti_le_choi"] is None
+    assert m["G"]["ti_le_choi"] == 2.0                  # 6 đăng ký / chỉ tiêu 3
+    # "Chọi cao nhất" (giá trị None xếp cuối): T không đứng đầu
+    ds = sorted(api.get_club_fill_stats()["data"], key=lambda c: -(c["ti_le_choi"] if c["ti_le_choi"] is not None else -1))
+    assert ds[0]["club_id"] == "G"
+
+
+def test_get_danh_sach_clb_co_tu_do(api):
+    _dung_fa(api)
+    assert api.get_danh_sach_clb("T")["data"]["tu_do"] is True
+    assert api.get_danh_sach_clb("G")["data"]["tu_do"] is False
+
+
+def test_get_danh_sach_clb_khong_fa_tu_do_false(api):
+    api.create_or_update_club("clb_a", "CLB A", capacity=2)
+    assert api.get_danh_sach_clb("clb_a")["data"]["tu_do"] is False
+
+
+def _chu_xuat(api, tmp_path):
+    from openpyxl import load_workbook
+    p = str(tmp_path / "so.xlsx")
+    api._ghi_so_excel(p, api._du_lieu_xuat())
+    wb = load_workbook(p)
+    return {ws.title: [[str(c) for c in r if c is not None] for r in ws.iter_rows(values_only=True)]
+            for ws in wb.worksheets}
+
+
+def test_xuat_clb_tu_do_khong_ghi_12_tren_5(api, tmp_path):
+    _dung_fa(api)
+    tat_ca = _chu_xuat(api, tmp_path)
+    van = "\n".join(" | ".join(r) for dong in tat_ca.values() for r in dong)
+    assert "12/5" not in van and "240" not in van
+    assert "Đã xếp 12 · không giới hạn chỗ" in van     # đầu khối "Theo CLB"
+    # dòng CLB T trong trang Thống kê: sức chứa "không giới hạn chỗ", tỉ lệ lấp đầy trống
+    dong_t = [r for dong in tat_ca.values() for r in dong if r and "T" in r and "không giới hạn chỗ" in r]
+    assert dong_t
+
+
+def test_xuat_clb_gioi_han_giu_nguyen(api, tmp_path):
+    _dung_fa(api)
+    van = "\n".join(" | ".join(r) for dong in _chu_xuat(api, tmp_path).values() for r in dong)
+    assert "/3 chỗ" in van                              # CLB G vẫn "Đã xếp x/3 chỗ"
