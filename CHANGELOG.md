@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-2: không gian FA cảnh báo ở bước xem trước, mẫu sổ FA và sổ mẫu 120 em (TH)
+
+- `api_nhap.py`: `_canh_bao_fa_xem_truoc` + `xem_truoc_so_nhap`: workspace bật FA-DAA thì chạy `fa_daa.kiem_truoc_fa` và `kiem_ho_so_huy_chuong` trên dữ liệu đã đọc từ sổ (cột FA vắng thì lấy giá trị đang lưu), gom theo mã lỗi: mỗi mã MỘT cảnh báo mang chính mã đó, `params` = `nhom: true`, `n`, `vd`; thêm một dòng `so_nhap_canh_bao_fa_se_loi` khi có lỗi chặn. Vẫn nhập được; `import_so_nhap` không đổi. Workspace không FA: không thêm gì.
+- `so_nhap.py`: `ghi_so_nhap(..., che_do_fa=False)`: True thì cột CLB có đủ 4 cột FA (Loại…), cột điểm quyết tâm có nhãn "Huy chương (60/30/10)" (danh sách thả xuống 60/30/10) và Hướng dẫn nói về huy chương (`_huong_dan_fa`). Bộ đọc nhận thêm tiêu đề "huy chuong" như "Điểm quyết tâm". Mặc định (không FA): sổ y như cũ (test băm). `api_xuat.tao_so_nhap_mau` truyền `che_do_fa=dung_fa_daa(...)`.
+- `i18n_errors.py` (vi+en) + `python tao_i18n_js.py`: 11 câu `<mã>_nhom` (chọn khi `params.nhom`) và `so_nhap_canh_bao_fa_se_loi`; `format_message` và `translateError` (`i18n.js`) dùng câu `_nhom`; thêm vào `MA_MOI_SAU_ANH_CHUP` (`tests/test_ws_nhan.py`).
+- `du_lieu_test/tao_so_nhap_fa_mau.py` (seed cố định) sinh `du_lieu_test/SO_NHAP_FA_MAU_120HS.xlsx`: 120 em, 2 buổi, mỗi buổi 1 CLB Tự do + 2 Giới hạn + 1 Tuyển chọn; MÔ PHỎNG, ghi rõ ở sheet "Hướng dẫn".
+- Test: `tests/test_fg2_xem_truoc_fa.py` (4 đỏ → xanh, thêm 4 test: câu chữ nhóm, không ghi CSDL, sổ mẫu tất định + ghi MÔ PHỎNG, hướng dẫn FA).
+
 ## 2026-11-13 — FG-6: mỗi số một đơn vị, danh sách thay cho tường chữ (TH)
 
 - `api_sau_xep.py`: kết quả `nhap_phan_hoi_forms` và `nhap_sau_ket_qua_forms` thêm `hoc_sinh` (số học sinh có dòng/khiếu nại mới), `dong_bo_qua: [{dong, ly_do}]` (số dòng trong tệp + mã lý do); giữ khoá cũ `n_ket_qua`, `n_tuan_3`, `n_khieu_nai`, `bo_qua` vì test cũ còn đọc. Hàm `_tep_rong`: tệp không có dòng trả lời -> mã riêng `phan_hoi_tep_rong` (trước: "không phải tệp phản hồi"). `_chen_phan_hoi` trả thêm tập học sinh có dòng mới.

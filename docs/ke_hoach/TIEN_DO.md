@@ -134,6 +134,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FG-4 (nhánh fg-sua, TH) | xong | 2026-11-13 | js/10_theo_doi.js, i18n.js | tests/test_giao_dien_fg4_nut_nap.py | napTepForms: nút bận "Đang nạp…", không gọi hai lần, lỗi chung, luôn mở lại nút. |
 | FG-5 (nhánh fg-sua, TH) | xong | 2026-11-13 | fa_sau_xep.py, api_sau_xep.py | tests/test_fg5_khop_ma.py | khop_ma_hoc_sinh: khớp mềm mã học sinh ở hai đường nạp Forms; trả ma_khong_khop (tối đa 20). |
 | FG-6 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_sau_xep.py, i18n_errors.py, js/10_theo_doi.js, js/02_van_hanh.js, i18n.js | tests/test_fg6_ket_qua_nap.py, tests/test_giao_dien_fg6_danh_sach_loi.py | Kết quả nạp có hoc_sinh/dong_bo_qua; tệp rỗng mã riêng; toast một câu + danh sách; bước kiểm tra gom lỗi theo mã. |
+| FG-2 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_nhap.py, api_xuat.py, so_nhap.py, i18n_errors.py, i18n.js, du_lieu_test/tao_so_nhap_fa_mau.py | tests/test_fg2_xem_truoc_fa.py | Xem trước sổ ở workspace FA: cảnh báo gom theo mã + dòng "sẽ bị chặn"; mẫu sổ FA (Loại, Huy chương 60/30/10); sổ mẫu 120 em hợp lệ. |
 | FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
 | FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
 | FA-D7L (giảm may rủi) | chưa | | | | Điểm lẻ 0,1 tuỳ chọn, mặc định tắt |

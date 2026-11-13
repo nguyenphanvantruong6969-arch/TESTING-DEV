@@ -60,6 +60,13 @@ MA_MOI_SAU_ANH_CHUP = {
     # === C: FA-M8 — add below ===
     # === end C ===
 
+    # FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ.
+    "fa_thieu_clb_tu_do_nhom", "fa_clb_thieu_loai_nhom", "fa_clb_thieu_suc_chua_nhom",
+    "fa_clb_thieu_diem_san_nhom", "fa_giu_cho_vuot_suc_chua_nhom", "fa_giu_cho_hoc_sinh_la_nhom",
+    "fa_giu_cho_khong_xep_clb_nhom", "fa_huy_chuong_gia_tri_sai_nhom",
+    "fa_huy_chuong_trung_gia_tri_nhom", "fa_huy_chuong_ngoai_nguyen_vong_nhom",
+    "fa_huy_chuong_clb_tu_do_nhom", "so_nhap_canh_bao_fa_se_loi",
+
     # FA gaps (GAP-1, GAP-2): điểm danh, mời danh sách chờ.
     "fa_tinh_nang_can_fa", "fa_diem_danh_chua_bat", "diem_danh_gia_tri_sai", "diem_danh_khong_thuoc_clb",
     "moi_khong_con_cho", "gioi_han_gv_sai", "fa_khieu_nai_chua_bat", "khieu_nai_khong_hop_le", "khieu_nai_qua_han",

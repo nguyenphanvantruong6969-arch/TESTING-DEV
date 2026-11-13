@@ -66,6 +66,7 @@ COT_HS_DAU = ["Mã HS", "Họ tên", "Nhóm ưu tiên"]
 # Hàng 2: tên từng cột trong nhóm. Dữ liệu bắt đầu từ hàng 3.
 TIEU_DE_NHOM = "Nguyện vọng"
 TEN_COT_QUYET_TAM = "Điểm quyết tâm"      # trong mã vẫn là điểm Wharton (cột CSV wp_k)
+TEN_COT_HUY_CHUONG = "Huy chương (60/30/10)"   # FG-2: cùng cột đó, nhãn của sổ mẫu chế độ FA
 HANG_DAU_DU_LIEU_HS = 3
 
 # Nhãn buổi trong danh sách thả xuống -> mã buổi lưu trong CSDL.
@@ -421,7 +422,8 @@ def _chu_cot(i: int) -> str:
 
 
 _MAU_NHOM_NV = re.compile(r"^nguyen vong\s*(\d+)$")        # hàng 1 của sổ hai hàng
-_TEN_QUYET_TAM = {"diem quyet tam", "commitment points", "preference points", "diem w"}
+_TEN_QUYET_TAM = {"diem quyet tam", "commitment points", "preference points", "diem w",
+                  "huy chuong"}      # FG-2: tiêu đề "Huy chương (60/30/10)" của sổ mẫu chế độ FA
 
 
 def _loai_cot_nhom(o, cfg=None):
@@ -1289,6 +1291,37 @@ def _huong_dan_co_dau(cfg=None) -> list:
     return ra
 
 
+def _huong_dan_fa(ra: list, cfg=None) -> list:
+    """Hướng dẫn của sổ MẪU chế độ FA-DAA (FG-2): bỏ lời về "hai quỹ 100 điểm" của Wharton, thêm
+    lời về cột Loại và cột Huy chương (60/30/10), và một ví dụ đúng với huy chương."""
+    n = _cfg(cfg)
+    slot_l = dang_chu(n["nhan"], "slot", "l", "vi")
+    ten_cot_nv = dang_chu(n["nhan"], "slot", "s", "vi")
+    cuoi = next((i for i, d in enumerate(ra) if d.startswith("Ví dụ một dòng")), len(ra))
+    ra = [d for d in ra[:cuoi] if "quỹ" not in d and TEN_COT_QUYET_TAM not in d
+          and not d.startswith("        Số nguyên không âm; ô trống")]
+    b5 = next(i for i, d in enumerate(ra) if d.startswith("Bước 5."))
+    fa = [
+        "        Sheet \"%s\", cột Loại: Tự do, Giới hạn hoặc Tuyển chọn (bắt buộc ở chế độ này);" % ten_sheet_clb(cfg),
+        "        mỗi buổi cần ít nhất một %s Tự do. Giới hạn / Tuyển chọn cần Chỉ tiêu lớn hơn 0;" % slot_l,
+        "        Tuyển chọn cần thêm Điểm sàn.",
+        "        Cột %s (sau cột %s): mỗi em đặt tối đa ba huy chương cho mỗi buổi:" % (
+            TEN_COT_HUY_CHUONG, ten_cot_diem_thi(cfg)),
+        "        60 (vàng), 30 (bạc), 10 (đồng), mỗi giá trị một lần mỗi buổi, chỉ đặt vào %s" % slot_l,
+        "        em đã xếp trong nguyện vọng và không phải %s Tự do. Ô trống = không đặt." % slot_l,
+        "",
+    ]
+    ra = ra[:b5] + fa + ra[b5:]
+    return ra + [
+        "Ví dụ một dòng:",
+        "                                 Nguyện vọng 1                       Nguyện vọng 2",
+        "  Mã HS   Họ tên          %s   %s   %s   %s   %s   %s"
+        % (ten_cot_nv, ten_cot_diem_thi(cfg), TEN_COT_HUY_CHUONG, ten_cot_nv,
+           ten_cot_diem_thi(cfg), TEN_COT_HUY_CHUONG),
+        "  HS001   Nguyễn Văn An   Tin học   9,5      60                  Bóng rổ            30",
+    ]
+
+
 def ten_khong_trung(clubs) -> int:
     """Đổi tên CLB (tại chỗ) để không hai CLB nào trùng `khoa_ten`. Trả số tên đã đổi.
 
@@ -1318,7 +1351,8 @@ def ten_khong_trung(clubs) -> int:
 
 
 def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=True,
-                cfg=None, luon_co_cot_w: bool = False, co_lop: bool = False, giu_cho=None):
+                cfg=None, luon_co_cot_w: bool = False, co_lop: bool = False, giu_cho=None,
+                che_do_fa: bool = False):
     """Ghi sổ nhập ra tệp .xlsx (đường dẫn hoặc tệp nhị phân đang mở).
 
     clubs:    dict có name, capacity, reserve_capacity, reserve_group, buoi, club_id
@@ -1347,6 +1381,9 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     luon_co_cot_w: True thì sổ CÓ cột "Điểm quyết tâm" dù workspace tắt tính năng (A13.7: sổ
               MẪU phát cho người dùng), kèm ghi chú trong sheet Hướng dẫn. Mặc định False = như
               cũ: cột chỉ có khi `rules.wharton` bật. Không có tác dụng với điểm theo người.
+    che_do_fa: FG-2. True (chỉ sổ MẪU của workspace bật FA-DAA) thì cột CLB có đủ bốn cột FA
+              (Loại…), cột điểm quyết tâm đổi nhãn thành "Huy chương (60/30/10)" (chỉ nhận 60, 30,
+              10) và Hướng dẫn nói về huy chương. Mặc định False = sổ y như cũ từng byte.
     """
     from openpyxl import Workbook
     from openpyxl.formatting.rule import FormulaRule
@@ -1388,7 +1425,8 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     ws = wb.active
     ws.title = sheet_clb
     # FA-1: cột FA chỉ khi có CLB mang chúng.
-    co_fa = any(k in c for c in clubs for k in KHOA_FA)
+    co_fa = che_do_fa or any(k in c for c in clubs for k in KHOA_FA)
+    ten_w = TEN_COT_HUY_CHUONG if che_do_fa else TEN_COT_QUYET_TAM
     ws.append(cot_clb(cfg) + (COT_FA if co_fa else []))
     for c in clubs:
         hang_fa = []
@@ -1405,7 +1443,7 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
         o.fill, o.font, o.alignment = NEN_TIEU_DE, CHU_TIEU_DE, GIUA
     ws.row_dimensions[1].height = 30
     for r in range(2, so_dong_clb + 1):
-        for col in range(1, 7):
+        for col in range(1, 7 + (len(COT_FA) if che_do_fa else 0)):
             o = ws.cell(row=r, column=col)
             o.fill, o.border = NEN_NHAP, VIEN
     ws.freeze_panes = "A2"
@@ -1448,7 +1486,7 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     ten_cot_nv = dang_chu(n_cfg["nhan"], "slot", "s", "vi")
     ten_cot_diem = ten_diem + (" thi" if ten_diem == "Điểm" else "")
     cot_nhom = [ten_cot_nv] if ca_nhan else (
-        [ten_cot_nv, ten_cot_diem] + ([TEN_COT_QUYET_TAM] if co_w else []))
+        [ten_cot_nv, ten_cot_diem] + ([ten_w] if co_w else []))
     hang_1 = cot_dau + [c for k in range(1, so_nv + 1)
                         for c in [f"{TIEU_DE_NHOM} {k}"] + [None] * (buoc - 1)]
     hang_2 = [None] * len(cot_dau) + cot_nhom * so_nv
@@ -1573,10 +1611,16 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
             them_kiem_diem(get_column_letter(nv1 + 1 + buoc * k), so_dong_hs)
         if co_w:
             c_w = get_column_letter(nv1 + 2 + buoc * k)
-            dv_w = DataValidation(
-                type="whole", operator="greaterThanOrEqual", formula1="0", allow_blank=True,
-                showErrorMessage=True, errorTitle=TEN_COT_QUYET_TAM,
-                error="Điểm quyết tâm là số nguyên từ 0 trở lên (mỗi quỹ cộng đúng 100).")
+            if che_do_fa:
+                dv_w = DataValidation(
+                    type="list", formula1='"60,30,10"', allow_blank=True,
+                    showErrorMessage=True, errorTitle=ten_w,
+                    error="Huy chương chỉ nhận 60 (vàng), 30 (bạc) hoặc 10 (đồng).")
+            else:
+                dv_w = DataValidation(
+                    type="whole", operator="greaterThanOrEqual", formula1="0", allow_blank=True,
+                    showErrorMessage=True, errorTitle=TEN_COT_QUYET_TAM,
+                    error="Điểm quyết tâm là số nguyên từ 0 trở lên (mỗi quỹ cộng đúng 100).")
             dv_w.add(f"{c_w}{R0}:{c_w}{so_dong_hs}")
             wh.add_data_validation(dv_w)
     # Cùng một CLB chọn hai lần trên một dòng -> tô đỏ.
@@ -1595,7 +1639,10 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # ---- Hướng dẫn ------------------------------------------------------
     hd = wb.create_sheet(SHEET_HD)
     hd.column_dimensions["A"].width = 90
-    for i, dong in enumerate(huong_dan(cfg, ghi_chu_cot_w=luon_co_cot_w, co_lop=co_lop), start=1):
+    dong_hd = huong_dan(cfg, ghi_chu_cot_w=luon_co_cot_w, co_lop=co_lop)
+    if che_do_fa:
+        dong_hd = _huong_dan_fa(dong_hd, cfg)
+    for i, dong in enumerate(dong_hd, start=1):
         o = hd.cell(row=i, column=1, value=dong)
         if i == 1:
             o.font = Font(bold=True, size=14, color="1F3A5F")

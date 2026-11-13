@@ -2108,7 +2108,9 @@
     if (entry === null || entry === undefined) return "";
     if (typeof entry === "string") return entry;
     if (typeof entry === "object" && entry.code) {
-      const table = ERROR_MESSAGES[entry.code];
+      // FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ có params.nhom và câu riêng "<mã>_nhom".
+      const nhom = entry.params && entry.params.nhom && ERROR_MESSAGES[entry.code + "_nhom"];
+      const table = nhom || ERROR_MESSAGES[entry.code];
       const template = table ? (table[currentLang] || table.vi) : entry.code;
       return interpolate(template, nhanHoaBuoi(entry.params));
     }

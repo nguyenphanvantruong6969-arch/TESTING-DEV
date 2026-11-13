@@ -118,3 +118,49 @@ def test_so_mau_fa_120hs_hop_le_xem_truoc_sach_va_chay_duoc(api):
     assert [w for w in ra["data"]["canh_bao"] if w["code"].startswith("fa_")] == []
     assert api.import_so_nhap(_b64(MAU_FA))["ok"]
     assert api.run_pipeline(seed=3)["ok"]
+
+
+def test_canh_bao_gom_nhom_co_cau_chu_va_dong_chan_chay(api, tmp_path):
+    """Mỗi nhóm đọc được bằng cả hai ngôn ngữ (có số đếm), và có MỘT dòng nói lần chạy sẽ bị chặn."""
+    from i18n_errors import format_message
+    _bat_fa(api)
+    ra = api.xem_truoc_so_nhap(_b64(_so_khong_fa(tmp_path)))
+    canh_bao = ra["data"]["canh_bao"]
+    b = _canh_bao(ra, "fa_huy_chuong_gia_tri_sai")[0]
+    assert b["params"]["nhom"] is True
+    assert "10 ô huy chương không phải 60/30/10" in format_message(b["code"], b["params"], "vi")
+    assert "10 medal" in format_message(b["code"], b["params"], "en")
+    a = _canh_bao(ra, "fa_clb_thieu_loai")[0]
+    assert format_message(a["code"], a["params"], "vi").startswith("4 CLB chưa có Loại")
+    assert len(_canh_bao(ra, "so_nhap_canh_bao_fa_se_loi")) == 1
+    assert canh_bao[-1]["code"] == "so_nhap_canh_bao_fa_se_loi"
+
+
+def test_xem_truoc_khong_ghi_gi_va_van_nhap_duoc(api, tmp_path):
+    p = _so_khong_fa(tmp_path)
+    _bat_fa(api)
+    api.xem_truoc_so_nhap(_b64(p))
+    with api._ket_noi_doc() as cur:
+        assert cur.execute("SELECT COUNT(*) FROM clubs").fetchone()[0] == 0
+    assert api.import_so_nhap(_b64(p))["ok"]            # cảnh báo không chặn nhập
+
+
+def test_so_mau_fa_ghi_ro_mo_phong_va_tat_dinh():
+    import openpyxl
+
+    from du_lieu_test import tao_so_nhap_fa_mau as t
+    wb = openpyxl.load_workbook(MAU_FA)
+    chu = " ".join(str(r[0]) for r in wb[so_nhap.SHEET_HD].iter_rows(values_only=True) if r[0])
+    assert "MÔ PHỎNG" in chu
+    c1, s1 = t.dung_so(7)
+    c2, s2 = t.dung_so(7)
+    assert (c1, s1) == (c2, s2)
+    assert t.dung_so(8)[1] != s1
+
+
+def test_so_mau_fa_huong_dan_noi_ve_huy_chuong_khong_ve_quy(api, tmp_path):
+    _bat_fa(api)
+    ra = api.tao_so_nhap_mau(str(tmp_path / "fa.xlsx"))
+    c = chup(ra["data"]["path"])
+    hd = " ".join(str(v) for v in c["trang"][c["sheets"][-1]]["o"].values())
+    assert "Huy chương (60/30/10)" in hd and "quỹ" not in hd and "Điểm quyết tâm" not in hd
