@@ -1,5 +1,5 @@
 Mode: SG_SONG_SONG person C
-LOCK: LEAD session_01VfPzNuse9EfjuDwwt7335U 2026-11-13T16:10Z
+LOCK: LEAD session_01VfPzNuse9EfjuDwwt7335U 2026-11-13T15:55Z
 STATUS: RUNNING
 BASE: 98709f1f374368c65ee2833467715fd933dc84f6
 SNAPSHOT: in a clean worktree of BASE run every mode of `mau_forms_thi_clb/tao_mau_forms.py`
@@ -14,7 +14,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-5 | TODO | 0 | | | | | |
+| SG-5 | CODING | 0 | 7f7b5ca | | session_01VfPzNruBqHHaJZQcLRxRzS | | |
 | SG-7 | TODO | 0 | | | | | |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
@@ -30,3 +30,4 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 
 ## Log
 - 2026-11-13T16:10Z LEAD session_01VfPzNuse9EfjuDwwt7335U setup branch claude/sg-c from BASE 98709f1
+- 2026-11-13T15:55Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 CODING start 7f7b5ca coder session_01VfPzNruBqHHaJZQcLRxRzS
