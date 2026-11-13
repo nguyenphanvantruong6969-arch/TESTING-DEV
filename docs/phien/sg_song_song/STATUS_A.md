@@ -49,3 +49,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T17:24Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CHECKING checker=session_01TGThn68N7shbENa7GNKWsZ 53025b1
 2026-11-13T17:27Z CHECKER session_01TGThn68N7shbENa7GNKWsZ SG-4 FIX-1
 2026-11-13T17:41Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 FIX-1 sent to coder session_01TGThn7xWLDq89PLMhnwS9V 98d47ce
+2026-11-13T17:50Z CODER session_01TGThn7xWLDq89PLMhnwS9V SG-4 FIX-1: 1 done ({person} -> {person_l} in both en strings, i18n_loi.js regenerated) READY 17eaf11 red:n/a (wording only; verified en text no longer capitalised via tests/test_sg4_khop_ma.py, test_ws_nhan, test_van_phong_tu_nhien pass, kiem_nhanh 7/7) mutation:n/a
