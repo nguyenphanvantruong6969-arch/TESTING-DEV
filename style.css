@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light; /* SG-11a M6: kiosk chỉ có giao diện sáng; chế độ tối của hệ điều hành không được tô tối ô nhập / thanh cuộn */
   --ink: #1C2321;
   --ink-soft: #3A423F;
   --slate: #5B6570;
@@ -1241,7 +1242,7 @@ html.tat-hieu-ung .status-strip:hover {
 .hs-buoi-nhan {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--gold-text); /* SG-11a L1: chữ nhỏ cần bản đậm của vàng (đủ tương phản) */
 }
 
 .hs-chua-chon {
@@ -2208,7 +2209,8 @@ html.tat-hieu-ung .status-strip:hover {
 
 /* Thẻ 02 Kết quả: hai tầng nút chọn (cách xem, cách sắp). Nút to, rõ cho màn hình họp. */
 /* .main co theo nội dung (margin auto); thẻ Kết quả có bảng hẹp ở Theo CLB nên giữ rộng như nhau ở cả ba cách xem */
-.main:has(#view-results.is-active) { width: 100%; box-sizing: border-box; }
+.main:has(#view-results.is-active),
+.main:has(#view-scoring.is-active) { width: 100%; box-sizing: border-box; } /* SG-11a L4: Nhập điểm dùng chung bề rộng nội dung với thẻ Kết quả */
 .main { min-width: 0; }                                /* cột 1fr của lưới không được nở theo bảng rộng: bảng tự cuộn ngang trong .scroll-x, trang thì không */
 .kq-chon-hang { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .kq-chon-hang-phu { margin-bottom: 14px; }
@@ -2962,3 +2964,13 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 
 /* === SG-C: add below === */
 /* === end SG-C === */
+
+.hint-text[hidden] { display: none; }
+
+/* SG-11a M7: ở 1024 px thẻ Kết quả (xem theo mã) rộng hơn khung chứa (630 px) nên bảng phải cuộn ngang và tiêu đề cột bị cắt.
+   Dưới 1100 px: lề trang hẹp lại và ô buổi bớt cứng; từ 1100 px trở lên (1366, 1920) không đổi. */
+@media (max-width: 1100px) {
+  .main { padding-left: 24px; padding-right: 24px; }
+  #kqBang td:not(.kq-cd) { min-width: 5em; }
+  #kqBang th, #kqBang td { padding-left: 6px; padding-right: 6px; }
+}

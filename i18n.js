@@ -999,6 +999,7 @@
       clb_tu_do_lap_nhieu: "{n} {person_l} · không giới hạn chỗ",
       clb_tu_do_theo_clb: "{x} {person_l} · không giới hạn chỗ",
       clb_tu_do_theo_clb_nhieu: "{x} {person_l} · không giới hạn chỗ",
+      xuat_fa_an_goi_y: "Các nút xuất lý do kết quả, bảng nhu cầu, gợi ý chỉ tiêu và biên bản bốc thăm chỉ hiện khi bật chế độ \"Xếp theo loại {slot_l} và huy chương\".",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */
@@ -1992,6 +1993,7 @@
       clb_tu_do_lap_nhieu: "{n} {person_pl} · no seat limit",
       clb_tu_do_theo_clb: "{x} {person_l} · no seat limit",
       clb_tu_do_theo_clb_nhieu: "{x} {person_pl} · no seat limit",
+      xuat_fa_an_goi_y: "The buttons for result reasons, the demand table, capacity suggestions and the draw record only appear when \"Allocate by {slot_l} type and medals\" is turned on.",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */

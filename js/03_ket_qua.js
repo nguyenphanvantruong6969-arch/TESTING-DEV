@@ -845,6 +845,7 @@ function loadMatchResults(search) {
     el("btnXuatNhuCau").hidden = !fa;
     el("btnXuatGoiY").hidden = !fa; /* GAP-7 */
     el("btnXuatBienBan").hidden = !fa;
+    el("xuatFaAnGoiY").hidden = !!fa; /* SG-11a L5: nút chỉ-FA bị ẩn thì nói vì sao (một dòng) */
     veCotLyDo(!!cauLyDo);
     taiDiemDanh(); /* GAP-1: khung điểm danh (js/10_theo_doi.js) — tự ẩn khi cờ tắt */
     /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
