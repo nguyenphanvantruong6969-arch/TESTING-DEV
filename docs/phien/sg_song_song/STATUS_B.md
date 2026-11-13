@@ -15,6 +15,9 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 
 ## Fix lists
 
+### SG-2 regression (found by lead during SG-6, round "pre-check")
+1. `mau_csv/SO_NHAP_CLB.xlsx` not regenerated after the SG-2 guide-sentence change -> `tests/test_t1b_nhan_trung_cu.py::test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet` red (passes at 5c8ee63). Sent to SG-6 coder as a separate commit `SG-2 FIX-1`. Lesson: lead runs the full non-UI suite before each checker.
+
 ## Decisions
 - SG-11b = finding M4 only (dialog focus trap + Esc + initial focus in `wsMoManChon`); M6/M7/L1/L4/L5 belong to person A (SG-11a).
 - Strings go only inside the `=== SG-B: add below ===` … `=== end SG-B ===` marker blocks; CSS only in the SG-B block at the end of `style.css`.
@@ -42,3 +45,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T16:50Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 DONE (checker PASS c70048f + lead review, kiem_nhanh 7/7) d9da2c5
 2026-11-13T16:51Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CODING coder=session_01YVAyu2N9LpsmHLzKjBUGzq start=dc0451b
 2026-11-13T18:10Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY aad4846 red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known) + tests/test_t1b_nhan_trung_cu.py::test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet (pre-existing from SG-2) mutation:so_nhap reader KHOA_GIO disabled -> 5 new tests red; restored
+2026-11-13T17:45Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 lead sweep at aad4846: 5587 passed, red = a13_12 (known) + t1a (SG-2 regression) -> pre-check fix sent to coder
