@@ -35,7 +35,7 @@ Checker: session_01YVAytyjEXTMBsvTPMw9NsZ · range 5ab87d0..f1ae45a (branch tip 
 
 # Round 2 (M4 only) — range 5ab87d0..29bfa1e (fix f1ae45a..29bfa1e, branch tip dff2363)
 
-Checker: session_01YVAyu3PXika1Vx6orU1Yim-checker-r2 (Sonnet) · Verdict **PASS**
+Checker: session_01YVAyu3LJVjJwZrCxTDDP4W (Sonnet) · Verdict **PASS**
 
 ## FIX-1 closure (Chromium, keyboard only; scratch probes outside the repo, 1366×768 vi and 1920×1080 en)
 1. **Esc at document level — closed.** Click `#wsHop .hint-text` (activeElement = BODY) → Esc → `#wsOverlay` hidden, focus on `#btnWorkspace`. Same after the FG-1 dialog closes. First start (no workspace chosen): Esc does nothing, also from body; Tab stays trapped (20 presses). Probe waited for the list to render (an earlier unwaited probe of mine raced the async render: probe error, not a product defect).
