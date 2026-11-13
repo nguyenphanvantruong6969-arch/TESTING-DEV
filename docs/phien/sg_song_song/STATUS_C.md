@@ -15,7 +15,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
-| SG-7 | CODING | 0 | eb6ef50 | | session_01VfPzNvgJo8vZQhB3sTbaQr | | |
+| SG-7 | CHECKING | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
 
@@ -55,3 +55,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T17:40Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 DONE (lead review: diff read; 110 item/related tests pass; ruff clean; kiem_nhanh 7/7 60 cases; generator diff only m2/m3 --fa-daa* registration files) a4d950a
 - 2026-11-13T17:26Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 CODING start eb6ef50 coder session_01VfPzNvgJo8vZQhB3sTbaQr
 - 2026-11-13T17:31Z CODER session_01VfPzNvgJo8vZQhB3sTbaQr SG-7 READY b4800ad red:3 of 4 new UI tests failed (step 4 and import panel had no grouping/5-example/'và N nữa', old button style, no shared helper) mutation:removing the 5-example slice in veCanhBaoGom -> 2 UI tests fail, restored
+- 2026-11-13T17:48Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 READY b4800ad accepted (range 9709a20..b4800ad); checker r1 session_01VfPzNv27d7DuoAmjt9g79n
