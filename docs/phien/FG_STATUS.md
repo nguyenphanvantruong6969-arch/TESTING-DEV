@@ -10,14 +10,14 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- FG-3: delegated to a Sonnet worker (task start = HEAD after this commit).
+- FG-4: delegated to a Sonnet worker (task start = HEAD after this commit). After FG-4: wave gate 1 (§2.4).
 
 ## Item table
 | Item | State | Commit | Tests |
 |---|---|---|---|
 | STEP0 | DONE (lead review OK) | 63b6e73 | 13 test files, 41 red / 15 green on 24846d2 |
 | FG-1 | DONE (server side was GONE-ON-HEAD) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
-| FG-3 | TODO | | |
+| FG-3 | DONE | f2dc276 | test_fg3_nap_lai (5) |
 | FG-4 | TODO | | |
 | FG-5 | TODO | | |
 | FG-6 | TODO | | |
@@ -47,7 +47,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 |---|---|---|
 | STEP0 | session_01VfPzNuWUv3W6FtiR2fPPpB | DONE |
 | FG-1 | session_01VfPzNtE2gjQkFTnk4CKsg9 | DONE, review GO |
-| FG-3 | (creating) | |
+| FG-3 | session_01VfPzNv8yPVuUfCb3LScjpc | DONE, review GO |
+| FG-4 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -73,3 +74,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Red run before (HEAD without fix): tests/test_fg3_nap_lai.py 5 failed. After: 40 passed (fg3 + gap5 + m6b API/UI). ruff clean; kiem_nhanh --co-so origin/main 7/7.
   - Mutation: feedback dedupe disabled -> test_nap_hai_lan_phan_hoi_khong_them_dong red; Forms-appeal dedupe off (tu_forms=False) -> 3 appeal tests red; both restored.
   - Dedupe of Forms appeals applies only when the row has a real Forms completion time (no time -> old CHO rule, keeps m6b test with frozen clock). Two old exact-dict asserts extended with dong_moi/dong_trung (not loosened).
+- 2026-11-13T02:27Z lead: FG-3 review GO: diff 9b888a2..ed411f7 matches spec D1=C (identical feedback row skipped+counted; Forms appeal with real completion time already stored in any state → khieu_nai_trung; manual appeals unchanged); created_at format matches the INSERT; related -k run: 80 passed, 5 red = FG-4/5/6 acceptance tests only (expected).
