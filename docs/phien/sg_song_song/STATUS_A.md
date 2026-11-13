@@ -7,7 +7,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-1 (C3) | CHECKING | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z | |
+| SG-1 (C3) | CHECKING | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | |
 | SG-3 (C2) | TODO | 0 | | | | | |
 | SG-4 (M3) | TODO | 0 | | | | | |
 | SG-10 (M2) | TODO | 0 | | | | | |
