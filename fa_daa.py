@@ -109,6 +109,24 @@ def giu_cho_hop_le(clubs: dict, giu_cho, students: dict, preferences=None) -> se
     return ra
 
 
+def dem_nv1_trong_buoi(clubs: dict, preferences: dict) -> dict:
+    """{club_id: số học sinh xếp CLB này ĐẦU TIÊN TRONG BUỔI của nó} (nguyện vọng 1 theo buổi).
+
+    MỘT định nghĩa cho bảng nhu cầu (`bang_nhu_cau`) và lỗi `fa_clb_tuyen_chon_chua_co_diem`
+    (SG-1 FIX-1): cùng số em ở cả hai nơi. CLB không có trong `clubs` bị bỏ qua."""
+    nv1 = {c: 0 for c in clubs}
+    for ds in preferences.values():
+        thay_buoi = set()
+        for c in ds or []:
+            if c not in clubs:
+                continue
+            b = clubs[c].get("buoi") or BUOI_MAC_DINH
+            if b not in thay_buoi:
+                thay_buoi.add(b)
+                nv1[c] += 1
+    return nv1
+
+
 def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None,
                   tested_scores=None) -> list:
     """Kiểm dữ liệu FA trước khi chạy; trả danh sách `err(...)` (rỗng = hợp lệ).
@@ -126,6 +144,8 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None,
     Thiếu một trong hai tham số thì bỏ kiểm này (hành vi cũ).
     """
     loi = []
+    nv1_buoi = (dem_nv1_trong_buoi(clubs, preferences)
+                if preferences is not None and tested_scores is not None else {})
     cac_buoi = sorted({c.get("buoi") or BUOI_MAC_DINH for c in clubs.values()})
     co_tu_do = {c.get("buoi") or BUOI_MAC_DINH for c in clubs.values() if c.get("loai") == TU_DO}
     loi += [err("fa_thieu_clb_tu_do", buoi=b) for b in cac_buoi if b not in co_tu_do]
@@ -146,7 +166,7 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None,
             if dang_ky and not tested_scores.get(cid):
                 loi.append(err("fa_clb_tuyen_chon_chua_co_diem", club_id=cid,
                                so_dang_ky=len(dang_ky),
-                               so_nv1=sum(1 for s in dang_ky if preferences[s][0] == cid)))
+                               so_nv1=nv1_buoi[cid]))
     cap = sorted(set(giu_cho), key=lambda p: (str(p[0]), str(p[1])))
     dung_duoc = giu_cho_hop_le(clubs, cap, students, preferences)
     for c, s in cap:
@@ -590,18 +610,13 @@ def bang_nhu_cau(clubs: dict, preferences: dict, tested_scores: dict, fa_clb: di
     def buoi_cua(cid):
         return clubs[cid].get("buoi") or BUOI_MAC_DINH
 
-    nv1 = {c: 0 for c in clubs}
+    nv1 = dem_nv1_trong_buoi(clubs, preferences)
     so_ghi = {c: 0 for c in clubs}
     dat_san = {c: 0 for c in clubs}
     for sid, ds in preferences.items():
         trong = [c for c in ds if c in clubs]
-        thay_buoi = set()
         for c in trong:
             so_ghi[c] += 1
-            b = buoi_cua(c)
-            if b not in thay_buoi:
-                thay_buoi.add(b)
-                nv1[c] += 1
             if (fa_clb.get(c) or {}).get("loai") == TUYEN_CHON:
                 diem = tested_scores.get(c, {}).get(sid)
                 if diem is not None and diem >= ((fa_clb.get(c) or {}).get("diem_san") or 0):

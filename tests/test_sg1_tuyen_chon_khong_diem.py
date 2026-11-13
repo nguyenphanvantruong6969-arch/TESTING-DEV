@@ -26,6 +26,18 @@ def test_ham_thuan_chan_khi_khong_ai_co_diem():
     assert fa_daa.chi_loi_chan(loi) == loi
 
 
+def test_ham_thuan_hai_buoi_nv1_tinh_theo_buoi():
+    # SG-1 FIX-1: nguyện vọng 1 là CLB đầu tiên TRONG BUỔI của nó, không phải đầu danh sách chung.
+    clubs = {"A": {**_c("TU_DO", 50), "buoi": "b1"},
+             "S": {**_c("TUYEN_CHON", 3, san=5), "buoi": "b2"},
+             "B": {**_c("TU_DO", 50), "buoi": "b2"}}
+    hs = {s: {} for s in ("s1", "s2")}
+    prefs = {"s1": ["A", "S"], "s2": ["A", "S"]}
+    loi = fa_daa.kiem_truoc_fa(clubs, [], hs, prefs, tested_scores={})
+    assert ma(loi) == [MA_MOI]
+    assert loi[0]["params"] == {"club_id": "S", "so_dang_ky": 2, "so_nv1": 2}
+
+
 def test_ham_thuan_co_mot_diem_thi_khong_chan():
     clubs = {"T": _c("TU_DO", 50), "S": _c("TUYEN_CHON", 3, san=5)}
     hs = {s: {} for s in ("s1", "s2")}
