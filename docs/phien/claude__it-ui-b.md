@@ -1,5 +1,5 @@
 Branch: claude/it-ui-b
-STATUS: BLOCKED: waited too long for A (only failure: tests/test_a13_12_tai_lieu.py code-map test-file count 254 vs 260 in A-owned CLAUDE_CHI_TIET.md)
+STATUS: IN_PROGRESS (green loop round 2, after merging origin/claude/forms-gop)
 WARNING: lead is not Opus (claude-sonnet-5-5)
 Lead: CHU_TRI session_01VfPzNuCMVqq71ep3pTUA9K. BASE = 51962176a71456ca0417a3ce97da360227f8a7a7 (origin/claude/forms-gop HEAD, already holds G0 + FA-M7, so MERGE-G0 is a no-op)
 
@@ -49,8 +49,14 @@ All numbers SIMULATED; all Forms work TH (not tried on real Microsoft).
 - Windows build NOT triggered (step b: only after CI Tests green on this HEAD).
 - Waiting for A (AUTO rule): REQUEST A already above. Not fixing it myself (fix rules: never edit another worker's files).
 
+## Green loop round 2 (claude/it-ui-b, lead session_01VfPzNsjEZdwCpR5bXRdhgG, 2026-11-13)
+- Cause of round-1 failure gone: `origin/claude/forms-gop` already merged B (f809e2b) and A folded the code-map count (263). Merged
+  forms-gop into it-ui-b (clean merge, no code change). `tests/test_a13_12_tai_lieu.py` 8 passed; ruff clean; kiem_nhanh 7/7, 60/60.
+- Converter files: only B's own commit (568bd20) differs from BASE, snapshot identical earlier (53 files, 0 diffs).
+- Full local suite running in background; then push, CI Tests, Windows build.
+
 ## Waiting for Truong
-- Worker A is PAUSED (IT_UI_STATUS), so nobody will update the 254 in CLAUDE_CHI_TIET.md. Allow worker B to change that one number to 260 (one-line edit, will be re-folded by A at integration)? Until answered B stays at line 2 STATUS IN_PROGRESS, waiting per AUTO rules.
+- (Answered by events: A integrated B on forms-gop and fixed the count; no action needed.) Old text: worker A is PAUSED (IT_UI_STATUS), so nobody will update the 254 in CLAUDE_CHI_TIET.md. Allow worker B to change that one number to 260 (one-line edit, will be re-folded by A at integration)? Until answered B stays at line 2 STATUS IN_PROGRESS, waiting per AUTO rules.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
