@@ -15,7 +15,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
-| SG-7 | CHECKING | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
+| SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
 
@@ -33,6 +33,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
   of `SOAT_GIAO_DIEN_KE_HOACH.md` and the finding as reproduced in code (SG_SONG_SONG 2.1 fallback).
 
 - SG-7: helper placed in js/00_nen.js (no A/B edits there). Step-4 warning prefix `ma:` (internal code) dropped from visible text; old `slice(0,30)` cap replaced by the 5-example rule. Old i18n keys canh_bao_gom/xem_dau/thu_gon left (outside SG-C block).
+- SG-7: dead leftovers outside the SG-C blocks (i18n keys `canh_bao_gom`, `canh_bao_xem_dau`, `canh_bao_thu_gon`; old `.canh-bao-nhom` flex rule in style.css) are left for lead A at integration, to avoid editing outside C's marker blocks. The FG-6 run-log grouping (`showLog`) stays as is: same rule in spirit, not one of SG-7's two surfaces.
 
 ## For Truong
 SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registration form, after the question text; en: none, forms are Vietnamese-only):
@@ -57,3 +58,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T17:31Z CODER session_01VfPzNvgJo8vZQhB3sTbaQr SG-7 READY b4800ad red:3 of 4 new UI tests failed (step 4 and import panel had no grouping/5-example/'và N nữa', old button style, no shared helper) mutation:removing the 5-example slice in veCanhBaoGom -> 2 UI tests fail, restored
 - 2026-11-13T17:48Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 READY b4800ad accepted (range 9709a20..b4800ad); checker r1 session_01VfPzNv27d7DuoAmjt9g79n
 - 2026-11-13T17:51Z CHECKER session_01VfPzNv27d7DuoAmjt9g79n SG-7 PASS (see docs/phien/sg_review/SG-7.md)
+- 2026-11-13T18:14Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 DONE (lead review: diff read; 17 UI tests pass in Chromium; own mutation 'và N nữa' count -> 2 fail, restored; checker kiem_nhanh 7/7, diff JS/CSS/i18n only) b4800ad
