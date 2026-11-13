@@ -75,3 +75,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Mutation: feedback dedupe disabled -> test_nap_hai_lan_phan_hoi_khong_them_dong red; Forms-appeal dedupe off (tu_forms=False) -> 3 appeal tests red; both restored.
   - Dedupe of Forms appeals applies only when the row has a real Forms completion time (no time -> old CHO rule, keeps m6b test with frozen clock). Two old exact-dict asserts extended with dong_moi/dong_trung (not loosened).
 - 2026-11-13T02:27Z lead: FG-3 review GO: diff 9b888a2..ed411f7 matches spec D1=C (identical feedback row skipped+counted; Forms appeal with real completion time already stored in any state → khieu_nai_trung; manual appeals unchanged); created_at format matches the INSERT; related -k run: 80 passed, 5 red = FG-4/5/6 acceptance tests only (expected).
+- 2026-11-13 WORKER session_01VfPzNtbYjiRYVCMfuncuk2 FG-4 DONE 06cb12d
+  - Red run before: tests/test_giao_dien_fg4_nut_nap.py 2 failed (busy-state test, both buttons) / 2 green error-path tests. After: 4 passed; related (gap1 theo_doi, m6b, i18n) green, Chromium really ran. ruff clean; kiem_nhanh --co-so origin/main 7/7.
+  - Mutation: removed `.finally(xong)` -> 4 failed; restored, 4 passed. (Code commit 06cb12d carries the message "ghi hash vào Log" by a shell-chain slip; content is the full FG-4 change.)
