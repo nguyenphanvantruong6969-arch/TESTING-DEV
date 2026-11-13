@@ -16,7 +16,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
-| SG-9 | CODING | 0 | 1bf5e85 | | session_01VfPzNud4JhboVzj5e8xu4E | | |
+| SG-9 | CHECKING | 0 | a1b6ecb | 98908e1 | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt6qaZtDuK7uYC28bX | (see review) |
 | SG-12 | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -61,3 +61,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T18:14Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 DONE (lead review: diff read; 17 UI tests pass in Chromium; own mutation 'và N nữa' count -> 2 fail, restored; checker kiem_nhanh 7/7, diff JS/CSS/i18n only) b4800ad
 - 2026-11-13T18:11Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 CODING start 1bf5e85 coder session_01VfPzNud4JhboVzj5e8xu4E
 - 2026-11-13T18:29Z CODER session_01VfPzNud4JhboVzj5e8xu4E SG-9 READY 98908e1 red:14 of 16 new tests failed on base (no busy state/double-click guard/.catch, 71 bare .then) mutation:removing nut.disabled=true in chayNut -> 5 double-click tests fail, restored; related: 606 UI/label tests pass, ruff clean
+- 2026-11-13T18:38Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 READY 98908e1 accepted (range a1b6ecb..98908e1); checker r1 session_01VfPzNt6qaZtDuK7uYC28bX
