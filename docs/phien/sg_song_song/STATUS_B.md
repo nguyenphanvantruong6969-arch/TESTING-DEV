@@ -10,7 +10,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
-| SG-8 (M5) | TODO | 0 | | | | | |
+| SG-8 (M5) | CODING | 0 | 620d2d6 | | session_01YVAytzNj1eT4xGk3rANq4G | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -59,3 +59,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T19:04Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CHECKING r2 checker=session_01YVAyu3A184isUsUrEroXCZ range=d7c9c19..b83651d (fix 194305f..b83651d)
 2026-11-13T19:09Z CHECKER session_01YVAyu3A184isUsUrEroXCZ SG-6 PASS
 2026-11-13T19:35Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 DONE (checker r2 PASS 144fbe6 + lead review, kiem_nhanh 7/7) b83651d
+2026-11-13T19:36Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CODING coder=session_01YVAytzNj1eT4xGk3rANq4G start=620d2d6
