@@ -155,12 +155,20 @@ function wsMoManChon(coTheDong) {
   wsCoTheDong = coTheDong;
   wsSuaDong = null;
   wsWizard = null;
-  el("wsOverlay").hidden = false;
+  wsHienOverlay(true);
   wsLamMoiDanhSach();
 }
 
+/* `role="dialog"` chỉ có khi màn chọn đang hiện: ẩn rồi thì không còn hộp thoại nào trong DOM (FG-1). */
+function wsHienOverlay(hien) {
+  const o = el("wsOverlay");
+  o.hidden = !hien;
+  if (hien) o.setAttribute("role", "dialog");
+  else o.removeAttribute("role");
+}
+
 function wsDongManChon() {
-  el("wsOverlay").hidden = true;
+  wsHienOverlay(false);
   const nut = el("btnWorkspace");
   if (nut && !nut.hidden) nut.focus();
 }
@@ -254,8 +262,68 @@ function wsDongWorkspace(w) {
           hanhDong("doi_ten", () => wsBatSua(w, "doi_ten")),
           hanhDong("nhan_ban", () => wsBatSua(w, "nhan_ban")),
           hanhDong("luu_mau", () => wsBatSua(w, "luu_mau")),
+          hanhDong("tinh_nang", () => wsMoTinhNang(w)),
           hanhDong("xuat", () => wsXuat(w)),
           nutXoa)))));
+}
+
+/* FG-1: bật/tắt tính năng sau khi xếp cho một không gian làm việc (không đụng luật làm đổi kết quả). */
+const WS_TINH_NANG = [["fa_diem_danh", "ws_r_fa_diem_danh"], ["fa_khieu_nai", "ws_r_fa_khieu_nai"],
+  ["fa_vong_2", "ws_r_fa_vong_2"], ["fa_phan_hoi", "ws_r_fa_phan_hoi"], ["fa_vong_doi_cho", "ws_tn_vong_doi_cho"]];
+
+function wsMoTinhNang(w) {
+  /* Hộp thoại dựng và hiện NGAY (ô còn khoá), rồi mới nạp cấu hình: màn chọn không còn là
+     hộp thoại duy nhất trong lúc chờ backend. */
+  const dong = (xong) => {
+    lop.remove();
+    if (xong && wsCoTheDong) wsDongManChon(); else wsHienOverlay(true);
+  };
+  const o = WS_TINH_NANG.map(([khoa, nhan], i) => {
+    const hop = wsEl("input", { type: "checkbox", id: "wsTn" + i, "data-khoa": khoa, disabled: true });
+    return [hop, wsEl("label", { class: "ws-kem", for: "wsTn" + i }, hop, " ", t(nhan))];
+  });
+  const ngay = wsEl("input", { type: "number", class: "text-input", id: "wsTnNgay", min: "1", max: "14",
+    value: "3", disabled: true, "aria-label": t("ws_tn_so_ngay") });
+  const loi = wsEl("p", { class: "hint-text", role: "alert" });
+  const khongFa = wsEl("p", { class: "hint-text", text: t("ws_tn_khong_fa") });
+  const luu = wsEl("button", { type: "button", class: "btn btn-primary", text: t("ws_btn_luu"), disabled: true });
+  luu.addEventListener("click", () => khiBan(luu, () => {
+    const rules = {};
+    o.forEach(([hop]) => { rules[hop.dataset.khoa] = hop.checked; });
+    rules.fa_khieu_nai_so_ngay = Number(ngay.value);
+    return callApi("update_workspace_config", { rules }, w.slug).then((r) => {
+      if (!r.ok) { loi.textContent = trErrs(r.errors).join(" "); return; }
+      showToast(t("ws_tn_da_luu"), "success");
+      dong(true);
+      if (w.dang_mo) {
+        wsApDungCauHinh(r.data.config);
+        if (typeof TAB_LOADERS !== "undefined" && TAB_LOADERS.others) TAB_LOADERS.others();
+      }
+    });
+  }));
+  const huy = wsEl("button", { type: "button", class: "btn btn-ghost", text: t("btn_cancel"), onclick: () => dong(false) });
+  const lop = wsEl("div", { class: "ws-overlay", role: "dialog", "aria-modal": "true", "aria-labelledby": "wsTnTieuDe" },
+    wsEl("div", { class: "ws-hop" },
+      wsEl("h2", { id: "wsTnTieuDe", class: "ws-tieu-de", text: t("ws_tn_tieu_de", { ten: w.name }) }),
+      khongFa,
+      ...o.map(([, nhan]) => wsEl("div", null, nhan)),
+      wsEl("div", null, wsEl("span", { class: "ws-sua-nhan", text: t("ws_tn_so_ngay") }), " ", ngay),
+      loi,
+      wsEl("div", { class: "ws-chan" }, luu, huy)));
+  lop.addEventListener("keydown", (ev) => { if (ev.key === "Escape") dong(false); });
+  wsHienOverlay(false);
+  document.body.append(lop);
+  huy.focus();
+  callApi("get_workspace_config", w.slug).then((res) => {
+    if (!res.ok) { dong(false); showErrorToast(res.errors); return; }
+    const luat = res.data.config.rules || {};
+    const coFa = luat.fa_daa === true;
+    o.forEach(([hop]) => { hop.checked = luat[hop.dataset.khoa] === true; hop.disabled = !coFa; });
+    if (Number.isInteger(luat.fa_khieu_nai_so_ngay)) ngay.value = String(luat.fa_khieu_nai_so_ngay);
+    ngay.disabled = !coFa;
+    luu.disabled = !coFa;
+    khongFa.hidden = coFa;   // hiện sẵn cho tới khi biết có FA
+  });
 }
 
 function wsBatSua(w, kieu) {

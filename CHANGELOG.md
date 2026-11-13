@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-1: bật/tắt tính năng sau khi xếp cho từng không gian làm việc (TH)
+
+- `js/075_workspace.js`: mục "Tính năng sau khi xếp…" trong menu ⋯ của dòng không gian làm việc (`wsMoTinhNang`): hộp thoại 5 ô
+  (`CO_SAU_XEP`) + số ngày khiếu nại (1–14), lưu qua `update_workspace_config` (chỉ các khoá này); lỗi hiện trong hộp thoại, hộp
+  vẫn mở; không có FA thì ô khoá kèm một dòng giải thích; lưu xong áp lại cấu hình và nạp lại thẻ chi tiết (không cần khởi động lại).
+  `wsHienOverlay`: màn chọn chỉ mang `role="dialog"` khi đang hiện (`index.html` bỏ role tĩnh).
+- `i18n.js` (vi + en): `ws_btn_tinh_nang`, `ws_tn_*`. Không đổi mã backend (máy chủ đã chặn cờ khi thiếu FA).
+- Test: `tests/test_giao_dien_fg1_bat_tinh_nang.py` (3 đỏ → xanh), `tests/test_fg1_bat_tinh_nang.py` (giữ); sửa
+  `tests/test_ws_giao_dien.py` (thứ tự menu thêm `tinh_nang`).
+
 ## 2026-11-12 — DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026): tệp bối cảnh dự án + tệp giao việc cho Fable
 
 - `docs/fable/01_PROJECT_CONTEXT.md` (mới): tóm tắt toàn dự án cho AI đọc (bài toán, RB-DA, lớp FA-DAA, chương trình, bất biến, số liệu MÔ PHỎNG, điểm yếu, thứ tự đọc).
