@@ -7,6 +7,7 @@ stability, truthfulness and fairness risks before real use. Related item: A13 (F
 ## Plan
 - [x] Top 3 findings for G-A with evidence, written to `docs/fable/03_RESEARCH_MEMO.md`
 - [x] G-A.2: solutions per finding, school-size simulations, other improvements (no new student input)
+- [x] G-H first pass (reducing luck): `docs/fable/04_GH_REDUCING_LUCK.md`, top 3 methods, stopped to ask
 - [ ] Wait for Truong's decisions (below)
 
 ## Current state (overwrite each handoff)
@@ -38,3 +39,4 @@ stability, truthfulness and fairness risks before real use. Related item: A13 (F
 ## Session log (append only, newest last)
 - 2026-11-12: first G-A pass, top 3 findings, stopped to ask Truong.
 - 2026-11-13: G-A.2 written after Truong confirmed the Opus request; stopped for decisions.
+- 2026-11-13: G-H first pass after Truong's OK; script `du_lieu_test/fable_gh_giam_may_rui.py`. Top lever: seats by demand.

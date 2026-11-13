@@ -407,3 +407,7 @@ Rejected after testing: rule E, post-result manual cancel as a mechanism, equal 
 Additional reference (Crossref, 2026-11-13): Biró, P., Fleiner, T., Irving, R. W. & Manlove, D. F. (2010). The
 College Admissions problem with lower and common quotas. *Theoretical Computer Science* 411(34–36).
 doi:10.1016/j.tcs.2010.05.005
+
+## G-H. Reducing luck
+
+See `docs/fable/04_GH_REDUCING_LUCK.md` (separate file: this memo is at its length cap).
