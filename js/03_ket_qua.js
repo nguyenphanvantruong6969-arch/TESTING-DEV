@@ -553,6 +553,7 @@ function loadPhanBoNguyenVong() {
     clear(box);
 
     const hang = d.phan_bo.slice();
+    if (d.ngoai_danh_sach) hang.push({ hang: null, gop: false, ngoai: true, so_em: d.ngoai_danh_sach });
     if (d.khong_ro) hang.push({ hang: null, gop: false, so_em: d.khong_ro });
     const lonNhat = Math.max(1, ...hang.map((h) => h.so_em));
 
@@ -573,7 +574,7 @@ function loadPhanBoNguyenVong() {
       if (h.hang !== null) luyKe += h.so_em;
       return {
         hang: h.hang,
-        nhan: h.hang === null ? t("nv_khong_ro")
+        nhan: h.hang === null ? t(h.ngoai ? "nv_ngoai_danh_sach" : "nv_khong_ro")
             : h.gop ? t("nv_hang_gop", { n: h.hang })
             : t("nv_hang", { n: h.hang }),
         so_em: h.so_em,

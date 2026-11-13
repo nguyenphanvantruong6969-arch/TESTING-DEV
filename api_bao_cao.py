@@ -426,6 +426,16 @@ class BaoCaoMixin:
             dem = {r["hang"]: r["so_em"] for r in rows}
             khong_ro = dem.pop(None, 0)
             tong = sum(dem.values()) + khong_ro
+            # SG-3: chỗ không có thứ hạng mà em CHƯA TỪNG khai CLB đó = xếp bằng phương án dự phòng
+            # (chế độ FA). Đếm riêng, không tính là nguyện vọng nào.
+            with self._ket_noi_doc() as cur:
+                ngoai_ds = cur.execute("""
+                    SELECT COUNT(*) FROM match_results m
+                    WHERE m.club_id IS NOT NULL AND m.rank_in_student_pref IS NULL
+                      AND NOT EXISTS (SELECT 1 FROM preferences p
+                                      WHERE p.student_id = m.student_id AND p.club_id = m.club_id)
+                """).fetchone()[0]
+            khong_ro -= ngoai_ds
 
             phan_bo = []
             for h in (1, 2, 3):
@@ -440,6 +450,7 @@ class BaoCaoMixin:
             return _ok({
                 "phan_bo": phan_bo,
                 "khong_ro": khong_ro,
+                "ngoai_danh_sach": ngoai_ds,
                 "tong_da_xep": tong,
             })
         except Exception as e:

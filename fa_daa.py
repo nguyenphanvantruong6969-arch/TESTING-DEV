@@ -472,6 +472,22 @@ def chay_fa_daa(students: dict, clubs: dict, tested_scores: dict, applicants: di
             nhom += [{"buoi": buoi, "student_id": sid, "club_id": cid, "group_no": i % n + 1}
                      for i, sid in enumerate(tv)]
 
+    # (7) SG-3: `rank_in_student_pref` = thứ hạng trong danh sách GỐC của em TRONG BUỔI (cùng giá trị với
+    # `rank_in_list` của `ly_do_ket_qua`), không phải trong danh sách đã lọc/tăng cường `prefs_fa`.
+    # CLB em không khai (dự phòng vào CLB Tự do) -> không có thứ hạng (NULL khi ghi). Chỉ sửa kết quả
+    # đầu ra; lõi DA và việc ai vào CLB nào không đổi.
+    for buoi in ket.ds_buoi:
+        hang_buoi = ket.per_buoi[buoi].rank_in_student_pref
+        for sid, cid in ket.per_buoi[buoi].assignment.items():
+            if cid is None:
+                continue
+            goc = [c for c in (preferences.get(sid) or []) if c in clubs_fa
+                   and (clubs_fa[c].get("buoi") or BUOI_MAC_DINH) == buoi]
+            if cid in goc:
+                hang_buoi[sid] = goc.index(cid) + 1
+            else:
+                hang_buoi.pop(sid, None)
+
     return KetQuaFA(ket_qua=ket, clubs=clubs_fa, tested_scores=tested_fa, applicants=app_fa,
                     preferences=prefs_fa, reserve_fn=reserve_fn, loai_bo=loai_bo,
                     canh_bao=canh_bao, fallback=fallback, nhom=nhom, dong_cua=dong_cua)

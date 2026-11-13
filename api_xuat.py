@@ -744,6 +744,9 @@ class XuatKetQuaMixin:
                      else ("Nguyện vọng %d" % h["hang"]),
                      h["so_em"], phan_tram(h["so_em"], tong)]
                     for h in n["phan_bo"]]
+            if n.get("ngoai_danh_sach"):
+                dong.append(["Xếp ngoài danh sách nguyện vọng", n["ngoai_danh_sach"],
+                             phan_tram(n["ngoai_danh_sach"], tong)])
             if n["khong_ro"]:
                 dong.append(["Không rõ thứ hạng", n["khong_ro"],
                              phan_tram(n["khong_ro"], tong)])

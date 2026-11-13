@@ -993,6 +993,7 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Xếp ngoài danh sách nguyện vọng",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */
@@ -1980,6 +1981,7 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Placed outside their choices",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */

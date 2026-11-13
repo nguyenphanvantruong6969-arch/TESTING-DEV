@@ -8,7 +8,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
-| SG-3 (C2) | CODING | 0 | 39de078 | | session_01TGThn5vDcdjy25A1uMuruk | | |
+| SG-3 (C2) | CODING | 0 | 39de078 | | session_01TGThn5vDcdjy25A1uMuruk | | test_sg3_hang_fa.py (5) |
 | SG-4 (M3) | TODO | 0 | | | | | |
 | SG-10 (M2) | TODO | 0 | | | | | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
@@ -22,7 +22,10 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 - D-A4: SG-1 round-1 checker logged its PASS line with the round-0 checker id (session_01TGThn8ctQ...); review file 'Round 1' section is the r2 session's work. Lead re-verified: 2311 tests passed, ruff clean, kiem_nhanh 7/7.
 - D-A3: SG-11 scope for person A = M6, M7, L1, L4, L5 (+ one-line consistency rules, glossary list to docs/). M4 belongs to person B (SG-11b).
 
+- D-A5 (SG-3): rank fixed as a post-process at the end of `fa_daa.chay_fa_daa` (writes into `ket.per_buoi[buoi].rank_in_student_pref`); `fa_daa.ly_do_ket_qua` `rank_in_list` was already original-list and per-session, unchanged. Panel: new key `ngoai_danh_sach` = placed, rank NULL, club never in `preferences`. Fable's HS001/HS002 rebuilt from spec (D-A1); test also needs a scored attempt in club S (HS005) or the SG-1 check blocks the run.
+
 ## For Truong
+- SG-3 academic check (FA NV1 numbers possibly computed from trimmed-list rank): `du_lieu_test/mo_phong_fa_daa.py` + FA_DAA_VISION.md line ~206 (63 % top-2): NOT affected (true preference `thich`, only `assignment` used). 48 %→79 % (docs/fable/01_PROJECT_CONTEXT.md, 02_FABLE_BRIEF.md, FA_DAA_VISION.md ~360) and 29 %→47 % (GIAM_MAY_RUI_KE_HOACH.md): generating script not found, cannot confirm they are FA numbers; please check. FA_GAPS_KE_HOACH.md ~366 only describes the dashboard (no number). Other pre-scan files: no FA NV1 number. `du_lieu_test/bao_cao_phan_bo.py` reads stored rank: affected only if run with FA on. Any past FA run's `ket_qua_phan_bo.csv`/dashboard NV1 is affected.
 
 ## Log
 2026-11-13T12:54Z LEAD session_01TGThn8FotZk5dp89pKN66o SETUP lead-is-opus ba4b207
@@ -36,3 +39,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T15:54Z CHECKER session_01TGThn8ctQPeoQJvGZsej9z SG-1 PASS
 2026-11-13T16:13Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 DONE lead-review agree 95de0b9
 2026-11-13T16:13Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-3 CODING coder=session_01TGThn5vDcdjy25A1uMuruk 39de078
+2026-11-13T17:05Z CODER session_01TGThn5vDcdjy25A1uMuruk SG-3 READY HASH red:5 of 5 new tests failed before fix (HS001 rank 1 vs original 2, fallback rank 1 not NULL, dashboard NV1 100% vs direct count 40%) mutation:rank line replaced by old value -> 4 tests fail, restored
