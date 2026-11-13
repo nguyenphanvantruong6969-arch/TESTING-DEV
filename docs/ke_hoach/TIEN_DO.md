@@ -129,3 +129,6 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-M10 (IT giao diện, TH) | xong | 2026-11-12 | api_forms_nap.py, js/12_chuan_bi_nap.js, mau_forms_thi_clb/danh_sach_chua_dang_ky.py, i18n.js | tests/test_fa_m10_thuan.py, test_fa_m10_sau_xep_nut.py (8 ca), test_giao_dien_fa_m10_nut.py (5 ca) | Bước 5: xuất KETQUA_NHAP_LIST.csv, ai chưa đăng ký, đối chiếu hai lần xuất List |
 | FA-M8 (IT giao diện, TH) | xong | 2026-11-12 | api_forms_bo.py, js/13_chuan_bi_bo.js, mau_forms_thi_clb/tao_mau_forms.py, mau_forms_thi_clb/bieu_mau.py, i18n.js, style.css | tests/test_fa_m8_bo_bieu_mau.py (28 ca), test_fa_m8_api.py (12 ca), test_giao_dien_fa_m8_bo.py (6 ca) | Bước 3: một zip biểu mẫu cho đường đã chọn, Phiếu CLB .docx, không tick đáp án trên Forms, XEM_LAI_DAP_AN.xlsx |
 | DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026) | xong | 2026-11-12 | docs/fable/01_PROJECT_CONTEXT.md, docs/fable/02_FABLE_BRIEF.md, CHANGELOG.md | — (chỉ tài liệu) | Bối cảnh dự án + giao việc nghiên cứu cho Fable |
+| FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
+| FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
+| FA-D7L (giảm may rủi) | chưa | | | | Điểm lẻ 0,1 tuỳ chọn, mặc định tắt |
