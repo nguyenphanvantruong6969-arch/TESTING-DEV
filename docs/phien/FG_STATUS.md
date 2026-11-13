@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 3: FG-8 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-9, wave gate 3, FINISH.
+- Wave 3: FG-9 delegated to a Sonnet worker (task start = HEAD after this commit); then wave gate 3, FINISH.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -23,7 +23,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-6 | DONE | (see Log) | test_fg6_ket_qua_nap (5), test_giao_dien_fg6_danh_sach_loi (2) |
 | FG-2 | DONE | 9db3039 | test_fg2_xem_truoc_fa (10) |
 | FG-7 | DONE (FIX1 d754dbd) | 8c8202c | test_fg7_bieu_mau_sau_ket_qua (16) |
-| FG-8 | TODO | | |
+| FG-8 | DONE | cd0b2df | test_fg8_goi_y_suc_khoe (2), test_giao_dien_fg8_cau_chu (6) |
 | FG-9 | TODO (KPI-link sub-bullet GONE-ON-HEAD) | | |
 
 ## Snapshots
@@ -54,7 +54,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-6 | session_01VfPzNru1AhpnZkxiBZ3HP2 | DONE, review GO |
 | FG-2 | session_01VfPzNs42szCLCJK8kCxfWR | DONE, review GO |
 | FG-7 | session_01VfPzNvLWfY7KLXz5Lj6S7P | DONE, review GO after FIX1 |
-| FG-8 | (creating) | |
+| FG-8 | session_01VfPzNukgBtxgvdTkP7cCJi | DONE, review GO |
+| FG-9 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -118,4 +119,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Red run before: tests/test_fg8_goi_y_suc_khoe.py 2 failed + tests/test_giao_dien_fg8_cau_chu.py 5 failed / 1 green guard (7 failed, 1 passed; Chromium ran). After: 8 passed; + test_van_phong_tu_nhien, test_ws_nhan, i18n sync/khoa, and 15 UI test files (wizard, health, appeals, feedback, FG-1/4/6, a13_11, t3) = all green. ruff clean; kiem_nhanh --co-so origin/main 7/7.
   - Mutation: summary always is-warn -> test_dong_tom_tat...[0-False] red; restored (git diff clean for that line).
   - Notes: tests/test_ws_nhan.py SUA_CO_Y extended for the intended health_panel_hint rewording (snapshot test). Hint text uses the real label "Nghiêm trọng"/"Serious" (an all-caps word trips the natural-wording test). forms_tep_sau_ket_qua text now names the group "Sau khi công bố kết quả" (vi+en), FA-M9 logic untouched. With one session the #knBuoi select is hidden and the appeals list drops the session label.
-
+- 2026-11-13T05:45Z lead: FG-8 review GO: health hint vi+en says 'Nghiêm trọng' items block the run, summary red only when n_high>0; wizard 4 boxes disabled+unticked while FA off; checkbox same line (CSS :has on .ws-truong, checkbox only); heading 'Sau khi công bố kết quả' shown when either panel is; hint line on the two import buttons; one-session workspace hides #knBuoi and the session label; forms_tep_sau_ket_qua text only (FA-M9 logic untouched); test_ws_nhan SUA_CO_Y records the intended rewording. 85 passed (fg8, van_phong, ws_nhan, ws_giao_dien).
