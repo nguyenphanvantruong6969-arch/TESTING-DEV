@@ -1,5 +1,74 @@
 # CHANGELOG
 
+## 2026-11-13 — FG FINISH: báo cáo, sổ sách, chạy thử người mới (chỉ tài liệu, TH)
+
+- `docs/phien/bao_cao_dem/2026-11-13_fg_sua.md`: bảng 9 mục FG-1…FG-9, test đã thêm, quyết định, mục GONE-ON-HEAD, "Chờ Truong", chạy thử người mới theo spec §5 (chế độ trình duyệt, không gian làm việc mới ngoài kho mã): bật 5 tính năng từ menu → nạp sổ mẫu FA 120 em → chạy → nạp tệp Forms sau kết quả MÔ PHỎNG hai lần: cùng số đếm (33 phản hồi, 3 khiếu nại), lần hai báo trùng. Không có lỗi mới. Phần "Vòng xanh" để lead điền.
+- `docs/ke_hoach/TIEN_DO.md`, `docs/phien/claude__forms-gop.md` (mục FG): ghi tiến độ. Không đổi mã sản xuất hay test.
+
+## 2026-11-13 — FG-9: thanh bên bỏ số thứ tự, thông báo "Tải sổ nhập mẫu" có nút "Mở thư mục" (TH)
+
+- `index.html` + `style.css`: bỏ 7 số 01–07 ở thanh bên (và luật `.nav-icon`); thứ tự thẻ không đổi.
+- `js/00_nen.js` (`showToast`): tuỳ chọn `hanhDong {nhan, khiBam, tooltip}` thêm một nút trong thông báo, đường dài nằm ở tooltip. `js/02_van_hanh.js` (`taiSoNhapMau`): câu thông báo bỏ đường dẫn (khoá mới `so_mau_da_tao_ngan`, vi+en trong `i18n.js`), nút "Mở thư mục" gọi `mo_thu_muc`; vẫn tự mở thư mục như trước (giữ hành vi gần hôm nay nhất); dòng phản hồi dưới vùng thả tệp vẫn có đường đầy đủ.
+- Chỉ số "chưa có chỗ nào · Cần xử lý" đã bấm được từ trước (test xanh, giữ).
+- Test cũ mở rộng sang trạng thái mới (không bỏ khẳng định): `test_giao_dien_a14_lop.py::test_thanh_ben_sau_khi_gop_va_bao_chua_co_ket_qua` (nhãn không mở đầu bằng số, đúng 7 thẻ theo thứ tự), `test_ws_so_nhap_giao_dien.py::_tai_mau` (chờ tooltip chứa .xlsx + nút "Mở thư mục" thay vì tên tệp trong câu).
+- Test: `tests/test_giao_dien_fg9_ux_nho.py` (3; 2 đỏ → xanh, thêm kiểm 7 nhãn không bắt đầu bằng số).
+
+## 2026-11-13 — FG-8: chữ gợi ý cảnh báo, bước 3 trình hướng dẫn, nhóm "Sau khi công bố kết quả", ẩn "Chưa chia buổi" (TH)
+
+- `i18n.js` + `index.html`: `health_panel_hint` (vi+en) nói mục "Nghiêm trọng" chặn việc chạy; `js/02_van_hanh.js`: dòng tóm tắt đỏ (`is-warn`) chỉ khi `n_high > 0`, còn lại trung tính (`style.css`).
+- `js/075_workspace.js` (`wsBuoc3`): bốn ô "Theo dõi sau khi xếp…" bị khoá và bỏ tick khi `wzFaDaa` tắt; `style.css`: ô tick cùng dòng nhãn (chỉ `.ws-truong` có checkbox).
+- `index.html` + `js/10_theo_doi.js` (`batKhung`): tiêu đề nhóm "Sau khi công bố kết quả" trước hai khung khiếu nại + phản hồi (hiện khi có khung hiện) và một dòng gợi ý nút nào cho biểu mẫu cũ/mới (`ph_goi_y_nut`); khi workspace chỉ có một buổi, ô chọn buổi ẩn và danh sách khiếu nại bỏ nhãn "Chưa chia buổi".
+- `i18n_errors.py` (vi+en) + `tao_i18n_js.py`: câu `forms_tep_sau_ket_qua` gọi đúng tên nhóm mới (logic FA-M9 không đổi). `tests/test_ws_nhan.py`: `SUA_CO_Y` ghi nhận chủ ý đổi chữ `health_panel_hint`.
+- Test: `tests/test_fg8_goi_y_suc_khoe.py` (2), `tests/test_giao_dien_fg8_cau_chu.py` (6) đỏ → xanh.
+
+## 2026-11-13 — FG-7: biểu mẫu "Sau khi xem kết quả" chỉ liệt kê ngày có CLB, tiêu đề riêng, hướng dẫn đúng đường menu (TH)
+
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--sau-ket-qua` nhận `--so-nhap-clb` (chỉ liệt kê ngày có CLB trong sổ qua `buoi_co_clb_trong_so_nhap`; không có thì như cũ); tiêu đề docx riêng "Phản hồi và báo lỗi sau khi xem kết quả" (`ghi_docx_chi_thi(..., tieu_de=)`); bước 4 hướng dẫn chỉ "Kiosk → Không gian làm việc → ⋯ → Tính năng sau khi xếp…" (không còn khoá cấu hình); bước 5 giải thích vì sao giữ `[mã]`/`(mã)`; `--help` bỏ mã nội bộ; in thư mục ra tuyệt đối ở dòng cuối. Chỉ đầu ra `--sau-ket-qua` và chữ `--help` đổi; `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--phan-hoi`, `--tuan-3` giữ từng byte (băm trong test).
+- Test: `tests/test_fg7_bieu_mau_sau_ket_qua.py` (5 đỏ → xanh; sửa lỗi test `c["ten"]` → `c["name"]`).
+
+## 2026-11-13 — FG-2: không gian FA cảnh báo ở bước xem trước, mẫu sổ FA và sổ mẫu 120 em (TH)
+
+- `api_nhap.py`: `_canh_bao_fa_xem_truoc` + `xem_truoc_so_nhap`: workspace bật FA-DAA thì chạy `fa_daa.kiem_truoc_fa` và `kiem_ho_so_huy_chuong` trên dữ liệu đã đọc từ sổ (cột FA vắng thì lấy giá trị đang lưu), gom theo mã lỗi: mỗi mã MỘT cảnh báo mang chính mã đó, `params` = `nhom: true`, `n`, `vd`; thêm một dòng `so_nhap_canh_bao_fa_se_loi` khi có lỗi chặn. Vẫn nhập được; `import_so_nhap` không đổi. Workspace không FA: không thêm gì.
+- `so_nhap.py`: `ghi_so_nhap(..., che_do_fa=False)`: True thì cột CLB có đủ 4 cột FA (Loại…), cột điểm quyết tâm có nhãn "Huy chương (60/30/10)" (danh sách thả xuống 60/30/10) và Hướng dẫn nói về huy chương (`_huong_dan_fa`). Bộ đọc nhận thêm tiêu đề "huy chuong" như "Điểm quyết tâm". Mặc định (không FA): sổ y như cũ (test băm). `api_xuat.tao_so_nhap_mau` truyền `che_do_fa=dung_fa_daa(...)`.
+- `i18n_errors.py` (vi+en) + `python tao_i18n_js.py`: 11 câu `<mã>_nhom` (chọn khi `params.nhom`) và `so_nhap_canh_bao_fa_se_loi`; `format_message` và `translateError` (`i18n.js`) dùng câu `_nhom`; thêm vào `MA_MOI_SAU_ANH_CHUP` (`tests/test_ws_nhan.py`).
+- `du_lieu_test/tao_so_nhap_fa_mau.py` (seed cố định) sinh `du_lieu_test/SO_NHAP_FA_MAU_120HS.xlsx`: 120 em, 2 buổi, mỗi buổi 1 CLB Tự do + 2 Giới hạn + 1 Tuyển chọn; MÔ PHỎNG, ghi rõ ở sheet "Hướng dẫn".
+- Test: `tests/test_fg2_xem_truoc_fa.py` (4 đỏ → xanh, thêm 4 test: câu chữ nhóm, không ghi CSDL, sổ mẫu tất định + ghi MÔ PHỎNG, hướng dẫn FA).
+
+## 2026-11-13 — FG-6: mỗi số một đơn vị, danh sách thay cho tường chữ (TH)
+
+- `api_sau_xep.py`: kết quả `nhap_phan_hoi_forms` và `nhap_sau_ket_qua_forms` thêm `hoc_sinh` (số học sinh có dòng/khiếu nại mới), `dong_bo_qua: [{dong, ly_do}]` (số dòng trong tệp + mã lý do); giữ khoá cũ `n_ket_qua`, `n_tuan_3`, `n_khieu_nai`, `bo_qua` vì test cũ còn đọc. Hàm `_tep_rong`: tệp không có dòng trả lời -> mã riêng `phan_hoi_tep_rong` (trước: "không phải tệp phản hồi"). `_chen_phan_hoi` trả thêm tập học sinh có dòng mới.
+- `i18n_errors.py` (vi+en) + `python tao_i18n_js.py`: `phan_hoi_tep_rong`; thêm vào `MA_MOI_SAU_ANH_CHUP` (`tests/test_ws_nhan.py`).
+- `js/10_theo_doi.js` (`ketQuaNapForms`): thông báo MỘT câu ("Đã nạp phản hồi của 3 học sinh, 1 khiếu nại mới."); khung `#phNhapKetQua` hiện `<ul>` theo lý do (dòng trùng, khiếu nại trùng, mã không khớp được liệt kê, dòng bỏ qua theo lý do, khiếu nại không nhận gom theo mã). `js/02_van_hanh.js` (`showLog`): lỗi cùng mã gom lại, tối đa 5 dòng mỗi mã rồi "và N lỗi nữa". `i18n.js` vi+en.
+- `js/00_nen.js` + `style.css`: dấu × của nút đóng thông báo vẽ bằng CSS (`::before`) để chữ thông báo không kèm "×".
+- Test: `tests/test_fg6_ket_qua_nap.py` (4 đỏ → xanh, 1 xanh sẵn), `tests/test_giao_dien_fg6_danh_sach_loi.py` (2 đỏ → xanh). Sửa 3 assert cũ theo spec (không nới): `test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py` (thêm khoá mới), `test_giao_dien_fa_m6b_sau_ket_qua.py` (thông báo giờ một câu; chi tiết s3 chuyển xuống danh sách).
+
+## 2026-11-13 — FG-5: mã học sinh gõ khác hoa/thường hay thừa khoảng trắng vẫn khớp (TH)
+
+- `fa_sau_xep.py`: `khop_ma_hoc_sinh(ma_go, tat_ca_ma)` (hàm thuần): khớp đúng thắng; không thì khớp `strip().casefold()` nếu đúng MỘT học sinh; mơ hồ/không có -> None. Mã đã lưu không đổi.
+- `api_sau_xep.py`: `_chen_phan_hoi` (đường `nhap_phan_hoi_forms` và nhánh phản hồi của `nhap_sau_ket_qua_forms`) và nhánh khiếu nại của `nhap_sau_ket_qua_forms` dùng hàm trên; cả hai kết quả thêm `ma_khong_khop` (mã gõ không khớp, theo thứ tự gặp, tối đa 20); giữ các khoá cũ (đổi hình dạng là FG-6).
+- Test: `tests/test_fg5_khop_ma.py` (6 đỏ → xanh); mở rộng 2 assert từ điển cũ (`test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py`) thêm khoá `ma_khong_khop`, không nới.
+
+## 2026-11-13 — FG-4: hai nút nạp tệp Forms dùng một hàm, có trạng thái bận (TH)
+
+- `js/10_theo_doi.js`: `napTepForms(nut, input, tenApi, khiXong)` thay hai bộ xử lý chép lại; nút khoá + nhãn "Đang nạp…" (`dang_nap`, vi+en trong `i18n.js`) khi gọi API, bấm lần hai không sinh yêu cầu mới, `.catch` hiện thông báo lỗi chung, `finally` luôn xoá ô tệp và mở lại nút.
+- Test: `tests/test_giao_dien_fg4_nut_nap.py` (2 đỏ → xanh, 2 đường lỗi giữ nguyên).
+
+## 2026-11-13 — FG-3: nạp lại cùng một tệp Forms không thêm gì (TH)
+
+- `api_sau_xep.py`: `_chen_phan_hoi` bỏ qua dòng trùng hệt `(student_id, nguon, loai, hai_long, hieu_ly_do, kho_nhat, con_di, muon_doi)` và đếm (trả thêm số dòng trùng); `_them_khieu_nai(..., tu_forms)`: khi dòng Forms có giờ hoàn thành thật, cùng `(student_id, buoi, created_at)` ở MỌI trạng thái = "đã nạp" (không phải lỗi, không sinh khiếu nại CHO mới). Khiếu nại gõ tay trên kiosk giữ luật cũ.
+- Kết quả `nhap_phan_hoi_forms` / `nhap_sau_ket_qua_forms` thêm `dong_moi`, `dong_trung` (và `khieu_nai_moi`, `khieu_nai_trung` ở đường sau kết quả); giữ khoá cũ (đổi hình dạng đầy đủ là FG-6).
+- Test: `tests/test_fg3_nap_lai.py` (5 đỏ → xanh); mở rộng 2 assert từ điển cũ trong `test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py` (thêm khoá, không nới).
+
+## 2026-11-13 — FG-1: bật/tắt tính năng sau khi xếp cho từng không gian làm việc (TH)
+
+- `js/075_workspace.js`: mục "Tính năng sau khi xếp…" trong menu ⋯ của dòng không gian làm việc (`wsMoTinhNang`): hộp thoại 5 ô
+  (`CO_SAU_XEP`) + số ngày khiếu nại (1–14), lưu qua `update_workspace_config` (chỉ các khoá này); lỗi hiện trong hộp thoại, hộp
+  vẫn mở; không có FA thì ô khoá kèm một dòng giải thích; lưu xong áp lại cấu hình và nạp lại thẻ chi tiết (không cần khởi động lại).
+  `wsHienOverlay`: màn chọn chỉ mang `role="dialog"` khi đang hiện (`index.html` bỏ role tĩnh).
+- `i18n.js` (vi + en): `ws_btn_tinh_nang`, `ws_tn_*`. Không đổi mã backend (máy chủ đã chặn cờ khi thiếu FA).
+- Test: `tests/test_giao_dien_fg1_bat_tinh_nang.py` (3 đỏ → xanh), `tests/test_fg1_bat_tinh_nang.py` (giữ); sửa
+  `tests/test_ws_giao_dien.py` (thứ tự menu thêm `tinh_nang`).
+
 ## 2026-11-13 — GIAM-MAY-RUI-KH (Truong yêu cầu 13/11/2026): kế hoạch giảm may rủi cho Sonnet (chỉ tài liệu)
 
 - `docs/ke_hoach/GIAM_MAY_RUI_KE_HOACH.md` (mới): FA-CT1 chia chỗ theo nhu cầu (gợi ý, không ghi chỉ tiêu), FA-CT2 "được thêm X chỗ thì thêm vào đâu" + nút xuất cho giáo viên, FA-D7L điểm lẻ 0,1 (tuỳ chọn, mặc định tắt; tập đạt điểm sàn giữ nguyên nhờ cắt bớt rồi làm tròn).

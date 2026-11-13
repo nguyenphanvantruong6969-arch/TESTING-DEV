@@ -370,6 +370,48 @@ class NhapDuLieuMixin:
                                 ten=", ".join(ngoai[:5])))
         return canh_bao, cap_thi, bo_nhom
 
+    def _canh_bao_fa_xem_truoc(self, du_lieu) -> list:
+        """FG-2: workspace FA-DAA — chạy `kiem_truoc_fa` và `kiem_ho_so_huy_chuong` trên dữ liệu ĐÃ
+        ĐỌC từ sổ (chưa nạp), gom theo mã lỗi: mỗi mã MỘT cảnh báo mang chính mã đó, `nhom=True`,
+        `n` = số mục trong nhóm, `vd` = mục đầu tiên. Cột FA vắng trong sổ thì lấy giá trị đang
+        lưu của CLB (đúng điều nạp sổ sẽ làm). Có lỗi CHẶN thì thêm một dòng nói lần chạy sẽ bị
+        chặn tới khi sửa. Không chặn nạp. Không FA -> []."""
+        if not dung_fa_daa(self._luat_nghiem()):
+            return []
+        with self._ket_noi_doc() as cur:
+            fa_clb, cap_db, _ = fa_daa.doc_du_lieu_fa(cur)
+        clubs = {}
+        for c in du_lieu["clubs"]:
+            cu = fa_clb.get(c["club_id"], {})
+            clubs[c["club_id"]] = {
+                "capacity": c["capacity"], "buoi": c.get("buoi") or BUOI_MAC_DINH,
+                **{k: (c[k] if k in c else cu.get(k)) for k in so_nhap.KHOA_FA}}
+        students = {s["student_id"]: {} for s in du_lieu["students"]}
+        prefs = {s["student_id"]: [x["club_id"] for x in s["nv"]] for s in du_lieu["students"]}
+        huy: dict = {}
+        for s in du_lieu["students"]:
+            for x in s["nv"]:
+                w = x.get("diem_w")
+                if w in (None, ""):
+                    continue
+                if isinstance(w, str) and re.fullmatch(r"[0-9]+", w.strip()):
+                    w = int(w.strip())
+                huy.setdefault(s["student_id"], {})[x["club_id"]] = w
+        cap = du_lieu["giu_cho"] if "giu_cho" in du_lieu else cap_db
+        loi = (fa_daa.kiem_truoc_fa(clubs, cap, students, prefs)
+               + fa_daa.kiem_ho_so_huy_chuong(prefs, huy, clubs))
+        nhom: dict = {}
+        for e in loi:
+            nhom.setdefault(e["code"], []).append(e)
+        ra = []
+        for ma, ds in nhom.items():
+            p = ds[0]["params"]
+            vd = p.get("club_id") or p.get("student_id") or p.get("buoi") or ""
+            ra.append(err(ma, nhom=True, n=len(ds), vd=str(vd)))
+        if any(ma not in fa_daa.MA_CANH_BAO for ma in nhom):
+            ra.append(err("so_nhap_canh_bao_fa_se_loi"))
+        return ra
+
     def xem_truoc_so_nhap(self, file_base64: str):
         """Đọc sổ và tóm tắt, KHÔNG ghi gì vào CSDL.
 
@@ -383,6 +425,8 @@ class NhapDuLieuMixin:
             kq = so_nhap.tom_tat(du_lieu)
             kq["loi"] = du_lieu["loi"]
             kq["canh_bao"] = [] if du_lieu["loi"] else self._canh_bao_so_nhap(du_lieu)[0]
+            if not du_lieu["loi"]:
+                kq["canh_bao"] += self._canh_bao_fa_xem_truoc(du_lieu)
             # Workspace chưa bật điểm Wharton mà sổ có cột "Điểm W k": nói trước khi bấm Nhập
             # rằng các ô đó sẽ bị bỏ qua (lúc nhập thật, bước nạp CSV cũng báo đúng câu này).
             if not du_lieu["loi"] and not dung_wharton(self._luat_nghiem()):

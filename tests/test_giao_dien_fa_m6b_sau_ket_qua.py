@@ -54,8 +54,10 @@ def test_nap_tep_gop_hien_so_dem_va_mot_khieu_nai(mo):  # noqa: F811
     page.set_input_files("#phTepSauKetQua", duong)
     page.wait_for_selector(".toast")
     chu = page.locator(".toast").first.inner_text()
-    assert "3 phản hồi" in chu and "1 khiếu nại" in chu, chu
-    assert "s3" in chu                                         # khiếu nại quá hạn được liệt kê trong thông báo
+    assert "3 học sinh" in chu and "1 khiếu nại mới" in chu, chu     # FG-6: thông báo là MỘT câu
+    assert chu.count(".") == 1 and "s3" not in chu, chu
+    page.wait_for_selector("#phNhapKetQua ul li")
+    assert "s3" in page.locator("#phNhapKetQua").inner_text()      # khiếu nại quá hạn được liệt kê trong danh sách
     page.wait_for_function("() => document.getElementById('knDanhSach').textContent.includes('Điểm thi nhập sai')")
     assert page.locator("#knDanhSach li").count() == 1
     page.locator('[data-tab="others"]').click()

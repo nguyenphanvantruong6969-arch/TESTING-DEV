@@ -25,6 +25,10 @@
 function batKhung(idKhung, res) {
   const bat = !!(res && res.ok && res.data.bat);
   el(idKhung).hidden = !bat;
+  if (idKhung === "khieuNaiPanel" || idKhung === "phanHoiTongPanel") {
+    /* Một tiêu đề nhóm chung cho hai khung: hiện khi ít nhất một khung đang hiện. */
+    el("sauCongBoTieuDe").hidden = el("khieuNaiPanel").hidden && el("phanHoiTongPanel").hidden;
+  }
   if (res && !res.ok) showErrorToast(res.errors);
   return bat;
 }
@@ -133,6 +137,7 @@ function taiMoi() {
 }
 
 let knSoNgay = 3;
+let knMotBuoi = false;
 
 function veKhieuNai(d) {
   knSoNgay = d.so_ngay;
@@ -140,10 +145,13 @@ function veKhieuNai(d) {
   const chon = el("knBuoi");
   const cu = chon.value;
   clear(chon);
+  /* Chỉ một buổi: nhãn "Chưa chia buổi" vô nghĩa với người dùng → ẩn ô chọn và bỏ nhãn khỏi danh sách. */
+  knMotBuoi = d.ds_buoi.length <= 1;
+  chon.hidden = knMotBuoi;
   d.ds_buoi.forEach((b) => {
     const o = document.createElement("option");
     o.value = b;
-    o.textContent = nhanBuoi(b);
+    o.textContent = knMotBuoi && b === BUOI_MAC_DINH ? "" : nhanBuoi(b);
     chon.appendChild(o);
   });
   if (d.ds_buoi.includes(cu)) chon.value = cu;
@@ -158,7 +166,10 @@ function veKhieuNai(d) {
   }
   d.khieu_nai.forEach((k) => {
     const li = document.createElement("li");
-    let chu = t("kn_dong", { name: k.name, student_id: k.student_id, buoi: nhanBuoi(k.buoi), ghi_chu: k.ghi_chu || "" })
+    let chu = knMotBuoi && (!k.buoi || k.buoi === BUOI_MAC_DINH)
+      ? k.name + " (" + k.student_id + ")" + (k.ghi_chu ? ": " + k.ghi_chu : "")
+      : t("kn_dong", { name: k.name, student_id: k.student_id, buoi: nhanBuoi(k.buoi), ghi_chu: k.ghi_chu || "" });
+    chu = chu
       + " — " + t("kn_trang_thai_" + k.trang_thai);
     if (k.trang_thai === "CHAP_NHAN") {
       chu += " (" + (k.da_chay_lai ? t("kn_da_chay_lai", { n: k.dieu_chinh_cu.length }) : t("kn_can_chay_lai")) + ")";
@@ -257,6 +268,46 @@ function taiPhanHoi() {
   });
 }
 
+/* FG-4: MỘT hàm cho hai nút nạp tệp Forms. Nút khoá + nhãn "Đang nạp…" trong lúc chạy; lỗi API (kể cả mạng) ->
+   một thông báo chung, không có lỗi JS chưa bắt; `finally` luôn xoá ô tệp và mở lại nút. */
+function napTepForms(nut, input, tenApi, khiXong) {
+  nut.addEventListener("click", () => { if (!nut.disabled) input.click(); });
+  input.addEventListener("change", () => {
+    const tep = input.files && input.files[0];
+    if (!tep || nut.disabled) {
+      input.value = "";
+      return;
+    }
+    const chuGoc = nut.textContent;
+    nut.disabled = true;
+    nut.textContent = t("dang_nap");
+    const xong = () => {
+      input.value = "";
+      nut.textContent = chuGoc;
+      nut.disabled = false;
+    };
+    const doc = new FileReader();
+    doc.onerror = () => {
+      showToast(t("loi_giao_dien_ngoai_du_kien"), "error");
+      xong();
+    };
+    doc.onload = () => {
+      Promise.resolve()
+        .then(() => callApi(tenApi, bufferSangBase64(doc.result)))
+        .then((res) => {
+          if (!res.ok) {
+            showErrorToast(res.errors);
+            return null;
+          }
+          return khiXong(res.data);
+        })
+        .catch(() => showToast(t("loi_giao_dien_ngoai_du_kien"), "error"))
+        .finally(xong);
+    };
+    doc.readAsArrayBuffer(tep);
+  });
+}
+
 function khoiTaoPhanHoi() {
   [["ph-hai-long", "hai_long"], ["ph-hieu", "hieu"], ["ph-kho", "kho"]].forEach(([lop, khoa]) => {
     document.querySelectorAll("#phanHoiPanel button." + lop).forEach((b) => {
@@ -293,54 +344,51 @@ function khoiTaoPhanHoi() {
     chayXuat([["xuat_muc_phan_hoi", "export_phan_hoi", [""],
       (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]], el("phNhapKetQua"));
   });
-  el("btnNhapPhanHoi").addEventListener("click", () => el("phTep").click());
-  el("phTep").addEventListener("change", (e) => {
-    const tep = e.target.files && e.target.files[0];
-    if (!tep) return;
-    const doc = new FileReader();
-    doc.onload = () => {
-      callApi("nhap_phan_hoi_forms", bufferSangBase64(doc.result)).then((res) => {
-        e.target.value = "";
-        if (!res.ok) {
-          showErrorToast(res.errors);
-          return;
-        }
-        el("phNhapKetQua").textContent = t("ph_nhap_xong", { n: res.data.n_ket_qua, m: res.data.n_tuan_3,
-          b: res.data.bo_qua });
-        taiPhanHoi();
-      });
-    };
-    doc.readAsArrayBuffer(tep);
+  napTepForms(el("btnNhapPhanHoi"), el("phTep"), "nhap_phan_hoi_forms", (d) => {
+    ketQuaNapForms(d, null);
+    return taiPhanHoi();
   });
-  /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại) -> một thông báo có số đếm và các khiếu nại không nhận. */
-  el("btnNhapSauKetQua").addEventListener("click", () => el("phTepSauKetQua").click());
-  el("phTepSauKetQua").addEventListener("change", (e) => {
-    const tep = e.target.files && e.target.files[0];
-    if (!tep) return;
-    const doc = new FileReader();
-    doc.onload = () => {
-      callApi("nhap_sau_ket_qua_forms", bufferSangBase64(doc.result)).then((res) => {
-        e.target.value = "";
-        if (!res.ok) {
-          showErrorToast(res.errors);
-          return;
-        }
-        const d = res.data;
-        const dongLoi = (d.khieu_nai_loi || []).map((x) => {
-          const buoi = nhanBuoi(x.buoi);
-          return t("ssk_loi_dong", { student_id: x.student_id, buoi, loi: trErr({ code: x.code,
-            params: { student_id: x.student_id, buoi, so_ngay: knSoNgay } }) });
-        });
-        const canhBao = (d.canh_bao || []).map(trErr);
-        const chu = [t("ssk_nap_xong", { n: d.n_ket_qua, m: d.n_khieu_nai, b: d.bo_qua })]
-          .concat(dongLoi, canhBao).join(" ");
-        el("phNhapKetQua").textContent = chu;
-        showToast(chu, dongLoi.length || canhBao.length ? "warn" : "success");
-        taiPhanHoi().then(taiKhieuNai);
-      });
-    };
-    doc.readAsArrayBuffer(tep);
+  /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại). FG-6: toast MỘT câu, chi tiết thành danh sách. */
+  napTepForms(el("btnNhapSauKetQua"), el("phTepSauKetQua"), "nhap_sau_ket_qua_forms", (d) => {
+    ketQuaNapForms(d, "sau");
+    return taiPhanHoi().then(taiKhieuNai);
   });
+}
+
+/* FG-6: một câu cho thông báo, danh sách `<ul>` theo lý do cho khung dưới nút (mã không khớp được liệt kê). */
+function ketQuaNapForms(d, loai) {
+  const khung = el("phNhapKetQua");
+  const muc = [];
+  if (d.dong_trung) muc.push(t("ssk_li_trung", { n: d.dong_trung }));
+  if (d.khieu_nai_trung) muc.push(t("ssk_li_kn_trung", { n: d.khieu_nai_trung }));
+  if ((d.ma_khong_khop || []).length) muc.push(t("ssk_li_ma_la", { n: d.ma_khong_khop.length, ds: d.ma_khong_khop.join(", ") }));
+  const theoLyDo = new Map();
+  (d.dong_bo_qua || []).forEach((x) => theoLyDo.set(x.ly_do, (theoLyDo.get(x.ly_do) || []).concat(x.dong)));
+  theoLyDo.forEach((dongs, ly) => muc.push(t("ssk_li_bo_qua", { n: dongs.length, ly: t("ssk_ly_" + ly), ds: dongs.join(", ") })));
+  const theoMa = new Map();
+  (d.khieu_nai_loi || []).forEach((x) => theoMa.set(x.code, (theoMa.get(x.code) || []).concat(x)));
+  theoMa.forEach((cac, code) => {
+    const ds = cac.map((x) => x.student_id + " (" + nhanBuoi(x.buoi) + ")").join(", ");
+    muc.push(t("ssk_li_kn_loi", { n: cac.length, ds, loi: trErr({ code, params: {
+      student_id: cac.map((x) => x.student_id).join(", "), buoi: nhanBuoi(cac[0].buoi), so_ngay: knSoNgay } }) }));
+  });
+  (d.canh_bao || []).forEach((e) => muc.push(trErr(e)));
+  const cau = loai === "sau" ? t("ssk_nap_xong", { hs: d.hoc_sinh, kn: d.khieu_nai_moi })
+    : t("ph_nhap_xong", { hs: d.hoc_sinh });
+  clear(khung);
+  const p = document.createElement("div");
+  p.textContent = cau;
+  khung.appendChild(p);
+  if (muc.length) {
+    const ul = document.createElement("ul");
+    muc.forEach((chu) => {
+      const li = document.createElement("li");
+      li.textContent = chu;
+      ul.appendChild(li);
+    });
+    khung.appendChild(ul);
+  }
+  showToast(cau, muc.length ? "warn" : "success");
 }
 
 /* GAP-8: giá trị một chỉ số — tỉ lệ thành %, số đếm giữ nguyên, None -> "chưa có dữ liệu" (không bao giờ 0). */

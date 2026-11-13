@@ -81,7 +81,8 @@ function loadHealthReport() {
       return;
     }
 
-    summary.className = "health-summary is-warn";
+    /* Đỏ chỉ khi có mục NGHIÊM TRỌNG (mục đó chặn việc chạy); còn lại để trung tính. */
+    summary.className = d.n_high > 0 ? "health-summary is-warn" : "health-summary";
     summary.textContent = t("health_summary", { n: d.n_warnings, n_high: d.n_high });
 
     const SEV_LABEL = {
@@ -395,6 +396,7 @@ const MA_LOI_HO_SO_WHARTON = [
   "wharton_ngoai_tap", "wharton_tang_lech", "wharton_nguyen_vong_chua_xep",
 ];
 const LOG_SO_EM_TOI_DA = 5;
+const LOG_SO_LOI_MOI_MA = 5;
 
 /* Tách `errors` thành {khac: lỗi thường, em: [[sid, [lỗi]]] theo mã tăng dần, gop: có gộp không}. */
 function tachLoiWharton(errors) {
@@ -457,7 +459,15 @@ function showLog(errors) {
     if (loi) ganChiTietKyThuat(dong, [loi]);
     box.appendChild(dong);
   };
-  khac.forEach((e) => them(trErr(e), "", e));
+  /* FG-6: lỗi cùng mã gom lại, tối đa LOG_SO_LOI_MOI_MA dòng mỗi mã rồi "và N lỗi nữa". */
+  const dem = {};
+  khac.forEach((e) => {
+    dem[e.code] = (dem[e.code] || 0) + 1;
+    if (dem[e.code] <= LOG_SO_LOI_MOI_MA) them(trErr(e), "", e);
+  });
+  Object.keys(dem).forEach((ma) => {
+    if (dem[ma] > LOG_SO_LOI_MOI_MA) them(t("log_loi_nua", { m: dem[ma] - LOG_SO_LOI_MOI_MA }), "log-tom-tat");
+  });
   if (!em.length) return;
   them(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }), "log-tom-tat");
   em.slice(0, LOG_SO_EM_TOI_DA).forEach(([sid, loi]) => {
@@ -818,11 +828,14 @@ function taiSoNhapMau() {
       feedbackErrors(el("feedbackImportAll"), res.errors);
       return;
     }
-    const cau = t("so_mau_da_tao", { path: res.data.path, n: res.data.n_clubs }) +
-      (res.data.n_ten_doi ? "\n" + t("xuat_kq_ten_doi", { n: res.data.n_ten_doi }) : "");
+    const phu = res.data.n_ten_doi ? "\n" + t("xuat_kq_ten_doi", { n: res.data.n_ten_doi }) : "";
+    const cau = t("so_mau_da_tao", { path: res.data.path, n: res.data.n_clubs }) + phu;
     feedback(el("feedbackImportAll"), cau, false);
-    showToast(cau, "success");
-    callApi("mo_thu_muc", res.data.path);
+    /* FG-9: thong bao ngan (khong kem duong dan); duong day du o tooltip, nut "Mo thu muc". Van tu mo thu muc nhu truoc. */
+    const moThuMuc = () => callApi("mo_thu_muc", res.data.path);
+    showToast(t("so_mau_da_tao_ngan", { n: res.data.n_clubs }) + phu, "success",
+      { hanhDong: { nhan: t("btn_mo_thu_muc"), khiBam: moThuMuc, tooltip: res.data.path } });
+    moThuMuc();
   });
 }
 

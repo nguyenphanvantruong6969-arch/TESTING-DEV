@@ -16,6 +16,11 @@ from rbda_priority_pipeline import BUOI_MAC_DINH, dung_fa_daa, khoa_sap_buoi
 CHU_TRANG_THAI = {"CO_MAT": "Có mặt", "VANG_CO_PHEP": "Vắng có phép", "VANG_KHONG_PHEP": "Vắng không phép"}
 
 
+def _tep_rong(hang) -> bool:
+    """FG-6: tệp xuất Forms không có dòng trả lời nào (không có hàng nào, hoặc chỉ có hàng tiêu đề)."""
+    return not any(any(o not in (None, "") for o in r) for r in list(hang)[1:])
+
+
 class SauXepMixin:
 
     def _co_diem_danh(self) -> bool:
@@ -236,12 +241,16 @@ class SauXepMixin:
             k.update(anh.get(k["id"], {"da_chay_lai": False, "dieu_chinh_cu": []}))
         return ds
 
-    def _them_khieu_nai(self, cur, student_id, buoi, ghi_chu, luc, so_ngay, run_goc=None):
+    def _them_khieu_nai(self, cur, student_id, buoi, ghi_chu, luc, so_ngay, run_goc=None, tu_forms=False):
         """Kiểm và ghi MỘT khiếu nại (dùng chung cho `gui_khieu_nai` và `nhap_sau_ket_qua_forms`).
 
         `luc` = lúc em gửi (datetime). Trả (id, None) nếu ghi, hoặc (None, lỗi có cấu trúc) với một trong
         khieu_nai_khong_hop_le / khieu_nai_qua_han / khieu_nai_trung. Không tự commit."""
         run_goc = sx.run_goc_theo_buoi(cur) if run_goc is None else run_goc
+        if tu_forms and cur.execute(          # FG-3: giờ Forms thật, đã nạp (mọi trạng thái) -> không phải lỗi
+                "SELECT 1 FROM fa_khieu_nai WHERE student_id = ? AND buoi = ? AND created_at = ?",
+                (student_id, buoi, luc.strftime("%Y-%m-%d %H:%M:%S"))).fetchone():
+            return None, {"code": "khieu_nai_da_nap", "params": {}}
         co = cur.execute("SELECT 1 FROM match_results WHERE student_id = ? AND buoi = ?",
                          (student_id, buoi)).fetchone()
         if not co or buoi not in run_goc:
@@ -474,14 +483,24 @@ class SauXepMixin:
 
     def _chen_phan_hoi(self, cur, dong, luc=None):
         """Ghi các dòng phản hồi đã đọc từ tệp Forms (nguồn 'forms'); mã học sinh không có trong CSDL bị bỏ.
-        Trả ({loai: số dòng đã ghi}, tập mã bị bỏ). Không tự commit."""
+        Dòng trùng hệt một dòng đã có (FG-3) bị bỏ qua và đếm. Mã gõ khớp mềm (FG-5). Trả ({loai: số dòng đã ghi}, mã gõ bị bỏ theo thứ tự, số dòng trùng, {học sinh có dòng mới}).
+        Không tự commit."""
         luc = luc or datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         dem = {"ket_qua": 0, "tuan_3": 0}
-        bo_qua = set()
-        co = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+        bo_qua, trung, em_moi = {}, 0, set()            # dict: giữ thứ tự gặp đầu tiên (FG-5)
+        co = [r[0] for r in cur.execute("SELECT student_id FROM students")]
         for d in dong:
-            if d["student_id"] not in co:
-                bo_qua.add(d["student_id"])
+            ma = sx.khop_ma_hoc_sinh(d["student_id"], co)
+            if ma is None:
+                bo_qua[d["student_id"]] = None
+                continue
+            d = dict(d, student_id=ma)
+            if cur.execute(
+                    "SELECT 1 FROM fa_phan_hoi WHERE student_id = ? AND nguon = 'forms' AND loai = ? AND hai_long IS ? "
+                    "AND hieu_ly_do IS ? AND kho_nhat IS ? AND con_di IS ? AND muon_doi IS ?",
+                    (d["student_id"], d["loai"], d["hai_long"], d["hieu_ly_do"], d["kho_nhat"], d["con_di"],
+                     d["muon_doi"])).fetchone():
+                trung += 1
                 continue
             cur.execute(
                 "INSERT INTO fa_phan_hoi (created_at, student_id, nguon, loai, hai_long, hieu_ly_do, "
@@ -489,7 +508,8 @@ class SauXepMixin:
                 (luc, d["student_id"], d["loai"], d["hai_long"], d["hieu_ly_do"], d["kho_nhat"],
                  d["con_di"], d["muon_doi"]))
             dem[d["loai"]] += 1
-        return dem, bo_qua
+            em_moi.add(d["student_id"])
+        return dem, bo_qua, trung, em_moi
 
     def nhap_phan_hoi_forms(self, file_base64: str):
         """GAP-5/6 (TH): nạp tệp Excel xuất từ biểu mẫu phản hồi / khảo sát tuần 3. Mã học sinh lạ bị bỏ (đếm)."""
@@ -504,14 +524,19 @@ class SauXepMixin:
             try:
                 wb = load_workbook(io.BytesIO(base64.b64decode(file_base64, validate=True)), read_only=True,
                                    data_only=True)
-                dong = sx.doc_tep_forms_phan_hoi(wb.worksheets[0].iter_rows(values_only=True))
+                hang = [list(r) for r in wb.worksheets[0].iter_rows(values_only=True)]
+                if _tep_rong(hang):
+                    return _fail(err("phan_hoi_tep_rong"))
+                dong = sx.doc_tep_forms_phan_hoi(hang)
             except (ValueError, binascii.Error, OSError, KeyError, IndexError) as e:
                 return _fail(err("phan_hoi_tep_sai", detail=str(e)))
             except Exception as e:                     # zipfile.BadZipFile, InvalidFileException…
                 return _fail(err("phan_hoi_tep_sai", detail=type(e).__name__))
             with self._ket_noi_ghi() as cur:
-                dem, bo_qua = self._chen_phan_hoi(cur, dong)
-            return _ok({"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua)})
+                dem, bo_qua, trung, em_moi = self._chen_phan_hoi(cur, dong)
+            return _ok({"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua),
+                        "hoc_sinh": len(em_moi), "ma_khong_khop": list(bo_qua)[:20],
+                        "dong_moi": dem["ket_qua"] + dem["tuan_3"], "dong_trung": trung, "dong_bo_qua": []})
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -536,6 +561,8 @@ class SauXepMixin:
                 wb = load_workbook(io.BytesIO(base64.b64decode(file_base64, validate=True)), read_only=True,
                                    data_only=True)
                 hang = [list(r) for r in wb.worksheets[0].iter_rows(values_only=True)]
+                if _tep_rong(hang):
+                    return _fail(err("phan_hoi_tep_rong"))
                 dong = sx.doc_tep_forms_phan_hoi(hang) if bat_ph else []
             except (ValueError, binascii.Error, OSError, KeyError, IndexError) as e:
                 return _fail(err("phan_hoi_tep_sai", detail=str(e)))
@@ -546,11 +573,11 @@ class SauXepMixin:
                 canh_bao.append(err("fa_phan_hoi_chua_bat"))
             if not bat_kn:
                 canh_bao.append(err("fa_khieu_nai_chua_bat"))
-            khieu_nai_loi, n_khieu_nai, bo_qua_dong = [], 0, 0
+            khieu_nai_loi, n_khieu_nai, bo_qua_dong, kn_trung, dong_trung = [], 0, [], 0, 0
             with self._ket_noi_ghi() as cur:
-                n_ket_qua, bo_qua = 0, set()
+                n_ket_qua, bo_qua, em_moi = 0, {}, set()
                 if bat_ph:
-                    dem, bo_qua = self._chen_phan_hoi(cur, dong)
+                    dem, bo_qua, dong_trung, em_moi = self._chen_phan_hoi(cur, dong)
                     n_ket_qua = dem["ket_qua"] + dem["tuan_3"]
                 if bat_kn:
                     hop_le = {r[0] for r in cur.execute("SELECT DISTINCT buoi FROM match_results")}
@@ -562,28 +589,35 @@ class SauXepMixin:
                         if not bat_ph:                      # chỉ nhận khiếu nại mà tệp không có phần khiếu nại
                             return _fail(err("phan_hoi_tep_sai", detail=str(e)))
                         yeu_cau, bo_dong = [], []           # tệp ba câu cũ: không có nhánh khiếu nại
-                    bo_qua_dong = len(bo_dong)
-                    co = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+                    bo_qua_dong = [{"dong": so, "ly_do": ly_do} for so, _ma, ly_do in bo_dong]
+                    co = [r[0] for r in cur.execute("SELECT student_id FROM students")]
                     run_goc = sx.run_goc_theo_buoi(cur)
                     thieu_gio = False
                     for y in yeu_cau:
-                        if y["student_id"] not in co:
-                            bo_qua.add(y["student_id"])
+                        ma = sx.khop_ma_hoc_sinh(y["student_id"], co)
+                        if ma is None:
+                            bo_qua[y["student_id"]] = None
                             continue
+                        y = dict(y, student_id=ma)
                         luc = y["luc"]
                         if luc is None:
                             luc, thieu_gio = sx.bay_gio(), True
                         id_kn, loi = self._them_khieu_nai(cur, y["student_id"], y["buoi"], y["ghi_chu"], luc,
-                                                          so_ngay, run_goc)
-                        if loi:
+                                                          so_ngay, run_goc, tu_forms=y["luc"] is not None)
+                        if loi and loi["code"] == "khieu_nai_da_nap":
+                            kn_trung += 1
+                        elif loi:
                             khieu_nai_loi.append({"student_id": y["student_id"], "buoi": y["buoi"],
                                                   "code": loi["code"]})
                         else:
                             n_khieu_nai += 1
+                            em_moi.add(y["student_id"])
                     if thieu_gio:
                         canh_bao.append(err("khieu_nai_khong_co_gio_forms"))
-            return _ok({"n_ket_qua": n_ket_qua, "n_khieu_nai": n_khieu_nai, "bo_qua": len(bo_qua) + bo_qua_dong,
-                        "khieu_nai_loi": khieu_nai_loi, "canh_bao": canh_bao})
+            return _ok({"n_ket_qua": n_ket_qua, "n_khieu_nai": n_khieu_nai, "bo_qua": len(bo_qua) + len(bo_qua_dong),
+                        "hoc_sinh": len(em_moi), "ma_khong_khop": list(bo_qua)[:20], "dong_moi": n_ket_qua,
+                        "dong_trung": dong_trung, "dong_bo_qua": bo_qua_dong, "khieu_nai_moi": n_khieu_nai,
+                        "khieu_nai_trung": kn_trung, "khieu_nai_loi": khieu_nai_loi, "canh_bao": canh_bao})
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:

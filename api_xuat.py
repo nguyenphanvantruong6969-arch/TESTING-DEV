@@ -1350,7 +1350,8 @@ class XuatKetQuaMixin:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
             so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
                                  luon_co_cot_w=True,       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
-                                 co_lop=True)              # và cột Lớp (A14, đã duyệt)
+                                 co_lop=True,              # và cột Lớp (A14, đã duyệt)
+                                 che_do_fa=dung_fa_daa(self._luat_nghiem()))   # FG-2 (D3)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except LoiDuongXuat as e:

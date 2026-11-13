@@ -685,6 +685,56 @@ MESSAGES = {
         "vi": "{student_id}: CLB {club_id} là CLB Tự do nên không nhận huy chương.",
         "en": "{student_id}: club {club_id} is a Free club, so it can't take a medal.",
     },
+    # --- FG-2: cảnh báo FA ở bước xem trước sổ, gom theo mã. Chọn khi params.nhom = true; n = số mục,
+    # vd = mục đầu tiên. Mã gốc (không đuôi _nhom) vẫn là câu cho MỘT mục khi chạy xếp. ---
+    "fa_thieu_clb_tu_do_nhom": {
+        "vi": "{n} buổi chưa có CLB loại Tự do (ví dụ: {vd}). Mỗi buổi cần ít nhất một CLB Tự do.",
+        "en": "{n} session(s) have no Free club (for example: {vd}). Each session needs at least one Free club.",
+    },
+    "fa_clb_thieu_loai_nhom": {
+        "vi": "{n} CLB chưa có Loại (ví dụ: {vd}).",
+        "en": "{n} club(s) have no Type yet (for example: {vd}).",
+    },
+    "fa_clb_thieu_suc_chua_nhom": {
+        "vi": "{n} CLB Giới hạn hoặc Tuyển chọn cần chỉ tiêu lớn hơn 0 (ví dụ: {vd}).",
+        "en": "{n} Limited or Selective club(s) need a seat count above 0 (for example: {vd}).",
+    },
+    "fa_clb_thieu_diem_san_nhom": {
+        "vi": "{n} CLB Tuyển chọn chưa có điểm sàn (ví dụ: {vd}).",
+        "en": "{n} Selective club(s) have no pass mark yet (for example: {vd}).",
+    },
+    "fa_giu_cho_vuot_suc_chua_nhom": {
+        "vi": "{n} CLB giữ chỗ nhiều hơn chỉ tiêu (ví dụ: {vd}).",
+        "en": "{n} club(s) reserve more seats than their seat count (for example: {vd}).",
+    },
+    "fa_giu_cho_hoc_sinh_la_nhom": {
+        "vi": "{n} dòng giữ chỗ sẽ bị bỏ qua vì không có học sinh đó (ví dụ: {vd}).",
+        "en": "{n} reserved-seat row(s) will be ignored because the student doesn't exist (for example: {vd}).",
+    },
+    "fa_giu_cho_khong_xep_clb_nhom": {
+        "vi": "{n} dòng giữ chỗ sẽ bị bỏ qua vì học sinh chưa xếp CLB đó trong nguyện vọng (ví dụ: {vd}).",
+        "en": "{n} reserved-seat row(s) will be ignored because the student didn't rank that club (for example: {vd}).",
+    },
+    "fa_huy_chuong_gia_tri_sai_nhom": {
+        "vi": "{n} ô huy chương không phải 60/30/10 (ví dụ: {vd}).",
+        "en": "{n} medal cell(s) are not 60/30/10 (for example: {vd}).",
+    },
+    "fa_huy_chuong_trung_gia_tri_nhom": {
+        "vi": "{n} trường hợp một học sinh dùng cùng một huy chương hai lần trong một buổi (ví dụ: {vd}).",
+        "en": "{n} case(s) of a student using the same medal twice in one session (for example: {vd}).",
+    },
+    "fa_huy_chuong_ngoai_nguyen_vong_nhom": {
+        "vi": "{n} huy chương đặt ở CLB không nằm trong nguyện vọng (ví dụ: {vd}).",
+        "en": "{n} medal(s) placed on a club that isn't in the student's choices (for example: {vd}).",
+    },
+    "fa_huy_chuong_clb_tu_do_nhom": {
+        "vi": "{n} huy chương đặt ở CLB Tự do, nơi không nhận huy chương (ví dụ: {vd}).",
+        "en": "{n} medal(s) placed on a Free club, which takes no medals (for example: {vd}).",
+    },
+    "so_nhap_canh_bao_fa_se_loi": {
+        "vi": "Không gian làm việc đang ở chế độ FA-DAA: vẫn nhập được sổ này, nhưng lần chạy xếp sẽ bị chặn cho tới khi sửa xong các mục trên (sửa CLB ở Quản lý, hoặc sửa sổ rồi nhập lại).",
+        "en": "This workspace uses FA-DAA: the workbook can still be imported, but the allocation run will be blocked until the items above are fixed (edit clubs in Manage, or fix the workbook and import it again).",
+    },
     # --- FA-DAA (FA-4): chạy ---
     "fa_diem_bo_qua": {
         "vi": "CLB {club_id} (Giới hạn) không xét điểm thi: {n} điểm thi đã được bỏ qua khi xếp.",
@@ -753,6 +803,10 @@ MESSAGES = {
     "phan_hoi_tep_sai": {
         "vi": "Tệp này không phải tệp xuất của biểu mẫu phản hồi (không thấy cột mã {person_l} và câu hỏi phản hồi).",
         "en": "This file isn't an export of the feedback form (no {person} ID column or feedback question).",
+    },
+    "phan_hoi_tep_rong": {
+        "vi": "Tệp này không có câu trả lời nào (chỉ có hàng tiêu đề hoặc trống). Hãy xuất lại từ biểu mẫu sau khi có người nộp.",
+        "en": "This file has no responses (it is empty or only has the header row). Export it again once someone has submitted.",
     },
     "fa_khieu_nai_chua_bat": {
         "vi": "Không gian làm việc này chưa bật nhận khiếu nại sau khi xếp.",
@@ -1244,8 +1298,8 @@ MESSAGES = {
         "en": "File \"{ten}\" isn't used on path {duong}. Check that the right path is chosen.",
     },
     "forms_tep_sau_ket_qua": {
-        "vi": "Tệp \"{ten}\" là biểu mẫu Sau khi xem kết quả, không nạp ở bước này. Hãy nạp nó ở khung Phản hồi sau khi xếp.",
-        "en": "File \"{ten}\" is the After-results form; it isn't loaded in this step. Load it in the Feedback panel after allocation.",
+        "vi": "Tệp \"{ten}\" là biểu mẫu Sau khi xem kết quả, không nạp ở bước này. Hãy nạp nó ở nhóm \"Sau khi công bố kết quả\" sau khi xếp.",
+        "en": "File \"{ten}\" is the After-results form; it isn't loaded in this step. Load it in the \"After the results are published\" group after allocation.",
     },
     "forms_can_chon_de": {
         "vi": "Tệp \"{ten}\" cần biết đề thi. Hãy chọn đề rồi nạp lại.",
@@ -1346,6 +1400,8 @@ def format_message(code: str, params: dict | None = None, lang: str = DEFAULT_LA
     entry = MESSAGES.get(code)
     if not entry:
         return code
+    if params.get("nhom") and (code + "_nhom") in MESSAGES:        # FG-2: dòng cảnh báo gom nhóm
+        entry = MESSAGES[code + "_nhom"]
     template = entry.get(lang) or entry.get(DEFAULT_LANG) or code
     template = dien_nhan(template, nhan, lang, thoat_ngoac=True)
     try:

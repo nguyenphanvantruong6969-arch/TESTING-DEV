@@ -366,7 +366,9 @@ def test_api_hai_nut_cu_van_cho_ket_qua_cu(api, de, gio):
                  _lc_cu(bm.CAU_KHO_NHAT, "huy_chuong")],
                 ["s9", _lc_cu(bm.CAU_HAI_LONG, "5"), _lc_cu(bm.CAU_HIEU_LY_DO, "1"),
                  _lc_cu(bm.CAU_KHO_NHAT, "khong_co")]])
-    assert api.nhap_phan_hoi_forms(tep)["data"] == {"n_ket_qua": 1, "n_tuan_3": 0, "bo_qua": 1}
+    assert api.nhap_phan_hoi_forms(tep)["data"] == {"n_ket_qua": 1, "n_tuan_3": 0, "bo_qua": 1,
+                                                       "dong_moi": 1, "dong_trung": 0, "ma_khong_khop": ["s9"],
+                                                       "hoc_sinh": 1, "dong_bo_qua": []}
     b = _buoi(api)
     assert api.gui_khieu_nai("s1", b, "x")["ok"]
     assert ma(api.gui_khieu_nai("s1", b, "lần hai")["errors"]) == ["khieu_nai_trung"]
