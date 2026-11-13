@@ -31,3 +31,8 @@
 ## SG-4 (M3) — một luật khớp mã học sinh cho khiếu nại gõ tay
 - CHANGELOG: `api_sau_xep.gui_khieu_nai` khớp mã bằng `fa_sau_xep.khop_ma_hoc_sinh` như đường Forms (đúng thắng; không thì `strip().casefold()` nếu đúng MỘT; mơ hồ bị từ chối); mã lưu không bị đổi. Tách lỗi: `khieu_nai_hs_khong_co` (không có học sinh) và `khieu_nai_chua_co_ket_qua` (có học sinh, chưa có kết quả ở buổi đó). Mã cũ `khieu_nai_khong_hop_le` giữ cho đường Forms (`nhap_sau_ket_qua_forms`). Tệp: `api_sau_xep.py`, `i18n_errors.py` (khối SG-A), `i18n_loi.js`, `tests/test_ws_nhan.py`. Test mới: `tests/test_sg4_khop_ma.py` (4); sửa 2 khẳng định cũ ở `test_fa_gap3_khieu_nai.py`, `test_fa_m6b_sau_ket_qua.py`.
 - TIEN_DO: SG-4 (M3) xong, chờ soát.
+
+## SG-10 (M2) — CLB Tự do không hiện % lấp đầy
+CHANGELOG: SG-10 — `get_club_fill_stats` thêm khóa `tu_do` (loai == TU_DO; False khi không FA). Màn kết quả (`js/03_ket_qua.js`): dòng CLB Tự do hiện "N <người> · không giới hạn chỗ" thay thanh/% lấp đầy, cột chỉ tiêu "không giới hạn chỗ", độ chọi "—", không gắn nhãn cần-để-ý, luôn xếp sau khi sắp theo độ đầy; ô "Chỗ còn trống" bỏ CLB Tự do khỏi cả tử số và mẫu số. Chuỗi i18n (vi + en) trong khối SG-A: `clb_khong_gioi_han_cho`, `clb_tu_do_lap`, `clb_tu_do_lap_nhieu`. Không FA: giao diện y như cũ. Tệp: api_bao_cao.py, js/03_ket_qua.js, i18n.js. Test mới: tests/test_sg10_clb_tu_do.py (3), tests/test_giao_dien_sg10_clb_tu_do.py (3, Chromium 1366×768).
+TIEN_DO: SG-10 (M2) xong — CLB Tự do không còn "150%".
+Ghi chú: xuất CSV/Excel (`api_xuat.py`) vẫn in cột "Tỉ lệ lấp đầy" từ `capacity` cho CLB Tự do — ngoài phạm vi SG-10 (api_bao_cao/03_ket_qua), chuyển lead xem xét.

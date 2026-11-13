@@ -285,6 +285,7 @@ function loadTomTatKetQua() {
       let tongCho = 0;
       let trong = 0;
       lap.data.forEach((c) => {
+        if (c.tu_do) return;   /* CLB Tự do không giới hạn chỗ: không tính vào chỗ trống */
         tongCho += c.capacity || 0;
         trong += Math.max(0, (c.capacity || 0) - (c.matched || 0));
       });
@@ -372,6 +373,7 @@ function tiLeLap(c) {
    không đánh dấu gì. Độ chọi đã in ở từng dòng, và "Chọi cao nhất" đưa
    các CLB đó lên đầu. */
 function nhanCanDeY(c) {
+  if (c.tu_do) return null;
   if (c.capacity > 0 && c.matched === 0) {
     return { lop: "is-nguy", chu: "⚠ " + t("fill_tag_khong_ai") };
   }
@@ -386,6 +388,9 @@ function nhanCanDeY(c) {
    tiêu chung; cộng lại đúng bằng tỉ lệ lấp đầy in bên cạnh. Bề rộng tính
    từ SỐ GỐC, không làm tròn từng đoạn rồi cộng (tổng có thể vượt 100%). */
 function veOThanhLapDay(c) {
+  if (c.tu_do) {
+    return `<span class="fill-pct">${esc(t(c.matched === 1 ? "clb_tu_do_lap" : "clb_tu_do_lap_nhieu", { n: c.matched }))}</span>`;
+  }
   const suc = c.capacity > 0 ? c.capacity : 0;
   const duTru = Math.min(c.matched_reserve || 0, c.matched);
   const chung = Math.max(0, c.matched - duTru);
@@ -420,8 +425,10 @@ function veBangNhuCauCLB(ds) {
   const chon = el("fillSapXep");
   if (chon) chon.value = cach;
   /* sort ổn định: hòa thì giữ thứ tự (buổi, mã) mà phần mềm trả về. */
-  if (cach === "day_nhat") ds.sort((a, b) => tiLeLap(b) - tiLeLap(a));
-  else if (cach === "vang_nhat") ds.sort((a, b) => tiLeLap(a) - tiLeLap(b));
+  /* CLB Tự do không có tỉ lệ lấp đầy: luôn xếp sau các CLB có giới hạn chỗ. */
+  const tuDoSau = (f) => (a, b) => (a.tu_do ? 1 : 0) - (b.tu_do ? 1 : 0) || f(a, b);
+  if (cach === "day_nhat") ds.sort(tuDoSau((a, b) => tiLeLap(b) - tiLeLap(a)));
+  else if (cach === "vang_nhat") ds.sort(tuDoSau((a, b) => tiLeLap(a) - tiLeLap(b)));
   else if (cach === "choi_cao") {
     ds.sort((a, b) => (b.ti_le_choi ?? -1) - (a.ti_le_choi ?? -1));
   }
@@ -456,10 +463,10 @@ function veBangNhuCauCLB(ds) {
       `<td class="clb-ten">${esc(c.name || c.club_id)}</td>` +
       `<td class="num">${esc(c.so_dang_ky)}</td>` +
       `<td class="num">${esc(c.so_dat_nv1)}</td>` +
-      `<td class="num clb-chi-tieu">${esc(c.capacity)}</td>` +
+      `<td class="num clb-chi-tieu">${esc(c.tu_do ? t("clb_khong_gioi_han_cho") : c.capacity)}</td>` +
       `<td class="num clb-da-xep">${esc(c.matched)}</td>` +
       `<td class="clb-lap">${veOThanhLapDay(c)}</td>` +
-      `<td class="num">${esc(soThapPhan(c.ti_le_choi))}</td>` +
+      `<td class="num">${esc(c.tu_do ? "—" : soThapPhan(c.ti_le_choi))}</td>` +
       `<td class="clb-luu-y">${nhan ? `<span class="fill-tag ${nhan.lop}">${esc(nhan.chu)}</span>` : ""}</td>` +
       `<td class="clb-nut"></td>`;
     tr.querySelector(".cot-buoi-clb").hidden = !nhieuBuoi;

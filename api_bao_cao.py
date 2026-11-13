@@ -11,6 +11,7 @@ from api_chung import (
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
+from so_nhap import TU_DO
 from rbda_priority_pipeline import (
     chuan_hoa_lop,
     BUOI_MAC_DINH,
@@ -105,7 +106,7 @@ class BaoCaoMixin:
                                    AS so_dat_nv1
                         FROM hang GROUP BY club_id
                     )
-                    SELECT c.club_id, c.name, c.capacity, c.reserve_capacity,
+                    SELECT c.club_id, c.name, c.capacity, c.reserve_capacity, c.loai,
                            COALESCE(c.buoi, ?) AS buoi,
                            COUNT(m.student_id) as matched,
                            SUM(CASE WHEN m.matched_tier = 'reserve' THEN 1 ELSE 0 END)
@@ -122,6 +123,8 @@ class BaoCaoMixin:
             ra = []
             for r in rows:
                 d = dict(r)
+                # CLB Tu do (FA) khong gioi han cho: chi tieu luu chi la so tam, khong dung de tinh %.
+                d["tu_do"] = d.pop("loai", None) == TU_DO
                 suc = d.get("capacity") or 0
                 # Khong co chi tieu thi de None chu khong phai 0 — "khong co
                 # cho" khac han "thua cho", va 0 o cot nay doc ra nghia
