@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 3: FG-9 delegated to a Sonnet worker (task start = HEAD after this commit); then wave gate 3, FINISH.
+- FINISH delegated to a Sonnet worker (report + bookkeeping + novice walkthrough; docs only). Lead runs the full suite with coverage on code HEAD in parallel, then the green loop (§2.5).
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -24,7 +24,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-2 | DONE | 9db3039 | test_fg2_xem_truoc_fa (10) |
 | FG-7 | DONE (FIX1 d754dbd) | 8c8202c | test_fg7_bieu_mau_sau_ket_qua (16) |
 | FG-8 | DONE | cd0b2df | test_fg8_goi_y_suc_khoe (2), test_giao_dien_fg8_cau_chu (6) |
-| FG-9 | TODO (KPI-link sub-bullet GONE-ON-HEAD) | | |
+| FG-9 | DONE (KPI-link sub-bullet was GONE-ON-HEAD) | 39eb6a5 | test_giao_dien_fg9_ux_nho (3) |
 
 ## Snapshots
 - Rebuild from BASE: `git worktree add <scratch>/base f5e8a41`, then in it run
@@ -55,7 +55,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-2 | session_01VfPzNs42szCLCJK8kCxfWR | DONE, review GO |
 | FG-7 | session_01VfPzNvLWfY7KLXz5Lj6S7P | DONE, review GO after FIX1 |
 | FG-8 | session_01VfPzNukgBtxgvdTkP7cCJi | DONE, review GO |
-| FG-9 | (creating) | |
+| FG-9 | session_01VfPzNsKCDN6sCNzaUQr5XA | DONE, review GO |
+| FINISH | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -125,3 +126,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Mutation: numbers put back on first nav item + toast button not appended -> both acceptance tests red; restored, green, git status clean.
   - Old tests extended to the new state (no assertion dropped): test_giao_dien_a14_lop.py::test_thanh_ben_sau_khi_gop_va_bao_chua_co_ket_qua (7 tabs in order, no label starts with a digit; was 01–07), test_ws_so_nhap_giao_dien.py::_tai_mau (waits for a title containing .xlsx + "Mở thư mục" button; was .xlsx in toast text). fg9 sidebar test also checks 7 labels.
   - Decision: automatic folder opening KEPT (closest to today); button re-opens it. Path-free sentence uses new key so_mau_da_tao_ngan (vi+en); the feedback line under the drop zone still shows the full path. showToast gained opts.hanhDong {nhan, khiBam, tooltip}.
+- 2026-11-13T06:10Z lead: FG-9 review GO: nav numbers removed (01–07), .nav-icon CSS dropped; showToast opts.hanhDong {nhan, khiBam, tooltip}; short toast + 'Mở thư mục' button, full path in title; auto-open KEPT (decision: closest to today); old tests a14_lop and ws_so_nhap_giao_dien extended to the new state, no assertion dropped.
+- 2026-11-13T06:12Z lead: WAVE GATE 3 GREEN: origin/claude/forms-gop nothing new; ruff clean; kiem_nhanh --co-so origin/main --so-seed 20: 7/7, 60/60; generator diff -r 4/4 identical (only --sau-ket-qua changed, by design).
