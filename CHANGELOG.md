@@ -21,6 +21,12 @@
 - Test: `tests/test_giao_dien_fg1_bat_tinh_nang.py` (3 đỏ → xanh), `tests/test_fg1_bat_tinh_nang.py` (giữ); sửa
   `tests/test_ws_giao_dien.py` (thứ tự menu thêm `tinh_nang`).
 
+## 2026-11-13 — GIAM-MAY-RUI-KH (Truong yêu cầu 13/11/2026): kế hoạch giảm may rủi cho Sonnet (chỉ tài liệu)
+
+- `docs/ke_hoach/GIAM_MAY_RUI_KE_HOACH.md` (mới): FA-CT1 chia chỗ theo nhu cầu (gợi ý, không ghi chỉ tiêu), FA-CT2 "được thêm X chỗ thì thêm vào đâu" + nút xuất cho giáo viên, FA-D7L điểm lẻ 0,1 (tuỳ chọn, mặc định tắt; tập đạt điểm sàn giữ nguyên nhờ cắt bớt rồi làm tròn).
+- `docs/phien/claude__giam-may-rui.md` (mới, bàn giao nhánh), `docs/ke_hoach/giam_may_rui/PROMPT_SONNET.md` (mới, câu lệnh khởi động).
+- Không đổi mã, không test mới.
+
 ## 2026-11-12 — DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026): tệp bối cảnh dự án + tệp giao việc cho Fable
 
 - `docs/fable/01_PROJECT_CONTEXT.md` (mới): tóm tắt toàn dự án cho AI đọc (bài toán, RB-DA, lớp FA-DAA, chương trình, bất biến, số liệu MÔ PHỎNG, điểm yếu, thứ tự đọc).
