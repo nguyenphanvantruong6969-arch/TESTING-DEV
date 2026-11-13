@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 3: FG-7 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-8, FG-9, wave gate 3, FINISH.
+- Wave 3: FG-8 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-9, wave gate 3, FINISH.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -22,7 +22,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-5 | DONE | e90555a | test_fg5_khop_ma (6) |
 | FG-6 | DONE | (see Log) | test_fg6_ket_qua_nap (5), test_giao_dien_fg6_danh_sach_loi (2) |
 | FG-2 | DONE | 9db3039 | test_fg2_xem_truoc_fa (10) |
-| FG-7 | TODO | | |
+| FG-7 | DONE (FIX1 d754dbd) | 8c8202c | test_fg7_bieu_mau_sau_ket_qua (16) |
 | FG-8 | TODO | | |
 | FG-9 | TODO (KPI-link sub-bullet GONE-ON-HEAD) | | |
 
@@ -53,7 +53,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-5 | session_01VfPzNr3qCVAmDxcnmnLfjh | DONE, review GO |
 | FG-6 | session_01VfPzNru1AhpnZkxiBZ3HP2 | DONE, review GO |
 | FG-2 | session_01VfPzNs42szCLCJK8kCxfWR | DONE, review GO |
-| FG-7 | (creating) | |
+| FG-7 | session_01VfPzNvLWfY7KLXz5Lj6S7P | DONE, review GO after FIX1 |
+| FG-8 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -112,3 +113,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13 WORKER session_01VfPzNvLWfY7KLXz5Lj6S7P FG-7 FIX1 DONE d754dbd
   - Red before: 6 new tests failed (5 modes + default). After: test_fg7 + test_van_phong_tu_nhien + every test naming tao_mau_forms = 371 passed; ruff clean; kiem_nhanh 7/7; golden-hash guards green (stdout only). No existing test asserted the last stdout line.
   - Mutation: default-mode print removed -> test_che_do_mac_dinh red; restored.
+- 2026-11-13T05:20Z lead: FG-7 review: day filter via --so-nhap-clb, own title, step 4 = menu path, help without internal codes, guide line on [tag]/(code) OK; fix round 1 asked for the absolute output folder in EVERY mode (spec), done d754dbd → GO. Code commit 8c8202c has message 'FG-7: log' (slip, explained in c42de59; help text is not under the byte-identity rule). 26 passed (fg7 + van_phong); generator diff -r 4/4 identical.
