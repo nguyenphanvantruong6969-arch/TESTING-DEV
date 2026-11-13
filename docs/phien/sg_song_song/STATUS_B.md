@@ -9,7 +9,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
-| SG-6 (H1, D1 = A) | CODING | 0 | dc0451b | | session_01YVAyu2N9LpsmHLzKjBUGzq | | |
+| SG-6 (H1, D1 = A) | CHECKING | 0 | d7c9c19 | 194305f | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu1Uy5qgbSS878jxQF4 | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
@@ -47,3 +47,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T18:10Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY aad4846 red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known) + tests/test_t1b_nhan_trung_cu.py::test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet (pre-existing from SG-2) mutation:so_nhap reader KHOA_GIO disabled -> 5 new tests red; restored
 2026-11-13T17:45Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 lead sweep at aad4846: 5587 passed, red = a13_12 (known) + t1a (SG-2 regression) -> pre-check fix sent to coder
 2026-11-13T17:50Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY 194305f fix:1 done (sample regenerated in separate commit, only Hướng dẫn differs; t1b/so_mau_co_cot_quyet_tam/a13_13_kiem_nhan/fg2_xem_truoc_fa 82 passed),2 done (sample has no Giờ/Địa điểm columns),3 done
+2026-11-13T17:59Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CHECKING checker=session_01YVAyu1Uy5qgbSS878jxQF4 range=d7c9c19..194305f (incl. SG-2 FIX-1 55fd02f)
