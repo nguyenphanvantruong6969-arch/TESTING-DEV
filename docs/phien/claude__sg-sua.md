@@ -6,7 +6,7 @@
 ## Feature / goal
 Fix the 19 findings of Fable's whole-kiosk UI audit ("Soát giao diện kiosk RB-DA", 2026-11-13), most severe first.
 Spec: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (follow exactly; items SG-1 … SG-12). Run by three people in parallel
-(A `claude/sg-a` Opus + integrator, B `claude/sg-b`, C `claude/sg-c` Sonnet): `docs/ke_hoach/SG_SONG_SONG.md`;
+(A `claude/sg-a` + integrator, B `claude/sg-b`, C `claude/sg-c`; each person = one Opus lead + Sonnet coder + Sonnet checker): `docs/ke_hoach/SG_SONG_SONG.md`;
 per-person state in `docs/phien/sg_song_song/STATUS_<X>.md`, overall `docs/phien/SG_STATUS.md` after integration. Base = `claude/forms-gop` (already holds FG-1…FG-9). All numbers SIMULATED.
 
 ## Plan (written by Opus; ticked by Sonnet)
@@ -48,3 +48,4 @@ per-person state in `docs/phien/sg_song_song/STATUS_<X>.md`, overall `docs/phien
 | 2026-11-13 | Opus (forms-gop session) | Read Fable report, re-checked C1/C2/C3/H1 in code, wrote spec + this handoff | plan only |
 | 2026-11-13 | Opus (forms-gop session) | Truong approved D1–D3; wrote three-role runbook SG_VONG_LAP.md | plan only |
 | 2026-11-13 | Opus (forms-gop session) | Truong chose a 3-way parallel split; wrote SG_SONG_SONG.md, added marker blocks | no behaviour change |
+| 2026-11-13 | Opus (forms-gop session) | Truong: each person = 1 Opus lead managing a Sonnet coder + a Sonnet checker; SG_SONG_SONG.md rewritten | plan only |
