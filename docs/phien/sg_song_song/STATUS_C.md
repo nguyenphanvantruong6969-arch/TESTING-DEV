@@ -16,7 +16,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
-| SG-9 | CHECKING | 0 | a1b6ecb | 98908e1 | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt6qaZtDuK7uYC28bX | (see review) |
+| SG-9 | FIX-1 | 1 | a1b6ecb | 98908e1 | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt6qaZtDuK7uYC28bX | (see review) |
 | SG-12 | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -27,6 +27,14 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 2. On nt, for these two modes, skip only the byte-hash assert (reason string names SG-5), not the whole test.
 3. Fix the overlong two-sentence comment line in that file.
 
+### SG-9 FIX-1 (LEAD disagrees with checker PASS on two cheap points; checker notes 1-2 in docs/phien/sg_review/SG-9.md)
+1. tests/test_giao_dien_sg9_nut_ban.py: make the `.catch` inside `chayNut` (and `chayTai`) provable — e.g. in the rejection test
+   assert NO `unhandledrejection` reached the page (stub/count it) and exactly ONE error toast. Verify: removing that `.catch` must
+   make the test fail.
+2. js/12_chuan_bi_nap.js `chuyen` (`S.dang`) and the `goi` helper (`S5.dang`): reset the busy flag in the wrapper's `sauCung`
+   (finally) so a synchronously thrown API call does not leave the step dead; add a UI test (API function that throws
+   synchronously → second click makes a second call).
+
 ## Decisions
 - WARNING: lead is not Opus (`get_session` reports claude-sonnet-5-5 at setup; the serving model may change).
 - Fable's report artifact is unreadable from this account ("artifact not found") → red tests come from the spec text
@@ -34,6 +42,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 
 - SG-7: helper placed in js/00_nen.js (no A/B edits there). Step-4 warning prefix `ma:` (internal code) dropped from visible text; old `slice(0,30)` cap replaced by the 5-example rule. Old i18n keys canh_bao_gom/xem_dau/thu_gon left (outside SG-C block).
 - SG-7: dead leftovers outside the SG-C blocks (i18n keys `canh_bao_gom`, `canh_bao_xem_dau`, `canh_bao_thu_gon`; old `.canh-bao-nhom` flex rule in style.css) are left for lead A at integration, to avoid editing outside C's marker blocks. The FG-6 run-log grouping (`showLog`) stays as is: same rule in spirit, not one of SG-7's two surfaces.
+- SG-9 (seen by checker, out of C scope): the khiếu nại error text shows the internal session name `__mac_dinh__` → for person A (SG-4 owns `gui_khieu_nai`).
 
 ## For Truong
 SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registration form, after the question text; en: none, forms are Vietnamese-only):
@@ -63,3 +72,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T18:29Z CODER session_01VfPzNud4JhboVzj5e8xu4E SG-9 READY 98908e1 red:14 of 16 new tests failed on base (no busy state/double-click guard/.catch, 71 bare .then) mutation:removing nut.disabled=true in chayNut -> 5 double-click tests fail, restored; related: 606 UI/label tests pass, ruff clean
 - 2026-11-13T18:38Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 READY 98908e1 accepted (range a1b6ecb..98908e1); checker r1 session_01VfPzNt6qaZtDuK7uYC28bX
 - 2026-11-13T18:59Z CHECKER session_01VfPzNt6qaZtDuK7uYC28bX SG-9 PASS (a1b6ecb..98908e1; 495 UI tests passed 0 skipped, own mutation: removing .catch survives because unhandledrejection shows same toast -> notes only; see docs/phien/sg_review/SG-9.md)
+- 2026-11-13T19:06Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 checker PASS overruled -> FIX-1 (2 points), sent to coder session_01VfPzNud4JhboVzj5e8xu4E
