@@ -10,7 +10,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
-| SG-8 (M5) | READY | 0 | 620d2d6 | 03974ec | session_01YVAytzNj1eT4xGk3rANq4G | | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
+| SG-8 (M5) | CHECKING | 0 | b3570ac | 03974ec | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu32HHT4cB1VP6Wyrys | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -63,3 +63,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T19:35Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 DONE (checker r2 PASS 144fbe6 + lead review, kiem_nhanh 7/7) b83651d
 2026-11-13T19:36Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CODING coder=session_01YVAytzNj1eT4xGk3rANq4G start=620d2d6
 2026-11-13T19:56Z CODER session_01YVAytzNj1eT4xGk3rANq4G SG-8 READY 03974ec red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known; full non-UI suite 5599 passed, 4 skipped) mutation:api code prefix phieu_nd_ -> phieu_nd_x -> 2 API tests red; UI noiDung=trErr -> raw ma -> vi UI test red; restored. Related UI tests really run: 59 passed; kiem_nhanh 7/7 (60 cases identical); ruff clean; generator/chuyen_phieu_clb.py untouched, .md report + Sổ nhập Loại verified byte-identical by golden test
+2026-11-13T20:09Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CHECKING checker=session_01YVAyu32HHT4cB1VP6Wyrys range=b3570ac..03974ec
