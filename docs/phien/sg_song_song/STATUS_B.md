@@ -9,7 +9,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
-| SG-6 (H1, D1 = A) | CHECKING | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
+| SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
@@ -35,6 +35,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 
 - SG-6: "student notice" read as the student timetable (get_thoi_khoa_bieu cell + Excel timetable/Theo lớp cell "Tên (giờ, địa điểm)"); no separate notice exists in the app. Keys gio/dia_diem are added to API responses only when some club has them (old data: responses unchanged). Club CSV (not student CSV) accepts optional gio/dia_diem columns.
 - SG-6: soat-ma four tiers not run as a separate pass; kiem_nhanh 7/7 (60 cases identical), ruff clean, 91 related test files: 1889 passed, 2 red.
+- SG-6 lead review: accepted checker r2 PASS (144fbe6); reran SG-6/SG-2/t1b/ws_nhan tests incl. Chromium (80 passed) and kiem_nhanh 7/7. Coder full non-UI suite at 297d653: 5591 passed, only a13_12 red. Optional (non-blocking, for lead A): Excel labels Giờ/Địa điểm hard-coded Vietnamese like other Excel headers; step-1 table does not redraw on language switch (pre-existing).
 
 ## For Truong
 (none)
@@ -57,3 +58,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T19:10Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY 297d653 fix:1 done (doc_clb_dot; UI test vi+en uploads Phiếu via #cb-b1-tep, 4 cols without),2 done (doc_clb_fa; Phiếu->chuyen_phieu->chuyen_fa_daa->Sổ->import test); generator snapshot 8 modes identical to BASE 98709f1; full non-UI suite: 5591 passed, 4 skipped (not SG-6 files), 1 red = a13_12 known; UI tests sg6/fa_m7_nguon/sg2 11 passed; ruff clean
 2026-11-13T19:04Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CHECKING r2 checker=session_01YVAyu3A184isUsUrEroXCZ range=d7c9c19..b83651d (fix 194305f..b83651d)
 2026-11-13T19:09Z CHECKER session_01YVAyu3A184isUsUrEroXCZ SG-6 PASS
+2026-11-13T19:35Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 DONE (checker r2 PASS 144fbe6 + lead review, kiem_nhanh 7/7) b83651d
