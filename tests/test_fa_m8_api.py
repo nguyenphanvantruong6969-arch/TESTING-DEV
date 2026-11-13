@@ -16,7 +16,6 @@ import forms_dot
 forms_dot.nap_mau_forms()
 import bieu_mau  # noqa: E402
 
-pytestmark = pytest.mark.giu_ma  # SG-12: dựng/đọc tệp xuất có mã
 
 
 @pytest.fixture

@@ -532,3 +532,13 @@ def test_api_nhan_dien_tep_thuan_va_de_trung_la_loi_i18n(api, de):
     # ở tầng API: _mot_tep bắt lỗi và trả mã i18n
     d = api._mot_tep("a.xlsx", b"", "B", de2) if hasattr(api, "_mot_tep") else None
     assert d is None or d["loi"]["code"] in ("xlsx_read_failed", "forms_tieu_de_trung")
+
+
+def test_bo_bieu_mau_mac_dinh_thuan_dung_duoc_va_phieu_clb_khong_co_ban_do(de, tmp_path):
+    """Hồi quy: phiếu thiết lập CLB (giáo viên điền, tiêu đề không phải `TieuDe`) làm hỏng cả bộ ở chế độ mặc định."""
+    for duong in ("A", "B"):
+        thu_muc = tmp_path / duong
+        tm.tao_bo_bieu_mau(de, str(thu_muc), duong=duong)
+        tep = sorted(p.name for p in thu_muc.rglob("*") if p.is_file())
+        assert not [t for t in tep if "PHIEU_CLB" in t and t.startswith("MAP_")]
+        assert any(t.startswith("MAP_NHAP_FORMS_") for t in tep)

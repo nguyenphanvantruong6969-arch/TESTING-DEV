@@ -431,7 +431,7 @@ TEN_CAI_DAT_CHI_THI = "CAI_DAT_FORMS_CHI_THI.md"
 _GIO_ZIP = (2026, 1, 1, 0, 0, 0)
 
 
-def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi", tieu_de=None):
+def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi", tieu_de=None, ghi_map=True):
     """Quick Import cho chế độ chỉ thi; giống hệt từng byte khi đầu vào không đổi."""
     from docx import Document
     from docx.shared import Pt
@@ -452,7 +452,8 @@ def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi", ti
     dong(de["tieu_de"] + hau_to if tieu_de is None else tieu_de, co=16, dam=True, sau=10)
     so = 0
     phan = bm.cac_phan(de, chi_thi=True, buoi=buoi) if phan is None else phan
-    ghi_ban_do(duong, phan)
+    if ghi_map:                  # phiếu thiết lập CLB (giáo viên điền) không có mã câu: không có bản đồ
+        ghi_ban_do(duong, phan)
     for i, (ten, cac_cau) in enumerate(phan, 1):
         dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
         for tieu_de, _loai, lua_chon, _bb in cac_cau:
@@ -1182,7 +1183,7 @@ def sinh_phieu_clb(de, thu_muc):
     with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
         f.write(ghi_cai_dat_phieu_clb(de))
     duong_docx = os.path.join(thu_muc, TEN_DOCX_PHIEU_CLB)
-    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_phieu_clb(), hau_to=" — phiếu thiết lập CLB")
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_phieu_clb(), hau_to=" — phiếu thiết lập CLB", ghi_map=False)
     return [duong_md, duong_docx]
 
 
