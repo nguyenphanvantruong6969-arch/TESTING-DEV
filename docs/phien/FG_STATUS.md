@@ -1,6 +1,6 @@
 Mode: CHU_TRI_FG
-RUNNING CHU_TRI_FG session_01VfPzNt8wLhNQyk5sYejKse 2026-11-13T01:14Z
-STATUS: RUNNING
+DONE 2026-11-13T10:10Z (no lock)
+STATUS: FG GREEN
 
 # FG status (FG-1 … FG-9, after user test of forms-gop)
 
@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Green loop round 2: waiting for the Windows build re-run (run 43388168466 attempt 2). Then fill report 'Vòng xanh', STATUS FG GREEN, §2.6 merge.
+- DONE. FG GREEN on claude/fg-sua (code d34e7a7); merged into claude/forms-gop (§2.6). Report docs/phien/bao_cao_dem/2026-11-13_fg_sua.md.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -55,8 +55,11 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 ## Green loop round 2 (code HEAD d34e7a7)
 - Local full suite + cov on d34e7a7: 6038 passed, 0 failed, 4 skipped (numpy ×2, POSIX-user, deferred D1; none UI), coverage 93.75 % (≥ 85).
 - CI Tests run 43382229518 on d34e7a7: all 3 jobs green (Linux full + real UI with the no-skipped-UI check, ruff, Windows).
-- Windows build run 43388168466 (workflow_dispatch, ref claude/fg-sua @ d34e7a7): attempt 1 CANCELLED from outside at 08:41Z during its test step (KeyboardInterrupt / 'The operation was canceled'; no timeout or concurrency in the workflow; no failing test before the cancel) → re-run once (attempt 2).
+- Windows build run 43388168466 (workflow_dispatch, ref claude/fg-sua @ d34e7a7): attempt 1 CANCELLED from outside at 08:41Z during its test step (KeyboardInterrupt / 'The operation was canceled'; no timeout or concurrency in the workflow; no failing test before the cancel) → re-run once (attempt 2): GREEN (Windows tests → PyInstaller → package check → release), 10:00Z.
 - §2.6 pre-check: IT_UI_STATUS.md on origin/claude/forms-gop has no lock (IT-UI GREEN); origin/claude/forms-gop c1de264 is an ancestor of claude/fg-sua → fast-forward, no conflicts.
+
+- §2.6 gate on the merged tree (origin/claude/forms-gop 9d5862b + claude/fg-sua; forms-gop side adds only docs/fable/04_UI_AUDIT_BRIEF.md, no conflicts): ruff clean, FG tests 74 passed, kiem_nhanh 7/7, 60/60.
+- ROUND 2 GREEN → FG GREEN.
 
 ## Workers
 | Task | Session | State |
@@ -149,3 +152,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13 WORKER session_01VfPzNqz2WHdbmmR46EeJMg FIX-1 DONE eddf198 (3 test ids green + gap5/m6b 58 passed; ruff clean; kiem_nhanh 7/7, 60/60; tests only + code-map doc, no production code)
 - 2026-11-13T07:15Z lead: FIX-1 review GO: code-map count 275 files / 6.042 cases; gap6 exact dicts extended (no key dropped); FG-7 golden hashes per os.name (exact on each OS). Tests only + doc.
 - 2026-11-13T09:00Z lead: green loop round 2: local + CI Tests green; Windows build attempt 1 cancelled externally, re-run.
+- 2026-11-13T10:10Z lead: Windows build attempt 2 green. FG GREEN. Report 'Vòng xanh' filled; report line on FA-M8..10 corrected (IT-UI GREEN). Merging claude/fg-sua into claude/forms-gop (§2.6 conditions all hold). Lock released.
