@@ -155,3 +155,29 @@ def test_tep_ghi_cho_giao_vien_giu_nguyen_chu_viet(tmp_path):
     cot = [c.value for c in ws[1]]
     nhan = {r[cot.index("Loại")].value for r in ws.iter_rows(min_row=2)} - {None}
     assert nhan <= set(so_nhap.NHAN_LOAI_HIEN_THI.values()) and nhan, (cot, nhan)
+
+
+# ---- FIX-1: tệp kết quả lưu TRƯỚC SG-8 (`{ma, clb, noi_dung}`, nhãn Việt, chuỗi trong `chan`) vẫn đọc được ----
+CU_LOI = [{"ma": "phieu_thieu_cau_2", "clb": "Cu A", "noi_dung": "chưa trả lời câu 2: đã bỏ qua"},
+          {"ma": "ma_la_khong_biet", "clb": "Cu B", "noi_dung": "câu lạ đã lưu"}]
+
+
+def ghi_ket_qua_cu(api, tmp_path):
+    import json
+    from api_forms import TEN_TEP_KET_QUA_PHIEU
+    b64, _ = b64_phieu(tmp_path, DONG)
+    assert api.nap_phieu_clb(b64)["ok"]
+    duong = os.path.join(forms_dot.thu_muc_forms(api.db_path), TEN_TEP_KET_QUA_PHIEU)
+    with open(duong, "w", encoding="utf-8") as f:
+        json.dump({"n_clb": 3, "theo_loai": {"Tự do": 1}, "loi": CU_LOI, "canh_bao": [],
+                   "chan": ["Buổi \"thu_3\" chưa có CLB loại Tự do."]}, f, ensure_ascii=False)
+
+
+def test_tep_ket_qua_cu_duoc_doi_sang_ma_khi_mo_lai(api, tmp_path):
+    ghi_ket_qua_cu(api, tmp_path)
+    d = api.get_forms_buoc_12()["data"]["clb"]
+    a, b = d["loi"]
+    assert a["code"] == "phieu_nd_phieu_thieu_cau_2" and a["params"] == {"clb": "Cu A"}
+    assert format_message(a["code"], a["params"], "vi") == "Cu A: " + pc.NOI_DUNG["phieu_thieu_cau_2"]
+    assert "code" not in b and b["noi_dung"] == "câu lạ đã lưu"          # mã lạ: giữ chữ đã lưu
+    assert d["theo_loai"] == {"Tự do": 1} and d["chan"] == ["Buổi \"thu_3\" chưa có CLB loại Tự do."]

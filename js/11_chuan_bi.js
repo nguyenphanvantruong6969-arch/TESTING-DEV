@@ -159,12 +159,13 @@ window.ChuanBi = (() => {
     return cuon;
   }
 
-  /* SG-8: API trả mã Loại (TU_DO…) và {code, params}; chữ vi/en do giao diện đặt. Tệp đợt cũ (nhãn Việt, câu
-     đã dịch) vẫn hiện nguyên chữ. */
+  /* SG-8: API trả mã Loại (TU_DO…) và {code, params}; chữ vi/en do giao diện đặt. Tệp đợt lưu trước SG-8: nhãn
+     Loại Việt và chuỗi trong `chan` hiện nguyên chữ; mục lỗi/cảnh báo `{ma, clb, noi_dung}` được API đổi sang mã
+     khi biết `ma`, còn `ma` lạ thì hiện "<CLB>: <noi_dung>" (nhánh dự phòng ở `noiDung`). */
   const nhanLoai = (k) => (k && ["TU_DO", "GIOI_HAN", "TUYEN_CHON"].includes(k) ? t("fa_loai_" + k) : (k || ""));
   const nhanBuoi = (c) => (/^(thu_[2-7]|chu_nhat)$/.test(c.buoi || "") ? t("buoi_ma_" + c.buoi) : (c.buoi_nhan || c.buoi || ""));
   const tomLoai = (theo) => Object.keys(theo || {}).map((k) => nhanLoai(k) + " " + theo[k]).join(", ");
-  const noiDung = (x) => trErr(x);
+  const noiDung = (x) => (x && x.code ? trErr(x) : x.clb + ": " + (x.noi_dung || ""));
 
   function veBuoc1(khung, tt) {
     const b1 = tt.clb;

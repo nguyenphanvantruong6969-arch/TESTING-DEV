@@ -16,6 +16,7 @@ import forms_dot
 import so_nhap
 from api_workspace import CauHinhHong, LoiDuongXuat, loi_cau_hinh
 from i18n_errors import err
+from i18n_errors import MESSAGES
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
 
@@ -78,6 +79,12 @@ class FormsMixin:
         (`NOI_DUNG` chỉ còn để `chuyen_phieu_clb.viet_bao_cao` ghi báo cáo .md cho giáo viên)."""
         return [{"ma": x["ma"], "clb": x["clb"], "code": "phieu_nd_" + x["ma"], "params": {"clb": x["clb"]}}
                 for x in ds]
+
+    @staticmethod
+    def _muc_bao_cao_cu_sang_ma(x):
+        if isinstance(x, dict) and "code" not in x and ("phieu_nd_" + str(x.get("ma"))) in MESSAGES:
+            return {**x, "code": "phieu_nd_" + x["ma"], "params": {"clb": x.get("clb", "")}}
+        return x
 
     @staticmethod
     def _clb_hien_thi(clubs):
@@ -150,6 +157,10 @@ class FormsMixin:
                 with open(os.path.join(forms_dot.thu_muc_forms(self.db_path), TEN_TEP_KET_QUA_PHIEU),
                           encoding="utf-8") as f:
                     clb.update({k: v for k, v in json.load(f).items() if k in ("theo_loai", "loi", "canh_bao", "chan")})
+                # Tệp lưu trước SG-8: mục `{ma, clb, noi_dung}` -> `{code, params}` khi `ma` đã biết; `ma` lạ giữ
+                # nguyên (giao diện hiện "<CLB>: <noi_dung>"). `theo_loai` nhãn Việt và `chan` chuỗi vẫn hiện như đã lưu.
+                for khoa in ("loi", "canh_bao"):
+                    clb[khoa] = [self._muc_bao_cao_cu_sang_ma(x) for x in clb[khoa]]
             except (OSError, ValueError):
                 pass
         de = {"co": False, "khop": False, "n_clb_thi": 0, "n_cau": 0}

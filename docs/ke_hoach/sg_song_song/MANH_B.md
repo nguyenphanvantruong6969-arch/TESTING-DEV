@@ -46,3 +46,7 @@ Files: `api_forms.py`, `i18n_errors.py`, `i18n_loi.js`, `js/11_chuan_bi.js` (per
 New tests: `tests/test_sg8_thong_bao_buoc1.py` (8), `tests/test_giao_dien_sg8_buoc1_tieng_anh.py` (2, Chromium vi + en).
 **TIEN_DO line:** SG-8 (M5) | done | files above | tests/test_sg8_thong_bao_buoc1.py (8), tests/test_giao_dien_sg8_buoc1_tieng_anh.py (2).
 Note for A/C: vi UI change that is deliberate: the "Buổi `thu_3`" check line (FA gate check) now reads `Buổi "Thứ 3"` (the existing session-label rule `nhanHoaBuoi` applies now that the error is rendered by the UI). Step 4 (`api_forms_nap.py` `noi_dung`) is another list and was not touched (SG-8 scope = step 1). `js/11_chuan_bi.js` for SG-9: call sites unchanged.
+
+## SG-8 FIX-1 — rounds saved before SG-8
+**CHANGELOG entry:** SG-8 FIX-1 — `get_forms_buoc_12` maps old saved `loi`/`canh_bao` items `{ma, clb, noi_dung}` to `{code: "phieu_nd_<ma>", params: {clb}}` when `code` is absent and the `ma` is known; an unknown `ma` stays as stored and `js/11_chuan_bi.js` `noiDung` shows "<CLB>: <noi_dung>" for items without `code`. Legacy `theo_loai` (Vietnamese labels) and string `chan` entries keep showing as stored. Comment in `11_chuan_bi.js` corrected. English UI test now asserts a real English sentence (mutation `noiDung = x.clb + ": " + x.code` turns it red). New tests: old-shape JSON in `tests/test_sg8_thong_bao_buoc1.py` (1) and `tests/test_giao_dien_sg8_buoc1_tieng_anh.py` (2, vi + en).
+**TIEN_DO line:** SG-8 FIX-1 | done | api_forms.py, js/11_chuan_bi.js | tests above.
