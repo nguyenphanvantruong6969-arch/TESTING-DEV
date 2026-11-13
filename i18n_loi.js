@@ -1280,10 +1280,10 @@ window.I18N_ERROR_MESSAGES = {
   },
   "khieu_nai_hs_khong_co": {
     "vi": "Không nhận được khiếu nại: không tìm thấy {person_l} có mã {student_id}. Hãy kiểm tra lại mã rồi gõ lại.",
-    "en": "Appeal not accepted: no {person} with ID {student_id} was found. Check the ID and type it again."
+    "en": "Appeal not accepted: no {person_l} with ID {student_id} was found. Check the ID and type it again."
   },
   "khieu_nai_chua_co_ket_qua": {
     "vi": "Không nhận được khiếu nại: {person_l} {student_id} chưa có kết quả ở buổi {buoi}.",
-    "en": "Appeal not accepted: {person} {student_id} has no result for session {buoi} yet."
+    "en": "Appeal not accepted: {person_l} {student_id} has no result for session {buoi} yet."
   }
 };
