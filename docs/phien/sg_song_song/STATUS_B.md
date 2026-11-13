@@ -1,0 +1,26 @@
+# SG parallel — person B status (single source of truth)
+
+Mode: SG_SONG_SONG person B
+LOCK: LEAD session_01YVAytz9tLyA9nbFitcHYj9 2026-11-13T15:30Z
+STATUS: RUNNING
+BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: (pending)
+
+## Items
+| Item | State | Round | Start | End | Coder session | Checker session | Tests |
+|---|---|---|---|---|---|---|---|
+| SG-2 (C1) | TODO | 0 | | | | | |
+| SG-6 (H1, D1 = A) | TODO | 0 | | | | | |
+| SG-8 (M5) | TODO | 0 | | | | | |
+| SG-11b (M4 only) | TODO | 0 | | | | | |
+
+## Fix lists
+
+## Decisions
+- SG-11b = finding M4 only (dialog focus trap + Esc + initial focus in `wsMoManChon`); M6/M7/L1/L4/L5 belong to person A (SG-11a).
+- Strings go only inside the `=== SG-B: add below ===` … `=== end SG-B ===` marker blocks; CSS only in the SG-B block at the end of `style.css`.
+- CHANGELOG / TIEN_DO lines go to `docs/ke_hoach/sg_song_song/MANH_B.md` (lead A folds them in).
+
+## For Truong
+
+## Log
+2026-11-13T15:30Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 - branch claude/sg-b created from BASE 98709f1
