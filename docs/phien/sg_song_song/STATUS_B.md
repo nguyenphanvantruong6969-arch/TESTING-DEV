@@ -9,7 +9,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
-| SG-6 (H1, D1 = A) | CODING | 1 | d7c9c19 | 194305f | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu1Uy5qgbSS878jxQF4 | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
+| SG-6 (H1, D1 = A) | CHECKING | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
@@ -55,3 +55,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T18:20Z CHECKER session_01YVAyu1Uy5qgbSS878jxQF4 SG-6 FIX-1 (review: docs/phien/sg_review/SG-6.md; 1) step-1 table: doc_clb_dot drops gio/dia_diem; 2) step 4 doc_clb_fa/ghi_tep_phan_mem drops them: real Forms->Sổ->import never stores them)
 2026-11-13T18:28Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 FIX-1 sent to coder session_01YVAyu2N9LpsmHLzKjBUGzq
 2026-11-13T19:10Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY 297d653 fix:1 done (doc_clb_dot; UI test vi+en uploads Phiếu via #cb-b1-tep, 4 cols without),2 done (doc_clb_fa; Phiếu->chuyen_phieu->chuyen_fa_daa->Sổ->import test); generator snapshot 8 modes identical to BASE 98709f1; full non-UI suite: 5591 passed, 4 skipped (not SG-6 files), 1 red = a13_12 known; UI tests sg6/fa_m7_nguon/sg2 11 passed; ruff clean
+2026-11-13T19:04Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CHECKING r2 checker=session_01YVAyu3A184isUsUrEroXCZ range=d7c9c19..b83651d (fix 194305f..b83651d)
