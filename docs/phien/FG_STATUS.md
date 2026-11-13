@@ -99,3 +99,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - NOTE for lead (not FG-2): tests/test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien is RED from FG-1's strings ws_tn_tieu_de (vi+en use an em dash "—" joining the sentence). FG-1 passed its own tests but this wording test was not in its related run; fix belongs to an FG-1 follow-up or FG-8 (wording).
   - Sample: du_lieu_test/SO_NHAP_FA_MAU_120HS.xlsx via du_lieu_test/tao_so_nhap_fa_mau.py (seed 20261113; content deterministic, file bytes differ per run only by zip timestamps).
 
+- 2026-11-13 WORKER session_01VfPzNtE2gjQkFTnk4CKsg9 FG-1 FIX1 DONE 13e93f3
+  - Red before: test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien (ws_tn_tieu_de vi+en had a dash). Now: test_van_phong_tu_nhien + fg1 API + fg1 UI (Chromium ran) + i18n = 28 passed; ruff clean; kiem_nhanh 7/7.
