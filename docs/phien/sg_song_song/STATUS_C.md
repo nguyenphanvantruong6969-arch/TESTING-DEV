@@ -17,7 +17,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
 | SG-9 | DONE | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
-| SG-12 | CODING | 0 | e729ff1 | | session_01VfPzNuP2CPBJGP9uHdXZyx (1st: session_01VfPzNs8qcCiQLCKtu6pP4g, context limit) | | |
+| SG-12 | CHECKING | 0 | e729ff1 | f6939af | session_01VfPzNuP2CPBJGP9uHdXZyx (1st: session_01VfPzNs8qcCiQLCKtu6pP4g) | session_01VfPzNsvHqNsTacxhiYKg2y | tests/test_sg12_tieu_de_thuan.py (+ see review) |
 
 ## Fix lists
 ### SG-5 FIX-1 (checker session_01VfPzNrFdN7RhAERrSNeTJV, docs/phien/sg_review/SG-5.md)
@@ -98,3 +98,4 @@ Worktrees: `git worktree add --detach W_pre e729ff1` (pre-SG-12) and `W_head <HE
 - 2026-11-13T19:50Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 CODING start 2ad6081 coder session_01VfPzNs8qcCiQLCKtu6pP4g
 - 2026-11-13T20:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 coder 1 stopped at context limit (handoff 1be392a, docs/phien/claude__sg-c.md); coder 2 session_01VfPzNuP2CPBJGP9uHdXZyx continues (+ lead: conftest autouse giu-ma -> opt-in)
 - 2026-11-13T21:35Z CODER session_01VfPzNuP2CPBJGP9uHdXZyx SG-12 READY f6939af red:default-mode bo bieu mau crashed (phieu CLB titles not TieuDe) -> new regression test red before fix, plus 38 old tests red when the global fixture was removed (23 of them = that bug) mutation:removing ghi_map=False for phieu CLB -> new test + 23 m8 tests fail (restored); earlier mutations by previous coder (2) kept. related batch (51 files + ws_nhan + van_phong + tai_lieu) 824 passed, 1 failed = the known test_ban_do_ma_so_tep_test_la_so_that; UI (23 forms/nap/theo doi files + fa_m8_bo, Playwright 1.63.0, Chromium) 157 passed 0 skipped; PLAIN exports load in the browser through the kiosk import (fa_m9_nap UI tests run in default plain mode, data in tmp outside repo); ruff clean; kiem_nhanh 7/7 (60 cases, 20 seeds)
+- 2026-11-13T21:15Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 READY f6939af accepted (range e729ff1..f6939af); checker r1 session_01VfPzNsvHqNsTacxhiYKg2y
