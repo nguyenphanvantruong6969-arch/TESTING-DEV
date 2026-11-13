@@ -81,3 +81,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Mutation: removed `.finally(xong)` -> 4 failed; restored, 4 passed. (Code commit 06cb12d carries the message "ghi hash vào Log" by a shell-chain slip; content is the full FG-4 change.)
 - 2026-11-13T02:52Z lead: FG-4 review GO: one helper napTepForms(nut, input, tenApi, khiXong) per spec, busy label, catch→generic toast, finally resets; 21 UI tests passed (Chromium ran).
 - 2026-11-13T02:55Z lead: WAVE GATE 1 GREEN: merged origin/claude/forms-gop c1de264 (conflicts only in CHANGELOG/TIEN_DO, both sides kept) → e099a3c; ruff clean; wave tests 68 passed; kiem_nhanh --co-so origin/main --so-seed 20: 7/7, 60/60; generator diff -r vs BASE snapshots: 4/4 identical.
+- 2026-11-13 WORKER session_01VfPzNPmYjiRYVCMfuncuk2 FG-5 DONE e90555a
+  - Red run before: tests/test_fg5_khop_ma.py 6 failed (khop_ma_hoc_sinh missing, no ma_khong_khop). After: 6 passed; related -k run 66 passed, remaining 6 red = FG-6/FG-7 acceptance tests only. ruff clean; kiem_nhanh --co-so origin/main 7/7. Two old exact-dict asserts (gap5, m6b) extended with ma_khong_khop, not loosened.
+  - Mutation: ambiguity ignored (casefold match takes first of many) -> test_khop_ma_ham_thuan + test_mo_ho_hai_em_ab_AB red; restored, 6 passed, git status clean.
