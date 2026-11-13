@@ -7,8 +7,8 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-1 (C3) | CHECKING | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | |
-| SG-3 (C2) | TODO | 0 | | | | | |
+| SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
+| SG-3 (C2) | CODING | 0 | 39de078 | | session_01TGThn5vDcdjy25A1uMuruk | | |
 | SG-4 (M3) | TODO | 0 | | | | | |
 | SG-10 (M2) | TODO | 0 | | | | | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
@@ -19,6 +19,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 ## Decisions
 - D-A1: Fable's report artifact is not readable from this account (artifact not found). Per 2.1, red tests come from the spec text (SOAT_GIAO_DIEN_KE_HOACH.md §3) and the code.
 - D-A2: claude/sg-a branched from origin/claude/forms-gop tip (ba4b207), not BASE 98709f1: the two extra commits only touch docs/ke_hoach/SG_SONG_SONG.md and docs/phien/claude__sg-sua.md. Diffs and checker START use item Start hashes, so nothing else changes.
+- D-A4: SG-1 round-1 checker logged its PASS line with the round-0 checker id (session_01TGThn8ctQ...); review file 'Round 1' section is the r2 session's work. Lead re-verified: 2311 tests passed, ruff clean, kiem_nhanh 7/7.
 - D-A3: SG-11 scope for person A = M6, M7, L1, L4, L5 (+ one-line consistency rules, glossary list to docs/). M4 belongs to person B (SG-11b).
 
 ## For Truong
@@ -33,3 +34,5 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T15:25Z CODER session_01TGThn7GRLE7ML1TDfW53iL SG-1 FIX-1: 1 done (dem_nv1_trong_buoi shared by bang_nhu_cau and kiem_truoc_fa; two-session test so_nv1==2; note: test adds a TU_DO club B in b2, else fa_thieu_clb_tu_do also fires) READY 95de0b9 red:two-session test failed with old count mutation:restored old sum(...)[0]==cid -> new test fails, reverted
 2026-11-13T15:49Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 CHECKING r2 95de0b9
 2026-11-13T15:54Z CHECKER session_01TGThn8ctQPeoQJvGZsej9z SG-1 PASS
+2026-11-13T16:13Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 DONE lead-review agree 95de0b9
+2026-11-13T16:13Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-3 CODING coder=session_01TGThn5vDcdjy25A1uMuruk 39de078
