@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- FINISH delegated to a Sonnet worker (report + bookkeeping + novice walkthrough; docs only). Lead runs the full suite with coverage on code HEAD in parallel, then the green loop (§2.5).
+- Green loop round 1 RED → FIX-1 delegated to a Sonnet worker (task start = HEAD after this commit).
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -33,6 +33,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - Lead copy: `<scratchpad of session_01VfPzNt8wLhNQyk5sYejKse>/snap/{fa-daa,fa-daa_mot,phan-hoi,tuan-3,sau-ket-qua}`.
 
 ## Decisions
+- FG-7 golden hashes are per platform (os.name): Linux values from STEP0; Windows values = actual Windows output in CI run 43376547591 (these modes are unchanged by FG). Still an exact comparison on each platform.
 - Every review touching UI strings also runs tests/test_van_phong_tu_nhien.py and tests/test_ws_nhan.py (lesson from FG-1 FIX1).
 - Workers must run `git fetch origin main:refs/remotes/origin/main` before `kiem_nhanh` (else trung_khit cannot compare).
 - D1–D4 as spec §1 (final).
@@ -42,6 +43,14 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Waiting for Truong
 - (none yet)
+
+## Green loop round 1 (code HEAD 1e2adb9, docs HEAD fdfc3f7)
+- Local full suite + cov on 1e2adb9: 6035 passed, 3 failed, 4 skipped (none UI), coverage 93.75 % (≥ 85).
+- CI Tests run 43376547591 on fdfc3f7: ruff green; Windows job FAILED 7 (5502 passed, 84 skipped); Linux job was still running.
+- Failing ids (none fails on BASE; all caused by FG):
+  1. tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that — CLAUDE_CHI_TIET.md code map says "263 tệp test_*.py", repo now has 275 (FG added 12).
+  2. tests/test_fa_gap6_tuan_3.py::test_nhap_tuan_3_va_tong_hop and ::test_tep_co_ca_hai_loai_cau — exact result dicts lack the FG-3/5/6 keys (hoc_sinh, ma_khong_khop, dong_moi, dong_trung, dong_bo_qua).
+  3. Windows only: tests/test_fg7_bieu_mau_sau_ket_qua.py::test_che_do_khac_giu_nguyen_tung_byte[fa_daa|fa_daa_mot|phan_hoi|tuan_3] — golden hashes were taken on Linux; Windows bytes differ (FG did not touch these modes, so Windows output = BASE output).
 
 ## Workers
 | Task | Session | State |
@@ -56,7 +65,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-7 | session_01VfPzNvLWfY7KLXz5Lj6S7P | DONE, review GO after FIX1 |
 | FG-8 | session_01VfPzNukgBtxgvdTkP7cCJi | DONE, review GO |
 | FG-9 | session_01VfPzNsKCDN6sCNzaUQr5XA | DONE, review GO |
-| FINISH | (creating) | |
+| FINISH | session_01VfPzNqz9T4QpQyTxcxNyFF | DONE, review GO (report line on FA-M8..10 to correct) |
+| FIX-1 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -129,3 +139,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13T06:10Z lead: FG-9 review GO: nav numbers removed (01–07), .nav-icon CSS dropped; showToast opts.hanhDong {nhan, khiBam, tooltip}; short toast + 'Mở thư mục' button, full path in title; auto-open KEPT (decision: closest to today); old tests a14_lop and ws_so_nhap_giao_dien extended to the new state, no assertion dropped.
 - 2026-11-13T06:12Z lead: WAVE GATE 3 GREEN: origin/claude/forms-gop nothing new; ruff clean; kiem_nhanh --co-so origin/main --so-seed 20: 7/7, 60/60; generator diff -r 4/4 identical (only --sau-ket-qua changed, by design).
 - 2026-11-13 WORKER session_01VfPzNqz9T4QpQyTxcxNyFF FINISH DONE b7c8380 (docs only; novice walkthrough spec §5 passed: 33 feedback + 3 appeals both loads, 2nd load reports duplicates; no new bug; report docs/phien/bao_cao_dem/2026-11-13_fg_sua.md, placeholder "Vòng xanh" left for lead)
+- 2026-11-13T07:00Z lead: FINISH review GO (walkthrough detailed and consistent). Report wrongly says FA-M8/9/10 unfinished / IT-UI paused; IT_UI_STATUS.md says IT-UI GREEN — lead corrects it when filling 'Vòng xanh'. Green loop round 1 RED (see section) → FIX-1.
