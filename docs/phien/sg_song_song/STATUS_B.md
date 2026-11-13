@@ -8,10 +8,10 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
+| SG-2 (C1) | CODING | 2 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | DONE | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
-| SG-11b (M4 only) | CHECKING | 1 | 5ab87d0 | 29bfa1e | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAyu3LJVjJwZrCxTDDP4W (r2) | tests/test_giao_dien_sg11b_focus_man_chon.py |
+| SG-11b (M4 only) | DONE | 1 | 5ab87d0 | 29bfa1e | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAyu3LJVjJwZrCxTDDP4W (r2) | tests/test_giao_dien_sg11b_focus_man_chon.py |
 
 ## Fix lists
 
@@ -32,6 +32,9 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 3. Static `aria-modal` stays on hidden overlay -> toggle with `role` in `wsHienOverlay`.
 4. (lead, from Optional) Esc with a row `⋯` menu open closes only the menu first.
 
+### SG-2 FIX-2 (lead, full suite incl. UI at dff2363: 6087 passed, 3 red)
+1. `tests/test_giao_dien_loi_chan_gon.py` 2 red since d9da2c5: `showLog` hint added as a second `.log-dong.log-tom-tat` line. Render the hint outside those classes; old test untouched. Sent to SG-2 coder session_01YVAyu23VvGaoDixHWJZn1G.
+
 ## Decisions
 - SG-11b = finding M4 only (dialog focus trap + Esc + initial focus in `wsMoManChon`); M6/M7/L1/L4/L5 belong to person A (SG-11a).
 - Strings go only inside the `=== SG-B: add below ===` … `=== end SG-B ===` marker blocks; CSS only in the SG-B block at the end of `style.css`.
@@ -49,6 +52,8 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 
 - SG-8: UI path no longer reads `NOI_DUNG` / `NHAN_LOAI_HIEN_THI`; both stay as constants only for files the software writes (Sổ nhập "Loại" column, `BAO_CAO_PHIEU_CLB.md`). `theo_loai` is keyed by Loại code; Loại labels reuse existing `fa_loai_*` UI keys (vi = `NHAN_LOAI_HIEN_THI`, test-guarded); `chan` is raw `{code, params}`; added a `langchange` redraw in `js/11_chuan_bi.js` (fixes the pre-existing no-redraw on language switch). Deliberate vi change: the gate check `Buổi "thu_3"` now shows `Buổi "Thứ 3"` (existing session-label rule). Step 4 (`api_forms_nap.py` `noi_dung`) out of scope.
 - SG-8 lead review: accepted checker r2 PASS; lead full non-UI suite at 5e47810: 5600 passed, only a13_12 red; reran SG-8 + ws_nhan + van_phong_tu_nhien incl. Chromium (70 passed); kiem_nhanh 7/7. `NOI_DUNG` constant kept only for the teacher .md report writer (file stays byte-identical); UI reads i18n codes only.
+- SG-11b lead review: accepted checker r2 PASS (FIX-1 1-4 closed, global Esc unchanged elsewhere); SG-11b tests green in lead full suite at dff2363.
+- Lead lesson: SG-2 checker ran a `-k` subset and missed two red tests (t1a, loi_chan_gon). Lead now runs the full suite (incl. UI) before DONE.
 
 ## For Truong
 - (observation, not done: outside SG-8) Chuẩn bị đợt step 4 (`api_forms_nap.py` `noi_dung`, `js/12_chuan_bi_nap.js`) still returns Vietnamese sentences, so the English UI there is not translated. Candidate for a later item.
@@ -90,3 +95,5 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T23:01Z CODER session_01YVAyu3PXika1Vx6orU1Yim SG-11b READY 29bfa1e fix:1 done,2 done,3 done,4 done; red-first: 4 new tests red on old JS (stash), mutation: Esc close removed -> 5 red, focus-return removed -> FG-1 test red, menu-first removed -> menu test red; restored. 154 passed 0 skipped (checker list + ws_nhan + van_phong_tu_nhien), ruff clean, kiem_nhanh 7/7
 2026-11-13T23:25Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b CHECKING r2 checker=session_01YVAyu3LJVjJwZrCxTDDP4W range=5ab87d0..29bfa1e (fix f1ae45a..29bfa1e); lead full suite incl. UI started at dff2363
 2026-11-13T23:40Z CHECKER session_01YVAyu3LJVjJwZrCxTDDP4W SG-11b PASS (review: docs/phien/sg_review/SG-11b.md Round 2; FIX-1 1-4 closed, global Esc unchanged elsewhere, 128 UI/related passed, kiem_nhanh 7/7)
+2026-11-13T23:58Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b DONE (checker r2 PASS) 29bfa1e
+2026-11-13T23:58Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 full suite at dff2363: 6087 passed, red = a13_12 (known) + 2x test_giao_dien_loi_chan_gon (SG-2 regression) -> SG-2 FIX-2 to coder
