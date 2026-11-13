@@ -9,6 +9,8 @@ import copy
 import os
 import sys
 
+import pytest
+
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
 sys.path.insert(0, GOC)
@@ -47,6 +49,7 @@ def test_ngay_ba_clb_du_dieu_kien_van_co_cau_doi_bac_dong():
     assert "thu_2-doi" in [bm.ma_cua_cau(td) for _, cs in bm.cac_phan_fa_gop(de) for td, *_ in cs]
 
 
+@pytest.mark.giu_ma
 def test_dong_mo_ta_huy_chuong_dung_luat_that():
     de = _de({"clb_nhiepanh"})
     vang = next(td for _, cs in bm.cac_phan_fa(de, "thu_2") for td, *_ in cs if td.startswith("[thu_2-vang]"))
@@ -79,6 +82,7 @@ def _hang_hai_clb(de, doi):
 TU_DO = {"clb_nhiepanh"}
 
 
+@pytest.mark.giu_ma
 def test_tep_cu_co_cau_doi_o_ngay_hai_clb_khong_canh_bao_gia():
     """Tệp cũ: học sinh trả lời "Có" ở câu đổi dù ngày chỉ có 2 CLB nhận huy chương -> không còn cảnh báo giả."""
     de = _de(TU_DO)

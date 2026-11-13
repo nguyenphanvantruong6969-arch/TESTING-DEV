@@ -101,6 +101,7 @@ def test_nhan_dien_doan_de(api, tmp_path, chu):
     assert res["data"]["tep"][0]["bien_the_doan"] == chu
 
 
+@pytest.mark.giu_ma
 def test_nhan_dien_khong_ghi_gi_va_khong_can_de(api, tmp_path):
     _, thi, sn = _bo(tmp_path, _de_3_de(), "A")
     assert api.dat_fa_duong("A")["ok"]                       # chưa có de_thi.json

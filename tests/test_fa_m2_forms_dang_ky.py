@@ -59,6 +59,7 @@ def test_co_thong_tin_hoc_sinh_va_hai_cau_huy_chuong_tuy_chon(de):
     assert "Đổi chỗ huy chương bạc và đồng?" in doi[0]
 
 
+@pytest.mark.giu_ma
 def test_cau_vang_bo_clb_tu_do_khi_de_thi_co_loai(de):
     de2 = copy.deepcopy(de)
     for c in de2["cau_lac_bo"]:
@@ -135,6 +136,7 @@ def _so_nhap_clb(de, tmp_path, tu_do):
     return p
 
 
+@pytest.mark.giu_ma
 def test_fa_s6_so_nhap_clb_bo_clb_tu_do_khoi_cau_vang(de, tmp_path):
     tu_do = next(c for c in de["cau_lac_bo"])
     sn = _so_nhap_clb(de, tmp_path, tu_do["club_id"])

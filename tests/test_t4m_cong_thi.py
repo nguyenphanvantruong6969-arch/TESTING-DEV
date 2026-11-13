@@ -161,6 +161,7 @@ def test_q4a_mot_tep_moi_clb_co_de_va_clb_csv(tmp_path, de):
     assert covua[2] == bm.ten_buoi(de, "thu_2")
 
 
+@pytest.mark.giu_ma
 def test_q4a_docx_khong_cau_cong_giu_the_ma(tmp_path, de):
     docx = pytest.importorskip("docx")
     tm.sinh_moi_clb(de, str(tmp_path))

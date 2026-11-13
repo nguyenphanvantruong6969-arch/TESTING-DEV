@@ -317,6 +317,7 @@ def test_de_thi_json_dot_giong_mac_dinh_khi_cung_noi_dung(api, tmp_path):
         copy.deepcopy(DE_MAC_DINH["cau_lac_bo"]), sort_keys=True)
 
 
+@pytest.mark.giu_ma
 def test_nap_de_thi_giu_loai_clb_va_tu_do_khong_vao_cau_vang_fa(api, tmp_path):
     """`loai` của bước 1 phải sang de_thi.json: bieu_mau.cac_phan_fa dựa vào nó để loại CLB Tự do khỏi câu huy chương vàng."""
     so_nhap_ = __import__("so_nhap")
