@@ -54,3 +54,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T18:10Z CHECKER session_01TGThn6utYnaicoK4Ce6A5K SG-4 PASS
 2026-11-13T18:12Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 DONE lead-review agree (96 passed, kiem_nhanh 7/7) 17eaf11
 2026-11-13T18:12Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CODING coder=session_01TGThn6PGJParLMUADLpcQk f660d28
+2026-11-13T18:17Z CODER session_01TGThn6PGJParLMUADLpcQk SG-10 READY 27d2262 red:3 of 3 backend tests failed before fix (no tu_do key); UI results-tab tests fail without JS fix mutation:tu_do forced False -> 4 tests fail, JS fix reverted -> 2 UI tests fail, both restored
