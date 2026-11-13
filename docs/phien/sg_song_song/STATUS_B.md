@@ -72,3 +72,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T20:42Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 FIX-1 sent to coder session_01YVAytzNj1eT4xGk3rANq4G
 2026-11-13T20:44Z CODER session_01YVAytzNj1eT4xGk3rANq4G SG-8 READY 5e47810 fix:1 done (get_forms_buoc_12 maps old {ma,clb,noi_dung} to code; unknown ma -> UI shows 'clb: noi_dung'; legacy theo_loai/chan strings kept; comment fixed; tests vi+en),2 done (EN phrase assertion; mutation noiDung=clb+code -> EN test red; mutation of API mapping -> old-shape test red; restored). 16 related test files + ws_nhan + van_phong_tu_nhien + i18n_sync: 220 passed, 0 skipped (Chromium); ruff clean; kiem_nhanh 7/7
 2026-11-13T21:08Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CHECKING r2 checker=session_01YVAyu2ToRHhkBjTaybds6n range=b3570ac..5e47810 (fix 03974ec..5e47810)
+2026-11-13T21:14Z CHECKER session_01YVAyu2ToRHhkBjTaybds6n SG-8 PASS

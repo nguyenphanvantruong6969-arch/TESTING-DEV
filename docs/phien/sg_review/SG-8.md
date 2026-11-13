@@ -60,3 +60,33 @@ Environment: scratch venv outside the repo (`requirements-dev.txt` + playwright 
 9. **soat-ma:** `kiem_nhanh` 7/7; tiers 1-3 read on the diff (no DA edit, no SQL, backward-compatible only for `theo_loai`/`chan`, not for `loi`/`canh_bao`: FIX-1);
    tier 4: `js/11_chuan_bi.js` (person C's file) edit minimal and declared in `MANH_B.md`, as is every other file.
 10. **Old consumers (lead point d):** grep `js/` and `tests/` for `noi_dung` / `loai_nhan` / `theo_loai` / `nap_phieu_clb` / `get_forms_buoc_12`: only `js/11_chuan_bi.js` (updated); `js/12_chuan_bi_nap.js` uses step-4 `noi_dung`, a different list, untouched.
+
+---
+
+# Round 2 (CHECKER session_01YVAyu2ToRHhkBjTaybds6n) — fix range 03974ec..5e47810 (head 10cd320 = 5e47810 + status only), whole range b3570ac..5e47810
+
+**Verdict: PASS.** Both round-1 points are closed. Data are SIMULATED. Environment: scratch venv + scratch worktrees outside the repo (removed); no production code or test edited.
+
+## FIX-1 item 1 — old-shape `phieu_clb_ket_qua.json`
+- Code: `api_forms.get_forms_buoc_12` maps `loi`/`canh_bao` items without `code` to `{code: "phieu_nd_<ma>", params: {clb}}` when `phieu_nd_<ma>` is in `MESSAGES`; unknown `ma` stays as stored; `js/11_chuan_bi.js` `noiDung` falls back to `"<clb>: <noi_dung>"` for items without `code`. `theo_loai` / `chan` untouched (pass through as stored).
+- Independent Chromium repro (scratch test, not committed, using the repo's `mo`/`api` fixtures): upload a Phiếu through the API, overwrite the round's `phieu_clb_ket_qua.json` with the old shape (`loi` = known `ma` + unknown `ma`, `canh_bao` = known `ma`, `theo_loai={"Tự do":1,"Giới hạn":2}`, `chan=["Buổi \"thu_3\" …"]`), `ChuanBi.lamMoi()`:
+  - vi: `Cu A: chưa trả lời câu 2 (mở thêm nhóm được không): không phân loại được, đã bỏ qua` (the old wording); `Cu B: câu lạ` (unknown `ma`: `clb: noi_dung`); warning line likewise; summary "(Tự do 1, Giới hạn 2)" and the `chan` string shown as stored.
+  - en: `Cu A: hasn't answered question 2 (can extra groups be opened?), so the club can't be classified: skipped`; `Cu B: câu lạ`; same legacy summary/`chan` as stored (stored Vietnamese text is expected for old files).
+  - In both languages the whole `#cb-buoc-1` text has no `{`, no `"ma"`, no `phieu_nd_`; no page error.
+  - (My first attempt timed out only because I uploaded via the file input, which writes to a different place than the `api` fixture's db; not a product issue. Redone the way the committed test does.)
+- New tests: `test_tep_ket_qua_cu_duoc_doi_sang_ma_khi_mo_lai` (API) and `test_tep_ket_qua_cu_hien_chu_khong_hien_json[vi|en]` (Chromium) — both really ran.
+
+## FIX-1 item 2 — English phrase assertion + mutations (scratch worktree at 5e47810, restored each time)
+Test files `test_sg8_thong_bao_buoc1.py` + `test_giao_dien_sg8_buoc1_tieng_anh.py`: base 13 passed, 0 skipped.
+| Mutation | Result |
+|---|---|
+| API mapping off (`for khoa in ()`) | 3 failed |
+| `noiDung = trErr(x)` (no fallback) | 2 failed |
+| fallback prints `x.ma` instead of `noi_dung` | 2 failed |
+| raw code in the `code` branch (my round-1 mutation `x.clb + ": " + x.code`) | 4 failed (the English test now red too) |
+
+## Whole range 2.10, brief
+- **Unchanged since round 1 (evidence reused):** scope, red-first (8 failed at b3570ac), 14 codes only in the SG-B block, string/`NOI_DUNG` verdict, teacher files byte-identical, generator untouched, step-4 out of scope, English walkthrough with 0 Vietnamese characters (fresh upload), vi text identical except the deliberate `Buổi "Thứ 3"` line. The round-2 delta is only: `api_forms.py` (+11 lines, one static helper + 3-line loop in the already-guarded `try`), one line + comment in `js/11_chuan_bi.js`, two tests, docs.
+- **Re-run now at 10cd320:** the 16 test files matching `api_forms|chuyen_phieu_clb|NHAN_LOAI_HIEN_THI|loai_nhan|nap_phieu_clb|get_forms_buoc_12|theo_loai|ChuanBi` + `test_ws_nhan` + `test_van_phong_tu_nhien` + `test_a13_12_tai_lieu` = **218 passed, 1 failed** (the known `test_ban_do_ma_so_tep_test_la_so_that`), 0 skipped (Chromium, `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`). `ruff check .` clean; `tao_i18n_js.py` leaves the tree unchanged.
+- **Invariants:** `kiem_nhanh --co-so 98709f1 --so-seed 20` = **7/7**, 60 cases byte-identical (`origin/main` is not a ref in this clone, so BASE was used). No DA core / `compute_club_priority` / schema / CSV contract touched; inv. 6 `{ok,data,errors}` kept; the new mapping is read-only (it never rewrites the stored file).
+- **Optional (non-blocking, unchanged):** English wording repeats the club name for some lines; step 4 `noi_dung` is still Vietnamese; for old files the English UI shows stored Vietnamese in `theo_loai`/`chan` (by design).
