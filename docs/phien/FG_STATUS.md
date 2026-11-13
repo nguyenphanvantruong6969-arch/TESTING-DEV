@@ -3,12 +3,10 @@ DONE 2026-11-13T10:10Z (no lock)
 STATUS: FG GREEN
 
 # FG status (FG-1 … FG-9, after user test of forms-gop)
-
 > English, ≤ 150 lines. Spec: `docs/ke_hoach/FORMS_GOP_SUA_KE_HOACH.md`; mechanics: `docs/ke_hoach/FG_TU_DONG.md`.
 > All numbers SIMULATED; all Forms work TH.
 
 BASE = f5e8a41 (origin/claude/forms-gop at start)
-
 ## Current step
 - DONE. FG GREEN on claude/fg-sua (code d34e7a7); merged into claude/forms-gop (§2.6). Report docs/phien/bao_cao_dem/2026-11-13_fg_sua.md.
 
@@ -30,7 +28,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - Rebuild from BASE: `git worktree add <scratch>/base f5e8a41`, then in it run
   `mau_forms_thi_clb/tao_mau_forms.py <mode> --ra <scratch>/snap/<name>` for `--fa-daa`, `--fa-daa --mot-bieu-mau`,
   `--phan-hoi`, `--tuan-3` (and `--sau-ket-qua` for reference). Output verified deterministic (two runs, `diff -r` clean).
-- Lead copy: `<scratchpad of session_01VfPzNt8wLhNQyk5sYejKse>/snap/{fa-daa,fa-daa_mot,phan-hoi,tuan-3,sau-ket-qua}`.
 
 ## Decisions
 - FG-7 golden hashes are per platform (os.name): Linux values from STEP0; Windows values = actual Windows output in CI run 43376547591 (these modes are unchanged by FG). Still an exact comparison on each platform.
@@ -60,7 +57,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 - §2.6 gate on the merged tree (origin/claude/forms-gop 9d5862b + claude/fg-sua; forms-gop side adds only docs/fable/04_UI_AUDIT_BRIEF.md, no conflicts): ruff clean, FG tests 74 passed, kiem_nhanh 7/7, 60/60.
 - ROUND 2 GREEN → FG GREEN.
-
 ## Workers
 | Task | Session | State |
 |---|---|---|
@@ -76,7 +72,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-9 | session_01VfPzNsKCDN6sCNzaUQr5XA | DONE, review GO |
 | FINISH | session_01VfPzNqz9T4QpQyTxcxNyFF | DONE, review GO (report line on FA-M8..10 to correct) |
 | FIX-1 | session_01VfPzNqz2WHdbmmR46EeJMg | DONE, review GO |
-
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
 - 2026-11-13 WORKER session_01VfPzNuWUv3W6FtiR2fPPpB STEP0 DONE 63b6e73 (tests only, no production code; ruff clean; run on HEAD 24846d2: 41 failed / 15 passed over tests/test_fg*.py + tests/test_giao_dien_fg*.py)
