@@ -33,3 +33,17 @@ acceptable, and a guessed new one cannot be produced here. Do not weaken the pos
 3. Also fix the comment line in that file (now one overlong line mixing two sentences).
 Verify the content digest is equal on posix before/after only where expected (changes in m2/m3 yes; the other modes
 untouched).
+
+# Round 2 (checker, this session) — range bd6d821..a4d950a — verdict PASS
+
+Fix commit a4d950a touches only `tests/test_fg7_bieu_mau_sau_ket_qua.py` (+ status); no production code changed since b9c4f32.
+- `_bam_noi_dung` is OS-independent: file names via `relpath(...).replace(os.sep, "/")`, `sorted` roots and names (output is
+  flat, so no sibling-vs-subdir order issue), `.md` bytes with `\r\n`→`\n`, `.docx` only paragraph and table-cell text via
+  python-docx (no zip bytes, no core.xml). Generated docx has no headers, footers or text boxes, so the digest covers all text.
+- Asserted on both OSes (runs before the nt skip); the posix byte hash dicts are untouched (`git diff b9c4f32 a4d950a`
+  shows no hash change) and still strict; only the nt byte-hash assert is skipped, only for `fa_daa`, `fa_daa_mot`, with a reason naming SG-5.
+- Mutation: `Huy chương giúp em`→`Huy chuong giup em` in `bieu_mau.py` MO_TA_HUY_CHUONG → both fa_daa tests fail at the
+  content-digest assert (line 92); restored. Comment lines now separate; ruff clean.
+- Round-1 points re-run at a4d950a: test_sg5_huy_chuong, test_fa_m2_forms_dang_ky, test_fg7_bieu_mau_sau_ket_qua,
+  test_fa_m3_huy_chuong_b, test_van_phong_tu_nhien, test_ws_nhan = 110 passed.
+- Limit: the nt branch itself was not executed here (no Windows); read from code only.
