@@ -125,6 +125,7 @@ def test_tep_xuat_mau_nap_sach_vao_phan_mem(tmp_path, de):
     assert (ra / "BANG_DIEM.xlsx").exists()
 
 
+@pytest.mark.tieu_de_thuan
 def test_tep_xuat_mau_dung_la_ban_sinh_tu_de_thi(tmp_path, de):
     """Sửa de_thi.json mà quên chạy lại tao_mau_forms.py thì test này đỏ."""
     moi = tmp_path / "x.xlsx"
@@ -139,6 +140,7 @@ def test_tep_xuat_mau_dung_la_ban_sinh_tu_de_thi(tmp_path, de):
     assert bang(str(moi)) == bang(os.path.join(THU_MUC, "MAU_XUAT_TU_FORMS.xlsx"))
 
 
+@pytest.mark.tieu_de_thuan
 def test_cai_dat_forms_khop_de_thi(de):
     with open(os.path.join(THU_MUC, "CAI_DAT_FORMS.md"), encoding="utf-8") as f:
         assert f.read() == tm.ghi_cai_dat(de)

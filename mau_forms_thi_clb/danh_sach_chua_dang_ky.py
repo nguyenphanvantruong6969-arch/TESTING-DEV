@@ -23,6 +23,8 @@ _KY_TU_CAM = '<>:"/\\|?*'
 _TEN_DANH_RIENG = frozenset(["CON", "PRN", "AUX", "NUL"] + ["COM%d" % i for i in range(1, 10)]
                             + ["LPT%d" % i for i in range(1, 10)])
 _COT_MA = re.compile(r"^\s*(?:\d+[.)]\s*)?\[student_id\]")
+# SG-12: biểu mẫu mới ghi tiêu đề THUẦN (không "[student_id]"); câu mã học sinh không phụ thuộc đề nên nhận thẳng chữ thuần.
+_TIEU_DE_MA_THUAN = re.compile(r"^\s*(?:\d+[.)]\s*)?Mã học sinh của em\b")
 
 
 def _ten_tep(lop):
@@ -66,12 +68,16 @@ def _chu(x):
     return str(x).strip()
 
 
+def _la_cot_ma(tieu_de):
+    return tieu_de == "student_id" or bool(_COT_MA.match(tieu_de) or _TIEU_DE_MA_THUAN.match(tieu_de))
+
+
 def doc_da_dang_ky(duong):
     """Tập mã học sinh đã đăng ký trong tệp xuất (xlsx/csv). Không có cột mã -> ValueError."""
     hang = _hang_cua(duong)
     if not hang:
         raise ValueError("tệp rỗng: cần cột [student_id] hoặc student_id")
-    i = next((k for k, o in enumerate(hang[0]) if _chu(o) == "student_id" or _COT_MA.match(_chu(o))), None)
+    i = next((k for k, o in enumerate(hang[0]) if _la_cot_ma(_chu(o))), None)
     if i is None:
         raise ValueError("không thấy cột [student_id] hoặc student_id")
     return {_chu(d[i]) for d in hang[1:] if i < len(d) and _chu(d[i])}

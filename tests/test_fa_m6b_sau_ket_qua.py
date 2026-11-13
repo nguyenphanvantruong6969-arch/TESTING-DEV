@@ -376,9 +376,12 @@ def test_api_hai_nut_cu_van_cho_ket_qua_cu(api, de, gio):
 
 
 # ---------------------------------------------------------------- 7. bộ sinh
+@pytest.mark.tieu_de_thuan
 def test_sinh_sau_ket_qua_hai_tep_va_giong_het(de, tmp_path):
     assert tmf.main(["--sau-ket-qua", "--ra", str(tmp_path)]) == 0
-    assert _tep(tmp_path) == ["CAI_DAT_FORMS_SAU_KET_QUA.md", "NHAP_FORMS_SAU_KET_QUA.docx"]
+    # SG-12: thêm tệp bản đồ MAP_*.json cạnh biểu mẫu (tiêu đề thuần -> mã)
+    assert _tep(tmp_path) == ["CAI_DAT_FORMS_SAU_KET_QUA.md", "MAP_NHAP_FORMS_SAU_KET_QUA.json",
+                              "NHAP_FORMS_SAU_KET_QUA.docx"]
     md = (tmp_path / "CAI_DAT_FORMS_SAU_KET_QUA.md").read_text(encoding="utf-8")
     assert "TH" in md and "CHƯA thử" in md
     for can in ("[co_sai]", "End of form", "Không (0)", "Có (1)", "Record name", "One response per person",
@@ -401,8 +404,9 @@ def test_sinh_sau_ket_qua_xung_khac_che_do_khac(tmp_path):
     assert _tep(tmp_path) == []
 
 
+@pytest.mark.tieu_de_thuan
 def test_phan_hoi_van_giong_het_nhu_truoc(tmp_path):
-    """`--phan-hoi` giữ nguyên: hai tệp cũ, không có câu mới."""
+    """`--phan-hoi` giữ nguyên: hai tệp cũ (+ MAP_*.json của SG-12), không có câu mới."""
     assert tmf.main(["--phan-hoi", "--ra", str(tmp_path)]) == 0
-    assert _tep(tmp_path) == ["CAI_DAT_FORMS_PHAN_HOI.md", "NHAP_FORMS_PHAN_HOI.docx"]
+    assert _tep(tmp_path) == ["CAI_DAT_FORMS_PHAN_HOI.md", "MAP_NHAP_FORMS_PHAN_HOI.json", "NHAP_FORMS_PHAN_HOI.docx"]
     assert "co_sai" not in (tmp_path / "CAI_DAT_FORMS_PHAN_HOI.md").read_text(encoding="utf-8")

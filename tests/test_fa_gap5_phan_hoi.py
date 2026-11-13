@@ -6,6 +6,8 @@ import io
 import os
 import sys
 
+import pytest
+
 import cau_hinh_ws as ch
 import fa_sau_xep as sx
 from _fa import dung_fa_clb, dung_hs_fa, ma
@@ -69,6 +71,7 @@ def test_tong_hop_thuan_lay_lan_cuoi_moi_em():
 
 # ----------------------------------------------------------------------------- Forms (TH)
 
+@pytest.mark.tieu_de_thuan
 def test_sinh_mau_forms_phan_hoi_va_sinh_lai_giong_het(tmp_path):
     assert tmf.main(["--phan-hoi", "--ra", str(tmp_path)]) == 0
     md = tmp_path / "CAI_DAT_FORMS_PHAN_HOI.md"

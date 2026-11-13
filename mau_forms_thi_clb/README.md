@@ -156,6 +156,17 @@ R1..R38 và HDT §9). `--zip` thêm `<ra>.zip` ngoài thư mục. Sinh lại cho
 > chuyển đổi dừng và báo thiếu câu. Tương tự, lựa chọn trong câu Ranking phải
 > giữ phần `(club_id)` ở cuối.
 
+> **Tiêu đề thuần (mặc định).** Từ nay biểu mẫu sinh ra KHÔNG còn `[mã]` ở đầu
+> câu và `(club_id)` ở cuối lựa chọn: học sinh chỉ thấy chữ thuần. Mã nằm ở
+> `MAP_<tên tệp Quick Import>.json` cạnh mỗi biểu mẫu (tiêu đề thuần → mã). Bộ
+> chuyển đổi và kiosk nhận ra từng câu bằng CHÍNH chữ tiêu đề, dựng lại bản đồ
+> từ `de_thi.json` nên không cần nạp tệp MAP: **đừng sửa chữ tiêu đề hay lựa
+> chọn trên Forms**. Hai câu đề thi trùng chữ giữa các CLB được thêm
+> "(tên CLB, câu k)"; hai CLB cùng tên trong một buổi bị báo lỗi (đổi tên một
+> CLB). Tệp xuất CŨ có `[mã]` vẫn nạp được. Muốn giữ tiêu đề có mã như trước
+> (ví dụ cho đợt đang chạy): thêm cờ `--giu-ma` — đầu ra giống hệt từng byte
+> trước thay đổi này và không có tệp MAP.
+
 ## 2. Soát thử trước khi phát cho học sinh
 
 Tự điền **hai phiếu** — một phiếu thi một CLB, một phiếu chọn *"Không"* ở mọi

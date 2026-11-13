@@ -1,9 +1,11 @@
 """GAP-6: khảo sát tuần 3 (hai câu: còn đi CLB không? muốn đổi không?) — mẫu Forms (TH — chưa thử trên Microsoft
 thật), nạp tệp xuất qua cùng bộ nhập của GAP-5, tổng hợp và trang "Tuần 3" trong tệp xuất. Dữ liệu là dữ liệu MÔ PHỎNG.
 """
+import pytest
 from test_fa_gap5_phan_hoi import _dung, _lc, _xlsx_forms, bm, tmf
 
 
+@pytest.mark.tieu_de_thuan
 def test_sinh_mau_forms_tuan_3_va_sinh_lai_giong_het(tmp_path):
     assert tmf.main(["--tuan-3", "--ra", str(tmp_path)]) == 0
     md = tmp_path / "CAI_DAT_FORMS_TUAN_3.md"

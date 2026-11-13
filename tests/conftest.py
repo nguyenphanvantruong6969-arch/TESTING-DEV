@@ -41,3 +41,20 @@ def khong_ghi_vao_thu_muc_tai_ve_that(tmp_path, monkeypatch):
     cho_tam = tmp_path / "TaiXuong_gia"
     cho_tam.mkdir(exist_ok=True)
     monkeypatch.setenv("RBDA_THU_MUC_TAI_VE", str(cho_tam))
+
+
+@pytest.fixture(autouse=True)
+def tieu_de_giu_ma_cho_test_cu(request):
+    """SG-12: các test viết TRƯỚC khi biểu mẫu chuyển sang tiêu đề thuần dựng tệp xuất bằng các hàm tên câu của
+    `bieu_mau` (và so với chữ có mã). Chúng chạy ở chế độ GIỮ MÃ — đúng là "tệp xuất cũ có mã vẫn nạp được". Tiêu đề
+    thuần được kiểm riêng ở `tests/test_sg12_tieu_de_thuan.py` (module này chạy ở chế độ mặc định = thuần). Test nào kiểm ĐẦU RA MẶC ĐỊNH của
+    bộ sinh (`tmf.main` không cờ) đánh dấu `@pytest.mark.tieu_de_thuan` để so với chữ thuần."""
+    if request.module.__name__.startswith("test_sg12") or request.node.get_closest_marker("tieu_de_thuan"):
+        yield                      # test kiểm đầu ra MẶC ĐỊNH của bộ sinh (tiêu đề thuần): không ép chế độ giữ mã
+        return
+    duong = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mau_forms_thi_clb")
+    if duong not in sys.path:
+        sys.path.insert(0, duong)
+    import bieu_mau
+    with bieu_mau.che_do_giu_ma(True):
+        yield
