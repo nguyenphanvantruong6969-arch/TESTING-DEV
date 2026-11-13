@@ -14,7 +14,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-5 | READY | 1 | 7f7b5ca | | session_01VfPzNruBqHHaJZQcLRxRzS | | tests/test_sg5_huy_chuong.py |
+| SG-5 | CHECKING | 0 | bd6d821 | b9c4f32 | session_01VfPzNruBqHHaJZQcLRxRzS | | tests/test_sg5_huy_chuong.py |
 | SG-7 | TODO | 0 | | | | | |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
