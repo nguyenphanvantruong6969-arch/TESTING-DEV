@@ -21,7 +21,7 @@ import tao_mau_forms as tmf  # noqa: E402
 
 # sha256 của cả thư mục đầu ra (tên + nội dung) chụp trên f5e8a41, sinh hai lần giống nhau.
 # Byte đầu ra khác nhau theo hệ điều hành (os.name); FG không đổi các chế độ này, nên mỗi nền
-# tảng giữ nguyên băm của chính nó (posix: chụp ở STEP0; nt: đầu ra thật ở CI run 43376547591).
+# tảng giữ nguyên băm của chính nó (SG-5 đổi riêng fa_daa, fa_daa_mot: posix đã chụp lại; nt CHƯA, cần chụp ở CI) (posix: chụp ở STEP0; nt: đầu ra thật ở CI run 43376547591).
 _CHE_DO = {
     "fa_daa": ["--fa-daa"],
     "fa_daa_mot": ["--fa-daa", "--mot-bieu-mau"],
@@ -30,8 +30,8 @@ _CHE_DO = {
 }
 _BAM_THEO_HE = {
     "posix": {
-        "fa_daa": "acdefb99e7cdf7f7d65702ee4ef5b11b9a7adfd0abb97a160b1d68b13d01755e",
-        "fa_daa_mot": "0e652cff8372cf9135072a03495bd38fe249b67f51c401c08d35de4d3a6bc73d",
+        "fa_daa": "172df180d80f257051cda2502ff125378524fa45819ca72a49453000dd64c84d",
+        "fa_daa_mot": "a40300e96830dba1ab1a7d45dc243288324fa600738f37ce363174abc71d0f75",
         "phan_hoi": "f4cc8d3f5bd8c560685c455a919ce0a81ffe05e82843498d931ccbe673c8c54a",
         "tuan_3": "eb73af3d5a3a80babec6b30dfbe5e63faf24016c8ec5ea04aece6cad75073e00",
     },

@@ -32,6 +32,8 @@ SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registrati
 Changed vs the brief: (1) "medals only break ties after the test score" is true only for clubs WITH scores; in `fa_daa` a Giới hạn club orders by medal BEFORE the lottery (key `(1, -medal, stb)`), so the text says both. (2) "leaving default never hurts" is not provable (not a dominant strategy), so it is NOT claimed. (3) Default is "first/second/third NON-free club", so the text says free clubs are skipped.
 Placement is in the question title because Quick Import has no per-section description field (untested on real Forms).
 
+- SG-5: `nt` hashes of fa_daa/fa_daa_mot in tests/test_fg7_bieu_mau_sau_ket_qua.py are STALE (posix re-pinned; Windows CI output needed).
+
 ## Log
 - 2026-11-13T16:10Z LEAD session_01VfPzNuse9EfjuDwwt7335U setup branch claude/sg-c from BASE 98709f1
 - 2026-11-13T15:55Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 CODING start 7f7b5ca coder session_01VfPzNruBqHHaJZQcLRxRzS
