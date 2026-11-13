@@ -15,8 +15,8 @@ from _so_nhap_dump import chup
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAU_FA = os.path.join(GOC, "du_lieu_test", "SO_NHAP_FA_MAU_120HS.xlsx")
-# sha256 của `chup()` sổ mẫu mặc định (không FA) chụp trên f5e8a41; FG-2 không được đổi nó.
-BAM_SO_MAU_MAC_DINH = "af67f52b2ccbf31b29a259d34249b904ac999f9c40d5575156e253535fdf119a"
+# sha256 của `chup()` sổ mẫu mặc định (không FA): chụp trên f5e8a41, cập nhật ở SG-2 (câu "ô trống tính là 0" của Hướng dẫn).
+BAM_SO_MAU_MAC_DINH = "54d4bc37342a8a25a35089b7aae2e762a6edd4bfe1e587d0fafa681d9b837559"
 
 
 def _b64(duong):

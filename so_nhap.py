@@ -1265,8 +1265,9 @@ def _huong_dan_co_dau(cfg=None) -> list:
                 % (slot_l, diem_l, diem_l),
                 "        quỹ 2 chia cho các %s không thi, quyết định thứ tự giữa các %s không thi."
                 % (slot_l, nguoi_l),
-                "        Số nguyên không âm; ô trống tính là 0. Quỹ nào chỉ có một %s thì điền 100."
-                % slot_l,
+                "        Số nguyên không âm, mỗi quỹ cộng đúng 100. Quỹ nào chỉ có một %s thì để"
+                " trống, phần mềm tự điền 100;" % slot_l,
+                "        quỹ có từ hai %s trở lên mà để trống cả quỹ thì lần chạy xếp bị chặn." % slot_l,
             ]
             vd = ["                                 Nguyện vọng 1                    Nguyện vọng 2",
                   "  Mã HS   Họ tên          %s   %s   %s   %s   %s   %s"

@@ -412,6 +412,39 @@ class NhapDuLieuMixin:
             ra.append(err("so_nhap_canh_bao_fa_se_loi"))
         return ra
 
+    def _canh_bao_wharton_trong_xem_truoc(self, du_lieu) -> list:
+        """SG-2: workspace bật điểm quyết tâm (không FA) — báo TRƯỚC khi nạp những em có một quỹ
+        từ hai CLB trở lên cùng một buổi mà mọi ô điểm đều trống hoặc 0: lần chạy xếp sẽ bị chặn
+        (`wharton_chua_dung_het`). Cùng cách chia quỹ với `tu_dien_wharton_mot_clb` (quỹ 1 = CLB
+        có thi, quỹ 2 = không thi; quỹ chỉ một CLB được tự điền nên không báo). Gom MỘT cảnh báo
+        `so_nhap_canh_bao_wharton_trong` (`n` = số em, `vd` = mã em đầu tiên). Không chặn nạp."""
+        luat = self._luat_nghiem()
+        if dung_fa_daa(luat) or not dung_wharton(luat):
+            return []
+        buoi_clb = {c["club_id"]: c.get("buoi") or BUOI_MAC_DINH for c in du_lieu["clubs"]}
+        with self._ket_noi_doc() as cur:
+            for cid, buoi in cur.execute("SELECT club_id, buoi FROM clubs"):
+                buoi_clb.setdefault(cid, buoi or BUOI_MAC_DINH)
+
+        def la_dat_diem(v) -> bool:
+            if isinstance(v, str):
+                v = v.strip()
+                return bool(re.fullmatch(r"[0-9]+", v)) and int(v) > 0
+            return isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0
+
+        trong = []
+        for s in du_lieu["students"]:
+            quy: dict = {}
+            for x in s["nv"]:
+                khoa = (buoi_clb.get(x["club_id"], BUOI_MAC_DINH), bool(x["thi"]))
+                quy.setdefault(khoa, []).append(x)
+            if any(len(ds) >= 2 and not any(la_dat_diem(x.get("diem_w")) for x in ds)
+                   for ds in quy.values()):
+                trong.append(s["student_id"])
+        if not trong:
+            return []
+        return [err("so_nhap_canh_bao_wharton_trong", n=len(trong), vd=str(trong[0]))]
+
     def xem_truoc_so_nhap(self, file_base64: str):
         """Đọc sổ và tóm tắt, KHÔNG ghi gì vào CSDL.
 
@@ -427,6 +460,8 @@ class NhapDuLieuMixin:
             kq["canh_bao"] = [] if du_lieu["loi"] else self._canh_bao_so_nhap(du_lieu)[0]
             if not du_lieu["loi"]:
                 kq["canh_bao"] += self._canh_bao_fa_xem_truoc(du_lieu)
+            if not du_lieu["loi"]:
+                kq["canh_bao"] += self._canh_bao_wharton_trong_xem_truoc(du_lieu)
             # Workspace chưa bật điểm Wharton mà sổ có cột "Điểm W k": nói trước khi bấm Nhập
             # rằng các ô đó sẽ bị bỏ qua (lúc nhập thật, bước nạp CSV cũng báo đúng câu này).
             if not du_lieu["loi"] and not dung_wharton(self._luat_nghiem()):

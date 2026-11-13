@@ -2956,6 +2956,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 /* (spacer: unchanged line between marker blocks) */
 
 /* === SG-B: add below === */
+.ws-tn-wharton { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border, #d8dee4); }
+.ws-tn-wharton .hint-text { margin: 4px 0 0 24px; }
 /* === end SG-B === */
 
 /* (spacer: unchanged line between marker blocks) */

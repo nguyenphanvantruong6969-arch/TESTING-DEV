@@ -68,6 +68,7 @@ MA_MOI_SAU_ANH_CHUP = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-B: add below ===
+    "so_nhap_canh_bao_wharton_trong",
     # === end SG-B ===
 
     # (spacer: unchanged line between marker blocks)

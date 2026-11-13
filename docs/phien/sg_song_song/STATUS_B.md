@@ -20,6 +20,10 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 - Strings go only inside the `=== SG-B: add below ===` … `=== end SG-B ===` marker blocks; CSS only in the SG-B block at the end of `style.css`.
 - CHANGELOG / TIEN_DO lines go to `docs/ke_hoach/sg_song_song/MANH_B.md` (lead A folds them in).
 
+- SG-2: blocked-run headline text (`wharton_ho_so_chua_hop_le`) left unchanged (old test B3 forbids "tắt"; extra entries in `errors` break detail-list tests). The "turn it off" hint + button "Mở Tính năng sau khi xếp…" live in `showLog` (js/02_van_hanh.js, person C's file, one row + one button).
+- SG-2: preview warning is per fund (tested / untested) per day, mirroring `tu_dien_wharton_mot_clb`, so one-club funds (auto-filled) are not flagged.
+- SG-2: updated `BAM_SO_MAU_MAC_DINH` in tests/test_fg2_xem_truoc_fa.py and regenerated du_lieu_test/SO_NHAP_DQT_*.xlsx: only the Hướng dẫn sheet changed (guide sentence, item 3).
+
 ## For Truong
 
 ## Log

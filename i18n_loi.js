@@ -1273,5 +1273,9 @@ window.I18N_ERROR_MESSAGES = {
   "forms_chua_chuyen_tep": {
     "vi": "Chưa chuyển tệp nào thành Sổ nhập. Hãy nạp tệp ở bước 4 trước.",
     "en": "No files have been converted into an input workbook yet. Load the files in step 4 first."
+  },
+  "so_nhap_canh_bao_wharton_trong": {
+    "vi": "{n} {person_l} (ví dụ {vd}) có từ hai {slot_l} trong cùng một buổi mà chưa điền điểm quyết tâm nào, nên lần chạy xếp sẽ bị chặn. Cách sửa: điền đủ 100 điểm cho mỗi nhóm trong sổ rồi nhập lại, hoặc tắt điểm quyết tâm ở Không gian làm việc → ⋯ → Tính năng sau khi xếp….",
+    "en": "{n} {person_l}(s) (for example {vd}) have two or more {slot_l}s in the same session with no commitment points filled in, so the allocation run will be blocked. To fix it: fill in 100 points for each group in the workbook and import again, or turn commitment points off in Workspace → ⋯ → After-allocation features…."
   }
 };

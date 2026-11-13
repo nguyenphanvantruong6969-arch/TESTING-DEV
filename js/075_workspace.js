@@ -284,13 +284,21 @@ function wsMoTinhNang(w) {
   });
   const ngay = wsEl("input", { type: "number", class: "text-input", id: "wsTnNgay", min: "1", max: "14",
     value: "3", disabled: true, "aria-label": t("ws_tn_so_ngay") });
+  const hopW = wsEl("input", { type: "checkbox", role: "switch", id: "wsTnWharton", disabled: true });
+  const ghiChuW = wsEl("p", { class: "hint-text ws-tn-wharton-ghi-chu", id: "wsTnWhartonGhiChu",
+    text: t("ws_tn_wharton_goi_y") });
+  hopW.setAttribute("aria-describedby", "wsTnWhartonGhiChu");
   const loi = wsEl("p", { class: "hint-text", role: "alert" });
   const khongFa = wsEl("p", { class: "hint-text", text: t("ws_tn_khong_fa") });
   const luu = wsEl("button", { type: "button", class: "btn btn-primary", text: t("ws_btn_luu"), disabled: true });
   luu.addEventListener("click", () => khiBan(luu, () => {
     const rules = {};
-    o.forEach(([hop]) => { rules[hop.dataset.khoa] = hop.checked; });
-    rules.fa_khieu_nai_so_ngay = Number(ngay.value);
+    if (hopW.disabled) {
+      o.forEach(([hop]) => { rules[hop.dataset.khoa] = hop.checked; });
+      rules.fa_khieu_nai_so_ngay = Number(ngay.value);
+    } else {
+      rules.wharton = hopW.checked;   // không FA: chỉ ô điểm quyết tâm mở, các ô FA vẫn khoá
+    }
     return callApi("update_workspace_config", { rules }, w.slug).then((r) => {
       if (!r.ok) { loi.textContent = trErrs(r.errors).join(" "); return; }
       showToast(t("ws_tn_da_luu"), "success");
@@ -308,6 +316,8 @@ function wsMoTinhNang(w) {
       khongFa,
       ...o.map(([, nhan]) => wsEl("div", null, nhan)),
       wsEl("div", null, wsEl("span", { class: "ws-sua-nhan", text: t("ws_tn_so_ngay") }), " ", ngay),
+      wsEl("div", { class: "ws-tn-wharton" },
+        wsEl("label", { class: "ws-kem", for: "wsTnWharton" }, hopW, " ", t("ws_tn_wharton")), ghiChuW),
       loi,
       wsEl("div", { class: "ws-chan" }, luu, huy)));
   lop.addEventListener("keydown", (ev) => { if (ev.key === "Escape") dong(false); });
@@ -321,8 +331,22 @@ function wsMoTinhNang(w) {
     o.forEach(([hop]) => { hop.checked = luat[hop.dataset.khoa] === true; hop.disabled = !coFa; });
     if (Number.isInteger(luat.fa_khieu_nai_so_ngay)) ngay.value = String(luat.fa_khieu_nai_so_ngay);
     ngay.disabled = !coFa;
-    luu.disabled = !coFa;
+    // Điểm quyết tâm: FA cần nó (FA-N3) nên khoá kèm lý do; không FA thì tắt/bật được. Mặc định (khoá vắng) = bật.
+    hopW.checked = coFa || luat.wharton !== false;
+    hopW.disabled = coFa;
+    ghiChuW.textContent = t(coFa ? "ws_tn_wharton_can_fa" : "ws_tn_wharton_goi_y");
+    luu.disabled = false;
     khongFa.hidden = coFa;   // hiện sẵn cho tới khi biết có FA
+  });
+}
+
+/* Từ khung lỗi chạy xếp: mở hộp thoại "Tính năng sau khi xếp…" của không gian làm việc đang mở. */
+function wsMoTinhNangDangMo() {
+  if (!wsTrangThai || !wsTrangThai.enabled) return;
+  wsMoManChon(true);
+  wsLamMoiDanhSach().then(() => {
+    const w = wsDanhSach.find((x) => x.slug === wsTrangThai.slug);
+    if (w) wsMoTinhNang(w);
   });
 }
 
