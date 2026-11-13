@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- FG-4: delegated to a Sonnet worker (task start = HEAD after this commit). After FG-4: wave gate 1 (§2.4).
+- Wave 2: FG-5 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-6, FG-2, wave gate 2.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -48,7 +48,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | STEP0 | session_01VfPzNuWUv3W6FtiR2fPPpB | DONE |
 | FG-1 | session_01VfPzNtE2gjQkFTnk4CKsg9 | DONE, review GO |
 | FG-3 | session_01VfPzNv8yPVuUfCb3LScjpc | DONE, review GO |
-| FG-4 | (creating) | |
+| FG-4 | session_01VfPzNtbYjiRYVCMfuncuk2 | DONE, review GO |
+| FG-5 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -78,3 +79,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13 WORKER session_01VfPzNtbYjiRYVCMfuncuk2 FG-4 DONE 06cb12d
   - Red run before: tests/test_giao_dien_fg4_nut_nap.py 2 failed (busy-state test, both buttons) / 2 green error-path tests. After: 4 passed; related (gap1 theo_doi, m6b, i18n) green, Chromium really ran. ruff clean; kiem_nhanh --co-so origin/main 7/7.
   - Mutation: removed `.finally(xong)` -> 4 failed; restored, 4 passed. (Code commit 06cb12d carries the message "ghi hash vào Log" by a shell-chain slip; content is the full FG-4 change.)
+- 2026-11-13T02:52Z lead: FG-4 review GO: one helper napTepForms(nut, input, tenApi, khiXong) per spec, busy label, catch→generic toast, finally resets; 21 UI tests passed (Chromium ran).
+- 2026-11-13T02:55Z lead: WAVE GATE 1 GREEN: merged origin/claude/forms-gop c1de264 (conflicts only in CHANGELOG/TIEN_DO, both sides kept) → e099a3c; ruff clean; wave tests 68 passed; kiem_nhanh --co-so origin/main --so-seed 20: 7/7, 60/60; generator diff -r vs BASE snapshots: 4/4 identical.
