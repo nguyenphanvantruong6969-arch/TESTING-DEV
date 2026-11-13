@@ -875,3 +875,14 @@ function wsTaoWorkspace() {
     return moRoiTaiLai(res.data.slug);
   });
 }
+
+/* SG-6: giờ và địa điểm sinh hoạt của một CLB (do giáo viên khai trên Phiếu thiết lập CLB).
+   Chỉ có khi CLB đã khai: chưa khai thì "" và màn hình y như cũ. Dùng chung cho các bảng. */
+function chuGioDiaDiem(c) {
+  return [c && c.gio, c && c.dia_diem].map((x) => String(x || "").trim()).filter(Boolean).join(" · ");
+}
+
+function gioDiaDiemHtml(c) {
+  const chu = chuGioDiaDiem(c);
+  return chu ? ` <span class="clb-gio-dia-diem">${esc(chu)}</span>` : "";
+}

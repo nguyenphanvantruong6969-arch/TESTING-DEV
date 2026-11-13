@@ -322,6 +322,11 @@ class XuatKetQuaMixin:
                 phan.append(t.n("{session}: ") + str(c.get("buoi")))
             phan.append("Đã xếp %d/%d chỗ" % (c.get("matched") or 0,
                                               c.get("capacity") or 0))
+            # SG-6: giờ / địa điểm giáo viên khai (chỉ khi có). Là chữ người dùng gõ: không điền.
+            if (c.get("gio") or "").strip():
+                phan.append(t.n("Giờ: ") + c["gio"].strip())
+            if (c.get("dia_diem") or "").strip():
+                phan.append(t.n("Địa điểm: ") + c["dia_diem"].strip())
             t.khoi(" · ".join(phan), len(cot))
             t.bang(cot, [
                 [i, r["student_id"], r["ho_ten"] or "", r["lop"] or "",
@@ -336,6 +341,13 @@ class XuatKetQuaMixin:
     # THEO LỚP (A14): bản để GỬI GIÁO VIÊN CHỦ NHIỆM. Chỉ có kết quả — KHÔNG điểm thi, điểm
     # quyết tâm, số bốc thăm hay diện trúng tuyển. Một khối mỗi lớp, em chưa có chỗ tô đỏ.
     # -----------------------------------------------------------------
+    @staticmethod
+    def _o_clb_kem_gio(r) -> str:
+        """Tên CLB, kèm "(giờ, địa điểm)" khi CLB đã khai (SG-6). Chưa khai: đúng tên như cũ."""
+        ten = r["ten_club"] or r["club_id"] or ""
+        gd = ", ".join(x for x in ((r["gio"] or "").strip(), (r["dia_diem"] or "").strip()) if x)
+        return "%s (%s)" % (ten, gd) if gd else ten
+
     def _du_lieu_theo_lop(self, rows, ds_buoi, nhieu_buoi) -> dict:
         """{"cot": tiêu đề cột, "nhom": [(lớp|None, [dòng])]}; dòng = [mã, họ tên, ô buổi...].
 
@@ -344,7 +356,7 @@ class XuatKetQuaMixin:
         for r in rows:
             em = theo_em.setdefault(r["student_id"], {
                 "ho_ten": r["ho_ten"] or "", "lop": r["lop"] or None, "o": {}})
-            em["o"][r["buoi"]] = (r["ten_club"] or r["club_id"] or "") if r["club_id"] else ""
+            em["o"][r["buoi"]] = self._o_clb_kem_gio(r) if r["club_id"] else ""
         theo_lop: dict = {}
         for sid, em in sorted(theo_em.items()):
             o = [em["o"].get(b, "") for b in ds_buoi] if nhieu_buoi else [
@@ -1200,6 +1212,11 @@ class XuatKetQuaMixin:
         } for r in cur.execute(
             "SELECT club_id, name, capacity, reserve_capacity, "
             "COALESCE(reserve_group, ''), buoi FROM clubs ORDER BY club_id")]
+        # SG-6: giờ / địa điểm đi cùng sổ khi có CLB nào đã khai; không thì sổ y như cũ.
+        gd = {r[0]: (r[1], r[2]) for r in cur.execute("SELECT club_id, gio, dia_diem FROM clubs")}
+        if any(g or d for g, d in gd.values()):
+            for c in clubs:
+                c["gio"], c["dia_diem"] = gd.get(c["club_id"], (None, None))
         n_ten_doi = so_nhap.ten_khong_trung(clubs)
         hs = {r[0]: {"student_id": r[0], "name": r[1] or "", "reserve_group": r[2],
                      "class_id": r[3], "nv": []}
@@ -1893,7 +1910,7 @@ class XuatKetQuaMixin:
             rows = cur.execute("""
                 SELECT m.student_id, s.name AS ho_ten, m.buoi, m.club_id,
                        c.name AS ten_club, m.rank_in_student_pref, m.matched_tier,
-                       s.reserve_group, s.class_id AS lop
+                       s.reserve_group, s.class_id AS lop, c.gio, c.dia_diem
                 FROM match_results m
                 LEFT JOIN students s ON s.student_id = m.student_id
                 LEFT JOIN clubs   c ON c.club_id   = m.club_id
@@ -1942,9 +1959,14 @@ class XuatKetQuaMixin:
                 for sid, em in sorted(theo_em.items())
             ])
             # Cột Lớp chỉ ở bản Excel; CSV thời khoá biểu giữ nguyên (hợp đồng cột CSV).
+            # SG-6: bản Excel (phát cho học sinh) kèm giờ / địa điểm trong ô; CSV giữ nguyên.
+            o_xlsx = {}
+            for r in rows:
+                o_xlsx.setdefault(r["student_id"], {})[r["buoi"]] = (
+                    self._o_clb_kem_gio(r) if r["club_id"] else "")
             tkb_xlsx = (["Mã {person_l}", "Họ tên", "{cohort}"] + list(ds_buoi) + ["Số {slot_sl}"], [
                 [sid, em["ho_ten"], em["lop"]]
-                + [em["o"].get(b, "") for b in ds_buoi]
+                + [o_xlsx[sid].get(b, "") for b in ds_buoi]
                 + [sum(1 for b in ds_buoi if em["o"].get(b))]
                 for sid, em in sorted(theo_em.items())
             ])

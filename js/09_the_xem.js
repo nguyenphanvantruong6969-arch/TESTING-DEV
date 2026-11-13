@@ -232,7 +232,8 @@ function kqBamCot(i) {
 function kqHangLich(em, dsBuoi, coLop) {
   const tenBuoi = dsBuoi.map((b) => {
     const x = em.theo_buoi[b];
-    return x && x.club_id ? (x.club_name || x.club_id) : "";
+    return x && x.club_id
+      ? (x.club_name || x.club_id) + (chuGioDiaDiem(x) ? " (" + chuGioDiaDiem(x) + ")" : "") : "";
   });
   const oBuoi = tenBuoi.map((ten) => (ten ? `<td>${esc(ten)}</td>` : `<td class="o-trong">-</td>`));
   return {
@@ -272,7 +273,7 @@ function veKqTheoClb() {
     }));
     if (!hang.length) { kqBaoRong("members_rong"); return; }
     kqVeBang([t("th_student_id"), t("th_name"), t("th_cohort")], hang,
-      t("members_dem", { x: hang.length, y: d.capacity }), 3, 2);
+      t("members_dem", { x: hang.length, y: d.capacity }) + (chuGioDiaDiem(d) ? " · " + chuGioDiaDiem(d) : ""), 3, 2);
   });
 }
 

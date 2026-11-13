@@ -453,7 +453,7 @@ function veBangNhuCauCLB(ds) {
     tr.innerHTML =
       `<td class="cot-buoi-clb">${esc(nhanBuoi(c.buoi))}</td>` +
       `<td>${esc(c.club_id)}</td>` +
-      `<td class="clb-ten">${esc(c.name || c.club_id)}</td>` +
+      `<td class="clb-ten">${esc(c.name || c.club_id)}${gioDiaDiemHtml(c)}</td>` +
       `<td class="num">${esc(c.so_dang_ky)}</td>` +
       `<td class="num">${esc(c.so_dat_nv1)}</td>` +
       `<td class="num clb-chi-tieu">${esc(c.capacity)}</td>` +
@@ -517,7 +517,8 @@ function moDanhSachCLB(club_id) {
     const d = res.data;
     const vung = el("clbDsArea");
     el("clbDsTieuDe").textContent =
-      t("clb_ds_tieu_de", { ten: d.club_name || d.club_id });
+      t("clb_ds_tieu_de", { ten: d.club_name || d.club_id }) +
+      (chuGioDiaDiem(d) ? " · " + chuGioDiaDiem(d) : "");
 
     const body = el("clbDsBody");
     clear(body);

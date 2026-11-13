@@ -94,6 +94,12 @@ def _phan_loai(p, ten, loi, canh_bao):
     clb = {"name": ten, "buoi": so_nhap.ma_buoi(p[C_BUOI]), "reserve_capacity": 0}
     if toi_thieu:
         clb["so_toi_thieu"] = toi_thieu
+    # SG-6 (H1): giờ và địa điểm giáo viên gõ -> Sổ nhập (hai cột tuỳ chọn). Để trống thì không có
+    # khoá, nên phiếu không khai giờ cho ra sổ y hệt như trước.
+    if p[C_GIO]:
+        clb["gio"] = p[C_GIO]
+    if p[C_DIA_DIEM]:
+        clb["dia_diem"] = p[C_DIA_DIEM]
     if mo:
         phong = _nguyen_duong(p[C_PHONG])
         if phong is None:

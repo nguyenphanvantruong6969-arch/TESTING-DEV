@@ -776,6 +776,13 @@ class NhapDuLieuMixin:
                                   buoi_value)
                     if fa_bat:
                         fa_daa.ghi_thuoc_tinh_clb(cur, club_id, fa)
+                    # SG-6 (H1): giờ / địa điểm — cột tuỳ chọn, chỉ để hiển thị. Cột vắng = giữ giá
+                    # trị đang lưu; cột có mà ô trống = xoá về NULL. Không đụng thuật toán.
+                    cot_gd = [k for k in so_nhap.KHOA_GIO if k in fieldnames]
+                    if cot_gd:
+                        cur.execute(
+                            "UPDATE clubs SET %s WHERE club_id = ?" % ", ".join(k + " = ?" for k in cot_gd),
+                            [(row.get(k) or "").strip() or None for k in cot_gd] + [club_id])
                     if club_id in da_co:
                         n_sua += 1
                     else:

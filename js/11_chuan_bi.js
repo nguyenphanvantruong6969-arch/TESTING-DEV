@@ -141,7 +141,9 @@ window.ChuanBi = (() => {
     const bang = mot("table", "data-table");
     bang.id = "cb-b1-bang";
     const dau = bang.createTHead().insertRow();
-    ["cb_cot_ten", "cb_cot_buoi", "cb_cot_loai", "cb_cot_chi_tieu"].forEach((k) => {
+    /* SG-6: hai cột Giờ / Địa điểm chỉ khi có CLB đã khai; không thì bảng y như cũ. */
+    const coGio = clubs.some((c) => c.gio || c.dia_diem);
+    ["cb_cot_ten", "cb_cot_buoi", "cb_cot_loai", "cb_cot_chi_tieu"].concat(coGio ? ["cb_cot_gio", "cb_cot_dia_diem"] : []).forEach((k) => {
       const th = mot("th", "", t(k));
       th.scope = "col";
       dau.appendChild(th);
@@ -149,7 +151,7 @@ window.ChuanBi = (() => {
     const tb = bang.createTBody();
     clubs.forEach((c) => {
       const tr = tb.insertRow();
-      [c.name, c.buoi_nhan, c.loai_nhan, c.chi_tieu].forEach((v) => {
+      [c.name, c.buoi_nhan, c.loai_nhan, c.chi_tieu].concat(coGio ? [c.gio, c.dia_diem] : []).forEach((v) => {
         tr.insertCell().textContent = v === null || v === undefined ? "" : String(v);
       });
     });

@@ -81,7 +81,9 @@ class FormsMixin:
     def _clb_hien_thi(clubs):
         return [{"club_id": c["club_id"], "name": c["name"], "buoi": c.get("buoi") or "",
                  "buoi_nhan": so_nhap.nhan_buoi(c.get("buoi") or ""), "loai": c.get("loai"),
-                 "loai_nhan": so_nhap.NHAN_LOAI_HIEN_THI.get(c.get("loai"), ""), "chi_tieu": c.get("capacity")}
+                 "loai_nhan": so_nhap.NHAN_LOAI_HIEN_THI.get(c.get("loai"), ""), "chi_tieu": c.get("capacity"),
+                 # SG-6: khoá chỉ có khi CLB khai giờ / địa điểm (bảng bước 1 hiện cột khi có).
+                 **{k: c[k] for k in so_nhap.KHOA_GIO if c.get(k)}}
                 for c in clubs]
 
     def nap_phieu_clb(self, file_base64, ky_truoc_base64=""):
