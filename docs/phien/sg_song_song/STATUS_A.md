@@ -9,7 +9,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 |---|---|---|---|---|---|---|---|
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
-| SG-4 (M3) | CODING | 1 | a959972 | 53025b1 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ | |
+| SG-4 (M3) | CHECKING | 1 | a959972 | 17eaf11 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ, session_01TGThn6utYnaicoK4Ce6A5K | |
 | SG-10 (M2) | TODO | 0 | | | | | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
 
@@ -50,3 +50,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T17:27Z CHECKER session_01TGThn68N7shbENa7GNKWsZ SG-4 FIX-1
 2026-11-13T17:41Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 FIX-1 sent to coder session_01TGThn7xWLDq89PLMhnwS9V 98d47ce
 2026-11-13T17:50Z CODER session_01TGThn7xWLDq89PLMhnwS9V SG-4 FIX-1: 1 done ({person} -> {person_l} in both en strings, i18n_loi.js regenerated) READY 17eaf11 red:n/a (wording only; verified en text no longer capitalised via tests/test_sg4_khop_ma.py, test_ws_nhan, test_van_phong_tu_nhien pass, kiem_nhanh 7/7) mutation:n/a
+2026-11-13T17:55Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CHECKING r2 17eaf11
