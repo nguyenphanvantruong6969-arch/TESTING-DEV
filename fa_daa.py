@@ -620,6 +620,127 @@ def goi_y_chi_tieu(rows, gioi_han: dict) -> list:
     return ra
 
 
+class LoiChiaCho(ValueError):
+    """Lỗi của gợi ý chia chỗ (FA-CT1/CT2); `loi` là một mục `err(...)` cho giao diện."""
+
+    def __init__(self, loi: dict):
+        super().__init__(loi["code"])
+        self.loi = loi
+
+
+def _nhu_cau_clb(r: dict, nhu_cau) -> int:
+    """Nhu cầu `d_c` của một dòng bảng nhu cầu: số giáo viên đưa (`nhu_cau`) nếu có, không thì NV1;
+    TUYEN_CHON (không có `nhu_cau`): min(NV1, số đạt điểm sàn)."""
+    if nhu_cau is not None and r["club_id"] in nhu_cau:
+        return nhu_cau[r["club_id"]]
+    d = r["nv1"]
+    if r.get("loai") == TUYEN_CHON and r.get("so_dat_san") is not None:
+        d = min(d, r["so_dat_san"])
+    return d
+
+
+def chia_cho_theo_nhu_cau(rows, tong: int, gioi_han: dict, nhu_cau: dict | None = None) -> list:
+    """FA-CT1: GỢI Ý chia `tong` chỗ của MỘT buổi cho các CLB không TU_DO theo tỉ lệ nhu cầu.
+
+    Chỉ là số báo cáo cho giáo viên: KHÔNG ghi `clubs.capacity`, không đọc mã học sinh hay kết quả,
+    không vào khoá ưu tiên (bất biến 2). `rows` = `bang_nhu_cau(...)` của một buổi.
+    Nhu cầu `d_c` xem `_nhu_cau_clb`. Sàn `f_c = max(1, so_giu_cho)`; trần `g_c = gioi_han[c]` (không có:
+    không trần; trần < sàn thì sàn thắng vì em giữ chỗ phải vừa). Sàn và trần là CẬN, không cộng thêm.
+    Cách chia (tất định, số học `Fraction`): CLB nhu cầu 0 ở sàn; các CLB còn lại nhận
+    `clamp(λ·d_c, f_c, g_c)` với λ duy nhất để tổng bằng chỗ còn lại — đây là điểm dừng của vòng "cố
+    định CLB chạm cận, chia lại phần còn lại theo tỉ lệ" của đặc tả, tính đúng cả khi sàn và trần
+    cùng chạm. Rồi làm tròn phần lẻ theo số dư lớn nhất (Hamilton; hoà: d_c lớn hơn, rồi club_id);
+    CLB lẻ nằm hẳn giữa hai cận nguyên nên làm tròn không ra ngoài cận. Mọi nhu cầu bằng 0 -> chia đều
+    (d_c = 1). Mọi CLB có nhu cầu chạm trần -> chỗ thừa ghi ở `du` (mọi dòng của buổi).
+    Ra: dòng vào + `goi_y`, `chenh` (= goi_y − capacity), `ghi_chu` ∈ {"", cham_gioi_han, san_giu_cho,
+    khong_nhu_cau}, `du`; dòng TU_DO: goi_y/chenh None. Sắp theo (buổi, club_id). Không sửa đầu vào.
+    Sàn vượt `tong` -> `LoiChiaCho(chia_cho_tong_qua_nho)`.
+    """
+    from fractions import Fraction
+
+    rows = sorted(rows, key=lambda r: (str(r["buoi"]), str(r["club_id"])))
+    tham = [r for r in rows if r.get("loai") != TU_DO]
+    d = {r["club_id"]: _nhu_cau_clb(r, nhu_cau) for r in tham}
+    f = {r["club_id"]: max(1, r.get("so_giu_cho") or 0) for r in tham}
+    g = {}
+    for r in tham:
+        gh = gioi_han.get(r["club_id"])
+        g[r["club_id"]] = None if gh is None else max(gh, f[r["club_id"]])
+    can = sum(f.values())
+    if can > tong:
+        raise LoiChiaCho(err("chia_cho_tong_qua_nho", buoi=rows[0]["buoi"], tong=tong, can=can))
+    if tham and not any(d.values()):
+        d = {c: 1 for c in d}                                  # chia đều
+    duong = [c for c in d if d[c] > 0]
+    con = tong - sum(f[c] for c in d if d[c] == 0)
+
+    def gia_tri(lam):                                          # clamp(λ·d, f, g)
+        ra = {}
+        for c in duong:
+            x = max(lam * d[c], f[c])
+            ra[c] = x if g[c] is None else min(x, g[c])
+        return ra
+
+    v: dict = {c: Fraction(f[c]) for c in d if d[c] == 0}
+    cham_tran = set()
+    du = 0
+    toi_da = None if any(g[c] is None for c in duong) else sum(g[c] for c in duong)
+    if toi_da is not None and con >= toi_da:
+        du = con - toi_da
+        v.update({c: Fraction(g[c]) for c in duong})
+        cham_tran = set(duong)
+        lam = None
+    elif duong:
+        moc = sorted({Fraction(0)} | {Fraction(f[c], d[c]) for c in duong}
+                     | {Fraction(g[c], d[c]) for c in duong if g[c] is not None})
+        truoc = moc[0]
+        lam = None
+        for b in moc:
+            s = sum(gia_tri(b).values())
+            if s >= con:
+                s0 = sum(gia_tri(truoc).values())
+                tu_do = sum(d[c] for c in duong if Fraction(f[c], d[c]) <= truoc
+                            and (g[c] is None or Fraction(g[c], d[c]) >= b))
+                lam = b if s == con else truoc + Fraction(con - s0, tu_do)
+                break
+            truoc = b
+        if lam is None:                                        # vượt mốc cuối: chỉ CLB không trần
+            s0 = sum(gia_tri(truoc).values())
+            lam = truoc + Fraction(con - s0, sum(d[c] for c in duong if g[c] is None))
+        v.update(gia_tri(lam))
+        cham_tran = {c for c in duong if g[c] is not None and lam * d[c] > g[c]}
+    else:
+        lam = None
+        du = con
+    # Làm tròn Hamilton
+    nguyen = {c: int(x) for c, x in v.items()}             # x >= 0 nên int() = floor
+    thieu = (tong - du) - sum(nguyen.values())
+    le = sorted((c for c in v if v[c] != nguyen[c]), key=lambda c: (-(v[c] - nguyen[c]), -d[c], str(c)))
+    for c in le[:thieu]:
+        nguyen[c] += 1
+    assert all(f[c] <= nguyen[c] and (g[c] is None or nguyen[c] <= g[c]) for c in nguyen)
+    assert sum(nguyen.values()) == tong - du
+
+    ra = []
+    for r in rows:
+        cid = r["club_id"]
+        if r.get("loai") == TU_DO:
+            ra.append({**r, "goi_y": None, "chenh": None, "ghi_chu": "", "du": du})
+            continue
+        if d[cid] == 0 or _nhu_cau_clb(r, nhu_cau) == 0:
+            ghi = "khong_nhu_cau"
+        elif cid in cham_tran:
+            ghi = "cham_gioi_han"
+        elif lam is not None and lam * d[cid] < f[cid]:
+            ghi = "san_giu_cho"
+        else:
+            ghi = ""
+        cap = r.get("capacity")
+        ra.append({**r, "goi_y": nguyen[cid], "chenh": None if cap is None else nguyen[cid] - cap,
+                   "ghi_chu": ghi, "du": du})
+    return ra
+
+
 def kiem_tang_tu_goi_y(goi_y: dict, khai: dict) -> list:
     """GAP-7: giáo viên chỉ được TĂNG từ gợi ý ({club_id: n} cả hai): vi phạm `GIAM_SUC_CHUA` của `kiem_chi_tang`.
     CLB không có trong `khai` thì không xét."""

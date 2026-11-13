@@ -11,7 +11,7 @@ Spec: `docs/ke_hoach/GIAM_MAY_RUI_KE_HOACH.md` (follow exactly). Branch from `or
 `claude/giam-may-rui`; no PR. All numbers SIMULATED.
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [ ] FA-CT1: `chia_cho_theo_nhu_cau` (pure) + tests `tests/test_fa_ct1_chia_cho.py`
+- [x] FA-CT1: `chia_cho_theo_nhu_cau` (pure) + tests `tests/test_fa_ct1_chia_cho.py`
 - [ ] FA-CT2: `goi_y_tang_them` (pure) + `export_chia_cho` API + UI button + tests
 - [ ] FA-D7L: `quy_diem_10_le`, `diem_dieu_chinh_le`, `--diem-le`, `rules.fa_diem_le`, kiosk `dat_diem_san` + tests
 - [ ] Finish: soat-ma, `kiem_nhanh --co-so origin/main --so-seed 20` 7/7 (60/60), report

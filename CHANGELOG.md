@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-11-13 — FA-CT1 (A13, giảm may rủi): gợi ý chia lại chỗ một buổi theo nhu cầu (chỉ báo cáo)
+
+- `fa_daa.py`: `chia_cho_theo_nhu_cau(rows, tong, gioi_han, nhu_cau=None)` (hàm thuần) chia `tong` chỗ của một buổi cho
+  CLB Giới hạn / Tuyển chọn theo tỉ lệ nhu cầu (NV1; Tuyển chọn: min(NV1, số đạt sàn); hoặc số giáo viên đưa), sàn
+  `max(1, số giữ chỗ)`, trần = giới hạn giáo viên; làm tròn số dư lớn nhất (Hamilton); chỗ thừa ở `du`. Lỗi mới
+  `LoiChiaCho` / mã `chia_cho_tong_qua_nho` (vi + en, `MA_MOI_SAU_ANH_CHUP`, đã chạy `tao_i18n_js.py`).
+- Không ghi `clubs.capacity`, không đụng lõi DA / khoá ưu tiên / STB / `run_history`.
+- Test mới: `tests/test_fa_ct1_chia_cho.py` (105 ca: ví dụ tay, tổng và cận trên 60 bộ ngẫu nhiên, tỉ lệ, tất định,
+  giữ chỗ, Tự do / nhu cầu ghi đè / Tuyển chọn, nhu cầu 0 và chỗ thừa). Dữ liệu MÔ PHỎNG.
+
 ## 2026-11-13 — GIAM-MAY-RUI-KH (Truong yêu cầu 13/11/2026): kế hoạch giảm may rủi cho Sonnet (chỉ tài liệu)
 
 - `docs/ke_hoach/GIAM_MAY_RUI_KE_HOACH.md` (mới): FA-CT1 chia chỗ theo nhu cầu (gợi ý, không ghi chỉ tiêu), FA-CT2 "được thêm X chỗ thì thêm vào đâu" + nút xuất cho giáo viên, FA-D7L điểm lẻ 0,1 (tuỳ chọn, mặc định tắt; tập đạt điểm sàn giữ nguyên nhờ cắt bớt rồi làm tròn).

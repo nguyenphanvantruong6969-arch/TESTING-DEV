@@ -402,6 +402,10 @@ MESSAGES = {
         "vi": "Giới hạn chỉ tiêu phải là số nguyên dương (nhận {value}).",
         "en": "The capacity limit must be a positive whole number (got {value}).",
     },
+    "chia_cho_tong_qua_nho": {
+        "vi": "{session} {buoi}: {tong} chỗ là chưa đủ. Cần ít nhất {can} chỗ (mỗi {slot_sl} ít nhất 1 chỗ, cộng chỗ đã giữ trước).",
+        "en": "{buoi}: {tong} seats aren't enough. At least {can} are needed (1 per {slot_l}, plus the reserved seats).",
+    },
     "club_not_found": {
         "vi": "Không tìm thấy {slot_sl} {club_id}.",
         "en": "{slot} {club_id} wasn't found.",
