@@ -56,3 +56,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T18:12Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CODING coder=session_01TGThn6PGJParLMUADLpcQk f660d28
 2026-11-13T18:17Z CODER session_01TGThn6PGJParLMUADLpcQk SG-10 READY 4dad18a red:3 of 3 backend tests failed before fix (no tu_do key); UI results-tab tests fail without JS fix mutation:tu_do forced False -> 4 tests fail, JS fix reverted -> 2 UI tests fail, both restored
 2026-11-13T18:33Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CHECKING checker=session_01TGThn5KnRmS2eSHn9DjZpt 4dad18a
+2026-11-13T18:50Z CHECKER session_01TGThn5KnRmS2eSHn9DjZpt SG-10 FIX-1 (see docs/phien/sg_review/SG-10.md: 3 must-fix — Theo CLB caption 'Đã xếp 12/5 chỗ' in 09_the_xem/get_danh_sach_clb, ti_le_choi still 2.4 for free club leaking to sort + unplaced tags, exports 12/5 + 240%)
