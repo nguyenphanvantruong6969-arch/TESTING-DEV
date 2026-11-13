@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-13 — FG FINISH: báo cáo, sổ sách, chạy thử người mới (chỉ tài liệu, TH)
+
+- `docs/phien/bao_cao_dem/2026-11-13_fg_sua.md`: bảng 9 mục FG-1…FG-9, test đã thêm, quyết định, mục GONE-ON-HEAD, "Chờ Truong", chạy thử người mới theo spec §5 (chế độ trình duyệt, không gian làm việc mới ngoài kho mã): bật 5 tính năng từ menu → nạp sổ mẫu FA 120 em → chạy → nạp tệp Forms sau kết quả MÔ PHỎNG hai lần: cùng số đếm (33 phản hồi, 3 khiếu nại), lần hai báo trùng. Không có lỗi mới. Phần "Vòng xanh" để lead điền.
+- `docs/ke_hoach/TIEN_DO.md`, `docs/phien/claude__forms-gop.md` (mục FG): ghi tiến độ. Không đổi mã sản xuất hay test.
+
 ## 2026-11-13 — FG-9: thanh bên bỏ số thứ tự, thông báo "Tải sổ nhập mẫu" có nút "Mở thư mục" (TH)
 
 - `index.html` + `style.css`: bỏ 7 số 01–07 ở thanh bên (và luật `.nav-icon`); thứ tự thẻ không đổi.
