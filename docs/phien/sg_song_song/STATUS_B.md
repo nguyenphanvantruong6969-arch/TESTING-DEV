@@ -97,3 +97,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T23:40Z CHECKER session_01YVAyu3LJVjJwZrCxTDDP4W SG-11b PASS (review: docs/phien/sg_review/SG-11b.md Round 2; FIX-1 1-4 closed, global Esc unchanged elsewhere, 128 UI/related passed, kiem_nhanh 7/7)
 2026-11-13T23:58Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b DONE (checker r2 PASS) 29bfa1e
 2026-11-13T23:58Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 full suite at dff2363: 6087 passed, red = a13_12 (known) + 2x test_giao_dien_loi_chan_gon (SG-2 regression) -> SG-2 FIX-2 to coder
+2026-11-13T23:57Z CODER session_01YVAyu23VvGaoDixHWJZn1G SG-2 READY 690322f fix:1 done (hint moved out of .log-dong; old test untouched),2 done (36 giao_dien tests on showLog/logBox + sg2 backend pass, ruff clean, kiem_nhanh 7/7)
