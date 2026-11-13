@@ -418,7 +418,7 @@ def _doc_diem_quyet_tam(o):
 HUY_CHUONG_DIEM = (60, 30, 10)  # vàng, bạc, đồng (FA-DAA V§6)
 
 
-def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
+def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong="", so_clb_nhan=None):
     """Huy chương MỘT em MỘT ngày trên đường B (chỉ Forms; FA-M3, quyết định D2/D12 của Truong 08/11/2026).
 
     Mặc định: vàng/bạc/đồng cho ba CLB KHÔNG Tự do đầu tiên theo thứ tự nguyện vọng (ngoại lệ bất biến 2 trong
@@ -427,8 +427,12 @@ def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
       * `doi_bac_dong`: "Có" thì đổi chỗ bạc và đồng; trống = giữ.
     Giá trị không dùng được (vàng vào CLB Tự do / ngoài danh sách, ô đổi lạ, đổi khi chỉ còn một CLB) thì giữ mặc
     định và báo. Trả `({club_id: 60|30|10}, [cảnh báo])`. Nguyện vọng trùng chỉ tính một lần.
+    `so_clb_nhan` (SG-5): số CLB của ngày nhận được huy chương; < 3 thì câu đổi bạc/đồng vô nghĩa (biểu mẫu mới không
+    có câu đó, tệp cũ vẫn có) nên ô đổi bị bỏ qua, KHÔNG báo. None = không biết, giữ cách cũ.
     """
     canh_bao = []
+    if so_clb_nhan is not None and so_clb_nhan < bm.SO_CLB_TOI_THIEU_CAU_DOI:
+        doi_bac_dong = ""
     ds = [c for c in dict.fromkeys(_o(c) for c in nguyen_vong) if c and c not in tu_do]
     if not ds:
         return {}, canh_bao
@@ -1092,7 +1096,9 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
             vang = clb_vang["club_id"] if clb_vang else ""
             if tho_vang not in ("", bm.GIU_MAC_DINH_VANG) and not vang:
                 bao("%s: huy chương vàng %r không phải CLB nào — giữ mặc định" % (buoi, tho_vang))
-            huy_chuong, canh_bao_hc = dat_huy_chuong_duong_b(xep, tu_do, vang, "" if tho_doi in ("", bm.DOI_KHONG) else tho_doi)
+            huy_chuong, canh_bao_hc = dat_huy_chuong_duong_b(
+                xep, tu_do, vang, "" if tho_doi in ("", bm.DOI_KHONG) else tho_doi,
+                so_clb_nhan=sum(1 for c in de["cau_lac_bo"] if c["buoi"] == buoi and c["club_id"] not in tu_do))
             for nd in canh_bao_hc:
                 bao("%s: %s" % (buoi, nd))
             hs["nguyen_vong"][buoi] = xep

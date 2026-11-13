@@ -228,9 +228,25 @@ def cau_nguyen_vong_fa(de, ma_buoi, k):
     return "[%s-nv%d] %s — Nguyện vọng %d" % (ma_buoi, k, ten_buoi(de, ma_buoi), k)
 
 
+# SG-5 (H3): một dòng mô tả dưới phần huy chương, nói đúng luật thật của `fa_daa`: huy chương KHÔNG đổi thứ tự
+# nguyện vọng; nó chỉ là tiêu chí ưu tiên ở từng CLB — CLB Tuyển chọn: điểm thi trước, huy chương khi bằng điểm;
+# CLB Giới hạn (không xét điểm): huy chương trước bốc thăm. Mặc định (`dat_huy_chuong_duong_b`): vàng, bạc, đồng cho
+# ba CLB không Tự do đầu tiên theo thứ tự nguyện vọng. Cố ý KHÔNG hứa "để mặc định không bao giờ thiệt".
+MO_TA_HUY_CHUONG = ("Huy chương giúp em được ưu tiên hơn bạn khác ở CLB đó: CLB có xét điểm thi thì chỉ dùng khi "
+                    "bằng điểm thi, CLB không xét điểm thi thì dùng trước khi bốc thăm. Em không chọn gì thì hệ "
+                    "thống tự đặt vàng cho nguyện vọng 1, bạc cho nguyện vọng 2, đồng cho nguyện vọng 3 "
+                    "(CLB Tự do không có huy chương nên được bỏ qua).")
+SO_CLB_TOI_THIEU_CAU_DOI = 3          # đổi chỗ bạc và đồng chỉ có nghĩa khi có >= 3 CLB nhận huy chương
+
+
+def so_clb_nhan_huy_chuong(de, ma_buoi):
+    """Số CLB của ngày đủ điều kiện nhận huy chương (không Tự do; chưa biết `loai` thì tính là có)."""
+    return sum(1 for c in clb_cua_buoi(de, ma_buoi) if c.get("loai") != "TU_DO")
+
+
 def cau_vang_fa(de, ma_buoi):
-    return ("[%s-vang] %s — Đặt huy chương vàng vào CLB khác NV1? Chọn \"%s\" nếu không đổi."
-            % (ma_buoi, ten_buoi(de, ma_buoi), GIU_MAC_DINH_VANG))
+    return ("[%s-vang] %s — Đặt huy chương vàng vào CLB khác NV1? Chọn \"%s\" nếu không đổi. %s"
+            % (ma_buoi, ten_buoi(de, ma_buoi), GIU_MAC_DINH_VANG, MO_TA_HUY_CHUONG))
 
 
 def cau_doi_fa(de, ma_buoi):
@@ -247,14 +263,15 @@ def cac_phan_fa(de, ma_buoi):
     o_buoi = clb_cua_buoi(de, ma_buoi)
     ds = [lua_chon_clb(c) for c in o_buoi]
     khong_tu_do = [lua_chon_clb(c) for c in o_buoi if c.get("loai") != "TU_DO"]
+    cau_huy_chuong = [(cau_vang_fa(de, ma_buoi), "choice", [GIU_MAC_DINH_VANG] + khong_tu_do, False)]
+    if len(khong_tu_do) >= SO_CLB_TOI_THIEU_CAU_DOI:          # SG-5: ngày < 3 CLB nhận huy chương không có câu đổi
+        cau_huy_chuong.append((cau_doi_fa(de, ma_buoi), "choice", [DOI_KHONG, DOI_CO], False))
     return [
         ("Thông tin học sinh", [(cau_ma_hoc_sinh(), "text", [], True), (cau_ho_ten(), "text", [], True)]),
         ("%s · Nguyện vọng" % ten_buoi(de, ma_buoi), [
             (cau_nguyen_vong_fa(de, ma_buoi, k), "choice", list(ds), True)
             for k in range(1, min(SO_NGUYEN_VONG_FA, len(ds)) + 1)]),
-        ("%s · Huy chương (không bắt buộc)" % ten_buoi(de, ma_buoi), [
-            (cau_vang_fa(de, ma_buoi), "choice", [GIU_MAC_DINH_VANG] + khong_tu_do, False),
-            (cau_doi_fa(de, ma_buoi), "choice", [DOI_KHONG, DOI_CO], False)]),
+        ("%s · Huy chương (không bắt buộc)" % ten_buoi(de, ma_buoi), cau_huy_chuong),
     ]
 
 
