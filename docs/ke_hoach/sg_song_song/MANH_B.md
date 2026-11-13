@@ -34,3 +34,8 @@ member-count line) and `js/05_quan_ly.js` (person C) in one cell of `loadAdminCl
 
 ## SG-2 FIX-1 (done during SG-6)
 **CHANGELOG entry:** SG-2 FIX-1 — regenerated `mau_csv/SO_NHAP_CLB.xlsx` with `mau_csv/tao_so_nhap.py` after the SG-2 Hướng dẫn sentence change; cell diff vs 5c8ee63: only the Hướng dẫn sheet differs (other generated workbooks left untouched). **TIEN_DO line:** SG-2 FIX-1 | done | mau_csv/SO_NHAP_CLB.xlsx | tests/test_t1b_nhan_trung_cu.py green.
+
+## SG-6 FIX-1 — real Forms route
+**CHANGELOG entry:** SG-6 FIX-1 — `gio` / `dia_diem` now survive the real route: `so_de_thi.doc_clb_dot` (step-1 table redraw) and `chuyen_forms_sang_phan_mem.doc_clb_fa` (step 4 -> Sổ -> import) carry them only when the club declared them (no key otherwise, so workbooks without them are unchanged). New tests: Phiếu -> `chuyen_phieu` -> `chuyen_fa_daa` -> Sổ -> `import_so_nhap` -> `clubs.gio/dia_diem` (3 tests in `tests/test_sg6_gio_dia_diem.py`); Chromium upload through `#cb-b1-tep` shows two extra columns (vi + en) and exactly 4 columns without them (`tests/test_giao_dien_sg6_gio_dia_diem.py`). Generator snapshot (8 modes) identical to BASE.
+**TIEN_DO line:** SG-6 FIX-1 | done | so_de_thi.py, chuyen_forms_sang_phan_mem.py | tests above.
+Note for A: `mau_forms_thi_clb/chuyen_forms_sang_phan_mem.py` (person C's file) — one tuple in `doc_clb_fa` extended with "gio", "dia_diem" (SG-12 should keep it). Known: the step-1 table does not redraw on a language switch (pre-existing); the UI test switches language before uploading.
