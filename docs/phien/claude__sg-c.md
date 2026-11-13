@@ -55,3 +55,4 @@ Other consumers of codes, untouched: TAO_GOOGLE_FORM.gs + tao_google_forms.py (G
   Likely cause: they compare generator output with COMMITTED files in mau_forms_thi_clb/ (default plain) while the conftest
   fixture forces giu-ma, or the committed chi-thi/moi-clb files need regenerating. Try marker `tieu_de_thuan` first; check
   whether committed CAI_DAT_FORMS_CHI_THI.md etc. must be regenerated (snapshot said md unchanged, docx/MAP are new).
+| 2026-11-13 | Sonnet | Appended related-batch result (844 pass, 7 fail: 4 Playwright missing, 3 stale committed files) | next session fixes the 3, then kiem_nhanh, UI, STATUS_C, READY |
