@@ -25,7 +25,7 @@ Ba phiên **không nói chuyện trực tiếp với nhau**. Chúng phối hợp
 ### 1.3 Ba khối prompt
 **QUẢN LÝ (Opus):**
 ```text
-Read CLAUDE.md, then docs/ke_hoach/SG_VONG_LAP.md (fetch origin/claude/sg-sua and read it there if that branch exists, else origin/claude/forms-gop) and act as role QUAN_LY. Truong authorises, for this job only: creating branch claude/sg-sua and pushing to it, merging origin/claude/fg-sua and origin/claude/forms-gop into it, scheduling check-in reminders for this session, running the full test suite, and opening ONE pull request claude/sg-sua -> main at FINISH. Never merge or close a PR, never force-push, never push to main or any other branch, never trigger the Windows build workflow, no subagents. Mode: AUTO. Loop until SG GREEN or SG RED.
+Read CLAUDE.md, then docs/ke_hoach/SG_VONG_LAP.md (fetch origin/claude/sg-sua and read it there if that branch exists, else origin/claude/forms-gop) and act as role QUAN_LY. Truong authorises, for this job only: creating branch claude/sg-sua from origin/claude/forms-gop and pushing to it, merging origin/main into it, scheduling check-in reminders for this session, running the full test suite, and opening ONE pull request claude/sg-sua -> main at FINISH. Never merge or close a PR, never force-push, never push to main or any other branch, never trigger the Windows build workflow, no subagents. Mode: AUTO. Loop until SG GREEN or SG RED.
 ```
 **LẬP TRÌNH (Sonnet):**
 ```text
@@ -66,7 +66,7 @@ bản build Windows (bản build ghi đè bản phát hành công khai, nên ch�
 
 ### 2.2 Environment (every role, once per session)
 ```bash
-git fetch origin claude/sg-sua claude/fg-sua claude/forms-gop main:refs/remotes/origin/main 2>/dev/null
+git fetch origin claude/sg-sua claude/forms-gop main:refs/remotes/origin/main 2>/dev/null
 git fetch --unshallow 2>/dev/null || true
 python3 -m venv .venv && .venv/bin/pip install -q -r requirements-dev.txt && .venv/bin/pip install -q playwright==1.63.0
 ```
@@ -124,7 +124,7 @@ Context above ~300k tokens: finish the current step, record the exact next step 
 the same prompt again`, stop.
 
 ### 2.5 Role QUAN_LY (Opus): plan holder and gatekeeper
-1. **Step 0** (spec §3 Step 0): create `claude/sg-sua`, merge, checks, create `SG_STATUS.md` (all items TODO, L2/L3
+1. **Step 0** (spec §3 Step 0): create `claude/sg-sua` from `origin/claude/forms-gop`, checks, create `SG_STATUS.md` (all items TODO, L2/L3
    verified), copy the plan ticks into `docs/phien/claude__sg-sua.md`. Snapshot: in a worktree of BASE, run every
    generator mode of `mau_forms_thi_clb/tao_mau_forms.py` (`""`, `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--bien-the`,
    `--chi-thi`, `--phan-hoi`, `--sau-ket-qua`, `--tuan-3`) into the scratchpad and record the recipe in `SNAPSHOT:`.

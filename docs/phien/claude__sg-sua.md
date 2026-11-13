@@ -7,10 +7,10 @@
 Fix the 19 findings of Fable's whole-kiosk UI audit ("Soát giao diện kiosk RB-DA", 2026-11-13), most severe first.
 Spec: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (follow exactly; items SG-1 … SG-12). Run as a three-role loop
 (QUAN_LY Opus / LAP_TRINH Sonnet / SOAT_MA checker): `docs/ke_hoach/SG_VONG_LAP.md`; live state in
-`docs/phien/SG_STATUS.md`. Base = `claude/fg-sua` + merge of `claude/forms-gop`. All numbers SIMULATED.
+`docs/phien/SG_STATUS.md`. Base = `claude/forms-gop` (already holds FG-1…FG-9). All numbers SIMULATED.
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [ ] Step 0: QUAN_LY builds `claude/sg-sua` = fg-sua + forms-gop; verify L2, L3 (FG-9)
+- [ ] Step 0: QUAN_LY builds `claude/sg-sua` from forms-gop; verify L2, L3 (FG-9)
 - [ ] SG-1 selective club with no scores blocks the run (C3)
 - [ ] SG-2 default workspace no longer traps a new user (C1)
 - [ ] SG-3 FA rank from the original list + flag earlier FA numbers (C2)

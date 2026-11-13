@@ -6,9 +6,8 @@
 > Locate code by FUNCTION NAME (`grep -n "^def <name>"`), never line numbers.
 
 ## 0. Rules for the implementer (read first)
-- **Base (Step 0, done by the manager):** `claude/sg-sua` = `origin/claude/fg-sua` + merge of `origin/claude/forms-gop`
-  (which is `main` + these docs). So FG-1…FG-9 are included without waiting for a merge into `main`; the final PR
-  `claude/sg-sua` → `main` carries FG and SG together.
+- **Base (Step 0, done by the manager):** `claude/sg-sua` from `origin/claude/forms-gop`, which already holds `main`
+  + FG-1…FG-9 (merged 909f8df, FG GREEN) + these docs. The final PR `claude/sg-sua` → `main` carries FG and SG together.
   Several items reuse FG patterns (FG-1 menu dialog, FG-2 preview warning, FG-4 busy helper, FG-6 grouped list).
 - **How the work runs:** three sessions in a loop (manager / coder / checker), mechanics in `docs/ke_hoach/SG_VONG_LAP.md`.
 - One commit per item, message `SG-n: …`. Test first (rule 2): write the acceptance test, see it red, then fix.
@@ -45,7 +44,7 @@ Within a severity, smaller items go first.
 
 | Order | Item | Finding(s) | Size | Touches | Needs |
 |---|---|---|---|---|---|
-| 0 | Step 0 | create `claude/sg-sua` = fg-sua + forms-gop; verify L2, L3 fixed (FG-9) | S | — | — |
+| 0 | Step 0 | create `claude/sg-sua` from forms-gop (has FG); verify L2, L3 fixed (FG-9) | S | — | — |
 | 1 | SG-1 | C3 selective club with no scores at all | S | `fa_daa.kiem_truoc_fa`, health report | — |
 | 2 | SG-2 | C1 default workspace blocks itself | S | FG-1 dialog, preview, sample guide text | — |
 | 3 | SG-3 | C2 FA rank from trimmed list | M | `fa_daa.chay_fa_daa`, report/dashboard | D3 |
@@ -71,9 +70,9 @@ Within a severity, smaller items go first.
 
 ## 3. Items
 ### Step 0 — build the base branch (manager)
-`git switch -c claude/sg-sua origin/claude/fg-sua && git merge --no-edit origin/claude/forms-gop`. Conflicts are
-expected only in bookkeeping files (CHANGELOG, TIEN_DO, handoffs, status files): keep both sides. A conflict in code →
-STATUS `SG RED: step 0 conflict in <file>`, stop. Then `ruff`, `kiem_nhanh` 7/7 and the FG tests on the merged tree.
+`git switch -c claude/sg-sua origin/claude/forms-gop` (if `claude/sg-sua` exists on origin: check it out and continue).
+Check `docs/phien/FG_STATUS.md` line 3 says `FG GREEN`; else STATUS `SG RED: FG not green`, stop. Then `ruff`,
+`kiem_nhanh` 7/7 and `-k fg` tests on that tree.
 Verify L2 (sidebar numbers) and L3 (absolute path in toast) no longer reproduce (FG-9); record in the item table.
 
 ### SG-1 — Selective club that nobody can pass (C3)
