@@ -87,6 +87,7 @@ function initWorkspace() {
   el("wsOverlay").addEventListener("keydown", (ev) => {
     if (ev.key === "Escape" && wsCoTheDong) wsDongManChon();
   });
+  document.addEventListener("keydown", wsBayTab);
   window.addEventListener("langchange", () => {
     wsCapNhatTieuDe();
     if (el("wsOverlay").hidden) return;
@@ -107,6 +108,28 @@ function initWorkspace() {
        đè lên trên và KHÔNG đóng được cho tới khi mở một workspace. */
     if (wsTrangThai.enabled && !wsTrangThai.chon) wsMoManChon(false);
   });
+}
+
+/* SG-11b (M4): bẫy Tab. Khi màn chọn (hoặc hộp thoại bật/tắt tính năng đặt chồng lên) đang hiện,
+   Tab / Shift+Tab xoay vòng trong hộp; focus lỡ rơi ra ngoài thì kéo về ô đầu / ô cuối. */
+function wsBayTab(ev) {
+  if (ev.key !== "Tab" || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+  const hien = [...document.querySelectorAll(".ws-overlay")].filter((o) => !o.hidden);
+  const hop = hien[hien.length - 1];
+  if (!hop) return;
+  const duoc = [...hop.querySelectorAll(
+    'button, input, select, textarea, summary, a[href], [tabindex]:not([tabindex="-1"])')]
+    .filter((e) => !e.disabled && e.type !== "hidden" && !e.hidden && e.getClientRects().length > 0);
+  if (!duoc.length) { ev.preventDefault(); return; }
+  const dau = duoc[0], cuoi = duoc[duoc.length - 1];
+  const dangO = document.activeElement;
+  if (!hop.contains(dangO) || (ev.shiftKey && (dangO === dau || dangO === hop.querySelector(".ws-tieu-de")))) {
+    ev.preventDefault();
+    (ev.shiftKey ? cuoi : dau).focus();
+  } else if (!ev.shiftKey && dangO === cuoi) {
+    ev.preventDefault();
+    dau.focus();
+  }
 }
 
 /* Tiêu đề cửa sổ: "<tên danh từ chỗ xếp> · <tên workspace>". Trình duyệt dự phòng lấy
