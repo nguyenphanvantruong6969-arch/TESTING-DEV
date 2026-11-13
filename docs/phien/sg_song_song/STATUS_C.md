@@ -14,7 +14,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-5 | CHECKING | 0 | bd6d821 | b9c4f32 | session_01VfPzNruBqHHaJZQcLRxRzS | | tests/test_sg5_huy_chuong.py |
+| SG-5 | CHECKING | 0 | bd6d821 | b9c4f32 | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNrFdN7RhAERrSNeTJV | tests/test_sg5_huy_chuong.py |
 | SG-7 | TODO | 0 | | | | | |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
@@ -39,3 +39,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T15:55Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 CODING start 7f7b5ca coder session_01VfPzNruBqHHaJZQcLRxRzS
 - 2026-11-13T16:01Z CODER session_01VfPzNruBqHHaJZQcLRxRzS SG-5 READY 7b7109a red:3 of 6 new tests failed (3 false 'chỉ còn 1 CLB' warnings counted, no description, swap present on 2-club day) mutation:forcing swap on / disabling reader day-size guard -> 2 new tests fail, restored
 - 2026-11-13T16:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 READY accepted, range bd6d821..b9c4f32 (Start corrected to the assign commit); CHECKING
+- 2026-11-13T16:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 checker r1 session_01VfPzNrFdN7RhAERrSNeTJV
