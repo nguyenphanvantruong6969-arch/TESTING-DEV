@@ -45,3 +45,13 @@ Other consumers of codes, untouched: TAO_GOOGLE_FORM.gs + tao_google_forms.py (G
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-13 | Sonnet | SG-12 implemented, tests green on subsets, handoff at >400k tokens | batch/kiem_nhanh/UI/status line/READY entry still open |
+
+## Result of the related batch (appended after handoff)
+51 files + ws_nhan + van_phong: 844 passed, 7 failed.
+- 4 x tests/test_giao_dien_fa_m8_bo.py: Playwright not installed in .venv (pip install playwright==1.63.0), not a code failure; rerun.
+- 3 real, to fix next: tests/test_t4m_bo_dung_bk34.py::test_04_forms_la_dau_ra_cua_tao_mau_forms_khong_viet_lai,
+  tests/test_t4m_chi_thi.py::test_q2_che_do_mac_dinh_van_sinh_giong_tep_trong_kho,
+  tests/test_t4m_cong_thi.py::test_q4a_chi_thi_va_mac_dinh_van_sinh_giong_tep_trong_kho.
+  Likely cause: they compare generator output with COMMITTED files in mau_forms_thi_clb/ (default plain) while the conftest
+  fixture forces giu-ma, or the committed chi-thi/moi-clb files need regenerating. Try marker `tieu_de_thuan` first; check
+  whether committed CAI_DAT_FORMS_CHI_THI.md etc. must be regenerated (snapshot said md unchanged, docx/MAP are new).
