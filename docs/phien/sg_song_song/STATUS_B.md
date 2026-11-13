@@ -8,7 +8,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-2 (C1) | CHECKING | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
+| SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | TODO | 0 | | | | | |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
@@ -24,6 +24,8 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 - SG-2: preview warning is per fund (tested / untested) per day, mirroring `tu_dien_wharton_mot_clb`, so one-club funds (auto-filled) are not flagged.
 - SG-2: updated `BAM_SO_MAU_MAC_DINH` in tests/test_fg2_xem_truoc_fa.py and regenerated du_lieu_test/SO_NHAP_DQT_*.xlsx: only the Hướng dẫn sheet changed (guide sentence, item 3).
 
+- SG-2 lead review: accepted checker PASS; reran item tests + test_fg2/test_ws_nhan/test_van_phong_tu_nhien (78 passed, UI ran) and kiem_nhanh 7/7 (60 cases identical). Checker optional notes (hint shown also under FA; English dialog not eyeballed) left as non-blocking; lead A may re-check at integration.
+
 ## For Truong
 
 ## Log
@@ -33,3 +35,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T15:55Z CODER session_01YVAyu23VvGaoDixHWJZn1G SG-2 READY d9da2c5 red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known) mutation:len(ds)>=99 -> test_diem_toan_0_van_bao+1 red; hopW.disabled=true -> UI switch test red; restored
 2026-11-13T16:15Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 CHECKING checker=session_01YVAyu3aEQRoHtkKoFwqkCc range=5c8ee63..d9da2c5
 2026-11-13T16:29Z CHECKER session_01YVAyu3aEQRoHtkKoFwqkCc SG-2 PASS
+2026-11-13T16:50Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 DONE (checker PASS c70048f + lead review, kiem_nhanh 7/7) d9da2c5
