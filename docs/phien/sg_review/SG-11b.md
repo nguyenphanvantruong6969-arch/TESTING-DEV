@@ -30,3 +30,32 @@ Checker: session_01YVAytyjEXTMBsvTPMw9NsZ · range 5ab87d0..f1ae45a (branch tip 
 - Initial focus lands on the heading (tabindex -1), not a control; acceptable (reads the title, next Tab = first control), noted only.
 - No existing shared focus helper in the repo (grep for `Escape`/`Tab` handling): `wsBayTab` does not duplicate anything.
 - The coder did not run soat-ma as a separate pass (stated in the Log); done here.
+
+---
+
+# Round 2 (M4 only) — range 5ab87d0..29bfa1e (fix f1ae45a..29bfa1e, branch tip dff2363)
+
+Checker: session_01YVAyu3PXika1Vx6orU1Yim-checker-r2 (Sonnet) · Verdict **PASS**
+
+## FIX-1 closure (Chromium, keyboard only; scratch probes outside the repo, 1366×768 vi and 1920×1080 en)
+1. **Esc at document level — closed.** Click `#wsHop .hint-text` (activeElement = BODY) → Esc → `#wsOverlay` hidden, focus on `#btnWorkspace`. Same after the FG-1 dialog closes. First start (no workspace chosen): Esc does nothing, also from body; Tab stays trapped (20 presses). Probe waited for the list to render (an earlier unwaited probe of mine raced the async render: probe error, not a product defect).
+2. **Focus after FG-1 dialog — closed.** Esc and Hủy/Cancel both return focus inside `#wsOverlay` (the `⋯` summary), chooser stays open, role/aria-modal restored; next Esc closes the chooser. FG-1 Tab cycle (12 presses) stays inside it; Esc in FG-1 closes only FG-1.
+3. **aria-modal — closed.** Hidden: no `role`, no `aria-modal`; shown: `dialog` + `true`. Static attribute gone from `index.html` (the one-attribute edit, declared in `MANH_B.md` for person A: confirmed it is the only `index.html` change).
+4. **Menu-first Esc — closed.** Open row `⋯` menu → Esc closes only the menu, focus on its summary; second Esc closes the chooser.
+- Wizard: Tab trap (15 presses) holds; Esc closes the chooser, reopen shows a clean list (same as round 1). Chooser Tab/Shift+Tab 20 presses each way stays inside. Screenshots at both sizes: no horizontal overflow, dialog fits.
+
+## Global Esc handling / shared files
+- Diff touches only `js/075_workspace.js`, `index.html` (1 attribute), the test file, `MANH_B.md`, status/review docs. `js/00_nen.js` is **unchanged**.
+- `wsBanPhim` is a capture-phase `document` keydown listener registered once in `initWorkspace`. Its first line returns when no `.ws-overlay` is visible, so with the chooser hidden it does nothing: probe confirmed Esc and Tab on the main page behave normally (Tab is not hijacked, Esc not swallowed).
+- `ev.stopPropagation()` is called only when a `details.menu-khac[open]` exists inside the topmost visible overlay. This is the only place another handler (the global `⋯`-menu close in `00_nen.js`) is pre-empted, and there the menu is closed by `wsBanPhim` itself. All other Esc handling in `js/`: grep finds only `00_nen.js:339` (closes every open `details.menu-khac`) and the FG-1 dialog's own `keydown` in `075_workspace.js`; the other `keydown` handlers (`00_nen.js:125`, `02_van_hanh.js`, `04_nhap_tai_cho.js`, `05_quan_ly.js`, `12_chuan_bi_nap.js`) react to Enter/Space/arrows only. No `<dialog>` / `showModal` in the app. So no other dialog/overlay/menu changes behaviour. UI tests that cover `menu-khac` (fg1_bat_tinh_nang, sg2_diem_quyet_tam, ws_giao_dien) and `test_giao_dien_t3_l2_van_hanh.py` (Esc) are in the run below.
+- Mutation (scratch edit, restored, `git status` clean): capture → bubble phase → `test_dong_hop_tinh_nang_tra_focus_vao_man_chon` and `test_esc_dong_menu_truoc_roi_moi_dong_man_chon` red.
+
+## Tests / hygiene (whole range)
+- `tests/test_giao_dien_sg11b_focus_man_chon.py`: 9 passed, 5 runs in a row, no flake, no hard sleeps.
+- New file + every `tests/test_giao_dien_*` grepping wsOverlay/wsMoManChon/btnWorkspace/wsMoTinhNang + `test_ws_nhan.py` + `test_van_phong_tu_nhien.py` + `test_giao_dien_t3_l2_van_hanh.py`: **128 passed, 0 skipped** (Chromium really ran).
+- `kiem_nhanh --co-so origin/main --so-seed 20`: 7/7 (after fetching `main`; the first run said 6/7 only because `origin/main` was missing locally). `ruff check .` clean. No Python / CSS / i18n in the range, so tiers 1 and 2 (core, backend) are N/A and invariants 1–8 are untouched.
+- soat-ma tier 3 (UI): item 5 (keyboard: Tab, Shift+Tab, Esc) exercised above; items 1–4, 6 not affected (no API calls, no data in `innerHTML`, no strings added). Tier 4: fragment updated in `MANH_B.md`, test file name per convention, no forbidden files edited. Round-1 evidence reused unchanged for: scope (M4 only), initial focus on the heading, edit-row/re-render focus, wizard custom steps, `⋯` menu items joining the cycle.
+- Known expected red (not run in this selection): `test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`.
+
+## Optional (non-blocking)
+- The closed-state test checks role and aria-modal only for `#wsOverlay`; the FG-1 layer is a separate element created per call (removed on close), so nothing to leak.
