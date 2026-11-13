@@ -46,3 +46,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T17:07Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CODING coder=session_01TGThn7xWLDq89PLMhnwS9V c7ff951
 2026-11-13T17:30Z CODER session_01TGThn7xWLDq89PLMhnwS9V SG-4 READY 53025b1 red:4 of 4 new tests failed before fix (hs010 with trailing space/case rejected, one code for both causes, new codes missing) mutation:khop_ma_hoc_sinh replaced by exact-only match -> case/space test fails, restored
 2026-11-13T17:24Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CHECKING checker=session_01TGThn68N7shbENa7GNKWsZ 53025b1
+2026-11-13T17:27Z CHECKER session_01TGThn68N7shbENa7GNKWsZ SG-4 FIX-1
