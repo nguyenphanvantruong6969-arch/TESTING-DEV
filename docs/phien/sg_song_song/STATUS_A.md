@@ -8,8 +8,8 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
-| SG-3 (C2) | CHECKING | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
-| SG-4 (M3) | TODO | 0 | | | | | |
+| SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
+| SG-4 (M3) | CODING | 0 | c7ff951 | | session_01TGThn7xWLDq89PLMhnwS9V | | |
 | SG-10 (M2) | TODO | 0 | | | | | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
 
@@ -42,3 +42,5 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T17:05Z CODER session_01TGThn5vDcdjy25A1uMuruk SG-3 READY f2e7702 red:5 of 5 new tests failed before fix (HS001 rank 1 vs original 2, fallback rank 1 not NULL, dashboard NV1 100% vs direct count 40%) mutation:rank line replaced by old value -> 4 tests fail, restored
 2026-11-13T16:42Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-3 CHECKING checker=session_01TGThn5ifqoQYavHTFkb9a4 f2e7702
 2026-11-13T17:40Z CHECKER session_01TGThn5ifqoQYavHTFkb9a4 SG-3 PASS
+2026-11-13T17:07Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-3 DONE lead-review agree (2326 passed, kiem_nhanh 7/7) f2e7702
+2026-11-13T17:07Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CODING coder=session_01TGThn7xWLDq89PLMhnwS9V c7ff951
