@@ -11,7 +11,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | DONE | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
-| SG-11b (M4 only) | CODING | 1 | 5ab87d0 | f1ae45a | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAytyjEXTMBsvTPMw9NsZ | tests/test_giao_dien_sg11b_focus_man_chon.py |
+| SG-11b (M4 only) | CHECKING | 1 | 5ab87d0 | 29bfa1e | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAyu3LJVjJwZrCxTDDP4W (r2) | tests/test_giao_dien_sg11b_focus_man_chon.py |
 
 ## Fix lists
 
@@ -88,3 +88,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T22:58Z CHECKER session_01YVAytyjEXTMBsvTPMw9NsZ SG-11b FIX-1 (review: docs/phien/sg_review/SG-11b.md; 1) Esc listener only on #wsOverlay: dead when focus is on body (click on text, after FG-1 dialog); 2) FG-1 dialog close leaves focus on body; 3) aria-modal stays on hidden overlay, role is removed)
 2026-11-13T22:55Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b FIX-1 sent to coder session_01YVAyu3PXika1Vx6orU1Yim
 2026-11-13T23:01Z CODER session_01YVAyu3PXika1Vx6orU1Yim SG-11b READY 29bfa1e fix:1 done,2 done,3 done,4 done; red-first: 4 new tests red on old JS (stash), mutation: Esc close removed -> 5 red, focus-return removed -> FG-1 test red, menu-first removed -> menu test red; restored. 154 passed 0 skipped (checker list + ws_nhan + van_phong_tu_nhien), ruff clean, kiem_nhanh 7/7
+2026-11-13T23:25Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b CHECKING r2 checker=session_01YVAyu3LJVjJwZrCxTDDP4W range=5ab87d0..29bfa1e (fix f1ae45a..29bfa1e); lead full suite incl. UI started at dff2363
