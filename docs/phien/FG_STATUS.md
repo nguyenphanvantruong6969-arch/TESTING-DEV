@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Green loop round 1 RED → FIX-1 delegated to a Sonnet worker (task start = HEAD after this commit).
+- Green loop round 2: waiting for the Windows build re-run (run 43388168466 attempt 2). Then fill report 'Vòng xanh', STATUS FG GREEN, §2.6 merge.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -52,6 +52,12 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   2. tests/test_fa_gap6_tuan_3.py::test_nhap_tuan_3_va_tong_hop and ::test_tep_co_ca_hai_loai_cau — exact result dicts lack the FG-3/5/6 keys (hoc_sinh, ma_khong_khop, dong_moi, dong_trung, dong_bo_qua).
   3. Windows only: tests/test_fg7_bieu_mau_sau_ket_qua.py::test_che_do_khac_giu_nguyen_tung_byte[fa_daa|fa_daa_mot|phan_hoi|tuan_3] — golden hashes were taken on Linux; Windows bytes differ (FG did not touch these modes, so Windows output = BASE output).
 
+## Green loop round 2 (code HEAD d34e7a7)
+- Local full suite + cov on d34e7a7: 6038 passed, 0 failed, 4 skipped (numpy ×2, POSIX-user, deferred D1; none UI), coverage 93.75 % (≥ 85).
+- CI Tests run 43382229518 on d34e7a7: all 3 jobs green (Linux full + real UI with the no-skipped-UI check, ruff, Windows).
+- Windows build run 43388168466 (workflow_dispatch, ref claude/fg-sua @ d34e7a7): attempt 1 CANCELLED from outside at 08:41Z during its test step (KeyboardInterrupt / 'The operation was canceled'; no timeout or concurrency in the workflow; no failing test before the cancel) → re-run once (attempt 2).
+- §2.6 pre-check: IT_UI_STATUS.md on origin/claude/forms-gop has no lock (IT-UI GREEN); origin/claude/forms-gop c1de264 is an ancestor of claude/fg-sua → fast-forward, no conflicts.
+
 ## Workers
 | Task | Session | State |
 |---|---|---|
@@ -66,7 +72,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-8 | session_01VfPzNukgBtxgvdTkP7cCJi | DONE, review GO |
 | FG-9 | session_01VfPzNsKCDN6sCNzaUQr5XA | DONE, review GO |
 | FINISH | session_01VfPzNqz9T4QpQyTxcxNyFF | DONE, review GO (report line on FA-M8..10 to correct) |
-| FIX-1 | (creating) | |
+| FIX-1 | session_01VfPzNqz2WHdbmmR46EeJMg | DONE, review GO |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -141,3 +147,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13 WORKER session_01VfPzNqz9T4QpQyTxcxNyFF FINISH DONE b7c8380 (docs only; novice walkthrough spec §5 passed: 33 feedback + 3 appeals both loads, 2nd load reports duplicates; no new bug; report docs/phien/bao_cao_dem/2026-11-13_fg_sua.md, placeholder "Vòng xanh" left for lead)
 - 2026-11-13T07:00Z lead: FINISH review GO (walkthrough detailed and consistent). Report wrongly says FA-M8/9/10 unfinished / IT-UI paused; IT_UI_STATUS.md says IT-UI GREEN — lead corrects it when filling 'Vòng xanh'. Green loop round 1 RED (see section) → FIX-1.
 - 2026-11-13 WORKER session_01VfPzNqz2WHdbmmR46EeJMg FIX-1 DONE eddf198 (3 test ids green + gap5/m6b 58 passed; ruff clean; kiem_nhanh 7/7, 60/60; tests only + code-map doc, no production code)
+- 2026-11-13T07:15Z lead: FIX-1 review GO: code-map count 275 files / 6.042 cases; gap6 exact dicts extended (no key dropped); FG-7 golden hashes per os.name (exact on each OS). Tests only + doc.
+- 2026-11-13T09:00Z lead: green loop round 2: local + CI Tests green; Windows build attempt 1 cancelled externally, re-run.
