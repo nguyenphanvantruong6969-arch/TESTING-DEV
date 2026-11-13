@@ -16,7 +16,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
-| SG-9 | FIX-1 | 1 | a1b6ecb | 98908e1 | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt6qaZtDuK7uYC28bX | (see review) |
+| SG-9 | CHECKING | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
 | SG-12 | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -74,3 +74,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T18:59Z CHECKER session_01VfPzNt6qaZtDuK7uYC28bX SG-9 PASS (a1b6ecb..98908e1; 495 UI tests passed 0 skipped, own mutation: removing .catch survives because unhandledrejection shows same toast -> notes only; see docs/phien/sg_review/SG-9.md)
 - 2026-11-13T19:06Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 checker PASS overruled -> FIX-1 (2 points), sent to coder session_01VfPzNud4JhboVzj5e8xu4E
 - 2026-11-13T19:08Z CODER session_01VfPzNud4JhboVzj5e8xu4E SG-9 FIX-1 READY c266cae (1) rejection test now counts unhandledrejection (must be 0) and exactly one .toast.is-error; new chayTai test; mutation: removing .catch in chayNut -> 5 fail, in chayTai -> 1 fail, restored. (2) chuyen (S.dang) and goi (S5.dang) reset the flag in sauCung; new UI test: synchronously throwing API at step 5 then second click -> 2 calls; mutation: removing S5 sauCung -> 2 fail, restored; S.dang covered by a static check only (UI path needs uploaded files). related: 70 UI/label tests pass, ruff clean
+- 2026-11-13T19:27Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 FIX-1 READY c266cae; checker r2 session_01VfPzNt89iBAQw8naoMzV7d
