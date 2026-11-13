@@ -206,3 +206,52 @@ def test_bang_buoc_1_chi_them_khoa_khi_da_khai():
     assert "gio" not in cu and "dia_diem" not in cu            # phiếu cũ: dữ liệu y như trước
     moi = PipelineAPI._clb_hien_thi([{"club_id": "x", "name": "X", "capacity": 5, "gio": GIO, "dia_diem": DIA}])[0]
     assert (moi["gio"], moi["dia_diem"]) == (GIO, DIA)
+
+
+# ---- đường thật: Phiếu -> chuyen_phieu -> chuyen_fa_daa -> Sổ -> nạp (FIX-1) ------
+def _chuoi(tmp_path, gio, dia):
+    import copy
+
+    import bieu_mau as bm
+    import chuyen_forms_sang_phan_mem as cv
+    from test_fa_m3_chuyen import _lc, _tep_dang_ky
+    de = copy.deepcopy(bm.doc_de_thi())
+    wb = Workbook()
+    ws = wb.active
+    ws.append(pc.TIEU_DE_PHIEU)
+    for i, c in enumerate(de["cau_lac_bo"]):
+        dong = [""] * len(pc.TIEU_DE_PHIEU)
+        dong[pc.C_TEN], dong[pc.C_BUOI], dong[pc.C_MO_NHOM] = c["name"], "Thứ 2", "Không"
+        dong[pc.C_CHO], dong[pc.C_LY_DO], dong[pc.C_CAN_THI] = "20", "Phòng", "Không"
+        if i == 0:
+            dong[pc.C_GIO], dong[pc.C_DIA_DIEM] = gio, dia
+        ws.append(dong)
+    phieu = str(tmp_path / "p.xlsx")
+    wb.save(phieu)
+    kq = pc.chuyen_phieu(phieu, str(tmp_path / "b1"))
+    dk = _tep_dang_ky(tmp_path, de, [dict(sid="HS1", email="a@x.vn", nv1=_lc(de, de["cau_lac_bo"][0]["club_id"]))])
+    cv.chuyen_fa_daa(str(tmp_path / "ra"), de, kq["so_nhap"], dang_ky_xlsx=[dk])
+    return de, str(tmp_path / "ra" / cv.TEN_SO)
+
+
+def test_duong_that_phieu_den_so_cuoi_co_gio(tmp_path):
+    de, so = _chuoi(tmp_path, GIO, DIA)
+    du = so_nhap.doc_so_nhap(load_workbook(so))
+    assert du["loi"] == []
+    dau = next(c for c in du["clubs"] if c["name"] == de["cau_lac_bo"][0]["name"])
+    assert (dau["gio"], dau["dia_diem"]) == (GIO, DIA)
+
+
+def test_duong_that_phieu_den_nap_vao_csdl(api, tmp_path):
+    de, so = _chuoi(tmp_path, GIO, DIA)
+    r = api.import_so_nhap(_b64(so))
+    assert r["ok"], r["errors"]
+    with api._ket_noi_doc() as cur:
+        assert tuple(cur.execute("SELECT gio, dia_diem FROM clubs WHERE name = ?",
+                                 (de["cau_lac_bo"][0]["name"],)).fetchone()) == (GIO, DIA)
+
+
+def test_duong_that_khong_khai_gio_so_khong_them_cot(tmp_path):
+    _, so = _chuoi(tmp_path, "", "")
+    dau = [c.value for c in load_workbook(so)[so_nhap.SHEET_CLB][1]]
+    assert "Giờ" not in dau and "Địa điểm" not in dau

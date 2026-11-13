@@ -1119,7 +1119,9 @@ def doc_clb_fa(duong_so_nhap, de):
             canh_bao.append(("", "", "Sổ nhập CLB có %r nhưng de_thi.json không có CLB này — bỏ" % c["name"]))
             continue
         doi_ma[c["club_id"]] = goc["club_id"]
-        clb_fa[goc["club_id"]] = {k: c[k] for k in ("loai", "capacity", "diem_san", "so_toi_thieu", "suc_chua_phong")
+        # SG-6: "gio" / "dia_diem" đi cùng CHỈ khi sổ có và CLB đã khai (không thì không thêm khoá nào).
+        clb_fa[goc["club_id"]] = {k: c[k] for k in ("loai", "capacity", "diem_san", "so_toi_thieu", "suc_chua_phong",
+                                                    "gio", "dia_diem")
                                   if c.get(k) is not None}
     for ma in theo_ma:
         if ma not in clb_fa:
