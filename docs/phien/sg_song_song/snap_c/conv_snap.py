@@ -1,6 +1,10 @@
 # usage: python -I conv_snap.py <tree-root> <out.json> base|coded|plain
 # base = pre-SG-12 tree (e729ff1 worktree) with its own coded sample export; coded/plain = HEAD tree with bieu_mau.che_do_giu_ma(True/False)
-import sys, os, json, hashlib, tempfile, contextlib
+import contextlib
+import json
+import os
+import sys
+import tempfile
 root, out, mode = sys.argv[1:4]
 sys.path[:0] = [os.path.join(root, "mau_forms_thi_clb"), root]
 import bieu_mau as bm, tao_mau_forms as tm, chuyen_forms_sang_phan_mem as cv, openpyxl
@@ -22,4 +26,5 @@ with cm, tempfile.TemporaryDirectory() as t:
     y = os.path.join(t, "ct.xlsx"); tm.ghi_mau_xuat_chi_thi(de, y, ds)
     k2 = cv.chuyen_chi_thi([y], lists, os.path.join(t, "ra2"), de)
     res["chi_thi"] = [k2["n_hoc_sinh"], k2["n_bai_thi"], [c[2] for c in k2["canh_bao"]], dump(os.path.join(t, "ra2", cv.TEN_SO))]
-json.dump(res, open(out, "w"), sort_keys=True, default=str)
+with open(out, "w", encoding="utf-8") as f:
+    json.dump(res, f, sort_keys=True, default=str)

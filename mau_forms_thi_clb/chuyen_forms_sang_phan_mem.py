@@ -1075,8 +1075,10 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
     theo_ten = {bm._chuan(c["name"]): c for c in de["cau_lac_bo"]}
 
-    def tim_clb(chu):
-        return theo_ma.get(bm.ma_trong_lua_chon(chu)) or theo_ma.get(chu) or theo_ten.get(bm._chuan(chu))
+    def tim_clb(chu, ma_cau):
+        # SG-12: bản đồ của đúng câu này trả lời trước (khớp CHÍNH XÁC chữ); chỉ khi không khớp mới đọc "(mã)" / tên
+        return (theo_ma.get(bm.ma_trong_lua_chon(chu, ban_do, ma_cau)) or theo_ma.get(chu)
+                or theo_ten.get(bm._chuan(chu)))
 
     for h in cot_la(tieu_de, ban_do):                          # SG-12: báo, không lặng lẽ bỏ
         canh_bao.append(("", "", "bỏ qua cột %r: không khớp câu nào của biểu mẫu đăng ký" % h))
@@ -1108,7 +1110,7 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
                 muc = dong[i].strip()
                 if not muc:
                     continue
-                clb = tim_clb(muc)
+                clb = tim_clb(muc, "%s-nv%d" % (buoi, k))
                 if clb is None:
                     bao("%s: Nguyện vọng %d %r không phải CLB nào trong de_thi.json — bỏ ô này" % (buoi, k, muc))
                 elif clb["buoi"] != buoi:
@@ -1123,7 +1125,7 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
                 bao("%s: nộp lần nữa — phiếu CUỐI cùng được tính, bỏ phiếu dòng %d" % (buoi, hs["dong_buoi"][buoi]))
             tho_vang = _gia_tri(dong, cot[buoi + "-vang"]) if buoi + "-vang" in cot else ""
             tho_doi = _gia_tri(dong, cot[buoi + "-doi"]) if buoi + "-doi" in cot else ""
-            clb_vang = None if tho_vang in ("", bm.GIU_MAC_DINH_VANG) else tim_clb(tho_vang)
+            clb_vang = None if tho_vang in ("", bm.GIU_MAC_DINH_VANG) else tim_clb(tho_vang, buoi + "-vang")
             vang = clb_vang["club_id"] if clb_vang else ""
             if tho_vang not in ("", bm.GIU_MAC_DINH_VANG) and not vang:
                 bao("%s: huy chương vàng %r không phải CLB nào — giữ mặc định" % (buoi, tho_vang))

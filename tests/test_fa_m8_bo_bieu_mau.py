@@ -21,7 +21,6 @@ import bieu_mau as bm  # noqa: E402
 import chuyen_phieu_clb as pc  # noqa: E402
 import tao_mau_forms as tm  # noqa: E402
 
-
 DE = bm.doc_de_thi()
 CO_DE = [c["club_id"] for c in bm.clb_co_thi(DE)]
 DONG_DU_PHONG = tm.DONG_DU_PHONG_KHONG_DAP_AN

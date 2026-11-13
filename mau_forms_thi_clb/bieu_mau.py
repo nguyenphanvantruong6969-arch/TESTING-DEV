@@ -628,6 +628,7 @@ def xay_ban_do(cac_cau_hoi):
     Khoá đã gộp khoảng trắng. Hai câu KHÁC mã trùng tiêu đề thuần, hai lựa chọn khác giá trị trùng chữ trong cùng
     một câu, hoặc tiêu đề thuần mở đầu bằng "[…]" (đọc nhầm thành thẻ mã) -> LoiDeThi (liệt kê hết)."""
     cau, lua, loi = {}, {}, []
+    chuan_lua = {}
     for td, _loai, lcs, *_ in cac_cau_hoi:
         if not isinstance(td, TieuDe):
             loi.append("câu %r không phải tiêu đề do bộ sinh dựng" % str(td)[:60])
@@ -638,11 +639,16 @@ def xay_ban_do(cac_cau_hoi):
         if cau.setdefault(k, td.ma) != td.ma:
             loi.append("hai câu %r và %r có cùng tiêu đề %r" % (cau[k], td.ma, k[:60]))
         cua_cau = lua.setdefault(td.ma, {})
+        chuan_cua_cau = chuan_lua.setdefault(td.ma, {})
         for lc in lcs:
             if isinstance(lc, LuaChon) and lc.ma is not None:
                 kl = _khoa(lc.thuan)
                 if cua_cau.setdefault(kl, lc.ma) != lc.ma:
                     loi.append("câu %s: hai lựa chọn %r và %r có cùng chữ %r" % (td.ma, cua_cau[kl], lc.ma, kl))
+                # chỉ khác hoa/thường hay khoảng trắng: bộ đọc có thể đọc nhầm (tìm theo tên đã gộp) -> từ chối ngay
+                elif chuan_cua_cau.setdefault(_chuan(kl), kl) != kl:
+                    loi.append("câu %s: hai lựa chọn %r và %r chỉ khác hoa/thường hay khoảng trắng" % (
+                        td.ma, chuan_cua_cau[_chuan(kl)], kl))
     if loi:
         raise LoiDeThi("tiêu đề trùng hoặc không dùng được (đổi tên CLB / buổi / câu hỏi trong de_thi.json):\n  - "
                        + "\n  - ".join(sorted(set(loi))))

@@ -17,7 +17,6 @@ forms_dot.nap_mau_forms()
 import bieu_mau  # noqa: E402
 
 
-
 @pytest.fixture
 def ap(api, tmp_path):
     api.thu_muc_xuat = str(tmp_path / "tai_ve")

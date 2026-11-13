@@ -542,3 +542,48 @@ def test_bo_bieu_mau_mac_dinh_thuan_dung_duoc_va_phieu_clb_khong_co_ban_do(de, t
         tep = sorted(p.name for p in thu_muc.rglob("*") if p.is_file())
         assert not [t for t in tep if "PHIEU_CLB" in t and t.startswith("MAP_")]
         assert any(t.startswith("MAP_NHAP_FORMS_") for t in tep)
+
+
+def test_hai_clb_chi_khac_hoa_thuong_trong_mot_ngay_bi_tu_choi_o_bo_sinh(de):
+    """Fix 1: bộ đọc tìm CLB theo tên đã gộp hoa/thường, nên bộ sinh không nhận hai CLB chỉ khác hoa/thường hay khoảng trắng."""
+    de2 = copy.deepcopy(de)
+    c0, c1 = bm.clb_cua_buoi(de2, "thu_2")[:2]
+    c1["name"] = "  " + c0["name"].lower().replace(" ", "  ")
+    assert c1["name"] != c0["name"]
+    with pytest.raises(bm.LoiDeThi) as e:
+        bm.ban_do_chung(de2)
+    assert "chỉ khác hoa/thường" in str(e.value) and c0["name"] in str(e.value)
+
+
+def test_doc_dang_ky_ban_do_cua_cau_tra_loi_truoc_ten_trung_ma_clb_khac(de, tmp_path):
+    """Fix 1 (đường đọc): tên của CLB B trùng đúng MÃ của CLB A cùng buổi. Bản đồ của câu phải trả B; trước đây tìm theo mã
+    trước nên đọc nhầm sang A (nguyện vọng và cả câu huy chương vàng)."""
+    de2 = copy.deepcopy(de)
+    a, b = bm.clb_cua_buoi(de2, "thu_2")[:2]
+    b["name"] = a["club_id"]
+    assert bm.ban_do_chung(de2)["lua_chon"]["thu_2-nv1"][a["club_id"]] == b["club_id"]
+    phan = bm.cac_phan_fa_gop(de2)
+    tieu = ["ID", "Start time", "Completion time", "Email", "Name"] + [str(c[0]) for _, cs in phan for c in cs]
+    o = {"Email": "a@x.vn", bm.cau_ma_hoc_sinh(): "HS1", bm.cau_ho_ten(): "An",
+         bm.cau_nguyen_vong_fa(de2, "thu_2", 1): bm.lua_chon_clb(b),
+         bm.cau_nguyen_vong_fa(de2, "thu_2", 2): bm.lua_chon_clb(a),
+         bm.cau_vang_fa(de2, "thu_2"): bm.lua_chon_clb(a)}
+    wb = openpyxl.Workbook()
+    wb.active.append(tieu)
+    wb.active.append([o.get(h, "") for h in tieu])
+    x = str(tmp_path / "t.xlsx")
+    wb.save(x)
+    t, cac = _tieu_cua(x)
+    ds, cb = cv.doc_dang_ky_fa_forms(de2, t, cac, set())
+    hs = ds["a@x.vn"]
+    assert hs["nguyen_vong"]["thu_2"] == [b["club_id"], a["club_id"]]
+    assert hs["wp"]["thu_2"][a["club_id"]] == 60 and not [c for c in cb if "trùng" in c[2]]
+
+
+def test_hai_buoi_cung_ten_la_loi_cung_tieu_de_cau(de):
+    """Nhánh trùng TIÊU ĐỀ CÂU của `xay_ban_do` (không phải trùng lựa chọn): hai buổi cùng tên -> hai câu Nguyện vọng 1."""
+    de2 = copy.deepcopy(de)
+    de2["buoi"][1]["ten"] = de2["buoi"][0]["ten"]
+    with pytest.raises(bm.LoiDeThi) as e:
+        bm.ban_do_chung(de2)
+    assert "hai câu" in str(e.value) and "có cùng tiêu đề" in str(e.value)
