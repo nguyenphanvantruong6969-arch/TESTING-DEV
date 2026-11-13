@@ -323,6 +323,20 @@ def tong_hop_phan_hoi(rows, loai: str) -> dict:
     }
 
 
+def khop_ma_hoc_sinh(ma_go, tat_ca_ma):
+    """FG-5: mã học sinh gõ trong Forms -> mã đã lưu. Khớp đúng thắng; không thì khớp `strip().casefold()` nếu đúng MỘT
+    học sinh khớp; còn lại None (không có / mơ hồ). Mã đã lưu không bao giờ bị đổi. Hàm thuần."""
+    ma_go = "" if ma_go is None else str(ma_go)
+    tat_ca_ma = list(tat_ca_ma)
+    if ma_go in tat_ca_ma:
+        return ma_go
+    khoa = ma_go.strip().casefold()
+    if not khoa:
+        return None
+    ung = [m for m in tat_ca_ma if str(m).strip().casefold() == khoa]
+    return ung[0] if len(ung) == 1 else None
+
+
 def doc_tep_forms_phan_hoi(hang) -> list:
     """Các dòng của tệp xuất Forms (hàng 1 = tiêu đề) -> [{student_id, loai, hai_long, ...}]. Cột nhận theo MÃ trong
     "[mã]" của tiêu đề; giá trị theo "(mã)" cuối lựa chọn. Dòng thiếu mã học sinh bị bỏ. Không có cột câu hỏi nào

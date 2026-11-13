@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-5: mã học sinh gõ khác hoa/thường hay thừa khoảng trắng vẫn khớp (TH)
+
+- `fa_sau_xep.py`: `khop_ma_hoc_sinh(ma_go, tat_ca_ma)` (hàm thuần): khớp đúng thắng; không thì khớp `strip().casefold()` nếu đúng MỘT học sinh; mơ hồ/không có -> None. Mã đã lưu không đổi.
+- `api_sau_xep.py`: `_chen_phan_hoi` (đường `nhap_phan_hoi_forms` và nhánh phản hồi của `nhap_sau_ket_qua_forms`) và nhánh khiếu nại của `nhap_sau_ket_qua_forms` dùng hàm trên; cả hai kết quả thêm `ma_khong_khop` (mã gõ không khớp, theo thứ tự gặp, tối đa 20); giữ các khoá cũ (đổi hình dạng là FG-6).
+- Test: `tests/test_fg5_khop_ma.py` (6 đỏ → xanh); mở rộng 2 assert từ điển cũ (`test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py`) thêm khoá `ma_khong_khop`, không nới.
+
 ## 2026-11-13 — FG-4: hai nút nạp tệp Forms dùng một hàm, có trạng thái bận (TH)
 
 - `js/10_theo_doi.js`: `napTepForms(nut, input, tenApi, khiXong)` thay hai bộ xử lý chép lại; nút khoá + nhãn "Đang nạp…" (`dang_nap`, vi+en trong `i18n.js`) khi gọi API, bấm lần hai không sinh yêu cầu mới, `.catch` hiện thông báo lỗi chung, `finally` luôn xoá ô tệp và mở lại nút.

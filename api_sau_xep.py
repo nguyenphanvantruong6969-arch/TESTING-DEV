@@ -478,16 +478,18 @@ class SauXepMixin:
 
     def _chen_phan_hoi(self, cur, dong, luc=None):
         """Ghi các dòng phản hồi đã đọc từ tệp Forms (nguồn 'forms'); mã học sinh không có trong CSDL bị bỏ.
-        Dòng trùng hệt một dòng đã có (FG-3) bị bỏ qua và đếm. Trả ({loai: số dòng đã ghi}, tập mã bị bỏ, số dòng trùng).
+        Dòng trùng hệt một dòng đã có (FG-3) bị bỏ qua và đếm. Mã gõ khớp mềm (FG-5). Trả ({loai: số dòng đã ghi}, mã gõ bị bỏ theo thứ tự, số dòng trùng).
         Không tự commit."""
         luc = luc or datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         dem = {"ket_qua": 0, "tuan_3": 0}
-        bo_qua, trung = set(), 0
-        co = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+        bo_qua, trung = {}, 0                           # dict: giữ thứ tự gặp đầu tiên (FG-5)
+        co = [r[0] for r in cur.execute("SELECT student_id FROM students")]
         for d in dong:
-            if d["student_id"] not in co:
-                bo_qua.add(d["student_id"])
+            ma = sx.khop_ma_hoc_sinh(d["student_id"], co)
+            if ma is None:
+                bo_qua[d["student_id"]] = None
                 continue
+            d = dict(d, student_id=ma)
             if cur.execute(
                     "SELECT 1 FROM fa_phan_hoi WHERE student_id = ? AND nguon = 'forms' AND loai = ? AND hai_long IS ? "
                     "AND hieu_ly_do IS ? AND kho_nhat IS ? AND con_di IS ? AND muon_doi IS ?",
@@ -524,7 +526,7 @@ class SauXepMixin:
             with self._ket_noi_ghi() as cur:
                 dem, bo_qua, trung = self._chen_phan_hoi(cur, dong)
             return _ok({"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua),
-                        "dong_moi": dem["ket_qua"] + dem["tuan_3"], "dong_trung": trung})
+                        "ma_khong_khop": list(bo_qua)[:20], "dong_moi": dem["ket_qua"] + dem["tuan_3"], "dong_trung": trung})
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -561,7 +563,7 @@ class SauXepMixin:
                 canh_bao.append(err("fa_khieu_nai_chua_bat"))
             khieu_nai_loi, n_khieu_nai, bo_qua_dong, kn_trung, dong_trung = [], 0, 0, 0, 0
             with self._ket_noi_ghi() as cur:
-                n_ket_qua, bo_qua = 0, set()
+                n_ket_qua, bo_qua = 0, {}
                 if bat_ph:
                     dem, bo_qua, dong_trung = self._chen_phan_hoi(cur, dong)
                     n_ket_qua = dem["ket_qua"] + dem["tuan_3"]
@@ -576,13 +578,15 @@ class SauXepMixin:
                             return _fail(err("phan_hoi_tep_sai", detail=str(e)))
                         yeu_cau, bo_dong = [], []           # tệp ba câu cũ: không có nhánh khiếu nại
                     bo_qua_dong = len(bo_dong)
-                    co = {r[0] for r in cur.execute("SELECT student_id FROM students")}
+                    co = [r[0] for r in cur.execute("SELECT student_id FROM students")]
                     run_goc = sx.run_goc_theo_buoi(cur)
                     thieu_gio = False
                     for y in yeu_cau:
-                        if y["student_id"] not in co:
-                            bo_qua.add(y["student_id"])
+                        ma = sx.khop_ma_hoc_sinh(y["student_id"], co)
+                        if ma is None:
+                            bo_qua[y["student_id"]] = None
                             continue
+                        y = dict(y, student_id=ma)
                         luc = y["luc"]
                         if luc is None:
                             luc, thieu_gio = sx.bay_gio(), True
@@ -598,7 +602,7 @@ class SauXepMixin:
                     if thieu_gio:
                         canh_bao.append(err("khieu_nai_khong_co_gio_forms"))
             return _ok({"n_ket_qua": n_ket_qua, "n_khieu_nai": n_khieu_nai, "bo_qua": len(bo_qua) + bo_qua_dong,
-                        "dong_moi": n_ket_qua, "dong_trung": dong_trung, "khieu_nai_moi": n_khieu_nai,
+                        "ma_khong_khop": list(bo_qua)[:20], "dong_moi": n_ket_qua, "dong_trung": dong_trung, "khieu_nai_moi": n_khieu_nai,
                         "khieu_nai_trung": kn_trung, "khieu_nai_loi": khieu_nai_loi, "canh_bao": canh_bao})
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))

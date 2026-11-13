@@ -132,6 +132,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FG-1 (nhánh fg-sua, TH) | xong | 2026-11-13 | js/075_workspace.js, i18n.js, index.html | tests/test_giao_dien_fg1_bat_tinh_nang.py, test_fg1_bat_tinh_nang.py | Hộp thoại bật/tắt 5 tính năng sau khi xếp + số ngày khiếu nại, từ menu ⋯ của dòng không gian làm việc. |
 | FG-3 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_sau_xep.py | tests/test_fg3_nap_lai.py | Nạp lại cùng tệp: không thêm dòng phản hồi, không sinh khiếu nại mới; đếm dong_moi/dong_trung/khieu_nai_moi/khieu_nai_trung. |
 | FG-4 (nhánh fg-sua, TH) | xong | 2026-11-13 | js/10_theo_doi.js, i18n.js | tests/test_giao_dien_fg4_nut_nap.py | napTepForms: nút bận "Đang nạp…", không gọi hai lần, lỗi chung, luôn mở lại nút. |
+| FG-5 (nhánh fg-sua, TH) | xong | 2026-11-13 | fa_sau_xep.py, api_sau_xep.py | tests/test_fg5_khop_ma.py | khop_ma_hoc_sinh: khớp mềm mã học sinh ở hai đường nạp Forms; trả ma_khong_khop (tối đa 20). |
 | FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
 | FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
 | FA-D7L (giảm may rủi) | chưa | | | | Điểm lẻ 0,1 tuỳ chọn, mặc định tắt |
