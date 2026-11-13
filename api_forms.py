@@ -73,15 +73,17 @@ class FormsMixin:
 
     @staticmethod
     def _dong_bao_cao(ds):
-        """[{ma, clb, ...}] -> [{ma, clb, noi_dung}] bằng câu tiếng Việt của báo cáo Phiếu CLB."""
-        import chuyen_phieu_clb as pc
-        return [{"ma": x["ma"], "clb": x["clb"], "noi_dung": pc.NOI_DUNG.get(x["ma"], x["ma"])} for x in ds]
+        """[{ma, clb, ...}] -> [{ma, clb, code, params}] (SG-8, bất biến 6): giao diện dịch `code` + `params` ra
+        vi/en; câu chữ nằm ở `i18n_errors.py` (`phieu_nd_<ma>`), không còn đọc `NOI_DUNG` ở đường giao diện
+        (`NOI_DUNG` chỉ còn để `chuyen_phieu_clb.viet_bao_cao` ghi báo cáo .md cho giáo viên)."""
+        return [{"ma": x["ma"], "clb": x["clb"], "code": "phieu_nd_" + x["ma"], "params": {"clb": x["clb"]}}
+                for x in ds]
 
     @staticmethod
     def _clb_hien_thi(clubs):
         return [{"club_id": c["club_id"], "name": c["name"], "buoi": c.get("buoi") or "",
                  "buoi_nhan": so_nhap.nhan_buoi(c.get("buoi") or ""), "loai": c.get("loai"),
-                 "loai_nhan": so_nhap.NHAN_LOAI_HIEN_THI.get(c.get("loai"), ""), "chi_tieu": c.get("capacity"),
+                 "chi_tieu": c.get("capacity"),
                  # SG-6: khoá chỉ có khi CLB khai giờ / địa điểm (bảng bước 1 hiện cột khi có).
                  **{k: c[k] for k in so_nhap.KHOA_GIO if c.get(k)}}
                 for c in clubs]
@@ -93,7 +95,6 @@ class FormsMixin:
         các CLB hợp lệ vẫn được lưu. Tệp sai dạng hoặc không CLB nào hợp lệ -> `phieu_clb_tep_sai`, tệp cũ giữ nguyên."""
         forms_dot.nap_mau_forms()
         import chuyen_phieu_clb as pc
-        from i18n_errors import format_all
         du_lieu, loi_co = self._bytes_xlsx(file_base64)
         if loi_co or du_lieu is None:
             return _fail(loi_co)
@@ -110,14 +111,14 @@ class FormsMixin:
                     return _fail(err("phieu_clb_tep_sai", detail=str(e)))
                 kq = tom["kq"]
                 loi, canh_bao = self._dong_bao_cao(kq["loi"]), self._dong_bao_cao(kq["canh_bao"])
-                chan = format_all(kq["kiem_truoc"])
+                chan = kq["kiem_truoc"]            # SG-8: {code, params}; giao diện dịch, không đổi thành chữ ở đây
                 if not kq["clubs"]:
-                    return _fail(err("phieu_clb_tep_sai", detail="; ".join(
-                        "%s: %s" % (x["clb"], x["noi_dung"]) for x in loi) or "không có CLB hợp lệ nào"))
+                    ly_do = [{"code": x["code"], "params": x["params"]} for x in loi] or [
+                        err("phieu_clb_khong_co_clb_hop_le")]
+                    return _fail([err("phieu_clb_tep_sai")] + ly_do)
                 theo_loai = {}
-                for c in kq["clubs"]:
-                    nhan = so_nhap.NHAN_LOAI_HIEN_THI.get(c["loai"], c["loai"])
-                    theo_loai[nhan] = theo_loai.get(nhan, 0) + 1
+                for c in kq["clubs"]:                # khoá = mã Loại (TU_DO…); giao diện đặt nhãn vi/en
+                    theo_loai[c["loai"]] = theo_loai.get(c["loai"], 0) + 1
                 du = {"n_clb": len(kq["clubs"]), "theo_loai": theo_loai, "loi": loi, "canh_bao": canh_bao, "chan": chan}
                 shutil.copyfile(tep_tai_len, os.path.join(thu_muc, "PHIEU_CLB.xlsx"))
                 shutil.copyfile(tom["bao_cao"], os.path.join(thu_muc, "BAO_CAO_PHIEU_CLB.md"))

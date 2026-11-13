@@ -69,6 +69,7 @@ MA_MOI_SAU_ANH_CHUP = {
 
     # === SG-B: add below ===
     "so_nhap_canh_bao_wharton_trong",
+    "phieu_nd_phieu_thieu_cau_2", "phieu_nd_phieu_thieu_phong", "phieu_nd_phieu_thieu_cho", "phieu_nd_phieu_moc_sai", "phieu_nd_phieu_toi_thieu_sai", "phieu_nd_phieu_tu_do_co_ly_do_gioi_han", "phieu_nd_phieu_thieu_ly_do", "phieu_nd_phieu_thieu_cau_4", "phieu_nd_phieu_thu_thach_khong_tu_cham", "phieu_nd_phieu_thieu_tieu_chi", "phieu_nd_phieu_cho_duyet_tuyen_chon", "phieu_nd_phieu_nop_nhieu_lan", "phieu_nd_phieu_mac_dinh_ky_truoc", "phieu_clb_khong_co_clb_hop_le",
     # === end SG-B ===
 
     # (spacer: unchanged line between marker blocks)
