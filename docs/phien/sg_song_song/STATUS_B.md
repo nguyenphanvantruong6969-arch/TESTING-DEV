@@ -9,7 +9,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
-| SG-6 (H1, D1 = A) | TODO | 0 | | | | | |
+| SG-6 (H1, D1 = A) | CODING | 0 | dc0451b | | session_01YVAyu2N9LpsmHLzKjBUGzq | | |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
@@ -36,3 +36,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T16:15Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 CHECKING checker=session_01YVAyu3aEQRoHtkKoFwqkCc range=5c8ee63..d9da2c5
 2026-11-13T16:29Z CHECKER session_01YVAyu3aEQRoHtkKoFwqkCc SG-2 PASS
 2026-11-13T16:50Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 DONE (checker PASS c70048f + lead review, kiem_nhanh 7/7) d9da2c5
+2026-11-13T16:51Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CODING coder=session_01YVAyu2N9LpsmHLzKjBUGzq start=dc0451b
