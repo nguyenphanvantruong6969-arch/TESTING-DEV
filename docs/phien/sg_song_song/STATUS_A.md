@@ -11,7 +11,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
 | SG-4 (M3) | DONE | 1 | a959972 | 17eaf11 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ, session_01TGThn6utYnaicoK4Ce6A5K | |
 | SG-10 (M2) | DONE | 1 | f660d28 | d7f5bac | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt, session_01TGThn5kSVpqQSJfK4pvZA2 | |
-| SG-11a (M6, M7, L1, L4, L5) | CODING | 0 | e676654 | | session_01TGThn8tXzyzjkRWaYP2tTL | | |
+| SG-11a (M6, M7, L1, L4, L5) | CHECKING | 0 | e676654 | 103aef6 | session_01TGThn8tXzyzjkRWaYP2tTL | session_01TGThn6k5CksKndQKBEWwRo | |
 
 ## Fix lists
 - SG-10 FIX-1 (checker session_01TGThn5KnRmS2eSHn9DjZpt, lead agrees): 1. Theo CLB caption via get_danh_sach_clb tu_do; 2. ti_le_choi None for free clubs; 3. exports in api_xuat.py (person B's file, minimal); 4. UI test asserts person noun. get_tai_theo_buoi left as is -> For Truong.
@@ -68,3 +68,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 DONE lead-review agree (159 passed, kiem_nhanh 7/7) d7f5bac
 2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-11a CODING coder=session_01TGThn8tXzyzjkRWaYP2tTL e676654
 2026-11-13T19:50Z CODER session_01TGThn8tXzyzjkRWaYP2tTL SG-11a READY 103aef6 red:6 of 15 new tests failed before fix (color-scheme not light, gold vs gold-text, Nhập điểm 499px vs 1022/1184px, no L5 hint, results table 761px in 630px box at 1024) mutation:L5 hidden forced true -> L5 test fails, restored; fix files stashed -> reds above
+2026-11-13T20:05Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-11a CHECKING checker=session_01TGThn6k5CksKndQKBEWwRo 103aef6
