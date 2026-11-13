@@ -21,7 +21,9 @@ import tao_mau_forms as tmf  # noqa: E402
 
 # sha256 của cả thư mục đầu ra (tên + nội dung) chụp trên f5e8a41, sinh hai lần giống nhau.
 # Byte đầu ra khác nhau theo hệ điều hành (os.name); FG không đổi các chế độ này, nên mỗi nền
-# tảng giữ nguyên băm của chính nó (SG-5 đổi riêng fa_daa, fa_daa_mot: posix đã chụp lại; nt CHƯA, cần chụp ở CI) (posix: chụp ở STEP0; nt: đầu ra thật ở CI run 43376547591).
+# tảng giữ nguyên băm của chính nó (posix: chụp ở STEP0; nt: đầu ra thật ở CI run 43376547591).
+# SG-5 cố ý đổi `fa_daa` và `fa_daa_mot`: posix chụp lại; nt chưa có băm mới, nên hai chế độ đó trên nt chỉ
+# kiểm BĂM NỘI DUNG (không phụ thuộc hệ điều hành, xem `_bam_noi_dung`), không kiểm băm byte.
 _CHE_DO = {
     "fa_daa": ["--fa-daa"],
     "fa_daa_mot": ["--fa-daa", "--mot-bieu-mau"],
@@ -56,10 +58,40 @@ def _bam_cay(thu_muc):
     return h.hexdigest()
 
 
+def _bam_noi_dung(thu_muc):
+    """Băm không phụ thuộc hệ điều hành: tên tệp + byte của .md + chữ trong đoạn văn/bảng của .docx (không byte zip)."""
+    from docx import Document
+    h = hashlib.sha256()
+    for r, _, tep in sorted(os.walk(thu_muc)):
+        for t in sorted(tep):
+            p = os.path.join(r, t)
+            h.update(os.path.relpath(p, thu_muc).replace(os.sep, "/").encode())
+            if t.endswith(".md"):
+                with open(p, "rb") as f:
+                    h.update(f.read().replace(b"\r\n", b"\n"))
+            elif t.endswith(".docx"):
+                d = Document(p)
+                for x in d.paragraphs:
+                    h.update(x.text.encode() + b"\n")
+                for b in d.tables:
+                    for dong in b.rows:
+                        for o in dong.cells:
+                            h.update(o.text.encode() + b"\t")
+    return h.hexdigest()
+
+
+# SG-5: chỉ hai chế độ đăng ký FA-DAA; băm nội dung chụp trên posix, đúng trên cả hai hệ điều hành.
+_BAM_NOI_DUNG = {"fa_daa": "7677a8de7d116d65a8d00c3c1f468a0be032baef31200d2670408aab19afad53", "fa_daa_mot": "666e56b2a8fe2521f7a50ba4e5e9abe73c45d89a89469d934946490d337081e6"}
+
+
 @pytest.mark.parametrize("ten", sorted(BAM_GOC))
 def test_che_do_khac_giu_nguyen_tung_byte(ten, tmp_path):
     arg, bam = BAM_GOC[ten]
     assert tmf.main(arg + ["--ra", str(tmp_path)]) == 0
+    if ten in _BAM_NOI_DUNG:
+        assert _bam_noi_dung(str(tmp_path)) == _BAM_NOI_DUNG[ten]
+    if ten in _BAM_NOI_DUNG and os.name == "nt":
+        pytest.skip("SG-5: băm byte của %s trên nt chưa chụp lại (đã kiểm băm nội dung ở trên)" % ten)
     assert _bam_cay(str(tmp_path)) == bam
 
 

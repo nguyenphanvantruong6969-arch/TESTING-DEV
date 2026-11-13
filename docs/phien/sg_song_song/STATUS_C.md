@@ -38,7 +38,6 @@ SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registrati
 Changed vs the brief: (1) "medals only break ties after the test score" is true only for clubs WITH scores; in `fa_daa` a Giới hạn club orders by medal BEFORE the lottery (key `(1, -medal, stb)`), so the text says both. (2) "leaving default never hurts" is not provable (not a dominant strategy), so it is NOT claimed. (3) Default is "first/second/third NON-free club", so the text says free clubs are skipped.
 Placement is in the question title because Quick Import has no per-section description field (untested on real Forms).
 
-- SG-5: `nt` hashes of fa_daa/fa_daa_mot in tests/test_fg7_bieu_mau_sau_ket_qua.py are STALE (posix re-pinned; Windows CI output needed).
 
 ## Log
 - 2026-11-13T16:10Z LEAD session_01VfPzNuse9EfjuDwwt7335U setup branch claude/sg-c from BASE 98709f1
@@ -48,3 +47,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T16:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 checker r1 session_01VfPzNrFdN7RhAERrSNeTJV
 - 2026-11-13T16:34Z CHECKER session_01VfPzNrFdN7RhAERrSNeTJV SG-5 FIX-1 (wording/snapshot/old-exports pass; nt hashes of fa_daa/fa_daa_mot stale -> content digest on both OS, see docs/phien/sg_review/SG-5.md)
 - 2026-11-13T16:52Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 FIX-1 agreed, sent to coder session_01VfPzNruBqHHaJZQcLRxRzS
+- 2026-11-13T16:52Z CODER session_01VfPzNruBqHHaJZQcLRxRzS SG-5 FIX-1 READY: (1) content digest _bam_noi_dung (names + .md bytes CRLF-normalised + docx paragraph/table text) pinned for fa_daa, fa_daa_mot, asserted on both OSes, posix byte hash kept; (2) on nt only the byte-hash assert is skipped (reason names SG-5); (3) comment fixed into separate lines, obsolete 'nt STALE' note removed from For Truong. mutation: changing the description text -> content-digest fail, restored
