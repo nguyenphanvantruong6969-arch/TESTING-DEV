@@ -16,7 +16,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 |---|---|---|---|---|---|---|---|
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
-| SG-9 | CHECKING | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
+| SG-9 | DONE | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
 | SG-12 | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -43,6 +43,13 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 - SG-7: helper placed in js/00_nen.js (no A/B edits there). Step-4 warning prefix `ma:` (internal code) dropped from visible text; old `slice(0,30)` cap replaced by the 5-example rule. Old i18n keys canh_bao_gom/xem_dau/thu_gon left (outside SG-C block).
 - SG-7: dead leftovers outside the SG-C blocks (i18n keys `canh_bao_gom`, `canh_bao_xem_dau`, `canh_bao_thu_gon`; old `.canh-bao-nhom` flex rule in style.css) are left for lead A at integration, to avoid editing outside C's marker blocks. The FG-6 run-log grouping (`showLog`) stays as is: same rule in spirit, not one of SG-7's two surfaces.
 - SG-9 (seen by checker, out of C scope): the khiếu nại error text shows the internal session name `__mac_dinh__` → for person A (SG-4 owns `gui_khieu_nai`).
+- SG-9: checker r2 recommends replacing the static source-text check for `S.dang` (`chuyen`, js/12) with a UI test (sync-throwing
+  `chuyen_tep_forms`, seeded like `test_giao_dien_fa_m9_nap.py`); behaviour verified correct by the checker's scratch test. Non-blocking;
+  left as an optional improvement for lead A / a later item (not worth a third round).
+- SG-12 technical choices (lead): (1) the title→code map is derived from `de` by ONE shared function in `bieu_mau.py` (same title functions
+  as the generator); the generator writes it as `MAP_*.json` beside each form, readers use the same function, so the kiosk needs no extra
+  upload; (2) a generator flag keeping the old coded titles, so that mode is byte-identical to BASE and this semester's run can keep codes
+  (spec D2 note "keep a if time is short"); default = plain titles as approved (D2 = b).
 
 ## For Truong
 SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registration form, after the question text; en: none, forms are Vietnamese-only):
@@ -76,3 +83,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T19:08Z CODER session_01VfPzNud4JhboVzj5e8xu4E SG-9 FIX-1 READY c266cae (1) rejection test now counts unhandledrejection (must be 0) and exactly one .toast.is-error; new chayTai test; mutation: removing .catch in chayNut -> 5 fail, in chayTai -> 1 fail, restored. (2) chuyen (S.dang) and goi (S5.dang) reset the flag in sauCung; new UI test: synchronously throwing API at step 5 then second click -> 2 calls; mutation: removing S5 sauCung -> 2 fail, restored; S.dang covered by a static check only (UI path needs uploaded files). related: 70 UI/label tests pass, ruff clean
 - 2026-11-13T19:27Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 FIX-1 READY c266cae; checker r2 session_01VfPzNt89iBAQw8naoMzV7d
 - 2026-11-13T19:43Z CHECKER session_01VfPzNt89iBAQw8naoMzV7d SG-9 PASS (round 2, 98908e1..c266cae; own mutations: .catch in chayNut/chayTai now fail tests, S5.dang UI test + S.dang static test fail on removal; 498 UI tests 0 skipped; ruff clean; kiem_nhanh 7/7; note: S.dang UI test is feasible, see docs/phien/sg_review/SG-9.md Round 2)
+- 2026-11-13T19:50Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 DONE (lead review: wrapper read; 27 SG-9/FG-4/SG-7 UI tests pass in Chromium; checker r2 own mutations + 498 UI tests, kiem_nhanh 7/7; JS-only diff) c266cae
