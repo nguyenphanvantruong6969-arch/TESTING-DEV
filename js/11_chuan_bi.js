@@ -44,7 +44,7 @@ window.ChuanBi = (() => {
   }
 
   function lamMoi() {
-    return callApi("get_fa_duong").then((res) => {
+    return chayTai(callApi("get_fa_duong"), (res) => {
       if (!res.ok) { showErrorToast(res.errors); return res; }
       duongHienTai = res.data.duong || null;
       chonONhap();
@@ -54,7 +54,7 @@ window.ChuanBi = (() => {
   }
 
   function datDuong(gia_tri) {
-    return callApi("dat_fa_duong", gia_tri).then((res) => {
+    return chayTai(callApi("dat_fa_duong", gia_tri), (res) => {
       if (!res.ok) { showErrorToast(res.errors); chonONhap(); return res; }
       duongHienTai = res.data.duong;
       veMoiBuoc();
@@ -165,7 +165,7 @@ window.ChuanBi = (() => {
     khung.appendChild(mot("p", "hint-text", t("cb_b1_ghi")));
     const hang = mot("div", "cb-nut-hang");
     hang.appendChild(nutChonTep(khung, "cb-b1-tep", "cb-b1-nap", "cb_b1_nut", (b64) => {
-      callApi("nap_phieu_clb", b64, "").then((res) => {
+      chayNut(el("cb-b1-nap"), () => callApi("nap_phieu_clb", b64, ""), (res) => {
         if (!res.ok) { showErrorToast(res.errors); return; }
         lamMoi();
       });
@@ -192,14 +192,14 @@ window.ChuanBi = (() => {
     khung.appendChild(mot("p", "hint-text", t("cb_b2_ghi")));
     const hang = mot("div", "cb-nut-hang");
     hang.appendChild(nut("cb-b2-tai-mau", "cb_b2_tai_mau", () => {
-      callApi("tai_mau_de_thi", "").then((res) => {
+      chayNut(el("cb-b2-tai-mau"), () => callApi("tai_mau_de_thi", ""), (res) => {
         if (!res.ok) { showErrorToast(res.errors); return; }
         tepMauGhi = res.data.path;
         lamMoi();
       });
     }));
     hang.appendChild(nutChonTep(khung, "cb-b2-tep", "cb-b2-nap", "cb_b2_nap", (b64) => {
-      callApi("nap_de_thi", b64).then((res) => {
+      chayNut(el("cb-b2-nap"), () => callApi("nap_de_thi", b64), (res) => {
         if (res.ok) { loiDeThi = []; lamMoi(); return; }
         const chiTiet = res.errors.filter((e) => e.code === "de_thi_tep_sai" && e.params && e.params.detail)
           .map((e) => e.params.detail);
@@ -226,7 +226,7 @@ window.ChuanBi = (() => {
   /* Một lần đọc trạng thái cho cả hai khung; mỗi khung đăng ký riêng với `dangKyBuoc`. */
 
   function docRoiVe(khung, ve) {
-    callApi("get_forms_buoc_12").then((res) => {
+    chayTai(callApi("get_forms_buoc_12"), (res) => {
       if (!res.ok) { showErrorToast(res.errors); return; }
       clear(khung);
       ve(khung, res.data);
