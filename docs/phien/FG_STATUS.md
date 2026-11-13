@@ -10,18 +10,18 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 2: FG-2 delegated to a Sonnet worker (task start = HEAD after this commit); then wave gate 2.
+- Wave 3: FG-7 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-8, FG-9, wave gate 3, FINISH.
 
 ## Item table
 | Item | State | Commit | Tests |
 |---|---|---|---|
 | STEP0 | DONE (lead review OK) | 63b6e73 | 13 test files, 41 red / 15 green on 24846d2 |
-| FG-1 | DONE (server side was GONE-ON-HEAD) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
+| FG-1 | DONE (server side was GONE-ON-HEAD; FIX1 13e93f3) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
 | FG-3 | DONE | f2dc276 | test_fg3_nap_lai (5) |
 | FG-4 | DONE | (see Log) | test_giao_dien_fg4_nut_nap (4) |
 | FG-5 | DONE | e90555a | test_fg5_khop_ma (6) |
 | FG-6 | DONE | (see Log) | test_fg6_ket_qua_nap (5), test_giao_dien_fg6_danh_sach_loi (2) |
-| FG-2 | TODO | | |
+| FG-2 | DONE | 9db3039 | test_fg2_xem_truoc_fa (10) |
 | FG-7 | TODO | | |
 | FG-8 | TODO | | |
 | FG-9 | TODO (KPI-link sub-bullet GONE-ON-HEAD) | | |
@@ -33,6 +33,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - Lead copy: `<scratchpad of session_01VfPzNt8wLhNQyk5sYejKse>/snap/{fa-daa,fa-daa_mot,phan-hoi,tuan-3,sau-ket-qua}`.
 
 ## Decisions
+- Every review touching UI strings also runs tests/test_van_phong_tu_nhien.py and tests/test_ws_nhan.py (lesson from FG-1 FIX1).
 - Workers must run `git fetch origin main:refs/remotes/origin/main` before `kiem_nhanh` (else trung_khit cannot compare).
 - D1–D4 as spec §1 (final).
 - STEP0 commits the red tests it writes (they are each item's acceptance tests, rule 2); the item worker turns them
@@ -51,7 +52,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-4 | session_01VfPzNtbYjiRYVCMfuncuk2 | DONE, review GO |
 | FG-5 | session_01VfPzNr3qCVAmDxcnmnLfjh | DONE, review GO |
 | FG-6 | session_01VfPzNru1AhpnZkxiBZ3HP2 | DONE, review GO |
-| FG-2 | (creating) | |
+| FG-2 | session_01VfPzNs42szCLCJK8kCxfWR | DONE, review GO |
+| FG-7 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -101,3 +103,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 - 2026-11-13 WORKER session_01VfPzNtE2gjQkFTnk4CKsg9 FG-1 FIX1 DONE 13e93f3
   - Red before: test_van_phong_tu_nhien.py::test_moi_cau_hien_thi_deu_viet_tu_nhien (ws_tn_tieu_de vi+en had a dash). Now: test_van_phong_tu_nhien + fg1 API + fg1 UI (Chromium ran) + i18n = 28 passed; ruff clean; kiem_nhanh 7/7.
+- 2026-11-13T04:00Z lead: FG-2 review GO: FA preview warnings grouped per code (original code + params nhom/n/vd, '<code>_nhom' sentences vi+en in Python and JS), 'run will be blocked' line, import still allowed; FA template (che_do_fa) with Loại columns + 'Huy chương (60/30/10)'; reader alias 'huy chuong'; default template hash guard green; sample du_lieu_test/SO_NHAP_FA_MAU_120HS.xlsx (seed, MÔ PHỎNG). FG-2 worker found an FG-1 regression (em dash in ws_tn_tieu_de breaks test_van_phong_tu_nhien) the lead missed → FG-1 FIX1 sent to the FG-1 worker; done 13e93f3, review GO.
+- 2026-11-13T04:35Z lead: WAVE GATE 2 GREEN: origin/claude/forms-gop has nothing new; ruff clean; kiem_nhanh --co-so origin/main --so-seed 20: 7/7, 60/60; generator diff -r: 4/4 identical; related -k run (fg, fa_m6b, fa_m2b, phan_hoi, khieu_nai, workspace, ws_, so_nhap, i18n, van_phong, thong_bao, nhan): 1705 passed, 3 skipped (numpy/POSIX, none UI), 14 failed = exactly the wave-3 acceptance tests (fg7 ×5, fg8 ×7, fg9 ×2), expected.
