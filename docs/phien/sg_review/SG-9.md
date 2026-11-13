@@ -46,3 +46,27 @@ acceptance: rejecting API → button re-enabled + error toast; double click → 
 5. Out of scope, seen in the walkthrough: the khiếu nại error text shows the internal session name `__mac_dinh__`.
 6. Only red test expected: `test_a13_12_tai_lieu::test_ban_do_ma_so_tep_test_la_so_that` (file count) — person A fixes at integration
    (not run separately by me; the UI run above is the related set).
+
+## Round 2 (checker session_01VfPzNt89iBAQw8naoMzV7d) — range 98908e1..c266cae (FIX-1) — verdict PASS
+
+Own mutations in a scratch worktree of c266cae (removed afterwards), `tests/test_giao_dien_sg9_nut_ban.py` = 19 passed on the clean tree:
+1. Remove the `.catch(baoLoiGiaoDien)` in `chayNut` (the `finally(khoi).then(khiXong)` branch) → the 5 `test_api_loi_nut_mo_lai_...` tests FAIL.
+   Checked which assert fires: the toast count stays 1 (the page-level handler shows the same toast), `window.__unh` becomes 1 → the
+   `unhandledrejection == 0` assert is what proves the `.catch`. (Round 1 note 1 is closed.)
+2. Remove the `.catch` in `chayTai` → `test_chay_tai_bat_loi_mot_thong_bao_khong_unhandled` FAILS (1 failed, 18 passed).
+3. Remove `sauCung` for `S5.dang` (`goi`) → the step-5 sync-throw UI test AND the static test fail (2 failed). The UI test makes exactly
+   2 calls on 2 clicks on the good tree.
+4. Remove `sauCung` for `S.dang` (`chuyen`) → only the static test fails (1 failed).
+
+`S.dang` — is the static-only check adequate? A UI test IS feasible: the coder's reason ("needs uploaded files") does not hold, step 4
+tests seed files with `set_input_files` (`test_giao_dien_fa_m9_nap.py::test_duong_a_lech_giua_hai_de_hien_hop_xac_nhan`). I wrote a
+15-line scratch test (not committed) from that file's `mo` fixture, `_bo_lech`, `_de_3_de`: open path "A", `set_input_files([lst]+thi)`,
+wait for 3 rows, replace `pywebview.api` by a Proxy whose `chuyen_tep_forms` counts and throws synchronously, click `#cb-nap-chuyen`,
+wait for `.toast.is-error` and for the button to be enabled, click again, `wait_for_function(window.__goi === 2)`. Result: PASSES on
+c266cae; with the `S.dang` `sauCung` removed it FAILS (timeout, only 1 call). So the behaviour is correct (verified), and the static
+check does fail on removal, but it pins exact source text (a reformat breaks it, a behavioural regression with other wording would not).
+Not blocking for PASS: recommend the lead/A swaps the static assert for that UI test (same shape as the step-5 test) at integration.
+
+Re-runs (HEAD e5747dc = c266cae + docs): `ruff check .` clean; `kiem_nhanh` 7/7 (needed `git fetch origin main` for `trung_khit`: 15 cases
+identical); `js/12_chuan_bi_nap.js` diff = exactly the two `sauCung` options (no other change); test diff = test file only.
+Chromium (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers): ALL `tests/test_giao_dien_*.py` + `test_t3_l2_buoi.py` = 498 passed, 0 skipped, 0 failed (738 s); includes SG-9 (19), FG-4 (10) and the tabs 05/10/11/12/13 files.
