@@ -67,3 +67,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T19:22Z CHECKER session_01TGThn5kSVpqQSJfK4pvZA2 SG-10 PASS
 2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 DONE lead-review agree (159 passed, kiem_nhanh 7/7) d7f5bac
 2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-11a CODING coder=session_01TGThn8tXzyzjkRWaYP2tTL e676654
+2026-11-13T19:50Z CODER session_01TGThn8tXzyzjkRWaYP2tTL SG-11a READY a306fdd red:6 of 15 new tests failed before fix (color-scheme not light, gold vs gold-text, Nhập điểm 499px vs 1022/1184px, no L5 hint, results table 761px in 630px box at 1024) mutation:L5 hidden forced true -> L5 test fails, restored; fix files stashed -> reds above
