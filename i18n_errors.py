@@ -1344,6 +1344,21 @@ MESSAGES = {
 
     # === C: FA-M8 — add below ===
     # === end C ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-A: add below ===
+    # === end SG-A ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-B: add below ===
+    # === end SG-B ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-C: add below ===
+    # === end SG-C ===
 }
 
 

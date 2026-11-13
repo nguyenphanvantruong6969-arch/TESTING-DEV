@@ -9,7 +9,8 @@
 - **Base (Step 0, done by the manager):** `claude/sg-sua` from `origin/claude/forms-gop`, which already holds `main`
   + FG-1…FG-9 (merged 909f8df, FG GREEN) + these docs. The final PR `claude/sg-sua` → `main` carries FG and SG together.
   Several items reuse FG patterns (FG-1 menu dialog, FG-2 preview warning, FG-4 busy helper, FG-6 grouped list).
-- **How the work runs:** three sessions in a loop (manager / coder / checker), mechanics in `docs/ke_hoach/SG_VONG_LAP.md`.
+- **How the work runs (Truong, 2026-11-13):** three people in parallel, items split by code area, mechanics in
+  `docs/ke_hoach/SG_SONG_SONG.md` (person A integrates into `claude/sg-sua`). Fallback: the three-role loop `SG_VONG_LAP.md`.
 - One commit per item, message `SG-n: …`. Test first (rule 2): write the acceptance test, see it red, then fix.
 - Invariant 1: default config byte-identical. Run `kiem_nhanh --co-so origin/main --so-seed 20` after every item that
   touches Python. SG-3 touches only the FA branch; prove it with `kiem_nhanh` + the FA tests.

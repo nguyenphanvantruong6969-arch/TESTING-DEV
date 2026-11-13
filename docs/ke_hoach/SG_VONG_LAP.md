@@ -1,5 +1,8 @@
 # Vòng lặp ba vai cho SG-1 … SG-12 (quản lý · lập trình · soát mã)
 
+> **Cách DỰ PHÒNG.** Truong chọn chia việc song song (2026-11-13): dùng `docs/ke_hoach/SG_SONG_SONG.md`.
+> Không chạy tệp này cùng lúc với `SG_SONG_SONG.md`.
+
 > Soạn 2026-11-13 (Opus) theo yêu cầu của Truong. Đặc tả việc cần làm: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md`
 > (D1 = A, D2 = b, D3 = NULL đã duyệt). Nguồn phát hiện: báo cáo Fable "Soát giao diện kiosk RB-DA".
 > Phần 1 cho cộng tác viên (tiếng Việt). Phần 2 cho Claude (tiếng Anh). Mọi số liệu là MÔ PHỎNG.

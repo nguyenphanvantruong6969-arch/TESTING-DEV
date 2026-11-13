@@ -5,12 +5,12 @@
 
 ## Feature / goal
 Fix the 19 findings of Fable's whole-kiosk UI audit ("Soát giao diện kiosk RB-DA", 2026-11-13), most severe first.
-Spec: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (follow exactly; items SG-1 … SG-12). Run as a three-role loop
-(QUAN_LY Opus / LAP_TRINH Sonnet / SOAT_MA checker): `docs/ke_hoach/SG_VONG_LAP.md`; live state in
-`docs/phien/SG_STATUS.md`. Base = `claude/forms-gop` (already holds FG-1…FG-9). All numbers SIMULATED.
+Spec: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (follow exactly; items SG-1 … SG-12). Run by three people in parallel
+(A `claude/sg-a` Opus + integrator, B `claude/sg-b`, C `claude/sg-c` Sonnet): `docs/ke_hoach/SG_SONG_SONG.md`;
+per-person state in `docs/phien/sg_song_song/STATUS_<X>.md`, overall `docs/phien/SG_STATUS.md` after integration. Base = `claude/forms-gop` (already holds FG-1…FG-9). All numbers SIMULATED.
 
 ## Plan (written by Opus; ticked by Sonnet)
-- [ ] Step 0: QUAN_LY builds `claude/sg-sua` from forms-gop; verify L2, L3 (FG-9)
+- [x] Step 0: BASE = forms-gop with FG + marker blocks (commit 'SG-KH: parallel split'); L2, L3 fixed by FG-9 (Fable appendix A)
 - [ ] SG-1 selective club with no scores blocks the run (C3)
 - [ ] SG-2 default workspace no longer traps a new user (C1)
 - [ ] SG-3 FA rank from the original list + flag earlier FA numbers (C2)
@@ -33,15 +33,18 @@ Spec: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (follow exactly; items SG-1 …
 - Default `wharton: true` stays (invariant 1); SG-2 adds an exit instead.
 
 ## Next steps (ordered)
-1. Collaborators start the three roles (prompts in `SG_VONG_LAP.md` §1.3).
-2. QUAN_LY: Step 0, then assign SG-1.
+1. Persons A, B, C start in parallel (`SG_SONG_SONG.md` §1).
+2. Person A integrates when B and C are DONE, gate, PR.
 
 ## Files touched
 - docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md: spec
-- docs/ke_hoach/SG_VONG_LAP.md: three-role loop runbook
+- docs/ke_hoach/SG_VONG_LAP.md: three-role loop runbook (fallback)
+- docs/ke_hoach/SG_SONG_SONG.md: parallel split runbook (A/B/C)
+- i18n_errors.py, i18n.js, tests/test_ws_nhan.py, style.css: empty SG-A/B/C marker blocks (comments only)
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-13 | Opus (forms-gop session) | Read Fable report, re-checked C1/C2/C3/H1 in code, wrote spec + this handoff | plan only |
 | 2026-11-13 | Opus (forms-gop session) | Truong approved D1–D3; wrote three-role runbook SG_VONG_LAP.md | plan only |
+| 2026-11-13 | Opus (forms-gop session) | Truong chose a 3-way parallel split; wrote SG_SONG_SONG.md, added marker blocks | no behaviour change |

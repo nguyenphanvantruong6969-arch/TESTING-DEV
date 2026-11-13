@@ -60,6 +60,21 @@ MA_MOI_SAU_ANH_CHUP = {
     # === C: FA-M8 — add below ===
     # === end C ===
 
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-A: add below ===
+    # === end SG-A ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-B: add below ===
+    # === end SG-B ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-C: add below ===
+    # === end SG-C ===
+
     # FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ.
     "fa_thieu_clb_tu_do_nhom", "fa_clb_thieu_loai_nhom", "fa_clb_thieu_suc_chua_nhom",
     "fa_clb_thieu_diem_san_nhom", "fa_giu_cho_vuot_suc_chua_nhom", "fa_giu_cho_hoc_sinh_la_nhom",

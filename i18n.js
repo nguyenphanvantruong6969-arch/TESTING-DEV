@@ -989,6 +989,21 @@
       cb_bo_xong: "Đã tạo bộ biểu mẫu ({n} tệp): {ten}",
       cb_bo_mo: "Mở thư mục",
       /* === end C === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-A: add below === */
+      /* === end SG-A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-B: add below === */
+      /* === end SG-B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-C: add below === */
+      /* === end SG-C === */
     },
 
     en: {
@@ -1961,6 +1976,21 @@
       cb_bo_xong: "Form set built ({n} files): {ten}",
       cb_bo_mo: "Open folder",
       /* === end C === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-A: add below === */
+      /* === end SG-A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-B: add below === */
+      /* === end SG-B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-C: add below === */
+      /* === end SG-C === */
     },
   };
 
