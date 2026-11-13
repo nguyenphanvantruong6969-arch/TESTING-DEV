@@ -81,7 +81,8 @@ function loadHealthReport() {
       return;
     }
 
-    summary.className = "health-summary is-warn";
+    /* Đỏ chỉ khi có mục NGHIÊM TRỌNG (mục đó chặn việc chạy); còn lại để trung tính. */
+    summary.className = d.n_high > 0 ? "health-summary is-warn" : "health-summary";
     summary.textContent = t("health_summary", { n: d.n_warnings, n_high: d.n_high });
 
     const SEV_LABEL = {

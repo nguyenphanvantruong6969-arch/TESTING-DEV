@@ -25,6 +25,10 @@
 function batKhung(idKhung, res) {
   const bat = !!(res && res.ok && res.data.bat);
   el(idKhung).hidden = !bat;
+  if (idKhung === "khieuNaiPanel" || idKhung === "phanHoiTongPanel") {
+    /* Một tiêu đề nhóm chung cho hai khung: hiện khi ít nhất một khung đang hiện. */
+    el("sauCongBoTieuDe").hidden = el("khieuNaiPanel").hidden && el("phanHoiTongPanel").hidden;
+  }
   if (res && !res.ok) showErrorToast(res.errors);
   return bat;
 }
@@ -133,6 +137,7 @@ function taiMoi() {
 }
 
 let knSoNgay = 3;
+let knMotBuoi = false;
 
 function veKhieuNai(d) {
   knSoNgay = d.so_ngay;
@@ -140,10 +145,13 @@ function veKhieuNai(d) {
   const chon = el("knBuoi");
   const cu = chon.value;
   clear(chon);
+  /* Chỉ một buổi: nhãn "Chưa chia buổi" vô nghĩa với người dùng → ẩn ô chọn và bỏ nhãn khỏi danh sách. */
+  knMotBuoi = d.ds_buoi.length <= 1;
+  chon.hidden = knMotBuoi;
   d.ds_buoi.forEach((b) => {
     const o = document.createElement("option");
     o.value = b;
-    o.textContent = nhanBuoi(b);
+    o.textContent = knMotBuoi && b === BUOI_MAC_DINH ? "" : nhanBuoi(b);
     chon.appendChild(o);
   });
   if (d.ds_buoi.includes(cu)) chon.value = cu;
@@ -158,7 +166,10 @@ function veKhieuNai(d) {
   }
   d.khieu_nai.forEach((k) => {
     const li = document.createElement("li");
-    let chu = t("kn_dong", { name: k.name, student_id: k.student_id, buoi: nhanBuoi(k.buoi), ghi_chu: k.ghi_chu || "" })
+    let chu = knMotBuoi && (!k.buoi || k.buoi === BUOI_MAC_DINH)
+      ? k.name + " (" + k.student_id + ")" + (k.ghi_chu ? ": " + k.ghi_chu : "")
+      : t("kn_dong", { name: k.name, student_id: k.student_id, buoi: nhanBuoi(k.buoi), ghi_chu: k.ghi_chu || "" });
+    chu = chu
       + " — " + t("kn_trang_thai_" + k.trang_thai);
     if (k.trang_thai === "CHAP_NHAN") {
       chu += " (" + (k.da_chay_lai ? t("kn_da_chay_lai", { n: k.dieu_chinh_cu.length }) : t("kn_can_chay_lai")) + ")";

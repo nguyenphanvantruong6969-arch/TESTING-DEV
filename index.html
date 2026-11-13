@@ -121,7 +121,7 @@
             <button class="btn btn-secondary" id="btnValidate" data-i18n="btn_validate">Kiểm tra lại dữ liệu</button>
           </div>
         </div>
-        <p class="hint-text" data-i18n="health_panel_hint">Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.</p>
+        <p class="hint-text" data-i18n="health_panel_hint">Mục "Nghiêm trọng" sẽ chặn việc chạy cho đến khi sửa xong; các mục còn lại không chặn nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.</p>
         <div id="healthSummary" class="health-summary"></div>
         <div id="healthList" class="health-list"></div>
       </div>
@@ -601,6 +601,7 @@
         </div>
       </div>
 
+      <h2 class="nhom-tieu-de" id="sauCongBoTieuDe" data-i18n="sau_cong_bo_tieu_de" hidden>Sau khi công bố kết quả</h2>
       <!-- GAP-3: khieu nai loi du lieu (chi khi rules.fa_khieu_nai bat); js/10_theo_doi.js -->
       <div class="panel" id="khieuNaiPanel" hidden>
         <div class="panel-head">
@@ -666,6 +667,7 @@
           </div>
         </div>
         <div class="panel-body">
+          <p class="hint" id="phGoiYNut" data-i18n="ph_goi_y_nut">"Nạp từ Forms (Excel)" dùng cho biểu mẫu cũ có 3 câu hỏi; "Nạp biểu mẫu Sau khi xem kết quả" dùng cho biểu mẫu gộp mới.</p>
           <p id="phTongHop"></p>
           <div id="phNhapKetQua" class="save-feedback" role="status"></div>
         </div>

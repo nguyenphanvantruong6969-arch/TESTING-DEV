@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-8: chữ gợi ý cảnh báo, bước 3 trình hướng dẫn, nhóm "Sau khi công bố kết quả", ẩn "Chưa chia buổi" (TH)
+
+- `i18n.js` + `index.html`: `health_panel_hint` (vi+en) nói mục "Nghiêm trọng" chặn việc chạy; `js/02_van_hanh.js`: dòng tóm tắt đỏ (`is-warn`) chỉ khi `n_high > 0`, còn lại trung tính (`style.css`).
+- `js/075_workspace.js` (`wsBuoc3`): bốn ô "Theo dõi sau khi xếp…" bị khoá và bỏ tick khi `wzFaDaa` tắt; `style.css`: ô tick cùng dòng nhãn (chỉ `.ws-truong` có checkbox).
+- `index.html` + `js/10_theo_doi.js` (`batKhung`): tiêu đề nhóm "Sau khi công bố kết quả" trước hai khung khiếu nại + phản hồi (hiện khi có khung hiện) và một dòng gợi ý nút nào cho biểu mẫu cũ/mới (`ph_goi_y_nut`); khi workspace chỉ có một buổi, ô chọn buổi ẩn và danh sách khiếu nại bỏ nhãn "Chưa chia buổi".
+- `i18n_errors.py` (vi+en) + `tao_i18n_js.py`: câu `forms_tep_sau_ket_qua` gọi đúng tên nhóm mới (logic FA-M9 không đổi). `tests/test_ws_nhan.py`: `SUA_CO_Y` ghi nhận chủ ý đổi chữ `health_panel_hint`.
+- Test: `tests/test_fg8_goi_y_suc_khoe.py` (2), `tests/test_giao_dien_fg8_cau_chu.py` (6) đỏ → xanh.
+
 ## 2026-11-13 — FG-7: biểu mẫu "Sau khi xem kết quả" chỉ liệt kê ngày có CLB, tiêu đề riêng, hướng dẫn đúng đường menu (TH)
 
 - `mau_forms_thi_clb/tao_mau_forms.py`: `--sau-ket-qua` nhận `--so-nhap-clb` (chỉ liệt kê ngày có CLB trong sổ qua `buoi_co_clb_trong_so_nhap`; không có thì như cũ); tiêu đề docx riêng "Phản hồi và báo lỗi sau khi xem kết quả" (`ghi_docx_chi_thi(..., tieu_de=)`); bước 4 hướng dẫn chỉ "Kiosk → Không gian làm việc → ⋯ → Tính năng sau khi xếp…" (không còn khoá cấu hình); bước 5 giải thích vì sao giữ `[mã]`/`(mã)`; `--help` bỏ mã nội bộ; in thư mục ra tuyệt đối ở dòng cuối. Chỉ đầu ra `--sau-ket-qua` và chữ `--help` đổi; `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--phan-hoi`, `--tuan-3` giữ từng byte (băm trong test).

@@ -1239,8 +1239,8 @@ window.I18N_ERROR_MESSAGES = {
     "en": "File \"{ten}\" isn't used on path {duong}. Check that the right path is chosen."
   },
   "forms_tep_sau_ket_qua": {
-    "vi": "Tệp \"{ten}\" là biểu mẫu Sau khi xem kết quả, không nạp ở bước này. Hãy nạp nó ở khung Phản hồi sau khi xếp.",
-    "en": "File \"{ten}\" is the After-results form; it isn't loaded in this step. Load it in the Feedback panel after allocation."
+    "vi": "Tệp \"{ten}\" là biểu mẫu Sau khi xem kết quả, không nạp ở bước này. Hãy nạp nó ở nhóm \"Sau khi công bố kết quả\" sau khi xếp.",
+    "en": "File \"{ten}\" is the After-results form; it isn't loaded in this step. Load it in the \"After the results are published\" group after allocation."
   },
   "forms_can_chon_de": {
     "vi": "Tệp \"{ten}\" cần biết đề thi. Hãy chọn đề rồi nạp lại.",

@@ -756,6 +756,14 @@ function wsBuoc3(hop) {
   const capNhatODanhSachNhom = () => {
     oTiers.disabled = !(oTierMode.value === "strict" || oPriority.value === "tier");
   };
+  /* Bốn ô "Theo dõi sau khi xếp…" cần xếp theo loại CLB: khoá và bỏ tick khi ô đó tắt. */
+  const oFaCon = ["wzFaDiemDanh", "wzFaKhieuNai", "wzFaVong2", "wzFaPhanHoi"].map((id) => {
+    const khoa = { faDiemDanh: "wzFaDiemDanh", faKhieuNai: "wzFaKhieuNai", faVong2: "wzFaVong2", faPhanHoi: "wzFaPhanHoi" };
+    const k = Object.keys(khoa).find((x) => khoa[x] === id);
+    return wsEl("input", { type: "checkbox", id, checked: w.faDaa === true && w[k] === true, disabled: w.faDaa !== true });
+  });
+  const oFaDaa = wsEl("input", { type: "checkbox", id: "wzFaDaa", checked: w.faDaa === true,
+    onchange: (ev) => oFaCon.forEach((o) => { o.disabled = !ev.target.checked; if (!ev.target.checked) o.checked = false; }) });
   oTierMode.addEventListener("change", capNhatODanhSachNhom);
   oPriority.addEventListener("change", capNhatODanhSachNhom);
   oPriority.addEventListener("change", capNhatOWharton);
@@ -771,16 +779,11 @@ function wsBuoc3(hop) {
     wsTruong("wzScoreScope", "ws_r_score_scope", oScope),
     wsTruong("wzWharton", "ws_r_wharton", oWharton, wsGoiYNgan(
       "wzWharton", t("ws_r_wharton_ngan"), t("ws_r_wharton_ghi_chu"))),
-    wsTruong("wzFaDaa", "ws_r_fa_daa", wsEl("input", { type: "checkbox", id: "wzFaDaa",
-      checked: w.faDaa === true }), wsGoiYNgan("wzFaDaa", t("ws_r_fa_daa_ngan"), t("ws_r_fa_daa_ghi_chu"))),
-    wsTruong("wzFaDiemDanh", "ws_r_fa_diem_danh", wsEl("input", { type: "checkbox", id: "wzFaDiemDanh",
-      checked: w.faDiemDanh === true }), t("ws_r_fa_diem_danh_ngan")),
-    wsTruong("wzFaKhieuNai", "ws_r_fa_khieu_nai", wsEl("input", { type: "checkbox", id: "wzFaKhieuNai",
-      checked: w.faKhieuNai === true }), t("ws_r_fa_diem_danh_ngan")),
-    wsTruong("wzFaVong2", "ws_r_fa_vong_2", wsEl("input", { type: "checkbox", id: "wzFaVong2",
-      checked: w.faVong2 === true }), t("ws_r_fa_diem_danh_ngan")),
-    wsTruong("wzFaPhanHoi", "ws_r_fa_phan_hoi", wsEl("input", { type: "checkbox", id: "wzFaPhanHoi",
-      checked: w.faPhanHoi === true }), t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaDaa", "ws_r_fa_daa", oFaDaa, wsGoiYNgan("wzFaDaa", t("ws_r_fa_daa_ngan"), t("ws_r_fa_daa_ghi_chu"))),
+    wsTruong("wzFaDiemDanh", "ws_r_fa_diem_danh", oFaCon[0], t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaKhieuNai", "ws_r_fa_khieu_nai", oFaCon[1], t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaVong2", "ws_r_fa_vong_2", oFaCon[2], t("ws_r_fa_diem_danh_ngan")),
+    wsTruong("wzFaPhanHoi", "ws_r_fa_phan_hoi", oFaCon[3], t("ws_r_fa_diem_danh_ngan")),
     wsTruong("wzTiers", "ws_r_tiers", oTiers, t("ws_r_tiers_chi_strict")),
   );
 }

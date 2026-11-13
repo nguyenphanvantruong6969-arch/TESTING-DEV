@@ -175,6 +175,12 @@ CHU_UI_MOI_T3 = os.path.join(GOC, "tests", "du_lieu_ws", "chu_ui_doi_co_y_t3.jso
 SUA_CO_Y = {
     ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],
     ("loi", "so_nhap_canh_bao_clb_ngoai_so"): [("thẻ 04", "thẻ 05"), ("tab 04", "tab 05")],
+    # FG-8: gợi ý khung "Cảnh báo dữ liệu" nay nói mục nghiêm trọng chặn việc chạy (chủ ý đổi chữ).
+    ("ui", "health_panel_hint"): [
+        ("Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch.",
+         'Mục "Nghiêm trọng" sẽ chặn việc chạy cho đến khi sửa xong; các mục còn lại không chặn nhưng có thể làm kết quả sai lệch.'),
+        ("These don't stop the allocation, but they can skew the results.",
+         'Items marked "Serious" block the run until they are fixed; the others don\'t stop it but can skew the results.')],
 }
 
 

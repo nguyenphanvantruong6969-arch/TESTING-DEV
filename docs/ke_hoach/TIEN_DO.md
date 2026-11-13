@@ -136,6 +136,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FG-6 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_sau_xep.py, i18n_errors.py, js/10_theo_doi.js, js/02_van_hanh.js, i18n.js | tests/test_fg6_ket_qua_nap.py, tests/test_giao_dien_fg6_danh_sach_loi.py | Kết quả nạp có hoc_sinh/dong_bo_qua; tệp rỗng mã riêng; toast một câu + danh sách; bước kiểm tra gom lỗi theo mã. |
 | FG-2 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_nhap.py, api_xuat.py, so_nhap.py, i18n_errors.py, i18n.js, du_lieu_test/tao_so_nhap_fa_mau.py | tests/test_fg2_xem_truoc_fa.py | Xem trước sổ ở workspace FA: cảnh báo gom theo mã + dòng "sẽ bị chặn"; mẫu sổ FA (Loại, Huy chương 60/30/10); sổ mẫu 120 em hợp lệ. |
 | FG-7 (nhánh fg-sua, TH) | xong | 2026-11-13 | mau_forms_thi_clb/tao_mau_forms.py | tests/test_fg7_bieu_mau_sau_ket_qua.py | --sau-ket-qua: lọc ngày theo sổ nhập, tiêu đề riêng, hướng dẫn bước 4 chỉ đường menu; --help sạch mã nội bộ. |
+| FG-8 (nhánh fg-sua, TH) | xong | 2026-11-13 | i18n.js, index.html, js/02_van_hanh.js, js/075_workspace.js, js/10_theo_doi.js, style.css, i18n_errors.py | tests/test_fg8_goi_y_suc_khoe.py, tests/test_giao_dien_fg8_cau_chu.py | Gợi ý cảnh báo, tóm tắt đỏ chỉ khi nghiêm trọng, ô wizard khoá theo FA, nhóm "Sau khi công bố kết quả", ẩn "Chưa chia buổi". |
 | FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
 | FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
 | FA-D7L (giảm may rủi) | chưa | | | | Điểm lẻ 0,1 tuỳ chọn, mặc định tắt |
