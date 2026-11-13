@@ -10,10 +10,11 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
 | SG-4 (M3) | DONE | 1 | a959972 | 17eaf11 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ, session_01TGThn6utYnaicoK4Ce6A5K | |
-| SG-10 (M2) | CHECKING | 0 | f660d28 | 4dad18a | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt | |
+| SG-10 (M2) | CODING | 1 | f660d28 | 4dad18a | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
 
 ## Fix lists
+- SG-10 FIX-1 (checker session_01TGThn5KnRmS2eSHn9DjZpt, lead agrees): 1. Theo CLB caption via get_danh_sach_clb tu_do; 2. ti_le_choi None for free clubs; 3. exports in api_xuat.py (person B's file, minimal); 4. UI test asserts person noun. get_tai_theo_buoi left as is -> For Truong.
 - SG-4 FIX-1 (checker session_01TGThn68N7shbENa7GNKWsZ, lead agrees): 1. en text of the two new appeal codes: `{person}` -> `{person_l}`; regenerate i18n_loi.js.
 - SG-1 FIX-1 (checker session_01TGThn8ctQPeoQJvGZsej9z, lead agrees): 1. `kiem_truoc_fa` so_nv1 must count first club WITHIN the club's session (as demand table `nv1`), not overall first; add a two-session test (expect 2).
 
@@ -21,6 +22,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 - D-A1: Fable's report artifact is not readable from this account (artifact not found). Per 2.1, red tests come from the spec text (SOAT_GIAO_DIEN_KE_HOACH.md §3) and the code.
 - D-A2: claude/sg-a branched from origin/claude/forms-gop tip (ba4b207), not BASE 98709f1: the two extra commits only touch docs/ke_hoach/SG_SONG_SONG.md and docs/phien/claude__sg-sua.md. Diffs and checker START use item Start hashes, so nothing else changes.
 - D-A4: SG-1 round-1 checker logged its PASS line with the round-0 checker id (session_01TGThn8ctQ...); review file 'Round 1' section is the r2 session's work. Lead re-verified: 2311 tests passed, ruff clean, kiem_nhanh 7/7.
+- D-A5: SG-10 FIX-1 includes exports (api_xuat.py, person B's file): same user-visible M2 defect on the exported result; kept minimal; conflicts with SG-6 resolved at integration keeping both.
 - D-A3: SG-11 scope for person A = M6, M7, L1, L4, L5 (+ one-line consistency rules, glossary list to docs/). M4 belongs to person B (SG-11b).
 
 - D-A5 (SG-3): rank fixed as a post-process at the end of `fa_daa.chay_fa_daa` (writes into `ket.per_buoi[buoi].rank_in_student_pref`); `fa_daa.ly_do_ket_qua` `rank_in_list` was already original-list and per-session, unchanged. Panel: new key `ngoai_danh_sach` = placed, rank NULL, club never in `preferences`. Fable's HS001/HS002 rebuilt from spec (D-A1); test also needs a scored attempt in club S (HS005) or the SG-1 check blocks the run.
@@ -57,3 +59,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T18:17Z CODER session_01TGThn6PGJParLMUADLpcQk SG-10 READY 4dad18a red:3 of 3 backend tests failed before fix (no tu_do key); UI results-tab tests fail without JS fix mutation:tu_do forced False -> 4 tests fail, JS fix reverted -> 2 UI tests fail, both restored
 2026-11-13T18:33Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CHECKING checker=session_01TGThn5KnRmS2eSHn9DjZpt 4dad18a
 2026-11-13T18:50Z CHECKER session_01TGThn5KnRmS2eSHn9DjZpt SG-10 FIX-1 (see docs/phien/sg_review/SG-10.md: 3 must-fix — Theo CLB caption 'Đã xếp 12/5 chỗ' in 09_the_xem/get_danh_sach_clb, ti_le_choi still 2.4 for free club leaking to sort + unplaced tags, exports 12/5 + 240%)
+2026-11-13T18:53Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 FIX-1 sent to coder session_01TGThn6PGJParLMUADLpcQk c9e1c15
