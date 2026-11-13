@@ -10,13 +10,13 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- FG-1: delegated to a Sonnet worker (task start = HEAD after this commit).
+- FG-3: delegated to a Sonnet worker (task start = HEAD after this commit).
 
 ## Item table
 | Item | State | Commit | Tests |
 |---|---|---|---|
 | STEP0 | DONE (lead review OK) | 63b6e73 | 13 test files, 41 red / 15 green on 24846d2 |
-| FG-1 | TODO (server side GONE-ON-HEAD) | | |
+| FG-1 | DONE (server side was GONE-ON-HEAD) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
 | FG-3 | TODO | | |
 | FG-4 | TODO | | |
 | FG-5 | TODO | | |
@@ -33,6 +33,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - Lead copy: `<scratchpad of session_01VfPzNt8wLhNQyk5sYejKse>/snap/{fa-daa,fa-daa_mot,phan-hoi,tuan-3,sau-ket-qua}`.
 
 ## Decisions
+- Workers must run `git fetch origin main:refs/remotes/origin/main` before `kiem_nhanh` (else trung_khit cannot compare).
 - D1–D4 as spec §1 (final).
 - STEP0 commits the red tests it writes (they are each item's acceptance tests, rule 2); the item worker turns them
   green and may extend them. The branch is expected red between STEP0 and FG-9; the green loop runs at FINISH.
@@ -45,7 +46,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | Task | Session | State |
 |---|---|---|
 | STEP0 | session_01VfPzNuWUv3W6FtiR2fPPpB | DONE |
-| FG-1 | (creating) | |
+| FG-1 | session_01VfPzNtE2gjQkFTnk4CKsg9 | DONE, review GO |
+| FG-3 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -65,4 +67,5 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Red run before: 3 failed (test_giao_dien_fg1_bat_tinh_nang.py, menu item missing) / 4 green API tests. After: 38 passed (fg1 + test_ws_giao_dien + i18n). Fixed test_ws_giao_dien menu-order assert (added tinh_nang). Race fixed: dialog built synchronously, config fetched after.
   - Mutation: opened the disabled-without-FA guard (boxes always enabled) -> test_khong_fa_thi_cac_o_bi_khoa... red; restored; earlier mutation (no close-after-save) -> test_bat_phan_hoi... red; restored. ruff clean; kiem_nhanh 6/7 (only trung_khit: no origin/main in this container, UI-only change, not a code fault).
   - Note: wsOverlay lost static role=dialog; wsHienOverlay sets it only while visible.
-
+- 2026-11-13T02:03Z lead: BASE f5e8a41 full suite (no --cov): 5972 passed, 4 skipped (none UI), 0 failed → no pre-existing failures.
+- 2026-11-13T02:03Z lead: FG-1 review GO: diff 2f4cb69..c2c1854 matches spec (5 CO_SAU_XEP boxes + so_ngay, FA-off disabled + hint, server error kept in dialog, re-apply config); 27 passed (fg1 + test_ws_giao_dien, Chromium ran); mutation logged; kiem_nhanh --co-so origin/main 7/7.
