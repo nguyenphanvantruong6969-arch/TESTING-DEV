@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-9: thanh bên bỏ số thứ tự, thông báo "Tải sổ nhập mẫu" có nút "Mở thư mục" (TH)
+
+- `index.html` + `style.css`: bỏ 7 số 01–07 ở thanh bên (và luật `.nav-icon`); thứ tự thẻ không đổi.
+- `js/00_nen.js` (`showToast`): tuỳ chọn `hanhDong {nhan, khiBam, tooltip}` thêm một nút trong thông báo, đường dài nằm ở tooltip. `js/02_van_hanh.js` (`taiSoNhapMau`): câu thông báo bỏ đường dẫn (khoá mới `so_mau_da_tao_ngan`, vi+en trong `i18n.js`), nút "Mở thư mục" gọi `mo_thu_muc`; vẫn tự mở thư mục như trước (giữ hành vi gần hôm nay nhất); dòng phản hồi dưới vùng thả tệp vẫn có đường đầy đủ.
+- Chỉ số "chưa có chỗ nào · Cần xử lý" đã bấm được từ trước (test xanh, giữ).
+- Test cũ mở rộng sang trạng thái mới (không bỏ khẳng định): `test_giao_dien_a14_lop.py::test_thanh_ben_sau_khi_gop_va_bao_chua_co_ket_qua` (nhãn không mở đầu bằng số, đúng 7 thẻ theo thứ tự), `test_ws_so_nhap_giao_dien.py::_tai_mau` (chờ tooltip chứa .xlsx + nút "Mở thư mục" thay vì tên tệp trong câu).
+- Test: `tests/test_giao_dien_fg9_ux_nho.py` (3; 2 đỏ → xanh, thêm kiểm 7 nhãn không bắt đầu bằng số).
+
 ## 2026-11-13 — FG-8: chữ gợi ý cảnh báo, bước 3 trình hướng dẫn, nhóm "Sau khi công bố kết quả", ẩn "Chưa chia buổi" (TH)
 
 - `i18n.js` + `index.html`: `health_panel_hint` (vi+en) nói mục "Nghiêm trọng" chặn việc chạy; `js/02_van_hanh.js`: dòng tóm tắt đỏ (`is-warn`) chỉ khi `n_high > 0`, còn lại trung tính (`style.css`).

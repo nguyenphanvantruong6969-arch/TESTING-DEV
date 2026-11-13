@@ -58,8 +58,9 @@ def mo_trang(tmp_path):
 
 def _tai_mau(page, thu_muc_xuat):
     page.locator("#btnTaiSoMau").click()
-    page.wait_for_function(
-        "document.querySelector('#toastStack').innerText.indexOf('.xlsx') !== -1", timeout=10000)
+    # FG-9: đường đầy đủ (tên .xlsx) nằm ở tooltip của thông báo, không còn trong câu; có nút "Mở thư mục".
+    page.wait_for_selector('#toastStack [title*=".xlsx"]', timeout=10000)
+    assert page.locator("#toastStack").get_by_role("button", name="Mở thư mục").count() >= 1
     tep = [f for f in os.listdir(thu_muc_xuat) if f.endswith(".xlsx")]
     assert tep, os.listdir(thu_muc_xuat)
     return openpyxl.load_workbook(os.path.join(thu_muc_xuat, tep[0]))

@@ -828,11 +828,14 @@ function taiSoNhapMau() {
       feedbackErrors(el("feedbackImportAll"), res.errors);
       return;
     }
-    const cau = t("so_mau_da_tao", { path: res.data.path, n: res.data.n_clubs }) +
-      (res.data.n_ten_doi ? "\n" + t("xuat_kq_ten_doi", { n: res.data.n_ten_doi }) : "");
+    const phu = res.data.n_ten_doi ? "\n" + t("xuat_kq_ten_doi", { n: res.data.n_ten_doi }) : "";
+    const cau = t("so_mau_da_tao", { path: res.data.path, n: res.data.n_clubs }) + phu;
     feedback(el("feedbackImportAll"), cau, false);
-    showToast(cau, "success");
-    callApi("mo_thu_muc", res.data.path);
+    /* FG-9: thong bao ngan (khong kem duong dan); duong day du o tooltip, nut "Mo thu muc". Van tu mo thu muc nhu truoc. */
+    const moThuMuc = () => callApi("mo_thu_muc", res.data.path);
+    showToast(t("so_mau_da_tao_ngan", { n: res.data.n_clubs }) + phu, "success",
+      { hanhDong: { nhan: t("btn_mo_thu_muc"), khiBam: moThuMuc, tooltip: res.data.path } });
+    moThuMuc();
   });
 }
 

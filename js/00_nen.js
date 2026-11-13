@@ -200,6 +200,17 @@ function showToast(message, type, opts) {
   msg.className = "toast-msg";
   msg.textContent = message;
   noiDung.appendChild(msg);
+  /* FG-9: tuy chon hanhDong {nhan, khiBam, tooltip}: mot nut trong thong bao; duong dan dai nam o tooltip. */
+  if (opts && opts.hanhDong) {
+    if (opts.hanhDong.tooltip) msg.title = opts.hanhDong.tooltip;
+    const nutHd = document.createElement("button");
+    nutHd.type = "button";
+    nutHd.className = "btn btn-ghost toast-hanh-dong";
+    nutHd.textContent = opts.hanhDong.nhan;
+    if (opts.hanhDong.tooltip) nutHd.title = opts.hanhDong.tooltip;
+    nutHd.addEventListener("click", opts.hanhDong.khiBam);
+    noiDung.appendChild(nutHd);
+  }
   /* Chi tiet ky thuat (vd. loi goc) nam rieng, dong san, mo ra khi can. */
   const coChiTiet = errors ? ganChiTietKyThuat(noiDung, errors) : false;
   toastEl.appendChild(noiDung);

@@ -200,13 +200,6 @@ button, input {
   color: var(--gold);
 }
 
-.nav-icon {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  opacity: 0.7;
-  width: 18px;
-}
-
 .sidebar-footer {
   margin-top: auto;
   padding-top: 16px;

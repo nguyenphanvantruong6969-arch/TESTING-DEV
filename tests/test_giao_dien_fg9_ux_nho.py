@@ -20,6 +20,8 @@ def test_thanh_ben_khong_con_so_thu_tu(mo_dau):  # noqa: F811
     page, api, loi = mo_dau(_dung)
     chu = page.evaluate("() => [...document.querySelectorAll('.nav-item .nav-icon')].map((e) => e.textContent.trim())")
     assert all(not re.fullmatch(r"\d+", c) for c in chu), chu
+    dau = page.evaluate("() => [...document.querySelectorAll('.nav-item')].map((e) => e.textContent.trim())")
+    assert len(dau) == 7 and all(not re.match(r"\d", c) for c in dau), dau      # mỗi nhãn không mở đầu bằng số
     assert not loi, loi
 
 
