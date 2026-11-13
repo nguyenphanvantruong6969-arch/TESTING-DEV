@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-4: hai nút nạp tệp Forms dùng một hàm, có trạng thái bận (TH)
+
+- `js/10_theo_doi.js`: `napTepForms(nut, input, tenApi, khiXong)` thay hai bộ xử lý chép lại; nút khoá + nhãn "Đang nạp…" (`dang_nap`, vi+en trong `i18n.js`) khi gọi API, bấm lần hai không sinh yêu cầu mới, `.catch` hiện thông báo lỗi chung, `finally` luôn xoá ô tệp và mở lại nút.
+- Test: `tests/test_giao_dien_fg4_nut_nap.py` (2 đỏ → xanh, 2 đường lỗi giữ nguyên).
+
 ## 2026-11-13 — FG-3: nạp lại cùng một tệp Forms không thêm gì (TH)
 
 - `api_sau_xep.py`: `_chen_phan_hoi` bỏ qua dòng trùng hệt `(student_id, nguon, loai, hai_long, hieu_ly_do, kho_nhat, con_di, muon_doi)` và đếm (trả thêm số dòng trùng); `_them_khieu_nai(..., tu_forms)`: khi dòng Forms có giờ hoàn thành thật, cùng `(student_id, buoi, created_at)` ở MỌI trạng thái = "đã nạp" (không phải lỗi, không sinh khiếu nại CHO mới). Khiếu nại gõ tay trên kiosk giữ luật cũ.

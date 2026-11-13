@@ -18,7 +18,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | STEP0 | DONE (lead review OK) | 63b6e73 | 13 test files, 41 red / 15 green on 24846d2 |
 | FG-1 | DONE (server side was GONE-ON-HEAD) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
 | FG-3 | DONE | f2dc276 | test_fg3_nap_lai (5) |
-| FG-4 | TODO | | |
+| FG-4 | DONE | (see Log) | test_giao_dien_fg4_nut_nap (4) |
 | FG-5 | TODO | | |
 | FG-6 | TODO | | |
 | FG-2 | TODO | | |

@@ -131,3 +131,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026) | xong | 2026-11-12 | docs/fable/01_PROJECT_CONTEXT.md, docs/fable/02_FABLE_BRIEF.md, CHANGELOG.md | — (chỉ tài liệu) | Bối cảnh dự án + giao việc nghiên cứu cho Fable |
 | FG-1 (nhánh fg-sua, TH) | xong | 2026-11-13 | js/075_workspace.js, i18n.js, index.html | tests/test_giao_dien_fg1_bat_tinh_nang.py, test_fg1_bat_tinh_nang.py | Hộp thoại bật/tắt 5 tính năng sau khi xếp + số ngày khiếu nại, từ menu ⋯ của dòng không gian làm việc. |
 | FG-3 (nhánh fg-sua, TH) | xong | 2026-11-13 | api_sau_xep.py | tests/test_fg3_nap_lai.py | Nạp lại cùng tệp: không thêm dòng phản hồi, không sinh khiếu nại mới; đếm dong_moi/dong_trung/khieu_nai_moi/khieu_nai_trung. |
+| FG-4 (nhánh fg-sua, TH) | xong | 2026-11-13 | js/10_theo_doi.js, i18n.js | tests/test_giao_dien_fg4_nut_nap.py | napTepForms: nút bận "Đang nạp…", không gọi hai lần, lỗi chung, luôn mở lại nút. |
