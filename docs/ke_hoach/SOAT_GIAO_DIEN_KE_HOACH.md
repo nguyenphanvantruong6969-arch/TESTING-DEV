@@ -6,8 +6,11 @@
 > Locate code by FUNCTION NAME (`grep -n "^def <name>"`), never line numbers.
 
 ## 0. Rules for the implementer (read first)
-- **Base:** start only after `claude/fg-sua` is merged into `main` (Step 0). Branch `claude/sg-sua` from that `main`.
+- **Base (Step 0, done by the manager):** `claude/sg-sua` = `origin/claude/fg-sua` + merge of `origin/claude/forms-gop`
+  (which is `main` + these docs). So FG-1…FG-9 are included without waiting for a merge into `main`; the final PR
+  `claude/sg-sua` → `main` carries FG and SG together.
   Several items reuse FG patterns (FG-1 menu dialog, FG-2 preview warning, FG-4 busy helper, FG-6 grouped list).
+- **How the work runs:** three sessions in a loop (manager / coder / checker), mechanics in `docs/ke_hoach/SG_VONG_LAP.md`.
 - One commit per item, message `SG-n: …`. Test first (rule 2): write the acceptance test, see it red, then fix.
 - Invariant 1: default config byte-identical. Run `kiem_nhanh --co-so origin/main --so-seed 20` after every item that
   touches Python. SG-3 touches only the FA branch; prove it with `kiem_nhanh` + the FA tests.
@@ -21,8 +24,14 @@
   as in `FORMS_GOP_SUA_KE_HOACH.md` / FG_STATUS "Snapshots"; compare .xlsx/.docx without `docProps/core.xml`).
 - After each item: `CHANGELOG.md`, `docs/ke_hoach/TIEN_DO.md`, tick the handoff `docs/phien/claude__sg-sua.md`.
 
-## 1. Decisions for Truong (answer before the items that need them)
-| # | Question | Options | Recommended |
+## 1. Decisions — APPROVED by Truong 2026-11-13 ("duyệt tất cả"): D1 = A, D2 = b, D3 = NULL
+These approvals cover the schema change of SG-6 (nullable columns, `di_tru_schema`, backup first), the optional
+CLB-sheet columns "Giờ" / "Địa điểm" (invariant 7: this item says so), and the reader-contract change of SG-12
+(old files with codes must still load). Anything BEYOND these still follows rule 7 (stop and ask).
+SG-5 wording: the coder drafts it, the checker checks it against the real rule; it ships, and the exact text is copied
+under "For Truong" in the status file so Truong can amend it later.
+
+| # | Question | Options | Recommended (= approved) |
 |---|---|---|---|
 | D1 | H1: keep club time and room the teacher typed? | **A** add nullable `gio`, `dia_diem` to `clubs` (`di_tru_schema`, idempotent, backup first) + two OPTIONAL columns "Giờ", "Địa điểm" on the CLB sheet of the Sổ nhập (reader accepts their absence), shown in club table, results, rosters, student notice · **B** no schema: warn at load "Giờ và Địa điểm chưa được lưu" | **A** (additive, nullable, results unaffected; same pattern as `COT_FA`). Blocks SG-6 only. |
 | D2 | H2: student-visible codes like `[thu_2-nv1]`, `(clb_bong_ro)` in every form | **a** keep (FG-7 decision) · **b** generator also writes a mapping file (title → code); the reader matches by exact plain title via that file, codes disappear from the form · **c** IT strips codes by hand after building | **b**, but as the LAST item (SG-12): it changes the reader contract, so it needs its own approval and a full converter snapshot. Keep **a** for this semester's real run if time is short. |
@@ -36,7 +45,7 @@ Within a severity, smaller items go first.
 
 | Order | Item | Finding(s) | Size | Touches | Needs |
 |---|---|---|---|---|---|
-| 0 | Step 0 | merge `claude/fg-sua` → `main` | S | — | Truong merges the PR |
+| 0 | Step 0 | create `claude/sg-sua` = fg-sua + forms-gop; verify L2, L3 fixed (FG-9) | S | — | — |
 | 1 | SG-1 | C3 selective club with no scores at all | S | `fa_daa.kiem_truoc_fa`, health report | — |
 | 2 | SG-2 | C1 default workspace blocks itself | S | FG-1 dialog, preview, sample guide text | — |
 | 3 | SG-3 | C2 FA rank from trimmed list | M | `fa_daa.chay_fa_daa`, report/dashboard | D3 |
@@ -50,9 +59,22 @@ Within a severity, smaller items go first.
 | 11 | SG-11 | UI hygiene: M4, M6, M7, L1, L4, L5 + consistency table | M | CSS, small JS | — |
 | 12 | SG-12 | H2 codes in student forms | L | generator + reader | D2 = b |
 
+## 2b. All 19 findings → items (nothing left out)
+| Finding | Item | Finding | Item | Finding | Item |
+|---|---|---|---|---|---|
+| C1 | SG-2 | H3 | SG-5 | M5 | SG-8 |
+| C2 | SG-3 | H4 | SG-7 | M6 | SG-11 |
+| C3 | SG-1 | M1 | SG-7 | M7 | SG-11 |
+| H1 | SG-6 | M2 | SG-10 | L1, L4, L5 | SG-11 |
+| H2 | SG-12 | M3 | SG-4 | L2, L3 | Step 0 (verify FG-9) |
+| — | — | M4 | SG-11 | review: 68 bare `.then()` | SG-9 |
+
 ## 3. Items
-### Step 0 — merge FG first
-Open PR `claude/fg-sua` → `main` (CI + Windows build green on 2e0e06a per FG_STATUS). Truong merges. Then branch.
+### Step 0 — build the base branch (manager)
+`git switch -c claude/sg-sua origin/claude/fg-sua && git merge --no-edit origin/claude/forms-gop`. Conflicts are
+expected only in bookkeeping files (CHANGELOG, TIEN_DO, handoffs, status files): keep both sides. A conflict in code →
+STATUS `SG RED: step 0 conflict in <file>`, stop. Then `ruff`, `kiem_nhanh` 7/7 and the FG tests on the merged tree.
+Verify L2 (sidebar numbers) and L3 (absolute path in toast) no longer reproduce (FG-9); record in the item table.
 
 ### SG-1 — Selective club that nobody can pass (C3)
 - In `fa_daa.kiem_truoc_fa` (or the FA part of `get_data_health_report`): for each TUYEN_CHON club with ≥ 1 applicant
@@ -96,7 +118,7 @@ Open PR `claude/fg-sua` → `main` (CI + Windows build green on 2e0e06a per FG_S
 - Acceptance: generated form for a day with 2 eligible clubs has no swap question; the 110 false warnings at step 4
   disappear on Fable's data; other generator modes byte-identical.
 
-### SG-6 — Club time and room (H1) — depends on D1
+### SG-6 — Club time and room (H1) — D1 = A approved
 - D1 = A: nullable columns, `di_tru_schema` idempotent with backup; reader fills them from `C_GIO`, `C_DIA_DIEM`;
   show in step-1 table, Quản lý, "Theo từng câu lạc bộ", Excel "Theo CLB"/"Theo lớp", rosters, student notice.
   Default run output (`match_results`) unchanged.
@@ -125,7 +147,7 @@ L1 `.hs-buoi-nhan` uses `--gold-text`; L4 Nhập điểm uses the shared content
 export buttons are hidden. Apply the consistency table of the report only where it is a one-line rule (severity labels
 and colours, file-location messages); wording glossary goes to `docs/` as a list for Truong to approve.
 
-### SG-12 — Plain titles in student forms (H2) — only if D2 = b, after separate approval
+### SG-12 — Plain titles in student forms (H2) — D2 = b approved
 Generator writes `MAP_*.json` (title → code) beside each form; readers match by exact title through it; old files
 with codes still load. Full converter snapshot (all modes, path A and B) before and after.
 
