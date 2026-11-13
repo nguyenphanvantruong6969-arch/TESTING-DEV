@@ -470,7 +470,6 @@ function showLog(errors) {
   });
   if (!em.length) return;
   them(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }), "log-tom-tat");
-  them(t("wh_goi_y_tat"), "log-tom-tat");
   em.slice(0, LOG_SO_EM_TOI_DA).forEach(([sid, loi]) => {
     const chiTiet = Array.from(new Set(loi.map(chuMotLoiWharton))).join(", ");
     them(t("wh_loi_dong_em", { student_id: sid, chi_tiet: chiTiet }), "log-em");
@@ -490,6 +489,10 @@ function showLog(errors) {
   nut.addEventListener("click", moDanhSachCanXuLy);
   hang.appendChild(nut);
   if (typeof wsMoTinhNangDangMo === "function") {
+    const goiY = document.createElement("span");
+    goiY.className = "log-goi-y";
+    goiY.textContent = t("wh_goi_y_tat");
+    hang.appendChild(goiY);
     const tat = document.createElement("button");
     tat.type = "button";
     tat.id = "btnMoTinhNangTuLoi";

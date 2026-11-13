@@ -56,3 +56,6 @@ Note for A/C: vi UI change that is deliberate: the "Buổi `thu_3`" check line (
 **TIEN_DO:** SG-11b (M4) done — see CHANGELOG fragment above.
 **FIX-1 (SG-11b):** `wsBayTab` → `wsBanPhim` (document-level, capture phase so it runs before the `⋯` menu Esc handler in `js/00_nen.js`): Esc now also works with focus on `<body>`; with a row `⋯` menu open Esc closes only that menu (focus back on its summary), the next Esc closes the chooser if `wsCoTheDong`; the FG-1 dialog keeps its own Esc. `dong()` of the FG-1 dialog returns focus to the `⋯` summary (else `#wsTieuDe`). `aria-modal="true"` is set/removed together with `role="dialog"` in `wsHienOverlay`. Tests: +4 in `tests/test_giao_dien_sg11b_focus_man_chon.py` (now 9).
 Note for A: `index.html` (your file) — one attribute removed: static `aria-modal="true"` on `#wsOverlay` (now set by `wsHienOverlay`).
+
+### SG-2 FIX-2
+`showLog` hint ("Nếu không dùng điểm quyết tâm, hãy tắt…") is now a `span.log-goi-y` inside the button row (`.log-hang-cuoi`), not a `.log-dong.log-tom-tat` line, so `tests/test_giao_dien_loi_chan_gon.py` is unchanged and green. CSS: `.log-goi-y` in the SG-B block of `style.css`.
