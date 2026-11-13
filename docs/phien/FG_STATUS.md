@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 2: FG-5 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-6, FG-2, wave gate 2.
+- Wave 2: FG-6 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-2, wave gate 2.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -19,7 +19,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-1 | DONE (server side was GONE-ON-HEAD) | 79f2de2 | test_fg1_bat_tinh_nang (4), test_giao_dien_fg1_bat_tinh_nang (3) |
 | FG-3 | DONE | f2dc276 | test_fg3_nap_lai (5) |
 | FG-4 | DONE | (see Log) | test_giao_dien_fg4_nut_nap (4) |
-| FG-5 | TODO | | |
+| FG-5 | DONE | e90555a | test_fg5_khop_ma (6) |
 | FG-6 | TODO | | |
 | FG-2 | TODO | | |
 | FG-7 | TODO | | |
@@ -49,7 +49,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-1 | session_01VfPzNtE2gjQkFTnk4CKsg9 | DONE, review GO |
 | FG-3 | session_01VfPzNv8yPVuUfCb3LScjpc | DONE, review GO |
 | FG-4 | session_01VfPzNtbYjiRYVCMfuncuk2 | DONE, review GO |
-| FG-5 | (creating) | |
+| FG-5 | session_01VfPzNr3qCVAmDxcnmnLfjh | DONE, review GO |
+| FG-6 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -84,3 +85,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 - 2026-11-13 WORKER session_01VfPzNPmYjiRYVCMfuncuk2 FG-5 DONE e90555a
   - Red run before: tests/test_fg5_khop_ma.py 6 failed (khop_ma_hoc_sinh missing, no ma_khong_khop). After: 6 passed; related -k run 66 passed, remaining 6 red = FG-6/FG-7 acceptance tests only. ruff clean; kiem_nhanh --co-so origin/main 7/7. Two old exact-dict asserts (gap5, m6b) extended with ma_khong_khop, not loosened.
   - Mutation: ambiguity ignored (casefold match takes first of many) -> test_khop_ma_ham_thuan + test_mo_ho_hai_em_ab_AB red; restored, 6 passed, git status clean.
+- 2026-11-13T03:12Z lead: FG-5 review GO: pure khop_ma_hoc_sinh (exact, else unique strip+casefold) used in _chen_phan_hoi (both import paths) and the appeal loop; stored IDs unchanged; ma_khong_khop first 20 in order. (Worker Log line shows id ...NPmYji...; real worker session is session_01VfPzNr3qCVAmDxcnmnLfjh.)
