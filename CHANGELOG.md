@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-7: biểu mẫu "Sau khi xem kết quả" chỉ liệt kê ngày có CLB, tiêu đề riêng, hướng dẫn đúng đường menu (TH)
+
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--sau-ket-qua` nhận `--so-nhap-clb` (chỉ liệt kê ngày có CLB trong sổ qua `buoi_co_clb_trong_so_nhap`; không có thì như cũ); tiêu đề docx riêng "Phản hồi và báo lỗi sau khi xem kết quả" (`ghi_docx_chi_thi(..., tieu_de=)`); bước 4 hướng dẫn chỉ "Kiosk → Không gian làm việc → ⋯ → Tính năng sau khi xếp…" (không còn khoá cấu hình); bước 5 giải thích vì sao giữ `[mã]`/`(mã)`; `--help` bỏ mã nội bộ; in thư mục ra tuyệt đối ở dòng cuối. Chỉ đầu ra `--sau-ket-qua` và chữ `--help` đổi; `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--phan-hoi`, `--tuan-3` giữ từng byte (băm trong test).
+- Test: `tests/test_fg7_bieu_mau_sau_ket_qua.py` (5 đỏ → xanh; sửa lỗi test `c["ten"]` → `c["name"]`).
+
 ## 2026-11-13 — FG-2: không gian FA cảnh báo ở bước xem trước, mẫu sổ FA và sổ mẫu 120 em (TH)
 
 - `api_nhap.py`: `_canh_bao_fa_xem_truoc` + `xem_truoc_so_nhap`: workspace bật FA-DAA thì chạy `fa_daa.kiem_truoc_fa` và `kiem_ho_so_huy_chuong` trên dữ liệu đã đọc từ sổ (cột FA vắng thì lấy giá trị đang lưu), gom theo mã lỗi: mỗi mã MỘT cảnh báo mang chính mã đó, `params` = `nhom: true`, `n`, `vd`; thêm một dòng `so_nhap_canh_bao_fa_se_loi` khi có lỗi chặn. Vẫn nhập được; `import_so_nhap` không đổi. Workspace không FA: không thêm gì.

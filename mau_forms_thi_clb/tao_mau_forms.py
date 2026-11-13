@@ -399,7 +399,7 @@ TEN_CAI_DAT_CHI_THI = "CAI_DAT_FORMS_CHI_THI.md"
 _GIO_ZIP = (2026, 1, 1, 0, 0, 0)
 
 
-def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
+def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi", tieu_de=None):
     """Quick Import cho chế độ chỉ thi; giống hệt từng byte khi đầu vào không đổi."""
     from docx import Document
     from docx.shared import Pt
@@ -417,7 +417,7 @@ def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
         r = p.add_run(chu)
         r.bold, r.font.size = dam, Pt(co)
 
-    dong(de["tieu_de"] + hau_to, co=16, dam=True, sau=10)
+    dong(de["tieu_de"] + hau_to if tieu_de is None else tieu_de, co=16, dam=True, sau=10)
     so = 0
     for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=buoi) if phan is None else phan, 1):
         dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
@@ -953,6 +953,28 @@ TEN_DOCX_SAU_KET_QUA = "NHAP_FORMS_SAU_KET_QUA.docx"
 TEN_CAI_DAT_SAU_KET_QUA = "CAI_DAT_FORMS_SAU_KET_QUA.md"
 
 
+def buoi_co_clb_trong_so_nhap(duong_so_nhap):
+    """FG-7: tập mã buổi có ít nhất một CLB trong Sổ nhập CLB (CLB hỏng không tính)."""
+    import chuyen_forms_sang_phan_mem as cv
+    import openpyxl
+    import so_nhap
+    du = so_nhap.doc_so_nhap(openpyxl.load_workbook(duong_so_nhap, data_only=True))
+    if du["loi"]:
+        from i18n_errors import format_all
+        raise cv.LoiTepXuat("Sổ nhập CLB (%s) có lỗi: %s" % (os.path.basename(duong_so_nhap),
+                                                           "; ".join(format_all(du["loi"][:3]))))
+    return {c.get("buoi") for c in du["clubs"] if c.get("buoi") and not c.get("hong")}
+
+
+def _de_chi_buoi(de, buoi_co_clb):
+    """Bản sao nông của `de` chỉ giữ các buổi có CLB; None -> như cũ."""
+    if buoi_co_clb is None:
+        return de
+    de2 = dict(de)
+    de2["buoi"] = [b for b in de["buoi"] if b["ma"] in buoi_co_clb]
+    return de2
+
+
 def ghi_cai_dat_sau_ket_qua(de):
     """CAI_DAT_FORMS_SAU_KET_QUA.md (FA-M6b, TH: chưa thử trên Forms thật). Quick Import không cài được rẽ nhánh và
     kiểu hộp chọn nhiều, nên hướng dẫn nêu từng bước tay."""
@@ -1005,8 +1027,10 @@ def ghi_cai_dat_sau_ket_qua(de):
     w("2. Kiosk: thẻ \"Chi tiết và xuất tệp\" → khung \"Phản hồi của học sinh\" → nút **Nạp biểu mẫu Sau khi xem kết quả**.")
     w("3. Một lần nạp ghi cả phản hồi và khiếu nại; nếu có lỗi giữa chừng thì không ghi gì. Hạn khiếu nại tính theo giờ hoàn "
       "thành do Forms ghi (cột Completion time), nên nạp muộn vẫn công bằng; tệp không có cột đó thì tính theo lúc nạp và có cảnh báo.")
-    w("4. Cần bật `fa_phan_hoi` và/hoặc `fa_khieu_nai` ở không gian làm việc; tắt một cái thì phần đó bị bỏ qua kèm cảnh báo.")
-    w("5. Giữ nguyên phần `[mã]` đầu mỗi câu và phần `(mã)` cuối mỗi lựa chọn: kiosk đọc theo các mã đó.")
+    w("4. Bật tính năng ở kiosk: Kiosk → Không gian làm việc → ⋯ → Tính năng sau khi xếp… (tick Phản hồi và/hoặc "
+      "Khiếu nại); tắt một cái thì phần đó bị bỏ qua kèm cảnh báo.")
+    w("5. Giữ nguyên phần `[mã]` đầu mỗi câu và phần `(mã)` cuối mỗi lựa chọn: kiosk đọc theo các mã đó "
+      "để biết câu nào là câu nào; sửa các mã này thì kiosk không nạp được câu đó.")
     w("")
     w("## Câu hỏi")
     w("")
@@ -1020,14 +1044,15 @@ def ghi_cai_dat_sau_ket_qua(de):
     return "\n".join(L)
 
 
-def sinh_sau_ket_qua(de, thu_muc):
+def sinh_sau_ket_qua(de, thu_muc, buoi_co_clb=None):
     """FA-M6b (TH): biểu mẫu "Sau khi xem kết quả" — .docx Quick Import + hướng dẫn rẽ nhánh. Sinh lại ra tệp giống từng byte."""
     os.makedirs(thu_muc, exist_ok=True)
     duong_md = os.path.join(thu_muc, TEN_CAI_DAT_SAU_KET_QUA)
     with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
         f.write(ghi_cai_dat_sau_ket_qua(de))
     duong_docx = os.path.join(thu_muc, TEN_DOCX_SAU_KET_QUA)
-    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_sau_ket_qua(de), hau_to=" — sau khi xem kết quả")
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_sau_ket_qua(_de_chi_buoi(de, buoi_co_clb)),
+                     tieu_de="Phản hồi và báo lỗi sau khi xem kết quả")
     return [duong_md, duong_docx]
 
 
@@ -1285,19 +1310,19 @@ def main(argv=None):
     ap.add_argument("--moi-clb", action="store_true",
                     help="mỗi CLB có đề một biểu mẫu riêng, không câu cổng (+ CLB.csv cho list CLB)")
     ap.add_argument("--fa-daa", action="store_true",
-                    help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
+                    help="biểu mẫu đăng ký xếp theo loại CLB (chưa thử trên Forms thật): mỗi ngày một biểu mẫu, ba câu Nguyện vọng + hai câu huy chương")
     ap.add_argument("--mot-bieu-mau", action="store_true",
-                    help="chỉ với --fa-daa (FA-M2b, TH): MỘT biểu mẫu đăng ký cho mọi ngày thay vì mỗi ngày một biểu mẫu")
+                    help="chỉ với --fa-daa: MỘT biểu mẫu đăng ký cho mọi ngày thay vì mỗi ngày một biểu mẫu")
     ap.add_argument("--bien-the", action="store_true",
-                    help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
+                    help="mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
     ap.add_argument("--phan-hoi", action="store_true",
-                    help="GAP-5 (TH): biểu mẫu 3 câu phản hồi sau khi xem kết quả")
+                    help="biểu mẫu 3 câu phản hồi sau khi xem kết quả")
     ap.add_argument("--sau-ket-qua", action="store_true",
-                    help="FA-M6b (TH): MỘT biểu mẫu \"Sau khi xem kết quả\" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu")
+                    help="MỘT biểu mẫu \"Sau khi xem kết quả\" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu; kèm --so-nhap-clb thì chỉ liệt kê các ngày có CLB trong sổ")
     ap.add_argument("--tuan-3", action="store_true",
-                    help="GAP-6 (TH): biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
+                    help="biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
     ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
-                    help="chỉ với --fa-daa: Sổ nhập CLB (FA-M1) để biết Loại; CLB Tự do không có trong câu vàng")
+                    help="với --fa-daa: Sổ nhập CLB để biết Loại (CLB Tự do không có trong câu vàng); với --sau-ket-qua: chỉ liệt kê các ngày có CLB")
     ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
     ap.add_argument("--de", default=bm.DE_THI_MAC_DINH, help="de_thi.json")
     a = ap.parse_args(argv)
@@ -1315,8 +1340,8 @@ def main(argv=None):
         ap.error("--sau-ket-qua là một chế độ riêng, không dùng chung với chế độ khác")
     if a.mot_bieu_mau and not a.fa_daa:
         ap.error("--mot-bieu-mau chỉ dùng cùng --fa-daa")
-    if a.so_nhap_clb and not a.fa_daa:
-        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
+    if a.so_nhap_clb and not (a.fa_daa or a.sau_ket_qua):
+        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa hoặc --sau-ket-qua")
     try:
         de = bm.doc_de_thi(a.de)
         if a.tuan_3:
@@ -1324,8 +1349,17 @@ def main(argv=None):
             print("Đã sinh mẫu Forms khảo sát tuần 3 (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
             return 0
         if a.sau_ket_qua:
-            ra = sinh_sau_ket_qua(de, a.ra)
+            buoi_co_clb = None
+            if a.so_nhap_clb:
+                import chuyen_forms_sang_phan_mem as cv
+                try:
+                    buoi_co_clb = buoi_co_clb_trong_so_nhap(a.so_nhap_clb)
+                except cv.LoiTepXuat as e:
+                    print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
+                    return 1
+            ra = sinh_sau_ket_qua(de, a.ra, buoi_co_clb=buoi_co_clb)
             print("Đã sinh mẫu Forms Sau khi xem kết quả (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.phan_hoi:
             ra = sinh_phan_hoi(de, a.ra)

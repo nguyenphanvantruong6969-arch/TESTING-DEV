@@ -49,7 +49,7 @@ def test_che_do_khac_giu_nguyen_tung_byte(ten, tmp_path):
 def _so_ba_ngay(tmp_path):
     """Sổ nhập CLB MÔ PHỎNG: chỉ các CLB của thu_2, thu_3, thu_4 trong de_thi.json."""
     de = bm.doc_de_thi()
-    clubs = [{"club_id": c["club_id"], "name": c["ten"], "capacity": 10, "reserve_capacity": 0,
+    clubs = [{"club_id": c["club_id"], "name": c["name"], "capacity": 10, "reserve_capacity": 0,
               "reserve_group": "", "buoi": c["buoi"], "loai": "TU_DO"}
              for c in de["cau_lac_bo"] if c["buoi"] in ("thu_2", "thu_3", "thu_4")]
     p = str(tmp_path / "so_ba_ngay.xlsx")
