@@ -9,7 +9,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 |---|---|---|---|---|---|---|---|
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
-| SG-4 (M3) | CODING | 0 | c7ff951 | | session_01TGThn7xWLDq89PLMhnwS9V | | |
+| SG-4 (M3) | CHECKING | 0 | a959972 | 53025b1 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ | |
 | SG-10 (M2) | TODO | 0 | | | | | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
 
@@ -45,3 +45,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T17:07Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-3 DONE lead-review agree (2326 passed, kiem_nhanh 7/7) f2e7702
 2026-11-13T17:07Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CODING coder=session_01TGThn7xWLDq89PLMhnwS9V c7ff951
 2026-11-13T17:30Z CODER session_01TGThn7xWLDq89PLMhnwS9V SG-4 READY 53025b1 red:4 of 4 new tests failed before fix (hs010 with trailing space/case rejected, one code for both causes, new codes missing) mutation:khop_ma_hoc_sinh replaced by exact-only match -> case/space test fails, restored
+2026-11-13T17:24Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 CHECKING checker=session_01TGThn68N7shbENa7GNKWsZ 53025b1
