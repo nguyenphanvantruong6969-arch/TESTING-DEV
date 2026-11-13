@@ -258,6 +258,20 @@ def cac_phan_fa(de, ma_buoi):
     ]
 
 
+def cac_phan_fa_gop(de):
+    """FA-M2b (TH): MỘT biểu mẫu đăng ký cho mọi ngày: phần thông tin một lần, rồi mỗi ngày (theo thứ tự `de["buoi"]`)
+    phần Nguyện vọng và phần Huy chương. Chữ từng câu giống hệt `cac_phan_fa` (thẻ `[<buổi>-nvK]` ... không đổi)."""
+    phan = [cac_phan_fa(de, de["buoi"][0]["ma"])[0]] if de["buoi"] else []
+    for b in de["buoi"]:
+        phan += cac_phan_fa(de, b["ma"])[1:]
+    return phan
+
+
+def dem_cau_fa_gop(de):
+    """Tổng số câu của biểu mẫu đăng ký gộp (Forms tính cả câu thông tin)."""
+    return sum(len(c) for _, c in cac_phan_fa_gop(de))
+
+
 # ------------------------------------------- GAP-5 (TH): ba câu phản hồi sau khi xem kết quả (V§9.1)
 # Mã trong "[…]" và "(…)" khớp `fa_sau_xep.MA_CAU_PHAN_HOI` / `KHO_NHAT` (bộ nhập của kiosk đọc theo mã).
 CAU_HAI_LONG = "[hai_long] Em hài lòng với kết quả xếp CLB đến mức nào?"
@@ -278,6 +292,27 @@ def cac_phan_phan_hoi():
         (CAU_KHO_NHAT, "choice", list(LUA_CHON_KHO_NHAT), True)])]
 
 
+# ------------------------------------------- FA-M6b (TH): MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại
+# Mã `[co_sai]`, `[kn_buoi]`, `[kn_ghi_chu]` khớp `fa_sau_xep.doc_tep_forms_khieu_nai`; lựa chọn kết thúc bằng "(mã)".
+CAU_CO_SAI = "[co_sai] Em có thấy thông tin của em trong kết quả bị sai không? (ví dụ sai mã, sai điểm, thiếu nguyện vọng)"
+LUA_CHON_CO_SAI = ["Không (0)", "Có (1)"]
+CAU_KN_BUOI = "[kn_buoi] Buổi nào có thông tin bị sai?"
+CAU_KN_GHI_CHU = "[kn_ghi_chu] Em mô tả ngắn chỗ sai"
+
+
+def cac_phan_sau_ket_qua(de):
+    """FA-M6b (TH): bố cục biểu mẫu "Sau khi xem kết quả": phần 1 = mã học sinh + 3 câu phản hồi + `[co_sai]` (bắt buộc);
+    phần 2 (chỉ khi `[co_sai]` = Có, rẽ nhánh cài tay) = `[kn_buoi]` (hộp chọn nhiều, mọi buổi) + `[kn_ghi_chu]`.
+    Loại 'checkbox' chỉ để mô tả: Quick Import không phân biệt, hướng dẫn bảo bật "Multiple answers"."""
+    p1 = cac_phan_phan_hoi()[0][1] + [(CAU_CO_SAI, "choice", list(LUA_CHON_CO_SAI), True)]
+    return [
+        ("Phản hồi sau khi xem kết quả", p1),
+        ("Báo lỗi dữ liệu (khiếu nại, chỉ lỗi dữ liệu)", [
+            (CAU_KN_BUOI, "checkbox", ["%s (%s)" % (b["ten"], b["ma"]) for b in de["buoi"]], True),
+            (CAU_KN_GHI_CHU, "text", [], True)]),
+    ]
+
+
 # ------------------------------------------- GAP-6 (TH): khảo sát tuần 3 (V§9.3)
 CAU_CON_DI = "[con_di] Em còn đi sinh hoạt CLB của mình không?"
 CAU_MUON_DOI = "[muon_doi] Em có muốn đổi sang CLB khác không?"
@@ -289,6 +324,40 @@ def cac_phan_tuan_3():
         (cau_ma_hoc_sinh(), "text", [], True),
         (CAU_CON_DI, "choice", list(LUA_CHON_CO_KHONG), True),
         (CAU_MUON_DOI, "choice", list(LUA_CHON_CO_KHONG), True)])]
+
+
+# ------------------------------------------- FA-M8 / R9 (TH): phiếu thiết lập CLB (PHIEU_THIET_LAP_CLB.md §1)
+# Tên câu hỏi GIỮ ĐÚNG TỪNG CHỮ: `chuyen_phieu_clb.doc_phieu_clb` đọc theo tiêu đề cột (test so với `TIEU_DE_PHIEU` của nó).
+TIEU_DE_PHIEU_CLB = [
+    "Tên CLB", "Buổi", "Giờ", "Địa điểm",
+    "Mở thêm nhóm được nếu đông không? (Có/Không)", "Số chỗ tối đa", "Lý do giới hạn",
+    "Sức chứa mỗi nhóm", "Số thành viên tối thiểu",
+    "Cần kỹ năng tối thiểu không? (Có/Không)", "Loại thử thách", "Mốc tối thiểu (thang 10)",
+    "Bảng tiêu chí", "Giữ chỗ (mã học sinh, cách nhau dấu phẩy)",
+]
+BUOI_PHIEU_CLB = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"]
+LOAI_THU_THACH_PHIEU_CLB = ["Trắc nghiệm", "Video", "Ảnh"]
+
+
+def cac_phan_phieu_clb():
+    """Bố cục phiếu thiết lập CLB: bảy phần; hai chỗ rẽ nhánh (sau câu "Mở thêm nhóm…" và sau câu "Cần kỹ năng…").
+
+    [(tên phần, [(tiêu đề, loại, lựa chọn, bắt buộc)])]; loại 'text' hoặc 'choice'. Kiểu thật trong Forms
+    (Số, Văn bản dài) do hướng dẫn nêu, vì Quick Import chỉ tạo câu văn bản và câu lựa chọn."""
+    t = dict(zip(["ten", "buoi", "gio", "dia_diem", "mo", "cho", "ly_do", "phong", "toi_thieu", "can", "loai",
+                  "moc", "tieu_chi", "giu"], TIEU_DE_PHIEU_CLB))
+    co_khong = ["Có", "Không"]
+    return [
+        ("Thông tin CLB", [(t["ten"], "text", [], True), (t["buoi"], "choice", list(BUOI_PHIEU_CLB), True),
+                           (t["gio"], "text", [], False), (t["dia_diem"], "text", [], False)]),
+        ("Mở thêm nhóm", [(t["mo"], "choice", list(co_khong), True)]),
+        ("Nhánh Có — sức chứa mỗi nhóm", [(t["phong"], "text", [], True)]),
+        ("Nhánh Không — số chỗ tối đa", [(t["cho"], "text", [], True), (t["ly_do"], "text", [], True)]),
+        ("Thành viên và kỹ năng", [(t["toi_thieu"], "text", [], True), (t["can"], "choice", list(co_khong), True)]),
+        ("Thử thách đầu vào", [(t["loai"], "choice", list(LOAI_THU_THACH_PHIEU_CLB), True),
+                               (t["moc"], "text", [], True), (t["tieu_chi"], "text", [], True)]),
+        ("Giữ chỗ", [(t["giu"], "text", [], False)]),
+    ]
 
 
 def cac_phan_moi_clb(de, clb):

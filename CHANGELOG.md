@@ -1,5 +1,110 @@
 # CHANGELOG
 
+## 2026-11-13 — GIAM-MAY-RUI-KH (Truong yêu cầu 13/11/2026): kế hoạch giảm may rủi cho Sonnet (chỉ tài liệu)
+
+- `docs/ke_hoach/GIAM_MAY_RUI_KE_HOACH.md` (mới): FA-CT1 chia chỗ theo nhu cầu (gợi ý, không ghi chỉ tiêu), FA-CT2 "được thêm X chỗ thì thêm vào đâu" + nút xuất cho giáo viên, FA-D7L điểm lẻ 0,1 (tuỳ chọn, mặc định tắt; tập đạt điểm sàn giữ nguyên nhờ cắt bớt rồi làm tròn).
+- `docs/phien/claude__giam-may-rui.md` (mới, bàn giao nhánh), `docs/ke_hoach/giam_may_rui/PROMPT_SONNET.md` (mới, câu lệnh khởi động).
+- Không đổi mã, không test mới.
+
+## 2026-11-12 — DOC-FABLE (ngoài sổ, Truong yêu cầu 12/11/2026): tệp bối cảnh dự án + tệp giao việc cho Fable
+
+- `docs/fable/01_PROJECT_CONTEXT.md` (mới): tóm tắt toàn dự án cho AI đọc (bài toán, RB-DA, lớp FA-DAA, chương trình, bất biến, số liệu MÔ PHỎNG, điểm yếu, thứ tự đọc).
+- `docs/fable/02_FABLE_BRIEF.md` (mới): luật nền, 6 mục tiêu nghiên cứu G-A…G-F theo ưu tiên, sản phẩm cần giao, cách chạy phiên Fable, ba câu lệnh dán sẵn.
+- Chỉ tài liệu; không đổi mã, không test mới.
+- `CLAUDE.md` quy tắc 11: thêm vai trò Fable (nghiên cứu, không sửa mã sản xuất), Truong duyệt 12/11/2026.
+
+## 2026-11-12 — FA-M8, FA-M9, FA-M10: bước 3–5 của thẻ "Chuẩn bị đợt" (TH = chưa thử trên Microsoft thật)
+
+- INTEGRATE-2: gộp `claude/it-ui-b` (FA-M9, FA-M10) và `claude/it-ui-c` (FA-M8) vào `claude/forms-gop` (gộp sạch, khối đánh dấu không xung đột); đếm lại số tệp test trong bản đồ mã (263) — lỗi duy nhất của nhánh B.
+
+**FA-M9 — Nạp tệp Forms / List ngay trong phần mềm (thẻ "Chuẩn bị đợt", bước 4).**
+- `api_forms_nap.py` (`FormsNapMixin`): `nhan_dien_tep_forms(files)` phân loại từng tệp (đăng ký / bài thi / List CSV / sau kết quả /
+  không rõ), loại tệp sai đường (`forms_tep_sai_duong`), đoán đề A/B/C của tệp bài thi bằng `doan_bien_the` (không ghi gì);
+  `chuyen_tep_forms(files, bien_the, lua_chon)` lưu tệp ở `forms/nap/tai_len/`, gọi `chuyen_fa_daa_du_lieu`, ghi
+  `forms/nap/SO_NHAP_CLB.xlsx` + `EMAIL_MA_HS.csv` (+ `BANG_DIEM.xlsx`, `PHAN_TICH_CAU_HOI.xlsx`); chênh lệch giữa các đề ->
+  `trang_thai: "cho_xac_nhan"` (hai nút "Dịch điểm về trung bình chung" / "Giữ điểm đã chấm", không phải chọn lại tệp); câu bị
+  gắn cờ -> `cau_co_co` để tick "Bỏ câu này" rồi chấm lại; lỗi đề / tệp -> `forms_khong_chuyen_duoc`, không ghi Sổ.
+  `get_forms_nap()` nhớ các tệp đã tải khi mở lại thẻ; `lay_so_nhap_nap()` trả Sổ nhập base64.
+- Nhập vào app.db vẫn bằng `xem_truoc_so_nhap` / `import_so_nhap` CÓ SẴN (không có đường nhập thứ hai).
+- Giao diện `js/12_chuan_bi_nap.js` (bước 4): khung thả nhiều tệp, bảng tệp (loại + ô chọn đề, đoán sẵn), nút "Chuyển thành Sổ
+  nhập", hộp xác nhận, danh sách "Bỏ câu này" + "Chấm lại", cảnh báo, xem trước, nút "Nhập sổ". Chuỗi `cb_nap_*` (vi + en).
+- Mã lỗi mới (khối B): `forms_thieu_tep_nap`, `forms_thieu_tep_dang_ky`, `forms_nhieu_tep_list`, `forms_chua_chuyen_tep`
+  (đã thêm vào `MA_MOI_SAU_ANH_CHUP`, đã chạy `tao_i18n_js.py`).
+- Tệp test mới: `tests/test_fa_m9_nap_tep_forms.py` (19 ca API), `tests/test_giao_dien_fa_m9_nap.py` (4 ca Chromium: đường B thả
+  1 đăng ký + 2 bài thi -> xem trước -> nhập, số học sinh khớp; đường A lệch đề -> xác nhận; tệp lạ / sai đường khoá nút;
+  chưa chọn đường). Trước đó: `tests/test_fa_m9_thuan.py`.
+- Đột biến đã chạy: API bỏ qua `lua_chon` (`lua_chon=None`) -> 3 ca đỏ (`test_xac_nhan_roi_lua_chon_thi_ghi_so`,
+  `test_bo_cau_cham_lai`, `test_duong_a_lech_giua_hai_de_hien_hop_xac_nhan`); khôi phục -> xanh. (`doan_bien_the` luôn "A" đã
+  đỏ ở FA-M9-THUAN.)
+- Mặc định không đổi: không đụng lõi DA, schema, cột CSV; đầu ra bộ chuyển đổi dòng lệnh y hệt (API == CLI, so từng ô).
+
+**FA-M10 — Ba nút "Sau khi xếp" ngay trong phần mềm (thẻ "Chuẩn bị đợt", bước 5).** TH = chưa thử trên Microsoft thật.
+- `api_forms_nap.py`: `xuat_ket_qua_list()` (các dòng `export_ly_do_csv` ghép email bằng `ghep_ket_qua_email.ghep` với
+  `forms/nap/EMAIL_MA_HS.csv` -> `KETQUA_NHAP_LIST.csv`; thiếu tệp email -> `forms_thieu_email`; không để lại `ket_qua_ly_do.csv`),
+  `ai_chua_dang_ky(file_base64)` (CSV danh sách lớp + mã học sinh đã đăng ký ở lần nạp cuối của bước 4 -> thư mục `chua_dang_ky/`:
+  mỗi lớp còn em chưa đăng ký một tệp + `tong_hop.csv`), `doi_chieu_hai_lan(cu_base64, moi_base64)` (-> `DOI_CHIEU_LIST.xlsx`, đề lấy
+  từ `forms/de_thi.json`). Mọi tệp ra rơi vào `thu_muc_tai_ve()` qua `_duong_xuat`: không ghi đè tệp cũ (`x (2)`), lỗi thì không ghi gì.
+  Dùng lại hàm sẵn có (`ghep`, `chua_dang_ky`, `doi_chieu` + `ghi_bao_cao`); dòng lệnh y hệt (API == CLI, so từng byte / từng ô).
+- Giao diện `js/12_chuan_bi_nap.js` (bước 5): ba khối — nút "Xuất KETQUA_NHAP_LIST.csv"; ô chọn CSV danh sách lớp + nút "Tạo danh sách
+  chưa đăng ký" (khoá tới khi chọn tệp; cảnh báo vượt giới hạn Power Automate); hai ô chọn CSV cũ / mới + nút "Đối chiếu" (CHỈ đường A).
+  Chuỗi `cb_nap_s5_*` (vi + en). Không mã lỗi mới (dùng `forms_thieu_email`, `forms_thieu_danh_sach_lop`, `forms_khong_chuyen_duoc`...).
+- Tệp test mới: `tests/test_fa_m10_sau_xep_nut.py` (8 ca API), `tests/test_giao_dien_fa_m10_nut.py` (5 ca Chromium).
+- Đột biến đã chạy: (1) API ghi thêm ký tự vào `KETQUA_NHAP_LIST.csv` -> `test_xuat_ket_qua_list_bang_cli_cung_tep` đỏ; (2) giao diện bỏ điều kiện
+  "đã chọn tệp" của nút "Ai chưa đăng ký" -> `test_nut_ai_chua_dang_ky_khoa_den_khi_chon_tep_roi_ghi_thu_muc` đỏ; khôi phục -> xanh.
+- Mặc định không đổi: không đụng lõi DA, schema, cột CSV; ba tập lệnh dòng lệnh không đổi.
+
+**FA-M8 — Tạo bộ biểu mẫu một lần bấm (R3, R8, R9).**
+- Hàm thuần (`mau_forms_thi_clb/tao_mau_forms.py`, `bieu_mau.py`): `sinh_phieu_clb` (R9, biểu mẫu thiết lập CLB, tiêu đề câu hỏi
+  y nguyên `PHIEU_THIET_LAP_CLB.md` §1), tham số `dap_an_tren_forms` (mặc định True = như cũ; False = hướng dẫn KHÔNG dặn đặt đáp án
+  trên Forms, R3), `ghi_xem_lai_dap_an` (`XEM_LAI_DAP_AN.xlsx`), `tao_bo_bieu_mau` và `ghi_zip_bo` (R8, một tệp zip cho đường đã chọn
+  kèm `00_DOC_TRUOC.md`). Đường A gọi lại `tao_bo_dung_t4m.tao_bo_dung(fa=True)`, không sao chép.
+- API `api_forms_bo.py` (`FormsBoMixin`): `get_bo_bieu_mau()` -> `{co_de, duong, co_bien_the}`; `tao_bo_bieu_mau_api(tuy_chon, output_path="")`
+  (`tuy_chon = {mot_bieu_mau (mặc định True), bien_the (mặc định False)}`) lấy đề từ `forms/de_thi.json`, đường từ `rules.fa_duong`, Loại CLB
+  từ `forms/SO_NHAP_CLB_CLB.xlsx` khi có (đường B); ghi `forms/bieu_mau/` và `BO_BIEU_MAU_<ngày>.zip` vào Tải xuống (không ghi đè, trùng
+  tên thì "(2)"). Trả `{path, dir, ten_zip, thu_muc, n_tep, duong, mot_bieu_mau, bien_the}`. Lỗi: `forms_chua_co_de`, `forms_duong_chua_chon`,
+  `forms_tao_bo_loi`. API KHÔNG có tuỳ chọn nào đổi R3; không ghi app.db.
+- Giao diện `js/13_chuan_bi_bo.js`: bước 3 vẽ bằng `ChuanBi.dangKyBuoc(3, ...)`: ô "Một biểu mẫu cho mọi buổi" (tích sẵn; tắt ở đường A vì
+  đường A dùng bộ dựng riêng), ô "Hai đề cho CLB Tuyển chọn" (chỉ bật khi đề có CLB có biến thể), nút "Tạo bộ biểu mẫu" (tắt khi chưa chọn đường
+  hoặc chưa có đề), thông báo có tên tệp zip, nút "Mở thư mục" (`mo_thu_muc`). Chuỗi `cb_bo_*` (vi + en) trong khối C của `i18n.js`; kiểu `style.css`
+  khối C.
+- Mã lỗi mới: không (dùng ba mã đã có từ G0).
+- Tệp test mới (3): `tests/test_fa_m8_bo_bieu_mau.py` (28 ca, hàm thuần), `tests/test_fa_m8_api.py` (12 ca), `tests/test_giao_dien_fa_m8_bo.py` (6 ca Chromium).
+- Đột biến đã chạy: (1) `tao_bo_bieu_mau` truyền `dap_an_tren_forms=True` -> `test_r3_so_voi_dap_an_tren_forms_true` (API) đỏ, và ở lớp thuần
+  `test_bo_khong_co_dap_an_tren_forms_o_moi_huong_dan` đỏ; (2) API bỏ qua `mot_bieu_mau` (luôn True) -> `test_mot_bieu_mau_theo_tuy_chon` đỏ;
+  (3) giao diện luôn gửi `mot_bieu_mau: true` -> `test_bo_tich_mot_bieu_mau_doi_bo` đỏ. Khôi phục -> xanh.
+- Mặc định không đổi: snapshot 8 chế độ của máy sinh (mặc định, `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--chi-thi`, `--phan-hoi`,
+  `--sau-ket-qua`, `--tuan-3`, `--bien-the` với đề hai CLB dựng trong thư mục tạm) dựng từ BASE 5196217 và từ nhánh: `diff -rq` KHÔNG khác biệt (23 tệp).
+  Không đụng lõi DA, schema, cột CSV.
+
+## 2026-11-11 — FA-M7 (+ G0): thẻ "Chuẩn bị đợt", CLB nhập một lần, đề thi trong một tệp Excel (TH = chưa thử trên Microsoft thật)
+
+- Gộp từ `claude/it-ui-a` (nền G0 + FA-M7). FA-M8, FA-M9, FA-M10 CHƯA làm (hai cộng tác viên B và C không chạy).
+- G0 (nền): `forms_dot.py` (đường dẫn thuần của đợt, mọi tệp nằm trong `forms/` cạnh app.db), `api_forms.py` (`FormsMixin`: `get_fa_duong`, `dat_fa_duong`, lưu `rules.fa_duong` A/B, không thuộc luật xếp), hai tệp rỗng `api_forms_nap.py` / `api_forms_bo.py` (dành cho FA-M9/FA-M10/FA-M8), `kiosk.spec` (hiddenimports cho `mau_forms_thi_clb`), thẻ "Chuẩn bị đợt" (chỉ hiện khi FA-DAA bật), `js/11_chuan_bi.js` + hai tệp JS rỗng, khối đánh dấu và mã lỗi dùng chung (vi + en).
+- FA-M7: bước "1. CLB" (`nap_phieu_clb`: nạp tệp xuất Phiếu thiết lập CLB, ghi `forms/SO_NHAP_CLB_CLB.xlsx`, không ghi app.db) và bước "2. Đề thi" (`tai_mau_de_thi` ghi `MAU_DE_THI_KIOSK.xlsx`; `nap_de_thi` đọc, gom MỌI lỗi một lần, lỗi thì không ghi gì, thành công ghi `forms/de_thi.json`); `get_forms_buoc_12` trả trạng thái để vẽ lại thẻ. Mô-đun mới `mau_forms_thi_clb/so_de_thi.py`. `chuyen_phieu_clb.chuyen_phieu` trả thêm khoá `kq`; đầu ra dòng lệnh không đổi. FIX1: `loai` của CLB đi theo sang `de_thi.json` để CLB Tự do không vào câu huy chương vàng; sửa chữ lỗi `forms_thieu_email` (hết gạch ngang nối câu).
+- Tệp chính: `forms_dot.py`, `api_forms.py`, `api_forms_nap.py`, `api_forms_bo.py`, `mau_forms_thi_clb/so_de_thi.py`, `mau_forms_thi_clb/chuyen_phieu_clb.py`, `js/11_chuan_bi.js`, `js/12_chuan_bi_nap.js`, `js/13_chuan_bi_bo.js`, `index.html`, `i18n.js`, `i18n_errors.py`, `i18n_loi.js`, `kiosk.spec`, `api.py`.
+- Test mới (đỏ trước): `tests/test_fa_m7_dong_goi.py`, `tests/test_fa_m7_duong.py`, `tests/test_giao_dien_fa_m7_the.py` (G0); `tests/test_fa_m7_nguon_mot_lan.py` (18 ca), `tests/test_giao_dien_fa_m7_nguon.py` (3 ca Chromium).
+- Đột biến đã chạy: bỏ phép đối chiếu CLB của đề thi với bước 1 (`if ma not in theo_ma` -> `if False and ...`) làm 3 ca đỏ; khôi phục thì 18/18 xanh.
+- Mặc định không đổi: không đụng lõi DA, schema, cột CSV; kết quả xếp không đổi (bước này không ghi app.db); đầu ra các lệnh `tao_mau_forms.py` giống từng byte.
+
+## 2026-11-11 — FA-M6b: MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu (TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/bieu_mau.py`: `CAU_CO_SAI`, `LUA_CHON_CO_SAI`, `CAU_KN_BUOI`, `CAU_KN_GHI_CHU`, `cac_phan_sau_ket_qua(de)` (phần 1: mã học sinh + 3 câu phản hồi + `[co_sai]`; phần 2: `[kn_buoi]` hộp chọn nhiều + `[kn_ghi_chu]`). `cac_phan_phan_hoi()` giữ nguyên.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `--sau-ket-qua` (riêng một chế độ, báo lỗi nếu dùng chung chế độ khác) ghi `NHAP_FORMS_SAU_KET_QUA.docx` + `CAI_DAT_FORMS_SAU_KET_QUA.md` (rẽ nhánh `[co_sai]`, bật Multiple answers cho `[kn_buoi]`, Settings, hạn 3 ngày, nộp muộn -> giáo viên chủ nhiệm, xuất và nạp). Docx Quick Import không phân biệt kiểu câu: câu `[kn_buoi]` phải bật "Multiple answers" tay (ghi trong hướng dẫn).
+- `fa_sau_xep.py`: `doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> (yeu_cau, bo_qua)` (hàm thuần; chỉ dòng `co_sai` = 1; mỗi (học sinh, buổi) một yêu cầu; giờ Forms từ "Completion time"/"Thời gian hoàn thành", dự phòng "Start time"; thiếu cột `[co_sai]` -> ValueError). `doc_tep_forms_phan_hoi` KHÔNG đổi (đọc tệp gộp, cột thừa bỏ qua).
+- `api_sau_xep.py`: tách `_chen_phan_hoi` và `_them_khieu_nai` dùng chung (đầu ra `nhap_phan_hoi_forms`, `gui_khieu_nai` giữ nguyên); mới `nhap_sau_ket_qua_forms(file_base64)`: một giao dịch, hạn khiếu nại theo giờ Forms, lỗi từng khiếu nại (`khieu_nai_qua_han`, `khieu_nai_trung`, `khieu_nai_khong_hop_le`) được BÁO không làm hỏng lần nạp, hai cờ tắt -> `fa_sau_ket_qua_chua_bat`, một cờ tắt -> phần kia bị bỏ qua kèm cảnh báo.
+- `i18n_errors.py` (+ `i18n_loi.js`, `tests/test_ws_nhan.py`): mã mới `fa_sau_ket_qua_chua_bat`, `khieu_nai_khong_co_gio_forms`. UI: nút "Nạp biểu mẫu Sau khi xem kết quả" ở khung Phản hồi (`index.html`, `js/10_theo_doi.js`, `i18n.js` vi + en).
+- Test mới (đỏ trước): `tests/test_fa_m6b_sau_ket_qua.py` (22), `tests/test_giao_dien_fa_m6b_sau_ket_qua.py` (2, Chromium). Đột biến: dùng giờ nạp thay giờ Forms -> 2 ca đỏ; bỏ lọc `co_sai` -> 1 ca đỏ.
+- Tài liệu: `docs/he_sinh_thai/FA_SAU_XEP.md` (mục 3.5 và mục 4). `--phan-hoi` và hướng dẫn của nó giữ nguyên từng byte.
+
+## 2026-11-11 — FA-M2b: MỘT biểu mẫu đăng ký cho mọi ngày, đường B (TH = chưa thử trên Microsoft thật)
+
+- `mau_forms_thi_clb/bieu_mau.py`: `cac_phan_fa_gop(de)` (phần thông tin một lần + mỗi ngày phần Nguyện vọng và phần Huy chương, đúng thứ tự `de["buoi"]`, chữ từng câu giống hệt `cac_phan_fa`) và `dem_cau_fa_gop(de)`.
+- `mau_forms_thi_clb/tao_mau_forms.py`: `sinh_dang_ky(de, thu_muc, mot_bieu_mau=False)` ghi MỘT tệp `NHAP_FORMS_DANG_KY_TAT_CA.docx` (mỗi chế độ xoá tệp .docx cũ của chế độ kia; vượt `TRAN_CAU_MOI_BIEU_MAU` thì `LoiDeThi`, không ghi gì); `ghi_cai_dat_dang_ky(de, mot_bieu_mau=False)` thêm mục "Một biểu mẫu cho mọi buổi"; cờ `--mot-bieu-mau` (chỉ với `--fa-daa`, ngược lại `ap.error`).
+- Bộ chuyển đổi `doc_dang_ky_fa_forms`: KHÔNG đổi (test chứng minh một tệp gộp cho cùng kết quả hai tệp từng ngày; nộp lại: phiếu cuối thắng mỗi ngày).
+- Mặc định không đổi: `--fa-daa`, `--phan-hoi`, `--tuan-3` ra tệp giống từng byte so với trước (`diff -r`).
+- Test mới (đỏ trước): `tests/test_fa_m2b_mot_bieu_mau.py` (13; đột biến bỏ một ngày khỏi `cac_phan_fa_gop` làm 5 ca đỏ).
+- Tài liệu: `docs/ke_hoach/FA_DAA_KE_HOACH.md` §4 (cột đường B). Không chọn D8.
+
 ## 2026-11-10 — GAP-14: bản ghi nhớ D1 (ưu tiên bù), KHÔNG có mã
 
 - Mới `docs/ke_hoach/FA_GAPS_D1_MEMO.md`: ba phương án A/B/C, rủi ro khuyến khích, bảng `hai_ky` đo bằng `du_lieu_test/mo_phong_fa_daa.py --n 100 --so-seed 5 --hai-ky 15` (SỐ LIỆU MÔ PHỎNG), ngoại lệ bất biến 2 mà B/C cần, câu hỏi cho Truong. Trạng thái: chờ Truong.

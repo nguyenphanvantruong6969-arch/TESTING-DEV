@@ -363,6 +363,87 @@ def doc_tep_forms_phan_hoi(hang) -> list:
     return ra
 
 
+# FA-M6b ---------------------------------------------------------------------------------------------------------------
+# Biểu mẫu gộp "Sau khi xem kết quả": phần phản hồi đọc bằng `doc_tep_forms_phan_hoi` (cột thừa bị bỏ qua), phần khiếu nại
+# đọc bằng hàm dưới đây. Lý do bỏ dòng là MÃ (không phải câu chữ) để kiosk dịch ở một nơi.
+LY_DO_BO_QUA_THIEU_MA = "thieu_ma_hoc_sinh"
+LY_DO_BO_QUA_BUOI_LA = "buoi_la"
+LY_DO_BO_QUA_KHONG_CO_BUOI = "khong_co_buoi"
+_TEN_COT_GIO_XONG = ("completion time", "thời gian hoàn thành")
+_TEN_COT_GIO_BAT_DAU = ("start time", "thời gian bắt đầu")
+
+
+def _doc_gio_forms(v):
+    """Ô giờ của tệp xuất Forms -> datetime, hoặc None nếu trống / không đọc được (không đoán định dạng ngày/tháng)."""
+    if isinstance(v, datetime.datetime):
+        return v.replace(microsecond=0, tzinfo=None)
+    if isinstance(v, str) and v.strip():
+        try:
+            return _doc_gio(v.strip())
+        except ValueError:
+            return None
+    return None
+
+
+def doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> tuple:
+    """Các dòng của tệp xuất biểu mẫu gộp (hàng 1 = tiêu đề) -> (yeu_cau, bo_qua). Hàm thuần.
+
+    Cột nhận theo MÃ "[mã]" của tiêu đề, giá trị theo "(mã)" cuối lựa chọn; ô hộp chọn nhiều = các lựa chọn cách nhau ";".
+    Chỉ dòng có `[co_sai]` = 1. Mỗi (học sinh, buổi) một yêu cầu `{student_id, buoi, ghi_chu, luc}`; `luc` là giờ hoàn thành
+    của Forms (cột "Completion time" / "Thời gian hoàn thành"; thiếu thì dùng "Start time") hoặc None. Mã buổi lạ, danh
+    sách buổi rỗng, thiếu mã học sinh -> `bo_qua` = (số dòng trong tệp, mã học sinh, mã lý do). Không có cột `[co_sai]`
+    (hoặc mã học sinh) -> ValueError."""
+    hang = list(hang)
+    if not hang:
+        raise ValueError("tep rong")
+    cot, gio_xong, gio_dau = {}, None, None
+    for i, o in enumerate(hang[0]):
+        m = _MA_CAU.match(str(o or ""))
+        if m:
+            cot[m.group(1).strip()] = i
+            continue
+        ten = str(o or "").strip().lower()
+        if ten in _TEN_COT_GIO_XONG and gio_xong is None:
+            gio_xong = i
+        elif ten in _TEN_COT_GIO_BAT_DAU and gio_dau is None:
+            gio_dau = i
+    if "co_sai" not in cot or "student_id" not in cot:
+        raise ValueError("khong co cot co_sai")
+    hop_le = set(ma_buoi_hop_le)
+
+    def o_(d, i):
+        return d[i] if i is not None and i < len(d) else None
+
+    def ma_lua_chon(v):
+        m = _MA_LUA_CHON.search(str(v).strip()) if v not in (None, "") else None
+        return m.group(1) if m else None
+
+    yeu_cau, bo_qua = [], []
+    for so_dong, d in enumerate(hang[1:], 2):
+        d = list(d)
+        if ma_lua_chon(o_(d, cot["co_sai"])) != "1":
+            continue
+        sid = str(o_(d, cot["student_id"]) or "").strip()
+        if not sid:
+            bo_qua.append((so_dong, "", LY_DO_BO_QUA_THIEU_MA))
+            continue
+        cac = [x for x in str(o_(d, cot.get("kn_buoi")) or "").split(";") if x.strip()]
+        if not cac:
+            bo_qua.append((so_dong, sid, LY_DO_BO_QUA_KHONG_CO_BUOI))
+            continue
+        ghi_chu = str(o_(d, cot.get("kn_ghi_chu")) or "").strip()
+        luc = _doc_gio_forms(o_(d, gio_xong)) or _doc_gio_forms(o_(d, gio_dau))
+        da = set()
+        for x in cac:
+            buoi = ma_lua_chon(x)
+            if buoi not in hop_le:
+                bo_qua.append((so_dong, sid, LY_DO_BO_QUA_BUOI_LA))
+            elif buoi not in da:
+                da.add(buoi)
+                yeu_cau.append({"student_id": sid, "buoi": buoi, "ghi_chu": ghi_chu, "luc": luc})
+    return yeu_cau, bo_qua
+
+
 # GAP-8 ---------------------------------------------------------------------------------------------------------------
 # Bảng điều khiển quản trị (V§11). CHỈ ĐỌC; mọi chỉ số là số liệu báo cáo, không bao giờ vào khoá ưu tiên (bất biến 2).
 # `gia_tri` None = chưa có dữ liệu (không bao giờ thay bằng 0). `muc_tieu` là mã (nhãn trong MUC_TIEU_DASHBOARD / i18n).

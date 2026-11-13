@@ -132,7 +132,10 @@ function taiMoi() {
   });
 }
 
+let knSoNgay = 3;
+
 function veKhieuNai(d) {
+  knSoNgay = d.so_ngay;
   el("knGoiY").textContent = t("kn_goi_y", { n: d.so_ngay });
   const chon = el("knBuoi");
   const cu = chon.value;
@@ -305,6 +308,35 @@ function khoiTaoPhanHoi() {
         el("phNhapKetQua").textContent = t("ph_nhap_xong", { n: res.data.n_ket_qua, m: res.data.n_tuan_3,
           b: res.data.bo_qua });
         taiPhanHoi();
+      });
+    };
+    doc.readAsArrayBuffer(tep);
+  });
+  /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại) -> một thông báo có số đếm và các khiếu nại không nhận. */
+  el("btnNhapSauKetQua").addEventListener("click", () => el("phTepSauKetQua").click());
+  el("phTepSauKetQua").addEventListener("change", (e) => {
+    const tep = e.target.files && e.target.files[0];
+    if (!tep) return;
+    const doc = new FileReader();
+    doc.onload = () => {
+      callApi("nhap_sau_ket_qua_forms", bufferSangBase64(doc.result)).then((res) => {
+        e.target.value = "";
+        if (!res.ok) {
+          showErrorToast(res.errors);
+          return;
+        }
+        const d = res.data;
+        const dongLoi = (d.khieu_nai_loi || []).map((x) => {
+          const buoi = nhanBuoi(x.buoi);
+          return t("ssk_loi_dong", { student_id: x.student_id, buoi, loi: trErr({ code: x.code,
+            params: { student_id: x.student_id, buoi, so_ngay: knSoNgay } }) });
+        });
+        const canhBao = (d.canh_bao || []).map(trErr);
+        const chu = [t("ssk_nap_xong", { n: d.n_ket_qua, m: d.n_khieu_nai, b: d.bo_qua })]
+          .concat(dongLoi, canhBao).join(" ");
+        el("phNhapKetQua").textContent = chu;
+        showToast(chu, dongLoi.length || canhBao.length ? "warn" : "success");
+        taiPhanHoi().then(taiKhieuNai);
       });
     };
     doc.readAsArrayBuffer(tep);

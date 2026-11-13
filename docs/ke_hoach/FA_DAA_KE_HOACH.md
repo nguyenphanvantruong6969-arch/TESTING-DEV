@@ -190,7 +190,7 @@ After DA (first pass):
 
 | | Path A: Power Apps "ECA" (existing app) | Path B: Microsoft Forms only |
 |---|---|---|
-| IT work | Edit app + list columns (build kit exists) | Create 1 form per day from a guide; no app edits |
+| IT work | Edit app + list columns (build kit exists) | Create 1 form per day from a guide; no app edits. One form for all days available (`--mot-bieu-mau`, FA-M2b) |
 | Autosave, random order per student, ▲▼, live medal defaults | Yes; students can swap medals | No autosave; 3 choice questions (no Ranking, D12); medals by order + gold and silver/bronze-swap questions (all 6 placements) |
 | Validation (min 3, distinct, medal rules) | In app, before submit | Required questions + converter warnings after |
 | Risk for "dùng thật học kỳ này" | Needs an Environment Maker and time (NC-02) | Lowest; works with M365 A3/A5 today |

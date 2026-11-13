@@ -54,6 +54,9 @@
       <button class="nav-item" data-tab="scoring">
         <span class="nav-icon">06</span> <span data-i18n="nav_scoring">Nhập điểm</span>
       </button>
+      <button class="nav-item" data-tab="chuan_bi" hidden>
+        <span class="nav-icon">07</span> <span data-i18n="nav_chuan_bi">Chuẩn bị đợt</span>
+      </button>
     </div>
 
     <div class="sidebar-footer">
@@ -657,6 +660,8 @@
           <div class="panel-actions">
             <input type="file" id="phTep" accept=".xlsx" hidden>
             <button class="btn btn-secondary" id="btnNhapPhanHoi" type="button" data-i18n="ph_nhap">Nạp từ Forms (Excel)</button>
+            <input type="file" id="phTepSauKetQua" accept=".xlsx" hidden>
+            <button class="btn btn-secondary" id="btnNhapSauKetQua" type="button" data-i18n="ssk_nap">Nạp biểu mẫu Sau khi xem kết quả</button>
             <button class="btn btn-secondary" id="btnXuatPhanHoi" type="button" data-i18n="ph_xuat">Xuất phản hồi (Excel)</button>
           </div>
         </div>
@@ -1185,6 +1190,40 @@
       </div>
     </section>
 
+    <!-- ---------- TAB 7: CHUẨN BỊ ĐỢT (FA-DAA; js/11_chuan_bi.js, 12_chuan_bi_nap.js, 13_chuan_bi_bo.js) ---------- -->
+    <section class="view" id="view-chuan_bi">
+      <header class="view-header">
+        <h1 data-i18n="cb_title">Chuẩn bị đợt</h1>
+        <p class="view-desc" data-i18n="cb_desc">Đi lần lượt từng bước: danh sách CLB, đề thi, bộ biểu mẫu, rồi nạp kết quả vào phần mềm.</p>
+      </header>
+
+      <p class="hint-text" id="cbGhiChuTat" data-i18n="cb_can_fa" hidden>Thẻ này chỉ dùng khi bật xếp theo loại CLB và huy chương: bật ở bước Luật khi tạo không gian làm việc.</p>
+
+      <div class="panel" id="cbDuongPanel">
+        <div class="panel-head"><h2 data-i18n="cb_duong_title">Chọn đường làm việc</h2></div>
+        <p class="hint-text" data-i18n="cb_duong_hint">Hai đường cho cùng một kết quả xếp. Chọn một lần cho cả đợt; không ảnh hưởng thuật toán.</p>
+        <div class="cb-duong-nhom" role="radiogroup" aria-labelledby="cbDuongTieuDe">
+          <label class="cb-duong"><input type="radio" name="cbDuong" value="A">
+            <span><strong data-i18n="cb_duong_a">Đường A: Power Apps + List</strong><br>
+            <span class="hint-text" data-i18n="cb_duong_a_ghi">Học sinh nhập qua ứng dụng; dữ liệu đi qua danh sách (List).</span></span></label>
+          <label class="cb-duong"><input type="radio" name="cbDuong" value="B">
+            <span><strong data-i18n="cb_duong_b">Đường B: chỉ Forms</strong><br>
+            <span class="hint-text" data-i18n="cb_duong_b_ghi">Học sinh chỉ dùng biểu mẫu; kết quả xuất ra tệp rồi nạp vào đây.</span></span></label>
+        </div>
+      </div>
+
+      <div class="panel"><div class="panel-head"><h2 data-i18n="cb_buoc_1_tieu_de">1. Câu lạc bộ</h2></div>
+        <div class="cb-buoc" id="cb-buoc-1"><p class="hint-text" data-i18n="cb_buoc_trong">Chưa có gì ở bước này.</p></div></div>
+      <div class="panel"><div class="panel-head"><h2 data-i18n="cb_buoc_2_tieu_de">2. Đề thi</h2></div>
+        <div class="cb-buoc" id="cb-buoc-2"><p class="hint-text" data-i18n="cb_buoc_trong">Chưa có gì ở bước này.</p></div></div>
+      <div class="panel"><div class="panel-head"><h2 data-i18n="cb_buoc_3_tieu_de">3. Tạo bộ biểu mẫu</h2></div>
+        <div class="cb-buoc" id="cb-buoc-3"><p class="hint-text" data-i18n="cb_buoc_trong">Chưa có gì ở bước này.</p></div></div>
+      <div class="panel"><div class="panel-head"><h2 data-i18n="cb_buoc_4_tieu_de">4. Nạp kết quả từ biểu mẫu</h2></div>
+        <div class="cb-buoc" id="cb-buoc-4"><p class="hint-text" data-i18n="cb_buoc_trong">Chưa có gì ở bước này.</p></div></div>
+      <div class="panel"><div class="panel-head"><h2 data-i18n="cb_buoc_5_tieu_de">5. Nhập vào phần mềm</h2></div>
+        <div class="cb-buoc" id="cb-buoc-5"><p class="hint-text" data-i18n="cb_buoc_trong">Chưa có gì ở bước này.</p></div></div>
+    </section>
+
   </main>
 </div>
 
@@ -1208,6 +1247,9 @@
 <script src="js/075_workspace.js"></script>
 <script src="js/09_the_xem.js"></script>
 <script src="js/10_theo_doi.js"></script>
+<script src="js/11_chuan_bi.js"></script>
+<script src="js/12_chuan_bi_nap.js"></script>
+<script src="js/13_chuan_bi_bo.js"></script>
 <script src="js/08_khoi_dong.js"></script>
 </body>
 </html>

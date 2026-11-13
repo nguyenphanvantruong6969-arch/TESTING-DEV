@@ -207,7 +207,7 @@ def chuyen_phieu(duong_xlsx, thu_muc_ra, ky_truoc=None):
     bao_cao = os.path.join(thu_muc_ra, "BAO_CAO_PHIEU_CLB.md")
     viet_bao_cao(kq, bao_cao)
     return {"so_nhap": so, "bao_cao": bao_cao, "n_clb": len(kq["clubs"]), "n_loi": len(kq["loi"]),
-            "n_canh_bao": len(kq["canh_bao"]), "n_chan": len(kq["kiem_truoc"])}
+            "n_canh_bao": len(kq["canh_bao"]), "n_chan": len(kq["kiem_truoc"]), "kq": kq}
 
 
 def main(argv=None):

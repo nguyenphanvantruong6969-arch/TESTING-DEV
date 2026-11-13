@@ -2918,3 +2918,38 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .dc-mau.is-duoc, .dc-mau.is-cham-duoc { background: var(--chart-general); }
 .dc-mau.is-khong, .dc-mau.is-cham-khong { background: var(--paper-raised); border: 2px solid var(--chart-khong-nhan); }
 .dc-mau.is-vach { width: 3px; height: 14px; border-radius: 1px; background: var(--ink); }
+
+/* === A: FA-M7 G0 — thẻ "Chuẩn bị đợt" === */
+.cb-duong-nhom { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+.cb-duong { display: flex; gap: 10px; align-items: flex-start; flex: 1 1 280px; padding: 12px 14px;
+  border: 1px solid var(--line, #d0d7de); border-radius: 8px; cursor: pointer; }
+.cb-duong input { margin-top: 4px; }
+.cb-buoc { margin-top: 4px; }
+.cb-trang-thai { margin: 8px 0; padding: 8px 12px; border-radius: 6px; font-weight: 600; }
+.cb-trang-thai[data-trang-thai="chua"] { background: var(--paper-raised, #f4f4f2); color: var(--ink, #222); }
+.cb-trang-thai[data-trang-thai="xanh"] { background: var(--moss-soft); color: #20452f; }
+.cb-trang-thai[data-trang-thai="do"] { background: var(--rust-soft); color: var(--rust-text); }
+.cb-trang-thai[data-trang-thai="cu"] { background: var(--paper-raised, #f4f4f2); color: var(--rust-text); }
+.cb-nut-hang { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.cb-dong-loi { margin: 6px 0 0 18px; padding: 0; }
+#view-chuan_bi .panel { margin-bottom: 16px; }
+/* === end A === */
+
+/* (spacer: unchanged line between marker blocks) */
+
+/* === B: FA-M9/M10 — add below === */
+.cb-nap-tha { margin: 8px 0; }
+.cb-nap-tep-loi td { color: var(--rust-text); }
+.cb-nap-bo-cau { list-style: none; margin: 6px 0; padding: 0; }
+.cb-nap-xac-nhan { margin: 8px 0; }
+.cb-nap5-phan { margin: 12px 0; padding-bottom: 8px; }
+.cb-nap5-chon { display: block; margin: 6px 0; }
+/* === end B === */
+
+/* (spacer: unchanged line between marker blocks) */
+
+/* === C: FA-M8 — add below === */
+.cb-bo-tuy-chon-hang { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0; }
+.cb-bo-tuy-chon { display: inline-flex; align-items: center; gap: 4px; }
+.cb-bo-tuy-chon input:disabled + span { opacity: 0.55; }
+/* === end C === */

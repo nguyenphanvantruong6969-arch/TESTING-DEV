@@ -1351,12 +1351,115 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
     if cac_tep:
         ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"))
     return {"n_hoc_sinh": len(hoc_sinh), "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
-            "canh_bao": canh_bao, "ghi_chu": [GHI_CHU_FA_DAA]}
+            "canh_bao": canh_bao, "ghi_chu": [GHI_CHU_FA_DAA],
+            "cau_co_co": [{"club_id": r["club_id"], "bien_the": r["bien_the"], "cau": r["cau"], "co": list(r["co"]),
+                           "ti_le_dung": r["ti_le_dung"]}
+                          for r in (hang_cau if cac_tep else []) if r["co"]]}
 
 
 TEN_EMAIL_MA_HS = "EMAIL_MA_HS.csv"
 GHI_CHU_FA_DAA = ("FA-DAA (TH, chưa thử trên Microsoft thật): huy chương là MỘT quỹ 60/30/10 ở cột \"Điểm quyết "
                   "tâm\"; điểm thi là số nguyên 0-10 (D7). Cờ \"làm quá nhanh\" chỉ để admin xem.")
+
+
+_BO_QUA_TIEU_DE = (TIEN_TO_DIEM, TIEN_TO_NHAN_XET)
+_MA_KHAI_NAI = {"co_sai", "kn_buoi", "kn_ghi_chu"}
+_RE_MA_DANG_KY = re.compile(r".+-nv\d+")
+_RE_MA_BAI_THI = re.compile(r"(?!thi-).+-\d+")
+_RE_THE_DAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[[^\]]+\]\s*")
+
+
+def _ma_cac_cot(tieu_de):
+    return {m for h in tieu_de or () if not str(h).startswith(_BO_QUA_TIEU_DE) for m in [bm.ma_cua_cau(h)] if m}
+
+
+def nhan_dien_tep(ten, tieu_de):
+    """FA-M9 (TH): loại tệp người dùng thả vào, chỉ nhìn tên tệp và dòng tiêu đề (không đọc dữ liệu, không ghi gì).
+
+    "sau_ket_qua" = biểu mẫu "Sau khi xem kết quả" (có `[co_sai]`, `[kn_buoi]` hoặc `[kn_ghi_chu]`); "lists" = CSV xuất
+    từ List đường A (có đủ cột Email, Thu, NV1); "dang_ky" = Forms đăng ký (có `[<buổi>-nvK]`); "bai_thi" = Forms bài thi
+    (có `[<club_id>-<số>]`); tệp trộn đăng ký với bài thi, tệp .csv không phải List, hoặc không nhận ra gì = "khong_ro"."""
+    ma = _ma_cac_cot(tieu_de)
+    if ma & _MA_KHAI_NAI:
+        return "sau_ket_qua"
+    cot = {str(h).strip().lower() for h in tieu_de or ()}
+    if {"email", "thu", "nv1"} <= cot:
+        return "lists"
+    if str(ten or "").lower().endswith(".csv"):
+        return "khong_ro"
+    co_dk = any(_RE_MA_DANG_KY.fullmatch(m) for m in ma)
+    co_thi = any(_RE_MA_BAI_THI.fullmatch(m) for m in ma)
+    if co_dk and not co_thi:
+        return "dang_ky"
+    if co_thi and not co_dk:
+        return "bai_thi"
+    return "khong_ro"
+
+
+def _chuan_cau(h):
+    return " ".join(_RE_THE_DAU.sub("", str(h), count=1).split())
+
+
+def doan_bien_the(de, tieu_de):
+    """FA-M9 (R5, TH): đoán tệp bài thi là đề "A", "B" hay "C" bằng cách so chữ của từng câu (sau thẻ `[...]`) với các đề.
+
+    Với mỗi CLB có câu trong tệp: các đề khớp TẤT CẢ câu của CLB đó (so từng số câu, bỏ khoảng trắng thừa). CLB chỉ có
+    một đề khớp với mọi chữ cái. Giao các tập đề của các CLB: đúng một đề -> trả chữ đó; còn lại (lẫn, mơ hồ, không khớp,
+    không có câu bài thi) -> None, UI bắt chọn tay. CLB lạ không có trong `de` bị bỏ qua. Không đổi gì ở CLI `--bien-the-tep`."""
+    import phan_tich_cau_hoi as pt
+    theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"] if c.get("de_thi")}
+    cau = {}                                                  # {club_id: {số câu: chữ câu}}
+    for h in tieu_de or ():
+        if str(h).startswith(_BO_QUA_TIEU_DE):
+            continue
+        ma = bm.ma_cua_cau(h)
+        m = _RE_MA_BAI_THI.fullmatch(ma) if ma else None
+        if m:
+            clb, so = ma.rsplit("-", 1)
+            if clb in theo_ma:
+                cau.setdefault(clb, {})[int(so)] = _chuan_cau(h)
+    if not cau:
+        return None
+    chung, co_nhieu_de = set(pt.CHU_BIEN_THE), False
+    for clb, theo_so in cau.items():
+        cac_de = pt.cac_bien_the(theo_ma[clb])
+        khop = set()
+        for chu, de_k in zip(pt.CHU_BIEN_THE, cac_de):
+            if all(0 < so <= len(de_k) and _chuan_cau(de_k[so - 1]["cau"]) == chu_cau
+                   for so, chu_cau in theo_so.items()):
+                khop.add(chu)
+        if len(cac_de) == 1 and khop:
+            khop = set(pt.CHU_BIEN_THE)                       # một đề: chữ nào cũng được, converter giữ đề A
+        else:
+            co_nhieu_de = True
+        chung &= khop
+    if not co_nhieu_de:
+        return "A" if chung else None                         # mọi CLB chỉ có một đề: chỉ có đề A
+    return next(iter(chung)) if len(chung) == 1 else None
+
+
+def chuyen_fa_daa_du_lieu(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz_xlsx=(), bien_the_tep=None,
+                          lua_chon=None, nhan_ban_nhap=False, co_so=None):
+    """FA-M9 (TH): bọc `chuyen_fa_daa` để trả DỮ LIỆU thay vì in ra hay ném lỗi (CLI `main` không đổi).
+
+    `lua_chon` (admin chọn ở UI, None = chưa chọn gì): {"dieu_chinh": "ap_dung" | "giu", "bo_cau": [(clb, đề, số)]}.
+    Trả {"trang_thai": "xong", **kết quả của chuyen_fa_daa} | {"trang_thai": "cho_xac_nhan", "thong_bao", "clb": [mã CLB lệch],
+    "bao_cao": đường dẫn DIEU_CHINH_BAN_DE.xlsx} | {"trang_thai": "loi", "thong_bao"} (lỗi bm.LoiDeThi / LoiTepXuat: không ghi Sổ)."""
+    lc = lua_chon or {}
+    try:
+        kq = chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=dang_ky_xlsx, lists=lists, quiz_xlsx=quiz_xlsx,
+                           nhan_ban_nhap=nhan_ban_nhap, co_so=co_so, bien_the_tep=bien_the_tep or None,
+                           ap_dung_dieu_chinh=lc.get("dieu_chinh") == "ap_dung",
+                           giu_diem_goc=lc.get("dieu_chinh") == "giu",
+                           bo_cau={tuple(x) for x in lc.get("bo_cau") or ()})
+    except LoiChoXacNhan as e:
+        m = re.match(r"CLB ([^:]+):", str(e))
+        return {"trang_thai": "cho_xac_nhan", "thong_bao": str(e),
+                "clb": [x.strip() for x in m.group(1).split(",")] if m else [],
+                "bao_cao": os.path.join(thu_muc_ra, "DIEU_CHINH_BAN_DE.xlsx")}
+    except (bm.LoiDeThi, LoiTepXuat) as e:
+        return {"trang_thai": "loi", "thong_bao": str(e)}
+    return {"trang_thai": "xong", **kq}
 
 
 def main(argv=None):
