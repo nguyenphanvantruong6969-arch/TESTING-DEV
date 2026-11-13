@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-3: nạp lại cùng một tệp Forms không thêm gì (TH)
+
+- `api_sau_xep.py`: `_chen_phan_hoi` bỏ qua dòng trùng hệt `(student_id, nguon, loai, hai_long, hieu_ly_do, kho_nhat, con_di, muon_doi)` và đếm (trả thêm số dòng trùng); `_them_khieu_nai(..., tu_forms)`: khi dòng Forms có giờ hoàn thành thật, cùng `(student_id, buoi, created_at)` ở MỌI trạng thái = "đã nạp" (không phải lỗi, không sinh khiếu nại CHO mới). Khiếu nại gõ tay trên kiosk giữ luật cũ.
+- Kết quả `nhap_phan_hoi_forms` / `nhap_sau_ket_qua_forms` thêm `dong_moi`, `dong_trung` (và `khieu_nai_moi`, `khieu_nai_trung` ở đường sau kết quả); giữ khoá cũ (đổi hình dạng đầy đủ là FG-6).
+- Test: `tests/test_fg3_nap_lai.py` (5 đỏ → xanh); mở rộng 2 assert từ điển cũ trong `test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py` (thêm khoá, không nới).
+
 ## 2026-11-13 — FG-1: bật/tắt tính năng sau khi xếp cho từng không gian làm việc (TH)
 
 - `js/075_workspace.js`: mục "Tính năng sau khi xếp…" trong menu ⋯ của dòng không gian làm việc (`wsMoTinhNang`): hộp thoại 5 ô

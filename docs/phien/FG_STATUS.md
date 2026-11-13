@@ -69,3 +69,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Note: wsOverlay lost static role=dialog; wsHienOverlay sets it only while visible.
 - 2026-11-13T02:03Z lead: BASE f5e8a41 full suite (no --cov): 5972 passed, 4 skipped (none UI), 0 failed → no pre-existing failures.
 - 2026-11-13T02:03Z lead: FG-1 review GO: diff 2f4cb69..c2c1854 matches spec (5 CO_SAU_XEP boxes + so_ngay, FA-off disabled + hint, server error kept in dialog, re-apply config); 27 passed (fg1 + test_ws_giao_dien, Chromium ran); mutation logged; kiem_nhanh --co-so origin/main 7/7.
+- 2026-11-13 WORKER session_01VfPzNv8yPVuUfCb3LScjpc FG-3 DONE HASH
+  - Red run before (HEAD without fix): tests/test_fg3_nap_lai.py 5 failed. After: 40 passed (fg3 + gap5 + m6b API/UI). ruff clean; kiem_nhanh --co-so origin/main 7/7.
+  - Mutation: feedback dedupe disabled -> test_nap_hai_lan_phan_hoi_khong_them_dong red; Forms-appeal dedupe off (tu_forms=False) -> 3 appeal tests red; both restored.
+  - Dedupe of Forms appeals applies only when the row has a real Forms completion time (no time -> old CHO rule, keeps m6b test with frozen clock). Two old exact-dict asserts extended with dong_moi/dong_trung (not loosened).
