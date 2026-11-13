@@ -98,7 +98,7 @@
       if (res.data.trang_thai === "cho_xac_nhan") { S.choXN = res.data.cho_xac_nhan; S.kq = null; }
       else { S.choXN = null; S.kq = res.data; }
       doiRoiVe();
-    });
+    }, { sauCung: () => { S.dang = false; } });   /* API ném lỗi đồng bộ cũng không để bước chết */
   }
 
   function chonDieuChinh(gia_tri, nutBam) { S.dieuChinh = gia_tri; chuyen(nutBam); }
@@ -347,7 +347,7 @@
       if (!res.ok) { S5[khoa] = null; showErrorToast(res.errors); veLai(); return; }
       S5[khoa] = res.data;
       veLai();
-    });
+    }, { sauCung: () => { S5.dang = ""; } });
   }
 
   function phan(k, tieuDe, ghi) {

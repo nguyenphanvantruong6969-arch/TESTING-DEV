@@ -115,6 +115,10 @@ def _thay_api(page, ten, che_do):
         }""", [ten, che_do])
 
 
+def _dem_unhandled(page):
+    page.evaluate("() => { window.__unh = 0; window.addEventListener('unhandledrejection', () => { window.__unh += 1; }); }")
+
+
 def _bam(page, nut):
     """Bấm bằng JS để thử cả khi nút ẩn dưới khung khác; nút đang khoá thì `.click()` của trình duyệt bị bỏ qua."""
     page.evaluate("id => document.getElementById(id).click()", nut)
@@ -127,15 +131,47 @@ def test_api_loi_nut_mo_lai_va_co_thong_bao_loi(mo, x):
     if truoc:
         truoc(page)
     chu_goc = page.locator("#" + nut).inner_text()
+    _dem_unhandled(page)
     _thay_api(page, ten_api, "nem")
     _bam(page, nut)
-    page.wait_for_selector("#toastStack .toast, #toastStack > *")
-    assert page.locator("#toastStack").inner_text().strip() != ""          # có thông báo lỗi
+    page.wait_for_selector("#toastStack .toast")
+    page.wait_for_timeout(300)
+    assert page.locator("#toastStack .toast.is-error").count() == 1        # ĐÚNG MỘT thông báo lỗi
+    # `.catch` của chayNut bắt lỗi: không có promise bị từ chối nào lọt tới trang (nếu bỏ `.catch` thì =1)
+    assert page.evaluate("() => window.__unh") == 0
     assert page.evaluate("() => window.__goi") == 1
     assert page.locator("#" + nut).is_enabled()                            # nút được mở lại
     assert page.locator("#" + nut).inner_text() == chu_goc                 # nhãn được trả lại
     loi_trang = [e for e in loi if "API hong" not in e]
     assert not loi_trang, loi_trang
+
+
+def test_chay_tai_bat_loi_mot_thong_bao_khong_unhandled(mo):
+    page, loi = mo(CAC_NUT[2])
+    _dem_unhandled(page)
+    page.evaluate("() => { chayTai(Promise.reject(new Error('tai hong')), () => {}); }")
+    page.wait_for_selector("#toastStack .toast.is-error")
+    page.wait_for_timeout(300)
+    assert page.locator("#toastStack .toast.is-error").count() == 1
+    assert page.evaluate("() => window.__unh") == 0
+
+
+def test_api_nem_loi_dong_bo_o_buoc_5_van_bam_lai_duoc(mo):
+    """Cờ bận `S5.dang` được đặt TRƯỚC lời gọi: API ném đồng bộ thì cờ phải được trả (sauCung), bấm lần hai gọi lần hai."""
+    x = CAC_NUT[3]
+    page, loi = mo(x)
+    _thay_api(page, x[4], "nem")
+    _bam(page, x[3])
+    page.wait_for_selector("#toastStack .toast.is-error")
+    page.wait_for_function("id => !document.getElementById(id).disabled", arg=x[3])
+    _bam(page, x[3])
+    page.wait_for_function("() => window.__goi === 2")
+
+
+def test_chuyen_va_goi_tra_co_ban_trong_sau_cung():
+    with open(os.path.join(GOC, "js/12_chuan_bi_nap.js"), encoding="utf-8") as f:
+        ma = f.read()
+    assert "sauCung: () => { S.dang = false; }" in ma and 'sauCung: () => { S5.dang = ""; }' in ma
 
 
 @pytest.mark.parametrize("x", CAC_NUT, ids=MA_NUT)
