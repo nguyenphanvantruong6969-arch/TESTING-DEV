@@ -86,3 +86,62 @@ def test_esc_khong_dong_khi_chua_chon(mo_trang):  # noqa: F811
     page.keyboard.press("Escape")
     assert not page.evaluate("document.getElementById('wsOverlay').hidden")
     assert not loi, loi
+
+
+# ---- FIX-1 ----
+def test_esc_dong_khi_focus_o_body(mo_trang):  # noqa: F811
+    page, api, goc, loi = mo_trang()
+    _mo(page)
+    page.locator("#wsHop .hint-text").click()
+    assert page.evaluate("document.activeElement.tagName") == "BODY"
+    page.keyboard.press("Escape")
+    assert page.evaluate("document.getElementById('wsOverlay').hidden")
+    assert page.evaluate("document.activeElement.id") == "btnWorkspace"
+    assert not loi, loi
+
+
+def _mo_tinh_nang(page, mo_man=True):
+    if mo_man:
+        _mo(page)
+    page.locator('tr[data-slug="truong-hoc"] .menu-khac > summary').click()
+    page.locator('button[data-slug="truong-hoc"][data-hanh-dong="tinh_nang"]').click()
+    page.wait_for_selector("#wsTnTieuDe")
+
+
+def test_dong_hop_tinh_nang_tra_focus_vao_man_chon(mo_trang):  # noqa: F811
+    page, api, goc, loi = mo_trang()
+    _mo_tinh_nang(page)
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#wsTnTieuDe", state="detached")
+    assert _tat_ca_trong(page)
+    assert not page.evaluate("document.getElementById('wsOverlay').hidden")   # chỉ đóng hộp con
+    _mo_tinh_nang(page, mo_man=False)
+    page.get_by_role("button", name="Huỷ").click()
+    page.wait_for_selector("#wsTnTieuDe", state="detached")
+    assert _tat_ca_trong(page)
+    assert not loi, loi
+
+
+def test_aria_modal_chi_co_khi_hien(mo_trang):  # noqa: F811
+    page, api, goc, loi = mo_trang()
+    gt = "(() => { const o = document.getElementById('wsOverlay'); return [o.getAttribute('role'), o.getAttribute('aria-modal')]; })()"
+    assert page.evaluate(gt) == [None, None]
+    _mo(page)
+    assert page.evaluate(gt) == ["dialog", "true"]
+    page.keyboard.press("Escape")
+    assert page.evaluate(gt) == [None, None]
+    assert not loi, loi
+
+
+def test_esc_dong_menu_truoc_roi_moi_dong_man_chon(mo_trang):  # noqa: F811
+    page, api, goc, loi = mo_trang()
+    _mo(page)
+    page.locator('tr[data-slug="truong-hoc"] .menu-khac > summary').click()
+    assert page.evaluate("!!document.querySelector('details.menu-khac[open]')")
+    page.keyboard.press("Escape")
+    assert not page.evaluate("!!document.querySelector('details.menu-khac[open]')")
+    assert not page.evaluate("document.getElementById('wsOverlay').hidden")
+    assert page.evaluate("document.activeElement.tagName") == "SUMMARY"
+    page.keyboard.press("Escape")
+    assert page.evaluate("document.getElementById('wsOverlay').hidden")
+    assert not loi, loi

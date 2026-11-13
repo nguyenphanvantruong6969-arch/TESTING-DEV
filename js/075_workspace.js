@@ -84,10 +84,8 @@ function wsTenMau(m) {
 function initWorkspace() {
   const nut = el("btnWorkspace");
   if (nut) nut.addEventListener("click", () => wsMoManChon(true));
-  el("wsOverlay").addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && wsCoTheDong) wsDongManChon();
-  });
-  document.addEventListener("keydown", wsBayTab);
+  /* Pha bắt (capture) để chạy TRƯỚC bộ xử lý Esc đóng menu "⋯" ở js/00_nen.js. */
+  document.addEventListener("keydown", wsBanPhim, true);
   window.addEventListener("langchange", () => {
     wsCapNhatTieuDe();
     if (el("wsOverlay").hidden) return;
@@ -112,11 +110,25 @@ function initWorkspace() {
 
 /* SG-11b (M4): bẫy Tab. Khi màn chọn (hoặc hộp thoại bật/tắt tính năng đặt chồng lên) đang hiện,
    Tab / Shift+Tab xoay vòng trong hộp; focus lỡ rơi ra ngoài thì kéo về ô đầu / ô cuối. */
-function wsBayTab(ev) {
-  if (ev.key !== "Tab" || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+function wsBanPhim(ev) {
   const hien = [...document.querySelectorAll(".ws-overlay")].filter((o) => !o.hidden);
   const hop = hien[hien.length - 1];
   if (!hop) return;
+  if (ev.key === "Escape") {
+    /* Esc đóng menu "⋯" đang mở trước (focus về nút ⋯), lần sau mới đóng màn chọn. Hộp bật/tắt tính năng
+       tự lo Esc của nó. Màn chọn chỉ đóng được khi đã có workspace để quay lại. */
+    const menu = hop.querySelector("details.menu-khac[open]");
+    if (menu) {
+      menu.open = false;
+      const tom = menu.querySelector("summary");
+      if (tom) tom.focus();
+      ev.stopPropagation();
+    } else if (hop === el("wsOverlay") && wsCoTheDong) {
+      wsDongManChon();
+    }
+    return;
+  }
+  if (ev.key !== "Tab" || ev.altKey || ev.ctrlKey || ev.metaKey) return;
   const duoc = [...hop.querySelectorAll(
     'button, input, select, textarea, summary, a[href], [tabindex]:not([tabindex="-1"])')]
     .filter((e) => !e.disabled && e.type !== "hidden" && !e.hidden && e.getClientRects().length > 0);
@@ -186,8 +198,8 @@ function wsMoManChon(coTheDong) {
 function wsHienOverlay(hien) {
   const o = el("wsOverlay");
   o.hidden = !hien;
-  if (hien) o.setAttribute("role", "dialog");
-  else o.removeAttribute("role");
+  if (hien) { o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); }
+  else { o.removeAttribute("role"); o.removeAttribute("aria-modal"); }
 }
 
 function wsDongManChon() {
@@ -299,7 +311,12 @@ function wsMoTinhNang(w) {
      hộp thoại duy nhất trong lúc chờ backend. */
   const dong = (xong) => {
     lop.remove();
-    if (xong && wsCoTheDong) wsDongManChon(); else wsHienOverlay(true);
+    if (xong && wsCoTheDong) { wsDongManChon(); return; }
+    wsHienOverlay(true);
+    /* Trả focus vào màn chọn: nút ⋯ đã mở hộp này nếu còn, không thì tiêu đề. */
+    const tom = document.querySelector('#wsBang tr[data-slug="' + w.slug + '"] .menu-khac > summary');
+    const dich = tom || el("wsTieuDe");
+    if (dich) dich.focus();
   };
   const o = WS_TINH_NANG.map(([khoa, nhan], i) => {
     const hop = wsEl("input", { type: "checkbox", id: "wsTn" + i, "data-khoa": khoa, disabled: true });
