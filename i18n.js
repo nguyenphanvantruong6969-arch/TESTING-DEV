@@ -1003,6 +1003,8 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} cảnh báo cùng loại. Ví dụ:",
+      canh_bao_gom_nua: "và {m} trường hợp nữa",
       /* === end SG-C === */
     },
 
@@ -1990,6 +1992,8 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} warnings of the same kind. Examples:",
+      canh_bao_gom_nua: "and {m} more cases",
       /* === end SG-C === */
     },
   };

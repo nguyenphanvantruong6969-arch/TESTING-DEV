@@ -32,6 +32,8 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 - Fable's report artifact is unreadable from this account ("artifact not found") → red tests come from the spec text
   of `SOAT_GIAO_DIEN_KE_HOACH.md` and the finding as reproduced in code (SG_SONG_SONG 2.1 fallback).
 
+- SG-7: helper placed in js/00_nen.js (no A/B edits there). Step-4 warning prefix `ma:` (internal code) dropped from visible text; old `slice(0,30)` cap replaced by the 5-example rule. Old i18n keys canh_bao_gom/xem_dau/thu_gon left (outside SG-C block).
+
 ## For Truong
 SG-5 wording (vi; sits in the gold-medal question of each `--fa-daa*` registration form, after the question text; en: none, forms are Vietnamese-only):
 "Huy chương giúp em được ưu tiên hơn bạn khác ở CLB đó: CLB có xét điểm thi thì chỉ dùng khi bằng điểm thi, CLB không xét điểm thi thì dùng trước khi bốc thăm. Em không chọn gì thì hệ thống tự đặt vàng cho nguyện vọng 1, bạc cho nguyện vọng 2, đồng cho nguyện vọng 3 (CLB Tự do không có huy chương nên được bỏ qua)."
@@ -52,3 +54,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T17:11Z CHECKER session_01VfPzNvd9nsMJp4kwS7QzT8 SG-5 PASS (round 2, a4d950a; see docs/phien/sg_review/SG-5.md)
 - 2026-11-13T17:40Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 DONE (lead review: diff read; 110 item/related tests pass; ruff clean; kiem_nhanh 7/7 60 cases; generator diff only m2/m3 --fa-daa* registration files) a4d950a
 - 2026-11-13T17:26Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-7 CODING start eb6ef50 coder session_01VfPzNvgJo8vZQhB3sTbaQr
+- 2026-11-13T17:31Z CODER session_01VfPzNuse9EfjuDwwt7335U SG-7 READY HASH red:3 of 4 new UI tests failed (step 4 and import panel had no grouping/5-example/'và N nữa', old button style, no shared helper) mutation:removing the 5-example slice in veCanhBaoGom -> 2 UI tests fail, restored

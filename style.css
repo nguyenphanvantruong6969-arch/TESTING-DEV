@@ -2961,4 +2961,8 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 /* (spacer: unchanged line between marker blocks) */
 
 /* === SG-C: add below === */
+.canh-bao-nhom { display: block; margin-bottom: 6px; }
+.canh-bao-tieu-de { font-weight: 600; }
+.canh-bao-con-lai { padding-left: 14px; color: var(--slate); font-style: italic; }
+.cb-canh-bao-gom { margin: 6px 0 0 0; }
 /* === end SG-C === */

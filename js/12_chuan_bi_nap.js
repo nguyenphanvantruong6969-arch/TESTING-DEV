@@ -221,10 +221,10 @@
     }
     if (kq.canh_bao.length) {
       k.appendChild(mot("strong", "", t("cb_nap_canh_bao", { n: kq.canh_bao.length })));
-      const ul = mot("ul", "cb-dong-loi");
-      ul.id = "cb-nap-canh-bao";
-      kq.canh_bao.slice(0, 30).forEach((c) => ul.appendChild(mot("li", "", (c.ma ? c.ma + ": " : "") + c.noi_dung)));
-      k.appendChild(ul);
+      const hop = mot("div", "cb-canh-bao-gom");
+      hop.id = "cb-nap-canh-bao";
+      veCanhBaoGom(hop, kq.canh_bao.map((c) => ({ ma: c.ma, chu: c.noi_dung })));
+      k.appendChild(hop);
     }
     const xt = kq.xem_truoc;
     if (xt) {

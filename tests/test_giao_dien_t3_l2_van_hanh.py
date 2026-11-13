@@ -55,19 +55,18 @@ def _canh_bao(n):
 
 
 # ---------------------------------------------------------------- T3-02
-def test_canh_bao_nhap_cung_loai_gom_thanh_mot_dong_co_nut_xem_nam_dong(api, mo):
+def test_canh_bao_nhap_cung_loai_gom_so_dem_nam_vi_du_va_dong_nua(api, mo):
+    """SG-7 thay kiểu nút "Xem 5 dòng đầu" của T3-02 bằng luật FG-6 (chi tiết ở test_giao_dien_sg7_canh_bao_gom)."""
     tat_wharton(api)
     page, loi = mo()
     page.evaluate("(w) => { canhBaoNhapGanNhat = w; veCanhBaoNhap(); }", _canh_bao(120))
     box = page.locator("#importWarnings")
     assert box.is_visible()
     assert box.locator(".canh-bao-nhom").count() == 1
-    assert "120" in box.locator(".canh-bao-nhom").inner_text()
-    assert box.locator(".canh-bao-dong:visible").count() == 0  # chưa mở: không dòng nào
-    box.locator(".canh-bao-xem").click()
+    assert "120" in box.locator(".canh-bao-tieu-de").inner_text()
     assert box.locator(".canh-bao-dong:visible").count() == 5
-    box.locator(".canh-bao-xem").click()
-    assert box.locator(".canh-bao-dong:visible").count() == 0
+    assert "115" in box.locator(".canh-bao-con-lai").inner_text()
+    assert box.locator("button").count() == 0
     assert not loi
 
 
@@ -76,7 +75,7 @@ def test_canh_bao_nhap_it_dong_van_hien_het(api, mo):
     page, loi = mo()
     page.evaluate("(w) => { canhBaoNhapGanNhat = w; veCanhBaoNhap(); }", _canh_bao(4))
     box = page.locator("#importWarnings")
-    assert box.locator(".canh-bao-nhom").count() == 0
+    assert box.locator(".canh-bao-tieu-de").count() == 0 and box.locator(".canh-bao-con-lai").count() == 0
     assert box.locator(".canh-bao-dong:visible").count() == 4
     assert not loi
 

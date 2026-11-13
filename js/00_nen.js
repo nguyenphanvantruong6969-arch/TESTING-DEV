@@ -134,6 +134,34 @@ function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
+/* SG-7 (H4, M1) — MỘT luật cho mọi danh sách cảnh báo dài (cùng luật FG-6 của nhật ký chạy):
+   gom theo mã; mỗi mã nhiều hơn CANH_BAO_VD_TOI_DA thì có dòng số đếm + đúng ngần ấy ví dụ + "và N trường hợp nữa";
+   ít hơn thì hiện hết, không thêm dòng nào. `muc` = [{ma, chu}] (chu đã là câu đọc được). Vẽ vào `hop`. */
+const CANH_BAO_VD_TOI_DA = 5;
+
+function veCanhBaoGom(hop, muc) {
+  const nhom = new Map();
+  muc.forEach((m) => {
+    if (!nhom.has(m.ma)) nhom.set(m.ma, []);
+    nhom.get(m.ma).push(m.chu);
+  });
+  const them = (cha, lop, chu) => {
+    const d = document.createElement("div");
+    d.className = lop;
+    d.textContent = chu;
+    cha.appendChild(d);
+  };
+  nhom.forEach((ds) => {
+    const n = document.createElement("div");
+    n.className = "canh-bao-nhom";
+    const dai = ds.length > CANH_BAO_VD_TOI_DA;
+    if (dai) them(n, "canh-bao-tieu-de", t("canh_bao_gom_dau", { n: ds.length }));
+    ds.slice(0, CANH_BAO_VD_TOI_DA).forEach((c) => them(n, "canh-bao-dong", "• " + c));
+    if (dai) them(n, "canh-bao-con-lai", t("canh_bao_gom_nua", { m: ds.length - CANH_BAO_VD_TOI_DA }));
+    hop.appendChild(n);
+  });
+}
+
 /* Thoat ca dau nhay: truoc day chi an toan GIUA hai the. Chi can mot
    cho sau nay dung esc() trong thuoc tinh (title="${esc(ten)}") la mot
    ten co dau nhay kep pha thuoc tinh ra va chen duoc ma. */
