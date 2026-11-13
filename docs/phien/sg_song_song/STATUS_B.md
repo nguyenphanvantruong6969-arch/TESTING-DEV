@@ -11,7 +11,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | DONE | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
-| SG-11b (M4 only) | READY | 0 | | f1ae45a | session_01YVAyu3PXika1Vx6orU1Yim | | tests/test_giao_dien_sg11b_focus_man_chon.py |
+| SG-11b (M4 only) | CHECKING | 0 | 5ab87d0 | f1ae45a | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAytyjEXTMBsvTPMw9NsZ | tests/test_giao_dien_sg11b_focus_man_chon.py |
 
 ## Fix lists
 
@@ -78,3 +78,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T21:36Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 DONE (checker r2 PASS + lead sweep 5600 passed, kiem_nhanh 7/7) 5e47810
 2026-11-13T21:37Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b CODING coder=session_01YVAyu3PXika1Vx6orU1Yim start=93d3d55
 2026-11-13T22:16Z CODER session_01YVAyu3PXika1Vx6orU1Yim SG-11b READY f1ae45a red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known; full non-UI 5600 passed, 4 skipped; UI 90 passed, 0 skipped) mutation:Tab-from-last wrap disabled -> 2 new Tab tests red; restored. ruff clean; kiem_nhanh 7/7; soat-ma four tiers not run as separate pass
+2026-11-13T22:27Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-11b CHECKING checker=session_01YVAytyjEXTMBsvTPMw9NsZ range=5ab87d0..f1ae45a
