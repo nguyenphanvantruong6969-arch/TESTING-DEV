@@ -62,3 +62,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T18:11Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 CODING start 1bf5e85 coder session_01VfPzNud4JhboVzj5e8xu4E
 - 2026-11-13T18:29Z CODER session_01VfPzNud4JhboVzj5e8xu4E SG-9 READY 98908e1 red:14 of 16 new tests failed on base (no busy state/double-click guard/.catch, 71 bare .then) mutation:removing nut.disabled=true in chayNut -> 5 double-click tests fail, restored; related: 606 UI/label tests pass, ruff clean
 - 2026-11-13T18:38Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 READY 98908e1 accepted (range a1b6ecb..98908e1); checker r1 session_01VfPzNt6qaZtDuK7uYC28bX
+- 2026-11-13T18:59Z CHECKER session_01VfPzNt6qaZtDuK7uYC28bX SG-9 PASS (a1b6ecb..98908e1; 495 UI tests passed 0 skipped, own mutation: removing .catch survives because unhandledrejection shows same toast -> notes only; see docs/phien/sg_review/SG-9.md)
