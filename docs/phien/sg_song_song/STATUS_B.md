@@ -9,7 +9,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
-| SG-6 (H1, D1 = A) | CHECKING | 0 | d7c9c19 | 194305f | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu1Uy5qgbSS878jxQF4 | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
+| SG-6 (H1, D1 = A) | CODING | 1 | d7c9c19 | 194305f | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu1Uy5qgbSS878jxQF4 | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | TODO | 0 | | | | | |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
@@ -17,6 +17,10 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 
 ### SG-2 regression (found by lead during SG-6, round "pre-check")
 1. `mau_csv/SO_NHAP_CLB.xlsx` not regenerated after the SG-2 guide-sentence change -> `tests/test_t1b_nhan_trung_cu.py::test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet` red (passes at 5c8ee63). Sent to SG-6 coder as a separate commit `SG-2 FIX-1`. Lesson: lead runs the full non-UI suite before each checker.
+
+### SG-6 FIX-1 (checker session_01YVAyu1Uy5qgbSS878jxQF4, d6fd6bd)
+1. Step-1 table: `so_de_thi.doc_clb_dot` whitelist drops gio/dia_diem -> `get_forms_buoc_12` / `veBuoc1` never show them; add UI upload test.
+2. Step 4: `chuyen_forms_sang_phan_mem.doc_clb_fa` / `ghi_tep_phan_mem` drop them -> real Forms->Sổ->import never stores them; end-to-end test.
 
 ## Decisions
 - SG-11b = finding M4 only (dialog focus trap + Esc + initial focus in `wsMoManChon`); M6/M7/L1/L4/L5 belong to person A (SG-11a).
@@ -49,3 +53,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T17:50Z CODER session_01YVAyu2N9LpsmHLzKjBUGzq SG-6 READY 194305f fix:1 done (sample regenerated in separate commit, only Hướng dẫn differs; t1b/so_mau_co_cot_quyet_tam/a13_13_kiem_nhan/fg2_xem_truoc_fa 82 passed),2 done (sample has no Giờ/Địa điểm columns),3 done
 2026-11-13T17:59Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 CHECKING checker=session_01YVAyu1Uy5qgbSS878jxQF4 range=d7c9c19..194305f (incl. SG-2 FIX-1 55fd02f)
 2026-11-13T18:20Z CHECKER session_01YVAyu1Uy5qgbSS878jxQF4 SG-6 FIX-1 (review: docs/phien/sg_review/SG-6.md; 1) step-1 table: doc_clb_dot drops gio/dia_diem; 2) step 4 doc_clb_fa/ghi_tep_phan_mem drops them: real Forms->Sổ->import never stores them)
+2026-11-13T18:28Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-6 FIX-1 sent to coder session_01YVAyu2N9LpsmHLzKjBUGzq
