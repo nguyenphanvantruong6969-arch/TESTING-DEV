@@ -20,12 +20,29 @@ import bieu_mau as bm  # noqa: E402
 import tao_mau_forms as tmf  # noqa: E402
 
 # sha256 của cả thư mục đầu ra (tên + nội dung) chụp trên f5e8a41, sinh hai lần giống nhau.
-BAM_GOC = {
-    "fa_daa": (["--fa-daa"], "acdefb99e7cdf7f7d65702ee4ef5b11b9a7adfd0abb97a160b1d68b13d01755e"),
-    "fa_daa_mot": (["--fa-daa", "--mot-bieu-mau"], "0e652cff8372cf9135072a03495bd38fe249b67f51c401c08d35de4d3a6bc73d"),
-    "phan_hoi": (["--phan-hoi"], "f4cc8d3f5bd8c560685c455a919ce0a81ffe05e82843498d931ccbe673c8c54a"),
-    "tuan_3": (["--tuan-3"], "eb73af3d5a3a80babec6b30dfbe5e63faf24016c8ec5ea04aece6cad75073e00"),
+# Byte đầu ra khác nhau theo hệ điều hành (os.name); FG không đổi các chế độ này, nên mỗi nền
+# tảng giữ nguyên băm của chính nó (posix: chụp ở STEP0; nt: đầu ra thật ở CI run 43376547591).
+_CHE_DO = {
+    "fa_daa": ["--fa-daa"],
+    "fa_daa_mot": ["--fa-daa", "--mot-bieu-mau"],
+    "phan_hoi": ["--phan-hoi"],
+    "tuan_3": ["--tuan-3"],
 }
+_BAM_THEO_HE = {
+    "posix": {
+        "fa_daa": "acdefb99e7cdf7f7d65702ee4ef5b11b9a7adfd0abb97a160b1d68b13d01755e",
+        "fa_daa_mot": "0e652cff8372cf9135072a03495bd38fe249b67f51c401c08d35de4d3a6bc73d",
+        "phan_hoi": "f4cc8d3f5bd8c560685c455a919ce0a81ffe05e82843498d931ccbe673c8c54a",
+        "tuan_3": "eb73af3d5a3a80babec6b30dfbe5e63faf24016c8ec5ea04aece6cad75073e00",
+    },
+    "nt": {
+        "fa_daa": "c9f376b4587ea03aab1be9358964cbad1c67adef31af16c7ca4c68a4c4cbd41f",
+        "fa_daa_mot": "143e8f0383a48c30fe93c582518e301cf834b3b9f446953a379e06efeb2ac9bf",
+        "phan_hoi": "f624c558d4c5a2fb0ab0b8098a0389c2796d229fe227049be3928d5ba446c773",
+        "tuan_3": "ebdfc5ce76d75e799e7588c631467742e6ab15ff5cf736551a25a86de597002c",
+    },
+}
+BAM_GOC = {k: (_CHE_DO[k], _BAM_THEO_HE[os.name][k]) for k in _CHE_DO}
 
 
 def _bam_cay(thu_muc):

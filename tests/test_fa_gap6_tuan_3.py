@@ -25,7 +25,8 @@ def test_nhap_tuan_3_va_tong_hop(api):
                        [2, "s2", _lc(bm.CAU_CON_DI, "0"), _lc(bm.CAU_MUON_DOI, "1")],
                        [3, "s3", _lc(bm.CAU_CON_DI, "1"), _lc(bm.CAU_MUON_DOI, "1")]])
     ra = api.nhap_phan_hoi_forms(tep)
-    assert ra["ok"] and ra["data"] == {"n_ket_qua": 0, "n_tuan_3": 3, "bo_qua": 0}, ra
+    assert ra["ok"] and ra["data"] == {"n_ket_qua": 0, "n_tuan_3": 3, "bo_qua": 0, "hoc_sinh": 3,
+                                "ma_khong_khop": [], "dong_moi": 3, "dong_trung": 0, "dong_bo_qua": []}, ra
     w = api.get_phan_hoi_tong_hop()["data"]["tuan_3"]
     assert w["n"] == 3 and abs(w["con_di_ty_le"] - 2 / 3) < 1e-9 and abs(w["muon_doi_ty_le"] - 2 / 3) < 1e-9
     with api._ket_noi_doc() as cur:
@@ -38,7 +39,9 @@ def test_tep_co_ca_hai_loai_cau(api):
     dau = [bm.cau_ma_hoc_sinh(), bm.CAU_HAI_LONG, bm.CAU_HIEU_LY_DO, bm.CAU_KHO_NHAT, bm.CAU_CON_DI, bm.CAU_MUON_DOI]
     tep = _xlsx_forms([dau, ["s1", _lc(bm.CAU_HAI_LONG, "3"), _lc(bm.CAU_HIEU_LY_DO, "1"),
                              _lc(bm.CAU_KHO_NHAT, "khong_co"), _lc(bm.CAU_CON_DI, "1"), _lc(bm.CAU_MUON_DOI, "0")]])
-    assert api.nhap_phan_hoi_forms(tep)["data"] == {"n_ket_qua": 1, "n_tuan_3": 1, "bo_qua": 0}
+    assert api.nhap_phan_hoi_forms(tep)["data"] == {
+        "n_ket_qua": 1, "n_tuan_3": 1, "bo_qua": 0, "hoc_sinh": 1,
+        "ma_khong_khop": [], "dong_moi": 2, "dong_trung": 0, "dong_bo_qua": []}
 
 
 def test_xuat_co_trang_tuan_3(api, tmp_path):
