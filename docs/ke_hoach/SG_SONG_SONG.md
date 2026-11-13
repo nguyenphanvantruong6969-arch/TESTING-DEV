@@ -95,7 +95,7 @@ python3 -m venv .venv && .venv/bin/pip install -q -r requirements-dev.txt && .ve
 ```
 Mode: SG_SONG_SONG person <X>
 LOCK: LEAD <session> <UTC>
-STATUS: RUNNING | DONE | BLOCKED        (lead A after integration: see 2.8)
+STATUS: RUNNING | DONE | BLOCKED        (lead A after integration: see 2.6)
 BASE: <hash>   SNAPSHOT: <recipe>
 ## Items   | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 ## Fix lists   (per item and round, copied from the checker's review file)
