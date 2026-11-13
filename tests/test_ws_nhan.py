@@ -62,7 +62,7 @@ MA_MOI_SAU_ANH_CHUP = {
 
     # FA gaps (GAP-1, GAP-2): điểm danh, mời danh sách chờ.
     "fa_tinh_nang_can_fa", "fa_diem_danh_chua_bat", "diem_danh_gia_tri_sai", "diem_danh_khong_thuoc_clb",
-    "moi_khong_con_cho", "gioi_han_gv_sai", "chia_cho_tong_qua_nho", "fa_khieu_nai_chua_bat", "khieu_nai_khong_hop_le", "khieu_nai_qua_han",
+    "moi_khong_con_cho", "gioi_han_gv_sai", "chia_cho_tong_qua_nho", "chia_cho_so_sai", "chia_cho_tep_nhu_cau_sai", "chia_cho_ma_clb_la", "fa_khieu_nai_chua_bat", "khieu_nai_khong_hop_le", "khieu_nai_qua_han",
     "khieu_nai_trung", "khieu_nai_da_xu_ly", "loi_luu_sau_xep",
     "fa_vong_2_chua_bat", "vong_2_lua_chon_sai", "vong_2_da_chay",
     "fa_phan_hoi_chua_bat", "phan_hoi_gia_tri_sai", "phan_hoi_tep_sai",

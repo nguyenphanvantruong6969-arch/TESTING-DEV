@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-11-13 — FA-CT2 (A13, giảm may rủi): "được thêm X chỗ thì thêm vào đâu" + tệp và nút cho giáo viên
+
+- `fa_daa.py`: `goi_y_tang_them(rows, them, gioi_han)` (hàm thuần): mỗi lần một chỗ cho CLB còn thừa cầu nhiều nhất (hoà:
+  NV1 lớn hơn, rồi mã CLB), không vượt giới hạn giáo viên hay nhu cầu; chỉ tăng nên `kiem_chi_tang` luôn sạch.
+- `api_xuat.py`: `export_chia_cho(output_path, buoi, tong, them, tep_nhu_cau)` ghi `chia_cho_theo_nhu_cau.xlsx`, mỗi buổi
+  một trang (chỉ tiêu hiện tại, xếp đầu tiên, đạt điểm sàn, đã giữ chỗ, giới hạn giáo viên, chỗ gợi ý FA-CT1, chênh lệch,
+  ghi chú; có `them` thì thêm "Chỗ thêm", "Chỗ sau khi thêm"). Không có dữ liệu học sinh, chỉ đọc app.db, không ghi chỉ tiêu.
+  `tep_nhu_cau`: đường dẫn hoặc `{ten, base64}` (giao diện) của tệp CSV/XLSX `club_id, nhu_cau`, chỉ đọc cho lần xuất.
+- Giao diện (`index.html`, `js/03_ket_qua.js`, `i18n.js` vi + en): nút "Gợi ý chia lại chỗ theo nhu cầu" cạnh các nút xuất
+  FA, hai ô số tuỳ chọn ("Tổng số chỗ mỗi buổi", "Được thêm bao nhiêu chỗ"), nút chọn tệp nhu cầu tham khảo, dòng hướng dẫn.
+- Mã lỗi mới: `chia_cho_so_sai`, `chia_cho_tep_nhu_cau_sai`, `chia_cho_ma_clb_la` (cảnh báo); đã thêm vào
+  `MA_MOI_SAU_ANH_CHUP`, đã chạy `tao_i18n_js.py`. Bản đồ mã: 266 tệp test, tên hàm mới.
+- Test mới: `tests/test_fa_ct2_tang_them.py` (63 ca: ví dụ tay, 50 bộ ngẫu nhiên tổng / trần / chỉ tăng, tệp xuất một
+  trang mỗi buổi, không có mã hay tên học sinh, app.db y hệt byte trước/sau, tệp nhu cầu CSV + XLSX, số sai, FA tắt),
+  `tests/test_giao_dien_fa_ct2.py` (3 ca Chromium). Dữ liệu MÔ PHỎNG.
+
 ## 2026-11-13 — FA-CT1 (A13, giảm may rủi): gợi ý chia lại chỗ một buổi theo nhu cầu (chỉ báo cáo)
 
 - `fa_daa.py`: `chia_cho_theo_nhu_cau(rows, tong, gioi_han, nhu_cau=None)` (hàm thuần) chia `tong` chỗ của một buổi cho

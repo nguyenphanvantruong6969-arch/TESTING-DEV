@@ -837,6 +837,8 @@ function loadMatchResults(search) {
     el("btnXuatNhuCau").hidden = !fa;
     el("btnXuatGoiY").hidden = !fa; /* GAP-7 */
     el("btnXuatBienBan").hidden = !fa;
+    el("btnXuatChiaCho").hidden = !fa; /* chia lại chỗ theo nhu cầu (chỉ gợi ý) */
+    el("chiaChoKhoi").hidden = !fa;
     veCotLyDo(!!cauLyDo);
     taiDiemDanh(); /* GAP-1: khung điểm danh (js/10_theo_doi.js) — tự ẩn khi cờ tắt */
     /* FA-P3: buổi không có lý do -> MỘT thông báo trên bảng (mã fa_ly_do_thieu_buoi), không để cột trống im lặng */
@@ -1044,6 +1046,31 @@ function initResultsHandlers() {
   el("btnXuatGoiY").addEventListener("click", () => {
     chayXuat([["xuat_muc_goi_y", "export_goi_y_chi_tieu", [""],
       (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]]);
+  });
+
+  /* Gợi ý chia lại chỗ theo nhu cầu: ô trống = mặc định (tổng hiện tại; không thêm chỗ). Tệp nhu cầu tham
+     khảo (club_id, nhu_cau) tuỳ chọn, chỉ đọc cho lần xuất này. */
+  let tepNhuCau = "";
+  el("btnChiaChoTep").addEventListener("click", () => el("chiaChoTep").click());
+  el("chiaChoTep").addEventListener("change", (e) => {
+    const tep = e.target.files && e.target.files[0];
+    if (!tep) return;
+    const doc = new FileReader();
+    doc.onload = () => {
+      tepNhuCau = { ten: tep.name, base64: bufferSangBase64(doc.result) };
+      el("chiaChoTenTep").textContent = tep.name;
+      e.target.value = "";
+    };
+    doc.readAsArrayBuffer(tep);
+  });
+  el("btnXuatChiaCho").addEventListener("click", () => {
+    const so = (id) => {
+      const v = el(id).value.trim();
+      return v === "" ? null : Number(v);
+    };
+    chayXuat([["xuat_muc_chia_cho", "export_chia_cho", ["", "", so("chiaChoTong"), so("chiaChoThem"), tepNhuCau],
+      (d) => [t("xuat_kq_chia_cho", { path: d.path })]
+        .concat(trErrs(d.canh_bao || [])).join("\n")]]);
   });
 
   el("btnXuatTheoLop").addEventListener("click", () => {

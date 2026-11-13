@@ -402,6 +402,18 @@ MESSAGES = {
         "vi": "Giới hạn chỉ tiêu phải là số nguyên dương (nhận {value}).",
         "en": "The capacity limit must be a positive whole number (got {value}).",
     },
+    "chia_cho_so_sai": {
+        "vi": "Số chỗ phải là số nguyên (tổng số chỗ lớn hơn 0, số chỗ thêm từ 0 trở lên; nhận {value}).",
+        "en": "Seat numbers must be whole numbers (total above 0, extra seats 0 or more; got {value}).",
+    },
+    "chia_cho_tep_nhu_cau_sai": {
+        "vi": "Không đọc được tệp nhu cầu tham khảo. Tệp cần hai cột \"club_id\" và \"nhu_cau\"; mỗi ô \"nhu_cau\" là một số nguyên từ 0 trở lên.",
+        "en": "Couldn't read the reference demand file. It needs two columns, \"club_id\" and \"nhu_cau\"; each \"nhu_cau\" cell must be a whole number of 0 or more.",
+    },
+    "chia_cho_ma_clb_la": {
+        "vi": "Tệp nhu cầu tham khảo có mã {slot_sl} không có trong danh sách, đã bỏ qua: {club_ids}.",
+        "en": "The reference demand file has {slot_l} codes that aren't in the list; they were skipped: {club_ids}.",
+    },
     "chia_cho_tong_qua_nho": {
         "vi": "{session} {buoi}: {tong} chỗ là chưa đủ. Cần ít nhất {can} chỗ (mỗi {slot_sl} ít nhất 1 chỗ, cộng chỗ đã giữ trước).",
         "en": "{buoi}: {tong} seats aren't enough. At least {can} are needed (1 per {slot_l}, plus the reserved seats).",

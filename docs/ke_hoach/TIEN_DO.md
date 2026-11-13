@@ -4,6 +4,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 
 | Mã | Trạng thái (chưa / đang / xong / chặn) | Ngày | Tệp đã sửa | Test mới | Ghi chú |
 |---|---|---|---|---|---|
+| FA-CT2 (A13, giảm may rủi) | xong | 2026-11-13 | fa_daa.py, api_xuat.py, index.html, js/03_ket_qua.js, i18n.js, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, docs/ke_hoach/CLAUDE_CHI_TIET.md, CHANGELOG.md | tests/test_fa_ct2_tang_them.py (63 ca), tests/test_giao_dien_fa_ct2.py (3 ca) | Thêm chỗ vào đâu + tệp Excel và nút cho giáo viên |
 | FA-CT1 (A13, giảm may rủi) | xong | 2026-11-13 | fa_daa.py, i18n_errors.py, i18n_loi.js, tests/test_ws_nhan.py, CHANGELOG.md | tests/test_fa_ct1_chia_cho.py (105 ca) | Gợi ý chia chỗ theo nhu cầu, chỉ báo cáo |
 | FA-M7 (+ G0) (IT giao diện, TH) | xong | 2026-11-11 | forms_dot.py, api_forms.py, api_forms_nap.py, api_forms_bo.py, mau_forms_thi_clb/so_de_thi.py, js/11_chuan_bi.js, index.html, i18n.js, i18n_errors.py, kiosk.spec, CHANGELOG.md | tests/test_fa_m7_dong_goi.py, test_fa_m7_duong.py, test_fa_m7_nguon_mot_lan.py, test_giao_dien_fa_m7_the.py, test_giao_dien_fa_m7_nguon.py | Thẻ "Chuẩn bị đợt" bước 1 (CLB) và 2 (Đề thi). Bước 3–5: FA-M8, FA-M9, FA-M10 (2026-11-12). |
 | FA-SOAT3 (soát đêm 3, Truong yêu cầu 09/11/2026) | xong (GO, chưa sửa lỗi) | 2026-11-09 | docs/phien/bao_cao_dem/2026-11-09_soat_dem3.md, docs/ke_hoach/FA_DAA_KE_HOACH.md, docs/phien/CHAY_DEM_FA_DAA.md, docs/phien/claude__keen-ride-72sa7t.md, CHANGELOG.md | — (chỉ tài liệu) | Đêm 4: FA-N1..N4, FA-9, FA-10 |

@@ -741,6 +741,45 @@ def chia_cho_theo_nhu_cau(rows, tong: int, gioi_han: dict, nhu_cau: dict | None 
     return ra
 
 
+def goi_y_tang_them(rows, them: int, gioi_han: dict) -> list:
+    """FA-CT2: "được thêm `them` chỗ thì thêm vào đâu" cho MỘT buổi — chỉ báo cáo, không ghi gì.
+
+    Thừa cầu `e_c = d_c − capacity` (`d_c` như FA-CT1, không có tệp nhu cầu); chỉ CLB không TU_DO có
+    `e_c > 0` nhận chỗ. Mỗi lần một chỗ cho CLB còn thừa cầu nhiều nhất (hoà: NV1 lớn hơn, rồi
+    club_id), không vượt trần `gioi_han` và không vượt nhu cầu. Chỗ không ai nhận -> `du`.
+    Ra: dòng vào + `them_vao` (>= 0), `capacity_moi`, `du`; chỉ tăng nên `kiem_chi_tang` luôn sạch.
+    """
+    import heapq
+
+    rows = sorted(rows, key=lambda r: (str(r["buoi"]), str(r["club_id"])))
+    con: dict = {}
+    for r in rows:
+        if r.get("loai") == TU_DO or r.get("capacity") is None:
+            continue
+        cid = r["club_id"]
+        e = _nhu_cau_clb(r, None) - r["capacity"]
+        gh = gioi_han.get(cid)
+        if gh is not None:
+            e = min(e, gh - r["capacity"])
+        if e > 0:
+            con[cid] = e
+    nv1 = {r["club_id"]: r["nv1"] for r in rows}
+    du_thua = {r["club_id"]: _nhu_cau_clb(r, None) - (r.get("capacity") or 0) for r in rows}
+    heap = [(-du_thua[c], -nv1[c], str(c), c) for c in con]
+    heapq.heapify(heap)
+    them_vao = {c: 0 for c in con}
+    con_lai = them
+    while con_lai > 0 and heap:
+        e, n, k, c = heapq.heappop(heap)
+        them_vao[c] += 1
+        con_lai -= 1
+        if them_vao[c] < con[c]:
+            heapq.heappush(heap, (e + 1, n, k, c))
+    return [{**r, "them_vao": them_vao.get(r["club_id"], 0),
+             "capacity_moi": None if r.get("capacity") is None
+             else r["capacity"] + them_vao.get(r["club_id"], 0), "du": con_lai} for r in rows]
+
+
 def kiem_tang_tu_goi_y(goi_y: dict, khai: dict) -> list:
     """GAP-7: giáo viên chỉ được TĂNG từ gợi ý ({club_id: n} cả hai): vi phạm `GIAM_SUC_CHUA` của `kiem_chi_tang`.
     CLB không có trong `khai` thì không xét."""

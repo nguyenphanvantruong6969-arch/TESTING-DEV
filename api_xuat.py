@@ -1838,6 +1838,163 @@ class XuatKetQuaMixin:
         except Exception as e:
             return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
 
+    def export_chia_cho(self, output_path: str = "", buoi: str = "", tong=None, them=None, tep_nhu_cau=""):
+        """FA-CT1 + FA-CT2: `chia_cho_theo_nhu_cau.xlsx` — mỗi buổi một trang: chỉ tiêu hiện tại, nhu cầu, số chỗ
+        GỢI Ý khi chia lại `tong` chỗ theo nhu cầu (mặc định = tổng chỉ tiêu hiện tại của các CLB không Tự do trong
+        buổi) và, khi có `them`, số chỗ nên thêm vào đâu. Chỉ là gợi ý: KHÔNG ghi `clubs.capacity`, chỉ đọc app.db,
+        không có mã hay tên học sinh. `tep_nhu_cau` (tuỳ chọn): đường dẫn hoặc {ten, base64} của tệp CSV/XLSX
+        `club_id, nhu_cau` (vd số thành viên năm trước), chỉ đọc cho lần xuất này; mã CLB lạ -> cảnh báo
+        `chia_cho_ma_clb_la`. Cần `rules.fa_daa` (`fa_chua_bat`)."""
+        return self._khoa_xuat(self._export_chia_cho_da_khoa, output_path, buoi, tong, them, tep_nhu_cau)
+
+    @staticmethod
+    def _so_hop_le(x, toi_thieu: int) -> bool:
+        return isinstance(x, int) and not isinstance(x, bool) and x >= toi_thieu
+
+    @staticmethod
+    def _doc_tep_nhu_cau(tep) -> dict:
+        """{club_id: nhu_cau} từ tệp CSV/XLSX hai cột `club_id, nhu_cau` (đường dẫn hoặc {ten, base64}).
+        Tệp sai -> ValueError (mô tả ngắn)."""
+        import base64
+        import csv
+        import io
+
+        if isinstance(tep, dict):
+            ten, du_lieu = str(tep.get("ten") or ""), base64.b64decode(tep.get("base64") or "", validate=True)
+        else:
+            ten = str(tep)
+            with open(ten, "rb") as f:
+                du_lieu = f.read()
+        if du_lieu[:2] == b"PK" or ten.lower().endswith((".xlsx", ".xlsm")):
+            from openpyxl import load_workbook
+            wb = load_workbook(io.BytesIO(du_lieu), read_only=True, data_only=True)
+            hang = [list(r) for r in wb.worksheets[0].iter_rows(values_only=True)]
+        else:
+            hang = list(csv.reader(io.StringIO(du_lieu.decode("utf-8-sig"))))
+        hang = [r for r in hang if r and any(c not in (None, "") for c in r)]
+        if not hang:
+            raise ValueError("tệp rỗng")
+        dau = [str(c or "").strip().lower() for c in hang[0]]
+        if "club_id" not in dau or "nhu_cau" not in dau:
+            raise ValueError("thiếu cột club_id / nhu_cau")
+        i_ma, i_nc = dau.index("club_id"), dau.index("nhu_cau")
+        ra = {}
+        for r in hang[1:]:
+            ma = str(r[i_ma] if i_ma < len(r) and r[i_ma] is not None else "").strip()
+            gt = r[i_nc] if i_nc < len(r) else None
+            if not ma:
+                continue
+            try:
+                so = float(str(gt).strip().replace(",", "."))
+            except ValueError:
+                raise ValueError("%s: nhu_cau “%s” không phải số" % (ma, gt)) from None
+            if so < 0 or so != int(so):
+                raise ValueError("%s: nhu_cau “%s” phải là số nguyên không âm" % (ma, gt))
+            ra[ma] = int(so)
+        return ra
+
+    def _export_chia_cho_da_khoa(self, output_path="", buoi="", tong=None, them=None, tep_nhu_cau=""):
+        import fa_daa
+        from openpyxl import Workbook
+
+        from fa_sau_xep import ten_trang_xlsx
+        from so_excel import Trang
+        from so_nhap import nhan_buoi
+        try:
+            if not dung_fa_daa(self._luat_nghiem()):
+                return _fail(err("fa_chua_bat"))
+            for x, toi_thieu in ((tong, 1), (them, 0)):
+                if x not in (None, "") and not self._so_hop_le(x, toi_thieu):
+                    return _fail(err("chia_cho_so_sai", value=repr(x)))
+            tong = None if tong == "" else tong
+            them = None if them == "" else them
+            nhu_cau, canh_bao = None, []
+            if tep_nhu_cau:
+                try:
+                    nhu_cau = self._doc_tep_nhu_cau(tep_nhu_cau)
+                except Exception as e:
+                    return _fail(err("chia_cho_tep_nhu_cau_sai", detail=str(e) or type(e).__name__))
+            with self._ket_noi_doc() as cur:
+                clubs, _hs, prefs = fa_daa.doc_clubs_va_nguyen_vong(cur)
+                _, cap, _ = fa_daa.doc_du_lieu_fa(cur)
+                diem: dict = {}
+                for cid, sid, d in cur.execute(
+                        "SELECT sc.club_id, sc.student_id, sc.score FROM club_scores sc "
+                        "JOIN club_test_selection t ON t.student_id = sc.student_id AND t.club_id = sc.club_id"):
+                    diem.setdefault(cid, {})[sid] = d
+                ten = {r[0]: r[1] or r[0] for r in cur.execute("SELECT club_id, name FROM clubs")}
+                gioi_han = dict(cur.execute("SELECT club_id, gioi_han FROM fa_gioi_han_gv").fetchall())
+            if nhu_cau is not None:
+                la = sorted(c for c in nhu_cau if c not in clubs)
+                if la:
+                    canh_bao.append(err("chia_cho_ma_clb_la", club_ids=", ".join(la)))
+                nhu_cau = {c: n for c, n in nhu_cau.items() if c in clubs}
+            rows = fa_daa.bang_nhu_cau(clubs, prefs, diem, clubs, cap, buoi=buoi or None, ten_clb=ten)
+            theo_buoi: dict = {}
+            for r in rows:
+                theo_buoi.setdefault(r["buoi"], []).append(r)
+            wb = Workbook()
+            wb.remove(wb.active)
+            da_dung: set = set()
+            du_theo_buoi = {}
+            ghi_chu_hien = {"cham_gioi_han": "Chạm giới hạn giáo viên", "san_giu_cho": "Giữ mức tối thiểu",
+                            "khong_nhu_cau": "Chưa ai xếp đầu tiên", "": ""}
+            for b in sorted(theo_buoi, key=str):
+                ds = theo_buoi[b]
+                tong_b = tong if tong is not None else sum(
+                    r["capacity"] or 0 for r in ds if r["loai"] != fa_daa.TU_DO)
+                try:
+                    chia = fa_daa.chia_cho_theo_nhu_cau(ds, tong_b, gioi_han, nhu_cau)
+                except fa_daa.LoiChiaCho as e:
+                    return _fail(e.loi)
+                tang = None
+                if them is not None:
+                    tang = {r["club_id"]: r for r in fa_daa.goi_y_tang_them(ds, them, gioi_han)}
+                du_theo_buoi[b] = {"chia": chia[0]["du"] if chia else 0,
+                                   "them": None if tang is None else
+                                   (next(iter(tang.values()))["du"] if tang else them)}
+                t = Trang(wb.create_sheet(ten_trang_xlsx(nhan_buoi(b) or b, da_dung)))
+                t.tieu_de("GỢI Ý CHIA LẠI CHỖ THEO NHU CẦU — %s" % (nhan_buoi(b) or b),
+                          "Số chỗ chỉ là gợi ý; thầy cô tự quyết và nhập chỉ tiêu như thường lệ.")
+                t.dong("Tổng số chỗ đem chia", tong_b)
+                if du_theo_buoi[b]["chia"]:
+                    t.dong("Chỗ thừa (mọi CLB có nhu cầu đã chạm giới hạn)", du_theo_buoi[b]["chia"])
+                if them is not None:
+                    t.dong("Được thêm", them)
+                    if du_theo_buoi[b]["them"]:
+                        t.dong("Chỗ thêm chưa cần dùng", du_theo_buoi[b]["them"])
+                t.hang += 1
+                cot = ["Tên CLB", "Loại", "Chỗ hiện tại", "Xếp đầu tiên", "Đạt điểm sàn", "Đã giữ chỗ",
+                       "Giới hạn giáo viên", "Chỗ gợi ý", "Chênh lệch", "Ghi chú"]
+                if nhu_cau is not None:
+                    cot += ["Nhu cầu tham khảo (tệp)"]
+                if them is not None:
+                    cot += ["Chỗ thêm", "Chỗ sau khi thêm"]
+                dong = []
+                for r in chia:
+                    cid = r["club_id"]
+                    d = [r["ten"], fa_daa.NHAN_LOAI_HIEN_THI.get(r["loai"], r["loai"] or ""), r["capacity"],
+                         r["nv1"], "" if r["so_dat_san"] is None else r["so_dat_san"], r["so_giu_cho"],
+                         "" if gioi_han.get(cid) is None else gioi_han[cid],
+                         "" if r["goi_y"] is None else r["goi_y"], "" if r["chenh"] is None else r["chenh"],
+                         ghi_chu_hien.get(r["ghi_chu"], "")]
+                    if nhu_cau is not None:
+                        d += ["" if cid not in nhu_cau else nhu_cau[cid]]
+                    if tang is not None:
+                        d += [tang[cid]["them_vao"], tang[cid]["capacity_moi"]]
+                    dong.append(d)
+                t.bang(cot, dong, khoa=True)
+                t.xong()
+            if not wb.sheetnames:
+                wb.create_sheet("Trống")
+            duong = self._duong_xuat(output_path, "chia_cho_theo_nhu_cau.xlsx")
+            wb.save(duong)
+            return _ok({"path": duong, "n_rows": len(rows), "du_theo_buoi": du_theo_buoi, "canh_bao": canh_bao})
+        except LoiDuongXuat as e:
+            return _fail(e.loi)
+        except Exception as e:
+            return _fail(err("error_exporting_csv", detail=self._chi_tiet_loi_xuat(e)))
+
     @staticmethod
     def _so_nguyen_duong(x) -> bool:
         return isinstance(x, int) and not isinstance(x, bool) and x > 0

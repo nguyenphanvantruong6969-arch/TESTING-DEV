@@ -372,6 +372,17 @@
           <button class="btn btn-secondary" id="btnXuatNhuCau" type="button" hidden data-i18n="btn_xuat_nhu_cau">Xuất bảng nhu cầu (CSV)</button>
           <button class="btn btn-secondary" id="btnXuatGoiY" type="button" hidden data-i18n="btn_xuat_goi_y">Xuất gợi ý chỉ tiêu kỳ sau (CSV)</button>
           <button class="btn btn-secondary" id="btnXuatBienBan" type="button" hidden data-i18n="btn_xuat_bien_ban">Xuất biên bản bốc thăm (bản in và Excel)</button>
+          <button class="btn btn-secondary" id="btnXuatChiaCho" type="button" hidden data-i18n="btn_xuat_chia_cho">Gợi ý chia lại chỗ theo nhu cầu</button>
+        </div>
+        <div id="chiaChoKhoi" hidden>
+        <div class="xuat-muc-hang">
+          <label class="xuat-muc"><span data-i18n="chia_cho_tong">Tổng số chỗ mỗi buổi</span> <input type="number" id="chiaChoTong" class="text-input text-input-sm" min="1" step="1" data-i18n-placeholder="chia_cho_tong_ph" placeholder="Như hiện tại"></label>
+          <label class="xuat-muc"><span data-i18n="chia_cho_them">Được thêm bao nhiêu chỗ</span> <input type="number" id="chiaChoThem" class="text-input text-input-sm" min="0" step="1" data-i18n-placeholder="chia_cho_them_ph" placeholder="Bỏ trống nếu không thêm"></label>
+          <input type="file" id="chiaChoTep" accept=".csv,.xlsx" hidden>
+          <button class="btn btn-ghost" id="btnChiaChoTep" type="button" data-i18n="chia_cho_chon_tep">Chọn tệp nhu cầu tham khảo…</button>
+          <span class="xuat-dem" id="chiaChoTenTep"></span>
+        </div>
+        <p class="hint-text" id="chiaChoHint" data-i18n="chia_cho_hint">Số chỗ chỉ là gợi ý; thầy cô tự quyết và nhập chỉ tiêu như thường lệ.</p>
         </div>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
