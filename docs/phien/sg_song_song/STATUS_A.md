@@ -27,3 +27,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T12:54Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 CODING coder=session_01TGThn7GRLE7ML1TDfW53iL ffb6ce2
 2026-11-13T13:04Z CODER session_01TGThn7GRLE7ML1TDfW53iL SG-1 READY 9934af2 red:5 of 8 new tests failed before fix (no tested_scores arg, no code in run/health) mutation:zero-score condition replaced by False -> 3 tests fail, restored
 2026-11-13T14:44Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 CHECKING checker=session_01TGThn8ctQPeoQJvGZsej9z 9934af2
+2026-11-13T14:47Z CHECKER session_01TGThn8ctQPeoQJvGZsej9z SG-1 FIX-1 so_nv1 counts overall first choice, not first in session (see docs/phien/sg_review/SG-1.md)
