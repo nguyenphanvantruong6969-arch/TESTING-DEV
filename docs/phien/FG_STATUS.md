@@ -10,7 +10,7 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- Wave 2: FG-6 delegated to a Sonnet worker (task start = HEAD after this commit); then FG-2, wave gate 2.
+- Wave 2: FG-2 delegated to a Sonnet worker (task start = HEAD after this commit); then wave gate 2.
 
 ## Item table
 | Item | State | Commit | Tests |
@@ -50,7 +50,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-3 | session_01VfPzNv8yPVuUfCb3LScjpc | DONE, review GO |
 | FG-4 | session_01VfPzNtbYjiRYVCMfuncuk2 | DONE, review GO |
 | FG-5 | session_01VfPzNr3qCVAmDxcnmnLfjh | DONE, review GO |
-| FG-6 | (creating) | |
+| FG-6 | session_01VfPzNru1AhpnZkxiBZ3HP2 | DONE, review GO |
+| FG-2 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -90,3 +91,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Red run before: tests/test_fg6_ket_qua_nap.py 4 failed (+1 green) and tests/test_giao_dien_fg6_danh_sach_loi.py 2 failed (Chromium ran). After: 9 passed incl. updated m6b UI test; related -k run (i18n/nhan/log/toast/khieu_nai/fg3-6, ~all green, exit 0). ruff clean; kiem_nhanh --co-so origin/main 7/7.
   - Mutation: log group cap 5 -> 500 => test_buoc_kiem_tra_du_lieu_gom_loi_theo_ma red; empty-file guard off => test_tep_rong_co_ma_rieng red; both restored.
   - Old keys n_ket_qua/n_tuan_3/n_khieu_nai/bo_qua kept (tests still read them). Three old asserts updated per spec (2 exact dicts + toast now one sentence, s3 detail moved to the list). Toast close "×" now CSS ::before so toast text ends with ".". venv created (.venv, gitignored).
+- 2026-11-13T03:36Z lead: FG-6 review GO: result keys per spec (hoc_sinh, dong_moi, dong_trung, ma_khong_khop, dong_bo_qua[{dong,ly_do}], khieu_nai_*; old keys kept, still read by tests); toast one sentence, <ul> grouped by reason (all 3 ly_do have vi+en labels); run log groups errors by code, 5 each + 'và N lỗi nữa'; phan_hoi_tep_rong vi+en + MA_MOI_SAU_ANH_CHUP. Toast '×' moved to CSS ::before (aria-label kept). Old-test edits follow the spec's one-sentence toast, not loosened. Related -k run: 183 passed.
