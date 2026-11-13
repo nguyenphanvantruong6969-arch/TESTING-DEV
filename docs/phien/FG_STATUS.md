@@ -34,6 +34,9 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Decisions
 - D1–D4 as spec §1 (final).
+- STEP0 commits the red tests it writes (they are each item's acceptance tests, rule 2); the item worker turns them
+  green and may extend them. The branch is expected red between STEP0 and FG-9; the green loop runs at FINISH.
+  A test already green on HEAD → item GONE-ON-HEAD; keep that test only if it adds coverage.
 
 ## Waiting for Truong
 - (none yet)
@@ -41,6 +44,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 ## Workers
 | Task | Session | State |
 |---|---|---|
+| STEP0 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
