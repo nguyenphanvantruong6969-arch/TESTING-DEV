@@ -10,7 +10,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
-| SG-8 (M5) | CHECKING | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
+| SG-8 (M5) | DONE | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -42,8 +42,10 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 - SG-6 lead review: accepted checker r2 PASS (144fbe6); reran SG-6/SG-2/t1b/ws_nhan tests incl. Chromium (80 passed) and kiem_nhanh 7/7. Coder full non-UI suite at 297d653: 5591 passed, only a13_12 red. Optional (non-blocking, for lead A): Excel labels Giờ/Địa điểm hard-coded Vietnamese like other Excel headers; step-1 table does not redraw on language switch (pre-existing).
 
 - SG-8: UI path no longer reads `NOI_DUNG` / `NHAN_LOAI_HIEN_THI`; both stay as constants only for files the software writes (Sổ nhập "Loại" column, `BAO_CAO_PHIEU_CLB.md`). `theo_loai` is keyed by Loại code; Loại labels reuse existing `fa_loai_*` UI keys (vi = `NHAN_LOAI_HIEN_THI`, test-guarded); `chan` is raw `{code, params}`; added a `langchange` redraw in `js/11_chuan_bi.js` (fixes the pre-existing no-redraw on language switch). Deliberate vi change: the gate check `Buổi "thu_3"` now shows `Buổi "Thứ 3"` (existing session-label rule). Step 4 (`api_forms_nap.py` `noi_dung`) out of scope.
+- SG-8 lead review: accepted checker r2 PASS; lead full non-UI suite at 5e47810: 5600 passed, only a13_12 red; reran SG-8 + ws_nhan + van_phong_tu_nhien incl. Chromium (70 passed); kiem_nhanh 7/7. `NOI_DUNG` constant kept only for the teacher .md report writer (file stays byte-identical); UI reads i18n codes only.
 
 ## For Truong
+- (observation, not done: outside SG-8) Chuẩn bị đợt step 4 (`api_forms_nap.py` `noi_dung`, `js/12_chuan_bi_nap.js`) still returns Vietnamese sentences, so the English UI there is not translated. Candidate for a later item.
 (none)
 
 ## Log
@@ -73,3 +75,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T20:44Z CODER session_01YVAytzNj1eT4xGk3rANq4G SG-8 READY 5e47810 fix:1 done (get_forms_buoc_12 maps old {ma,clb,noi_dung} to code; unknown ma -> UI shows 'clb: noi_dung'; legacy theo_loai/chan strings kept; comment fixed; tests vi+en),2 done (EN phrase assertion; mutation noiDung=clb+code -> EN test red; mutation of API mapping -> old-shape test red; restored). 16 related test files + ws_nhan + van_phong_tu_nhien + i18n_sync: 220 passed, 0 skipped (Chromium); ruff clean; kiem_nhanh 7/7
 2026-11-13T21:08Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CHECKING r2 checker=session_01YVAyu2ToRHhkBjTaybds6n range=b3570ac..5e47810 (fix 03974ec..5e47810)
 2026-11-13T21:14Z CHECKER session_01YVAyu2ToRHhkBjTaybds6n SG-8 PASS
+2026-11-13T21:36Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 DONE (checker r2 PASS + lead sweep 5600 passed, kiem_nhanh 7/7) 5e47810
