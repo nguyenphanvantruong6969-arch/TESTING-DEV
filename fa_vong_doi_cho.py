@@ -90,6 +90,7 @@ def chay_chu_trinh(asg, prefs, khoa_tho, toi_da=10000):
 def khoa_tho_fa(clubs: dict, prefs: dict, diem: dict, huy_chuong: dict, giu_cho) -> dict:
     """Khoá thô theo FA-DAA (V§8.2) bỏ phần bốc thăm: Giới hạn (giữ chỗ, -huy chương); Tuyển chọn (giữ chỗ, -điểm,
     -huy chương), chỉ em có điểm và đạt điểm sàn. Tự do không xét (nhận mọi em). `clubs[c]` có `loai`, `diem_san`."""
+    from fa_daa import dat_diem_san                      # FA-D7L: đạt sàn = điểm làm tròn nửa lên >= sàn
     giu = {(c, s) for c, s in giu_cho}
     ra: dict = {}
     for s, ds in prefs.items():
@@ -101,6 +102,6 @@ def khoa_tho_fa(clubs: dict, prefs: dict, diem: dict, huy_chuong: dict, giu_cho)
                 ra.setdefault(c, {})[s] = (g, -hc)
             elif loai == "TUYEN_CHON":
                 d = (diem.get(c) or {}).get(s)
-                if d is not None and d >= ((clubs.get(c) or {}).get("diem_san") or 0):
+                if d is not None and dat_diem_san(d, (clubs.get(c) or {}).get("diem_san")):
                     ra.setdefault(c, {})[s] = (g, -d, -hc)
     return ra

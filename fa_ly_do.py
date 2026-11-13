@@ -11,11 +11,11 @@ from __future__ import annotations
 
 
 def _so(x) -> str:
-    """12.0 -> '12'; 7.5 -> '7.5'."""
+    """12.0 -> '12'; 7.3 -> '7,3' (dấu phẩy thập phân kiểu Việt, FA-D7L)."""
     if x is None:
         return ""
     f = float(x)
-    return str(int(f)) if f.is_integer() else str(round(f, 2))
+    return str(int(f)) if f.is_integer() else str(round(f, 2)).replace(".", ",")
 
 
 def cau_ly_do(dong: dict, ten_clb: str) -> str:

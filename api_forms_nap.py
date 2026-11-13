@@ -143,6 +143,10 @@ class FormsNapMixin:
         return _ok({"tep": tep, "co_so_nhap": os.path.isfile(so_nhap),
                     "can_chon_de": bool(de) and self._co_bien_the(de)})
 
+    def _diem_le(self) -> bool:
+        """FA-D7L: `rules.fa_diem_le` (mặc định False)."""
+        return self._luat_nghiem().get("fa_diem_le") is True
+
     def lay_so_nhap_nap(self):
         """Sổ nhập đã chuyển (`forms/nap/SO_NHAP_CLB.xlsx`) dạng base64, để gọi `import_so_nhap` có sẵn."""
         p = os.path.join(forms_dot.thu_muc_nap(self.db_path), "SO_NHAP_CLB.xlsx")
@@ -239,7 +243,7 @@ class FormsNapMixin:
                     dang_ky_xlsx=dd(theo_loai["dang_ky"]) if duong == "B" else (),
                     lists=dd(nguon)[0] if duong == "A" else None,
                     quiz_xlsx=dd(theo_loai["bai_thi"]), bien_the_tep=bien_the_tep,
-                    lua_chon=self._lua_chon_sach(lua_chon))
+                    lua_chon=self._lua_chon_sach(lua_chon), diem_le=self._diem_le())
             except Exception as e:
                 return _fail(err("forms_khong_chuyen_duoc", detail=str(e)))
         if kq["trang_thai"] == "loi":

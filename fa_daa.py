@@ -24,6 +24,17 @@ from so_nhap import (  # noqa: E402,F401
 )
 
 
+def dat_diem_san(diem, san) -> bool:
+    """FA-D7L: em có đạt điểm sàn `san` (nguyên) không — so điểm SAU KHI làm tròn nửa lên:
+    floor(diem + 1/2) >= san, tính bằng `Fraction(str(diem))` (không so số thực thô).
+
+    Điểm nguyên: đúng bằng `diem >= san` như trước, nên kết quả mặc định không đổi. Điểm lẻ do bộ chuyển đổi ghi
+    (`--diem-le`, cắt bớt về một chữ số lẻ) cho đúng tập em đạt như điểm nguyên: với x >= 0 và t = floor(10x)/10,
+    floor(t + 1/2) == floor(x + 1/2) vì mọi nửa-nguyên là bội của 1/10 (xem `phan_tich_cau_hoi.cat_mot_chu_so_le`)."""
+    from fractions import Fraction
+    return (Fraction(str(diem)) + Fraction(1, 2)) // 1 >= (san or 0)
+
+
 def ghi_thuoc_tinh_clb(cur, club_id, thuoc_tinh: dict) -> None:
     """Ghi các khoá có trong `thuoc_tinh` (loai, diem_san, so_toi_thieu, suc_chua_phong) của CLB.
 
@@ -321,7 +332,7 @@ def chay_fa_daa(students: dict, clubs: dict, tested_scores: dict, applicants: di
                 continue
             diem = tested_fa.get(cid, {}).get(sid)
             san = (fa_clb.get(cid) or {}).get("diem_san") or 0
-            ly_do = "NOT_ATTEMPTED" if diem is None else ("BELOW_PASS" if diem < san else None)
+            ly_do = "NOT_ATTEMPTED" if diem is None else (None if dat_diem_san(diem, san) else "BELOW_PASS")
             if ly_do:
                 prefs_fa[sid].remove(cid)
                 if sid in app_fa.get(cid, []):
@@ -587,7 +598,7 @@ def bang_nhu_cau(clubs: dict, preferences: dict, tested_scores: dict, fa_clb: di
                 nv1[c] += 1
             if (fa_clb.get(c) or {}).get("loai") == TUYEN_CHON:
                 diem = tested_scores.get(c, {}).get(sid)
-                if diem is not None and diem >= ((fa_clb.get(c) or {}).get("diem_san") or 0):
+                if diem is not None and dat_diem_san(diem, (fa_clb.get(c) or {}).get("diem_san")):
                     dat_san[c] += 1
     hop_le = giu_cho_hop_le(clubs, giu_cho, {sid: {} for sid in preferences}, preferences)
     so_giu = {c: 0 for c in clubs}

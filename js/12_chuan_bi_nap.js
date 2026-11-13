@@ -22,6 +22,7 @@
     boCau: [],             // [[clb, de, cau]]
     nhap: null,            // {n_hoc_sinh} sau khi nhập
     dang: false,
+    diemLe: false,         // FA-D7L: rules.fa_diem_le (điểm lẻ 0,1; mặc định tắt)
   };
 
   const khung = () => el("cb-buoc-4");
@@ -175,6 +176,23 @@
     k.appendChild(cuon);
   }
 
+  /* FA-D7L: tick "Điểm lẻ đến 0,1" -> lưu rules.fa_diem_le; áp dụng từ lần bấm "Chuyển" kế tiếp. */
+  function veDiemLe(k) {
+    const nhan = mot("label", "xuat-muc");
+    const o = mot("input");
+    o.type = "checkbox"; o.id = "cb-nap-diem-le"; o.checked = S.diemLe;
+    o.addEventListener("change", () => {
+      callApi("dat_fa_diem_le", o.checked).then((res) => {
+        if (!res.ok) { o.checked = S.diemLe; showErrorToast(res.errors); return; }
+        S.diemLe = res.data.diem_le;
+      });
+    });
+    nhan.appendChild(o);
+    nhan.appendChild(document.createTextNode(" " + t("cb_nap_diem_le")));
+    k.appendChild(nhan);
+    k.appendChild(mot("p", "hint-text", t("cb_nap_diem_le_ghi")));
+  }
+
   function duocChuyen() {
     return S.tep.length > 0 && !S.dang && S.tep.every((x) => !x.loi && (x.loai !== "bai_thi" || !S.canDe || x.chu));
   }
@@ -250,7 +268,8 @@
   function ve(k) {
     if (!S.khoiTao) {
       S.khoiTao = true;
-      callApi("get_forms_nap").then((res) => {
+      Promise.all([callApi("get_forms_nap"), callApi("get_fa_diem_le")]).then(([res, le]) => {
+        S.diemLe = !!(le && le.ok && le.data.diem_le);
         if (res.ok && !S.tep.length && res.data.tep.length) {
           S.tep = res.data.tep.map((x) => Object.assign({}, x, { base64: null, chu: x.bien_the_doan || "" }));
           S.canDe = res.data.can_chon_de;
@@ -264,6 +283,7 @@
     if (!duong) { k.appendChild(trangThai("chua", t("cb_nap_chua_duong"))); return; }
     k.appendChild(mot("p", "hint-text", t(duong === "A" ? "cb_nap_ghi_a" : "cb_nap_ghi_b")));
     veKhungTha(k);
+    veDiemLe(k);
     if (!S.tep.length) { k.appendChild(trangThai("chua", t("cb_nap_chua_tep"))); return; }
     veBangTep(k);
     const hang = mot("div", "cb-nut-hang");

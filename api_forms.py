@@ -46,6 +46,27 @@ class FormsMixin:
                 return _fail(loi_cau_hinh(e) if isinstance(e, CauHinhHong) else err("ws_cau_hinh_hong", detail=str(e)))
         return _ok({"duong": duong})
 
+    def get_fa_diem_le(self):
+        """FA-D7L: {"diem_le": bool} theo `rules.fa_diem_le` (mặc định False)."""
+        try:
+            return _ok({"diem_le": self._luat_nghiem().get("fa_diem_le") is True})
+        except (ValueError, CauHinhHong) as e:
+            return _fail(loi_cau_hinh(e) if isinstance(e, CauHinhHong) else err("ws_cau_hinh_hong", detail=str(e)))
+
+    def dat_fa_diem_le(self, bat):
+        """FA-D7L: bật / tắt điểm lẻ 0,1 khi chuyển tệp Forms (`rules.fa_diem_le`, mặc định tắt). Không thuộc luật xếp.
+        Giá trị không phải true/false -> `ws_cau_hinh_hong`."""
+        if not isinstance(bat, bool):
+            return _fail(err("ws_cau_hinh_hong", detail="fa_diem_le: %r" % (bat,)))
+        with self._khoa_ghi:
+            try:
+                da_luu = cau_hinh_ws.doc_cau_hinh(self.db_path, nghiem=True)
+                cau_hinh_ws.ghi_cau_hinh(
+                    self.db_path, cau_hinh_ws.tron_len(da_luu, {"rules": {"fa_diem_le": bat}}))
+            except (ValueError, CauHinhHong, sqlite3.Error) as e:
+                return _fail(loi_cau_hinh(e) if isinstance(e, CauHinhHong) else err("ws_cau_hinh_hong", detail=str(e)))
+        return _ok({"diem_le": bat})
+
     # ------------------------------------------------------------------
     # FA-M7: bước "1. CLB" và "2. Đề thi" — nguồn MỘT lần (TH = chưa thử trên Microsoft / Google thật)
     # ------------------------------------------------------------------

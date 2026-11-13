@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026-11-13 — FA-D7L (A13, giảm may rủi): điểm thi lẻ đến 0,1 — tuỳ chọn, mặc định TẮT
+
+- Bộ chuyển đổi: `phan_tich_cau_hoi.cat_mot_chu_so_le` / `diem_dieu_chinh_le` và `chuyen_forms_sang_phan_mem.quy_diem_10_le`
+  CẮT BỚT về một chữ số lẻ (Fraction), kẹp 0–10. `chuyen_fa_daa(..., diem_le=False)`, `chuyen_fa_daa_du_lieu(..., diem_le)`,
+  cờ dòng lệnh `--diem-le` (chỉ với `--fa-daa`). Tắt: Sổ nhập y hệt từng ô. So sánh đề (D11) vẫn tính trên điểm chưa làm tròn.
+- Workspace: `rules.fa_diem_le` (bool, mặc định False; không thuộc luật xếp, không vào `run_history.luat_xep`); API
+  `get_fa_diem_le`, `dat_fa_diem_le` (`api_forms.py`); bước 4 "Nạp kết quả từ biểu mẫu" đọc cờ khi chuyển tệp và có ô tick
+  "Ghi điểm lẻ đến 0,1" + dòng hướng dẫn (`js/12_chuan_bi_nap.js`, `i18n.js` vi + en).
+- Kiosk: `fa_daa.dat_diem_san(diem, san)` = floor(Fraction(str(diem)) + 1/2) >= san, dùng ở `chay_fa_daa` (lọc Tuyển chọn),
+  `bang_nhu_cau` (`so_dat_san`), `fa_vong_doi_cho.khoa_tho_fa`. Điểm nguyên: đúng bằng `diem >= san` cũ. Câu lý do
+  (`fa_ly_do._so`) hiện điểm lẻ bằng dấu phẩy ("điểm chuẩn 7,3, em 7,1").
+- Chứng minh tập đạt sàn không đổi: với x >= 0, t = floor(10x)/10 thì floor(t + 1/2) == floor(x + 1/2) (docstring
+  `cat_mot_chu_so_le`). Test tính chất: 10.000 ca mỗi hàm, 0 lệch.
+- MÔ PHỎNG (`tests/test_fa_d7l_diem_le.py`, 20 seed, 200 học sinh, 6 CLB/buổi, mô hình `du_lieu_test/mo_phong_fa_daa.py`):
+  tỉ lệ lý do "bốc thăm" trong các lần bị từ chối ở CLB Tuyển chọn: điểm nguyên 201/3065 = 6,6 %, điểm lẻ 13/3068 = 0,4 %;
+  tập em bị loại vì dưới điểm sàn giống hệt nhau ở cả 20 seed.
+- Không đụng lõi DA, khoá ưu tiên, STB, `run_history`, schema hay cột CSV. Bản đồ mã: 268 tệp test, tên hàm mới.
+- Test mới: `tests/test_fa_d7l_diem_le.py` (10 ca), `tests/test_giao_dien_fa_d7l.py` (1 ca Chromium).
+
 ## 2026-11-13 — FA-CT2 (A13, giảm may rủi): "được thêm X chỗ thì thêm vào đâu" + tệp và nút cho giáo viên
 
 - `fa_daa.py`: `goi_y_tang_them(rows, them, gioi_han)` (hàm thuần): mỗi lần một chỗ cho CLB còn thừa cầu nhiều nhất (hoà:

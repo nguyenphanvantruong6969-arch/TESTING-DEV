@@ -80,6 +80,8 @@ MAC_DINH_TRUONG_HOC = {
         "fa_duong": None,           # FA-M7: đường chuẩn bị đợt "A" (Power Apps + List) / "B" (chỉ Forms); None = chưa chọn.
                                     # KHÔNG thuộc luật xếp, không vào `run_history.luat_xep`.
         "fa_vong_doi_cho": False,   # GAP-13: đo chu trình cải thiện ổn định (chỉ đọc, "không bảo đảm ổn định")
+        "fa_diem_le": False,        # FA-D7L: bộ chuyển đổi Forms ghi điểm lẻ 0,1 (cắt bớt); đạt sàn vẫn như điểm
+                                    # làm tròn. KHÔNG thuộc luật xếp, không vào `run_history.luat_xep`.
     },
 }
 
@@ -293,6 +295,9 @@ def _chuan_hoa(cfg, kiem_trung: bool = True) -> dict:
             raise ValueError("%s phải là true hoặc false, nhận %r." % (khoa, luat[khoa]))
         if luat[khoa] and not bat_fa:
             raise FaTinhNangCanFa(khoa)
+
+    if not isinstance(luat["fa_diem_le"], bool):
+        raise ValueError("fa_diem_le phải là true hoặc false, nhận %r." % (luat["fa_diem_le"],))
 
     if luat["fa_duong"] not in (None, "A", "B"):
         raise ValueError("fa_duong phải là null, \"A\" hoặc \"B\", nhận %r." % (luat["fa_duong"],))

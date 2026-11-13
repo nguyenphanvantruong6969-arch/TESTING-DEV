@@ -141,6 +141,27 @@ def diem_dieu_chinh(diem_tho, dich):
     return int(min(10, max(0, (x + Fraction(1, 2)) // 1)))
 
 
+def cat_mot_chu_so_le(x):
+    """FA-D7L: kẹp `x` (Fraction) vào 0-10 rồi CẮT BỚT về một chữ số lẻ (không làm tròn). Số nguyên -> int, không thì
+    float một chữ số lẻ (7.5), để Sổ nhập ghi "7.5" như mọi điểm khác.
+
+    Vì sao cắt bớt mà không làm tròn: với x >= 0 và t = floor(10x)/10 thì floor(t + 1/2) == floor(x + 1/2) — mọi
+    nửa-nguyên n − 1/2 là bội của 1/10, nên x >= n − 1/2 <=> t >= n − 1/2. Nên so t với điểm sàn SAU KHI làm tròn nửa
+    lên (`fa_daa.dat_diem_san`) cho đúng tập em đạt như điểm nguyên (D7). Làm tròn tới 0,1 thì hỏng: 4,45 -> 4,5 -> 5,
+    nhưng điểm nguyên của 4,45 là 4."""
+    from fractions import Fraction
+    x = min(Fraction(10), max(Fraction(0), x))
+    t = Fraction((x * 10) // 1, 10)
+    return int(t) if t.denominator == 1 else float(t)
+
+
+def diem_dieu_chinh_le(diem_tho, dich):
+    """FA-D7L: như `diem_dieu_chinh` nhưng giữ một chữ số lẻ: cắt bớt (điểm chưa tròn + dịch), kẹp 0-10.
+    Làm tròn nửa lên của kết quả == `diem_dieu_chinh(diem_tho, dich)` (xem `cat_mot_chu_so_le`)."""
+    from fractions import Fraction
+    return cat_mot_chu_so_le(Fraction(str(diem_tho)) + Fraction(str(round(dich, 9))))
+
+
 def _so(x):
     """Điểm đọc được (số hoặc chữ số) -> float; rỗng / None / không đọc được -> None."""
     if x is None or isinstance(x, bool):
