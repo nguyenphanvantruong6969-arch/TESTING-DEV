@@ -14,12 +14,18 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-5 | CHECKING | 0 | bd6d821 | b9c4f32 | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNrFdN7RhAERrSNeTJV | tests/test_sg5_huy_chuong.py |
+| SG-5 | FIX-1 | 1 | bd6d821 | b9c4f32 | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNrFdN7RhAERrSNeTJV | tests/test_sg5_huy_chuong.py |
 | SG-7 | TODO | 0 | | | | | |
 | SG-9 | TODO | 0 | | | | | |
 | SG-12 | TODO | 0 | | | | | |
 
 ## Fix lists
+### SG-5 FIX-1 (checker session_01VfPzNrFdN7RhAERrSNeTJV, docs/phien/sg_review/SG-5.md)
+1. tests/test_fg7_bieu_mau_sau_ket_qua.py: for `fa_daa`, `fa_daa_mot` ONLY add a platform-independent content digest
+   (sorted relative names + bytes of .md files + paragraph/table text of each .docx via python-docx), pinned once on
+   posix, asserted on BOTH OSes; keep the posix byte hash as is.
+2. On nt, for these two modes, skip only the byte-hash assert (reason string names SG-5), not the whole test.
+3. Fix the overlong two-sentence comment line in that file.
 
 ## Decisions
 - WARNING: lead is not Opus (`get_session` reports claude-sonnet-5-5 at setup; the serving model may change).
@@ -41,3 +47,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T16:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 READY accepted, range bd6d821..b9c4f32 (Start corrected to the assign commit); CHECKING
 - 2026-11-13T16:32Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 checker r1 session_01VfPzNrFdN7RhAERrSNeTJV
 - 2026-11-13T16:34Z CHECKER session_01VfPzNrFdN7RhAERrSNeTJV SG-5 FIX-1 (wording/snapshot/old-exports pass; nt hashes of fa_daa/fa_daa_mot stale -> content digest on both OS, see docs/phien/sg_review/SG-5.md)
+- 2026-11-13T16:52Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-5 FIX-1 agreed, sent to coder session_01VfPzNruBqHHaJZQcLRxRzS
