@@ -544,15 +544,39 @@ def test_bo_bieu_mau_mac_dinh_thuan_dung_duoc_va_phieu_clb_khong_co_ban_do(de, t
         assert any(t.startswith("MAP_NHAP_FORMS_") for t in tep)
 
 
-def test_hai_clb_chi_khac_hoa_thuong_trong_mot_ngay_bi_tu_choi_o_bo_sinh(de):
-    """Fix 1: bộ đọc tìm CLB theo tên đã gộp hoa/thường, nên bộ sinh không nhận hai CLB chỉ khác hoa/thường hay khoảng trắng."""
+def _de_hai_clb_chi_khac_hoa_thuong(de):
     de2 = copy.deepcopy(de)
     c0, c1 = bm.clb_cua_buoi(de2, "thu_2")[:2]
-    c1["name"] = "  " + c0["name"].lower().replace(" ", "  ")
+    c1["name"] = c0["name"].upper()
     assert c1["name"] != c0["name"]
-    with pytest.raises(bm.LoiDeThi) as e:
-        bm.ban_do_chung(de2)
-    assert "chỉ khác hoa/thường" in str(e.value) and c0["name"] in str(e.value)
+    return de2, c0, c1
+
+
+def test_hai_clb_chi_khac_hoa_thuong_bi_tu_choi_khi_sinh_thuan_nhung_van_doc_duoc_tep_co_ma(de, tmp_path):
+    """Chỉ SINH biểu mẫu thuần mới từ chối hai CLB cùng buổi chỉ khác hoa/thường (cờ `nghiem_chuan`); đường đọc và
+    `--giu-ma` giữ như trước SG-12: tệp xuất CÓ mã của đề như vậy vẫn đọc đúng."""
+    de2, c0, c1 = _de_hai_clb_chi_khac_hoa_thuong(de)
+    phan = bm.cac_phan_fa_gop(de2)
+    with bm.che_do_giu_ma(False):                                      # (b) sinh thuần: LoiDeThi
+        with pytest.raises(bm.LoiDeThi) as e:
+            tm.ghi_ban_do(str(tmp_path / "x.docx"), phan)
+        assert "chỉ khác hoa/thường" in str(e.value) and c0["name"] in str(e.value)
+        bm.ban_do_chung(de2)                                           # đường đọc không từ chối
+    with bm.che_do_giu_ma(True):                                       # (a) sinh giữ mã: thành công, không MAP
+        assert tm.ghi_ban_do(str(tmp_path / "y.docx"), bm.cac_phan_fa_gop(de2)) is None
+        tieu = ["ID", "Start time", "Completion time", "Email", "Name"] + [str(c[0]) for _, cs in bm.cac_phan_fa_gop(de2)
+                                                                           for c in cs]
+        o = {"Email": "a@x.vn", bm.cau_ma_hoc_sinh(): "HS1", bm.cau_ho_ten(): "An",
+             bm.cau_nguyen_vong_fa(de2, "thu_2", 1): bm.lua_chon_clb(c1),
+             bm.cau_nguyen_vong_fa(de2, "thu_2", 2): bm.lua_chon_clb(c0)}
+        wb = openpyxl.Workbook()
+        wb.active.append(tieu)
+        wb.active.append([str(o.get(h, "")) for h in tieu])
+        x = str(tmp_path / "c.xlsx")
+        wb.save(x)
+    t, cac = _tieu_cua(x)
+    ds, _cb = cv.doc_dang_ky_fa_forms(de2, t, cac, set())            # đọc ở chế độ mặc định
+    assert ds["a@x.vn"]["nguyen_vong"]["thu_2"] == [c1["club_id"], c0["club_id"]]
 
 
 def test_doc_dang_ky_ban_do_cua_cau_tra_loi_truoc_ten_trung_ma_clb_khac(de, tmp_path):
@@ -567,7 +591,7 @@ def test_doc_dang_ky_ban_do_cua_cau_tra_loi_truoc_ten_trung_ma_clb_khac(de, tmp_
     o = {"Email": "a@x.vn", bm.cau_ma_hoc_sinh(): "HS1", bm.cau_ho_ten(): "An",
          bm.cau_nguyen_vong_fa(de2, "thu_2", 1): bm.lua_chon_clb(b),
          bm.cau_nguyen_vong_fa(de2, "thu_2", 2): bm.lua_chon_clb(a),
-         bm.cau_vang_fa(de2, "thu_2"): bm.lua_chon_clb(a)}
+         bm.cau_vang_fa(de2, "thu_2"): bm.lua_chon_clb(b)}
     wb = openpyxl.Workbook()
     wb.active.append(tieu)
     wb.active.append([o.get(h, "") for h in tieu])
@@ -577,7 +601,8 @@ def test_doc_dang_ky_ban_do_cua_cau_tra_loi_truoc_ten_trung_ma_clb_khac(de, tmp_
     ds, cb = cv.doc_dang_ky_fa_forms(de2, t, cac, set())
     hs = ds["a@x.vn"]
     assert hs["nguyen_vong"]["thu_2"] == [b["club_id"], a["club_id"]]
-    assert hs["wp"]["thu_2"][a["club_id"]] == 60 and not [c for c in cb if "trùng" in c[2]]
+    assert hs["wp"]["thu_2"][b["club_id"]] == 60 and hs["wp"]["thu_2"][a["club_id"]] != 60   # vàng vào B, không vào A
+    assert not [c for c in cb if "trùng" in c[2]]
 
 
 def test_hai_buoi_cung_ten_la_loi_cung_tieu_de_cau(de):

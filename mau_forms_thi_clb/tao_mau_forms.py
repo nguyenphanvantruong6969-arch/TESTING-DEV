@@ -63,7 +63,7 @@ def ghi_ban_do(duong_docx, phan):
     goc = os.path.splitext(os.path.basename(duong_docx))[0]
     duong = os.path.join(os.path.dirname(duong_docx), "MAP_%s.json" % goc)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
-        f.write(bm.ban_do_ra_json(bm.ban_do_bieu_mau(phan)))
+        f.write(bm.ban_do_ra_json(bm.ban_do_bieu_mau(phan, nghiem_chuan=True)))
     return duong
 
 

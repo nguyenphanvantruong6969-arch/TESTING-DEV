@@ -621,12 +621,15 @@ def _moi_cau_hoi(de):
     return [c for _ten, cac in phan for c in cac]
 
 
-def xay_ban_do(cac_cau_hoi):
+def xay_ban_do(cac_cau_hoi, nghiem_chuan=False):
     """Dựng bản đồ từ [(TieuDe, loại, [lựa chọn])]:
     {"phien_ban": 1, "cau": {tiêu đề thuần: mã câu}, "lua_chon": {mã câu: {lựa chọn thuần: mã/giá trị}}}.
 
     Khoá đã gộp khoảng trắng. Hai câu KHÁC mã trùng tiêu đề thuần, hai lựa chọn khác giá trị trùng chữ trong cùng
-    một câu, hoặc tiêu đề thuần mở đầu bằng "[…]" (đọc nhầm thành thẻ mã) -> LoiDeThi (liệt kê hết)."""
+    một câu, hoặc tiêu đề thuần mở đầu bằng "[…]" (đọc nhầm thành thẻ mã) -> LoiDeThi (liệt kê hết).
+
+    `nghiem_chuan=True` (chỉ khi bộ sinh dựng bản đồ để GHI biểu mẫu thuần): từ chối thêm hai lựa chọn chỉ khác hoa/thường
+    hay khoảng trắng. Đường đọc và chế độ giữ mã để False: tệp xuất có mã đọc được như trước (đuôi "(mã)" không mơ hồ)."""
     cau, lua, loi = {}, {}, []
     chuan_lua = {}
     for td, _loai, lcs, *_ in cac_cau_hoi:
@@ -646,7 +649,7 @@ def xay_ban_do(cac_cau_hoi):
                 if cua_cau.setdefault(kl, lc.ma) != lc.ma:
                     loi.append("câu %s: hai lựa chọn %r và %r có cùng chữ %r" % (td.ma, cua_cau[kl], lc.ma, kl))
                 # chỉ khác hoa/thường hay khoảng trắng: bộ đọc có thể đọc nhầm (tìm theo tên đã gộp) -> từ chối ngay
-                elif chuan_cua_cau.setdefault(_chuan(kl), kl) != kl:
+                elif nghiem_chuan and chuan_cua_cau.setdefault(_chuan(kl), kl) != kl:
                     loi.append("câu %s: hai lựa chọn %r và %r chỉ khác hoa/thường hay khoảng trắng" % (
                         td.ma, chuan_cua_cau[_chuan(kl)], kl))
     if loi:
@@ -661,10 +664,10 @@ def ban_do_chung(de):
     return xay_ban_do(_moi_cau_hoi(de))
 
 
-def ban_do_bieu_mau(phan):
+def ban_do_bieu_mau(phan, nghiem_chuan=False):
     """Bản đồ của MỘT biểu mẫu = các phần `[(tên phần, [(tiêu đề, loại, lựa chọn, bắt buộc)])]` mà bộ sinh ghi.
     Bộ sinh ghi nó thành `MAP_<tên biểu mẫu>.json` cạnh biểu mẫu."""
-    return xay_ban_do([c for _ten, cac in phan for c in cac])
+    return xay_ban_do([c for _ten, cac in phan for c in cac], nghiem_chuan)
 
 
 def ban_do_ra_json(ban_do):
