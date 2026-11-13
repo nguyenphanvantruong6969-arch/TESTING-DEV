@@ -273,6 +273,14 @@ class SauXepMixin:
             if not bat:
                 return _fail(err("fa_khieu_nai_chua_bat"))
             with self._ket_noi_ghi() as cur:
+                # SG-4 (M3): cùng luật khớp mã với đường Forms (FG-5): đúng thắng, không thì khớp mềm nếu đúng MỘT.
+                go = student_id
+                student_id = sx.khop_ma_hoc_sinh(go, [r[0] for r in cur.execute("SELECT student_id FROM students")])
+                if student_id is None:
+                    return _fail(err("khieu_nai_hs_khong_co", student_id=str(go).strip()))
+                if not cur.execute("SELECT 1 FROM match_results WHERE student_id = ? AND buoi = ?",
+                                   (student_id, buoi)).fetchone() or buoi not in sx.run_goc_theo_buoi(cur):
+                    return _fail(err("khieu_nai_chua_co_ket_qua", student_id=student_id, buoi=buoi))
                 id_kn, loi = self._them_khieu_nai(cur, student_id, buoi, ghi_chu, sx.bay_gio(), so_ngay)
                 if loi:
                     return _fail(loi)

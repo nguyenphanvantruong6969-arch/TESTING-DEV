@@ -27,3 +27,7 @@
 
 ### TIEN_DO line
 - SG-3 (C2) — done: FA stores the original-list rank; fallback placements are NULL and shown separately.
+
+## SG-4 (M3) — một luật khớp mã học sinh cho khiếu nại gõ tay
+- CHANGELOG: `api_sau_xep.gui_khieu_nai` khớp mã bằng `fa_sau_xep.khop_ma_hoc_sinh` như đường Forms (đúng thắng; không thì `strip().casefold()` nếu đúng MỘT; mơ hồ bị từ chối); mã lưu không bị đổi. Tách lỗi: `khieu_nai_hs_khong_co` (không có học sinh) và `khieu_nai_chua_co_ket_qua` (có học sinh, chưa có kết quả ở buổi đó). Mã cũ `khieu_nai_khong_hop_le` giữ cho đường Forms (`nhap_sau_ket_qua_forms`). Tệp: `api_sau_xep.py`, `i18n_errors.py` (khối SG-A), `i18n_loi.js`, `tests/test_ws_nhan.py`. Test mới: `tests/test_sg4_khop_ma.py` (4); sửa 2 khẳng định cũ ở `test_fa_gap3_khieu_nai.py`, `test_fa_m6b_sau_ket_qua.py`.
+- TIEN_DO: SG-4 (M3) xong, chờ soát.

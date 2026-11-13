@@ -372,7 +372,7 @@ def test_api_hai_nut_cu_van_cho_ket_qua_cu(api, de, gio):
     b = _buoi(api)
     assert api.gui_khieu_nai("s1", b, "x")["ok"]
     assert ma(api.gui_khieu_nai("s1", b, "lần hai")["errors"]) == ["khieu_nai_trung"]
-    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_khong_hop_le"]
+    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_hs_khong_co"]
 
 
 # ---------------------------------------------------------------- 7. bộ sinh

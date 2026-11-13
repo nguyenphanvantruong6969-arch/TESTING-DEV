@@ -1277,5 +1277,13 @@ window.I18N_ERROR_MESSAGES = {
   "fa_clb_tuyen_chon_chua_co_diem": {
     "vi": "CLB {club_id} (Tuyển chọn) có {so_dang_ky} học sinh đăng ký ({so_nv1} học sinh xếp làm nguyện vọng 1) nhưng chưa có điểm của học sinh nào, nên tất cả sẽ bị loại. Hãy nhập điểm cho CLB này ở thẻ Nhập điểm, hoặc đổi CLB sang loại Giới hạn.",
     "en": "Club {club_id} (Selective) has {so_dang_ky} applicants ({so_nv1} with it as first choice) but no scores at all, so every one of them would be removed. Enter scores for this club in the Scores tab, or change the club to Limited."
+  },
+  "khieu_nai_hs_khong_co": {
+    "vi": "Không nhận được khiếu nại: không tìm thấy {person_l} có mã {student_id}. Hãy kiểm tra lại mã rồi gõ lại.",
+    "en": "Appeal not accepted: no {person} with ID {student_id} was found. Check the ID and type it again."
+  },
+  "khieu_nai_chua_co_ket_qua": {
+    "vi": "Không nhận được khiếu nại: {person_l} {student_id} chưa có kết quả ở buổi {buoi}.",
+    "en": "Appeal not accepted: {person} {student_id} has no result for session {buoi} yet."
   }
 };
