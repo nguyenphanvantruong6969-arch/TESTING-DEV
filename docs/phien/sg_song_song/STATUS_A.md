@@ -32,3 +32,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T15:20Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 FIX-1 sent to coder session_01TGThn7GRLE7ML1TDfW53iL 618e28b
 2026-11-13T15:25Z CODER session_01TGThn7GRLE7ML1TDfW53iL SG-1 FIX-1: 1 done (dem_nv1_trong_buoi shared by bang_nhu_cau and kiem_truoc_fa; two-session test so_nv1==2; note: test adds a TU_DO club B in b2, else fa_thieu_clb_tu_do also fires) READY 95de0b9 red:two-session test failed with old count mutation:restored old sum(...)[0]==cid -> new test fails, reverted
 2026-11-13T15:49Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-1 CHECKING r2 95de0b9
+2026-11-13T15:54Z CHECKER session_01TGThn8ctQPeoQJvGZsej9z SG-1 PASS

@@ -41,3 +41,37 @@ Evidence per checklist point (spec: SOAT_GIAO_DIEN_KE_HOACH.md §3 SG-1; Fable r
 
 ## Optional (does not block)
 - `api_nhap._canh_bao_fa_xem_truoc` could also pass scores from the workbook so the preview warns early (separate item if wanted).
+
+---
+
+# Round 1 — checker — diff 5b474dd..95de0b9 (whole item, after FIX-1) — verdict PASS
+
+Full 2.10 checklist redone on the whole diff. Production code at HEAD equals 95de0b9 (later commits are docs only).
+
+**FIX-1 confirmed done.** `fa_daa.dem_nv1_trong_buoi(clubs, preferences)` counts, per student, the first club of each session
+(`thay_buoi` logic, `BUOI_MAC_DINH` fallback, clubs not in `clubs` skipped). `kiem_truoc_fa` uses `nv1_buoi[cid]` for `so_nv1`;
+`bang_nhu_cau` now calls the same helper (one definition). Repro from round 0 now gives `so_nv1 == 2`.
+
+1. **Scope** — OK. Blocking `fa_clb_tuyen_chon_chua_co_diem` {club_id, so_dang_ky, so_nv1}; same function feeds run and health
+   report via `kiem_fa_tu_csdl`; `so_nv1` now per session; nothing extra. Only change outside the item: `test_fa_huy_chuong`
+   adds one score (justified, round 0).
+2. **Red-first** — scratch worktree at 5b474dd + new test file: 6 failed / 3 passed. FIX-1 test on 9934af2 (before the fix):
+   fails with `so_nv1: 0 != 2`. At 95de0b9: 9 passed.
+3. **Mutation** — (a) helper counts only the overall first club (`ds[0] == c`) → `test_ham_thuan_hai_buoi_nv1_tinh_theo_buoi` fails;
+   (b) `so_nv1=0` constant → 4 tests fail. Worktrees removed; main tree clean.
+4. **Tests** — `test_sg1_*`, `test_ws_nhan`, all `tests/test_fa_*.py`, and `test_giao_dien_fa_ket_qua.py` (Chromium, `/opt/pw-browsers`):
+   **2318 passed, 1 skipped** (the skip is `test_fa_tinh_chat.py:255`, a deferred V§13.12 item, not Chromium, not related).
+   `bang_nhu_cau` output unchanged: its tests (`test_fa_nhu_cau`, `test_fa_gap7_goi_y`, `test_fa_m6_tai_lieu`, `test_fa_tinh_chat`)
+   pass, and a differential check of 300 random multi-session cases (incl. `buoi=None`, unknown club ids, empty lists) gives the
+   identical md5 of all outputs at 5b474dd and 95de0b9.
+5. **Invariants** — `kiem_nhanh --co-so origin/main --so-seed 20`: **7/7** (60 cases byte-identical, ruff clean, no UPDATE/DELETE on
+   `run_history`). Inv. 2: priority code untouched. Inv. 5: blocked run stops in validate, no rows written (test). Inv. 6: `{code, params}`,
+   one message source. Inv. 7: no schema/CSV change. DA core untouched; `club_scores` is only read.
+6. **Strings** — vi + en, natural, no internal code; inside `=== SG-A ===` only; `i18n_loi.js` matches regeneration; code in
+   `MA_MOI_SAU_ANH_CHUP` (SG-A block).
+7. **UI** — not a UI item (existing error renderer); no browser walkthrough needed. `test_giao_dien_fa_ket_qua.py` ran for real (no skips).
+8. **soat-ma** — `kiem_nhanh` 7/7; manual read of the whole diff, four tiers: no findings. MANH_A.md fragment present and now accurate;
+   CHANGELOG/TIEN_DO not edited (correct). Optional: the fragment could mention `dem_nv1_trong_buoi` (one-line doc nit).
+9. **Special** — none for SG-1.
+
+No blocking findings. Optional list from round 0 still stands (preview path does not pass workbook scores).
