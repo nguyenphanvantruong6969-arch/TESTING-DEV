@@ -10,7 +10,7 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
 | SG-4 (M3) | DONE | 1 | a959972 | 17eaf11 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ, session_01TGThn6utYnaicoK4Ce6A5K | |
-| SG-10 (M2) | CODING | 0 | f660d28 | | session_01TGThn6PGJParLMUADLpcQk | | |
+| SG-10 (M2) | CHECKING | 0 | f660d28 | 4dad18a | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt | |
 | SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -55,3 +55,4 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T18:12Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-4 DONE lead-review agree (96 passed, kiem_nhanh 7/7) 17eaf11
 2026-11-13T18:12Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CODING coder=session_01TGThn6PGJParLMUADLpcQk f660d28
 2026-11-13T18:17Z CODER session_01TGThn6PGJParLMUADLpcQk SG-10 READY 4dad18a red:3 of 3 backend tests failed before fix (no tu_do key); UI results-tab tests fail without JS fix mutation:tu_do forced False -> 4 tests fail, JS fix reverted -> 2 UI tests fail, both restored
+2026-11-13T18:33Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CHECKING checker=session_01TGThn5KnRmS2eSHn9DjZpt 4dad18a
