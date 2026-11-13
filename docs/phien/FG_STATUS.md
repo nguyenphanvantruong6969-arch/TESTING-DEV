@@ -10,13 +10,13 @@ STATUS: RUNNING
 BASE = f5e8a41 (origin/claude/forms-gop at start)
 
 ## Current step
-- STEP0 (spec §1b): delegate to a Sonnet worker.
+- FG-1: delegated to a Sonnet worker (task start = HEAD after this commit).
 
 ## Item table
 | Item | State | Commit | Tests |
 |---|---|---|---|
-| STEP0 | TODO | | |
-| FG-1 | TODO | | |
+| STEP0 | DONE (lead review OK) | 63b6e73 | 13 test files, 41 red / 15 green on 24846d2 |
+| FG-1 | TODO (server side GONE-ON-HEAD) | | |
 | FG-3 | TODO | | |
 | FG-4 | TODO | | |
 | FG-5 | TODO | | |
@@ -24,7 +24,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-2 | TODO | | |
 | FG-7 | TODO | | |
 | FG-8 | TODO | | |
-| FG-9 | TODO | | |
+| FG-9 | TODO (KPI-link sub-bullet GONE-ON-HEAD) | | |
 
 ## Snapshots
 - Rebuild from BASE: `git worktree add <scratch>/base f5e8a41`, then in it run
@@ -44,7 +44,8 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 ## Workers
 | Task | Session | State |
 |---|---|---|
-| STEP0 | (creating) | |
+| STEP0 | session_01VfPzNuWUv3W6FtiR2fPPpB | DONE |
+| FG-1 | (creating) | |
 
 ## Log
 - 2026-11-13T01:14Z lead: branch claude/fg-sua created from BASE f5e8a41; lead model claude-opus-5-5; snapshots taken.
@@ -59,3 +60,4 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - FG-8: RED test_fg8_goi_y_suc_khoe.py (2) and test_giao_dien_fg8_cau_chu.py::{summary neutral when n_high=0, wizard 4 boxes disabled, checkbox same line as label, heading "Sau khi công bố kết quả", hide "Chưa chia buổi"}. Green guard: summary red when n_high>0.
   - FG-9: RED test_giao_dien_fg9_ux_nho.py::{test_thanh_ben_khong_con_so_thu_tu, test_tai_so_mau_co_nut_mo_thu_muc_va_tooltip_duong_dan}. Sub-bullet "chưa có chỗ nào · Cần xử lý" link: GONE-ON-HEAD for the KPI card (test_chi_so_chua_co_cho_bam_duoc_va_mo_khung green, kept): `.kpi-o[data-muc=chuaCoChoPanel]` is already a <button> that opens + scrolls the panel.
   - STEP0 notes (re-read vs current layout): (a) sidebar numbers are now 01–07 (07 = "Chuẩn bị đợt", hidden by default), not 01–06; the KPI strip and the "chưa có CLB" panel live in tab data-tab="others" (labelled "Chi tiết và xuất tệp"), not "results". (b) FG-9 "Tải sổ nhập mẫu" (taiSoNhapMau, js/02_van_hanh.js) already calls mo_thu_muc automatically and puts the full path in the toast sentence; test only requires a "Mở thư mục" toast button and the path in a title, whether auto-open stays is the worker's call. (c) FG-8 hide "Chưa chia buổi": label key buoi_chua_chia used by nhanBuoi (js/05_quan_ly.js); `#knBuoi` options show it today. (d) FA-M9: its import step RECOGNISES the after-results file (nhan_dien_tep_forms -> loai sau_ket_qua) but REJECTS it with error forms_tep_sau_ket_qua ("load it in the Feedback panel after allocation"); it does NOT load it. So FG-6/FG-8 do not need FA-M9 code, but FG-8 renames that panel group to "Sau khi công bố kết quả", leaving the wording of forms_tep_sau_ket_qua (i18n_errors.py, vi+en) stale: FG-8 worker should update that message text only (not FA-M9 logic), or log WAIT-TRUONG if it prefers. (e) env: no .venv existed; created with `python3 -m venv .venv` + requirements-dev + playwright==1.63.0 (ignored by git); UI tests run with PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers.
+- 2026-11-13T01:40Z lead: STEP0 reviewed (tests rerun: 41 failed / 15 passed, UI really ran, ruff clean); spot-read FG-3/FG-5 tests vs spec: OK. No item fully GONE-ON-HEAD. FG-8 worker may update the TEXT of forms_tep_sau_ket_qua (vi+en) to name the new heading; no FA-M9 logic.
