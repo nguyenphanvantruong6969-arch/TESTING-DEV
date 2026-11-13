@@ -65,7 +65,7 @@ MA_MOI_SAU_ANH_CHUP = {
     "moi_khong_con_cho", "gioi_han_gv_sai", "fa_khieu_nai_chua_bat", "khieu_nai_khong_hop_le", "khieu_nai_qua_han",
     "khieu_nai_trung", "khieu_nai_da_xu_ly", "loi_luu_sau_xep",
     "fa_vong_2_chua_bat", "vong_2_lua_chon_sai", "vong_2_da_chay",
-    "fa_phan_hoi_chua_bat", "phan_hoi_gia_tri_sai", "phan_hoi_tep_sai",
+    "fa_phan_hoi_chua_bat", "phan_hoi_gia_tri_sai", "phan_hoi_tep_sai", "phan_hoi_tep_rong",
     "fa_sau_ket_qua_chua_bat", "khieu_nai_khong_co_gio_forms",
     # FA-DAA (FA-1): thuộc tính CLB, giữ chỗ, cảnh báo nạp.
     "fa_loai_sai", "fa_diem_san_sai", "fa_toi_thieu_sai", "fa_suc_chua_phong_sai",

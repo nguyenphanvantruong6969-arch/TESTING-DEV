@@ -754,6 +754,10 @@ MESSAGES = {
         "vi": "Tệp này không phải tệp xuất của biểu mẫu phản hồi (không thấy cột mã {person_l} và câu hỏi phản hồi).",
         "en": "This file isn't an export of the feedback form (no {person} ID column or feedback question).",
     },
+    "phan_hoi_tep_rong": {
+        "vi": "Tệp này không có câu trả lời nào (chỉ có hàng tiêu đề hoặc trống). Hãy xuất lại từ biểu mẫu sau khi có người nộp.",
+        "en": "This file has no responses (it is empty or only has the header row). Export it again once someone has submitted.",
+    },
     "fa_khieu_nai_chua_bat": {
         "vi": "Không gian làm việc này chưa bật nhận khiếu nại sau khi xếp.",
         "en": "This workspace doesn't take appeals after allocation.",

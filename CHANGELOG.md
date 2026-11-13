@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2026-11-13 — FG-6: mỗi số một đơn vị, danh sách thay cho tường chữ (TH)
+
+- `api_sau_xep.py`: kết quả `nhap_phan_hoi_forms` và `nhap_sau_ket_qua_forms` thêm `hoc_sinh` (số học sinh có dòng/khiếu nại mới), `dong_bo_qua: [{dong, ly_do}]` (số dòng trong tệp + mã lý do); giữ khoá cũ `n_ket_qua`, `n_tuan_3`, `n_khieu_nai`, `bo_qua` vì test cũ còn đọc. Hàm `_tep_rong`: tệp không có dòng trả lời -> mã riêng `phan_hoi_tep_rong` (trước: "không phải tệp phản hồi"). `_chen_phan_hoi` trả thêm tập học sinh có dòng mới.
+- `i18n_errors.py` (vi+en) + `python tao_i18n_js.py`: `phan_hoi_tep_rong`; thêm vào `MA_MOI_SAU_ANH_CHUP` (`tests/test_ws_nhan.py`).
+- `js/10_theo_doi.js` (`ketQuaNapForms`): thông báo MỘT câu ("Đã nạp phản hồi của 3 học sinh, 1 khiếu nại mới."); khung `#phNhapKetQua` hiện `<ul>` theo lý do (dòng trùng, khiếu nại trùng, mã không khớp được liệt kê, dòng bỏ qua theo lý do, khiếu nại không nhận gom theo mã). `js/02_van_hanh.js` (`showLog`): lỗi cùng mã gom lại, tối đa 5 dòng mỗi mã rồi "và N lỗi nữa". `i18n.js` vi+en.
+- `js/00_nen.js` + `style.css`: dấu × của nút đóng thông báo vẽ bằng CSS (`::before`) để chữ thông báo không kèm "×".
+- Test: `tests/test_fg6_ket_qua_nap.py` (4 đỏ → xanh, 1 xanh sẵn), `tests/test_giao_dien_fg6_danh_sach_loi.py` (2 đỏ → xanh). Sửa 3 assert cũ theo spec (không nới): `test_fa_gap5_phan_hoi.py`, `test_fa_m6b_sau_ket_qua.py` (thêm khoá mới), `test_giao_dien_fa_m6b_sau_ket_qua.py` (thông báo giờ một câu; chi tiết s3 chuyển xuống danh sách).
+
 ## 2026-11-13 — FG-5: mã học sinh gõ khác hoa/thường hay thừa khoảng trắng vẫn khớp (TH)
 
 - `fa_sau_xep.py`: `khop_ma_hoc_sinh(ma_go, tat_ca_ma)` (hàm thuần): khớp đúng thắng; không thì khớp `strip().casefold()` nếu đúng MỘT học sinh; mơ hồ/không có -> None. Mã đã lưu không đổi.

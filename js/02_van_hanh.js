@@ -395,6 +395,7 @@ const MA_LOI_HO_SO_WHARTON = [
   "wharton_ngoai_tap", "wharton_tang_lech", "wharton_nguyen_vong_chua_xep",
 ];
 const LOG_SO_EM_TOI_DA = 5;
+const LOG_SO_LOI_MOI_MA = 5;
 
 /* Tách `errors` thành {khac: lỗi thường, em: [[sid, [lỗi]]] theo mã tăng dần, gop: có gộp không}. */
 function tachLoiWharton(errors) {
@@ -457,7 +458,15 @@ function showLog(errors) {
     if (loi) ganChiTietKyThuat(dong, [loi]);
     box.appendChild(dong);
   };
-  khac.forEach((e) => them(trErr(e), "", e));
+  /* FG-6: lỗi cùng mã gom lại, tối đa LOG_SO_LOI_MOI_MA dòng mỗi mã rồi "và N lỗi nữa". */
+  const dem = {};
+  khac.forEach((e) => {
+    dem[e.code] = (dem[e.code] || 0) + 1;
+    if (dem[e.code] <= LOG_SO_LOI_MOI_MA) them(trErr(e), "", e);
+  });
+  Object.keys(dem).forEach((ma) => {
+    if (dem[ma] > LOG_SO_LOI_MOI_MA) them(t("log_loi_nua", { m: dem[ma] - LOG_SO_LOI_MOI_MA }), "log-tom-tat");
+  });
   if (!em.length) return;
   them(trErr({ code: "wharton_tom_tat_chua_hop_le", params: { n: em.length } }), "log-tom-tat");
   em.slice(0, LOG_SO_EM_TOI_DA).forEach(([sid, loi]) => {

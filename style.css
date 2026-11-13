@@ -860,6 +860,7 @@ html.tat-hieu-ung .status-strip:hover {
   cursor: pointer;
   opacity: 0.8;
 }
+.toast-close::before { content: "\00d7"; }
 .toast-close:hover,
 .toast-close:focus-visible { opacity: 1; }
 

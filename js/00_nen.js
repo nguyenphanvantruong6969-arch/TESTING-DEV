@@ -221,7 +221,7 @@ function showToast(message, type, opts) {
     const nutDong = document.createElement("button");
     nutDong.type = "button";
     nutDong.className = "toast-close";
-    nutDong.textContent = "×";
+    /* Dấu × vẽ bằng CSS (::before): chữ của thông báo không kèm "×" khi đọc/sao chép (FG-6). */
     nutDong.setAttribute("aria-label", t("btn_dong"));
     nutDong.addEventListener("click", go);
     toastEl.appendChild(nutDong);

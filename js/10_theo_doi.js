@@ -334,23 +334,50 @@ function khoiTaoPhanHoi() {
       (d) => t("xuat_kq_tep_csv", { n: d.n_rows, path: d.path })]], el("phNhapKetQua"));
   });
   napTepForms(el("btnNhapPhanHoi"), el("phTep"), "nhap_phan_hoi_forms", (d) => {
-    el("phNhapKetQua").textContent = t("ph_nhap_xong", { n: d.n_ket_qua, m: d.n_tuan_3, b: d.bo_qua });
+    ketQuaNapForms(d, null);
     return taiPhanHoi();
   });
-  /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại) -> một thông báo có số đếm và các khiếu nại không nhận. */
+  /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại). FG-6: toast MỘT câu, chi tiết thành danh sách. */
   napTepForms(el("btnNhapSauKetQua"), el("phTepSauKetQua"), "nhap_sau_ket_qua_forms", (d) => {
-    const dongLoi = (d.khieu_nai_loi || []).map((x) => {
-      const buoi = nhanBuoi(x.buoi);
-      return t("ssk_loi_dong", { student_id: x.student_id, buoi, loi: trErr({ code: x.code,
-        params: { student_id: x.student_id, buoi, so_ngay: knSoNgay } }) });
-    });
-    const canhBao = (d.canh_bao || []).map(trErr);
-    const chu = [t("ssk_nap_xong", { n: d.n_ket_qua, m: d.n_khieu_nai, b: d.bo_qua })]
-      .concat(dongLoi, canhBao).join(" ");
-    el("phNhapKetQua").textContent = chu;
-    showToast(chu, dongLoi.length || canhBao.length ? "warn" : "success");
+    ketQuaNapForms(d, "sau");
     return taiPhanHoi().then(taiKhieuNai);
   });
+}
+
+/* FG-6: một câu cho thông báo, danh sách `<ul>` theo lý do cho khung dưới nút (mã không khớp được liệt kê). */
+function ketQuaNapForms(d, loai) {
+  const khung = el("phNhapKetQua");
+  const muc = [];
+  if (d.dong_trung) muc.push(t("ssk_li_trung", { n: d.dong_trung }));
+  if (d.khieu_nai_trung) muc.push(t("ssk_li_kn_trung", { n: d.khieu_nai_trung }));
+  if ((d.ma_khong_khop || []).length) muc.push(t("ssk_li_ma_la", { n: d.ma_khong_khop.length, ds: d.ma_khong_khop.join(", ") }));
+  const theoLyDo = new Map();
+  (d.dong_bo_qua || []).forEach((x) => theoLyDo.set(x.ly_do, (theoLyDo.get(x.ly_do) || []).concat(x.dong)));
+  theoLyDo.forEach((dongs, ly) => muc.push(t("ssk_li_bo_qua", { n: dongs.length, ly: t("ssk_ly_" + ly), ds: dongs.join(", ") })));
+  const theoMa = new Map();
+  (d.khieu_nai_loi || []).forEach((x) => theoMa.set(x.code, (theoMa.get(x.code) || []).concat(x)));
+  theoMa.forEach((cac, code) => {
+    const ds = cac.map((x) => x.student_id + " (" + nhanBuoi(x.buoi) + ")").join(", ");
+    muc.push(t("ssk_li_kn_loi", { n: cac.length, ds, loi: trErr({ code, params: {
+      student_id: cac.map((x) => x.student_id).join(", "), buoi: nhanBuoi(cac[0].buoi), so_ngay: knSoNgay } }) }));
+  });
+  (d.canh_bao || []).forEach((e) => muc.push(trErr(e)));
+  const cau = loai === "sau" ? t("ssk_nap_xong", { hs: d.hoc_sinh, kn: d.khieu_nai_moi })
+    : t("ph_nhap_xong", { hs: d.hoc_sinh });
+  clear(khung);
+  const p = document.createElement("div");
+  p.textContent = cau;
+  khung.appendChild(p);
+  if (muc.length) {
+    const ul = document.createElement("ul");
+    muc.forEach((chu) => {
+      const li = document.createElement("li");
+      li.textContent = chu;
+      ul.appendChild(li);
+    });
+    khung.appendChild(ul);
+  }
+  showToast(cau, muc.length ? "warn" : "success");
 }
 
 /* GAP-8: giá trị một chỉ số — tỉ lệ thành %, số đếm giữ nguyên, None -> "chưa có dữ liệu" (không bao giờ 0). */

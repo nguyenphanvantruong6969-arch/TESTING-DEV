@@ -117,7 +117,7 @@ def test_nhap_tep_xuat_forms(api):
     ra = api.nhap_phan_hoi_forms(tep)
     assert ra["ok"], ra
     assert ra["data"] == {"n_ket_qua": 2, "n_tuan_3": 0, "bo_qua": 1,
-                          "dong_moi": 2, "dong_trung": 0, "ma_khong_khop": ["s9"]}
+                          "dong_moi": 2, "dong_trung": 0, "ma_khong_khop": ["s9"], "hoc_sinh": 2, "dong_bo_qua": []}
     t = api.get_phan_hoi_tong_hop()["data"]["ket_qua"]
     assert t["n"] == 2 and t["hai_long_tb"] == 3.0
     assert ma(api.nhap_phan_hoi_forms(_xlsx_forms([["a", "b"], [1, 2]]))["errors"]) == ["phan_hoi_tep_sai"]

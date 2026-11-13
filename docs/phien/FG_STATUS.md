@@ -20,7 +20,7 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
 | FG-3 | DONE | f2dc276 | test_fg3_nap_lai (5) |
 | FG-4 | DONE | (see Log) | test_giao_dien_fg4_nut_nap (4) |
 | FG-5 | DONE | e90555a | test_fg5_khop_ma (6) |
-| FG-6 | TODO | | |
+| FG-6 | DONE | (see Log) | test_fg6_ket_qua_nap (5), test_giao_dien_fg6_danh_sach_loi (2) |
 | FG-2 | TODO | | |
 | FG-7 | TODO | | |
 | FG-8 | TODO | | |
