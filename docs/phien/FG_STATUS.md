@@ -109,3 +109,6 @@ BASE = f5e8a41 (origin/claude/forms-gop at start)
   - Red run before: tests/test_fg7_bieu_mau_sau_ket_qua.py 5 failed / 5 green (golden hashes). After: 10 passed + test_van_phong_tu_nhien (20 total); related run (m6b, mau_forms, m7, m8, gap5, m2, ws_nhan) 159 passed. ruff clean; kiem_nhanh --co-so origin/main 7/7.
   - Mutation: day filter disabled (all days kept) -> test_sau_ket_qua_voi_so_nhap_chi_liet_ke_ngay_co_clb red; restored.
   - Test bug fixed (not loosened): helper used c["ten"], real key is c["name"]. --help also had to lose "FA-DAA" (regex FA-[A-Z]\w*). Guide step 5 now explains why [tag]/(code) stay (added the sentence, no extra test).
+- 2026-11-13 WORKER session_01VfPzNvLWfY7KLXz5Lj6S7P FG-7 FIX1 DONE d754dbd
+  - Red before: 6 new tests failed (5 modes + default). After: test_fg7 + test_van_phong_tu_nhien + every test naming tao_mau_forms = 371 passed; ruff clean; kiem_nhanh 7/7; golden-hash guards green (stdout only). No existing test asserted the last stdout line.
+  - Mutation: default-mode print removed -> test_che_do_mac_dinh red; restored.
