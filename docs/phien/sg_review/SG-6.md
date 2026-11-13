@@ -44,3 +44,32 @@
 - SG-2 FIX-1 (55fd02f): `mau_csv/SO_NHAP_CLB.xlsx` — sheets `1. CLB` and `2. Học sinh` cell-identical to d7c9c19; only `Hướng dẫn` changed (the Wharton guide sentence); `tests/test_t1b_nhan_trung_cu.py` passes.
 - (d) Foreign files: `js/03_ket_qua.js` (2 lines), `js/05_quan_ly.js` (1 cell), `js/09_the_xem.js` (2 lines), `js/11_chuan_bi.js` (step-1 columns), `api_bao_cao.py`, `api_quan_ly.py`: minimal, all no-ops when empty, and declared in `docs/ke_hoach/sg_song_song/MANH_B.md`.
 - Known red `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` not run here (expected; person A fixes the count).
+
+---
+
+# Round 2 (CHECKER session_01YVAyu3A184isUsUrEroXCZ) — range d7c9c19..b83651d (fix commits 194305f..b83651d), branch claude/sg-b
+
+**Verdict: PASS.** Both FIX-1 points are closed end-to-end; output for data without time/room is unchanged. All data are SIMULATED.
+Environment note: no `.venv` in the container; I used a scratch venv from `requirements-dev.txt` (outside the repo). Scratch worktrees removed.
+
+## FIX-1 points
+1. **Step-1 table — closed.** `so_de_thi.doc_clb_dot` now adds `gio`/`dia_diem` only when the club has them (`if c.get(k)`), so `get_forms_buoc_12` → `veBuoc1` redraws with the two columns.
+   Evidence: Chromium test `test_buoc_1_hien_hai_cot_khi_phieu_co_gio[vi|en]` uploads a real Phiếu through `#cb-b1-tep`: 6 headers ending Giờ/Địa điểm (vi) and Time/Place (en), values present, no page error; `test_buoc_1_phieu_khong_gio_van_bon_cot` → exactly 4 columns. Ran for real (0 skipped).
+2. **Step 4 → Sổ → import — closed.** `doc_clb_fa` tuple extended with `"gio", "dia_diem"` (still filtered by `is not None`, so no key when the club did not declare them); `ghi_tep_phan_mem` copies them via `c.update(clb_fa[...])` into the club dicts. Evidence: `test_duong_that_*`: Phiếu → `chuyen_phieu` → `chuyen_fa_daa` → final Sổ has them → `import_so_nhap` → `clubs.gio='15:30-17:00'`, `clubs.dia_diem='Sân A'`; same chain without them → no `Giờ`/`Địa điểm` header in the Sổ.
+   I also ran the display APIs on the imported data (scratch test, not committed): `list_clubs_admin`, `get_club_fill_stats`, `get_danh_sach_clb` all contain the time and room. Timetable/Excel cells need a run; code unchanged since round 1 (evidence reused).
+
+## Round-2 checks
+- **Red-first (scratch worktree at 194305f + new tests of b83651d):** 4 failed (2 route tests, 2 UI tests), 15 passed (guards). At b83651d: all pass.
+- **Mutation (scratch):** `doc_clb_dot` reverted → 2 UI tests red; `doc_clb_fa` reverted → 2 route tests red. Restored/discarded.
+- **Byte-identity without time/room:** same chain (Phiếu with no gio/dia_diem → `chuyen_phieu` → `chuyen_fa_daa`) built at d7c9c19 and at b83651d; every cell of every sheet of both the step-1 file and the final Sổ compared → identical (741,767-byte JSON dump equal).
+- **Generator snapshot per recipe in STATUS_B.md** (default + 6 `--ra` modes + `--fa-daa --mot-bieu-mau`; `--bien-the` writes nothing; docProps/core.xml excluded), d7c9c19 vs HEAD: 18 files, 0 different.
+- **Person C file edit:** `chuyen_forms_sang_phan_mem.py` = 1 line comment + the tuple extended with 2 names (1+/3− lines of diff, no logic change); declared in `MANH_B.md` ("SG-6 FIX-1" section, note for A).
+- **Tests:** 111 passed, 0 skipped (item tests, t1b, fa_m1/m2/m3/m9, mau_forms_thi_clb, fa_m7_nguon, SG-2 tests; Chromium ran). `ruff check .` clean. Not run: full suite (22 min, CI/lead); known expected red `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that` not run.
+- **kiem_nhanh vs d7c9c19, 20 seeds:** 7/7, 60 cases (3 × 20) identical; no UPDATE/DELETE on history tables.
+
+## Rest of checklist 2.10 (whole range)
+Items 1, 5, 6, 7, 9 (migration twice = no-op with backup, old workbooks load, old-data identity) and soat-ma tiers 1-3: round-1 evidence stands — the only code changed since 194305f is the two lines above (`so_de_thi.py`, `chuyen_forms_sang_phan_mem.py`) plus tests/docs; no change to schema, DA core, `compute_club_priority`, i18n, CSS or the `{ok,data,errors}` contract. Item 7 step-1 table now also verified in Chromium (vi/en, above); soat-ma tier 4: MANH_B.md declares the new touched files.
+
+## Optional (do not block)
+- Step-1 table does not redraw on a language switch (pre-existing, declared by coder; test switches language first).
+- Round-1 optionals (hard-coded Vietnamese Excel labels; tight second line at 1920 px) remain.
