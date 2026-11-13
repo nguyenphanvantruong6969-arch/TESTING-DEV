@@ -17,7 +17,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
 | SG-9 | DONE | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
-| SG-12 | TODO | 0 | | | | | |
+| SG-12 | CODING | 0 | 2ad6081 | | session_01VfPzNs8qcCiQLCKtu6pP4g | | |
 
 ## Fix lists
 ### SG-5 FIX-1 (checker session_01VfPzNrFdN7RhAERrSNeTJV, docs/phien/sg_review/SG-5.md)
@@ -84,3 +84,4 @@ Placement is in the question title because Quick Import has no per-section descr
 - 2026-11-13T19:27Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 FIX-1 READY c266cae; checker r2 session_01VfPzNt89iBAQw8naoMzV7d
 - 2026-11-13T19:43Z CHECKER session_01VfPzNt89iBAQw8naoMzV7d SG-9 PASS (round 2, 98908e1..c266cae; own mutations: .catch in chayNut/chayTai now fail tests, S5.dang UI test + S.dang static test fail on removal; 498 UI tests 0 skipped; ruff clean; kiem_nhanh 7/7; note: S.dang UI test is feasible, see docs/phien/sg_review/SG-9.md Round 2)
 - 2026-11-13T19:50Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-9 DONE (lead review: wrapper read; 27 SG-9/FG-4/SG-7 UI tests pass in Chromium; checker r2 own mutations + 498 UI tests, kiem_nhanh 7/7; JS-only diff) c266cae
+- 2026-11-13T19:50Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 CODING start 2ad6081 coder session_01VfPzNs8qcCiQLCKtu6pP4g
