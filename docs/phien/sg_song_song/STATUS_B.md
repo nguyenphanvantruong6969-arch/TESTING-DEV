@@ -10,7 +10,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 |---|---|---|---|---|---|---|---|
 | SG-2 (C1) | DONE | 0 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
-| SG-8 (M5) | CHECKING | 0 | b3570ac | 03974ec | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu32HHT4cB1VP6Wyrys | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
+| SG-8 (M5) | CODING | 1 | b3570ac | 03974ec | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu32HHT4cB1VP6Wyrys | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
 | SG-11b (M4 only) | TODO | 0 | | | | | |
 
 ## Fix lists
@@ -21,6 +21,10 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 ### SG-6 FIX-1 (checker session_01YVAyu1Uy5qgbSS878jxQF4, d6fd6bd)
 1. Step-1 table: `so_de_thi.doc_clb_dot` whitelist drops gio/dia_diem -> `get_forms_buoc_12` / `veBuoc1` never show them; add UI upload test.
 2. Step 4: `chuyen_forms_sang_phan_mem.doc_clb_fa` / `ghi_tep_phan_mem` drop them -> real Forms->Sổ->import never stores them; end-to-end test.
+
+### SG-8 FIX-1 (checker session_01YVAyu32HHT4cB1VP6Wyrys, 2857546)
+1. Old-shape `phieu_clb_ket_qua.json` items `{ma, clb, noi_dung}` render as raw JSON in step 1 -> map to codes in `get_forms_buoc_12` (+ UI fallback), test.
+2. (lead, from Optional) English UI test needs a positive English phrase so a raw code turns it red.
 
 ## Decisions
 - SG-11b = finding M4 only (dialog focus trap + Esc + initial focus in `wsMoManChon`); M6/M7/L1/L4/L5 belong to person A (SG-11a).
@@ -65,3 +69,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T19:56Z CODER session_01YVAytzNj1eT4xGk3rANq4G SG-8 READY 03974ec red:tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that (known; full non-UI suite 5599 passed, 4 skipped) mutation:api code prefix phieu_nd_ -> phieu_nd_x -> 2 API tests red; UI noiDung=trErr -> raw ma -> vi UI test red; restored. Related UI tests really run: 59 passed; kiem_nhanh 7/7 (60 cases identical); ruff clean; generator/chuyen_phieu_clb.py untouched, .md report + Sổ nhập Loại verified byte-identical by golden test
 2026-11-13T20:09Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 CHECKING checker=session_01YVAyu32HHT4cB1VP6Wyrys range=b3570ac..03974ec
 2026-11-13T20:15Z CHECKER session_01YVAyu32HHT4cB1VP6Wyrys SG-8 FIX-1 (review: docs/phien/sg_review/SG-8.md; 1) rounds saved before SG-8: phieu_clb_ket_qua.json loi/canh_bao {ma,clb,noi_dung} render as raw JSON in step 1 (js/11_chuan_bi.js noiDung / get_forms_buoc_12 need legacy fallback + test))
+2026-11-13T20:42Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-8 FIX-1 sent to coder session_01YVAytzNj1eT4xGk3rANq4G
