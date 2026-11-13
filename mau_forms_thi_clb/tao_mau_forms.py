@@ -1347,6 +1347,7 @@ def main(argv=None):
         if a.tuan_3:
             ra = sinh_tuan_3(de, a.ra)
             print("Đã sinh mẫu Forms khảo sát tuần 3 (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.sau_ket_qua:
             buoi_co_clb = None
@@ -1364,10 +1365,12 @@ def main(argv=None):
         if a.phan_hoi:
             ra = sinh_phan_hoi(de, a.ra)
             print("Đã sinh mẫu Forms phản hồi (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.bien_the:
             ra = sinh_bien_the(de, a.ra)
             print("Đã sinh mẫu Forms đề biến thể (TH): %d tệp (%s)." % (len(ra), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.fa_daa:
             if a.so_nhap_clb:
@@ -1382,11 +1385,13 @@ def main(argv=None):
             ra = sinh_dang_ky(de, a.ra, mot_bieu_mau=a.mot_bieu_mau)
             print("Đã sinh mẫu Forms đăng ký FA-DAA (TH): %d biểu mẫu (%s)."
                   % (1 if a.mot_bieu_mau else len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.moi_clb:
             ra = sinh_moi_clb(de, a.ra)
             print("Đã sinh mẫu Forms mỗi CLB một biểu mẫu: %d biểu mẫu (%s)."
                   % (len(bm.clb_co_thi(de)), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.chi_thi:
             ra = sinh_chi_thi(de, a.ra)
@@ -1394,6 +1399,7 @@ def main(argv=None):
             print("Đã sinh mẫu Forms chỉ thi: %d câu, %d biểu mẫu (%s)."
                   % (bm.dem_cau(de, chi_thi=True), len(nhom),
                      ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
     except bm.LoiDeThi as e:
         print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
@@ -1408,6 +1414,7 @@ def main(argv=None):
               "(pip install -r requirements-dev.txt)", file=sys.stderr)
     print("Đã sinh mẫu Forms: %d phần, %d câu hỏi."
           % (len(bm.cac_phan(de)), sum(len(c) for _, c in bm.cac_phan(de))))
+    print("Thư mục đã ghi: %s" % os.path.abspath(THU_MUC))
     return 0
 
 

@@ -107,3 +107,20 @@ def test_in_thu_muc_ra_tuyet_doi_o_dong_cuoi(tmp_path, capsys, monkeypatch):
     assert tmf.main(["--sau-ket-qua", "--ra", "ra_tuong_doi"]) == 0
     dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
     assert os.path.abspath(str(tmp_path / "ra_tuong_doi")) in dong_cuoi
+
+
+@pytest.mark.parametrize("arg", [["--phan-hoi"], ["--tuan-3"], ["--fa-daa"], ["--chi-thi"], ["--moi-clb"]])
+def test_moi_che_do_in_thu_muc_ra_tuyet_doi_o_dong_cuoi(arg, tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert tmf.main(arg + ["--ra", "ra_tuong_doi"]) == 0
+    dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
+    assert dong_cuoi.endswith(os.path.abspath(str(tmp_path / "ra_tuong_doi")))
+
+
+def test_che_do_mac_dinh_in_thu_muc_ghi_o_dong_cuoi(tmp_path, capsys, monkeypatch):
+    # Chế độ mặc định ghi cạnh tệp tao_mau_forms.py (THU_MUC), không theo --ra; ghi tạm sang thư mục thử.
+    monkeypatch.setattr(tmf, "THU_MUC", str(tmp_path / "mac_dinh"))
+    os.makedirs(tmf.THU_MUC)
+    assert tmf.main([]) == 0
+    dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
+    assert dong_cuoi.endswith(os.path.abspath(tmf.THU_MUC))
