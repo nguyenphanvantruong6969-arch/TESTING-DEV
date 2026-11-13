@@ -10,8 +10,8 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 | SG-1 (C3) | DONE | 1 | 5b474dd | 95de0b9 | session_01TGThn7GRLE7ML1TDfW53iL | session_01TGThn8ctQPeoQJvGZsej9z, session_01TGThn4rAzzXnkc6uQerb5h | test_sg1_tuyen_chon_khong_diem.py (9) |
 | SG-3 (C2) | DONE | 0 | 39de078 | f2e7702 | session_01TGThn5vDcdjy25A1uMuruk | session_01TGThn5ifqoQYavHTFkb9a4 | test_sg3_hang_fa.py (5) |
 | SG-4 (M3) | DONE | 1 | a959972 | 17eaf11 | session_01TGThn7xWLDq89PLMhnwS9V | session_01TGThn68N7shbENa7GNKWsZ, session_01TGThn6utYnaicoK4Ce6A5K | |
-| SG-10 (M2) | CHECKING | 1 | f660d28 | d7f5bac | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt, session_01TGThn5kSVpqQSJfK4pvZA2 | |
-| SG-11a (M6, M7, L1, L4, L5) | TODO | 0 | | | | | |
+| SG-10 (M2) | DONE | 1 | f660d28 | d7f5bac | session_01TGThn6PGJParLMUADLpcQk | session_01TGThn5KnRmS2eSHn9DjZpt, session_01TGThn5kSVpqQSJfK4pvZA2 | |
+| SG-11a (M6, M7, L1, L4, L5) | CODING | 0 | e676654 | | session_01TGThn8tXzyzjkRWaYP2tTL | | |
 
 ## Fix lists
 - SG-10 FIX-1 (checker session_01TGThn5KnRmS2eSHn9DjZpt, lead agrees): 1. Theo CLB caption via get_danh_sach_clb tu_do; 2. ti_le_choi None for free clubs; 3. exports in api_xuat.py (person B's file, minimal); 4. UI test asserts person noun. get_tai_theo_buoi left as is -> For Truong.
@@ -64,3 +64,5 @@ Branch claude/sg-a starts at ba4b207 = BASE + 2 doc-only commits (SG_SONG_SONG.m
 2026-11-13T18:59Z CODER session_01TGThn6PGJParLMUADLpcQk SG-10 FIX-1: 1 done (get_danh_sach_clb tu_do + Theo CLB caption, key clb_tu_do_theo_clb[_nhieu] — not members_* because test_chu_moi_vi_sach_tieng_anh counts that prefix); 2 done (ti_le_choi None for free clubs; get_em_chua_co_cho also carries tu_do); 3 done (api_xuat.py, minimal; Tổng sức chứa sums numbers only); 4 done (noun + en tests); get_tai_theo_buoi noted under For Truong. READY d7f5bac red:new tests failed before fix mutation:3 core lines broken one at a time (JS09 branch, ti_le_choi guard, export branch) -> 1 test fails each, restored
 2026-11-13T19:15Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 CHECKING r2 checker=session_01TGThn5kSVpqQSJfK4pvZA2 d7f5bac
 2026-11-13T19:22Z CHECKER session_01TGThn5kSVpqQSJfK4pvZA2 SG-10 PASS
+2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-10 DONE lead-review agree (159 passed, kiem_nhanh 7/7) d7f5bac
+2026-11-13T19:38Z LEAD session_01TGThn8FotZk5dp89pKN66o SG-11a CODING coder=session_01TGThn8tXzyzjkRWaYP2tTL e676654
