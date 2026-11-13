@@ -31,3 +31,6 @@ New tests: `tests/test_sg6_gio_dia_diem.py`, `tests/test_giao_dien_sg6_gio_dia_d
 Note for A: touched `js/03_ket_qua.js` (your file) in two lines only — the `clb-ten` cell of the "Theo từng câu lạc bộ" table gets
 `${gioDiaDiemHtml(c)}`, and the member-list title gets " · giờ, địa điểm". Also `js/09_the_xem.js` in two lines (timetable cell,
 member-count line) and `js/05_quan_ly.js` (person C) in one cell of `loadAdminClubs`. All no-ops when the fields are empty.
+
+## SG-2 FIX-1 (done during SG-6)
+**CHANGELOG entry:** SG-2 FIX-1 — regenerated `mau_csv/SO_NHAP_CLB.xlsx` with `mau_csv/tao_so_nhap.py` after the SG-2 Hướng dẫn sentence change; cell diff vs 5c8ee63: only the Hướng dẫn sheet differs (other generated workbooks left untouched). **TIEN_DO line:** SG-2 FIX-1 | done | mau_csv/SO_NHAP_CLB.xlsx | tests/test_t1b_nhan_trung_cu.py green.

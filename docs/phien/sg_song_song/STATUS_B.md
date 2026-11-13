@@ -33,7 +33,7 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 - SG-6: soat-ma four tiers not run as a separate pass; kiem_nhanh 7/7 (60 cases identical), ruff clean, 91 related test files: 1889 passed, 2 red.
 
 ## For Truong
-- Red test not from SG-6 (fails at SG-B base d7c9c19 too, caused by SG-2 guide-text change): tests/test_t1b_nhan_trung_cu.py::test_t1a_so_mau_tinh_trung_so_mau_phan_mem_tao_moi_sheet (compares Hướng dẫn sheet of a sample workbook). Needs expected text updated by person B/A.
+(none)
 
 ## Log
 2026-11-13T15:30Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 - branch claude/sg-b created from BASE 98709f1
