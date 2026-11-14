@@ -488,6 +488,19 @@ function showLog(errors) {
   nut.textContent = t("wh_loi_mo_ds");
   nut.addEventListener("click", moDanhSachCanXuLy);
   hang.appendChild(nut);
+  if (typeof wsMoTinhNangDangMo === "function") {
+    const goiY = document.createElement("span");
+    goiY.className = "log-goi-y";
+    goiY.textContent = t("wh_goi_y_tat");
+    hang.appendChild(goiY);
+    const tat = document.createElement("button");
+    tat.type = "button";
+    tat.id = "btnMoTinhNangTuLoi";
+    tat.className = "btn btn-secondary";
+    tat.textContent = t("wh_mo_tinh_nang");
+    tat.addEventListener("click", wsMoTinhNangDangMo);
+    hang.appendChild(tat);
+  }
   box.appendChild(hang);
 }
 

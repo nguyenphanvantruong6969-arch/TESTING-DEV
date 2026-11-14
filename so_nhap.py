@@ -46,6 +46,10 @@ SHEET_HD = "Hướng dẫn"
 SHEET_GIU_CHO = "Giữ chỗ"                  # FA-1: sheet TUỲ CHỌN (Mã CLB, Mã học sinh)
 COT_FA = ["Loại", "Điểm sàn", "Tối thiểu", "Sức chứa phòng"]    # FA-1: cột CLB tuỳ chọn
 KHOA_FA = ("loai", "diem_san", "so_toi_thieu", "suc_chua_phong")
+# SG-6 (H1): giờ và địa điểm sinh hoạt — cột CLB TUỲ CHỌN, chỉ để hiển thị / xuất. Vắng cột (hoặc
+# CLB không mang khoá) = giữ giá trị đang lưu; sổ cũ không có chúng.
+COT_GIO = ["Giờ", "Địa điểm"]
+KHOA_GIO = ("gio", "dia_diem")
 
 # Số cột NV mặc định của mẫu trống. Trần nguyện vọng của phần mềm là 10 MỖI
 # BUỔI; 15 đủ cho trường một-hai buổi mà dòng vẫn vừa màn hình. Mẫu sinh từ
@@ -301,6 +305,8 @@ _TEN_COT_CLB = {
     "diem_san": {"diem san"},
     "so_toi_thieu": {"toi thieu", "so toi thieu"},
     "suc_chua_phong": {"suc chua phong"},
+    "gio": {"gio", "gio sinh hoat"},
+    "dia_diem": {"dia diem", "noi sinh hoat"},
 }
 _TEN_COT_HS = {
     "student_id": {"ma hs", "ma hoc sinh", "ma", "ma so", "ma so hoc sinh"},
@@ -675,6 +681,8 @@ def _doc_sheet_clb(ws, loi, clb_da_co, ma_da_co, clb_cu, cfg=None, ten_sheet=SHE
             "buoi": ma_buoi(lay(o, "buoi")) if "buoi" in cot else (cu.get("buoi") or ""),
             "dong": so_dong,
             **fa,
+            # SG-6: khoá CHỈ có khi sổ có cột đó; ô trống = xoá (None), cột vắng = giữ giá trị cũ.
+            **{k: (lay(o, k) or None) for k in KHOA_GIO if k in cot},
         })
 
     return clubs
@@ -1040,6 +1048,7 @@ def thanh_csv(du_lieu: dict) -> dict:
     """
     # FA-1: cột FA chỉ khi sổ CÓ cột đó (khoá có mặt); không thì tệp giống từng byte như cũ.
     cot_fa = [k for k in KHOA_FA if any(k in c for c in du_lieu["clubs"])]
+    cot_fa += [k for k in KHOA_GIO if any(k in c for c in du_lieu["clubs"])]   # SG-6: cùng quy tắc
     clubs = [["club_id", "name", "capacity", "reserve_capacity", "reserve_group", "buoi"] + cot_fa]
     for c in du_lieu["clubs"]:
         clubs.append([c["club_id"], c["name"], c["capacity"], c["reserve_capacity"],
@@ -1265,8 +1274,9 @@ def _huong_dan_co_dau(cfg=None) -> list:
                 % (slot_l, diem_l, diem_l),
                 "        quỹ 2 chia cho các %s không thi, quyết định thứ tự giữa các %s không thi."
                 % (slot_l, nguoi_l),
-                "        Số nguyên không âm; ô trống tính là 0. Quỹ nào chỉ có một %s thì điền 100."
-                % slot_l,
+                "        Số nguyên không âm, mỗi quỹ cộng đúng 100. Quỹ nào chỉ có một %s thì để"
+                " trống, phần mềm tự điền 100;" % slot_l,
+                "        quỹ có từ hai %s trở lên mà để trống cả quỹ thì lần chạy xếp bị chặn." % slot_l,
             ]
             vd = ["                                 Nguyện vọng 1                    Nguyện vọng 2",
                   "  Mã HS   Họ tên          %s   %s   %s   %s   %s   %s"
@@ -1427,12 +1437,16 @@ def ghi_so_nhap(duong_dan_hoac_tep, clubs=(), students=(), so_nv=None, co_nhom=T
     # FA-1: cột FA chỉ khi có CLB mang chúng.
     co_fa = che_do_fa or any(k in c for c in clubs for k in KHOA_FA)
     ten_w = TEN_COT_HUY_CHUONG if che_do_fa else TEN_COT_QUYET_TAM
-    ws.append(cot_clb(cfg) + (COT_FA if co_fa else []))
+    # SG-6: hai cột Giờ / Địa điểm chỉ khi có CLB mang khoá `gio` / `dia_diem`; không thì sổ y như cũ.
+    co_gio = any(k in c for c in clubs for k in KHOA_GIO)
+    ws.append(cot_clb(cfg) + (COT_FA if co_fa else []) + (COT_GIO if co_gio else []))
     for c in clubs:
         hang_fa = []
         if co_fa:
             hang_fa = [NHAN_LOAI_HIEN_THI.get(c.get("loai"), c.get("loai")) or None,
                        c.get("diem_san"), c.get("so_toi_thieu"), c.get("suc_chua_phong")]
+        if co_gio:
+            hang_fa += [c.get("gio") or None, c.get("dia_diem") or None]
         ws.append([c.get("name", ""), nhan_buoi(c.get("buoi") or ""),
                    c.get("capacity", ""), c.get("reserve_capacity") or None,
                    c.get("reserve_group") or None, c.get("club_id") or None] + hang_fa)

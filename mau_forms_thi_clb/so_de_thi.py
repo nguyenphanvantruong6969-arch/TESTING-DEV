@@ -96,7 +96,9 @@ def doc_clb_dot(duong_so_nhap):
         du = so_nhap.doc_so_nhap(wb)
     finally:
         wb.close()
-    return [{k: c.get(k) for k in ("club_id", "name", "buoi", "capacity", "reserve_capacity", "reserve_group", "loai")}
+    # SG-6: giờ / địa điểm đi cùng CHỈ khi CLB đã khai (bước 1 hiện hai cột khi có).
+    return [{**{k: c.get(k) for k in ("club_id", "name", "buoi", "capacity", "reserve_capacity", "reserve_group", "loai")},
+             **{k: c[k] for k in ("gio", "dia_diem") if c.get(k)}}
             for c in du["clubs"]]
 
 

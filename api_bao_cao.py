@@ -67,6 +67,14 @@ class BaoCaoMixin:
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
 
+    @staticmethod
+    def _gio_dia_diem_clb(cur) -> dict:
+        """SG-6: {club_id: (giờ, địa điểm)} — RỖNG khi chưa CLB nào khai cả hai, để dữ liệu cũ
+        không thêm khoá nào vào phản hồi (giao diện chỉ hiện khi có)."""
+        gd = {r[0]: ((r[1] or "").strip(), (r[2] or "").strip())
+              for r in cur.execute("SELECT club_id, gio, dia_diem FROM clubs")}
+        return gd if any(g or d for g, d in gd.values()) else {}
+
     @_nho_trong_luc_xuat
     def get_club_fill_stats(self):
         """Tỉ lệ lấp đầy mỗi club — dùng vẽ thanh progress bar."""
@@ -119,12 +127,15 @@ class BaoCaoMixin:
                     GROUP BY c.club_id
                     ORDER BY buoi COLLATE THU_TU_BUOI, c.club_id
                 """, (BUOI_MAC_DINH, BUOI_MAC_DINH)).fetchall()
+                gd = self._gio_dia_diem_clb(cur)
 
             ra = []
             for r in rows:
                 d = dict(r)
                 # CLB Tu do (FA) khong gioi han cho: chi tieu luu chi la so tam, khong dung de tinh %.
                 d["tu_do"] = d.pop("loai", None) == TU_DO
+                if gd:
+                    d["gio"], d["dia_diem"] = gd.get(d["club_id"], ("", ""))
                 suc = d.get("capacity") or 0
                 # Khong co chi tieu thi de None chu khong phai 0 — "khong co
                 # cho" khac han "thua cho", va 0 o cot nay doc ra nghia
@@ -258,6 +269,7 @@ class BaoCaoMixin:
         try:
             with self._ket_noi_doc() as cur:
                 ds_buoi = self._ds_buoi(cur)
+                gd = self._gio_dia_diem_clb(cur)
                 query = """
                     SELECT m.student_id, s.name, m.buoi, m.club_id,
                            c.name AS club_name, m.matched_tier,
@@ -299,6 +311,8 @@ class BaoCaoMixin:
                     "matched_tier": r["matched_tier"],
                     "rank_in_student_pref": r["rank_in_student_pref"],
                 }
+                if gd and r["club_id"] and any(gd.get(r["club_id"], ("", ""))):   # SG-6
+                    em["theo_buoi"][r["buoi"]]["gio"], em["theo_buoi"][r["buoi"]]["dia_diem"] = gd[r["club_id"]]
                 if r["club_id"]:
                     em["so_clb"] += 1
                     if r["rank_in_student_pref"] == 1:
@@ -383,6 +397,7 @@ class BaoCaoMixin:
                 ).fetchone()
                 if not clb:
                     return _fail(err("club_not_found", club_id=club_id))
+                gd = self._gio_dia_diem_clb(cur).get(club_id)
                 rows = cur.execute("""
                     SELECT m.student_id, s.name, m.buoi,
                            m.rank_in_student_pref, m.matched_tier,
@@ -392,14 +407,17 @@ class BaoCaoMixin:
                     WHERE m.club_id = ?
                     ORDER BY s.name, m.student_id
                 """, (club_id,)).fetchall()
-            return _ok({
+            ra = {
                 "club_id": clb["club_id"],
                 "club_name": clb["name"],
                 "buoi": clb["buoi"],
                 "capacity": clb["capacity"],
                 "tu_do": clb["loai"] == TU_DO,
                 "thanh_vien": [dict(r) for r in rows],
-            })
+            }
+            if gd and (gd[0] or gd[1]):          # SG-6: chỉ khi CLB này đã khai
+                ra["gio"], ra["dia_diem"] = gd
+            return _ok(ra)
         except Exception as e:
             return _fail(err("error_reading_club_roster", detail=str(e)))
 

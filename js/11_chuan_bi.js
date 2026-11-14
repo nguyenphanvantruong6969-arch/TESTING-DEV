@@ -141,7 +141,9 @@ window.ChuanBi = (() => {
     const bang = mot("table", "data-table");
     bang.id = "cb-b1-bang";
     const dau = bang.createTHead().insertRow();
-    ["cb_cot_ten", "cb_cot_buoi", "cb_cot_loai", "cb_cot_chi_tieu"].forEach((k) => {
+    /* SG-6: hai cột Giờ / Địa điểm chỉ khi có CLB đã khai; không thì bảng y như cũ. */
+    const coGio = clubs.some((c) => c.gio || c.dia_diem);
+    ["cb_cot_ten", "cb_cot_buoi", "cb_cot_loai", "cb_cot_chi_tieu"].concat(coGio ? ["cb_cot_gio", "cb_cot_dia_diem"] : []).forEach((k) => {
       const th = mot("th", "", t(k));
       th.scope = "col";
       dau.appendChild(th);
@@ -149,7 +151,7 @@ window.ChuanBi = (() => {
     const tb = bang.createTBody();
     clubs.forEach((c) => {
       const tr = tb.insertRow();
-      [c.name, c.buoi_nhan, c.loai_nhan, c.chi_tieu].forEach((v) => {
+      [c.name, nhanBuoi(c), nhanLoai(c.loai), c.chi_tieu].concat(coGio ? [c.gio, c.dia_diem] : []).forEach((v) => {
         tr.insertCell().textContent = v === null || v === undefined ? "" : String(v);
       });
     });
@@ -157,8 +159,13 @@ window.ChuanBi = (() => {
     return cuon;
   }
 
-  const tomLoai = (theo) => Object.keys(theo || {}).map((k) => k + " " + theo[k]).join(", ");
-  const noiDung = (x) => x.clb + ": " + x.noi_dung;
+  /* SG-8: API trả mã Loại (TU_DO…) và {code, params}; chữ vi/en do giao diện đặt. Tệp đợt lưu trước SG-8: nhãn
+     Loại Việt và chuỗi trong `chan` hiện nguyên chữ; mục lỗi/cảnh báo `{ma, clb, noi_dung}` được API đổi sang mã
+     khi biết `ma`, còn `ma` lạ thì hiện "<CLB>: <noi_dung>" (nhánh dự phòng ở `noiDung`). */
+  const nhanLoai = (k) => (k && ["TU_DO", "GIOI_HAN", "TUYEN_CHON"].includes(k) ? t("fa_loai_" + k) : (k || ""));
+  const nhanBuoi = (c) => (/^(thu_[2-7]|chu_nhat)$/.test(c.buoi || "") ? t("buoi_ma_" + c.buoi) : (c.buoi_nhan || c.buoi || ""));
+  const tomLoai = (theo) => Object.keys(theo || {}).map((k) => nhanLoai(k) + " " + theo[k]).join(", ");
+  const noiDung = (x) => (x && x.code ? trErr(x) : x.clb + ": " + (x.noi_dung || ""));
 
   function veBuoc1(khung, tt) {
     const b1 = tt.clb;
@@ -177,7 +184,7 @@ window.ChuanBi = (() => {
     khung.appendChild(trangThai(sach ? "xanh" : "do", t(sach ? "cb_b1_xanh" : "cb_b1_do", p)));
     khung.appendChild(bangClb(b1.clubs));
     [["cb_b1_loi", "cb-b1-loi", b1.loi.map(noiDung)], ["cb_b1_canh_bao", "cb-b1-canh-bao", b1.canh_bao.map(noiDung)],
-      ["cb_b1_chan", "cb-b1-chan", b1.chan]].forEach(([khoa, id, ds]) => {
+      ["cb_b1_chan", "cb-b1-chan", b1.chan.map(trErr)]].forEach(([khoa, id, ds]) => {
       if (!ds.length) return;
       khung.appendChild(mot("strong", "", t(khoa)));
       khung.appendChild(danhSach(id, ds));
@@ -235,6 +242,9 @@ window.ChuanBi = (() => {
 
   dangKyBuoc(1, (khung) => docRoiVe(khung, veBuoc1));
   dangKyBuoc(2, (khung) => docRoiVe(khung, veBuoc2));
+
+  /* SG-8: đổi ngôn ngữ thì vẽ lại các bước (bảng và câu lỗi bước 1 được dựng từ mã, không phải chữ đã dịch). */
+  window.addEventListener("langchange", () => { if (dangMo()) lamMoi(); });
 
   return { duong, dangKyBuoc, lamMoi };
 })();

@@ -1365,6 +1365,66 @@ MESSAGES = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-B: add below ===
+    "so_nhap_canh_bao_wharton_trong": {
+        "vi": "{n} {person_l} (ví dụ {vd}) có từ hai {slot_l} trong cùng một buổi mà chưa điền điểm quyết tâm nào, nên lần chạy xếp sẽ bị chặn. Cách sửa: điền đủ 100 điểm cho mỗi nhóm trong sổ rồi nhập lại, hoặc tắt điểm quyết tâm ở Không gian làm việc → ⋯ → Tính năng sau khi xếp….",
+        "en": "{n} {person_l}(s) (for example {vd}) have two or more {slot_l}s in the same session with no commitment points filled in, so the allocation run will be blocked. To fix it: fill in 100 points for each group in the workbook and import again, or turn commitment points off in Workspace → ⋯ → After-allocation features….",
+    },
+    "phieu_nd_phieu_thieu_cau_2": {
+        "vi": "{clb}: chưa trả lời câu 2 (mở thêm nhóm được không): không phân loại được, đã bỏ qua",
+        "en": "{clb}: hasn't answered question 2 (can extra groups be opened?), so the club can't be classified: skipped",
+    },
+    "phieu_nd_phieu_thieu_phong": {
+        "vi": "{clb}: CLB mở thêm nhóm được nhưng chưa ghi sức chứa mỗi nhóm: đã bỏ qua",
+        "en": "{clb}: the club can open extra groups but no room capacity per group is given: skipped",
+    },
+    "phieu_nd_phieu_thieu_cho": {
+        "vi": "{clb}: CLB không mở thêm nhóm nhưng chưa ghi số chỗ tối đa hợp lệ: đã bỏ qua",
+        "en": "{clb}: the club doesn't open extra groups but no valid maximum number of seats is given: skipped",
+    },
+    "phieu_nd_phieu_moc_sai": {
+        "vi": "{clb}: mốc tối thiểu phải là số nguyên từ 1 đến 10: đã bỏ qua",
+        "en": "{clb}: the pass mark must be a whole number from 1 to 10: skipped",
+    },
+    "phieu_nd_phieu_toi_thieu_sai": {
+        "vi": "{clb}: số thành viên tối thiểu không hợp lệ: không ghi",
+        "en": "{clb}: the minimum number of members is not valid: not recorded",
+    },
+    "phieu_nd_phieu_tu_do_co_ly_do_gioi_han": {
+        "vi": "{clb}: khai Tự do nhưng có ghi lý do giới hạn; CLB bị giới hạn thật không được khai Tự do, cần admin xem lại",
+        "en": "{clb}: declared Free but a reason for limiting is given; a club that is really limited can't be declared Free, an admin needs to review it",
+    },
+    "phieu_nd_phieu_thieu_ly_do": {
+        "vi": "{clb}: CLB giới hạn chưa ghi lý do (phòng/dụng cụ/người hướng dẫn)",
+        "en": "{clb}: the Limited club has no reason given (room, equipment or instructor)",
+    },
+    "phieu_nd_phieu_thieu_cau_4": {
+        "vi": "{clb}: chưa trả lời câu 4: coi là không cần kỹ năng (Giới hạn)",
+        "en": "{clb}: hasn't answered question 4: treated as needing no skill (Limited)",
+    },
+    "phieu_nd_phieu_thu_thach_khong_tu_cham": {
+        "vi": "{clb}: loại thử thách không phải trắc nghiệm: phần mềm không chấm tự động, admin nhập điểm",
+        "en": "{clb}: the challenge type is not multiple choice: the software can't mark it automatically, an admin enters the scores",
+    },
+    "phieu_nd_phieu_thieu_tieu_chi": {
+        "vi": "{clb}: CLB Tuyển chọn chưa ghi bảng tiêu chí",
+        "en": "{clb}: the Selective club has no criteria table",
+    },
+    "phieu_nd_phieu_cho_duyet_tuyen_chon": {
+        "vi": "{clb}: CLB Tuyển chọn: chờ ban quản lý duyệt trước khi mở cổng",
+        "en": "{clb}: Selective club: waiting for management approval before the gate opens",
+    },
+    "phieu_nd_phieu_nop_nhieu_lan": {
+        "vi": "{clb}: nộp phiếu nhiều lần: lấy phiếu cuối cùng",
+        "en": "{clb}: submitted the form more than once: the last submission is used",
+    },
+    "phieu_nd_phieu_mac_dinh_ky_truoc": {
+        "vi": "{clb}: chưa nộp phiếu: mặc định Giới hạn với chỉ tiêu kỳ trước",
+        "en": "{clb}: hasn't submitted the form: defaults to Limited with last term's quota",
+    },
+    "phieu_clb_khong_co_clb_hop_le": {
+        "vi": "Không có CLB hợp lệ nào trong tệp.",
+        "en": "There is no valid club in the file.",
+    },
     # === end SG-B ===
 
     # (spacer: unchanged line between marker blocks)

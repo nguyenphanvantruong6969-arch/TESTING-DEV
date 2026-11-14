@@ -406,7 +406,7 @@ function loadAdminClubs() {
         suaClbTuDong(c, tr);
       });
       tr.innerHTML =
-        `<td>${esc(c.club_id)}</td><td>${esc(c.name)}</td><td>${esc(c.capacity)}</td>` +
+        `<td>${esc(c.club_id)}</td><td>${esc(c.name)}${gioDiaDiemHtml(c)}</td><td>${esc(c.capacity)}</td>` +
         `<td>${esc(c.reserve_capacity)}</td><td>${esc(c.reserve_group || "—")}</td>` +
         `<td class="cot-buoi">${esc(nhanBuoi(c.buoi))}</td>` + (coFa ? oFaClb(c) : "") + `<td></td>`;
       const delBtn = document.createElement("button");
