@@ -21,6 +21,7 @@ Cấu hình mặc định giữ từng byte (`kiem_nhanh` 7/7, 60 ca = 3 bộ ×
 - **SG-11b (M4)**: hộp chọn không gian làm việc giữ tiêu điểm trong hộp (Tab/Shift+Tab), Esc đóng đúng lớp, trả tiêu điểm về nút mở. Test: `tests/test_giao_dien_sg11b_focus_man_chon.py`.
 - **SG-12 (H2, D2 = b)**: biểu mẫu học sinh dùng tiêu đề thuần (không `[mã]`, `(club_id)`); trình tạo ghi `MAP_*.json` cạnh từng biểu mẫu, bộ đọc khớp chính xác qua bản đồ; tệp xuất cũ có mã vẫn đọc được; `--giu-ma` cho đầu ra giống từng byte trước SG-12. Test: `tests/test_sg12_tieu_de_thuan.py`.
 - **Gộp (người A)**: xung đột SG-6 × SG-10 ở `api_bao_cao.get_club_fill_stats`, `api_xuat` (đầu khối "Theo CLB") và `js/09_the_xem.js` (`veKqTheoClb`) giữ cả hai hành vi; `i18n_loi.js` sinh lại. Test: `tests/test_sg_tich_hop_tu_do_gio.py` (3). `CLAUDE_CHI_TIET.md`: số tệp test 293.
+- **SG-6 (sửa CI)**: fixture `_csdl_cu` trong `tests/test_sg6_gio_dia_diem.py` dựng lại bảng `clubs` thay vì `ALTER TABLE … DROP COLUMN` (SQLite 3.45.1 của Python 3.11 trên CI báo "incomplete input" khi xoá cột cuối có chú thích `--`; SQLite 3.53 không lỗi). Chỉ đổi test; mã sản phẩm và schema không đổi.
 
 ## 2026-11-13 — FG FINISH: báo cáo, sổ sách, chạy thử người mới (chỉ tài liệu, TH)
 

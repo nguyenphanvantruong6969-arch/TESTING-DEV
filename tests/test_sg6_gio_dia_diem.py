@@ -165,10 +165,20 @@ def _csdl_cu(tmp_path):
     os.makedirs(os.path.dirname(db))
     a = PipelineAPI(db)
     a.create_or_update_club("a", "CLB A", 3, 0, "")
+    # Không dùng ALTER TABLE ... DROP COLUMN: SQLite 3.45 (Python 3.11 trên CI) lỗi
+    # "incomplete input" khi xoá cột cuối có chú thích "--" phía sau.
+    dong = [d for d in rp._BANG_RANG_BUOC["clubs"].splitlines()
+            if not d.strip().startswith(("gio ", "dia_diem ", "-- SG-6"))]
+    i = max(k for k, d in enumerate(dong) if d.strip() and not d.strip().startswith("--"))
+    ma, _, chu_thich = dong[i].partition("--")
+    dong[i] = ma.rstrip().rstrip(",") + ("  --" + chu_thich if chu_thich else "")
     conn = sqlite3.connect(db)
     conn.execute("PRAGMA foreign_keys = OFF")
-    conn.execute("ALTER TABLE clubs DROP COLUMN gio")
-    conn.execute("ALTER TABLE clubs DROP COLUMN dia_diem")
+    conn.execute("CREATE TABLE clubs_cu (" + "\n".join(dong) + "\n)")
+    cot = [r[1] for r in conn.execute("PRAGMA table_info(clubs_cu)")]
+    conn.execute(f"INSERT INTO clubs_cu ({', '.join(cot)}) SELECT {', '.join(cot)} FROM clubs")
+    conn.execute("DROP TABLE clubs")
+    conn.execute("ALTER TABLE clubs_cu RENAME TO clubs")
     conn.commit()
     conn.close()
     return db
