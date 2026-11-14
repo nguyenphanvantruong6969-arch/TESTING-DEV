@@ -109,7 +109,26 @@ def giu_cho_hop_le(clubs: dict, giu_cho, students: dict, preferences=None) -> se
     return ra
 
 
-def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> list:
+def dem_nv1_trong_buoi(clubs: dict, preferences: dict) -> dict:
+    """{club_id: số học sinh xếp CLB này ĐẦU TIÊN TRONG BUỔI của nó} (nguyện vọng 1 theo buổi).
+
+    MỘT định nghĩa cho bảng nhu cầu (`bang_nhu_cau`) và lỗi `fa_clb_tuyen_chon_chua_co_diem`
+    (SG-1 FIX-1): cùng số em ở cả hai nơi. CLB không có trong `clubs` bị bỏ qua."""
+    nv1 = {c: 0 for c in clubs}
+    for ds in preferences.values():
+        thay_buoi = set()
+        for c in ds or []:
+            if c not in clubs:
+                continue
+            b = clubs[c].get("buoi") or BUOI_MAC_DINH
+            if b not in thay_buoi:
+                thay_buoi.add(b)
+                nv1[c] += 1
+    return nv1
+
+
+def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None,
+                  tested_scores=None) -> list:
     """Kiểm dữ liệu FA trước khi chạy; trả danh sách `err(...)` (rỗng = hợp lệ).
 
     `clubs` {club_id: {buoi, capacity, loai, diem_san, ...}}, `giu_cho` [(club_id, student_id)],
@@ -118,8 +137,15 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> lis
     GIOI_HAN / TUYEN_CHON có sức chứa > 0; TUYEN_CHON có điểm sàn; số giữ chỗ dùng được của một
     CLB không quá sức chứa. CẢNH BÁO (`MA_CANH_BAO`): giữ chỗ cho học sinh không có, hoặc em
     không xếp CLB đó — không tính vào số giữ chỗ. Thứ tự lỗi cố định, không phụ thuộc thứ tự dict.
+
+    SG-1 (C3): khi biết CẢ `preferences` lẫn `tested_scores` {club_id: {student_id: điểm}}, CLB
+    TUYEN_CHON có người xếp trong nguyện vọng mà KHÔNG em nào có điểm là lỗi CHẶN
+    `fa_clb_tuyen_chon_chua_co_diem` {club_id, so_dang_ky, so_nv1} (mọi người đăng ký sẽ bị loại).
+    Thiếu một trong hai tham số thì bỏ kiểm này (hành vi cũ).
     """
     loi = []
+    nv1_buoi = (dem_nv1_trong_buoi(clubs, preferences)
+                if preferences is not None and tested_scores is not None else {})
     cac_buoi = sorted({c.get("buoi") or BUOI_MAC_DINH for c in clubs.values()})
     co_tu_do = {c.get("buoi") or BUOI_MAC_DINH for c in clubs.values() if c.get("loai") == TU_DO}
     loi += [err("fa_thieu_clb_tu_do", buoi=b) for b in cac_buoi if b not in co_tu_do]
@@ -135,6 +161,12 @@ def kiem_truoc_fa(clubs: dict, giu_cho, students: dict, preferences=None) -> lis
                 loi.append(err("fa_clb_thieu_suc_chua", club_id=cid))
         if loai == TUYEN_CHON and c.get("diem_san") is None:
             loi.append(err("fa_clb_thieu_diem_san", club_id=cid))
+        if loai == TUYEN_CHON and preferences is not None and tested_scores is not None:
+            dang_ky = [s for s in sorted(preferences, key=str) if cid in (preferences[s] or [])]
+            if dang_ky and not tested_scores.get(cid):
+                loi.append(err("fa_clb_tuyen_chon_chua_co_diem", club_id=cid,
+                               so_dang_ky=len(dang_ky),
+                               so_nv1=nv1_buoi[cid]))
     cap = sorted(set(giu_cho), key=lambda p: (str(p[0]), str(p[1])))
     dung_duoc = giu_cho_hop_le(clubs, cap, students, preferences)
     for c, s in cap:
@@ -191,7 +223,12 @@ def kiem_fa_tu_csdl(cur) -> list:
     Dùng chung cho lần chạy xếp (bước kiểm dữ liệu) và báo cáo sức khoẻ dữ liệu: cùng số, cùng em."""
     clubs, students, prefs = doc_clubs_va_nguyen_vong(cur)
     _, cap, huy = doc_du_lieu_fa(cur)
-    return kiem_truoc_fa(clubs, cap, students, prefs) + kiem_ho_so_huy_chuong(prefs, huy, clubs)
+    diem: dict = {}
+    for cid, sid, d in cur.execute("SELECT club_id, student_id, score FROM club_scores "
+                                   "ORDER BY club_id, student_id"):
+        diem.setdefault(cid, {})[sid] = d
+    return (kiem_truoc_fa(clubs, cap, students, prefs, diem)
+            + kiem_ho_so_huy_chuong(prefs, huy, clubs))
 
 
 # ---------------------------------------------------------------------------
@@ -435,6 +472,22 @@ def chay_fa_daa(students: dict, clubs: dict, tested_scores: dict, applicants: di
             nhom += [{"buoi": buoi, "student_id": sid, "club_id": cid, "group_no": i % n + 1}
                      for i, sid in enumerate(tv)]
 
+    # (7) SG-3: `rank_in_student_pref` = thứ hạng trong danh sách GỐC của em TRONG BUỔI (cùng giá trị với
+    # `rank_in_list` của `ly_do_ket_qua`), không phải trong danh sách đã lọc/tăng cường `prefs_fa`.
+    # CLB em không khai (dự phòng vào CLB Tự do) -> không có thứ hạng (NULL khi ghi). Chỉ sửa kết quả
+    # đầu ra; lõi DA và việc ai vào CLB nào không đổi.
+    for buoi in ket.ds_buoi:
+        hang_buoi = ket.per_buoi[buoi].rank_in_student_pref
+        for sid, cid in ket.per_buoi[buoi].assignment.items():
+            if cid is None:
+                continue
+            goc = [c for c in (preferences.get(sid) or []) if c in clubs_fa
+                   and (clubs_fa[c].get("buoi") or BUOI_MAC_DINH) == buoi]
+            if cid in goc:
+                hang_buoi[sid] = goc.index(cid) + 1
+            else:
+                hang_buoi.pop(sid, None)
+
     return KetQuaFA(ket_qua=ket, clubs=clubs_fa, tested_scores=tested_fa, applicants=app_fa,
                     preferences=prefs_fa, reserve_fn=reserve_fn, loai_bo=loai_bo,
                     canh_bao=canh_bao, fallback=fallback, nhom=nhom, dong_cua=dong_cua)
@@ -573,18 +626,13 @@ def bang_nhu_cau(clubs: dict, preferences: dict, tested_scores: dict, fa_clb: di
     def buoi_cua(cid):
         return clubs[cid].get("buoi") or BUOI_MAC_DINH
 
-    nv1 = {c: 0 for c in clubs}
+    nv1 = dem_nv1_trong_buoi(clubs, preferences)
     so_ghi = {c: 0 for c in clubs}
     dat_san = {c: 0 for c in clubs}
     for sid, ds in preferences.items():
         trong = [c for c in ds if c in clubs]
-        thay_buoi = set()
         for c in trong:
             so_ghi[c] += 1
-            b = buoi_cua(c)
-            if b not in thay_buoi:
-                thay_buoi.add(b)
-                nv1[c] += 1
             if (fa_clb.get(c) or {}).get("loai") == TUYEN_CHON:
                 diem = tested_scores.get(c, {}).get(sid)
                 if diem is not None and diem >= ((fa_clb.get(c) or {}).get("diem_san") or 0):

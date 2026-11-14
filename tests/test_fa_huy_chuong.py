@@ -196,6 +196,9 @@ def test_pipeline_chan_khi_ho_so_huy_chuong_sai(api):
 
 def test_pipeline_chay_duoc_voi_huy_chuong_khong_can_100_diem(api):
     _dung(api)
+    # SG-1: CLB Tuyển chọn có người đăng ký thì phải có ít nhất một điểm thi, nếu không lần chạy bị chặn.
+    assert api.submit_test_selection("s1", ["S"])["ok"]
+    assert api.submit_club_scores("S", [{"student_id": "s1", "score": 9}])["ok"]
     assert api.submit_huy_chuong("s1", {"G": 60})["ok"]
     kq = api.run_pipeline(seed=3)
     assert kq["ok"], kq["errors"]

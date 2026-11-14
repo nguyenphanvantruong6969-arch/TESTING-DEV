@@ -62,8 +62,8 @@
   function nhanTep(danhSachFile) {
     const ds = Array.from(danhSachFile || []);
     if (!ds.length) return;
-    Promise.all(ds.map(docTep)).then((files) =>
-      callApi("nhan_dien_tep_forms", files).then((res) => {
+    chayTai(Promise.all(ds.map(docTep)), (files) =>
+      chayTai(callApi("nhan_dien_tep_forms", files), (res) => {
         if (!res.ok) { showErrorToast(res.errors); return; }
         S.tep = res.data.tep.map((x, i) => Object.assign({}, x, { base64: files[i].base64, chu: x.bien_the_doan || "" }));
         S.canDe = res.data.can_chon_de;
@@ -86,11 +86,11 @@
     return lc;
   }
 
-  function chuyen() {
+  function chuyen(nutBam) {
     if (S.dang) return;
     S.dang = true;
     const files = S.moi ? S.tep.map((x) => ({ ten: x.ten, base64: x.base64 })) : null;
-    callApi("chuyen_tep_forms", files, bienThe(), luaChon()).then((res) => {
+    chayNut(nutBam, () => callApi("chuyen_tep_forms", files, bienThe(), luaChon()), (res) => {
       S.dang = false;
       if (!res.ok) { showErrorToast(res.errors); doiRoiVe(); return; }
       S.moi = false;
@@ -98,20 +98,20 @@
       if (res.data.trang_thai === "cho_xac_nhan") { S.choXN = res.data.cho_xac_nhan; S.kq = null; }
       else { S.choXN = null; S.kq = res.data; }
       doiRoiVe();
-    });
+    }, { sauCung: () => { S.dang = false; } });   /* API ném lỗi đồng bộ cũng không để bước chết */
   }
 
-  function chonDieuChinh(gia_tri) { S.dieuChinh = gia_tri; chuyen(); }
+  function chonDieuChinh(gia_tri, nutBam) { S.dieuChinh = gia_tri; chuyen(nutBam); }
 
-  function chamLai() {
+  function chamLai(ev) {
     S.boCau = Array.from(document.querySelectorAll("#cb-nap-bo-cau input:checked")).map((o) => JSON.parse(o.value));
-    chuyen();
+    chuyen(ev.currentTarget);
   }
 
-  function nhapSo() {
-    callApi("lay_so_nhap_nap").then((so) => {
+  function nhapSo(ev) {
+    chayNut(ev.currentTarget, () => callApi("lay_so_nhap_nap"), (so) => {
       if (!so.ok) { showErrorToast(so.errors); return; }
-      callApi("import_so_nhap", so.data.base64).then((res) => {
+      chayTai(callApi("import_so_nhap", so.data.base64), (res) => {
         if (!res.ok || !res.data) { showErrorToast(res.errors); return; }
         S.nhap = { n_hoc_sinh: res.data.n_hoc_sinh };
         doiRoiVe();
@@ -190,8 +190,8 @@
     hop.appendChild(trangThai("do", t("cb_nap_cho", { clb: S.choXN.clb.join(", ") })));
     hop.appendChild(mot("p", "hint-text", t("cb_nap_cho_ghi", { path: S.choXN.bao_cao })));
     const hang = mot("div", "cb-nut-hang");
-    hang.appendChild(nut("cb-nap-ap-dung", "cb_nap_ap_dung", () => chonDieuChinh("ap_dung")));
-    hang.appendChild(nut("cb-nap-giu", "cb_nap_giu", () => chonDieuChinh("giu")));
+    hang.appendChild(nut("cb-nap-ap-dung", "cb_nap_ap_dung", (ev) => chonDieuChinh("ap_dung", ev.currentTarget)));
+    hang.appendChild(nut("cb-nap-giu", "cb_nap_giu", (ev) => chonDieuChinh("giu", ev.currentTarget)));
     hop.appendChild(hang);
     k.appendChild(hop);
   }
@@ -221,10 +221,10 @@
     }
     if (kq.canh_bao.length) {
       k.appendChild(mot("strong", "", t("cb_nap_canh_bao", { n: kq.canh_bao.length })));
-      const ul = mot("ul", "cb-dong-loi");
-      ul.id = "cb-nap-canh-bao";
-      kq.canh_bao.slice(0, 30).forEach((c) => ul.appendChild(mot("li", "", (c.ma ? c.ma + ": " : "") + c.noi_dung)));
-      k.appendChild(ul);
+      const hop = mot("div", "cb-canh-bao-gom");
+      hop.id = "cb-nap-canh-bao";
+      veCanhBaoGom(hop, kq.canh_bao.map((c) => ({ ma: c.ma, chu: c.noi_dung })));
+      k.appendChild(hop);
     }
     const xt = kq.xem_truoc;
     if (xt) {
@@ -250,7 +250,7 @@
   function ve(k) {
     if (!S.khoiTao) {
       S.khoiTao = true;
-      callApi("get_forms_nap").then((res) => {
+      chayTai(callApi("get_forms_nap"), (res) => {
         if (res.ok && !S.tep.length && res.data.tep.length) {
           S.tep = res.data.tep.map((x) => Object.assign({}, x, { base64: null, chu: x.bien_the_doan || "" }));
           S.canDe = res.data.can_chon_de;
@@ -324,7 +324,7 @@
     o.addEventListener("change", () => {
       const f = o.files && o.files[0];
       if (!f) { S5[khoa] = null; return; }
-      docTep(f).then((x) => { S5[khoa] = x; capNhatNut(nutId); });
+      chayTai(docTep(f), (x) => { S5[khoa] = x; capNhatNut(nutId); });
     });
     nhan.appendChild(o);
     if (S5[khoa]) nhan.appendChild(mot("span", "hint-text", " " + S5[khoa].ten));
@@ -339,15 +339,15 @@
 
   function capNhatNut(id) { const n = el(id); if (n) n.disabled = !DIEU_KIEN[id](); }
 
-  function goi(ten, args, khoa) {
+  function goi(ten, args, khoa, nutBam) {
     if (S5.dang) return;
     S5.dang = ten;
-    callApi.apply(null, [ten].concat(args)).then((res) => {
+    chayNut(nutBam, () => callApi.apply(null, [ten].concat(args)), (res) => {
       S5.dang = "";
       if (!res.ok) { S5[khoa] = null; showErrorToast(res.errors); veLai(); return; }
       S5[khoa] = res.data;
       veLai();
-    });
+    }, { sauCung: () => { S5.dang = ""; } });
   }
 
   function phan(k, tieuDe, ghi) {
@@ -360,7 +360,7 @@
 
   function veXuat(k) {
     const p = phan(k, "cb_nap_s5_xuat", "cb_nap_s5_xuat_ghi");
-    const n = nut("cb-nap5-xuat", "cb_nap_s5_xuat_nut", () => goi("xuat_ket_qua_list", [], "xuat"));
+    const n = nut("cb-nap5-xuat", "cb_nap_s5_xuat_nut", (ev) => goi("xuat_ket_qua_list", [], "xuat", ev.currentTarget));
     n.disabled = !DIEU_KIEN["cb-nap5-xuat"]();
     p.appendChild(n);
     const r = S5.xuat;
@@ -380,7 +380,7 @@
   function veAi(k) {
     const p = phan(k, "cb_nap_s5_ai", "cb_nap_s5_ai_ghi");
     oChonTep(p, "cb-nap5-lop", "cb_nap_s5_chon_lop", "lop", "cb-nap5-ai");
-    const n = nut("cb-nap5-ai", "cb_nap_s5_ai_nut", () => goi("ai_chua_dang_ky", [S5.lop.base64], "ai"));
+    const n = nut("cb-nap5-ai", "cb_nap_s5_ai_nut", (ev) => goi("ai_chua_dang_ky", [S5.lop.base64], "ai", ev.currentTarget));
     n.disabled = !DIEU_KIEN["cb-nap5-ai"]();
     p.appendChild(n);
     const r = S5.ai;
@@ -396,7 +396,7 @@
     const p = phan(k, "cb_nap_s5_dc", "cb_nap_s5_dc_ghi");
     oChonTep(p, "cb-nap5-cu", "cb_nap_s5_cu", "cu", "cb-nap5-dc");
     oChonTep(p, "cb-nap5-moi", "cb_nap_s5_moi", "moi", "cb-nap5-dc");
-    const n = nut("cb-nap5-dc", "cb_nap_s5_dc_nut", () => goi("doi_chieu_hai_lan", [S5.cu.base64, S5.moi.base64], "dc"));
+    const n = nut("cb-nap5-dc", "cb_nap_s5_dc_nut", (ev) => goi("doi_chieu_hai_lan", [S5.cu.base64, S5.moi.base64], "dc", ev.currentTarget));
     n.disabled = !DIEU_KIEN["cb-nap5-dc"]();
     p.appendChild(n);
     const r = S5.dc;

@@ -110,6 +110,49 @@ function khiBan(nut, taoPromise) {
     .finally(() => { nut.disabled = false; });
 }
 
+/* SG-9: MOT cho cho moi lan goi API. Truoc day ~68 cho viet `callApi(..).then(..)` tran: loi JS trong
+   `.then` khong ai bat, nut co the xam mai, bam dup gui hai lan.
+   - baoLoiGiaoDien: mot thong bao loi chung (cung cau voi `unhandledrejection` o tren).
+   - chayTai(promise, khiXong): tai/lam moi KHONG do nut bam. Loi (API hay trong khiXong) -> thong bao loi,
+     khong nem tiep; tra Promise luon xong (gia tri cua khiXong, hoac undefined khi loi).
+   - chayNut(nut, taoPromise, khiXong, tuyChon): nut bam. Khoa nut + nhan "Dang..." (chi the <button>, chi xoa
+     nhan neu khiXong khong tu doi), loi -> thong bao, `finally` mo lai nut + tra nhan. Nut dang khoa thi
+     bo qua lan bam (Promise khong bao gio xong) nen bam dup chi goi API MOT lan.
+     Mac dinh nut mo lai ngay khi API tra ve (truoc khiXong, nhu khiBan: khiXong co the khoa nut lai).
+     tuyChon.nhan = khoa i18n cua nhan ban ("dang_xu_ly"); tuyChon.giuDenKhiXong = true: giu khoa den het khiXong;
+     tuyChon.sauCung: ham chay trong `finally`. */
+function baoLoiGiaoDien(loi) {
+  console.error(loi);
+  showToast(t("loi_giao_dien_ngoai_du_kien"), "error",
+    [{ code: "loi_giao_dien_ngoai_du_kien", params: { detail: String(loi) } }]);
+}
+
+function chayTai(promise, khiXong) {
+  return Promise.resolve(promise).then(khiXong).catch(baoLoiGiaoDien);
+}
+
+function noiTiep(...cacHam) {
+  return cacHam.reduce((p, f) => p.then(() => f()), Promise.resolve());
+}
+
+function chayNut(nut, taoPromise, khiXong, tuyChon) {
+  if (!nut || nut.disabled) return new Promise(() => {});
+  const tc = tuyChon || {};
+  const laNutBam = nut.tagName === "BUTTON";
+  const chuGoc = laNutBam ? nut.textContent : "";
+  const chuBan = laNutBam ? t(tc.nhan || "dang_xu_ly") : "";
+  nut.disabled = true;
+  if (laNutBam) nut.textContent = chuBan;
+  const khoi = () => {
+    if (laNutBam && nut.textContent === chuBan) nut.textContent = chuGoc;
+    nut.disabled = false;
+    if (tc.sauCung) tc.sauCung();
+  };
+  const goi = Promise.resolve().then(taoPromise);
+  if (tc.giuDenKhiXong) return goi.then(khiXong).catch(baoLoiGiaoDien).finally(khoi);
+  return goi.finally(khoi).then(khiXong).catch(baoLoiGiaoDien);
+}
+
 /* Bien mot <div> bam duoc thanh thu ban phim dung duoc: Tab toi duoc,
    Enter/Space kich hoat, va trinh doc man hinh biet no la gi. Truoc day
    ca tab Nhap tai cho chi dung duoc bang chuot. `laOTick`: o tick bat/tat
@@ -132,6 +175,34 @@ function choBamDuoc(elm, laOTick) {
 
 function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+/* SG-7 (H4, M1) — MỘT luật cho mọi danh sách cảnh báo dài (cùng luật FG-6 của nhật ký chạy):
+   gom theo mã; mỗi mã nhiều hơn CANH_BAO_VD_TOI_DA thì có dòng số đếm + đúng ngần ấy ví dụ + "và N trường hợp nữa";
+   ít hơn thì hiện hết, không thêm dòng nào. `muc` = [{ma, chu}] (chu đã là câu đọc được). Vẽ vào `hop`. */
+const CANH_BAO_VD_TOI_DA = 5;
+
+function veCanhBaoGom(hop, muc) {
+  const nhom = new Map();
+  muc.forEach((m) => {
+    if (!nhom.has(m.ma)) nhom.set(m.ma, []);
+    nhom.get(m.ma).push(m.chu);
+  });
+  const them = (cha, lop, chu) => {
+    const d = document.createElement("div");
+    d.className = lop;
+    d.textContent = chu;
+    cha.appendChild(d);
+  };
+  nhom.forEach((ds) => {
+    const n = document.createElement("div");
+    n.className = "canh-bao-nhom";
+    const dai = ds.length > CANH_BAO_VD_TOI_DA;
+    if (dai) them(n, "canh-bao-tieu-de", t("canh_bao_gom_dau", { n: ds.length }));
+    ds.slice(0, CANH_BAO_VD_TOI_DA).forEach((c) => them(n, "canh-bao-dong", "• " + c));
+    if (dai) them(n, "canh-bao-con-lai", t("canh_bao_gom_nua", { m: ds.length - CANH_BAO_VD_TOI_DA }));
+    hop.appendChild(n);
+  });
 }
 
 /* Thoat ca dau nhay: truoc day chi an toan GIUA hai the. Chi can mot

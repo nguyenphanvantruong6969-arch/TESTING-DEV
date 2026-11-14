@@ -1818,7 +1818,10 @@ _BANG_RANG_BUOC = {
     loai TEXT,                  -- 'TU_DO' | 'GIOI_HAN' | 'TUYEN_CHON'
     diem_san INTEGER,           -- điểm sàn 0-10 (TUYEN_CHON)
     so_toi_thieu INTEGER,       -- số thành viên tối thiểu (FA-5)
-    suc_chua_phong INTEGER      -- sức chứa một phòng (chia nhóm CLB tự do, FA-4)
+    suc_chua_phong INTEGER,     -- sức chứa một phòng (chia nhóm CLB tự do, FA-4)
+    -- SG-6 (H1): giờ và địa điểm giáo viên khai; CHỈ để hiển thị / xuất, thuật toán KHÔNG đọc.
+    gio TEXT,                   -- vd '15:30-17:00'; NULL = chưa khai
+    dia_diem TEXT               -- vd 'Sân A'; NULL = chưa khai
 """,
     "club_test_selection": """
     student_id TEXT NOT NULL REFERENCES students (student_id),
@@ -2476,7 +2479,8 @@ def di_tru_schema(db_path: str) -> list[str]:
 
 
 def _them_cot_fa_cho_clb(db_path: str) -> list[str]:
-    """ALTER TABLE clubs ADD COLUMN cho bốn cột FA còn thiếu; sao lưu trước. Idempotent."""
+    """ALTER TABLE clubs ADD COLUMN cho bốn cột FA và hai cột giờ / địa điểm (SG-6) còn thiếu;
+    sao lưu trước. Idempotent."""
     conn = connect_db(db_path)
     try:
         cur = conn.cursor()
@@ -2484,7 +2488,8 @@ def _them_cot_fa_cho_clb(db_path: str) -> list[str]:
                            ).fetchone():
             return []
         thieu = [(c, k) for c, k in (("loai", "TEXT"), ("diem_san", "INTEGER"),
-                                     ("so_toi_thieu", "INTEGER"), ("suc_chua_phong", "INTEGER"))
+                                     ("so_toi_thieu", "INTEGER"), ("suc_chua_phong", "INTEGER"),
+                                     ("gio", "TEXT"), ("dia_diem", "TEXT"))
                  if not _co_cot(cur, "clubs", c)]
         if not thieu:
             return []

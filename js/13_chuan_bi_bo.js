@@ -36,8 +36,8 @@
     return n;
   }
 
-  function tao() {
-    callApi("tao_bo_bieu_mau_api", { mot_bieu_mau: moMotBieuMau, bien_the: moBienThe }).then((res) => {
+  function tao(ev) {
+    chayNut(ev.currentTarget, () => callApi("tao_bo_bieu_mau_api", { mot_bieu_mau: moMotBieuMau, bien_the: moBienThe }), (res) => {
       if (!res.ok) { showErrorToast(res.errors); return; }
       zipGhi = res.data;
       showToast(t("cb_bo_xong", { n: zipGhi.n_tep, ten: zipGhi.ten_zip }), "success");
@@ -83,7 +83,7 @@
   }
 
   ChuanBi.dangKyBuoc(3, (khung) => {
-    callApi("get_bo_bieu_mau").then((res) => {
+    chayTai(callApi("get_bo_bieu_mau"), (res) => {
       if (!res.ok) { showErrorToast(res.errors); return; }
       clear(khung);
       veBuoc3(khung, res.data);

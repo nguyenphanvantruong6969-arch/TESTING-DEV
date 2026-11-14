@@ -63,16 +63,21 @@ MA_MOI_SAU_ANH_CHUP = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-A: add below ===
+    "fa_clb_tuyen_chon_chua_co_diem",
+    "khieu_nai_hs_khong_co", "khieu_nai_chua_co_ket_qua",
     # === end SG-A ===
 
     # (spacer: unchanged line between marker blocks)
 
     # === SG-B: add below ===
+    "so_nhap_canh_bao_wharton_trong",
+    "phieu_nd_phieu_thieu_cau_2", "phieu_nd_phieu_thieu_phong", "phieu_nd_phieu_thieu_cho", "phieu_nd_phieu_moc_sai", "phieu_nd_phieu_toi_thieu_sai", "phieu_nd_phieu_tu_do_co_ly_do_gioi_han", "phieu_nd_phieu_thieu_ly_do", "phieu_nd_phieu_thieu_cau_4", "phieu_nd_phieu_thu_thach_khong_tu_cham", "phieu_nd_phieu_thieu_tieu_chi", "phieu_nd_phieu_cho_duyet_tuyen_chon", "phieu_nd_phieu_nop_nhieu_lan", "phieu_nd_phieu_mac_dinh_ky_truoc", "phieu_clb_khong_co_clb_hop_le",
     # === end SG-B ===
 
     # (spacer: unchanged line between marker blocks)
 
     # === SG-C: add below ===
+    "forms_cot_la", "forms_thieu_ban_do", "forms_tieu_de_trung",
     # === end SG-C ===
 
     # FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ.

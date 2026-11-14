@@ -273,6 +273,14 @@ class SauXepMixin:
             if not bat:
                 return _fail(err("fa_khieu_nai_chua_bat"))
             with self._ket_noi_ghi() as cur:
+                # SG-4 (M3): cùng luật khớp mã với đường Forms (FG-5): đúng thắng, không thì khớp mềm nếu đúng MỘT.
+                go = student_id
+                student_id = sx.khop_ma_hoc_sinh(go, [r[0] for r in cur.execute("SELECT student_id FROM students")])
+                if student_id is None:
+                    return _fail(err("khieu_nai_hs_khong_co", student_id=str(go).strip()))
+                if not cur.execute("SELECT 1 FROM match_results WHERE student_id = ? AND buoi = ?",
+                                   (student_id, buoi)).fetchone() or buoi not in sx.run_goc_theo_buoi(cur):
+                    return _fail(err("khieu_nai_chua_co_ket_qua", student_id=student_id, buoi=buoi))
                 id_kn, loi = self._them_khieu_nai(cur, student_id, buoi, ghi_chu, sx.bay_gio(), so_ngay)
                 if loi:
                     return _fail(loi)
@@ -511,6 +519,24 @@ class SauXepMixin:
             em_moi.add(d["student_id"])
         return dem, bo_qua, trung, em_moi
 
+    def _ban_do_forms(self):
+        """SG-12: bản đồ tiêu đề thuần -> mã dựng từ đề thi của đợt (nếu có); không có đề thì chỉ các câu không phụ
+        thuộc đề. Đề hỏng / có tiêu đề trùng -> bản đồ chỉ gồm các câu không phụ thuộc đề."""
+        import forms_dot
+        forms_dot.nap_mau_forms()
+        import bieu_mau
+        try:
+            return bieu_mau.ban_do_chung(forms_dot.doc_de_dot(self.db_path))
+        except Exception:
+            return bieu_mau.ban_do_chung(None)
+
+    @staticmethod
+    def _canh_bao_cot_la(cot_la):
+        """Danh sách tiêu đề lạ -> [err('forms_cot_la')] (rỗng nếu không có)."""
+        if not cot_la:
+            return []
+        return [err("forms_cot_la", n=len(cot_la), vi_du="; ".join('"%s"' % c[:40] for c in cot_la[:3]))]
+
     def nhap_phan_hoi_forms(self, file_base64: str):
         """GAP-5/6 (TH): nạp tệp Excel xuất từ biểu mẫu phản hồi / khảo sát tuần 3. Mã học sinh lạ bị bỏ (đếm)."""
         import base64
@@ -527,16 +553,20 @@ class SauXepMixin:
                 hang = [list(r) for r in wb.worksheets[0].iter_rows(values_only=True)]
                 if _tep_rong(hang):
                     return _fail(err("phan_hoi_tep_rong"))
-                dong = sx.doc_tep_forms_phan_hoi(hang)
+                cot_la = []
+                dong = sx.doc_tep_forms_phan_hoi(hang, self._ban_do_forms(), cot_la)
             except (ValueError, binascii.Error, OSError, KeyError, IndexError) as e:
                 return _fail(err("phan_hoi_tep_sai", detail=str(e)))
             except Exception as e:                     # zipfile.BadZipFile, InvalidFileException…
                 return _fail(err("phan_hoi_tep_sai", detail=type(e).__name__))
             with self._ket_noi_ghi() as cur:
                 dem, bo_qua, trung, em_moi = self._chen_phan_hoi(cur, dong)
-            return _ok({"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua),
-                        "hoc_sinh": len(em_moi), "ma_khong_khop": list(bo_qua)[:20],
-                        "dong_moi": dem["ket_qua"] + dem["tuan_3"], "dong_trung": trung, "dong_bo_qua": []})
+            kq = {"n_ket_qua": dem["ket_qua"], "n_tuan_3": dem["tuan_3"], "bo_qua": len(bo_qua),
+                  "hoc_sinh": len(em_moi), "ma_khong_khop": list(bo_qua)[:20],
+                  "dong_moi": dem["ket_qua"] + dem["tuan_3"], "dong_trung": trung, "dong_bo_qua": []}
+            if cot_la:
+                kq["canh_bao"] = self._canh_bao_cot_la(cot_la)
+            return _ok(kq)
         except CauHinhHong as e:
             return _fail(loi_cau_hinh(e))
         except Exception as e:
@@ -563,12 +593,13 @@ class SauXepMixin:
                 hang = [list(r) for r in wb.worksheets[0].iter_rows(values_only=True)]
                 if _tep_rong(hang):
                     return _fail(err("phan_hoi_tep_rong"))
-                dong = sx.doc_tep_forms_phan_hoi(hang) if bat_ph else []
+                ban_do, cot_la = self._ban_do_forms(), []
+                dong = sx.doc_tep_forms_phan_hoi(hang, ban_do, cot_la) if bat_ph else []
             except (ValueError, binascii.Error, OSError, KeyError, IndexError) as e:
                 return _fail(err("phan_hoi_tep_sai", detail=str(e)))
             except Exception as e:                     # zipfile.BadZipFile, InvalidFileException…
                 return _fail(err("phan_hoi_tep_sai", detail=type(e).__name__))
-            canh_bao = []
+            canh_bao = self._canh_bao_cot_la(cot_la)
             if not bat_ph:
                 canh_bao.append(err("fa_phan_hoi_chua_bat"))
             if not bat_kn:
@@ -584,7 +615,9 @@ class SauXepMixin:
                     hop_le |= {r[0] for r in cur.execute("SELECT DISTINCT COALESCE(NULLIF(buoi, ''), ?) FROM clubs",
                                                          (BUOI_MAC_DINH,))}
                     try:
-                        yeu_cau, bo_dong = sx.doc_tep_forms_khieu_nai(hang, hop_le)
+                        yeu_cau, bo_dong = sx.doc_tep_forms_khieu_nai(hang, hop_le, ban_do)
+                    except sx.ThieuBanDo:
+                        return _fail(err("forms_thieu_ban_do"))
                     except ValueError as e:
                         if not bat_ph:                      # chỉ nhận khiếu nại mà tệp không có phần khiếu nại
                             return _fail(err("phan_hoi_tep_sai", detail=str(e)))

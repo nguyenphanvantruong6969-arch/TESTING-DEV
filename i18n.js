@@ -993,16 +993,33 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Xếp ngoài danh sách nguyện vọng",
+      clb_khong_gioi_han_cho: "không giới hạn chỗ",
+      clb_tu_do_lap: "{n} {person_l} · không giới hạn chỗ",
+      clb_tu_do_lap_nhieu: "{n} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb: "{x} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_l} · không giới hạn chỗ",
+      xuat_fa_an_goi_y: "Các nút xuất lý do kết quả, bảng nhu cầu, gợi ý chỉ tiêu và biên bản bốc thăm chỉ hiện khi bật chế độ \"Xếp theo loại {slot_l} và huy chương\".",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-B: add below === */
+      ws_tn_wharton: "Dùng điểm quyết tâm",
+      ws_tn_wharton_goi_y: "Tắt nếu học sinh không tự chia điểm quyết tâm cho các nguyện vọng; khi đó kết quả xếp chỉ dựa trên điểm thi và bốc thăm.",
+      wh_goi_y_tat: "Nếu không dùng điểm quyết tâm, hãy tắt ở Tính năng sau khi xếp…, rồi chạy lại.",
+      wh_mo_tinh_nang: "Mở Tính năng sau khi xếp…",
+      ws_tn_wharton_can_fa: "Không gian làm việc đang xếp theo loại CLB và huy chương, cách này cần điểm quyết tâm nên không tắt được.",
+      cb_cot_gio: "Giờ",
+      cb_cot_dia_diem: "Địa điểm",
       /* === end SG-B === */
 
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} cảnh báo cùng loại. Ví dụ:",
+      canh_bao_gom_nua: "và {m} trường hợp nữa",
+      dang_xu_ly: "Đang xử lý…",
       /* === end SG-C === */
     },
 
@@ -1980,16 +1997,33 @@
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Placed outside their choices",
+      clb_khong_gioi_han_cho: "no seat limit",
+      clb_tu_do_lap: "{n} {person_l} · no seat limit",
+      clb_tu_do_lap_nhieu: "{n} {person_pl} · no seat limit",
+      clb_tu_do_theo_clb: "{x} {person_l} · no seat limit",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_pl} · no seat limit",
+      xuat_fa_an_goi_y: "The buttons for result reasons, the demand table, capacity suggestions and the draw record only appear when \"Allocate by {slot_l} type and medals\" is turned on.",
       /* === end SG-A === */
 
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-B: add below === */
+      ws_tn_wharton: "Use commitment points",
+      ws_tn_wharton_goi_y: "Turn off if students do not split commitment points across their choices; results then depend on test scores and the lottery only.",
+      wh_goi_y_tat: "If commitment points are not used, turn them off in After-allocation features…, then run again.",
+      wh_mo_tinh_nang: "Open After-allocation features…",
+      ws_tn_wharton_can_fa: "This workspace allocates by club type and medals, which needs commitment points, so they cannot be turned off.",
+      cb_cot_gio: "Time",
+      cb_cot_dia_diem: "Place",
       /* === end SG-B === */
 
       /* (spacer: unchanged line between marker blocks) */
 
       /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} warnings of the same kind. Examples:",
+      canh_bao_gom_nua: "and {m} more cases",
+      dang_xu_ly: "Working…",
       /* === end SG-C === */
     },
   };

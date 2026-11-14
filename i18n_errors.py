@@ -1348,16 +1348,107 @@ MESSAGES = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-A: add below ===
+    "fa_clb_tuyen_chon_chua_co_diem": {
+        "vi": "CLB {club_id} (Tuyển chọn) có {so_dang_ky} học sinh đăng ký ({so_nv1} học sinh xếp làm nguyện vọng 1) nhưng chưa có điểm của học sinh nào, nên tất cả sẽ bị loại. Hãy nhập điểm cho CLB này ở thẻ Nhập điểm, hoặc đổi CLB sang loại Giới hạn.",
+        "en": "Club {club_id} (Selective) has {so_dang_ky} applicants ({so_nv1} with it as first choice) but no scores at all, so every one of them would be removed. Enter scores for this club in the Scores tab, or change the club to Limited.",
+    },
+    "khieu_nai_hs_khong_co": {
+        "vi": "Không nhận được khiếu nại: không tìm thấy {person_l} có mã {student_id}. Hãy kiểm tra lại mã rồi gõ lại.",
+        "en": "Appeal not accepted: no {person_l} with ID {student_id} was found. Check the ID and type it again.",
+    },
+    "khieu_nai_chua_co_ket_qua": {
+        "vi": "Không nhận được khiếu nại: {person_l} {student_id} chưa có kết quả ở buổi {buoi}.",
+        "en": "Appeal not accepted: {person_l} {student_id} has no result for session {buoi} yet.",
+    },
     # === end SG-A ===
 
     # (spacer: unchanged line between marker blocks)
 
     # === SG-B: add below ===
+    "so_nhap_canh_bao_wharton_trong": {
+        "vi": "{n} {person_l} (ví dụ {vd}) có từ hai {slot_l} trong cùng một buổi mà chưa điền điểm quyết tâm nào, nên lần chạy xếp sẽ bị chặn. Cách sửa: điền đủ 100 điểm cho mỗi nhóm trong sổ rồi nhập lại, hoặc tắt điểm quyết tâm ở Không gian làm việc → ⋯ → Tính năng sau khi xếp….",
+        "en": "{n} {person_l}(s) (for example {vd}) have two or more {slot_l}s in the same session with no commitment points filled in, so the allocation run will be blocked. To fix it: fill in 100 points for each group in the workbook and import again, or turn commitment points off in Workspace → ⋯ → After-allocation features….",
+    },
+    "phieu_nd_phieu_thieu_cau_2": {
+        "vi": "{clb}: chưa trả lời câu 2 (mở thêm nhóm được không): không phân loại được, đã bỏ qua",
+        "en": "{clb}: hasn't answered question 2 (can extra groups be opened?), so the club can't be classified: skipped",
+    },
+    "phieu_nd_phieu_thieu_phong": {
+        "vi": "{clb}: CLB mở thêm nhóm được nhưng chưa ghi sức chứa mỗi nhóm: đã bỏ qua",
+        "en": "{clb}: the club can open extra groups but no room capacity per group is given: skipped",
+    },
+    "phieu_nd_phieu_thieu_cho": {
+        "vi": "{clb}: CLB không mở thêm nhóm nhưng chưa ghi số chỗ tối đa hợp lệ: đã bỏ qua",
+        "en": "{clb}: the club doesn't open extra groups but no valid maximum number of seats is given: skipped",
+    },
+    "phieu_nd_phieu_moc_sai": {
+        "vi": "{clb}: mốc tối thiểu phải là số nguyên từ 1 đến 10: đã bỏ qua",
+        "en": "{clb}: the pass mark must be a whole number from 1 to 10: skipped",
+    },
+    "phieu_nd_phieu_toi_thieu_sai": {
+        "vi": "{clb}: số thành viên tối thiểu không hợp lệ: không ghi",
+        "en": "{clb}: the minimum number of members is not valid: not recorded",
+    },
+    "phieu_nd_phieu_tu_do_co_ly_do_gioi_han": {
+        "vi": "{clb}: khai Tự do nhưng có ghi lý do giới hạn; CLB bị giới hạn thật không được khai Tự do, cần admin xem lại",
+        "en": "{clb}: declared Free but a reason for limiting is given; a club that is really limited can't be declared Free, an admin needs to review it",
+    },
+    "phieu_nd_phieu_thieu_ly_do": {
+        "vi": "{clb}: CLB giới hạn chưa ghi lý do (phòng/dụng cụ/người hướng dẫn)",
+        "en": "{clb}: the Limited club has no reason given (room, equipment or instructor)",
+    },
+    "phieu_nd_phieu_thieu_cau_4": {
+        "vi": "{clb}: chưa trả lời câu 4: coi là không cần kỹ năng (Giới hạn)",
+        "en": "{clb}: hasn't answered question 4: treated as needing no skill (Limited)",
+    },
+    "phieu_nd_phieu_thu_thach_khong_tu_cham": {
+        "vi": "{clb}: loại thử thách không phải trắc nghiệm: phần mềm không chấm tự động, admin nhập điểm",
+        "en": "{clb}: the challenge type is not multiple choice: the software can't mark it automatically, an admin enters the scores",
+    },
+    "phieu_nd_phieu_thieu_tieu_chi": {
+        "vi": "{clb}: CLB Tuyển chọn chưa ghi bảng tiêu chí",
+        "en": "{clb}: the Selective club has no criteria table",
+    },
+    "phieu_nd_phieu_cho_duyet_tuyen_chon": {
+        "vi": "{clb}: CLB Tuyển chọn: chờ ban quản lý duyệt trước khi mở cổng",
+        "en": "{clb}: Selective club: waiting for management approval before the gate opens",
+    },
+    "phieu_nd_phieu_nop_nhieu_lan": {
+        "vi": "{clb}: nộp phiếu nhiều lần: lấy phiếu cuối cùng",
+        "en": "{clb}: submitted the form more than once: the last submission is used",
+    },
+    "phieu_nd_phieu_mac_dinh_ky_truoc": {
+        "vi": "{clb}: chưa nộp phiếu: mặc định Giới hạn với chỉ tiêu kỳ trước",
+        "en": "{clb}: hasn't submitted the form: defaults to Limited with last term's quota",
+    },
+    "phieu_clb_khong_co_clb_hop_le": {
+        "vi": "Không có CLB hợp lệ nào trong tệp.",
+        "en": "There is no valid club in the file.",
+    },
     # === end SG-B ===
 
     # (spacer: unchanged line between marker blocks)
 
     # === SG-C: add below ===
+    # SG-12: biểu mẫu ghi tiêu đề thuần (không còn "[mã]"), bộ đọc khớp qua bản đồ dựng từ đề thi.
+    "forms_cot_la": {
+        "vi": "{n} cột trong tệp không khớp câu hỏi nào của biểu mẫu nên bị bỏ qua, ví dụ: {vi_du}. "
+              "Hãy kiểm tra xem chữ câu hỏi trên Forms có bị sửa không.",
+        "en": "{n} columns in the file don't match any question of the form and were skipped, for example: {vi_du}. "
+              "Check whether the question wording was edited in Forms.",
+    },
+    "forms_thieu_ban_do": {
+        "vi": "Tệp ghi tên buổi bằng chữ (ví dụ \"Thứ Hai\") nhưng đợt này chưa có đề thi để đối chiếu tên buổi. "
+              "Hãy nạp đề thi của đợt rồi nạp lại tệp.",
+        "en": "The file writes days by name (for example \"Monday\") but this round has no exam file to match the names "
+              "against. Load the round's exam file, then load this file again.",
+    },
+    "forms_tieu_de_trung": {
+        "vi": "Đề thi có hai câu hoặc hai lựa chọn cùng chữ nên không phân biệt được trên biểu mẫu: {chi_tiet} "
+              "Hãy đổi tên trong đề thi rồi sinh lại biểu mẫu.",
+        "en": "The exam file has two questions or two options with the same wording, so they can't be told apart on the "
+              "form: {chi_tiet} Rename them in the exam file, then generate the form again.",
+    },
     # === end SG-C ===
 }
 

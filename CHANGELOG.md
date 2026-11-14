@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026-11-14 — SG-1 … SG-12: sửa sau đợt soát giao diện toàn kiosk (ba người song song, gộp ở claude/sg-sua)
+
+Đặc tả: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (D1 = A, D2 = b, D3 = NULL đã duyệt). Cách chạy: `docs/ke_hoach/SG_SONG_SONG.md`
+(người A `claude/sg-a`, B `claude/sg-b`, C `claude/sg-c`; mỗi mục một phiên viết mã + một phiên soát mã). Mảnh gốc từng người:
+`docs/ke_hoach/sg_song_song/MANH_A.md`, `MANH_A_SG11a.md`, `MANH_B.md`, `MANH_C.md` (đủ chi tiết tệp và test). Mọi số liệu là MÔ PHỎNG.
+Cấu hình mặc định giữ từng byte (`kiem_nhanh` 7/7, 60 ca = 3 bộ × 20 seed).
+
+- **SG-1 (C3)**: CLB Tuyển chọn có người đăng ký mà chưa em nào có điểm → lỗi chặn `fa_clb_tuyen_chon_chua_co_diem` {club_id, so_dang_ky, so_nv1} ở lần chạy FA và trong báo cáo sức khoẻ (cùng một hàm `fa_daa.kiem_truoc_fa`). `so_nv1` đếm nguyện vọng 1 TRONG BUỔI, dùng chung `dem_nv1_trong_buoi` với bảng nhu cầu. Test: `tests/test_sg1_tuyen_chon_khong_diem.py`.
+- **SG-2 (C1)**: không gian `Trường học` giữ `wharton: true`; hộp "Tính năng sau khi xếp…" có công tắc "Dùng điểm quyết tâm" (khoá khi bật FA), xem trước sổ cảnh báo em có ≥ 2 nguyện vọng cùng ngày mà không có điểm, câu "ô trống tính là 0" trong sheet Hướng dẫn được sửa, lần chạy bị chặn có nút mở hộp đó. Test: `tests/test_sg2_wharton_trong.py`, `tests/test_giao_dien_sg2_diem_quyet_tam.py`.
+- **SG-3 (C2)**: chế độ FA lưu `rank_in_student_pref` = thứ hạng trong danh sách GỐC trong buổi (bằng `rank_in_list` của lý do); em xếp dự phòng vào CLB không khai → NULL (D3), hiện riêng "Xếp ngoài danh sách nguyện vọng". Lõi DA không đổi. Số FA cũ cần đo lại: xem "Chờ Truong" trong báo cáo. Test: `tests/test_sg3_hang_fa.py`.
+- **SG-4 (M3)**: khiếu nại gõ tay khớp mã bằng `fa_sau_xep.khop_ma_hoc_sinh` như đường Forms; hai mã lỗi `khieu_nai_hs_khong_co`, `khieu_nai_chua_co_ket_qua`. Test: `tests/test_sg4_khop_ma.py`.
+- **SG-5 (H3)**: câu huy chương có dòng giải thích; câu đổi bạc/đồng chỉ có khi ngày có ≥ 3 CLB nhận huy chương (chỉ đầu ra `--fa-daa*` đổi). Test: `tests/test_sg5_huy_chuong.py`.
+- **SG-6 (H1, D1 = A)**: cột rỗng được `clubs.gio`, `clubs.dia_diem` qua `di_tru_schema` (sao lưu trước, chạy lại không đổi gì); hai cột TUỲ CHỌN "Giờ", "Địa điểm" ở sheet CLB của Sổ nhập; hiện ở bảng CLB, kết quả, danh sách, thời khoá biểu, Excel khi có. Hợp đồng CSV học sinh và `match_results` không đổi. Test: `tests/test_sg6_gio_dia_diem.py`, `tests/test_giao_dien_sg6_gio_dia_diem.py`.
+- **SG-7 (H4, M1)**: bước 4 và khung cảnh báo thẻ Nhập dùng chung `veCanhBaoGom` (gom theo mã, đếm, tối đa 5 ví dụ). Test: `tests/test_giao_dien_sg7_canh_bao_gom.py`.
+- **SG-8 (M5, bất biến 6)**: thông báo bước 1 "Chuẩn bị đợt" đi ra dạng mã `phieu_nd_*` qua `i18n_errors.py`, đổi ngôn ngữ vẽ lại bước 1–2; vòng lưu trước SG-8 vẫn hiện. Test: `tests/test_sg8_thong_bao_buoc1.py`, `tests/test_giao_dien_sg8_buoc1_tieng_anh.py`.
+- **SG-9**: `chayNut` / `chayTai` / `noiTiep` (`js/00_nen.js`) cho mọi lời gọi API ở `js/05, 10, 11, 12, 13_*.js`: nút bận, lỗi có thông báo, luôn mở lại nút. Test: `tests/test_giao_dien_sg9_nut_ban.py`.
+- **SG-10 (M2)**: CLB Tự do (FA) không còn % lấp đầy hay "x/y chỗ": màn kết quả, Theo CLB, độ chọi và tệp xuất hiện "N <người> · không giới hạn chỗ"; "Chỗ còn trống" bỏ CLB Tự do. Test: `tests/test_sg10_clb_tu_do.py`, `tests/test_giao_dien_sg10_clb_tu_do.py`.
+- **SG-11a (M6, M7, L1, L4, L5)**: `color-scheme: light`; bảng kết quả vừa 1024 px; `.hs-buoi-nhan` dùng `--gold-text`; Nhập điểm dùng chung bề rộng nội dung; một dòng gợi ý khi nút xuất chỉ-FA bị ẩn. Test: `tests/test_giao_dien_sg11a_ve_sinh.py`.
+- **SG-11b (M4)**: hộp chọn không gian làm việc giữ tiêu điểm trong hộp (Tab/Shift+Tab), Esc đóng đúng lớp, trả tiêu điểm về nút mở. Test: `tests/test_giao_dien_sg11b_focus_man_chon.py`.
+- **SG-12 (H2, D2 = b)**: biểu mẫu học sinh dùng tiêu đề thuần (không `[mã]`, `(club_id)`); trình tạo ghi `MAP_*.json` cạnh từng biểu mẫu, bộ đọc khớp chính xác qua bản đồ; tệp xuất cũ có mã vẫn đọc được; `--giu-ma` cho đầu ra giống từng byte trước SG-12. Test: `tests/test_sg12_tieu_de_thuan.py`.
+- **Gộp (người A)**: xung đột SG-6 × SG-10 ở `api_bao_cao.get_club_fill_stats`, `api_xuat` (đầu khối "Theo CLB") và `js/09_the_xem.js` (`veKqTheoClb`) giữ cả hai hành vi; `i18n_loi.js` sinh lại. Test: `tests/test_sg_tich_hop_tu_do_gio.py` (3). `CLAUDE_CHI_TIET.md`: số tệp test 293.
+- **SG-6 (sửa CI)**: fixture `_csdl_cu` trong `tests/test_sg6_gio_dia_diem.py` dựng lại bảng `clubs` thay vì `ALTER TABLE … DROP COLUMN` (SQLite 3.45.1 của Python 3.11 trên CI báo "incomplete input" khi xoá cột cuối có chú thích `--`; SQLite 3.53 không lỗi). Chỉ đổi test; mã sản phẩm và schema không đổi.
+
 ## 2026-11-13 — FG FINISH: báo cáo, sổ sách, chạy thử người mới (chỉ tài liệu, TH)
 
 - `docs/phien/bao_cao_dem/2026-11-13_fg_sua.md`: bảng 9 mục FG-1…FG-9, test đã thêm, quyết định, mục GONE-ON-HEAD, "Chờ Truong", chạy thử người mới theo spec §5 (chế độ trình duyệt, không gian làm việc mới ngoài kho mã): bật 5 tính năng từ menu → nạp sổ mẫu FA 120 em → chạy → nạp tệp Forms sau kết quả MÔ PHỎNG hai lần: cùng số đếm (33 phản hồi, 3 khiếu nại), lần hai báo trùng. Không có lỗi mới. Phần "Vòng xanh" để lead điền.

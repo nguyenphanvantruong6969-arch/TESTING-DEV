@@ -337,18 +337,66 @@ def khop_ma_hoc_sinh(ma_go, tat_ca_ma):
     return ung[0] if len(ung) == 1 else None
 
 
-def doc_tep_forms_phan_hoi(hang) -> list:
+class ThieuBanDo(ValueError):
+    """SG-12: tệp có tiêu đề / lựa chọn THUẦN (không "[mã]") mà không có bản đồ để đọc chúng (không có đề của đợt và
+    không có tệp MAP_*.json). Không đoán: dừng để báo."""
+
+
+# Cột hệ thống của Forms (không phải câu hỏi của mẫu): không báo là "cột lạ".
+_COT_HE_THONG_FORMS = {"id", "start time", "completion time", "last modified time", "email", "name", "total points",
+                       "quiz feedback", "thời gian bắt đầu", "thời gian hoàn thành"}
+
+
+def ban_do_tinh():
+    """Bản đồ của các câu KHÔNG phụ thuộc đề (mã học sinh, phản hồi, tuần 3, `[co_sai]`, `[kn_ghi_chu]`) — đọc được tiêu đề
+    thuần của biểu mẫu phản hồi mà không cần `de_thi.json`. Nạp `bieu_mau` muộn (cùng cách `forms_dot.nap_mau_forms`)."""
+    import forms_dot
+    forms_dot.nap_mau_forms()
+    import bieu_mau
+    return bieu_mau.ban_do_chung(None)
+
+
+def _khoa(chu):
+    return " ".join(str(chu or "").split())
+
+
+def _ma_cua_cot(o, ban_do):
+    """Tiêu đề cột -> (mã câu, có thẻ không). Thẻ "[mã]" (tệp cũ) trước, rồi khớp CHÍNH XÁC chữ thuần qua bản đồ."""
+    chu = str(o or "")
+    m = _MA_CAU.match(chu)
+    if m:
+        return m.group(1).strip(), True
+    cau = ban_do.get("cau") or {}
+    ma = cau.get(_khoa(chu)) or cau.get(_khoa(re.sub(r"^\s*\d+[.)]\s*", "", chu, count=1)))
+    return ma, False
+
+
+def _ma_lua_chon(ma_cau, v, ban_do):
+    """Ô lựa chọn -> giá trị mã: chữ thuần khớp bản đồ của câu đó trước (tệp mới), rồi "(mã)" cuối chữ (tệp cũ)."""
+    gt = (ban_do.get("lua_chon") or {}).get(ma_cau, {}).get(_khoa(v))
+    if gt is not None:
+        return gt
+    m = _MA_LUA_CHON.search(str(v).strip())
+    return m.group(1) if m else None
+
+
+def doc_tep_forms_phan_hoi(hang, ban_do=None, cot_la=None) -> list:
     """Các dòng của tệp xuất Forms (hàng 1 = tiêu đề) -> [{student_id, loai, hai_long, ...}]. Cột nhận theo MÃ trong
-    "[mã]" của tiêu đề; giá trị theo "(mã)" cuối lựa chọn. Dòng thiếu mã học sinh bị bỏ. Không có cột câu hỏi nào
-    của mẫu -> ValueError."""
+    "[mã]" của tiêu đề (tệp cũ) hoặc theo chữ thuần của tiêu đề qua `ban_do` (SG-12; mặc định `ban_do_tinh()`); giá trị
+    theo "(mã)" cuối lựa chọn hoặc chữ thuần của lựa chọn. Dòng thiếu mã học sinh bị bỏ. Không có cột câu hỏi nào
+    của mẫu -> ValueError. `cot_la` (danh sách, tuỳ chọn): nhận các tiêu đề không phải cột hệ thống mà không nhận ra."""
     hang = list(hang)
     if not hang:
         raise ValueError("tep rong")
+    if ban_do is None:
+        ban_do = ban_do_tinh()
     cot = {}
     for i, o in enumerate(hang[0]):
-        m = _MA_CAU.match(str(o or ""))
-        if m:
-            cot[m.group(1).strip()] = i
+        ma, _co_the = _ma_cua_cot(o, ban_do)
+        if ma:
+            cot[ma] = i
+        elif cot_la is not None and str(o or "").strip() and str(o).strip().lower() not in _COT_HE_THONG_FORMS:
+            cot_la.append(str(o).strip())
     loai_co = {MA_CAU_PHAN_HOI[m] for m in cot if m in MA_CAU_PHAN_HOI}
     if "student_id" not in cot or not loai_co:
         raise ValueError("khong co cot cau hoi phan hoi")
@@ -356,8 +404,7 @@ def doc_tep_forms_phan_hoi(hang) -> list:
     def lay(d, ma):
         if ma not in cot or cot[ma] >= len(d) or d[cot[ma]] in (None, ""):
             return None
-        m = _MA_LUA_CHON.search(str(d[cot[ma]]).strip())
-        return m.group(1) if m else None
+        return _ma_lua_chon(ma, d[cot[ma]], ban_do)
 
     ra = []
     for d in hang[1:]:
@@ -399,22 +446,30 @@ def _doc_gio_forms(v):
     return None
 
 
-def doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> tuple:
+def doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le, ban_do=None) -> tuple:
     """Các dòng của tệp xuất biểu mẫu gộp (hàng 1 = tiêu đề) -> (yeu_cau, bo_qua). Hàm thuần.
 
     Cột nhận theo MÃ "[mã]" của tiêu đề, giá trị theo "(mã)" cuối lựa chọn; ô hộp chọn nhiều = các lựa chọn cách nhau ";".
     Chỉ dòng có `[co_sai]` = 1. Mỗi (học sinh, buổi) một yêu cầu `{student_id, buoi, ghi_chu, luc}`; `luc` là giờ hoàn thành
     của Forms (cột "Completion time" / "Thời gian hoàn thành"; thiếu thì dùng "Start time") hoặc None. Mã buổi lạ, danh
     sách buổi rỗng, thiếu mã học sinh -> `bo_qua` = (số dòng trong tệp, mã học sinh, mã lý do). Không có cột `[co_sai]`
-    (hoặc mã học sinh) -> ValueError."""
+    (hoặc mã học sinh) -> ValueError.
+
+    SG-12: tiêu đề thuần đọc qua `ban_do` (mặc định `ban_do_tinh()`). Lựa chọn buổi của `[kn_buoi]` ghi bằng chữ thuần
+    ("Thứ Hai") chỉ đọc được khi `ban_do` có lựa chọn của câu đó (dựng từ đề của đợt): thiếu mà gặp ô như vậy thì ném
+    `ThieuBanDo` (ô còn mã "(thu_2)" của tệp cũ vẫn đọc được không cần bản đồ)."""
     hang = list(hang)
     if not hang:
         raise ValueError("tep rong")
+    if ban_do is None:
+        ban_do = ban_do_tinh()
     cot, gio_xong, gio_dau = {}, None, None
+    cot_the = {}
     for i, o in enumerate(hang[0]):
-        m = _MA_CAU.match(str(o or ""))
-        if m:
-            cot[m.group(1).strip()] = i
+        ma, co_the = _ma_cua_cot(o, ban_do)
+        if ma:
+            cot[ma] = i
+            cot_the[ma] = co_the
             continue
         ten = str(o or "").strip().lower()
         if ten in _TEN_COT_GIO_XONG and gio_xong is None:
@@ -423,19 +478,25 @@ def doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> tuple:
             gio_dau = i
     if "co_sai" not in cot or "student_id" not in cot:
         raise ValueError("khong co cot co_sai")
+    thieu_ban_do = ("kn_buoi" in cot and not cot_the["kn_buoi"]
+                    and not (ban_do.get("lua_chon") or {}).get("kn_buoi"))
     hop_le = set(ma_buoi_hop_le)
 
     def o_(d, i):
         return d[i] if i is not None and i < len(d) else None
 
-    def ma_lua_chon(v):
-        m = _MA_LUA_CHON.search(str(v).strip()) if v not in (None, "") else None
+    def ma_lua_chon(v, ma_cau=None):
+        if v in (None, ""):
+            return None
+        if ma_cau:
+            return _ma_lua_chon(ma_cau, v, ban_do)
+        m = _MA_LUA_CHON.search(str(v).strip())
         return m.group(1) if m else None
 
     yeu_cau, bo_qua = [], []
     for so_dong, d in enumerate(hang[1:], 2):
         d = list(d)
-        if ma_lua_chon(o_(d, cot["co_sai"])) != "1":
+        if ma_lua_chon(o_(d, cot["co_sai"]), "co_sai") != "1":
             continue
         sid = str(o_(d, cot["student_id"]) or "").strip()
         if not sid:
@@ -449,7 +510,9 @@ def doc_tep_forms_khieu_nai(hang, ma_buoi_hop_le) -> tuple:
         luc = _doc_gio_forms(o_(d, gio_xong)) or _doc_gio_forms(o_(d, gio_dau))
         da = set()
         for x in cac:
-            buoi = ma_lua_chon(x)
+            buoi = ma_lua_chon(x, "kn_buoi")
+            if buoi is None and thieu_ban_do:         # chữ thuần mà không có bản đồ: không đoán, dừng
+                raise ThieuBanDo("kn_buoi")
             if buoi not in hop_le:
                 bo_qua.append((so_dong, sid, LY_DO_BO_QUA_BUOI_LA))
             elif buoi not in da:

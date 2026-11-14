@@ -160,6 +160,11 @@ class QuanLyMixin:
                     "reserve_group, buoi FROM clubs ORDER BY COALESCE(buoi, '') COLLATE THU_TU_BUOI, club_id"
                 ).fetchall()
                 ra = [dict(r) for r in rows]
+                # SG-6: giờ / địa điểm chỉ khi có CLB đã khai (dữ liệu cũ: phản hồi như cũ).
+                gd = self._gio_dia_diem_clb(cur)
+                for c in ra:
+                    if gd:
+                        c["gio"], c["dia_diem"] = gd.get(c["club_id"], ("", ""))
                 # FA-UI-2: thuộc tính FA chỉ khi bật (tắt: phản hồi như cũ, bảng như cũ).
                 try:
                     fa_bat = dung_fa_daa(self._luat_nghiem())

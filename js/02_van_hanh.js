@@ -488,6 +488,19 @@ function showLog(errors) {
   nut.textContent = t("wh_loi_mo_ds");
   nut.addEventListener("click", moDanhSachCanXuLy);
   hang.appendChild(nut);
+  if (typeof wsMoTinhNangDangMo === "function") {
+    const goiY = document.createElement("span");
+    goiY.className = "log-goi-y";
+    goiY.textContent = t("wh_goi_y_tat");
+    hang.appendChild(goiY);
+    const tat = document.createElement("button");
+    tat.type = "button";
+    tat.id = "btnMoTinhNangTuLoi";
+    tat.className = "btn btn-secondary";
+    tat.textContent = t("wh_mo_tinh_nang");
+    tat.addEventListener("click", wsMoTinhNangDangMo);
+    hang.appendChild(tat);
+  }
   box.appendChild(hang);
 }
 
@@ -890,44 +903,9 @@ function veCanhBaoNhap() {
   if (!box) return;
   clear(box);
   box.hidden = canhBaoNhapGanNhat.length === 0;
-  /* T3-02: cung mot loai canh bao lap lai tren 5 dong (vd. 120 hoc sinh con thieu diem quyet tam)
-     thi gom thanh MOT dong + nut "Xem 5 dong dau". Ap dung cho canh bao thuong, khong cho dong chan chay. */
-  const nhom = new Map();
-  canhBaoNhapGanNhat.forEach((w) => {
-    if (!nhom.has(w.code)) nhom.set(w.code, []);
-    nhom.get(w.code).push(w);
-  });
-  const veDong = (w, an) => {
-    const div = document.createElement("div");
-    div.className = "canh-bao-dong";
-    div.textContent = "• " + trErr(w);
-    div.hidden = !!an;
-    return div;
-  };
-  nhom.forEach((ds) => {
-    if (ds.length <= CANH_BAO_HIEN_DAU) {
-      ds.forEach((w) => box.appendChild(veDong(w, false)));
-      return;
-    }
-    const tom = document.createElement("div");
-    tom.className = "canh-bao-nhom";
-    const chu = document.createElement("span");
-    chu.textContent = "• " + t("canh_bao_gom", { n: ds.length, vd: trErr(ds[0]) });
-    const nut = document.createElement("button");
-    nut.type = "button";
-    nut.className = "btn btn-ghost btn-nho canh-bao-xem";
-    const dongAn = ds.slice(0, CANH_BAO_HIEN_DAU).map((w) => veDong(w, true));
-    const veNut = () => { nut.textContent = t(dongAn[0].hidden ? "canh_bao_xem_dau" : "canh_bao_thu_gon", { k: CANH_BAO_HIEN_DAU }); };
-    nut.addEventListener("click", () => { dongAn.forEach((d) => { d.hidden = !d.hidden; }); veNut(); });
-    veNut();
-    tom.appendChild(chu);
-    tom.appendChild(nut);
-    box.appendChild(tom);
-    dongAn.forEach((d) => box.appendChild(d));
-  });
+  /* SG-7 (M1): cung luat voi buoc 4 — gom theo ma, dem, 5 vi du, "va N truong hop nua" (veCanhBaoGom o 00_nen.js). */
+  veCanhBaoGom(box, canhBaoNhapGanNhat.map((w) => ({ ma: w.code, chu: trErr(w) })));
 }
-
-const CANH_BAO_HIEN_DAU = 5;
 
 /* So loi hien toi da bay nhieu dong; con lai gom thanh "va N loi khac". */
 const SO_LOI_HIEN = 12;
