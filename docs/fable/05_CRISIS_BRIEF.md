@@ -3,8 +3,8 @@
 > Written 2026-11-14 (Opus, branch `claude/dreamy-johnson-cgw652`). English on purpose.
 > Read first: `CLAUDE.md`, `docs/fable/01_PROJECT_CONTEXT.md`, `docs/fable/02_FABLE_BRIEF.md` §1 (ground rules apply
 > unchanged), then this file. Role: research partner. **Never edit production code** (`CLAUDE.md` rule 11).
-> Registry: no item covers operational human error yet. Working code **FA-SC** ("sự cố") = new item, outside the
-> registry, pending Truong's approval (rule 1). Map each proposal to FA-SC-n, or to an existing item if it fits
+> Registry: no item covers operational human error yet. Item code **FA-SC** ("sự cố") = new item, outside the
+> registry, approved by Truong 2026-11-14 (D-SC1). Map each proposal to FA-SC-n, or to an existing item if it fits
 > better (G1–G5 changes over time, A13 FA-DAA sub-items, FA-M6 post-allocation).
 
 ## 1. Goal
@@ -120,7 +120,7 @@ instructions, a reminder), say so; that is a valid, cheap solution. Where the fi
    project report's commentary and conclusions).
 
 ## 5. Open decisions to put to Truong (present options; do not decide)
-- D-SC1: approve item code FA-SC and its sub-items.
+- D-SC1: item code FA-SC — APPROVED 2026-11-14. Sub-items FA-SC-n still need approval one by one.
 - D-SC2: may a student who took the wrong test retake it? Until when? Who approves (club teacher, ECA teacher)?
 - D-SC3: after results, which "I made a mistake" claims are accepted (data errors only, as the complaint form says now,
   or also proven misclicks)?

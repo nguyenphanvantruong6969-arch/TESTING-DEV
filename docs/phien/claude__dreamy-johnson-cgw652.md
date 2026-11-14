@@ -7,7 +7,7 @@
 Crisis and human-error scenarios for one real allocation round (students, club teachers, GVCN, IT): find what can go
 wrong when people slip (e.g. a student takes the wrong club's test), how much harm it does, whether the system detects
 it, and which fix keeps the 8 invariants. Research by Fable; brief `docs/fable/05_CRISIS_BRIEF.md`.
-Registry: none yet. Proposed new item **FA-SC** (outside the registry) — awaiting Truong (D-SC1).
+Registry: none yet. New item **FA-SC** (outside the registry), approved by Truong 2026-11-14 (D-SC1).
 
 ## Plan (written by Opus)
 - [x] Step 0 (Opus): write Fable brief `docs/fable/05_CRISIS_BRIEF.md` and this file.
@@ -21,14 +21,14 @@ Registry: none yet. Proposed new item **FA-SC** (outside the registry) — await
 - Done so far: Step 0 (docs only, no code).
 - In progress: none.
 - Tests: none needed (docs only).
-- Open problems: item code FA-SC not approved yet.
+- Open problems: none. FA-SC approved (D-SC1). Fable session started on branch `claude/fable-fa-sc` (from this branch).
 
 ## Decisions and gotchas (keep short)
 - Remedies must not reopen manipulation: post-result "I misclicked" claims are the key tension (brief S6, D-SC3).
 - Reruns after a correction keep the locked STB (inv. 3) and append to `run_history` (inv. 4).
 
 ## Next steps (ordered)
-1. Truong starts a Fable session with the prompt in brief §8.
+1. Fable does brief §4 step 1, stops, reports top 5. Truong decides D-SC2..4.
 
 ## Files touched
 - docs/fable/05_CRISIS_BRIEF.md: Fable brief for FA-SC.
@@ -39,3 +39,4 @@ Registry: none yet. Proposed new item **FA-SC** (outside the registry) — await
 |---|---|---|---|
 | 2026-11-14 | Opus | Wrote FA-SC Fable brief and handoff | docs only |
 | 2026-11-14 | Opus | Brief: student journey S8–S29, solution column required per row, prompt updated | Truong asked for more student-side cases |
+| 2026-11-14 | Opus | D-SC1 approved; started Fable session (brief §8 prompt) | Fable branch claude/fable-fa-sc |
