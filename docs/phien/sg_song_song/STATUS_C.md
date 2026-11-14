@@ -1,6 +1,6 @@
 Mode: SG_SONG_SONG person C
-LOCK: LEAD session_01VfPzNuse9EfjuDwwt7335U 2026-11-13T15:55Z
-STATUS: RUNNING
+LOCK: released by LEAD session_01VfPzNuse9EfjuDwwt7335U 2026-11-14T00:20Z (job DONE)
+STATUS: DONE
 BASE: 98709f1f374368c65ee2833467715fd933dc84f6
 SNAPSHOT: in a clean worktree of BASE run every mode of `mau_forms_thi_clb/tao_mau_forms.py`
 (`""`, `--fa-daa`, `--fa-daa --mot-bieu-mau`, `--bien-the`, `--chi-thi`, `--phan-hoi`, `--sau-ket-qua`, `--tuan-3`),
@@ -17,7 +17,7 @@ then `git checkout -- mau_forms_thi_clb/`); `--bien-the` exits non-zero on the s
 | SG-5 | DONE | 1 | bd6d821 | a4d950a | session_01VfPzNruBqHHaJZQcLRxRzS | session_01VfPzNvd9nsMJp4kwS7QzT8 (r2; r1 session_01VfPzNrFdN7RhAERrSNeTJV) | tests/test_sg5_huy_chuong.py, tests/test_fg7_bieu_mau_sau_ket_qua.py |
 | SG-7 | DONE | 0 | 9709a20 | b4800ad | session_01VfPzNvgJo8vZQhB3sTbaQr | session_01VfPzNv27d7DuoAmjt9g79n | (UI tests, see review) |
 | SG-9 | DONE | 1 | a1b6ecb | c266cae | session_01VfPzNud4JhboVzj5e8xu4E | session_01VfPzNt89iBAQw8naoMzV7d (r2; r1 session_01VfPzNt6qaZtDuK7uYC28bX) | tests/test_giao_dien_sg9_nut_ban.py |
-| SG-12 | CHECKING | 2 | e729ff1 | 488a20b | session_01VfPzNuP2CPBJGP9uHdXZyx (1st: session_01VfPzNs8qcCiQLCKtu6pP4g) | session_01VfPzNs7UkzJQcxqWMcwnFN (r3; r2 session_01VfPzNvabEwh2nAm7PHf7Jq; r1 session_01VfPzNsvHqNsTacxhiYKg2y) | tests/test_sg12_tieu_de_thuan.py (+ see review) |
+| SG-12 | DONE | 2 | e729ff1 | 488a20b | session_01VfPzNuP2CPBJGP9uHdXZyx (1st: session_01VfPzNs8qcCiQLCKtu6pP4g) | session_01VfPzNs7UkzJQcxqWMcwnFN (r3; r2 session_01VfPzNvabEwh2nAm7PHf7Jq; r1 session_01VfPzNsvHqNsTacxhiYKg2y) | tests/test_sg12_tieu_de_thuan.py (+ see review) |
 
 ## Fix lists
 ### SG-5 FIX-1 (checker session_01VfPzNrFdN7RhAERrSNeTJV, docs/phien/sg_review/SG-5.md)
@@ -80,6 +80,16 @@ Placement is in the question title because Quick Import has no per-section descr
 
 SG-12 (from the previous coder): other consumers of the codes, untouched: TAO_GOOGLE_FORM.gs + tao_google_forms.py (the Google Forms path stays coded), skill xu-li-raw-forms, docs (README of mau_forms_thi_clb updated; GHI_CHU_GIAO_VIEN.md, DINH_DANG_RAW.md, docs/* not). Not tried on real Microsoft Forms (TH). The Windows (nt) byte hashes of the four fg7 modes are not re-pinned (the content digest is asserted on both OS). Phieu thiet lap CLB (teacher form) keeps its plain titles and has no MAP file by design. This semester's run can keep codes with `--giu-ma`.
 
+- SG-12, this semester's real run: forms ALREADY sent with codes still load unchanged (tested: base == coded == plain converter
+  output). To regenerate coded forms (old style) use `tao_mau_forms.py ... --giu-ma` (byte-identical to the pre-SG-12 output).
+  Plain forms are NOT yet tried on real Microsoft Forms (TH): please do one real Quick Import + export before relying on them.
+- SG-5 and SG-12: Windows (nt) byte hashes of the changed generator modes in `tests/test_fg7_bieu_mau_sau_ket_qua.py` are not
+  re-pinned (no Windows here); on nt the byte-hash assert is skipped for those modes and an OS-independent content digest is asserted
+  on both OSes. Lead A: confirm the Windows CI job is green at integration.
+- Known red on this branch (expected, lead A fixes at integration): `tests/test_a13_12_tai_lieu.py::test_ban_do_ma_so_tep_test_la_so_that`.
+- Shared files touched by C beyond the marker blocks (minimal): `tests/conftest.py` (+opt-in `giu_ma` marker fixture), `pyproject.toml`
+  (marker entry), `js/00_nen.js` (shared helpers `veCanhBaoGom`, `chayNut`, `chayTai`, `noiTiep`).
+
 ## SG-12 snapshot recipe (checker can rebuild; scripts in docs/phien/sg_song_song/snap_c/)
 Worktrees: `git worktree add --detach W_pre e729ff1` (pre-SG-12) and `W_head <HEAD>`; scripts need `PY` = the venv python (edit the path in snap.sh).
 1. Generator: `snap.sh W_pre out_pre`, `snap.sh W_head out_gm --giu-ma`, `snap.sh W_head out_def`; `diff -rq out_pre out_gm` -> only `m1/MAP_NHAP_FORMS_THI_CLB.json` (a COMMITTED file snap.sh copies; the generator writes no MAP in giu-ma mode); `diff -rq out_pre out_def` -> only forms carrying codes + MAP_*.json + MAU_XUAT xlsx + CAI_DAT md bullets (m3/m6/m7/m8). Last run: giu-ma == pre for all 8 modes; pre vs BASE 98709f1 differ only m2/m3 (SG-5). Do not run snap.sh on the real tree (it does `git checkout -- mau_forms_thi_clb/`).
@@ -126,3 +136,5 @@ Worktrees: `git worktree add --detach W_pre e729ff1` (pre-SG-12) and `W_head <HE
 - 2026-11-13T23:35Z CODER session_01VfPzNuP2CPBJGP9uHdXZyx SG-12 FIX-2 READY 488a20b (1) `xay_ban_do(cac_cau_hoi, nghiem_chuan=False)`, `ban_do_bieu_mau(phan, nghiem_chuan=False)`: the casefold/whitespace option refusal runs ONLY with `nghiem_chuan=True`, passed only by `tao_mau_forms.ghi_ban_do` (plain generation; `--giu-ma` returns before it); `ban_do_chung` and every reader keep False, so a coded export of a de with "CLB Cờ vua"/"CLB CỜ VUA" in one day is read as before. Test test_hai_clb_chi_khac_hoa_thuong_bi_tu_choi_khi_sinh_thuan_nhung_van_doc_duoc_tep_co_ma: (b) plain generation raises LoiDeThi, (a) `--giu-ma` generation succeeds with no MAP and `doc_dang_ky_fa_forms` reads the coded export correctly. Mutations (restored): generator without the flag -> test fails; flag default True -> test fails. (2) the gold answer in test_doc_dang_ky_ban_do_cua_cau_tra_loi_truoc_ten_trung_ma_clb_khac is now `lua_chon_clb(b)`, asserts `wp[b] == 60` and `wp[a] != 60`; mutation `tim_clb(tho_vang, "zz")` -> that test fails (restored). Reruns at 488a20b: test_sg12 47 passed; related batch 828 tests, 827 passed, 1 failed = known test_ban_do_ma_so_tep_test_la_so_that (person A); UI 157 passed 0 skipped (Chromium, Playwright 1.63.0); ruff clean; kiem_nhanh 7/7 (60 cases, 20 seeds); generator `--giu-ma` == e729ff1 for 8 modes (only the committed m1 MAP differs), default diffs only coded forms + MAP + xlsx header + md bullets; converter base == coded == plain identical; bo bieu mau giu-ma == pre (58 files), default +25 MAP, 32 changed.
 - 2026-11-13T23:35Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 FIX-2 READY 488a20b; checker r3 session_01VfPzNs7UkzJQcxqWMcwnFN
 - 2026-11-13T23:48Z CHECKER session_01VfPzNs7UkzJQcxqWMcwnFN SG-12 PASS (round 3, ca5bf76..488a20b; own repro: coded reader + --giu-ma generator identical to e729ff1 on a case-differing de, plain generation raises LoiDeThi; mutations zz/-vang, flag off, default True fail tests; 846 non-UI + 268 UI Chromium 0 skipped; ruff clean; kiem_nhanh 7/7; snapshots identical; see docs/phien/sg_review/SG-12.md Round 3)
+- 2026-11-14T00:20Z LEAD session_01VfPzNuse9EfjuDwwt7335U SG-12 DONE (lead review: own generator snapshot --giu-ma at 488a20b == e729ff1 all 8 modes, e729ff1 vs BASE only SG-5 m2/m3, default: 0 code tags in all 11 docx vs 7+12 in pre thu_2; 274 item/related tests incl. SG-7/SG-9/fa_m9 UI in Chromium pass; ruff clean; kiem_nhanh 7/7 60 cases) 488a20b
+- 2026-11-14T00:20Z LEAD session_01VfPzNuse9EfjuDwwt7335U final: SG-5, SG-7, SG-9, SG-12 DONE; only known red test_ban_do_ma_so_tep_test_la_so_that; STATUS DONE
