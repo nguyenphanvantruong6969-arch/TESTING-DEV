@@ -36,3 +36,19 @@ Fable's report was not re-read; the spec text and the coder's repro tests were u
 - English dialog not visually verified by me (see 7).
 
 **Verdict: PASS.**
+
+---
+
+# Round 3 (FIX-2) — verdict PASS
+
+Diff `6aa59c0..690322f` (claude/sg-b), checker session_01YVAyu2yBkGgxzL1aNxajw8. Trigger: lead's full suite had `tests/test_giao_dien_loi_chan_gon.py` 2 red since d9da2c5 (hint added as a second `.log-tom-tat` line).
+
+1. **Old test unchanged and green — holds.** `git diff 5c8ee63..690322f -- tests/test_giao_dien_loi_chan_gon.py` is empty. At 690322f/HEAD: 6 passed. At 6aa59c0 (scratch worktree, removed): 2 failed (`test_chay_bi_chan_chi_hien_tom_tat_nam_em_va_con_lai`, `test_tieng_anh_loi_chan_gon_doi_theo`; strict-mode violation: `#logBox .log-tom-tat` resolved to 2 elements), 4 passed.
+2. **SG-2 sub-point 4 — holds, vi and en, 1366×768 and 1920×1080 (Chromium, scratch script, 26 blocked students).** Row `.log-hang-cuoi` = "and 21 more" label, "Open the list to fix", hint, `#btnMoTinhNangTuLoi` ("Mở Tính năng sau khi xếp…" / "Open After-allocation features…"); the hint is `flex: 1 1 100%` so it sits on its own line between the two buttons. No overflow (`documentElement.scrollWidth` = viewport, `#logBox` scrollWidth = clientWidth in all 4 cases); hint 14px, dark text on the page background, readable (screenshot viewed). Tab from "Open the list" lands on `#btnMoTinhNangTuLoi`; click opens the dialog without page errors. English really viewed this time (the round-1 gap is closed).
+3. **Mutation — holds.** Put `them(t("wh_goi_y_tat"), "log-tom-tat")` back after the headline → `loi_chan_gon` 2 red; restored, `git status` clean.
+4. **Related tests ran for real** (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`): every `tests/` file grepping showLog / logBox / log-tom-tat / log-dong / btnMoTinhNangTuLoi / wh_… = `test_giao_dien_chay`, `fg6_danh_sach_loi`, `loi_chan_gon`, `sg2_diem_quyet_tam`, plus `test_sg2_wharton_trong`, `test_ws_nhan`: 91 passed, 0 skipped. `ruff check .` clean. `kiem_nhanh --so-seed 20`: 7/7 (60 runs byte-identical).
+5. **Scope — holds.** Diff = `js/02_van_hanh.js` (−1/+4, inside `showLog` only, guarded by the existing `typeof wsMoTinhNangDangMo` check), `style.css` (+1 rule inside the SG-B block), `MANH_B.md` (declares the `02_van_hanh.js` change as "SG-2 FIX-2"). No i18n/string change (`wh_goi_y_tat` reused).
+
+Optional (does not block): the new test for sub-point 4 (`test_khung_loi_chay_bi_chan_co_nut_mo_hop_thoai`) still asserts only the vi word "tắt" in `#logBox`, so it would not notice the hint moving back into a `.log-tom-tat` line or disappearing in en; the mutation in 3 is caught by the old test only. No test pins the hint to the button row.
+
+**Verdict: PASS.**

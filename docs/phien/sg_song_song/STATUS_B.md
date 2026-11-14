@@ -99,3 +99,4 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T23:58Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 full suite at dff2363: 6087 passed, red = a13_12 (known) + 2x test_giao_dien_loi_chan_gon (SG-2 regression) -> SG-2 FIX-2 to coder
 2026-11-13T23:57Z CODER session_01YVAyu23VvGaoDixHWJZn1G SG-2 READY 690322f fix:1 done (hint moved out of .log-dong; old test untouched),2 done (36 giao_dien tests on showLog/logBox + sg2 backend pass, ruff clean, kiem_nhanh 7/7)
 2026-11-14T00:22Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 CHECKING r3 checker=session_01YVAyu2yBkGgxzL1aNxajw8 range=6aa59c0..690322f; lead full suite started at 616c189
+2026-11-14T00:25Z CHECKER session_01YVAyu2yBkGgxzL1aNxajw8 SG-2 PASS
