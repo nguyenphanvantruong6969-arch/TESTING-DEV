@@ -11,8 +11,8 @@ FA-SC Phase 1 (approved by Truong 2026-11-14, D-SC1): converter-only fixes from 
 OFF; without it the converter output is byte-identical (invariant 1). New sheets/files are reports only (invariant 2).
 
 ## Plan (written by Opus; ticked by lead after CHECKER NO BUGS)
-- [ ] L0 baseline: converter on `du_lieu_test/demo_t4m.py` fake data (`--day-du` and plain) into scratch; keep outputs
-- [ ] L1 FA-SC-6 roster input (P1-1)
+- [x] L0 baseline: converter on `du_lieu_test/demo_t4m.py` fake data (`--day-du` and plain) into scratch; keep outputs
+- [x] L1 FA-SC-6 roster input (P1-1) — cc2d9a4, checker NO BUGS 76b2c45
 - [ ] L2 FA-SC-4 sheet "Cần xử lý" (P1-2)
 - [ ] L3 FA-SC-4b per-club dropped-response report (P1-4)
 - [ ] L4 FA-SC-2 per-class confirmation sheet (P1-3)
@@ -39,6 +39,7 @@ OFF; without it the converter output is byte-identical (invariant 1). New sheets
   reservation (addressed to club teacher). Columns: student, issue (plain Vietnamese), who acts, what to do.
 - Typed-name ≠ roster-name check (S37/d05): only if the data already exists without a form change; else skip →
   Needs Truong.
+- Also (from L1 review): roster email listed on two IDs → one warning line (today it silently takes the first ID).
 - Existing "Cảnh báo" sheet unchanged. Test: each injected case gives one row. Drills flip: d06, d04, d07 (d05 only
   if no form change).
 
@@ -55,8 +56,8 @@ OFF; without it the converter output is byte-identical (invariant 1). New sheets
 - Test: one block per student; dropped test shows reason; privacy assertions (no other class's IDs, no STB column).
 
 ## Current state (overwrite each handoff)
-- Done so far: branch created from `origin/claude/fable-fa-sc` + protocol file copied (lead).
-- In progress: L1 (writer).
+- Done so far: setup; L1 (cc2d9a4, NO BUGS).
+- In progress: L2 (writer).
 - Tests: per lot, see protocol §2.
 - Open problems: none.
 
@@ -71,6 +72,7 @@ OFF; without it the converter output is byte-identical (invariant 1). New sheets
 - Phase 0 (P0-1…P0-7): wording, checklists, decisions D-SC2…D-SC7 (plan §4 has a recommendation for each).
 - P2-1 per-day lottery lock (schema change), P2-2 attendance, P2-3 capacity warning, P2-4, P2-5.
 - S37 typed-name check that needs a "class and full name" question in the test form (form generator change).
+- Roster with path A (CSV List): today a clear error; supporting it needs a decision on how List rows map to the roster.
 - Wiring the new converter options into the kiosk "Chuẩn bị đợt" tab.
 
 ## Decisions and gotchas
@@ -81,3 +83,4 @@ OFF; without it the converter output is byte-identical (invariant 1). New sheets
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-14 | Opus (lead) | branch setup, lot specs | |
+| 2026-11-14 | Sonnet (writer/checker) | L1 roster input | NO BUGS |
