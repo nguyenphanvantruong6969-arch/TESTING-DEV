@@ -181,19 +181,43 @@ def sql(db, cau, tham=()):
         con.close()
 
 
-def chay(dot, thu_muc, seed=SEED, luat=None, **ghi):
+SO_LOP = 6
+
+
+def danh_sach_that(dot, co_email=True):
+    """Danh sách của trường theo SỰ THẬT của đợt (mã và email đúng, 6 lớp 10A1..10A6): [(mã, lớp, email)].
+    Dùng cho tuỳ chọn `danh_sach_truong` của `chay` (mặc định TẮT)."""
+    return [(h["sid"], "10A%d" % (i % SO_LOP + 1), h["email"] if co_email else "") for i, h in enumerate(dot["hs"], 1)]
+
+
+def ghi_danh_sach(duong, hang):
+    import csv
+    with open(duong, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["student_id", "class_id", "email"])
+        w.writerows(hang)
+    return duong
+
+
+def chay(dot, thu_muc, seed=SEED, luat=None, danh_sach_truong=None, **ghi):
     """Trọn chuỗi: ghi tệp -> chuyển đổi -> nạp -> chạy. Trả dict; không ném lỗi khi bị chặn (ghi vào `loi`).
-    `luat`: thêm khoá vào `rules` của workspace tạm (ví dụ {"fa_diem_danh": True})."""
+    `luat`: thêm khoá vào `rules` của workspace tạm (ví dụ {"fa_diem_danh": True}).
+    `danh_sach_truong` (FA-SC L1, mặc định None = TẮT, số liệu cũ không đổi): [(mã, lớp, email)] ghi thành CSV rồi
+    đưa cho bộ chuyển đổi; kết quả `bao_cao_danh_sach` có trong dict trả về."""
     de, loai = de_fa()
     so_clb, tep_dk, tep_thi = ghi_tep(dot, thu_muc, de, loai, **ghi)
     ra = {"thu_muc": thu_muc, "loai": loai, "de": de, "canh_bao": [], "loi": [], "ket_qua": {}, "buoc_chan": None}
+    kw = {}
+    if danh_sach_truong is not None:
+        kw["danh_sach_truong"] = ghi_danh_sach(os.path.join(thu_muc, "danh_sach_truong.csv"), danh_sach_truong)
     try:
-        kq = cv.chuyen_fa_daa(os.path.join(thu_muc, "nap"), de, so_clb, dang_ky_xlsx=tep_dk, quiz_xlsx=[tep_thi])
+        kq = cv.chuyen_fa_daa(os.path.join(thu_muc, "nap"), de, so_clb, dang_ky_xlsx=tep_dk, quiz_xlsx=[tep_thi], **kw)
     except cv.LoiTepXuat as e:
         ra["buoc_chan"], ra["loi"] = "chuyen_doi", [str(e)]
         return ra
     ra["canh_bao"] = [x[2] for x in kq["canh_bao"]]
     ra["canh_bao_day_du"] = kq["canh_bao"]
+    ra["bao_cao_danh_sach"] = kq.get("bao_cao_danh_sach")
     api, db = mo_kiosk(thu_muc, **(luat or {}))
     ra["api"], ra["db"] = api, db
     r = nap(api, os.path.join(thu_muc, "nap", cv.TEN_SO))

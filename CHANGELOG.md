@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2026-11-14 — FA-SC-L1 (FA-SC-6, kế hoạch P1-1): danh sách học sinh của trường làm đầu vào bộ chuyển đổi
+
+Chỉ bộ chuyển đổi (`mau_forms_thi_clb/`), kiosk không đổi. Tuỳ chọn MỚI, mặc định TẮT: không có nó thì đầu ra giống từng byte
+(so `demo_t4m.py` thường và `--day-du`, và một đợt đường B 120 em giả; `kiem_nhanh` 7/7, 60 ca trùng khít). Số liệu MÔ PHỎNG.
+- `chuyen_fa_daa(..., danh_sach_truong=CSV)` và cờ `--danh-sach-truong` (chỉ đường B): CSV `student_id, class_id[, email]` đọc bằng
+  `danh_sach_chua_dang_ky.doc_danh_sach_truong` (hàm mới, `LoiDanhSach` nếu thiếu cột / rỗng). Hàm mới
+  `doi_chieu_danh_sach_truong`: mã gõ không có trong danh sách → một dòng cảnh báo; danh sách có cột email → thay mã gõ nhầm
+  bằng mã của danh sách và báo chỗ khác (nên mã trùng bạn không còn làm kiosk từ chối); hai email cùng một mã → một dòng nêu
+  cả hai email; `class_id` điền vào cột Lớp có sẵn của Sổ nhập (cột Sổ nhập không đổi). Hàm `ghi_chua_dang_ky` ghi
+  `CHUA_DANG_KY.xlsx` (sheet "Chưa đăng ký" theo lớp, sheet "Thiếu ngày"); kết quả có thêm khoá `bao_cao_danh_sach`. Chỉ là báo cáo
+  và điền lớp, không đổi điểm hay thứ hạng.
+- `du_lieu_test/su_co/chung.py`: `chay(..., danh_sach_truong=None)`, `danh_sach_that`, `ghi_danh_sach` (mặc định TẮT; số cũ của
+  d01–d14 không đổi). d01, d02, d03, d14 thêm các dòng "[có danh sách trường]": d03(a) không còn bị kiosk chặn, d14 từ 120/120
+  em không lớp xuống 0/120, d01 và d02 có em trong báo cáo.
+- Test mới: `tests/test_fa_sc_l1_danh_sach.py` (7 ca).
+- Chưa làm (cần Truong): đường A (CSV List) chưa dùng được với danh sách trường (báo lỗi rõ); chưa nối vào tab "Chuẩn bị đợt".
+
 ## 2026-11-14 — FA-SC (mục mới ngoài sổ, Truong duyệt D-SC1): sự cố do con người, phần nghiên cứu
 
 Chỉ tài liệu và kịch bản diễn tập; **không sửa mã sản phẩm**, không test mới. Mọi số liệu là MÔ PHỎNG (120 học sinh giả).

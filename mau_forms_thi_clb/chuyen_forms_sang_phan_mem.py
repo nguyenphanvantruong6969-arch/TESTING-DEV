@@ -1198,8 +1198,92 @@ def _thoi_gian_lam_bai(tieu_de, cac_dong):
     return ra, n_loi
 
 
+TEN_CHUA_DANG_KY = "CHUA_DANG_KY.xlsx"
+
+
+def _tom_tat(muc, toi_da=5):
+    return ", ".join(muc[:toi_da]) + (" …" if len(muc) > toi_da else "")
+
+
+def doi_chieu_danh_sach_truong(de, danh_sach, ds_truong):
+    """FA-SC L1: đối chiếu hồ sơ đường B (`danh_sach`, sửa tại chỗ) với danh sách của trường `ds_truong`
+    [{student_id, class_id, email}]. Trả (cảnh báo, {"chua_dang_ky": [(lớp, mã)], "thieu_ngay": [(mã, lớp, [ngày])]}).
+
+    Mã em gõ KHÔNG có trong danh sách: báo (giữ mã gõ). Danh sách có email ghi nhận email của em: thay mã gõ bằng mã
+    của danh sách và báo chỗ khác. Một mã do hai email dùng: một dòng nêu cả hai email. Lớp lấy từ danh sách (chỉ điền
+    khi em chưa có lớp). Chỉ báo cáo: không dòng nào ảnh hưởng điểm hay thứ hạng."""
+    canh_bao = []
+    theo_ma, theo_email = {}, {}
+    for r in ds_truong:
+        if r["student_id"] in theo_ma:
+            canh_bao.append(("", r["student_id"], "mã %s xuất hiện hơn một lần trong danh sách của trường — dùng dòng "
+                             "đầu (lớp %s)" % (r["student_id"], theo_ma[r["student_id"]]["class_id"])))
+            continue
+        theo_ma[r["student_id"]] = r
+        if r["email"]:
+            theo_email.setdefault(r["email"], r["student_id"])
+    dung = {}
+    for khoa, hs in danh_sach.items():
+        go = hs["student_id"]
+        ma_dung = theo_email.get(khoa) if khoa != go.lower() else None
+        if ma_dung and ma_dung != go:
+            canh_bao.append((hs["dong"], khoa, "email %s gõ mã %s, danh sách của trường ghi email này là mã %s — dùng "
+                             "mã %s" % (khoa, go, ma_dung, ma_dung)))
+            hs["student_id"] = go = ma_dung
+        elif go not in theo_ma:
+            canh_bao.append((hs["dong"], khoa, "email %s gõ mã %s: không có trong danh sách của trường — kiểm tra lại "
+                             "mã này" % (khoa, go)))
+        dung.setdefault(go, []).append(khoa)
+        if go in theo_ma and not hs.get("lop"):
+            hs["lop"] = theo_ma[go]["class_id"]
+    for ma, cac in dung.items():
+        if len(cac) > 1:
+            canh_bao.append(("", ma, "mã %s được dùng bởi %d email: %s — cần xác định đúng em" % (ma, len(cac),
+                                                                                              " và ".join(cac))))
+    dang_ky = {hs["student_id"] for hs in danh_sach.values() if hs["nguyen_vong"]}
+    chua = sorted((r["class_id"], ma) for ma, r in theo_ma.items() if ma not in dang_ky)
+    ngay = [b["ma"] for b in de["buoi"] if any(c["buoi"] == b["ma"] for c in de["cau_lac_bo"])]
+    thieu = sorted((hs["student_id"], hs.get("lop", ""), [d for d in ngay if d not in hs["nguyen_vong"]])
+                   for hs in danh_sach.values() if hs["nguyen_vong"] and any(d not in hs["nguyen_vong"] for d in ngay))
+    if chua:
+        canh_bao.append(("", "", "%d học sinh trong danh sách của trường chưa đăng ký ngày nào (%s) — xem %s"
+                         % (len(chua), _tom_tat([m for _, m in chua]), TEN_CHUA_DANG_KY)))
+    if thieu:
+        canh_bao.append(("", "", "%d học sinh đã đăng ký nhưng thiếu một số ngày (%s) — xem %s"
+                         % (len(thieu), _tom_tat(["%s: %s" % (m, ", ".join(d)) for m, _, d in thieu]), TEN_CHUA_DANG_KY)))
+    return canh_bao, {"chua_dang_ky": chua, "thieu_ngay": thieu}
+
+
+def ghi_chua_dang_ky(de, bao_cao, duong):
+    """CHUA_DANG_KY.xlsx: sheet "Chưa đăng ký" (theo lớp) và "Thiếu ngày". Chỉ mã học sinh, lớp, ngày — không điểm."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+    ten_ngay = {b["ma"]: b.get("ten", b["ma"]) for b in de["buoi"]}
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Chưa đăng ký"
+    ws.append(["Lớp", "Mã học sinh"])
+    for lop, ma in bao_cao["chua_dang_ky"]:
+        ws.append([lop, ma])
+    if not bao_cao["chua_dang_ky"]:
+        ws.append(["", "Mọi học sinh trong danh sách của trường đã đăng ký."])
+    ws = wb.create_sheet("Thiếu ngày")
+    ws.append(["Mã học sinh", "Lớp", "Chưa đăng ký ngày"])
+    for ma, lop, ngay in bao_cao["thieu_ngay"]:
+        ws.append([ma, lop, ", ".join(ten_ngay[d] for d in ngay)])
+    if not bao_cao["thieu_ngay"]:
+        ws.append(["", "", "Không có em nào thiếu ngày."])
+    for w in wb.worksheets:
+        for o in w[1]:
+            o.font = Font(bold=True)
+        w.column_dimensions["A"].width = w.column_dimensions["B"].width = 16
+        w.column_dimensions["C"].width = 40
+    wb.save(duong)
+
+
 def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz_xlsx=(), nhan_ban_nhap=False,
-                  co_so=None, bien_the_tep=None, ap_dung_dieu_chinh=False, giu_diem_goc=False, bo_cau=()):
+                  co_so=None, bien_the_tep=None, ap_dung_dieu_chinh=False, giu_diem_goc=False, bo_cau=(),
+                  danh_sach_truong=None):
     """FA-M3 (TH): đăng ký (đường B: Forms `dang_ky_xlsx`, hoặc đường A: CSV `lists`) + bài thi -> Sổ nhập FA.
 
     Loại CLB, chỉ tiêu, điểm sàn, giữ chỗ lấy từ Sổ nhập CLB của FA-M1 (`so_nhap_clb`). Huy chương MỘT quỹ 60/30/10
@@ -1212,7 +1296,12 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
     chênh lệch ngoài ngưỡng thì ghi DIEU_CHINH_BAN_DE.xlsx và dừng bằng LoiChoXacNhan TRỪ KHI admin chọn đúng một cờ:
     `ap_dung_dieu_chinh` (dịch về trung bình chung) hoặc `giu_diem_goc`. Không lệch thì không cần cờ. `bo_cau`
     {(club_id, đề, số câu)} (FA-S2; (club_id, số câu) chỉ khi CLB có một đề): câu admin đã xác nhận bỏ (V§7.5), chấm
-    lại cho mọi học sinh làm đề đó. Luôn ghi PHAN_TICH_CAU_HOI.xlsx."""
+    lại cho mọi học sinh làm đề đó. Luôn ghi PHAN_TICH_CAU_HOI.xlsx.
+
+    `danh_sach_truong` (đường dẫn CSV `student_id, class_id[, email]`, mặc định TẮT; chỉ đường B): đối chiếu mã học sinh
+    em gõ với danh sách của trường (mã lạ, hai email cùng một mã, thay mã gõ nhầm theo email nếu danh sách có cột email),
+    điền lớp, và ghi CHUA_DANG_KY.xlsx (em chưa đăng ký theo lớp; em thiếu ngày). Chỉ là báo cáo + điền lớp: không đổi
+    điểm hay thứ hạng nào. Bật thì kết quả có thêm khoá "bao_cao_danh_sach"; tắt thì đầu ra y như trước."""
     import fa_daa
     import phan_tich_cau_hoi as pt
     from fractions import Fraction
@@ -1242,6 +1331,15 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         raise LoiTepXuat("chế độ FA-DAA cần Sổ nhập CLB (--so-nhap-clb) để biết Loại của từng CLB")
     if bool(dang_ky_xlsx) == bool(lists):
         raise LoiTepXuat("chọn đúng MỘT nguồn đăng ký: tệp Forms đăng ký (đường B) hoặc CSV List (đường A)")
+    ds_truong = None
+    if danh_sach_truong:
+        if lists:
+            raise LoiTepXuat("danh sách học sinh của trường chỉ dùng được với đường B (tệp Forms đăng ký)")
+        from danh_sach_chua_dang_ky import LoiDanhSach, doc_danh_sach_truong
+        try:
+            ds_truong = doc_danh_sach_truong(danh_sach_truong)
+        except (LoiDanhSach, OSError) as e:
+            raise LoiTepXuat("danh sách học sinh của trường: %s" % e) from e
     clb_fa, giu_cho, canh_bao = doc_clb_fa(so_nhap_clb, de)
     tu_do = {c for c, v in clb_fa.items() if v.get("loai") == so_nhap.TU_DO}
     if lists:
@@ -1256,6 +1354,10 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
             canh_bao += cb
     if not danh_sach:
         raise LoiTepXuat("không có học sinh nào trong dữ liệu đăng ký")
+    bao_cao_ds = None
+    if ds_truong is not None:
+        cb, bao_cao_ds = doi_chieu_danh_sach_truong(de, danh_sach, ds_truong)
+        canh_bao += cb
     cac_tep = []
     for d in quiz_xlsx:
         tieu_de, cac_dong = doc_tep_xuat(d)
@@ -1391,11 +1493,16 @@ def chuyen_fa_daa(thu_muc_ra, de, so_nhap_clb, dang_ky_xlsx=(), lists=None, quiz
         w.writerows([h["email"], h["student_id"]] for h in hoc_sinh)
     if cac_tep:
         ghi_bang_diem(de, hoc_sinh, canh_bao, os.path.join(thu_muc_ra, "BANG_DIEM.xlsx"))
-    return {"n_hoc_sinh": len(hoc_sinh), "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
-            "canh_bao": canh_bao, "ghi_chu": [GHI_CHU_FA_DAA],
-            "cau_co_co": [{"club_id": r["club_id"], "bien_the": r["bien_the"], "cau": r["cau"], "co": list(r["co"]),
-                           "ti_le_dung": r["ti_le_dung"]}
-                          for r in (hang_cau if cac_tep else []) if r["co"]]}
+    if bao_cao_ds is not None:
+        ghi_chua_dang_ky(de, bao_cao_ds, os.path.join(thu_muc_ra, TEN_CHUA_DANG_KY))
+    ra = {"n_hoc_sinh": len(hoc_sinh), "n_bai_thi": sum(len(h["bai_thi"]) for h in hoc_sinh),
+          "canh_bao": canh_bao, "ghi_chu": [GHI_CHU_FA_DAA],
+          "cau_co_co": [{"club_id": r["club_id"], "bien_the": r["bien_the"], "cau": r["cau"], "co": list(r["co"]),
+                         "ti_le_dung": r["ti_le_dung"]}
+                        for r in (hang_cau if cac_tep else []) if r["co"]]}
+    if bao_cao_ds is not None:
+        ra["bao_cao_danh_sach"] = bao_cao_ds
+    return ra
 
 
 TEN_EMAIL_MA_HS = "EMAIL_MA_HS.csv"
@@ -1548,6 +1655,9 @@ def main(argv=None):
     ap.add_argument("--bo-cau", nargs="+", metavar="CLB-DE-SO",
                     help="câu admin xác nhận bỏ, ví dụ clb_covua-B-3 (đề B câu 3); CLB chỉ có một đề: clb_covua-3; "
                          "chấm lại cho mọi học sinh làm đề đó (chỉ với --fa-daa)")
+    ap.add_argument("--danh-sach-truong", metavar="CSV",
+                    help="CSV danh sách học sinh của trường (student_id, class_id[, email]): đối chiếu mã học sinh, điền lớp, "
+                         "ghi CHUA_DANG_KY.xlsx (chỉ với --fa-daa, đường --dang-ky)")
     ap.add_argument("--nhan-ban-nhap", action="store_true",
                     help="giữ cả dòng TrangThai = DRAFT của List (chỉ với --fa-daa, đường A)")
     a = ap.parse_args(argv)
@@ -1561,9 +1671,9 @@ def main(argv=None):
         if a.ap_dung_dieu_chinh and a.giu_diem_goc:
             ap.error("chỉ chọn MỘT trong --ap-dung-dieu-chinh và --giu-diem-goc")
     elif (a.so_nhap_clb or a.dang_ky or a.nhan_ban_nhap or a.bien_the_tep or a.ap_dung_dieu_chinh or a.giu_diem_goc
-          or a.bo_cau):
-        ap.error("--so-nhap-clb, --dang-ky, --nhan-ban-nhap, --bien-the-tep, --ap-dung-dieu-chinh, --giu-diem-goc và "
-                 "--bo-cau chỉ dùng cùng --fa-daa")
+          or a.bo_cau or a.danh_sach_truong):
+        ap.error("--so-nhap-clb, --dang-ky, --nhan-ban-nhap, --bien-the-tep, --ap-dung-dieu-chinh, --giu-diem-goc, "
+                 "--bo-cau và --danh-sach-truong chỉ dùng cùng --fa-daa")
     if not a.tep_xuat and not a.fa_daa:
         ap.error("cần ít nhất một tệp .xlsx")
     if a.bai_thi is not None and not a.chi_thi:
@@ -1582,7 +1692,7 @@ def main(argv=None):
                                quiz_xlsx=a.tep_xuat, nhan_ban_nhap=a.nhan_ban_nhap, co_so=a.co_so,
                                bien_the_tep=dict(x.split("=", 1) for x in a.bien_the_tep or []) or None,
                                ap_dung_dieu_chinh=a.ap_dung_dieu_chinh, giu_diem_goc=a.giu_diem_goc,
-                               bo_cau={_doc_bo_cau(x) for x in a.bo_cau or []})
+                               bo_cau={_doc_bo_cau(x) for x in a.bo_cau or []}, danh_sach_truong=a.danh_sach_truong)
         elif a.chi_thi:
             kq = chuyen_chi_thi(a.tep_xuat, a.lists, a.ra, bm.doc_de_thi(a.de), a.co_so, a.bai_thi)
         else:

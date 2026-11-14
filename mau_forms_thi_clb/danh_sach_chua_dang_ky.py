@@ -94,6 +94,17 @@ class LoiDanhSach(ValueError):
     """Danh sách lớp thiếu cột student_id, class_id (khác lỗi của tệp đăng ký)."""
 
 
+def doc_danh_sach_truong(duong):
+    """FA-SC L1: danh sách học sinh của trường -> [{student_id, class_id, email}] (email chữ thường, "" nếu không có
+    cột). Cùng định dạng với `chua_dang_ky`. Thiếu cột student_id/class_id hoặc không có dòng nào -> `LoiDanhSach`."""
+    with open(duong, encoding="utf-8-sig", newline="") as f:
+        hang = [r for r in csv.DictReader(f) if _chu(r.get("student_id"))]
+    if not hang or "class_id" not in hang[0]:
+        raise LoiDanhSach("danh sách phải có cột student_id, class_id và ít nhất một học sinh")
+    return [{"student_id": _chu(r["student_id"]), "class_id": _chu(r["class_id"]),
+             "email": _chu(r.get("email")).lower()} for r in hang]
+
+
 def chua_dang_ky(duong_danh_sach, duong_dang_ky, thu_muc_ra):
     """FA-M10 (TH): làm đúng việc của `main` nhưng trả DỮ LIỆU: {"lop": ty_le_dang_ky(...), "tep": [đường dẫn đã ghi],
     "n_email": số lớp còn em chưa đăng ký, "n_duoi": số lớp dưới ngưỡng, "vuot_gioi_han": bool}.

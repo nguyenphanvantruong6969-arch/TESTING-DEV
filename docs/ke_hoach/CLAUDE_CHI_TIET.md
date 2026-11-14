@@ -21,7 +21,7 @@
 | `i18n_errors.py` → `tao_i18n_js.py` → `i18n_loi.js` | Thông báo lỗi song ngữ, **một nguồn** | `err`, `phan_hoi_ok`, `phan_hoi_loi` |
 | `browser_host.py`, `recovery.py`, `chan_doan.py`, `main.py` | Máy chủ dự phòng 127.0.0.1, phục hồi, log, điểm vào | |
 | `index.html`, `js/00…08_*.js`, `i18n.js`, `style.css` | Giao diện; gọi backend qua `window.pywebview.api.*`, trả `{ok, data, errors}` | |
-| `tests/` | 293 tệp `test_*.py`, 6.224 ca (`pytest --collect-only`, 14/11/2026, nhánh claude/sg-sua) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
+| `tests/` | 294 tệp `test_*.py`, 6.231 ca (`pytest --collect-only`, 14/11/2026, nhánh claude/fa-sc-sua) | `test_pipeline_core.py`, `test_nhieu_buoi.py::TestTrungKhit`, `test_toi_uu_on_dinh.py`, `test_boc_tham.py`, … |
 | `du_lieu_test/` (gồm `mo_phong_fa_daa.py`, FA-10: chỉ in bảng số, nhãn "SỐ LIỆU MÔ PHỎNG"), `mau_csv/`, `docs/`, `BAN_GIAO.md` | Bộ dữ liệu mô phỏng, script đo, mẫu nhập, tài liệu cơ chế, nhật ký 25 lỗi đã sửa | |
 
 ## 12 ngành đích (mã dùng trong mọi tệp)
