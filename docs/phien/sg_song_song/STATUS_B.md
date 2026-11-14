@@ -2,13 +2,13 @@
 
 Mode: SG_SONG_SONG person B
 LOCK: LEAD session_01YVAytz9tLyA9nbFitcHYj9 2026-11-13T15:30Z
-STATUS: RUNNING
+STATUS: DONE
 BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for m in "" --fa-daa "--fa-daa --mot-bieu-mau" --bien-the --chi-thi --phan-hoi --sau-ket-qua --tuan-3: `python mau_forms_thi_clb/tao_mau_forms.py $m --ra <dir>`. Default mode IGNORES --ra (rewrites MAU_XUAT_TU_FORMS.xlsx + NHAP_FORMS_THI_CLB.docx in place: copy them out, then `git checkout -- .`); --bien-the writes nothing (no de_thi_bien_the in de_thi.json). Compare without docProps/core.xml.
 
 ## Items
 | Item | State | Round | Start | End | Coder session | Checker session | Tests |
 |---|---|---|---|---|---|---|---|
-| SG-2 (C1) | CHECKING | 2 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
+| SG-2 (C1) | DONE | 2 | 5c8ee63 | d9da2c5 | session_01YVAyu23VvGaoDixHWJZn1G | session_01YVAyu3aEQRoHtkKoFwqkCc | tests/test_sg2_wharton_trong.py, tests/test_giao_dien_sg2_diem_quyet_tam.py |
 | SG-6 (H1, D1 = A) | DONE | 1 | d7c9c19 | b83651d | session_01YVAyu2N9LpsmHLzKjBUGzq | session_01YVAyu3A184isUsUrEroXCZ (r2) | tests/test_sg6_gio_dia_diem.py, tests/test_giao_dien_sg6_gio_dia_diem.py |
 | SG-8 (M5) | DONE | 1 | b3570ac | 5e47810 | session_01YVAytzNj1eT4xGk3rANq4G | session_01YVAyu2ToRHhkBjTaybds6n (r2) | tests/test_sg8_thong_bao_buoc1.py, tests/test_giao_dien_sg8_buoc1_tieng_anh.py |
 | SG-11b (M4 only) | DONE | 1 | 5ab87d0 | 29bfa1e | session_01YVAyu3PXika1Vx6orU1Yim | session_01YVAyu3LJVjJwZrCxTDDP4W (r2) | tests/test_giao_dien_sg11b_focus_man_chon.py |
@@ -54,6 +54,8 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 - SG-8 lead review: accepted checker r2 PASS; lead full non-UI suite at 5e47810: 5600 passed, only a13_12 red; reran SG-8 + ws_nhan + van_phong_tu_nhien incl. Chromium (70 passed); kiem_nhanh 7/7. `NOI_DUNG` constant kept only for the teacher .md report writer (file stays byte-identical); UI reads i18n codes only.
 - SG-11b lead review: accepted checker r2 PASS (FIX-1 1-4 closed, global Esc unchanged elsewhere); SG-11b tests green in lead full suite at dff2363.
 - Lead lesson: SG-2 checker ran a `-k` subset and missed two red tests (t1a, loi_chan_gon). Lead now runs the full suite (incl. UI) before DONE.
+- SG-2 FIX-2: checker r3 PASS (session_01YVAyu2yBkGgxzL1aNxajw8); old test test_giao_dien_loi_chan_gon untouched and green.
+- Final gate (lead, HEAD 616c189 code): full suite incl. Chromium UI 6089 passed, 4 skipped (numpy/POSIX/deferred, not SG files), 1 red = known a13_12 test-file count; `ruff check .` clean; kiem_nhanh 7/7 (60 cases identical); generator 8 modes vs BASE snapshot: 18 files, 0 diffs. Coverage not measured here (CI / lead A gate).
 
 ## For Truong
 - (observation, not done: outside SG-8) Chuẩn bị đợt step 4 (`api_forms_nap.py` `noi_dung`, `js/12_chuan_bi_nap.js`) still returns Vietnamese sentences, so the English UI there is not translated. Candidate for a later item.
@@ -100,3 +102,5 @@ BASE: 98709f1f374368c65ee2833467715fd933dc84f6   SNAPSHOT: worktree of BASE; for
 2026-11-13T23:57Z CODER session_01YVAyu23VvGaoDixHWJZn1G SG-2 READY 690322f fix:1 done (hint moved out of .log-dong; old test untouched),2 done (36 giao_dien tests on showLog/logBox + sg2 backend pass, ruff clean, kiem_nhanh 7/7)
 2026-11-14T00:22Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 CHECKING r3 checker=session_01YVAyu2yBkGgxzL1aNxajw8 range=6aa59c0..690322f; lead full suite started at 616c189
 2026-11-14T00:25Z CHECKER session_01YVAyu2yBkGgxzL1aNxajw8 SG-2 PASS
+2026-11-14T00:50Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 SG-2 DONE (checker r3 PASS) 690322f
+2026-11-14T00:50Z LEAD session_01YVAytz9tLyA9nbFitcHYj9 - final gate green; STATUS DONE (SG-2, SG-6, SG-8, SG-11b DONE)
