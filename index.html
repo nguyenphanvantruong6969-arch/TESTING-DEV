@@ -37,25 +37,25 @@
 
     <div class="nav-group">
       <button class="nav-item is-active" data-tab="pipeline">
-        <span class="nav-icon">01</span> <span data-i18n="nav_pipeline">Xếp CLB</span>
+        <span data-i18n="nav_pipeline">Xếp CLB</span>
       </button>
       <button class="nav-item" data-tab="results">
-        <span class="nav-icon">02</span> <span data-i18n="nav_results">Kết quả</span>
+        <span data-i18n="nav_results">Kết quả</span>
       </button>
       <button class="nav-item" data-tab="others">
-        <span class="nav-icon">03</span> <span data-i18n="nav_others">Chi tiết và xuất tệp</span>
+        <span data-i18n="nav_others">Chi tiết và xuất tệp</span>
       </button>
       <button class="nav-item" data-tab="fallback">
-        <span class="nav-icon">04</span> <span data-i18n="nav_fallback">Nhập nguyện vọng</span>
+        <span data-i18n="nav_fallback">Nhập nguyện vọng</span>
       </button>
       <button class="nav-item" data-tab="admin">
-        <span class="nav-icon">05</span> <span data-i18n="nav_admin">Quản lý</span>
+        <span data-i18n="nav_admin">Quản lý</span>
       </button>
       <button class="nav-item" data-tab="scoring">
-        <span class="nav-icon">06</span> <span data-i18n="nav_scoring">Nhập điểm</span>
+        <span data-i18n="nav_scoring">Nhập điểm</span>
       </button>
       <button class="nav-item" data-tab="chuan_bi" hidden>
-        <span class="nav-icon">07</span> <span data-i18n="nav_chuan_bi">Chuẩn bị đợt</span>
+        <span data-i18n="nav_chuan_bi">Chuẩn bị đợt</span>
       </button>
     </div>
 
@@ -121,7 +121,7 @@
             <button class="btn btn-secondary" id="btnValidate" data-i18n="btn_validate">Kiểm tra lại dữ liệu</button>
           </div>
         </div>
-        <p class="hint-text" data-i18n="health_panel_hint">Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.</p>
+        <p class="hint-text" data-i18n="health_panel_hint">Mục "Nghiêm trọng" sẽ chặn việc chạy cho đến khi sửa xong; các mục còn lại không chặn nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.</p>
         <div id="healthSummary" class="health-summary"></div>
         <div id="healthList" class="health-list"></div>
       </div>
@@ -373,6 +373,7 @@
           <button class="btn btn-secondary" id="btnXuatGoiY" type="button" hidden data-i18n="btn_xuat_goi_y">Xuất gợi ý chỉ tiêu kỳ sau (CSV)</button>
           <button class="btn btn-secondary" id="btnXuatBienBan" type="button" hidden data-i18n="btn_xuat_bien_ban">Xuất biên bản bốc thăm (bản in và Excel)</button>
         </div>
+        <p class="hint-text" id="xuatFaAnGoiY" data-sg11a-xuat-fa data-i18n="xuat_fa_an_goi_y">Các nút xuất lý do kết quả, bảng nhu cầu, gợi ý chỉ tiêu và biên bản bốc thăm chỉ hiện khi bật chế độ "Xếp theo loại {slot_l} và huy chương".</p>
         <p class="hint-text" data-i18n="xuat_theo_lop_hint">Xuất theo lớp: mỗi lớp một tệp bảng tính, chỉ có kết quả xếp, không có điểm hay số bốc thăm. Gửi được cho giáo viên chủ nhiệm.</p>
         <div class="save-feedback xuat-ket-qua" id="xuatFeedback"></div>
         <p class="hint-text xuat-canh-bao" data-i18n="xuat_canh_bao_diem">Tệp xuất có điểm chấm và số bốc thăm. Không gửi các tệp này cho giáo viên chấm điểm.</p>
@@ -601,6 +602,7 @@
         </div>
       </div>
 
+      <h2 class="nhom-tieu-de" id="sauCongBoTieuDe" data-i18n="sau_cong_bo_tieu_de" hidden>Sau khi công bố kết quả</h2>
       <!-- GAP-3: khieu nai loi du lieu (chi khi rules.fa_khieu_nai bat); js/10_theo_doi.js -->
       <div class="panel" id="khieuNaiPanel" hidden>
         <div class="panel-head">
@@ -666,6 +668,7 @@
           </div>
         </div>
         <div class="panel-body">
+          <p class="hint" id="phGoiYNut" data-i18n="ph_goi_y_nut">"Nạp từ Forms (Excel)" dùng cho biểu mẫu cũ có 3 câu hỏi; "Nạp biểu mẫu Sau khi xem kết quả" dùng cho biểu mẫu gộp mới.</p>
           <p id="phTongHop"></p>
           <div id="phNhapKetQua" class="save-feedback" role="status"></div>
         </div>
@@ -1229,7 +1232,7 @@
 
 <div class="bd-tooltip" id="bieuDoTooltip" role="tooltip" hidden></div>
 <!-- ===================== WORKSPACE: MÀN CHỌN + TRÌNH HƯỚNG DẪN (js/075_workspace.js) ===================== -->
-<div class="ws-overlay" id="wsOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="wsTieuDe">
+<div class="ws-overlay" id="wsOverlay" hidden aria-labelledby="wsTieuDe">
   <div class="ws-hop" id="wsHop"></div>
 </div>
 

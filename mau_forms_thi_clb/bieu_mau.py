@@ -16,9 +16,11 @@ ngoặc — sửa lời câu hỏi trên Forms không làm hỏng việc đọc 
     [clb_covua-3]     câu 3 trong đề thi của CLB Cờ vua
 """
 
+import contextvars
 import json
 import os
 import re
+from contextlib import contextmanager
 
 THU_MUC = os.path.dirname(os.path.abspath(__file__))
 DE_THI_MAC_DINH = os.path.join(THU_MUC, "de_thi.json")
@@ -38,10 +40,67 @@ _MA_CLB = re.compile(r"^[A-Za-z0-9_]+$")
 # Forms đôi khi giữ số thứ tự "3." của Quick Import trong tên câu hỏi.
 _MA_CAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[([^\]]+)\]")
 _MA_TRONG_LUA_CHON = re.compile(r"\(([A-Za-z0-9_]+)\)\s*$")
+_RE_THE_DAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[[^\]]+\]\s*")
+_RE_SO_THU_TU = re.compile(r"^\s*\d+[.)]\s*")
 
 
 class LoiDeThi(ValueError):
     """de_thi.json sai — không sinh gì cả."""
+
+
+# ---- SG-12 (H2): tiêu đề THUẦN cho học sinh, mã chỉ nằm trong bản đồ ----
+# Mặc định học sinh KHÔNG thấy `[thu_2-nv1]` hay `(clb_bong_ro)`: bộ sinh ghi tiêu đề thuần và một tệp `MAP_*.json`
+# (tiêu đề thuần -> mã, lựa chọn thuần -> mã). Cờ `--giu-ma` của bộ sinh giữ nguyên tiêu đề có mã như trước (đúng từng
+# byte). Mọi hàm dựng tên câu / lựa chọn trả về chuỗi `TieuDe` / `LuaChon`: chữ hiển thị tuỳ chế độ, nhưng LUÔN mang
+# mã (`.ma`), bản có mã (`.co_ma`) và bản thuần (`.thuan`) — nên mọi nơi bên trong dùng được cả hai mà không đoán.
+_GIU_MA = contextvars.ContextVar("rbda_giu_ma", default=False)
+
+
+def dat_giu_ma(co):
+    """Bật / tắt giữ mã trong tiêu đề (mặc định tắt = tiêu đề thuần). Theo ngữ cảnh luồng, không phải biến toàn cục."""
+    _GIU_MA.set(bool(co))
+
+
+def dang_giu_ma():
+    return _GIU_MA.get()
+
+
+@contextmanager
+def che_do_giu_ma(co):
+    token = _GIU_MA.set(bool(co))
+    try:
+        yield
+    finally:
+        _GIU_MA.reset(token)
+
+
+class TieuDe(str):
+    """Tên một câu hỏi: là chuỗi sẽ ghi lên biểu mẫu; `.ma` mã câu, `.co_ma` bản "[mã] …", `.thuan` bản không mã."""
+    ma = None
+    co_ma = ""
+    thuan = ""
+
+
+class LuaChon(str):
+    """Một lựa chọn có mã: `.ma` mã (club_id, hay giá trị 0/1/…), `.co_ma` bản "… (mã)", `.thuan` bản không mã."""
+    ma = None
+    co_ma = ""
+    thuan = ""
+
+
+def _tieu_de(ma, co_ma, thuan=None):
+    thuan = _RE_THE_DAU.sub("", co_ma, count=1) if thuan is None else thuan
+    t = TieuDe(co_ma if _GIU_MA.get() else thuan)
+    t.ma, t.co_ma, t.thuan = ma, co_ma, thuan
+    return t
+
+
+def _lua_chon(co_ma):
+    m = _MA_TRONG_LUA_CHON.search(co_ma.strip())
+    thuan = co_ma.strip()[:m.start()].rstrip() if m else co_ma
+    t = LuaChon(co_ma if _GIU_MA.get() else thuan)
+    t.ma, t.co_ma, t.thuan = (m.group(1) if m else None), co_ma, thuan
+    return t
 
 
 def doc_de_thi(duong_dan=DE_THI_MAC_DINH):
@@ -125,51 +184,100 @@ def clb_co_thi(de):
 
 def lua_chon_clb(clb):
     """Ghi cả tên lẫn mã — người xử lý không phải tra ngược tên ra mã."""
-    return "%s (%s)" % (clb["name"], clb["club_id"])
+    return _lua_chon("%s (%s)" % (clb["name"], clb["club_id"]))
 
 
 # ---- Tên câu hỏi: nguồn duy nhất cho cả biểu mẫu lẫn bộ chuyển đổi ----
 
 def cau_ma_hoc_sinh():
-    return "[student_id] Mã học sinh của em (ghi đúng như trên thẻ học sinh)"
+    return _tieu_de("student_id", "[student_id] Mã học sinh của em (ghi đúng như trên thẻ học sinh)")
 
 
 def cau_ho_ten():
-    return "[name] Họ và tên của em"
+    return _tieu_de("name", "[name] Họ và tên của em")
 
 
 def cau_xep_hang(de, ma_buoi):
-    return ("[%s] %s — em muốn vào câu lạc bộ nào? Kéo thả, câu lạc bộ em "
-            "thích nhất lên đầu. Bận buổi này thì bỏ qua câu này."
-            % (ma_buoi, ten_buoi(de, ma_buoi)))
+    return _tieu_de(ma_buoi, "[%s] %s — em muốn vào câu lạc bộ nào? Kéo thả, câu lạc bộ em "
+                    "thích nhất lên đầu. Bận buổi này thì bỏ qua câu này."
+                    % (ma_buoi, ten_buoi(de, ma_buoi)))
 
 
 def cau_cong_thi(de, clb, chi_thi=False):
     if chi_thi:
         # Chế độ chỉ thi: nguyện vọng nằm ở ứng dụng đăng ký, không ở biểu mẫu này.
-        return ("[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
-                "câu lạc bộ này ở nguyện vọng %s trong ứng dụng đăng ký."
-                % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
-                   ten_buoi(de, clb["buoi"])))
-    return ("[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
-            "câu lạc bộ này ở câu nguyện vọng %s."
-            % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
-               ten_buoi(de, clb["buoi"])))
+        return _tieu_de("thi-" + clb["club_id"],
+                        "[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
+                        "câu lạc bộ này ở nguyện vọng %s trong ứng dụng đăng ký."
+                        % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
+                           ten_buoi(de, clb["buoi"])))
+    return _tieu_de("thi-" + clb["club_id"],
+                    "[thi-%s] %s · Em có dự thi %s không? Chỉ chọn Có nếu em đã xếp "
+                    "câu lạc bộ này ở câu nguyện vọng %s."
+                    % (clb["club_id"], ten_buoi(de, clb["buoi"]), clb["name"],
+                       ten_buoi(de, clb["buoi"])))
 
 
-def cau_de_thi(clb, so_thu_tu):
+def _cac_de_cua_clb(clb):
+    """[đề A, đề B, đề C…]: đề A là `de_thi`, đề B, C là `de_thi_bien_the` (nếu có)."""
+    return [clb.get("de_thi") or []] + list(clb.get("de_thi_bien_the") or [])
+
+
+def _ma_theo_chu_cau(de):
+    """{chữ câu (đã gộp khoảng trắng): {mã câu}} cho mọi câu của mọi đề (kể cả đề B, C)."""
+    ra = {}
+    for c in de.get("cau_lac_bo", []):
+        for qs in _cac_de_cua_clb(c):
+            for i, q in enumerate(qs, 1):
+                ra.setdefault(_khoa(q["cau"]), set()).add("%s-%d" % (c["club_id"], i))
+    return ra
+
+
+def cau_de_thi(clb, so_thu_tu, de=None):
+    """Tên câu đề thi `[<club_id>-<k>] <chữ câu>`. Tiêu đề thuần = chữ câu; hai câu KHÁC mã mà cùng chữ (trong `de`)
+    thì thêm "(tên CLB, câu k)" để tiêu đề không trùng. Không truyền `de` = không xét trùng."""
     cau = clb["de_thi"][so_thu_tu - 1]["cau"]
-    return "[%s-%d] %s" % (clb["club_id"], so_thu_tu, cau)
+    ma = "%s-%d" % (clb["club_id"], so_thu_tu)
+    thuan = cau
+    if de is not None and len(_ma_theo_chu_cau(de).get(_khoa(cau), ())) > 1:
+        thuan = "%s (%s, câu %d)" % (cau, clb["name"], so_thu_tu)
+    return _tieu_de(ma, "[%s-%d] %s" % (clb["club_id"], so_thu_tu, cau), thuan)
 
 
-def ma_cua_cau(tieu_de):
-    """'[thu_2] Thứ Hai — …' -> 'thu_2'. Không phải câu của mẫu -> None."""
-    m = _MA_CAU.match(str(tieu_de or ""))
-    return m.group(1).strip() if m else None
+def _khoa(chu):
+    """Khoá so khớp tiêu đề / lựa chọn thuần: gộp khoảng trắng, GIỮ hoa thường (khớp CHÍNH XÁC chữ trên biểu mẫu)."""
+    return " ".join(str(chu or "").split())
 
 
-def ma_trong_lua_chon(chu):
-    """'CLB Cờ vua (clb_covua)' -> 'clb_covua'."""
+def ma_cua_cau(tieu_de, ban_do=None):
+    """'[thu_2] Thứ Hai — …' -> 'thu_2'. Không phải câu của mẫu -> None.
+
+    Tiêu đề do bộ sinh dựng (`TieuDe`) thì trả thẳng `.ma`. Chuỗi từ tệp xuất: thẻ "[mã]" ở đầu (tệp cũ) trước; không có
+    thẻ thì khớp CHÍNH XÁC chữ thuần qua `ban_do` (từ `ban_do_chung(de)` hoặc tệp MAP_*.json), có chấp nhận số thứ tự
+    "3." Forms đôi khi giữ ở đầu."""
+    if isinstance(tieu_de, TieuDe):
+        return tieu_de.ma
+    chu = str(tieu_de or "")
+    m = _MA_CAU.match(chu)
+    if m:
+        return m.group(1).strip()
+    if ban_do:
+        cau = ban_do.get("cau") or {}
+        return cau.get(_khoa(chu)) or cau.get(_khoa(_RE_SO_THU_TU.sub("", chu, count=1)))
+    return None
+
+
+def ma_trong_lua_chon(chu, ban_do=None, ma_cau=None):
+    """'CLB Cờ vua (clb_covua)' -> 'clb_covua'.
+
+    Có `ban_do` và `ma_cau` (mã của câu chứa lựa chọn): khớp CHÍNH XÁC chữ thuần của lựa chọn trong câu đó trước (tệp
+    mới, 'Có' -> '1'); không khớp thì đọc "(mã)" cuối chữ (tệp cũ). `LuaChon` do bộ sinh dựng thì trả `.ma`."""
+    if isinstance(chu, LuaChon):
+        return chu.ma
+    if ban_do and ma_cau:
+        gia_tri = (ban_do.get("lua_chon") or {}).get(ma_cau, {}).get(_khoa(chu))
+        if gia_tri is not None:
+            return gia_tri
     m = _MA_TRONG_LUA_CHON.search(str(chu or "").strip())
     return m.group(1) if m else None
 
@@ -207,7 +315,7 @@ def cac_phan(de, chi_thi=False, buoi=None):
                 (cau_cong_thi(de, clb, chi_thi), "choice", [CO, KHONG], True),
             ]))
             phan.append(("%s · Đề thi %s" % (b["ten"], clb["name"]), [
-                (cau_de_thi(clb, i), "choice", cau["lua_chon"], True)
+                (cau_de_thi(clb, i, de), "choice", cau["lua_chon"], True)
                 for i, cau in enumerate(clb["de_thi"], 1)
             ]))
     return phan
@@ -225,17 +333,34 @@ DOI_KHONG = "Không, giữ mặc định"
 
 
 def cau_nguyen_vong_fa(de, ma_buoi, k):
-    return "[%s-nv%d] %s — Nguyện vọng %d" % (ma_buoi, k, ten_buoi(de, ma_buoi), k)
+    return _tieu_de("%s-nv%d" % (ma_buoi, k), "[%s-nv%d] %s — Nguyện vọng %d" % (ma_buoi, k, ten_buoi(de, ma_buoi), k))
+
+
+# SG-5 (H3): một dòng mô tả dưới phần huy chương, nói đúng luật thật của `fa_daa`: huy chương KHÔNG đổi thứ tự
+# nguyện vọng; nó chỉ là tiêu chí ưu tiên ở từng CLB — CLB Tuyển chọn: điểm thi trước, huy chương khi bằng điểm;
+# CLB Giới hạn (không xét điểm): huy chương trước bốc thăm. Mặc định (`dat_huy_chuong_duong_b`): vàng, bạc, đồng cho
+# ba CLB không Tự do đầu tiên theo thứ tự nguyện vọng. Cố ý KHÔNG hứa "để mặc định không bao giờ thiệt".
+MO_TA_HUY_CHUONG = ("Huy chương giúp em được ưu tiên hơn bạn khác ở CLB đó: CLB có xét điểm thi thì chỉ dùng khi "
+                    "bằng điểm thi, CLB không xét điểm thi thì dùng trước khi bốc thăm. Em không chọn gì thì hệ "
+                    "thống tự đặt vàng cho nguyện vọng 1, bạc cho nguyện vọng 2, đồng cho nguyện vọng 3 "
+                    "(CLB Tự do không có huy chương nên được bỏ qua).")
+SO_CLB_TOI_THIEU_CAU_DOI = 3          # đổi chỗ bạc và đồng chỉ có nghĩa khi có >= 3 CLB nhận huy chương
+
+
+def so_clb_nhan_huy_chuong(de, ma_buoi):
+    """Số CLB của ngày đủ điều kiện nhận huy chương (không Tự do; chưa biết `loai` thì tính là có)."""
+    return sum(1 for c in clb_cua_buoi(de, ma_buoi) if c.get("loai") != "TU_DO")
 
 
 def cau_vang_fa(de, ma_buoi):
-    return ("[%s-vang] %s — Đặt huy chương vàng vào CLB khác NV1? Chọn \"%s\" nếu không đổi."
-            % (ma_buoi, ten_buoi(de, ma_buoi), GIU_MAC_DINH_VANG))
+    return _tieu_de(ma_buoi + "-vang",
+                    "[%s-vang] %s — Đặt huy chương vàng vào CLB khác NV1? Chọn \"%s\" nếu không đổi. %s"
+                    % (ma_buoi, ten_buoi(de, ma_buoi), GIU_MAC_DINH_VANG, MO_TA_HUY_CHUONG))
 
 
 def cau_doi_fa(de, ma_buoi):
-    return ("[%s-doi] %s — Đổi chỗ huy chương bạc và đồng? Chọn \"%s\" nếu không đổi."
-            % (ma_buoi, ten_buoi(de, ma_buoi), DOI_KHONG))
+    return _tieu_de(ma_buoi + "-doi", "[%s-doi] %s — Đổi chỗ huy chương bạc và đồng? Chọn \"%s\" nếu không đổi."
+                    % (ma_buoi, ten_buoi(de, ma_buoi), DOI_KHONG))
 
 
 def cac_phan_fa(de, ma_buoi):
@@ -247,14 +372,15 @@ def cac_phan_fa(de, ma_buoi):
     o_buoi = clb_cua_buoi(de, ma_buoi)
     ds = [lua_chon_clb(c) for c in o_buoi]
     khong_tu_do = [lua_chon_clb(c) for c in o_buoi if c.get("loai") != "TU_DO"]
+    cau_huy_chuong = [(cau_vang_fa(de, ma_buoi), "choice", [GIU_MAC_DINH_VANG] + khong_tu_do, False)]
+    if len(khong_tu_do) >= SO_CLB_TOI_THIEU_CAU_DOI:          # SG-5: ngày < 3 CLB nhận huy chương không có câu đổi
+        cau_huy_chuong.append((cau_doi_fa(de, ma_buoi), "choice", [DOI_KHONG, DOI_CO], False))
     return [
         ("Thông tin học sinh", [(cau_ma_hoc_sinh(), "text", [], True), (cau_ho_ten(), "text", [], True)]),
         ("%s · Nguyện vọng" % ten_buoi(de, ma_buoi), [
             (cau_nguyen_vong_fa(de, ma_buoi, k), "choice", list(ds), True)
             for k in range(1, min(SO_NGUYEN_VONG_FA, len(ds)) + 1)]),
-        ("%s · Huy chương (không bắt buộc)" % ten_buoi(de, ma_buoi), [
-            (cau_vang_fa(de, ma_buoi), "choice", [GIU_MAC_DINH_VANG] + khong_tu_do, False),
-            (cau_doi_fa(de, ma_buoi), "choice", [DOI_KHONG, DOI_CO], False)]),
+        ("%s · Huy chương (không bắt buộc)" % ten_buoi(de, ma_buoi), cau_huy_chuong),
     ]
 
 
@@ -274,56 +400,90 @@ def dem_cau_fa_gop(de):
 
 # ------------------------------------------- GAP-5 (TH): ba câu phản hồi sau khi xem kết quả (V§9.1)
 # Mã trong "[…]" và "(…)" khớp `fa_sau_xep.MA_CAU_PHAN_HOI` / `KHO_NHAT` (bộ nhập của kiosk đọc theo mã).
-CAU_HAI_LONG = "[hai_long] Em hài lòng với kết quả xếp CLB đến mức nào?"
-CAU_HIEU_LY_DO = "[hieu_ly_do] Em có hiểu vì sao mình được xếp như vậy không?"
-CAU_KHO_NHAT = "[kho_nhat] Phần nào khó nhất với em?"
-LUA_CHON_HAI_LONG = ["1 — Rất không hài lòng (1)", "2 (2)", "3 (3)", "4 (4)", "5 — Rất hài lòng (5)"]
-LUA_CHON_CO_KHONG = ["Có (1)", "Không (0)"]
-LUA_CHON_KHO_NHAT = ["Chọn CLB (chon_clb)", "Xếp thứ tự nguyện vọng (xep_thu_tu)", "Đặt huy chương (huy_chuong)",
-                     "Bài thử thách (thu_thach)", "Không có phần nào khó (khong_co)"]
+# SG-12: các hằng này là TÊN CÂU / LỰA CHỌN, nên chữ hiển thị phụ thuộc chế độ giữ mã (xem đầu tệp) -> dựng khi đọc
+# (`__getattr__` ở cuối tệp), không đóng băng lúc nạp mô-đun. `bm.CAU_HAI_LONG` vẫn dùng như trước.
+def _cau_hai_long():
+    return _tieu_de("hai_long", "[hai_long] Em hài lòng với kết quả xếp CLB đến mức nào?")
+
+
+def _cau_hieu_ly_do():
+    return _tieu_de("hieu_ly_do", "[hieu_ly_do] Em có hiểu vì sao mình được xếp như vậy không?")
+
+
+def _cau_kho_nhat():
+    return _tieu_de("kho_nhat", "[kho_nhat] Phần nào khó nhất với em?")
+
+
+def _lua_chon_hai_long():
+    return [_lua_chon(x) for x in ["1 — Rất không hài lòng (1)", "2 (2)", "3 (3)", "4 (4)", "5 — Rất hài lòng (5)"]]
+
+
+def _lua_chon_co_khong():
+    return [_lua_chon(x) for x in ["Có (1)", "Không (0)"]]
+
+
+def _lua_chon_kho_nhat():
+    return [_lua_chon(x) for x in ["Chọn CLB (chon_clb)", "Xếp thứ tự nguyện vọng (xep_thu_tu)",
+                                   "Đặt huy chương (huy_chuong)", "Bài thử thách (thu_thach)",
+                                   "Không có phần nào khó (khong_co)"]]
 
 
 def cac_phan_phan_hoi():
     """GAP-5 (TH): bố cục biểu mẫu phản hồi: mã học sinh + 3 câu một chạm, đều bắt buộc."""
     return [("Phản hồi sau khi xem kết quả", [
         (cau_ma_hoc_sinh(), "text", [], True),
-        (CAU_HAI_LONG, "choice", list(LUA_CHON_HAI_LONG), True),
-        (CAU_HIEU_LY_DO, "choice", list(LUA_CHON_CO_KHONG), True),
-        (CAU_KHO_NHAT, "choice", list(LUA_CHON_KHO_NHAT), True)])]
+        (_cau_hai_long(), "choice", _lua_chon_hai_long(), True),
+        (_cau_hieu_ly_do(), "choice", _lua_chon_co_khong(), True),
+        (_cau_kho_nhat(), "choice", _lua_chon_kho_nhat(), True)])]
 
 
 # ------------------------------------------- FA-M6b (TH): MỘT biểu mẫu "Sau khi xem kết quả" = 3 câu phản hồi + nhánh khiếu nại
 # Mã `[co_sai]`, `[kn_buoi]`, `[kn_ghi_chu]` khớp `fa_sau_xep.doc_tep_forms_khieu_nai`; lựa chọn kết thúc bằng "(mã)".
-CAU_CO_SAI = "[co_sai] Em có thấy thông tin của em trong kết quả bị sai không? (ví dụ sai mã, sai điểm, thiếu nguyện vọng)"
-LUA_CHON_CO_SAI = ["Không (0)", "Có (1)"]
-CAU_KN_BUOI = "[kn_buoi] Buổi nào có thông tin bị sai?"
-CAU_KN_GHI_CHU = "[kn_ghi_chu] Em mô tả ngắn chỗ sai"
+def _cau_co_sai():
+    return _tieu_de("co_sai", "[co_sai] Em có thấy thông tin của em trong kết quả bị sai không? "
+                              "(ví dụ sai mã, sai điểm, thiếu nguyện vọng)")
+
+
+def _lua_chon_co_sai():
+    return [_lua_chon(x) for x in ["Không (0)", "Có (1)"]]
+
+
+def _cau_kn_buoi():
+    return _tieu_de("kn_buoi", "[kn_buoi] Buổi nào có thông tin bị sai?")
+
+
+def _cau_kn_ghi_chu():
+    return _tieu_de("kn_ghi_chu", "[kn_ghi_chu] Em mô tả ngắn chỗ sai")
 
 
 def cac_phan_sau_ket_qua(de):
     """FA-M6b (TH): bố cục biểu mẫu "Sau khi xem kết quả": phần 1 = mã học sinh + 3 câu phản hồi + `[co_sai]` (bắt buộc);
     phần 2 (chỉ khi `[co_sai]` = Có, rẽ nhánh cài tay) = `[kn_buoi]` (hộp chọn nhiều, mọi buổi) + `[kn_ghi_chu]`.
     Loại 'checkbox' chỉ để mô tả: Quick Import không phân biệt, hướng dẫn bảo bật "Multiple answers"."""
-    p1 = cac_phan_phan_hoi()[0][1] + [(CAU_CO_SAI, "choice", list(LUA_CHON_CO_SAI), True)]
+    p1 = cac_phan_phan_hoi()[0][1] + [(_cau_co_sai(), "choice", _lua_chon_co_sai(), True)]
     return [
         ("Phản hồi sau khi xem kết quả", p1),
         ("Báo lỗi dữ liệu (khiếu nại, chỉ lỗi dữ liệu)", [
-            (CAU_KN_BUOI, "checkbox", ["%s (%s)" % (b["ten"], b["ma"]) for b in de["buoi"]], True),
-            (CAU_KN_GHI_CHU, "text", [], True)]),
+            (_cau_kn_buoi(), "checkbox", [_lua_chon("%s (%s)" % (b["ten"], b["ma"])) for b in de["buoi"]], True),
+            (_cau_kn_ghi_chu(), "text", [], True)]),
     ]
 
 
 # ------------------------------------------- GAP-6 (TH): khảo sát tuần 3 (V§9.3)
-CAU_CON_DI = "[con_di] Em còn đi sinh hoạt CLB của mình không?"
-CAU_MUON_DOI = "[muon_doi] Em có muốn đổi sang CLB khác không?"
+def _cau_con_di():
+    return _tieu_de("con_di", "[con_di] Em còn đi sinh hoạt CLB của mình không?")
+
+
+def _cau_muon_doi():
+    return _tieu_de("muon_doi", "[muon_doi] Em có muốn đổi sang CLB khác không?")
 
 
 def cac_phan_tuan_3():
     """GAP-6 (TH): bố cục khảo sát tuần 3: mã học sinh + 2 câu có/không, đều bắt buộc."""
     return [("Khảo sát tuần 3", [
         (cau_ma_hoc_sinh(), "text", [], True),
-        (CAU_CON_DI, "choice", list(LUA_CHON_CO_KHONG), True),
-        (CAU_MUON_DOI, "choice", list(LUA_CHON_CO_KHONG), True)])]
+        (_cau_con_di(), "choice", _lua_chon_co_khong(), True),
+        (_cau_muon_doi(), "choice", _lua_chon_co_khong(), True)])]
 
 
 # ------------------------------------------- FA-M8 / R9 (TH): phiếu thiết lập CLB (PHIEU_THIET_LAP_CLB.md §1)
@@ -366,7 +526,7 @@ def cac_phan_moi_clb(de, clb):
     Thẻ câu vẫn là [<club_id>-<k>] như biểu mẫu chung, để bộ chuyển đổi nhận ra CLB.
     """
     return [("Đề thi %s" % clb["name"], [
-        (cau_de_thi(clb, i), "choice", cau["lua_chon"], True)
+        (cau_de_thi(clb, i, de), "choice", cau["lua_chon"], True)
         for i, cau in enumerate(clb["de_thi"], 1)])]
 
 
@@ -436,3 +596,124 @@ def ghi_so(x):
     """8.0 -> '8', 9.5 -> '9.5' — đúng dạng phần mềm đọc."""
     x = float(x)
     return str(int(x)) if x.is_integer() else ("%g" % x)
+
+
+# ------------------------------------------- SG-12 (H2): bản đồ tiêu đề thuần -> mã, MỘT hàm cho bộ sinh và bộ đọc
+BAN_DO_PHIEN_BAN = 1
+
+
+def _moi_cau_hoi(de):
+    """Mọi câu hỏi mà bộ sinh có thể ghi cho `de` (mọi chế độ, mọi đề A/B/C): [(TieuDe, loại, [lựa chọn])].
+    `de` None: chỉ các câu không phụ thuộc đề (mã học sinh, họ tên, phản hồi, khảo sát tuần 3, khiếu nại)."""
+    phan = list(cac_phan_phan_hoi()) + list(cac_phan_tuan_3())
+    if de is None:
+        phan += [("", [(cau_ma_hoc_sinh(), "text", [], True), (cau_ho_ten(), "text", [], True)]),
+                 ("", [(_cau_co_sai(), "choice", _lua_chon_co_sai(), True),
+                       (_cau_kn_buoi(), "checkbox", [], True), (_cau_kn_ghi_chu(), "text", [], True)])]
+    else:
+        phan += cac_phan(de) + cac_phan(de, chi_thi=True) + cac_phan_sau_ket_qua(de)
+        if de.get("buoi"):
+            phan += cac_phan_fa_gop(de)
+        for clb in clb_co_thi(de):
+            for qs in _cac_de_cua_clb(clb):
+                if qs:
+                    phan += cac_phan_moi_clb(de, dict(clb, de_thi=qs))
+    return [c for _ten, cac in phan for c in cac]
+
+
+def xay_ban_do(cac_cau_hoi, nghiem_chuan=False):
+    """Dựng bản đồ từ [(TieuDe, loại, [lựa chọn])]:
+    {"phien_ban": 1, "cau": {tiêu đề thuần: mã câu}, "lua_chon": {mã câu: {lựa chọn thuần: mã/giá trị}}}.
+
+    Khoá đã gộp khoảng trắng. Hai câu KHÁC mã trùng tiêu đề thuần, hai lựa chọn khác giá trị trùng chữ trong cùng
+    một câu, hoặc tiêu đề thuần mở đầu bằng "[…]" (đọc nhầm thành thẻ mã) -> LoiDeThi (liệt kê hết).
+
+    `nghiem_chuan=True` (chỉ khi bộ sinh dựng bản đồ để GHI biểu mẫu thuần): từ chối thêm hai lựa chọn chỉ khác hoa/thường
+    hay khoảng trắng. Đường đọc và chế độ giữ mã để False: tệp xuất có mã đọc được như trước (đuôi "(mã)" không mơ hồ)."""
+    cau, lua, loi = {}, {}, []
+    chuan_lua = {}
+    for td, _loai, lcs, *_ in cac_cau_hoi:
+        if not isinstance(td, TieuDe):
+            loi.append("câu %r không phải tiêu đề do bộ sinh dựng" % str(td)[:60])
+            continue
+        k = _khoa(td.thuan)
+        if _MA_CAU.match(td.thuan):
+            loi.append("tiêu đề %r mở đầu bằng [..] nên bị đọc nhầm thành thẻ mã" % k[:60])
+        if cau.setdefault(k, td.ma) != td.ma:
+            loi.append("hai câu %r và %r có cùng tiêu đề %r" % (cau[k], td.ma, k[:60]))
+        cua_cau = lua.setdefault(td.ma, {})
+        chuan_cua_cau = chuan_lua.setdefault(td.ma, {})
+        for lc in lcs:
+            if isinstance(lc, LuaChon) and lc.ma is not None:
+                kl = _khoa(lc.thuan)
+                if cua_cau.setdefault(kl, lc.ma) != lc.ma:
+                    loi.append("câu %s: hai lựa chọn %r và %r có cùng chữ %r" % (td.ma, cua_cau[kl], lc.ma, kl))
+                # chỉ khác hoa/thường hay khoảng trắng: bộ đọc có thể đọc nhầm (tìm theo tên đã gộp) -> từ chối ngay
+                elif nghiem_chuan and chuan_cua_cau.setdefault(_chuan(kl), kl) != kl:
+                    loi.append("câu %s: hai lựa chọn %r và %r chỉ khác hoa/thường hay khoảng trắng" % (
+                        td.ma, chuan_cua_cau[_chuan(kl)], kl))
+    if loi:
+        raise LoiDeThi("tiêu đề trùng hoặc không dùng được (đổi tên CLB / buổi / câu hỏi trong de_thi.json):\n  - "
+                       + "\n  - ".join(sorted(set(loi))))
+    return {"phien_ban": BAN_DO_PHIEN_BAN, "cau": cau, "lua_chon": {m: v for m, v in lua.items() if v}}
+
+
+def ban_do_chung(de):
+    """Bản đồ cho MỌI biểu mẫu có thể sinh từ `de` (bộ đọc không cần biết tệp thuộc chế độ nào). `de` None: chỉ các
+    câu không phụ thuộc đề. Cùng `de` thì cho ra cùng bản đồ."""
+    return xay_ban_do(_moi_cau_hoi(de))
+
+
+def ban_do_bieu_mau(phan, nghiem_chuan=False):
+    """Bản đồ của MỘT biểu mẫu = các phần `[(tên phần, [(tiêu đề, loại, lựa chọn, bắt buộc)])]` mà bộ sinh ghi.
+    Bộ sinh ghi nó thành `MAP_<tên biểu mẫu>.json` cạnh biểu mẫu."""
+    return xay_ban_do([c for _ten, cac in phan for c in cac], nghiem_chuan)
+
+
+def ban_do_ra_json(ban_do):
+    """Chuỗi JSON xác định (khoá sắp, UTF-8, không giờ), kết thúc bằng một dòng mới."""
+    return json.dumps(ban_do, ensure_ascii=False, sort_keys=True, indent=1) + "\n"
+
+
+def doc_ban_do(duong_dan):
+    """Đọc tệp MAP_*.json -> bản đồ. Hỏng / sai dạng -> LoiDeThi."""
+    try:
+        with open(duong_dan, encoding="utf-8") as f:
+            bd = json.load(f)
+        if not isinstance(bd, dict) or not isinstance(bd.get("cau"), dict) or not isinstance(bd.get("lua_chon"), dict):
+            raise ValueError("thiếu khoá cau / lua_chon")
+    except (OSError, ValueError) as e:
+        raise LoiDeThi("tệp bản đồ %s không đọc được: %s" % (duong_dan, e)) from e
+    return bd
+
+
+def gop_ban_do(*cac_ban_do):
+    """Gộp nhiều bản đồ (nhiều tệp MAP) thành một; hai bản đồ cho cùng tiêu đề hai mã khác nhau -> LoiDeThi."""
+    cau, lua = {}, {}
+    for bd in cac_ban_do:
+        for k, m in (bd.get("cau") or {}).items():
+            if cau.setdefault(k, m) != m:
+                raise LoiDeThi("các tệp bản đồ cho tiêu đề %r hai mã khác nhau (%s, %s)" % (k[:60], cau[k], m))
+        for m, v in (bd.get("lua_chon") or {}).items():
+            cua = lua.setdefault(m, {})
+            for kl, gt in v.items():
+                if cua.setdefault(kl, gt) != gt:
+                    raise LoiDeThi("các tệp bản đồ cho lựa chọn %r của câu %s hai giá trị khác nhau" % (kl[:60], m))
+    return {"phien_ban": BAN_DO_PHIEN_BAN, "cau": cau, "lua_chon": lua}
+
+
+_HANG_DONG = {
+    "CAU_HAI_LONG": _cau_hai_long, "CAU_HIEU_LY_DO": _cau_hieu_ly_do, "CAU_KHO_NHAT": _cau_kho_nhat,
+    "LUA_CHON_HAI_LONG": _lua_chon_hai_long, "LUA_CHON_CO_KHONG": _lua_chon_co_khong,
+    "LUA_CHON_KHO_NHAT": _lua_chon_kho_nhat, "CAU_CO_SAI": _cau_co_sai, "LUA_CHON_CO_SAI": _lua_chon_co_sai,
+    "CAU_KN_BUOI": _cau_kn_buoi, "CAU_KN_GHI_CHU": _cau_kn_ghi_chu, "CAU_CON_DI": _cau_con_di,
+    "CAU_MUON_DOI": _cau_muon_doi,
+}
+
+
+def __getattr__(ten):
+    """Các hằng tên câu / lựa chọn (xem SG-12 ở đầu tệp) được dựng theo chế độ giữ mã lúc đọc."""
+    f = _HANG_DONG.get(ten)
+    if f is None:
+        raise AttributeError("module %r has no attribute %r" % (__name__, ten))
+    return f()

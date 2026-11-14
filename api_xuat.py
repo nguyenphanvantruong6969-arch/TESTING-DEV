@@ -233,7 +233,7 @@ class XuatKetQuaMixin:
             dong_clb = bao["clb"][2]
             t.dong("Số {slot_l}", len(dong_clb))
             t.dong("Chỗ đã xếp", sum(d[6] or 0 for d in dong_clb))
-            t.dong("Tổng sức chứa", sum(d[7] or 0 for d in dong_clb))
+            t.dong("Tổng sức chứa", sum(d[7] for d in dong_clb if isinstance(d[7], (int, float))))
         if "nv" in bao and bao["nv"][2]:
             dau = bao["nv"][2][0]
             if dau[0] == "Nguyện vọng 1":
@@ -320,8 +320,16 @@ class XuatKetQuaMixin:
             phan = [ten, t.n("Mã {slot_sl}: ") + str(c["club_id"])]
             if du["nhieu_buoi"]:
                 phan.append(t.n("{session}: ") + str(c.get("buoi")))
-            phan.append("Đã xếp %d/%d chỗ" % (c.get("matched") or 0,
-                                              c.get("capacity") or 0))
+            if c.get("tu_do"):      # CLB Tự do: chỉ tiêu lưu chỉ là số tạm, không in "x/y"
+                phan.append("Đã xếp %d · không giới hạn chỗ" % (c.get("matched") or 0))
+            else:
+                phan.append("Đã xếp %d/%d chỗ" % (c.get("matched") or 0,
+                                                  c.get("capacity") or 0))
+            # SG-6: giờ / địa điểm giáo viên khai (chỉ khi có). Là chữ người dùng gõ: không điền.
+            if (c.get("gio") or "").strip():
+                phan.append(t.n("Giờ: ") + c["gio"].strip())
+            if (c.get("dia_diem") or "").strip():
+                phan.append(t.n("Địa điểm: ") + c["dia_diem"].strip())
             t.khoi(" · ".join(phan), len(cot))
             t.bang(cot, [
                 [i, r["student_id"], r["ho_ten"] or "", r["lop"] or "",
@@ -336,6 +344,13 @@ class XuatKetQuaMixin:
     # THEO LỚP (A14): bản để GỬI GIÁO VIÊN CHỦ NHIỆM. Chỉ có kết quả — KHÔNG điểm thi, điểm
     # quyết tâm, số bốc thăm hay diện trúng tuyển. Một khối mỗi lớp, em chưa có chỗ tô đỏ.
     # -----------------------------------------------------------------
+    @staticmethod
+    def _o_clb_kem_gio(r) -> str:
+        """Tên CLB, kèm "(giờ, địa điểm)" khi CLB đã khai (SG-6). Chưa khai: đúng tên như cũ."""
+        ten = r["ten_club"] or r["club_id"] or ""
+        gd = ", ".join(x for x in ((r["gio"] or "").strip(), (r["dia_diem"] or "").strip()) if x)
+        return "%s (%s)" % (ten, gd) if gd else ten
+
     def _du_lieu_theo_lop(self, rows, ds_buoi, nhieu_buoi) -> dict:
         """{"cot": tiêu đề cột, "nhom": [(lớp|None, [dòng])]}; dòng = [mã, họ tên, ô buổi...].
 
@@ -344,7 +359,7 @@ class XuatKetQuaMixin:
         for r in rows:
             em = theo_em.setdefault(r["student_id"], {
                 "ho_ten": r["ho_ten"] or "", "lop": r["lop"] or None, "o": {}})
-            em["o"][r["buoi"]] = (r["ten_club"] or r["club_id"] or "") if r["club_id"] else ""
+            em["o"][r["buoi"]] = self._o_clb_kem_gio(r) if r["club_id"] else ""
         theo_lop: dict = {}
         for sid, em in sorted(theo_em.items()):
             o = [em["o"].get(b, "") for b in ds_buoi] if nhieu_buoi else [
@@ -717,7 +732,8 @@ class XuatKetQuaMixin:
                              # Day la CHU (mot o ghep nhieu CLB), nen ke ca
                              # ban so=True cung viet so kieu Viet.
                              _so_vn(k["ti_le_choi"])
-                             if k["ti_le_choi"] is not None else "không có chỗ")
+                             if k["ti_le_choi"] is not None
+                             else "không giới hạn chỗ" if k.get("tu_do") else "không có chỗ")
                 for k in e["da_khai"]) or "(chưa khai nguyện vọng nào)"
 
         ra = {}
@@ -730,9 +746,11 @@ class XuatKetQuaMixin:
                 "Trong đó diện dự trữ", "Chỉ tiêu dự trữ"],
                 [[c.get("buoi"), c.get("club_id"), c.get("name"),
                   c.get("so_dang_ky"), c.get("so_dat_nv1"),
-                  ti_le_choi(c.get("ti_le_choi")),
-                  c.get("matched"), c.get("capacity") or 0,
-                  phan_tram(c.get("matched") or 0, c.get("capacity") or 0),
+                  "" if c.get("tu_do") else ti_le_choi(c.get("ti_le_choi")),
+                  c.get("matched"),
+                  "không giới hạn chỗ" if c.get("tu_do") else c.get("capacity") or 0,
+                  "" if c.get("tu_do")
+                  else phan_tram(c.get("matched") or 0, c.get("capacity") or 0),
                   c.get("matched_reserve"), c.get("reserve_capacity")]
                  for c in lap["data"]])
 
@@ -744,6 +762,9 @@ class XuatKetQuaMixin:
                      else ("Nguyện vọng %d" % h["hang"]),
                      h["so_em"], phan_tram(h["so_em"], tong)]
                     for h in n["phan_bo"]]
+            if n.get("ngoai_danh_sach"):
+                dong.append(["Xếp ngoài danh sách nguyện vọng", n["ngoai_danh_sach"],
+                             phan_tram(n["ngoai_danh_sach"], tong)])
             if n["khong_ro"]:
                 dong.append(["Không rõ thứ hạng", n["khong_ro"],
                              phan_tram(n["khong_ro"], tong)])
@@ -1200,6 +1221,11 @@ class XuatKetQuaMixin:
         } for r in cur.execute(
             "SELECT club_id, name, capacity, reserve_capacity, "
             "COALESCE(reserve_group, ''), buoi FROM clubs ORDER BY club_id")]
+        # SG-6: giờ / địa điểm đi cùng sổ khi có CLB nào đã khai; không thì sổ y như cũ.
+        gd = {r[0]: (r[1], r[2]) for r in cur.execute("SELECT club_id, gio, dia_diem FROM clubs")}
+        if any(g or d for g, d in gd.values()):
+            for c in clubs:
+                c["gio"], c["dia_diem"] = gd.get(c["club_id"], (None, None))
         n_ten_doi = so_nhap.ten_khong_trung(clubs)
         hs = {r[0]: {"student_id": r[0], "name": r[1] or "", "reserve_group": r[2],
                      "class_id": r[3], "nv": []}
@@ -1350,7 +1376,8 @@ class XuatKetQuaMixin:
                 clubs, _, _, n_ten_doi = self._du_lieu_so_nhap(cur)
             so_nhap.ghi_so_nhap(path, clubs, [], cfg=self._cfg_ws(nghiem=True),
                                  luon_co_cot_w=True,       # sổ mẫu luôn có cột Điểm quyết tâm (A13.7)
-                                 co_lop=True)              # và cột Lớp (A14, đã duyệt)
+                                 co_lop=True,              # và cột Lớp (A14, đã duyệt)
+                                 che_do_fa=dung_fa_daa(self._luat_nghiem()))   # FG-2 (D3)
             return _ok({"path": path, "dir": os.path.dirname(path),
                         "n_clubs": len(clubs), "n_ten_doi": n_ten_doi})
         except LoiDuongXuat as e:
@@ -1892,7 +1919,7 @@ class XuatKetQuaMixin:
             rows = cur.execute("""
                 SELECT m.student_id, s.name AS ho_ten, m.buoi, m.club_id,
                        c.name AS ten_club, m.rank_in_student_pref, m.matched_tier,
-                       s.reserve_group, s.class_id AS lop
+                       s.reserve_group, s.class_id AS lop, c.gio, c.dia_diem
                 FROM match_results m
                 LEFT JOIN students s ON s.student_id = m.student_id
                 LEFT JOIN clubs   c ON c.club_id   = m.club_id
@@ -1941,9 +1968,14 @@ class XuatKetQuaMixin:
                 for sid, em in sorted(theo_em.items())
             ])
             # Cột Lớp chỉ ở bản Excel; CSV thời khoá biểu giữ nguyên (hợp đồng cột CSV).
+            # SG-6: bản Excel (phát cho học sinh) kèm giờ / địa điểm trong ô; CSV giữ nguyên.
+            o_xlsx = {}
+            for r in rows:
+                o_xlsx.setdefault(r["student_id"], {})[r["buoi"]] = (
+                    self._o_clb_kem_gio(r) if r["club_id"] else "")
             tkb_xlsx = (["Mã {person_l}", "Họ tên", "{cohort}"] + list(ds_buoi) + ["Số {slot_sl}"], [
                 [sid, em["ho_ten"], em["lop"]]
-                + [em["o"].get(b, "") for b in ds_buoi]
+                + [o_xlsx[sid].get(b, "") for b in ds_buoi]
                 + [sum(1 for b in ds_buoi if em["o"].get(b))]
                 for sid, em in sorted(theo_em.items())
             ])

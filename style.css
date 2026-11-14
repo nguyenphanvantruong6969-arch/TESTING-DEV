@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light; /* SG-11a M6: kiosk chỉ có giao diện sáng; chế độ tối của hệ điều hành không được tô tối ô nhập / thanh cuộn */
   --ink: #1C2321;
   --ink-soft: #3A423F;
   --slate: #5B6570;
@@ -198,13 +199,6 @@ button, input {
 .nav-item.is-active {
   background: rgba(201,138,31,0.16);
   color: var(--gold);
-}
-
-.nav-icon {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  opacity: 0.7;
-  width: 18px;
 }
 
 .sidebar-footer {
@@ -860,6 +854,7 @@ html.tat-hieu-ung .status-strip:hover {
   cursor: pointer;
   opacity: 0.8;
 }
+.toast-close::before { content: "\00d7"; }
 .toast-close:hover,
 .toast-close:focus-visible { opacity: 1; }
 
@@ -1247,7 +1242,7 @@ html.tat-hieu-ung .status-strip:hover {
 .hs-buoi-nhan {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--gold-text); /* SG-11a L1: chữ nhỏ cần bản đậm của vàng (đủ tương phản) */
 }
 
 .hs-chua-chon {
@@ -2214,7 +2209,8 @@ html.tat-hieu-ung .status-strip:hover {
 
 /* Thẻ 02 Kết quả: hai tầng nút chọn (cách xem, cách sắp). Nút to, rõ cho màn hình họp. */
 /* .main co theo nội dung (margin auto); thẻ Kết quả có bảng hẹp ở Theo CLB nên giữ rộng như nhau ở cả ba cách xem */
-.main:has(#view-results.is-active) { width: 100%; box-sizing: border-box; }
+.main:has(#view-results.is-active),
+.main:has(#view-scoring.is-active) { width: 100%; box-sizing: border-box; } /* SG-11a L4: Nhập điểm dùng chung bề rộng nội dung với thẻ Kết quả */
 .main { min-width: 0; }                                /* cột 1fr của lưới không được nở theo bảng rộng: bảng tự cuộn ngang trong .scroll-x, trang thì không */
 .kq-chon-hang { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .kq-chon-hang-phu { margin-bottom: 14px; }
@@ -2740,6 +2736,11 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .ws-truong-goi-y { font-size: 12.5px; color: var(--slate); }
 .ws-truong .text-input { min-width: 0; width: 100%; max-width: 460px; }
 .ws-truong .ws-so { max-width: 120px; }
+/* Ô tick nằm cùng dòng với nhãn; gợi ý xuống dòng dưới. */
+.ws-truong:has(> input[type="checkbox"]) { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 8px; }
+.ws-truong:has(> input[type="checkbox"]) > input[type="checkbox"] { order: -1; margin: 0; }
+.ws-truong:has(> input[type="checkbox"]) > :not(label):not(input) { flex-basis: 100%; }
+.health-summary:not(.is-warn):not(.is-clean) { color: var(--slate); }
 .ws-hang { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .ws-tiers { font-family: var(--font-mono); resize: vertical; }
 
@@ -2953,3 +2954,31 @@ tr.ws-dang-mo td { background: var(--moss-soft); }
 .cb-bo-tuy-chon { display: inline-flex; align-items: center; gap: 4px; }
 .cb-bo-tuy-chon input:disabled + span { opacity: 0.55; }
 /* === end C === */
+
+/* (spacer: unchanged line between marker blocks) */
+
+/* === SG-B: add below === */
+.ws-tn-wharton { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border, #d8dee4); }
+.ws-tn-wharton .hint-text { margin: 4px 0 0 24px; }
+.clb-gio-dia-diem { display: block; font-size: 0.85em; color: var(--text-muted, #5b6672); }
+.log-goi-y { flex: 1 1 100%; }
+/* === end SG-B === */
+
+/* (spacer: unchanged line between marker blocks) */
+
+/* === SG-C: add below === */
+.canh-bao-nhom { display: block; margin-bottom: 6px; }
+.canh-bao-tieu-de { font-weight: 600; }
+.canh-bao-con-lai { padding-left: 14px; color: var(--slate); font-style: italic; }
+.cb-canh-bao-gom { margin: 6px 0 0 0; }
+/* === end SG-C === */
+
+.hint-text[hidden] { display: none; }
+
+/* SG-11a M7: ở 1024 px thẻ Kết quả (xem theo mã) rộng hơn khung chứa (630 px) nên bảng phải cuộn ngang và tiêu đề cột bị cắt.
+   Dưới 1100 px: lề trang hẹp lại và ô buổi bớt cứng; từ 1100 px trở lên (1366, 1920) không đổi. */
+@media (max-width: 1100px) {
+  .main { padding-left: 24px; padding-right: 24px; }
+  #kqBang td:not(.kq-cd) { min-width: 5em; }
+  #kqBang th, #kqBang td { padding-left: 6px; padding-right: 6px; }
+}

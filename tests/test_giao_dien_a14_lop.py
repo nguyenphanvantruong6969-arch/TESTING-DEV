@@ -265,9 +265,10 @@ def _mo_ket_qua(page, tang1):
 def test_thanh_ben_sau_khi_gop_va_bao_chua_co_ket_qua(mo):
     page, api, loi = mo({"HS1": "10A1"})
     nut = page.evaluate("""() => Array.from(document.querySelectorAll('.nav-item'))
-        .map(n => [n.dataset.tab, n.querySelector('.nav-icon').textContent])""")
-    assert nut == [["pipeline", "01"], ["results", "02"], ["others", "03"],
-                   ["fallback", "04"], ["admin", "05"], ["scoring", "06"], ["chuan_bi", "07"]]
+        .map(n => [n.dataset.tab, /^\\d+\\s/.test(n.textContent.trim())])""")
+    # FG-9: thanh bên không còn số thứ tự (trước đây 01–07); thứ tự thẻ giữ nguyên.
+    assert nut == [["pipeline", False], ["results", False], ["others", False],
+                   ["fallback", False], ["admin", False], ["scoring", False], ["chuan_bi", False]]
     for tang1 in ("lop", "clb", "ma"):
         _mo_ket_qua(page, tang1)
         page.wait_for_function("() => !document.getElementById('kqRong').hidden")

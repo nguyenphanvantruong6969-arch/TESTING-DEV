@@ -189,6 +189,7 @@ def _de_nhieu_clb(de, them=6):
     return d
 
 
+@pytest.mark.giu_ma
 def test_q5a_qua_nam_tick_mot_ngay_giu_nam_dau_theo_thu_tu_nv(de, tmp_path):
     d = _de_nhieu_clb(de)
     ds = ["clb_x%d" % i for i in range(6)] + ["clb_covua"]          # 7 CLB có đề, đều tick

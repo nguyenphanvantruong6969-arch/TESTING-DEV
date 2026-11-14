@@ -1,0 +1,3 @@
+## SG-11a — UI hygiene (M6, M7, L1, L4, L5)
+CHANGELOG: SG-11a. Files: `style.css` (`color-scheme: light` on `:root`; `.hs-buoi-nhan` uses `--gold-text`; Nhập điểm shares the Kết quả full-width rule; ≤1100 px block: narrower page margins and smaller result-cell min-width so the "by student code" table fits at 1024 px), `index.html` + `js/03_ket_qua.js` (one hint line `xuatFaAnGoiY` shown when the FA-only export buttons are hidden), `i18n.js` vi+en (`xuat_fa_an_goi_y`, SG-A block). New tests: `tests/test_giao_dien_sg11a_ve_sinh.py` (15).
+TIEN_DO: SG-11a done (M6, M7, L1, L4, L5); consistency table + wording glossary pending (report unreadable).

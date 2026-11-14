@@ -22,9 +22,11 @@ branch) with one kiosk import button. Spec: `docs/ke_hoach/FORMS_GOP_KE_HOACH.md
 - [ ] FA-M10: after-allocation buttons (KetQua List CSV with email, who has not registered, List diff) — NOT DONE — worker B/C BLOCKED (branch never pushed)
 - [ ] Phase 2 finish: soat-ma, snapshot diff, report `docs/phien/bao_cao_dem/<date>_it_giao_dien.md`
 - Fixes after the 2026-11-12 novice walkthrough (spec: `docs/ke_hoach/FORMS_GOP_SUA_KE_HOACH.md`; D1–D4 approved 2026-11-12):
-  - [ ] Wave 1: FG-1 (toggle after-results flags on open workspace), FG-3 (reload adds nothing), FG-4 (busy button)
-  - [ ] Wave 2: FG-5 (ID case/space match), FG-6 (one-unit counts, lists), FG-2 (FA preview warnings + FA sample)
-  - [ ] Wave 3: FG-7 (after-results form: real days, title, help), FG-8 (wording, wizard), FG-9 (small UX)
+  - [x] Wave 1: FG-1 (toggle after-results flags on open workspace), FG-3 (reload adds nothing), FG-4 (busy button)
+  - [x] Wave 2: FG-5 (ID case/space match), FG-6 (one-unit counts, lists), FG-2 (FA preview warnings + FA sample)
+  - [x] Wave 3: FG-7 (after-results form: real days, title, help), FG-8 (wording, wizard), FG-9 (small UX)
+  - [x] FG FINISH docs: report `docs/phien/bao_cao_dem/2026-11-13_fg_sua.md`, CHANGELOG, TIEN_DO, novice walkthrough re-run (spec §5) passed on branch `claude/fg-sua`
+  - [ ] FG green loop (full suite + coverage, CI, Windows build) and hand-back merge into this branch: owned by the lead (`docs/phien/FG_STATUS.md`)
 
 ## Current state (overwrite each handoff)
 - Merged `origin/claude/it-ui-a` (G0 + FA-M7, GREEN on its branch) into this branch (no conflicts); bookkeeping folded in

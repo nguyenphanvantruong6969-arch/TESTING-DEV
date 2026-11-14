@@ -60,12 +60,39 @@ MA_MOI_SAU_ANH_CHUP = {
     # === C: FA-M8 — add below ===
     # === end C ===
 
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-A: add below ===
+    "fa_clb_tuyen_chon_chua_co_diem",
+    "khieu_nai_hs_khong_co", "khieu_nai_chua_co_ket_qua",
+    # === end SG-A ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-B: add below ===
+    "so_nhap_canh_bao_wharton_trong",
+    "phieu_nd_phieu_thieu_cau_2", "phieu_nd_phieu_thieu_phong", "phieu_nd_phieu_thieu_cho", "phieu_nd_phieu_moc_sai", "phieu_nd_phieu_toi_thieu_sai", "phieu_nd_phieu_tu_do_co_ly_do_gioi_han", "phieu_nd_phieu_thieu_ly_do", "phieu_nd_phieu_thieu_cau_4", "phieu_nd_phieu_thu_thach_khong_tu_cham", "phieu_nd_phieu_thieu_tieu_chi", "phieu_nd_phieu_cho_duyet_tuyen_chon", "phieu_nd_phieu_nop_nhieu_lan", "phieu_nd_phieu_mac_dinh_ky_truoc", "phieu_clb_khong_co_clb_hop_le",
+    # === end SG-B ===
+
+    # (spacer: unchanged line between marker blocks)
+
+    # === SG-C: add below ===
+    "forms_cot_la", "forms_thieu_ban_do", "forms_tieu_de_trung",
+    # === end SG-C ===
+
+    # FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ.
+    "fa_thieu_clb_tu_do_nhom", "fa_clb_thieu_loai_nhom", "fa_clb_thieu_suc_chua_nhom",
+    "fa_clb_thieu_diem_san_nhom", "fa_giu_cho_vuot_suc_chua_nhom", "fa_giu_cho_hoc_sinh_la_nhom",
+    "fa_giu_cho_khong_xep_clb_nhom", "fa_huy_chuong_gia_tri_sai_nhom",
+    "fa_huy_chuong_trung_gia_tri_nhom", "fa_huy_chuong_ngoai_nguyen_vong_nhom",
+    "fa_huy_chuong_clb_tu_do_nhom", "so_nhap_canh_bao_fa_se_loi",
+
     # FA gaps (GAP-1, GAP-2): điểm danh, mời danh sách chờ.
     "fa_tinh_nang_can_fa", "fa_diem_danh_chua_bat", "diem_danh_gia_tri_sai", "diem_danh_khong_thuoc_clb",
     "moi_khong_con_cho", "gioi_han_gv_sai", "fa_khieu_nai_chua_bat", "khieu_nai_khong_hop_le", "khieu_nai_qua_han",
     "khieu_nai_trung", "khieu_nai_da_xu_ly", "loi_luu_sau_xep",
     "fa_vong_2_chua_bat", "vong_2_lua_chon_sai", "vong_2_da_chay",
-    "fa_phan_hoi_chua_bat", "phan_hoi_gia_tri_sai", "phan_hoi_tep_sai",
+    "fa_phan_hoi_chua_bat", "phan_hoi_gia_tri_sai", "phan_hoi_tep_sai", "phan_hoi_tep_rong",
     "fa_sau_ket_qua_chua_bat", "khieu_nai_khong_co_gio_forms",
     # FA-DAA (FA-1): thuộc tính CLB, giữ chỗ, cảnh báo nạp.
     "fa_loai_sai", "fa_diem_san_sai", "fa_toi_thieu_sai", "fa_suc_chua_phong_sai",
@@ -168,6 +195,12 @@ CHU_UI_MOI_T3 = os.path.join(GOC, "tests", "du_lieu_ws", "chu_ui_doi_co_y_t3.jso
 SUA_CO_Y = {
     ("ui", "xuat_hint_hoc_sinh"): [("thẻ 03 thì", "thẻ 04 thì"), ("tab 03", "tab 04")],
     ("loi", "so_nhap_canh_bao_clb_ngoai_so"): [("thẻ 04", "thẻ 05"), ("tab 04", "tab 05")],
+    # FG-8: gợi ý khung "Cảnh báo dữ liệu" nay nói mục nghiêm trọng chặn việc chạy (chủ ý đổi chữ).
+    ("ui", "health_panel_hint"): [
+        ("Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch.",
+         'Mục "Nghiêm trọng" sẽ chặn việc chạy cho đến khi sửa xong; các mục còn lại không chặn nhưng có thể làm kết quả sai lệch.'),
+        ("These don't stop the allocation, but they can skew the results.",
+         'Items marked "Serious" block the run until they are fixed; the others don\'t stop it but can skew the results.')],
 }
 
 

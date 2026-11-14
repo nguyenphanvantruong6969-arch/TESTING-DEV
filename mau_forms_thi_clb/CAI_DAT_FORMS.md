@@ -79,10 +79,10 @@ Biểu mẫu có **26 phần, 67 câu hỏi**: 5 buổi, 15 CLB, trong đó **10
 
 ## 2. Đổi 5 câu nguyện vọng sang Ranking
 
-Quick Import không biết loại **Ranking** — các câu `[thu_…]` về tới Forms
+Quick Import không biết loại **Ranking** — các câu nguyện vọng (mỗi buổi một câu) về tới Forms
 sẽ là câu Choice. Với từng câu: bấm **+ Add new → ⌄ → Ranking** ngay dưới
-nó, **dán nguyên văn** tiêu đề và các lựa chọn (giữ cả phần `[mã]` và phần
-`(club_id)`), để **không bắt buộc**, rồi xoá câu Choice cũ.
+nó, **dán nguyên văn** tiêu đề và các lựa chọn, để **không bắt buộc**, rồi xoá
+câu Choice cũ. Tiêu đề và lựa chọn là chữ thuần (học sinh không thấy mã); kiosk nhận ra từng câu bằng chữ đó nên **đừng sửa chữ** tiêu đề hay lựa chọn trên Forms. Bảng mã nằm ở `MAP_<tên tệp>.json` cạnh tệp Quick Import (kiosk tự dựng lại từ đề thi, không cần nạp tệp này).
 
 ## 3. Rẽ nhánh — chỉ 10 chỗ
 

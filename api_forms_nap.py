@@ -80,7 +80,11 @@ class FormsNapMixin:
         except Exception as e:
             d["loi"] = err("xlsx_read_failed", detail="%s: %s" % (ten, e))
             return d
-        loai = cv.nhan_dien_tep(ten, tieu)
+        try:
+            loai = cv.nhan_dien_tep(ten, tieu, de)
+        except ValueError as e:                    # bieu_mau.LoiDeThi: đề có tiêu đề trùng (SG-12)
+            d["loi"] = err("forms_tieu_de_trung", chi_tiet=str(e).replace("\n", " ")[:300])
+            return d
         d["loai"] = loai
         if loai == "khong_ro":
             d["loi"] = err("forms_tep_khong_nhan_ra", ten=ten)

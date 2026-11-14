@@ -37,6 +37,7 @@ def _cau(phan):
 
 
 # ---------------------------------------------------------------- 1. bố cục
+@pytest.mark.giu_ma
 def test_bo_cuc_hai_phan(de):
     phan = bm.cac_phan_sau_ket_qua(de)
     assert [len(cs) for _, cs in phan] == [5, 2]
@@ -60,6 +61,7 @@ def test_bo_cuc_hai_phan(de):
     assert bm.CAU_CO_SAI.startswith("[co_sai]")
 
 
+@pytest.mark.giu_ma
 def test_cac_phan_phan_hoi_khong_doi():
     """So với bản sao nguyên văn của cấu trúc trước FA-M6b."""
     mong = [("Phản hồi sau khi xem kết quả", [
@@ -366,17 +368,21 @@ def test_api_hai_nut_cu_van_cho_ket_qua_cu(api, de, gio):
                  _lc_cu(bm.CAU_KHO_NHAT, "huy_chuong")],
                 ["s9", _lc_cu(bm.CAU_HAI_LONG, "5"), _lc_cu(bm.CAU_HIEU_LY_DO, "1"),
                  _lc_cu(bm.CAU_KHO_NHAT, "khong_co")]])
-    assert api.nhap_phan_hoi_forms(tep)["data"] == {"n_ket_qua": 1, "n_tuan_3": 0, "bo_qua": 1}
+    assert api.nhap_phan_hoi_forms(tep)["data"] == {"n_ket_qua": 1, "n_tuan_3": 0, "bo_qua": 1,
+                                                       "dong_moi": 1, "dong_trung": 0, "ma_khong_khop": ["s9"],
+                                                       "hoc_sinh": 1, "dong_bo_qua": []}
     b = _buoi(api)
     assert api.gui_khieu_nai("s1", b, "x")["ok"]
     assert ma(api.gui_khieu_nai("s1", b, "lần hai")["errors"]) == ["khieu_nai_trung"]
-    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_khong_hop_le"]
+    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_hs_khong_co"]
 
 
 # ---------------------------------------------------------------- 7. bộ sinh
 def test_sinh_sau_ket_qua_hai_tep_va_giong_het(de, tmp_path):
     assert tmf.main(["--sau-ket-qua", "--ra", str(tmp_path)]) == 0
-    assert _tep(tmp_path) == ["CAI_DAT_FORMS_SAU_KET_QUA.md", "NHAP_FORMS_SAU_KET_QUA.docx"]
+    # SG-12: thêm tệp bản đồ MAP_*.json cạnh biểu mẫu (tiêu đề thuần -> mã)
+    assert _tep(tmp_path) == ["CAI_DAT_FORMS_SAU_KET_QUA.md", "MAP_NHAP_FORMS_SAU_KET_QUA.json",
+                              "NHAP_FORMS_SAU_KET_QUA.docx"]
     md = (tmp_path / "CAI_DAT_FORMS_SAU_KET_QUA.md").read_text(encoding="utf-8")
     assert "TH" in md and "CHƯA thử" in md
     for can in ("[co_sai]", "End of form", "Không (0)", "Có (1)", "Record name", "One response per person",
@@ -400,7 +406,7 @@ def test_sinh_sau_ket_qua_xung_khac_che_do_khac(tmp_path):
 
 
 def test_phan_hoi_van_giong_het_nhu_truoc(tmp_path):
-    """`--phan-hoi` giữ nguyên: hai tệp cũ, không có câu mới."""
+    """`--phan-hoi` giữ nguyên: hai tệp cũ (+ MAP_*.json của SG-12), không có câu mới."""
     assert tmf.main(["--phan-hoi", "--ra", str(tmp_path)]) == 0
-    assert _tep(tmp_path) == ["CAI_DAT_FORMS_PHAN_HOI.md", "NHAP_FORMS_PHAN_HOI.docx"]
+    assert _tep(tmp_path) == ["CAI_DAT_FORMS_PHAN_HOI.md", "MAP_NHAP_FORMS_PHAN_HOI.json", "NHAP_FORMS_PHAN_HOI.docx"]
     assert "co_sai" not in (tmp_path / "CAI_DAT_FORMS_PHAN_HOI.md").read_text(encoding="utf-8")

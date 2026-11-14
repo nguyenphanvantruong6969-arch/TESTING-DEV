@@ -11,6 +11,7 @@ from api_chung import (
 from i18n_errors import err
 from i18n_errors import phan_hoi_loi as _fail
 from i18n_errors import phan_hoi_ok as _ok
+from so_nhap import TU_DO
 from rbda_priority_pipeline import (
     chuan_hoa_lop,
     BUOI_MAC_DINH,
@@ -66,6 +67,14 @@ class BaoCaoMixin:
         except Exception as e:
             return _fail(err("error_reading_results", detail=str(e)))
 
+    @staticmethod
+    def _gio_dia_diem_clb(cur) -> dict:
+        """SG-6: {club_id: (giờ, địa điểm)} — RỖNG khi chưa CLB nào khai cả hai, để dữ liệu cũ
+        không thêm khoá nào vào phản hồi (giao diện chỉ hiện khi có)."""
+        gd = {r[0]: ((r[1] or "").strip(), (r[2] or "").strip())
+              for r in cur.execute("SELECT club_id, gio, dia_diem FROM clubs")}
+        return gd if any(g or d for g, d in gd.values()) else {}
+
     @_nho_trong_luc_xuat
     def get_club_fill_stats(self):
         """Tỉ lệ lấp đầy mỗi club — dùng vẽ thanh progress bar."""
@@ -105,7 +114,7 @@ class BaoCaoMixin:
                                    AS so_dat_nv1
                         FROM hang GROUP BY club_id
                     )
-                    SELECT c.club_id, c.name, c.capacity, c.reserve_capacity,
+                    SELECT c.club_id, c.name, c.capacity, c.reserve_capacity, c.loai,
                            COALESCE(c.buoi, ?) AS buoi,
                            COUNT(m.student_id) as matched,
                            SUM(CASE WHEN m.matched_tier = 'reserve' THEN 1 ELSE 0 END)
@@ -118,16 +127,22 @@ class BaoCaoMixin:
                     GROUP BY c.club_id
                     ORDER BY buoi COLLATE THU_TU_BUOI, c.club_id
                 """, (BUOI_MAC_DINH, BUOI_MAC_DINH)).fetchall()
+                gd = self._gio_dia_diem_clb(cur)
 
             ra = []
             for r in rows:
                 d = dict(r)
+                # CLB Tu do (FA) khong gioi han cho: chi tieu luu chi la so tam, khong dung de tinh %.
+                d["tu_do"] = d.pop("loai", None) == TU_DO
+                if gd:
+                    d["gio"], d["dia_diem"] = gd.get(d["club_id"], ("", ""))
                 suc = d.get("capacity") or 0
                 # Khong co chi tieu thi de None chu khong phai 0 — "khong co
                 # cho" khac han "thua cho", va 0 o cot nay doc ra nghia
                 # nguoc hang.
                 d["ti_le_choi"] = (
-                    round(d["so_dang_ky"] / suc, 2) if suc else None)
+                    round(d["so_dang_ky"] / suc, 2)
+                    if suc and not d["tu_do"] else None)
                 ra.append(d)
             return _ok(ra)
         except Exception as e:
@@ -254,6 +269,7 @@ class BaoCaoMixin:
         try:
             with self._ket_noi_doc() as cur:
                 ds_buoi = self._ds_buoi(cur)
+                gd = self._gio_dia_diem_clb(cur)
                 query = """
                     SELECT m.student_id, s.name, m.buoi, m.club_id,
                            c.name AS club_name, m.matched_tier,
@@ -295,6 +311,8 @@ class BaoCaoMixin:
                     "matched_tier": r["matched_tier"],
                     "rank_in_student_pref": r["rank_in_student_pref"],
                 }
+                if gd and r["club_id"] and any(gd.get(r["club_id"], ("", ""))):   # SG-6
+                    em["theo_buoi"][r["buoi"]]["gio"], em["theo_buoi"][r["buoi"]]["dia_diem"] = gd[r["club_id"]]
                 if r["club_id"]:
                     em["so_clb"] += 1
                     if r["rank_in_student_pref"] == 1:
@@ -372,13 +390,14 @@ class BaoCaoMixin:
         try:
             with self._ket_noi_doc() as cur:
                 clb = cur.execute(
-                    "SELECT club_id, name, capacity, reserve_capacity, "
+                    "SELECT club_id, name, capacity, reserve_capacity, loai, "
                     "       COALESCE(buoi, ?) AS buoi "
                     "FROM clubs WHERE club_id = ?",
                     (BUOI_MAC_DINH, club_id),
                 ).fetchone()
                 if not clb:
                     return _fail(err("club_not_found", club_id=club_id))
+                gd = self._gio_dia_diem_clb(cur).get(club_id)
                 rows = cur.execute("""
                     SELECT m.student_id, s.name, m.buoi,
                            m.rank_in_student_pref, m.matched_tier,
@@ -388,13 +407,17 @@ class BaoCaoMixin:
                     WHERE m.club_id = ?
                     ORDER BY s.name, m.student_id
                 """, (club_id,)).fetchall()
-            return _ok({
+            ra = {
                 "club_id": clb["club_id"],
                 "club_name": clb["name"],
                 "buoi": clb["buoi"],
                 "capacity": clb["capacity"],
+                "tu_do": clb["loai"] == TU_DO,
                 "thanh_vien": [dict(r) for r in rows],
-            })
+            }
+            if gd and (gd[0] or gd[1]):          # SG-6: chỉ khi CLB này đã khai
+                ra["gio"], ra["dia_diem"] = gd
+            return _ok(ra)
         except Exception as e:
             return _fail(err("error_reading_club_roster", detail=str(e)))
 
@@ -426,6 +449,16 @@ class BaoCaoMixin:
             dem = {r["hang"]: r["so_em"] for r in rows}
             khong_ro = dem.pop(None, 0)
             tong = sum(dem.values()) + khong_ro
+            # SG-3: chỗ không có thứ hạng mà em CHƯA TỪNG khai CLB đó = xếp bằng phương án dự phòng
+            # (chế độ FA). Đếm riêng, không tính là nguyện vọng nào.
+            with self._ket_noi_doc() as cur:
+                ngoai_ds = cur.execute("""
+                    SELECT COUNT(*) FROM match_results m
+                    WHERE m.club_id IS NOT NULL AND m.rank_in_student_pref IS NULL
+                      AND NOT EXISTS (SELECT 1 FROM preferences p
+                                      WHERE p.student_id = m.student_id AND p.club_id = m.club_id)
+                """).fetchone()[0]
+            khong_ro -= ngoai_ds
 
             phan_bo = []
             for h in (1, 2, 3):
@@ -440,6 +473,7 @@ class BaoCaoMixin:
             return _ok({
                 "phan_bo": phan_bo,
                 "khong_ro": khong_ro,
+                "ngoai_danh_sach": ngoai_ds,
                 "tong_da_xep": tong,
             })
         except Exception as e:
@@ -491,6 +525,7 @@ class BaoCaoMixin:
                         "ten_clb": r["ten_clb"],
                         "buoi": r["buoi"],
                         "ti_le_choi": (choi.get(r["club_id"]) or {}).get("ti_le_choi"),
+                        "tu_do": bool((choi.get(r["club_id"]) or {}).get("tu_do")),
                     })
 
             ds = []

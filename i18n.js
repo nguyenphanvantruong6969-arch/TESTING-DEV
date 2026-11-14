@@ -78,6 +78,7 @@
       btn_clear_queue: "Bỏ tệp",
       btn_tai_so_mau: "Tải sổ nhập mẫu",
       so_mau_da_tao: "Đã tạo sổ nhập ({n} {slot_sl} điền sẵn) → {path}",
+      so_mau_da_tao_ngan: "Đã tạo sổ nhập ({n} {slot_sl} điền sẵn).",
       so_nhap_dang_doc: "Đang đọc sổ…",
       so_nhap_tom_tat: "Sẵn sàng nhập: {n_clb} {slot_sl} · {n_buoi} {session_l} · {n_hoc_sinh} {person_l} · {n_nguyen_vong} nguyện vọng · {n_thi} lượt thi",
       so_nhap_co_loi: "Sổ có {n} lỗi cần sửa. Chưa nạp gì cả. Hãy sửa trong Excel, lưu lại rồi kéo sổ vào lần nữa.",
@@ -496,7 +497,7 @@
       btn_redraw_stb: "Bốc thăm lại…",
       toast_redraw_armed: "Bấm \"Chạy sắp xếp\" để bốc thăm lại. Sẽ có thêm một bước xác nhận trước khi chạy.",
       health_panel_title: "Cảnh báo dữ liệu",
-      health_panel_hint: "Những điểm dưới đây không chặn việc sắp xếp nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.",
+      health_panel_hint: "Mục \"Nghiêm trọng\" sẽ chặn việc chạy cho đến khi sửa xong; các mục còn lại không chặn nhưng có thể làm kết quả sai lệch. Nên xem trước khi chạy.",
       health_clean: "Không thấy vấn đề nào. Dữ liệu đã sẵn sàng.",
       health_chua_co_du_lieu: "Chưa có dữ liệu để xếp. Nhập Sổ nhập CLB ở khung bên trên (cần ít nhất một {person_l} và một {slot_l}).",
       health_summary: "{n} cảnh báo, {n_high} cảnh báo nghiêm trọng.",
@@ -617,6 +618,12 @@
       ws_btn_nhap_zip: "Khôi phục từ tệp nén",
       ws_btn_dong: "Đóng",
       ws_btn_luu: "Lưu",
+      ws_btn_tinh_nang: "Tính năng sau khi xếp…",
+      ws_tn_tieu_de: "Tính năng sau khi xếp của {ten}",
+      ws_tn_khong_fa: "Không gian làm việc này không xếp theo loại CLB và huy chương, nên các tính năng này đang tắt. Phải chọn \"Xếp theo loại CLB và huy chương\" khi tạo không gian làm việc.",
+      ws_tn_vong_doi_cho: "Mời danh sách chờ vào chỗ trống",
+      ws_tn_so_ngay: "Số ngày nhận khiếu nại (1–14)",
+      ws_tn_da_luu: "Đã lưu tính năng sau khi xếp.",
       ws_btn_tiep: "Tiếp",
       ws_btn_quay_lai: "Quay lại",
       ws_btn_tao: "Tạo không gian làm việc",
@@ -741,12 +748,23 @@
       ph_tong_hop: "{n} học sinh trả lời; hài lòng trung bình {tb}; {hieu} hiểu lý do.",
       ph_tong_tuan_3: "Tuần 3: {n} học sinh trả lời; {con_di} còn đi; {muon_doi} muốn đổi.",
       ph_chua_co: "chưa có dữ liệu",
+      sau_cong_bo_tieu_de: "Sau khi công bố kết quả",
+      ph_goi_y_nut: "\"Nạp từ Forms (Excel)\" dùng cho biểu mẫu cũ có 3 câu hỏi; \"Nạp biểu mẫu Sau khi xem kết quả\" dùng cho biểu mẫu gộp mới.",
       ph_nhap: "Nạp từ Forms (Excel)",
+      dang_nap: "Đang nạp…",
       ph_xuat: "Xuất phản hồi (Excel)",
-      ph_nhap_xong: "Đã nạp {n} phản hồi và {m} khảo sát tuần 3; bỏ qua {b} mã không có.",
+      ph_nhap_xong: "Đã nạp phản hồi của {hs} học sinh.",
       ssk_nap: "Nạp biểu mẫu Sau khi xem kết quả",
-      ssk_nap_xong: "Đã nạp {n} phản hồi và {m} khiếu nại; bỏ qua {b} dòng hoặc mã không có.",
-      ssk_loi_dong: "Khiếu nại không nhận ({student_id}, {buoi}): {loi}",
+      ssk_nap_xong: "Đã nạp phản hồi của {hs} học sinh, {kn} khiếu nại mới.",
+      ssk_li_trung: "{n} dòng đã nạp từ trước, không nạp lại.",
+      ssk_li_kn_trung: "{n} khiếu nại đã nạp từ trước, không nạp lại.",
+      ssk_li_ma_la: "{n} mã không khớp học sinh nào: {ds}.",
+      ssk_li_bo_qua: "{n} dòng bị bỏ qua ({ly}): dòng {ds}.",
+      ssk_li_kn_loi: "{n} khiếu nại không nhận ({ds}): {loi}",
+      ssk_ly_thieu_ma_hoc_sinh: "thiếu mã",
+      ssk_ly_buoi_la: "buổi không có trong không gian làm việc",
+      ssk_ly_khong_co_buoi: "không chọn buổi",
+      log_loi_nua: "và {m} lỗi nữa",
       xuat_muc_phan_hoi: "Phản hồi",
       ws_r_fa_phan_hoi: "Phản hồi 3 câu và khảo sát tuần 3",
       v2_tieu_de: "Vòng 2",
@@ -971,6 +989,38 @@
       cb_bo_xong: "Đã tạo bộ biểu mẫu ({n} tệp): {ten}",
       cb_bo_mo: "Mở thư mục",
       /* === end C === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Xếp ngoài danh sách nguyện vọng",
+      clb_khong_gioi_han_cho: "không giới hạn chỗ",
+      clb_tu_do_lap: "{n} {person_l} · không giới hạn chỗ",
+      clb_tu_do_lap_nhieu: "{n} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb: "{x} {person_l} · không giới hạn chỗ",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_l} · không giới hạn chỗ",
+      xuat_fa_an_goi_y: "Các nút xuất lý do kết quả, bảng nhu cầu, gợi ý chỉ tiêu và biên bản bốc thăm chỉ hiện khi bật chế độ \"Xếp theo loại {slot_l} và huy chương\".",
+      /* === end SG-A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-B: add below === */
+      ws_tn_wharton: "Dùng điểm quyết tâm",
+      ws_tn_wharton_goi_y: "Tắt nếu học sinh không tự chia điểm quyết tâm cho các nguyện vọng; khi đó kết quả xếp chỉ dựa trên điểm thi và bốc thăm.",
+      wh_goi_y_tat: "Nếu không dùng điểm quyết tâm, hãy tắt ở Tính năng sau khi xếp…, rồi chạy lại.",
+      wh_mo_tinh_nang: "Mở Tính năng sau khi xếp…",
+      ws_tn_wharton_can_fa: "Không gian làm việc đang xếp theo loại CLB và huy chương, cách này cần điểm quyết tâm nên không tắt được.",
+      cb_cot_gio: "Giờ",
+      cb_cot_dia_diem: "Địa điểm",
+      /* === end SG-B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} cảnh báo cùng loại. Ví dụ:",
+      canh_bao_gom_nua: "và {m} trường hợp nữa",
+      dang_xu_ly: "Đang xử lý…",
+      /* === end SG-C === */
     },
 
     en: {
@@ -1032,6 +1082,7 @@
       btn_clear_queue: "Remove file",
       btn_tai_so_mau: "Download the input workbook",
       so_mau_da_tao: "Input workbook created ({n} {slot_l}(s) filled in) → {path}",
+      so_mau_da_tao_ngan: "Input workbook created ({n} {slot_l}(s) filled in).",
       so_nhap_dang_doc: "Reading the workbook…",
       so_nhap_tom_tat: "Ready to import: {n_clb} {slot_l}(s) · {n_buoi} {session_l}(s) · {n_hoc_sinh} {person_l}(s) · {n_nguyen_vong} preference(s) · {n_thi} test entry(ies)",
       so_nhap_co_loi: "The workbook has {n} problem(s) to fix. Nothing was imported. Fix them in Excel, save, and drop the workbook again.",
@@ -1450,7 +1501,7 @@
       btn_redraw_stb: "Redraw lottery…",
       toast_redraw_armed: "Click \"Run allocation\" to redraw the lottery. There will be one more confirmation before it runs.",
       health_panel_title: "Data warnings",
-      health_panel_hint: "These don't stop the allocation, but they can skew the results. Check them before running.",
+      health_panel_hint: "Items marked \"Serious\" block the run until they are fixed; the others don't stop it but can skew the results. Check them before running.",
       health_clean: "No problems found. The data is ready.",
       health_chua_co_du_lieu: "There is no data to allocate yet. Import the intake workbook in the box above (at least one {person_l} and one {slot_l} are needed).",
       health_summary: "{n} warning(s), {n_high} serious.",
@@ -1571,6 +1622,12 @@
       ws_btn_nhap_zip: "Restore from an archive file",
       ws_btn_dong: "Close",
       ws_btn_luu: "Save",
+      ws_btn_tinh_nang: "After-allocation features…",
+      ws_tn_tieu_de: "After-allocation features for {ten}",
+      ws_tn_khong_fa: "This workspace does not allocate by club type and medals, so these features are off. Choose \"Allocate by club type and medals\" when the workspace is created.",
+      ws_tn_vong_doi_cho: "Invite the waiting list to free seats",
+      ws_tn_so_ngay: "Days to accept appeals (1–14)",
+      ws_tn_da_luu: "After-allocation features saved.",
       ws_btn_tiep: "Next",
       ws_btn_quay_lai: "Back",
       ws_btn_tao: "Create workspace",
@@ -1695,12 +1752,23 @@
       ph_tong_hop: "{n} students answered; average satisfaction {tb}; {hieu} understood the reason.",
       ph_tong_tuan_3: "Week 3: {n} students answered; {con_di} still attending; {muon_doi} want to change.",
       ph_chua_co: "no data yet",
+      sau_cong_bo_tieu_de: "After the results are published",
+      ph_goi_y_nut: "\"Load from Forms (Excel)\" is for the old 3-question form; \"Load the After-results form\" is for the new combined form.",
       ph_nhap: "Load from Forms (Excel)",
+      dang_nap: "Loading…",
       ph_xuat: "Export feedback (Excel)",
-      ph_nhap_xong: "Loaded {n} feedback answers and {m} week-3 answers; skipped {b} unknown IDs.",
+      ph_nhap_xong: "Loaded feedback from {hs} students.",
       ssk_nap: "Load the After-results form",
-      ssk_nap_xong: "Loaded {n} feedback answers and {m} appeals; skipped {b} rows or unknown IDs.",
-      ssk_loi_dong: "Appeal not accepted ({student_id}, {buoi}): {loi}",
+      ssk_nap_xong: "Loaded feedback from {hs} students, {kn} new appeals.",
+      ssk_li_trung: "{n} rows were already loaded earlier and were not loaded again.",
+      ssk_li_kn_trung: "{n} appeals were already loaded earlier and were not loaded again.",
+      ssk_li_ma_la: "{n} IDs match no student: {ds}.",
+      ssk_li_bo_qua: "{n} rows skipped ({ly}): row {ds}.",
+      ssk_li_kn_loi: "{n} appeals not accepted ({ds}): {loi}",
+      ssk_ly_thieu_ma_hoc_sinh: "missing ID",
+      ssk_ly_buoi_la: "session not in this workspace",
+      ssk_ly_khong_co_buoi: "no session chosen",
+      log_loi_nua: "and {m} more errors",
       xuat_muc_phan_hoi: "Feedback",
       ws_r_fa_phan_hoi: "3-question feedback and week-3 survey",
       v2_tieu_de: "Round 2",
@@ -1925,6 +1993,38 @@
       cb_bo_xong: "Form set built ({n} files): {ten}",
       cb_bo_mo: "Open folder",
       /* === end C === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-A: add below === */
+      nv_ngoai_danh_sach: "Placed outside their choices",
+      clb_khong_gioi_han_cho: "no seat limit",
+      clb_tu_do_lap: "{n} {person_l} · no seat limit",
+      clb_tu_do_lap_nhieu: "{n} {person_pl} · no seat limit",
+      clb_tu_do_theo_clb: "{x} {person_l} · no seat limit",
+      clb_tu_do_theo_clb_nhieu: "{x} {person_pl} · no seat limit",
+      xuat_fa_an_goi_y: "The buttons for result reasons, the demand table, capacity suggestions and the draw record only appear when \"Allocate by {slot_l} type and medals\" is turned on.",
+      /* === end SG-A === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-B: add below === */
+      ws_tn_wharton: "Use commitment points",
+      ws_tn_wharton_goi_y: "Turn off if students do not split commitment points across their choices; results then depend on test scores and the lottery only.",
+      wh_goi_y_tat: "If commitment points are not used, turn them off in After-allocation features…, then run again.",
+      wh_mo_tinh_nang: "Open After-allocation features…",
+      ws_tn_wharton_can_fa: "This workspace allocates by club type and medals, which needs commitment points, so they cannot be turned off.",
+      cb_cot_gio: "Time",
+      cb_cot_dia_diem: "Place",
+      /* === end SG-B === */
+
+      /* (spacer: unchanged line between marker blocks) */
+
+      /* === SG-C: add below === */
+      canh_bao_gom_dau: "{n} warnings of the same kind. Examples:",
+      canh_bao_gom_nua: "and {m} more cases",
+      dang_xu_ly: "Working…",
+      /* === end SG-C === */
     },
   };
 
@@ -2078,7 +2178,9 @@
     if (entry === null || entry === undefined) return "";
     if (typeof entry === "string") return entry;
     if (typeof entry === "object" && entry.code) {
-      const table = ERROR_MESSAGES[entry.code];
+      // FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ có params.nhom và câu riêng "<mã>_nhom".
+      const nhom = entry.params && entry.params.nhom && ERROR_MESSAGES[entry.code + "_nhom"];
+      const table = nhom || ERROR_MESSAGES[entry.code];
       const template = table ? (table[currentLang] || table.vi) : entry.code;
       return interpolate(template, nhanHoaBuoi(entry.params));
     }

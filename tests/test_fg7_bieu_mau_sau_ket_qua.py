@@ -1,0 +1,204 @@
+"""FG-7 (STEP0, spec §3): biểu mẫu "Sau khi xem kết quả" — chỉ liệt kê buổi có CLB trong sổ, tiêu đề riêng, hướng dẫn
+bước 4 chỉ đường menu, `--help` không còn mã nội bộ, in thư mục ra tuyệt đối; các chế độ khác GIỮ NGUYÊN từng byte.
+Dữ liệu MÔ PHỎNG; mọi việc Forms là TH.
+
+Spec §3 còn một ý "thêm một dòng giải thích vì sao giữ `[tag]` và `(code)`": hướng dẫn hiện đã có bước 5 nói kiosk đọc
+theo các mã đó, nên KHÔNG có test riêng cho dòng đó (người làm FG-7 xem lại, ghi vào nhật ký).
+"""
+import hashlib
+import os
+import re
+import sys
+
+import pytest
+
+import so_nhap
+
+GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(GOC, "mau_forms_thi_clb"))
+import bieu_mau as bm  # noqa: E402
+import tao_mau_forms as tmf  # noqa: E402
+
+# sha256 của cả thư mục đầu ra (tên + nội dung) chụp trên f5e8a41, sinh hai lần giống nhau.
+# Byte đầu ra khác nhau theo hệ điều hành (os.name).
+# GIỮ MÃ (`--giu-ma`, SG-12): đúng từng byte như trước SG-12 — băm cũ nguyên văn (posix: STEP0, riêng `fa_daa*` chụp lại ở
+# SG-5; nt: CI run 43376547591, `fa_daa*` trên nt chỉ kiểm băm nội dung vì băm byte nt đã cũ sau SG-5).
+_CHE_DO = {
+    "fa_daa": ["--fa-daa"],
+    "fa_daa_mot": ["--fa-daa", "--mot-bieu-mau"],
+    "phan_hoi": ["--phan-hoi"],
+    "tuan_3": ["--tuan-3"],
+}
+_BAM_GIU_MA = {
+    "posix": {
+        "fa_daa": "172df180d80f257051cda2502ff125378524fa45819ca72a49453000dd64c84d",
+        "fa_daa_mot": "a40300e96830dba1ab1a7d45dc243288324fa600738f37ce363174abc71d0f75",
+        "phan_hoi": "f4cc8d3f5bd8c560685c455a919ce0a81ffe05e82843498d931ccbe673c8c54a",
+        "tuan_3": "eb73af3d5a3a80babec6b30dfbe5e63faf24016c8ec5ea04aece6cad75073e00",
+    },
+    "nt": {
+        "phan_hoi": "f624c558d4c5a2fb0ab0b8098a0389c2796d229fe227049be3928d5ba446c773",
+        "tuan_3": "ebdfc5ce76d75e799e7588c631467742e6ab15ff5cf736551a25a86de597002c",
+    },
+}
+# MẶC ĐỊNH = tiêu đề thuần + MAP_*.json (SG-12 cố ý đổi cả bốn chế độ): băm byte chụp trên posix; trên nt chưa có băm byte
+# mới nên chỉ bỏ qua phép kiểm băm byte (reason nêu SG-12), còn băm NỘI DUNG (`_bam_noi_dung`, không phụ thuộc hệ điều
+# hành) vẫn kiểm trên cả hai hệ điều hành.
+_BAM_MAC_DINH_POSIX = {
+    "fa_daa": "d1db77039427ee8d1913b2583f80d6de664265a6bb54a2a8c2cb2721a75231d5",
+    "fa_daa_mot": "f352d2ea78e4fad9136a0c3ed618f1b60337e6f35446113e60508bf53e707f9b",
+    "phan_hoi": "636af809966d3b02ace409f69856596b9631d7927f975b2fbb0e0073ab7f28c2",
+    "tuan_3": "1c764c036b55d44f544262a197413d8ada875ef92768bf1c97e10ac14a54fef2",
+}
+BAM_GOC = {k: (_CHE_DO[k], _BAM_MAC_DINH_POSIX[k]) for k in _CHE_DO}
+
+
+def _bam_cay(thu_muc):
+    h = hashlib.sha256()
+    for r, _, tep in sorted(os.walk(thu_muc)):
+        for t in sorted(tep):
+            p = os.path.join(r, t)
+            h.update(os.path.relpath(p, thu_muc).replace(os.sep, "/").encode())
+            with open(p, "rb") as f:
+                h.update(f.read())
+    return h.hexdigest()
+
+
+def _bam_noi_dung(thu_muc):
+    """Băm không phụ thuộc hệ điều hành: tên tệp + byte của .md + chữ trong đoạn văn/bảng của .docx (không byte zip)."""
+    from docx import Document
+    h = hashlib.sha256()
+    for r, _, tep in sorted(os.walk(thu_muc)):
+        for t in sorted(tep):
+            p = os.path.join(r, t)
+            h.update(os.path.relpath(p, thu_muc).replace(os.sep, "/").encode())
+            if t.endswith(".md"):
+                with open(p, "rb") as f:
+                    h.update(f.read().replace(b"\r\n", b"\n"))
+            elif t.endswith(".json"):                                   # SG-12: MAP_*.json (tiêu đề thuần -> mã)
+                with open(p, "rb") as f:
+                    h.update(f.read().replace(b"\r\n", b"\n"))
+            elif t.endswith(".docx"):
+                d = Document(p)
+                for x in d.paragraphs:
+                    h.update(x.text.encode() + b"\n")
+                for b in d.tables:
+                    for dong in b.rows:
+                        for o in dong.cells:
+                            h.update(o.text.encode() + b"\t")
+    return h.hexdigest()
+
+
+# Băm NỘI DUNG của đầu ra mặc định (SG-12), chụp trên posix, đúng trên cả hai hệ điều hành.
+_BAM_NOI_DUNG = {
+    "fa_daa": "0a7a0998edec7924c4769aa7da488068959eec407c875d9c8e186980942b7a73",
+    "fa_daa_mot": "a5ace7044421178a6203cd33fe89bcce61110f85324871c29c170127384cb750",
+    "phan_hoi": "a4612656dd36cac3175ddcf52b6d323a0c27f0e269c9623d9bd5fb89a997a01e",
+    "tuan_3": "f8283b613f025eaf6a2581e278acbf853eb356cc83f21873cc2df692f5538089",
+}
+# Băm nội dung của đầu ra GIỮ MÃ chỉ có ở hai chế độ SG-5 đã ghim (băm nội dung SG-5): phải y như trước SG-12.
+_BAM_NOI_DUNG_GIU_MA = {"fa_daa": "7677a8de7d116d65a8d00c3c1f468a0be032baef31200d2670408aab19afad53",
+                        "fa_daa_mot": "666e56b2a8fe2521f7a50ba4e5e9abe73c45d89a89469d934946490d337081e6"}
+
+
+@pytest.mark.parametrize("ten", sorted(BAM_GOC))
+def test_che_do_mac_dinh_tieu_de_thuan_dung_chu_va_byte(ten, tmp_path):
+    arg, bam = BAM_GOC[ten]
+    assert tmf.main(arg + ["--ra", str(tmp_path)]) == 0
+    assert _bam_noi_dung(str(tmp_path)) == _BAM_NOI_DUNG[ten]
+    if os.name == "nt":
+        pytest.skip("SG-12: băm byte của %s trên nt chưa chụp lại (đã kiểm băm nội dung ở trên)" % ten)
+    assert _bam_cay(str(tmp_path)) == bam
+
+
+@pytest.mark.parametrize("ten", sorted(_CHE_DO))
+def test_che_do_giu_ma_giu_nguyen_tung_byte_nhu_truoc_sg12(ten, tmp_path):
+    bam = _BAM_GIU_MA["posix" if os.name == "posix" else "nt"].get(ten)
+    assert tmf.main(_CHE_DO[ten] + ["--giu-ma", "--ra", str(tmp_path)]) == 0
+    assert not [f for f in os.listdir(tmp_path) if f.startswith("MAP_")]
+    if ten in _BAM_NOI_DUNG_GIU_MA:
+        assert _bam_noi_dung(str(tmp_path)) == _BAM_NOI_DUNG_GIU_MA[ten]
+    if bam is None:
+        pytest.skip("SG-12: băm byte nt của %s (giữ mã) không còn đúng sau SG-5; đã kiểm băm nội dung" % ten)
+    assert _bam_cay(str(tmp_path)) == bam
+
+
+def _so_ba_ngay(tmp_path):
+    """Sổ nhập CLB MÔ PHỎNG: chỉ các CLB của thu_2, thu_3, thu_4 trong de_thi.json."""
+    de = bm.doc_de_thi()
+    clubs = [{"club_id": c["club_id"], "name": c["name"], "capacity": 10, "reserve_capacity": 0,
+              "reserve_group": "", "buoi": c["buoi"], "loai": "TU_DO"}
+             for c in de["cau_lac_bo"] if c["buoi"] in ("thu_2", "thu_3", "thu_4")]
+    p = str(tmp_path / "so_ba_ngay.xlsx")
+    so_nhap.ghi_so_nhap(p, clubs, [])
+    return p
+
+
+def _chu_docx(duong):
+    from docx import Document
+    return [p.text for p in Document(duong).paragraphs]
+
+
+def test_sau_ket_qua_voi_so_nhap_chi_liet_ke_ngay_co_clb(tmp_path):
+    ra = tmp_path / "ra"
+    assert tmf.main(["--sau-ket-qua", "--so-nhap-clb", _so_ba_ngay(tmp_path), "--ra", str(ra)]) == 0
+    chu = "\n".join(_chu_docx(str(ra / tmf.TEN_DOCX_SAU_KET_QUA)))
+    ten = {b["ma"]: b["ten"] for b in bm.doc_de_thi()["buoi"]}               # SG-12: lựa chọn buổi là tên thuần, không "(mã)"
+    for ma in ("thu_2", "thu_3", "thu_4"):
+        assert ten[ma] in chu
+    for ma in ("thu_5", "thu_6"):
+        assert ten[ma] not in chu
+
+
+def test_sau_ket_qua_khong_so_nhap_nhu_cu(tmp_path):
+    ra = tmp_path / "ra"
+    assert tmf.main(["--sau-ket-qua", "--ra", str(ra)]) == 0
+    chu = "\n".join(_chu_docx(str(ra / tmf.TEN_DOCX_SAU_KET_QUA)))
+    assert all(b["ten"] in chu for b in bm.doc_de_thi()["buoi"])                # đủ 5 ngày như trước (tên thuần, SG-12)
+
+
+def test_tieu_de_rieng_cho_che_do_sau_ket_qua(tmp_path):
+    assert tmf.main(["--sau-ket-qua", "--ra", str(tmp_path)]) == 0
+    dong = _chu_docx(str(tmp_path / tmf.TEN_DOCX_SAU_KET_QUA))
+    assert dong[0] == "Phản hồi và báo lỗi sau khi xem kết quả"
+
+
+def test_huong_dan_buoc_4_chi_duong_menu_khong_ten_khoa_cau_hinh(tmp_path):
+    assert tmf.main(["--sau-ket-qua", "--ra", str(tmp_path)]) == 0
+    with open(tmp_path / tmf.TEN_CAI_DAT_SAU_KET_QUA, encoding="utf-8") as f:
+        md = f.read()
+    buoc4 = next(d for d in md.splitlines() if d.startswith("4. "))
+    assert "Tính năng sau khi xếp" in buoc4
+    assert "fa_phan_hoi" not in buoc4 and "fa_khieu_nai" not in buoc4
+
+
+def test_help_khong_con_ma_noi_bo(capsys):
+    with pytest.raises(SystemExit):
+        tmf.main(["--help"])
+    giup = capsys.readouterr().out
+    assert giup
+    assert not re.search(r"FA-[A-Z]\w*|GAP-\d+|\bTH\b|đường B|đường A", giup), giup
+
+
+def test_in_thu_muc_ra_tuyet_doi_o_dong_cuoi(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert tmf.main(["--sau-ket-qua", "--ra", "ra_tuong_doi"]) == 0
+    dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
+    assert os.path.abspath(str(tmp_path / "ra_tuong_doi")) in dong_cuoi
+
+
+@pytest.mark.parametrize("arg", [["--phan-hoi"], ["--tuan-3"], ["--fa-daa"], ["--chi-thi"], ["--moi-clb"]])
+def test_moi_che_do_in_thu_muc_ra_tuyet_doi_o_dong_cuoi(arg, tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    assert tmf.main(arg + ["--ra", "ra_tuong_doi"]) == 0
+    dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
+    assert dong_cuoi.endswith(os.path.abspath(str(tmp_path / "ra_tuong_doi")))
+
+
+def test_che_do_mac_dinh_in_thu_muc_ghi_o_dong_cuoi(tmp_path, capsys, monkeypatch):
+    # Chế độ mặc định ghi cạnh tệp tao_mau_forms.py (THU_MUC), không theo --ra; ghi tạm sang thư mục thử.
+    monkeypatch.setattr(tmf, "THU_MUC", str(tmp_path / "mac_dinh"))
+    os.makedirs(tmf.THU_MUC)
+    assert tmf.main([]) == 0
+    dong_cuoi = [d for d in capsys.readouterr().out.splitlines() if d.strip()][-1]
+    assert dong_cuoi.endswith(os.path.abspath(tmf.THU_MUC))

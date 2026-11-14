@@ -229,6 +229,7 @@ def test_nop_lai_giu_phieu_dau(tmp_path, de):
     assert _doc_so(tmp_path / "ra")[0]["HS1"]["score_1"] == "2"
 
 
+@pytest.mark.giu_ma
 def test_ranking_tach_moi_vi_tri_mot_cot_van_doc_duoc(tmp_path, de):
     theo_ma = _tieu_de_theo_ma(de)
     p = _phieu(de, "HS1")

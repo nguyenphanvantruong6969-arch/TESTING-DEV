@@ -55,6 +55,26 @@ CHU_CAI = "abcdefghijklmnopqrstuvwxyz"
 
 # ------------------------------------------------------------ Quick Import
 
+def ghi_ban_do(duong_docx, phan):
+    """SG-12: ghi `MAP_<tên tệp>.json` cạnh biểu mẫu `duong_docx` (tiêu đề thuần -> mã). Chế độ giữ mã (`--giu-ma`) thì
+    tiêu đề đã có mã nên KHÔNG ghi gì. Trả đường dẫn đã ghi hoặc None."""
+    if bm.dang_giu_ma():
+        return None
+    goc = os.path.splitext(os.path.basename(duong_docx))[0]
+    duong = os.path.join(os.path.dirname(duong_docx), "MAP_%s.json" % goc)
+    with open(duong, "w", encoding="utf-8", newline="\n") as f:
+        f.write(bm.ban_do_ra_json(bm.ban_do_bieu_mau(phan, nghiem_chuan=True)))
+    return duong
+
+
+def _xoa_cu(thu_muc, tien_to):
+    """Xoá .docx cũ bắt đầu bằng `tien_to` và MAP_*.json đi kèm (của lần sinh trước)."""
+    for ten in os.listdir(thu_muc):
+        if (ten.startswith(tien_to) and ten.endswith(".docx")) or \
+                (ten.startswith("MAP_" + tien_to) and ten.endswith(".json")):
+            os.remove(os.path.join(thu_muc, ten))
+
+
 def ghi_docx(de, duong):
     """Bố cục giống KHAO_SAT_NHAP_FORMS.docx — dạng Quick Import đọc tốt:
     tiêu đề phần in đậm, câu hỏi đánh số, lựa chọn 'a. …' thụt lề."""
@@ -76,6 +96,7 @@ def ghi_docx(de, duong):
 
     dong(de["tieu_de"], co=16, dam=True, sau=10)
     so = 0
+    ghi_ban_do(duong, bm.cac_phan(de))
     for i, (ten, cac_cau) in enumerate(bm.cac_phan(de), 1):
         dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
         for tieu_de, _loai, lua_chon, _bb in cac_cau:
@@ -103,6 +124,11 @@ def _bang_dap_an(w, de, cac_clb):
 # FA-M8 / R3 (TH): kiosk chấm bài từ tệp đề thi, nên Forms không cần giữ đáp án (`dap_an_tren_forms=False`).
 DONG_DU_PHONG_KHONG_DAP_AN = ("> **TH — dự phòng:** nếu Forms từ chối bật **Time limit** khi chưa có đáp án, đánh dấu "
                               "đáp án đúng và điểm như hướng dẫn trước đây (đáp án ở `XEM_LAI_DAP_AN.xlsx`).")
+
+
+LUU_Y_TIEU_DE_THUAN = ("Tiêu đề và lựa chọn là chữ thuần (học sinh không thấy mã); kiosk nhận ra từng câu bằng chữ đó nên "
+                       "**đừng sửa chữ** tiêu đề hay lựa chọn trên Forms. Bảng mã nằm ở `MAP_<tên tệp>.json` cạnh tệp "
+                       "Quick Import (kiosk tự dựng lại từ đề thi, không cần nạp tệp này).")
 
 
 def _khoi_khong_dap_an(w):
@@ -148,10 +174,16 @@ def ghi_cai_dat(de, dap_an_tren_forms=True):
     w("")
     w("## 2. Đổi %d câu nguyện vọng sang Ranking" % len(de["buoi"]))
     w("")
-    w("Quick Import không biết loại **Ranking** — các câu `[thu_…]` về tới Forms")
-    w("sẽ là câu Choice. Với từng câu: bấm **+ Add new → ⌄ → Ranking** ngay dưới")
-    w("nó, **dán nguyên văn** tiêu đề và các lựa chọn (giữ cả phần `[mã]` và phần")
-    w("`(club_id)`), để **không bắt buộc**, rồi xoá câu Choice cũ.")
+    if bm.dang_giu_ma():
+        w("Quick Import không biết loại **Ranking** — các câu `[thu_…]` về tới Forms")
+        w("sẽ là câu Choice. Với từng câu: bấm **+ Add new → ⌄ → Ranking** ngay dưới")
+        w("nó, **dán nguyên văn** tiêu đề và các lựa chọn (giữ cả phần `[mã]` và phần")
+        w("`(club_id)`), để **không bắt buộc**, rồi xoá câu Choice cũ.")
+    else:
+        w("Quick Import không biết loại **Ranking** — các câu nguyện vọng (mỗi buổi một câu) về tới Forms")
+        w("sẽ là câu Choice. Với từng câu: bấm **+ Add new → ⌄ → Ranking** ngay dưới")
+        w("nó, **dán nguyên văn** tiêu đề và các lựa chọn, để **không bắt buộc**, rồi xoá")
+        w("câu Choice cũ. " + LUU_Y_TIEU_DE_THUAN)
     w("")
     w("## 3. Rẽ nhánh — chỉ %d chỗ" % n_thi)
     w("")
@@ -210,7 +242,7 @@ def ghi_mau_xuat(de, duong, so_hoc_sinh=60, hat_giong=2026):
 
     rd = random.Random(hat_giong)
     phan = bm.cac_phan(de)
-    co_diem = {bm.cau_de_thi(c, i) for c in bm.clb_co_thi(de)
+    co_diem = {bm.cau_de_thi(c, i, de) for c in bm.clb_co_thi(de)
                for i in range(1, len(c["de_thi"]) + 1)}
 
     tieu_de = ["ID", "Start time", "Completion time", "Email", "Name",
@@ -259,7 +291,7 @@ def ghi_mau_xuat(de, duong, so_hoc_sinh=60, hat_giong=2026):
                 for i, cau in enumerate(clb["de_thi"], 1):
                     dung = dung_ca[i - 1]
                     sai = [x for k, x in enumerate(cau["lua_chon"]) if k != cau["dap_an"]]
-                    td = bm.cau_de_thi(clb, i)
+                    td = bm.cau_de_thi(clb, i, de)
                     o[td] = cau["lua_chon"][cau["dap_an"]] if dung else rd.choice(sai)
                     o["Points - " + td] = de["diem_moi_cau"] if dung else 0
                     tong += o["Points - " + td]
@@ -293,7 +325,7 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
     for clb in clb_thi:
         tieu_de.append(bm.cau_cong_thi(de, clb, chi_thi=True))
         for i in range(1, len(clb["de_thi"]) + 1):
-            td = bm.cau_de_thi(clb, i)
+            td = bm.cau_de_thi(clb, i, de)
             tieu_de += [td, "Points - " + td]
 
     def phieu(email, ten, cac_clb, nang_luc):
@@ -307,7 +339,7 @@ def ghi_mau_xuat_chi_thi(de, duong, danh_sach, hat_giong=2026):
             for i, cau in enumerate(clb["de_thi"], 1):
                 dung = rd.random() < nang_luc
                 sai = [x for k, x in enumerate(cau["lua_chon"]) if k != cau["dap_an"]]
-                td = bm.cau_de_thi(clb, i)
+                td = bm.cau_de_thi(clb, i, de)
                 o[td] = cau["lua_chon"][cau["dap_an"]] if dung else rd.choice(sai)
                 o["Points - " + td] = de["diem_moi_cau"] if dung else 0
                 tong += o["Points - " + td]
@@ -399,7 +431,7 @@ TEN_CAI_DAT_CHI_THI = "CAI_DAT_FORMS_CHI_THI.md"
 _GIO_ZIP = (2026, 1, 1, 0, 0, 0)
 
 
-def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
+def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi", tieu_de=None, ghi_map=True):
     """Quick Import cho chế độ chỉ thi; giống hệt từng byte khi đầu vào không đổi."""
     from docx import Document
     from docx.shared import Pt
@@ -417,9 +449,12 @@ def ghi_docx_chi_thi(de, duong, buoi=None, phan=None, hau_to=" — bài thi"):
         r = p.add_run(chu)
         r.bold, r.font.size = dam, Pt(co)
 
-    dong(de["tieu_de"] + hau_to, co=16, dam=True, sau=10)
+    dong(de["tieu_de"] + hau_to if tieu_de is None else tieu_de, co=16, dam=True, sau=10)
     so = 0
-    for i, (ten, cac_cau) in enumerate(bm.cac_phan(de, chi_thi=True, buoi=buoi) if phan is None else phan, 1):
+    phan = bm.cac_phan(de, chi_thi=True, buoi=buoi) if phan is None else phan
+    if ghi_map:                  # phiếu thiết lập CLB (giáo viên điền) không có mã câu: không có bản đồ
+        ghi_ban_do(duong, phan)
+    for i, (ten, cac_cau) in enumerate(phan, 1):
         dong("PHẦN %d — %s" % (i, ten), co=14, dam=True, truoc=18, sau=8)
         for tieu_de, _loai, lua_chon, _bb in cac_cau:
             so += 1
@@ -524,9 +559,7 @@ def sinh_chi_thi(de, thu_muc, dap_an_tren_forms=True):
     """
     nhom = bm.chia_theo_buoi(de, chi_thi=True)         # LoiDeThi ở đây thì chưa ghi gì
     os.makedirs(thu_muc, exist_ok=True)
-    for ten in os.listdir(thu_muc):
-        if ten.startswith(TEN_DOCX_CHI_THI) and ten.endswith(".docx"):
-            os.remove(os.path.join(thu_muc, ten))
+    _xoa_cu(thu_muc, TEN_DOCX_CHI_THI)
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_CHI_THI)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
@@ -579,6 +612,7 @@ def ghi_docx_moi_clb(de, clb, duong):
 
     dong("%s — %s — bài thi" % (de["tieu_de"], clb["name"]), co=16, dam=True, sau=10)
     so = 0
+    ghi_ban_do(duong, bm.cac_phan_moi_clb(de, clb))
     for ten, cac_cau in bm.cac_phan_moi_clb(de, clb):
         dong(ten, co=14, dam=True, truoc=18, sau=8)
         for tieu_de, _loai, lua_chon, _bb in cac_cau:
@@ -667,9 +701,7 @@ def sinh_moi_clb(de, thu_muc, dap_an_tren_forms=True):
     """
     co_thi = _kiem_moi_clb(de)
     os.makedirs(thu_muc, exist_ok=True)
-    for ten in os.listdir(thu_muc):
-        if ten.startswith(TIEN_TO_DOCX_MOI_CLB) and ten.endswith(".docx"):
-            os.remove(os.path.join(thu_muc, ten))
+    _xoa_cu(thu_muc, TIEN_TO_DOCX_MOI_CLB)
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_MOI_CLB)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
@@ -724,6 +756,9 @@ def ghi_cai_dat_dang_ky(de, mot_bieu_mau=False):
     w("tên \"Nguyện vọng 1\", \"Nguyện vọng 2\", \"Nguyện vọng 3\" (ngày có ít hơn ba CLB thì ít câu hơn). Hai câu huy")
     w("chương không bắt buộc; mặc định huy chương theo thứ tự nguyện vọng (vàng NV1, bạc NV2, đồng NV3, CLB Tự do không nhận).")
     w("")
+    w("Câu \"đổi chỗ huy chương bạc và đồng\" chỉ có ở ngày có từ %d CLB trở lên nhận huy chương (không Tự do); ngày ít hơn chỉ có câu vàng." % bm.SO_CLB_TOI_THIEU_CAU_DOI)
+    w("Dòng mô tả huy chương nằm ngay trong câu vàng: \"%s\"" % bm.MO_TA_HUY_CHUONG)
+    w("")
     w("## Mô tả biểu mẫu (dán một dòng này vào ô Description)")
     w("")
     w("> %s" % bm.CAU_HUONG_DAN_DANG_KY)
@@ -732,7 +767,11 @@ def ghi_cai_dat_dang_ky(de, mot_bieu_mau=False):
         w("## Một biểu mẫu cho mọi buổi — tệp `%s`" % TEN_DOCX_DANG_KY_TAT_CA)
         w("")
         w("- Học sinh chỉ nhận MỘT đường dẫn. Phần thông tin học sinh xuất hiện một lần, sau đó mỗi ngày có phần Nguyện vọng")
-        w("  và phần Huy chương (thẻ câu vẫn là `[<buổi>-nv1..3]`, `[<buổi>-vang]`, `[<buổi>-doi]`).")
+        if bm.dang_giu_ma():
+            w("  và phần Huy chương (thẻ câu vẫn là `[<buổi>-nv1..3]`, `[<buổi>-vang]`, `[<buổi>-doi]`).")
+        else:
+            w("  và phần Huy chương (mã câu `<buổi>-nv1..3`, `<buổi>-vang`, `<buổi>-doi` nằm trong `MAP_*.json`, "
+              "không hiện cho học sinh). " + LUU_Y_TIEU_DE_THUAN)
         w("- Ba câu Nguyện vọng của MỌI ngày đều bắt buộc.")
         w("- Nộp lại: phiếu mới thay toàn bộ phiếu cũ của em, cho mọi ngày (bộ chuyển đổi giữ phiếu CUỐI của mỗi ngày).")
         w("- Bật \"Allow respondents to edit their responses\" nếu tổ chức của em cho phép (TH: chưa thử).")
@@ -797,9 +836,7 @@ def sinh_dang_ky(de, thu_muc, mot_bieu_mau=False):
                           "bỏ --mot-bieu-mau (mỗi ngày một biểu mẫu) hoặc giảm số ngày/CLB"
                           % (bm.dem_cau_fa_gop(de), bm.TRAN_CAU_MOI_BIEU_MAU))
     os.makedirs(thu_muc, exist_ok=True)
-    for ten in os.listdir(thu_muc):
-        if ten.startswith(TIEN_TO_DOCX_DANG_KY) and ten.endswith(".docx"):
-            os.remove(os.path.join(thu_muc, ten))
+    _xoa_cu(thu_muc, TIEN_TO_DOCX_DANG_KY)
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_DANG_KY)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
@@ -834,7 +871,8 @@ def ghi_cai_dat_bien_the(de, co, dap_an_tren_forms=True):
       " của CLB: các đề B, C; đề A là `de_thi`). Đừng sửa tay.")
     w("")
     w("Mỗi CLB có 2 đề (3 đề chỉ khi rất nhiều em thi) **cùng số câu và cùng cơ cấu độ khó**. Mỗi đề là MỘT biểu mẫu riêng, "
-      "không câu cổng (như chế độ `--moi-clb`); thẻ câu vẫn là `[<club_id>-<số câu>]` ở mọi đề.")
+      "không câu cổng (như chế độ `--moi-clb`); mã câu vẫn là `<club_id>-<số câu>` ở mọi đề (%s)."
+      % ("thẻ `[mã]` ở đầu tiêu đề" if bm.dang_giu_ma() else "nằm trong `MAP_*.json`, tiêu đề là chữ thuần"))
     w("")
     w("## Chia đề cho học sinh")
     w("")
@@ -903,9 +941,7 @@ def sinh_bien_the(de, thu_muc, dap_an_tren_forms=True):
     if loi:
         raise bm.LoiDeThi("de_thi.json sai:\n  - " + "\n  - ".join(loi))
     os.makedirs(thu_muc, exist_ok=True)
-    for ten in os.listdir(thu_muc):
-        if ten.startswith(TIEN_TO_DOCX_BIEN_THE) and ten.endswith(".docx"):
-            os.remove(os.path.join(thu_muc, ten))
+    _xoa_cu(thu_muc, TIEN_TO_DOCX_BIEN_THE)
     ra = []
     duong = os.path.join(thu_muc, TEN_CAI_DAT_BIEN_THE)
     with open(duong, "w", encoding="utf-8", newline="\n") as f:
@@ -932,7 +968,8 @@ def _ghi_khao_sat(de, thu_muc, ten_docx, ten_md, phan, hau_to, tieu_de_md, cau_m
             "- Nhập `%s` bằng Quick Import." % ten_docx,
             "- Settings: chỉ một lần trả lời mỗi người; mọi câu bắt buộc.",
             "- Xuất kết quả: Responses → Open in Excel; đem tệp đó nạp ở kiosk (khung Phản hồi, nút Nạp từ Forms).",
-            "- Câu hỏi giữ nguyên phần mã trong ngoặc vuông và ngoặc tròn: kiosk đọc theo mã đó.", "",
+            ("- Câu hỏi giữ nguyên phần mã trong ngoặc vuông và ngoặc tròn: kiosk đọc theo mã đó." if bm.dang_giu_ma()
+             else "- Tiêu đề và lựa chọn là chữ thuần, kiosk nhận ra câu bằng chính chữ đó: đừng sửa chữ trên Forms."), "",
             "## Câu hỏi", ""] + ["- %s" % c for c in cau_md] + [""]
     with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(dong))
@@ -951,6 +988,28 @@ def sinh_phan_hoi(de, thu_muc):
 
 TEN_DOCX_SAU_KET_QUA = "NHAP_FORMS_SAU_KET_QUA.docx"
 TEN_CAI_DAT_SAU_KET_QUA = "CAI_DAT_FORMS_SAU_KET_QUA.md"
+
+
+def buoi_co_clb_trong_so_nhap(duong_so_nhap):
+    """FG-7: tập mã buổi có ít nhất một CLB trong Sổ nhập CLB (CLB hỏng không tính)."""
+    import chuyen_forms_sang_phan_mem as cv
+    import openpyxl
+    import so_nhap
+    du = so_nhap.doc_so_nhap(openpyxl.load_workbook(duong_so_nhap, data_only=True))
+    if du["loi"]:
+        from i18n_errors import format_all
+        raise cv.LoiTepXuat("Sổ nhập CLB (%s) có lỗi: %s" % (os.path.basename(duong_so_nhap),
+                                                           "; ".join(format_all(du["loi"][:3]))))
+    return {c.get("buoi") for c in du["clubs"] if c.get("buoi") and not c.get("hong")}
+
+
+def _de_chi_buoi(de, buoi_co_clb):
+    """Bản sao nông của `de` chỉ giữ các buổi có CLB; None -> như cũ."""
+    if buoi_co_clb is None:
+        return de
+    de2 = dict(de)
+    de2["buoi"] = [b for b in de["buoi"] if b["ma"] in buoi_co_clb]
+    return de2
 
 
 def ghi_cai_dat_sau_ket_qua(de):
@@ -1005,8 +1064,14 @@ def ghi_cai_dat_sau_ket_qua(de):
     w("2. Kiosk: thẻ \"Chi tiết và xuất tệp\" → khung \"Phản hồi của học sinh\" → nút **Nạp biểu mẫu Sau khi xem kết quả**.")
     w("3. Một lần nạp ghi cả phản hồi và khiếu nại; nếu có lỗi giữa chừng thì không ghi gì. Hạn khiếu nại tính theo giờ hoàn "
       "thành do Forms ghi (cột Completion time), nên nạp muộn vẫn công bằng; tệp không có cột đó thì tính theo lúc nạp và có cảnh báo.")
-    w("4. Cần bật `fa_phan_hoi` và/hoặc `fa_khieu_nai` ở không gian làm việc; tắt một cái thì phần đó bị bỏ qua kèm cảnh báo.")
-    w("5. Giữ nguyên phần `[mã]` đầu mỗi câu và phần `(mã)` cuối mỗi lựa chọn: kiosk đọc theo các mã đó.")
+    w("4. Bật tính năng ở kiosk: Kiosk → Không gian làm việc → ⋯ → Tính năng sau khi xếp… (tick Phản hồi và/hoặc "
+      "Khiếu nại); tắt một cái thì phần đó bị bỏ qua kèm cảnh báo.")
+    if bm.dang_giu_ma():
+        w("5. Giữ nguyên phần `[mã]` đầu mỗi câu và phần `(mã)` cuối mỗi lựa chọn: kiosk đọc theo các mã đó "
+          "để biết câu nào là câu nào; sửa các mã này thì kiosk không nạp được câu đó.")
+    else:
+        w("5. Giữ nguyên chữ tiêu đề từng câu và chữ từng lựa chọn: kiosk nhận ra câu nào là câu nào bằng chính chữ đó "
+          "(mã nằm trong `MAP_NHAP_FORMS_SAU_KET_QUA.json`, học sinh không thấy); sửa chữ thì kiosk không nạp được câu đó.")
     w("")
     w("## Câu hỏi")
     w("")
@@ -1020,14 +1085,15 @@ def ghi_cai_dat_sau_ket_qua(de):
     return "\n".join(L)
 
 
-def sinh_sau_ket_qua(de, thu_muc):
+def sinh_sau_ket_qua(de, thu_muc, buoi_co_clb=None):
     """FA-M6b (TH): biểu mẫu "Sau khi xem kết quả" — .docx Quick Import + hướng dẫn rẽ nhánh. Sinh lại ra tệp giống từng byte."""
     os.makedirs(thu_muc, exist_ok=True)
     duong_md = os.path.join(thu_muc, TEN_CAI_DAT_SAU_KET_QUA)
     with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
         f.write(ghi_cai_dat_sau_ket_qua(de))
     duong_docx = os.path.join(thu_muc, TEN_DOCX_SAU_KET_QUA)
-    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_sau_ket_qua(de), hau_to=" — sau khi xem kết quả")
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_sau_ket_qua(_de_chi_buoi(de, buoi_co_clb)),
+                     tieu_de="Phản hồi và báo lỗi sau khi xem kết quả")
     return [duong_md, duong_docx]
 
 
@@ -1117,7 +1183,7 @@ def sinh_phieu_clb(de, thu_muc):
     with open(duong_md, "w", encoding="utf-8", newline="\n") as f:
         f.write(ghi_cai_dat_phieu_clb(de))
     duong_docx = os.path.join(thu_muc, TEN_DOCX_PHIEU_CLB)
-    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_phieu_clb(), hau_to=" — phiếu thiết lập CLB")
+    ghi_docx_chi_thi(de, duong_docx, phan=bm.cac_phan_phieu_clb(), hau_to=" — phiếu thiết lập CLB", ghi_map=False)
     return [duong_md, duong_docx]
 
 
@@ -1285,19 +1351,22 @@ def main(argv=None):
     ap.add_argument("--moi-clb", action="store_true",
                     help="mỗi CLB có đề một biểu mẫu riêng, không câu cổng (+ CLB.csv cho list CLB)")
     ap.add_argument("--fa-daa", action="store_true",
-                    help="FA-DAA đường B (TH): mỗi ngày một biểu mẫu đăng ký, ba câu Nguyện vọng + hai câu huy chương")
+                    help="biểu mẫu đăng ký xếp theo loại CLB (chưa thử trên Forms thật): mỗi ngày một biểu mẫu, ba câu Nguyện vọng + hai câu huy chương")
     ap.add_argument("--mot-bieu-mau", action="store_true",
-                    help="chỉ với --fa-daa (FA-M2b, TH): MỘT biểu mẫu đăng ký cho mọi ngày thay vì mỗi ngày một biểu mẫu")
+                    help="chỉ với --fa-daa: MỘT biểu mẫu đăng ký cho mọi ngày thay vì mỗi ngày một biểu mẫu")
     ap.add_argument("--bien-the", action="store_true",
-                    help="FA-DAA (TH): mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
+                    help="mỗi CLB có de_thi_bien_the sinh một biểu mẫu cho từng đề (A, B, C) + hướng dẫn")
     ap.add_argument("--phan-hoi", action="store_true",
-                    help="GAP-5 (TH): biểu mẫu 3 câu phản hồi sau khi xem kết quả")
+                    help="biểu mẫu 3 câu phản hồi sau khi xem kết quả")
     ap.add_argument("--sau-ket-qua", action="store_true",
-                    help="FA-M6b (TH): MỘT biểu mẫu \"Sau khi xem kết quả\" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu")
+                    help="MỘT biểu mẫu \"Sau khi xem kết quả\" = 3 câu phản hồi + nhánh khiếu nại lỗi dữ liệu; kèm --so-nhap-clb thì chỉ liệt kê các ngày có CLB trong sổ")
     ap.add_argument("--tuan-3", action="store_true",
-                    help="GAP-6 (TH): biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
+                    help="biểu mẫu khảo sát tuần 3 (còn đi CLB? muốn đổi?)")
     ap.add_argument("--so-nhap-clb", metavar="SO_NHAP_CLB.xlsx",
-                    help="chỉ với --fa-daa: Sổ nhập CLB (FA-M1) để biết Loại; CLB Tự do không có trong câu vàng")
+                    help="với --fa-daa: Sổ nhập CLB để biết Loại (CLB Tự do không có trong câu vàng); với --sau-ket-qua: chỉ liệt kê các ngày có CLB")
+    ap.add_argument("--giu-ma", action="store_true",
+                    help="giữ mã trong tiêu đề câu và lựa chọn như trước (\"[thu_2-nv1] …\", \"… (clb_bong_ro)\"), "
+                         "không ghi MAP_*.json; mặc định học sinh chỉ thấy chữ thuần và mã nằm trong MAP_*.json")
     ap.add_argument("--ra", default=THU_MUC, help="thư mục ghi (mặc định: cạnh tệp này)")
     ap.add_argument("--de", default=bm.DE_THI_MAC_DINH, help="de_thi.json")
     a = ap.parse_args(argv)
@@ -1315,25 +1384,42 @@ def main(argv=None):
         ap.error("--sau-ket-qua là một chế độ riêng, không dùng chung với chế độ khác")
     if a.mot_bieu_mau and not a.fa_daa:
         ap.error("--mot-bieu-mau chỉ dùng cùng --fa-daa")
-    if a.so_nhap_clb and not a.fa_daa:
-        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa")
+    if a.so_nhap_clb and not (a.fa_daa or a.sau_ket_qua):
+        ap.error("--so-nhap-clb chỉ dùng cùng --fa-daa hoặc --sau-ket-qua")
+    with bm.che_do_giu_ma(a.giu_ma):             # SG-12: chỉ trong lần chạy này, không rò sang người gọi
+        return _chay(a)
+
+
+def _chay(a):
     try:
         de = bm.doc_de_thi(a.de)
         if a.tuan_3:
             ra = sinh_tuan_3(de, a.ra)
             print("Đã sinh mẫu Forms khảo sát tuần 3 (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.sau_ket_qua:
-            ra = sinh_sau_ket_qua(de, a.ra)
+            buoi_co_clb = None
+            if a.so_nhap_clb:
+                import chuyen_forms_sang_phan_mem as cv
+                try:
+                    buoi_co_clb = buoi_co_clb_trong_so_nhap(a.so_nhap_clb)
+                except cv.LoiTepXuat as e:
+                    print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
+                    return 1
+            ra = sinh_sau_ket_qua(de, a.ra, buoi_co_clb=buoi_co_clb)
             print("Đã sinh mẫu Forms Sau khi xem kết quả (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.phan_hoi:
             ra = sinh_phan_hoi(de, a.ra)
             print("Đã sinh mẫu Forms phản hồi (TH): %s." % ", ".join(os.path.basename(x) for x in ra))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.bien_the:
             ra = sinh_bien_the(de, a.ra)
             print("Đã sinh mẫu Forms đề biến thể (TH): %d tệp (%s)." % (len(ra), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.fa_daa:
             if a.so_nhap_clb:
@@ -1348,11 +1434,13 @@ def main(argv=None):
             ra = sinh_dang_ky(de, a.ra, mot_bieu_mau=a.mot_bieu_mau)
             print("Đã sinh mẫu Forms đăng ký FA-DAA (TH): %d biểu mẫu (%s)."
                   % (1 if a.mot_bieu_mau else len(de["buoi"]), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.moi_clb:
             ra = sinh_moi_clb(de, a.ra)
             print("Đã sinh mẫu Forms mỗi CLB một biểu mẫu: %d biểu mẫu (%s)."
                   % (len(bm.clb_co_thi(de)), ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
         if a.chi_thi:
             ra = sinh_chi_thi(de, a.ra)
@@ -1360,6 +1448,7 @@ def main(argv=None):
             print("Đã sinh mẫu Forms chỉ thi: %d câu, %d biểu mẫu (%s)."
                   % (bm.dem_cau(de, chi_thi=True), len(nhom),
                      ", ".join(os.path.basename(x) for x in ra)))
+            print("Thư mục đã ghi: %s" % os.path.abspath(a.ra))
             return 0
     except bm.LoiDeThi as e:
         print("KHÔNG GHI TỆP NÀO — %s" % e, file=sys.stderr)
@@ -1374,6 +1463,7 @@ def main(argv=None):
               "(pip install -r requirements-dev.txt)", file=sys.stderr)
     print("Đã sinh mẫu Forms: %d phần, %d câu hỏi."
           % (len(bm.cac_phan(de)), sum(len(c) for _, c in bm.cac_phan(de))))
+    print("Thư mục đã ghi: %s" % os.path.abspath(THU_MUC))
     return 0
 
 

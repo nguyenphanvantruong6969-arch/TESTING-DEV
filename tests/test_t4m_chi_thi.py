@@ -333,6 +333,7 @@ def test_q2_khong_clb_nao_co_de_bao_loi(de):
         bm.chia_theo_buoi(d, chi_thi=True)
 
 
+@pytest.mark.giu_ma
 def test_q2_sinh_chi_thi_dung_cai_dat_va_docx(tmp_path, de):
     docx = pytest.importorskip("docx")
     files = tm.sinh_chi_thi(de, str(tmp_path))

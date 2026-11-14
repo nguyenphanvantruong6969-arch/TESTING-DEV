@@ -82,8 +82,8 @@ def test_gui_trong_han_qua_han_trung_va_la(api, gio):
     ra = api.gui_khieu_nai("s1", b, "Điểm thi nhập sai")
     assert ra["ok"] and isinstance(ra["data"]["id"], int)
     assert ma(api.gui_khieu_nai("s1", b, "lần hai")["errors"]) == ["khieu_nai_trung"]
-    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_khong_hop_le"]
-    assert ma(api.gui_khieu_nai("s2", "khong_co", "x")["errors"]) == ["khieu_nai_khong_hop_le"]
+    assert ma(api.gui_khieu_nai("s9", b, "x")["errors"]) == ["khieu_nai_hs_khong_co"]
+    assert ma(api.gui_khieu_nai("s2", "khong_co", "x")["errors"]) == ["khieu_nai_chua_co_ket_qua"]
     gio(api, days=4)
     ra = api.gui_khieu_nai("s2", b, "x")
     assert ma(ra["errors"]) == ["khieu_nai_qua_han"] and ra["errors"][0]["params"]["so_ngay"] == 3

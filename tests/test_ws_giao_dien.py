@@ -498,6 +498,6 @@ def test_dong_workspace_chi_con_mo_va_menu_xoa_cuoi_do_va_an_ma_thu_muc(mo_trang
     assert hang.locator("button:visible").count() == 1                        # chỉ "Mở"; phần còn lại trong ⋯
     hang.locator(".menu-khac > summary").click()
     nhan = hang.locator(".menu-khac-hop button").evaluate_all("e => e.map(x => x.dataset.hanhDong || 'xoa')")
-    assert nhan == ["doi_ten", "nhan_ban", "luu_mau", "xuat", "xoa"]            # Xoá đứng cuối
+    assert nhan == ["doi_ten", "nhan_ban", "luu_mau", "tinh_nang", "xuat", "xoa"]  # FG-1 thêm mục; Xoá đứng cuối
     assert hang.locator(".menu-khac-hop button.ws-xoa.nguy-hiem").count() == 1
     assert not loi, loi

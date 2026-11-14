@@ -87,18 +87,25 @@ def doc_tep_xuat(duong_dan):
     return dong[0], dong[1:]
 
 
-def _doc_cot(tieu_de):
-    """{mã câu: [chỉ số cột]} và {mã câu: chỉ số cột Points}."""
+_COT_HE_THONG = {"id", "start time", "completion time", "last modified time", "email", "name", "total points",
+                 "quiz feedback", "thời gian bắt đầu", "thời gian hoàn thành"}
+
+
+def _doc_cot(tieu_de, ban_do=None):
+    """{mã câu: [chỉ số cột]} và {mã câu: chỉ số cột Points}.
+
+    SG-12: tiêu đề có thẻ "[mã]" (tệp cũ) đọc theo thẻ; không có thẻ thì khớp CHÍNH XÁC chữ thuần qua `ban_do`
+    (`bm.ban_do_chung(de)` hoặc tệp MAP_*.json)."""
     cot, cot_diem = {}, {}
     for i, h in enumerate(tieu_de):
         if h.startswith(TIEN_TO_NHAN_XET):
             continue
         if h.startswith(TIEN_TO_DIEM):
-            ma = bm.ma_cua_cau(h[len(TIEN_TO_DIEM):])
+            ma = bm.ma_cua_cau(h[len(TIEN_TO_DIEM):], ban_do)
             if ma:
                 cot_diem[ma] = i
             continue
-        ma = bm.ma_cua_cau(h)
+        ma = bm.ma_cua_cau(h, ban_do)
         if ma:
             # Nhiều cột cùng mã (Ranking tách mỗi vị trí một cột) thì nối lại
             # theo thứ tự cột.
@@ -106,9 +113,23 @@ def _doc_cot(tieu_de):
     return cot, cot_diem
 
 
+def cot_la(tieu_de, ban_do):
+    """SG-12: các cột KHÔNG phải cột hệ thống của Forms mà cũng không nhận ra là câu nào của mẫu (không thẻ "[mã]",
+    không có trong bản đồ) — để BÁO, không lặng lẽ bỏ."""
+    ra = []
+    for h in tieu_de:
+        h = str(h or "").strip()
+        if not h or h.startswith((TIEN_TO_NHAN_XET, TIEN_TO_DIEM)) or h.lower() in _COT_HE_THONG:
+            continue
+        if bm.ma_cua_cau(h, ban_do) is None:
+            ra.append(h if len(h) <= 60 else h[:57] + "...")
+    return ra
+
+
 def _ban_do_cot(de, tieu_de):
     """{mã câu: [chỉ số cột]} và {mã câu: chỉ số cột Points}."""
-    cot, cot_diem = _doc_cot(tieu_de)
+    ban_do = bm.ban_do_chung(de)
+    cot, cot_diem = _doc_cot(tieu_de, ban_do)
     can = ["student_id", "name"] + [b["ma"] for b in de["buoi"]]
     for clb in bm.clb_co_thi(de):
         can.append("thi-" + clb["club_id"])
@@ -116,9 +137,9 @@ def _ban_do_cot(de, tieu_de):
     thieu = [m for m in can if m not in cot]
     if thieu:
         raise LoiTepXuat(
-            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải "
-            "giữ nguyên phần [mã] ở đầu." % (len(thieu), ", ".join(thieu)))
-    la = sorted(set(cot) - set(can))
+            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải giữ nguyên chữ tiêu đề "
+            "(tệp cũ: giữ phần [mã] ở đầu)." % (len(thieu), ", ".join(thieu)))
+    la = sorted(set(cot) - set(can)) + cot_la(tieu_de, ban_do)
     return cot, cot_diem, la
 
 
@@ -149,6 +170,7 @@ def _ap_tran_thi(de, theo_ma, nguyen_vong, bai_thi, bao):
 def phan_tich(de, tieu_de, cac_dong):
     """Đọc toàn bộ phản hồi. Không ghi gì — chỉ trả kết quả và cảnh báo."""
     cot, cot_diem, la = _ban_do_cot(de, tieu_de)
+    ban_do = bm.ban_do_chung(de)
     canh_bao = []
     if la:
         canh_bao.append(("", "", "bỏ qua %d câu không thuộc mẫu: %s"
@@ -176,7 +198,7 @@ def phan_tich(de, tieu_de, cac_dong):
                 muc = muc.strip()
                 if not muc:
                     continue
-                clb = theo_ma.get(bm.ma_trong_lua_chon(muc)) or theo_ten.get(bm._chuan(muc))
+                clb = theo_ma.get(bm.ma_trong_lua_chon(muc, ban_do, b["ma"])) or theo_ten.get(bm._chuan(muc))
                 if clb is None:
                     bao("%s: lựa chọn %r không phải CLB nào trong de_thi.json — bỏ ô này"
                         % (b["ma"], muc))
@@ -418,7 +440,7 @@ def _doc_diem_quyet_tam(o):
 HUY_CHUONG_DIEM = (60, 30, 10)  # vàng, bạc, đồng (FA-DAA V§6)
 
 
-def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
+def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong="", so_clb_nhan=None):
     """Huy chương MỘT em MỘT ngày trên đường B (chỉ Forms; FA-M3, quyết định D2/D12 của Truong 08/11/2026).
 
     Mặc định: vàng/bạc/đồng cho ba CLB KHÔNG Tự do đầu tiên theo thứ tự nguyện vọng (ngoại lệ bất biến 2 trong
@@ -427,8 +449,12 @@ def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
       * `doi_bac_dong`: "Có" thì đổi chỗ bạc và đồng; trống = giữ.
     Giá trị không dùng được (vàng vào CLB Tự do / ngoài danh sách, ô đổi lạ, đổi khi chỉ còn một CLB) thì giữ mặc
     định và báo. Trả `({club_id: 60|30|10}, [cảnh báo])`. Nguyện vọng trùng chỉ tính một lần.
+    `so_clb_nhan` (SG-5): số CLB của ngày nhận được huy chương; < 3 thì câu đổi bạc/đồng vô nghĩa (biểu mẫu mới không
+    có câu đó, tệp cũ vẫn có) nên ô đổi bị bỏ qua, KHÔNG báo. None = không biết, giữ cách cũ.
     """
     canh_bao = []
+    if so_clb_nhan is not None and so_clb_nhan < bm.SO_CLB_TOI_THIEU_CAU_DOI:
+        doi_bac_dong = ""
     ds = [c for c in dict.fromkeys(_o(c) for c in nguyen_vong) if c and c not in tu_do]
     if not ds:
         return {}, canh_bao
@@ -453,7 +479,7 @@ def dat_huy_chuong_duong_b(nguyen_vong, tu_do, vang="", doi_bac_dong=""):
     return dict(zip([vang_dat] + con_lai, HUY_CHUONG_DIEM)), canh_bao
 
 
-def _cot_chi_thi(de, tieu_de):
+def _cot_chi_thi(de, tieu_de, ban_do=None):
     """Cột Email/Name và cột bài thi của MỘT tệp Forms chỉ-thi.
 
     Trả (i_email, i_ten, cot, cot_diem, các CLB tệp này phủ, mã câu lạ). Một CLB phủ khi tệp có
@@ -462,8 +488,11 @@ def _cot_chi_thi(de, tieu_de):
 
     Tệp KHÔNG có câu cổng nào (T4M-Q4b, biểu mẫu của một CLB): phải chứa đủ câu của đúng MỘT CLB có
     đề; trộn nhiều CLB hoặc có thẻ lạ thì dừng.
+
+    SG-12: `ban_do` (từ `bm.ban_do_chung` của đề GỐC) để nhận tiêu đề thuần; không truyền thì dựng từ `de`.
     """
-    cot, cot_diem = _doc_cot(tieu_de)
+    ban_do = bm.ban_do_chung(de) if ban_do is None else ban_do
+    cot, cot_diem = _doc_cot(tieu_de, ban_do)
     chuan = [h.strip().lower() for h in tieu_de]
     if "email" not in chuan:
         raise LoiTepXuat("tệp xuất không có cột Email — bật \"Record name\" trong Settings của "
@@ -471,7 +500,7 @@ def _cot_chi_thi(de, tieu_de):
     i_email = chuan.index("email")
     i_ten = chuan.index("name") if "name" in chuan else None
     if not any(m.startswith("thi-") for m in cot):
-        return (i_email, i_ten, cot, cot_diem) + _cot_mot_clb(de, cot)
+        return (i_email, i_ten, cot, cot_diem) + _cot_mot_clb(de, cot, cot_la(tieu_de, ban_do))
     phu, thieu, can_het = [], [], set()
     for clb in bm.clb_co_thi(de):
         can = ["thi-" + clb["club_id"]] + ["%s-%d" % (clb["club_id"], i)
@@ -484,18 +513,19 @@ def _cot_chi_thi(de, tieu_de):
         can_het.update(can)
     if thieu:
         raise LoiTepXuat(
-            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải "
-            "giữ nguyên phần [mã] ở đầu." % (len(thieu), ", ".join(thieu)))
+            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải giữ nguyên chữ tiêu đề "
+            "(tệp cũ: giữ phần [mã] ở đầu)." % (len(thieu), ", ".join(thieu)))
     if not phu:
         raise LoiTepXuat("tệp xuất không có câu bài thi nào của mẫu (không thấy mã [thi-...])")
-    return i_email, i_ten, cot, cot_diem, phu, sorted(set(cot) - can_het)
+    return i_email, i_ten, cot, cot_diem, phu, sorted(set(cot) - can_het) + cot_la(tieu_de, ban_do)
 
 
-def _cot_mot_clb(de, cot):
-    """Tệp không câu cổng: trả ([CLB duy nhất], []). Dừng nếu rỗng, trộn CLB, thẻ lạ hoặc thiếu câu."""
+def _cot_mot_clb(de, cot, cot_khong_nhan=()):
+    """Tệp không câu cổng: trả ([CLB duy nhất], []). Dừng nếu rỗng, trộn CLB, thẻ lạ hoặc thiếu câu.
+    `cot_khong_nhan`: tiêu đề cột không nhận ra là câu nào (SG-12) — cũng là "thẻ lạ", dừng."""
     co_thi = bm.clb_co_thi(de)
     hop_le = {"%s-%d" % (c["club_id"], i) for c in co_thi for i in range(1, len(c["de_thi"]) + 1)}
-    la = sorted(m for m in cot if m not in hop_le)
+    la = sorted(m for m in cot if m not in hop_le) + list(cot_khong_nhan)
     if la:
         raise LoiTepXuat("tệp xuất có mã câu không thuộc CLB nào có đề thi trong de_thi.json: %s. "
                          "Mỗi tệp chỉ chứa câu của một CLB, giữ nguyên phần [mã] ở đầu câu."
@@ -513,8 +543,8 @@ def _cot_mot_clb(de, cot):
              if "%s-%d" % (clb["club_id"], i) not in cot]
     if thieu:
         raise LoiTepXuat(
-            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải "
-            "giữ nguyên phần [mã] ở đầu." % (len(thieu), ", ".join(thieu)))
+            "tệp xuất thiếu %d câu của mẫu (mã: %s). Câu hỏi trên Forms phải giữ nguyên chữ tiêu đề "
+            "(tệp cũ: giữ phần [mã] ở đầu)." % (len(thieu), ", ".join(thieu)))
     return phu, []
 
 
@@ -545,9 +575,10 @@ def phan_tich_chi_thi(de, danh_sach, cac_tep, co_so=None, fa=False, theo_tep=Non
         hoc_sinh[e].update({k: h[k] for k in ("tick", "wp", "dong_buoi") if k in h})
     da_phu = set()
     de_goc = de
+    ban_do_goc = bm.ban_do_chung(de_goc)         # SG-12: tiêu đề thuần của MỌI đề (A, B, C) tính từ đề gốc
     for ten_tep, tieu_de, cac_dong in cac_tep:
         chu_de, de = (theo_tep or {}).get(ten_tep, ("A", de_goc))
-        i_email, i_ten, cot, cot_diem, phu, la = _cot_chi_thi(de, tieu_de)
+        i_email, i_ten, cot, cot_diem, phu, la = _cot_chi_thi(de, tieu_de, ban_do_goc)
         da_phu.update(c["club_id"] for c in phu)
         if la:
             canh_bao.append(("", "", "%s: bỏ qua %d câu không thuộc bài thi: %s"
@@ -1026,7 +1057,8 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
     "Giữ mặc định" / "Không, giữ mặc định" đổi thành ô trống rồi gọi `dat_huy_chuong_duong_b` (đã có test).
     Hồ sơ như của `doc_lists` (nguyen_vong, wp, dong_buoi) cộng "student_id" là mã học sinh em gõ.
     """
-    cot, _ = _doc_cot(tieu_de)
+    ban_do = bm.ban_do_chung(de)
+    cot, _ = _doc_cot(tieu_de, ban_do)
     ma_buoi = {b["ma"] for b in de["buoi"]}
     nv_cot = {}
     for ma, cac in cot.items():
@@ -1034,8 +1066,8 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
         if m and m.group(1) in ma_buoi:
             nv_cot.setdefault(m.group(1), {})[int(m.group(2))] = cac[0]
     if not nv_cot or "student_id" not in cot:
-        raise LoiTepXuat("tệp đăng ký thiếu câu của biểu mẫu FA-DAA (cần [student_id] và [<buổi>-nv1..3]); giữ "
-                         "nguyên phần [mã] ở đầu câu hỏi")
+        raise LoiTepXuat("tệp đăng ký thiếu câu của biểu mẫu FA-DAA (cần câu mã học sinh và câu Nguyện vọng 1..3 của "
+                         "từng buổi); giữ nguyên chữ tiêu đề câu hỏi (tệp cũ: phần [mã] ở đầu câu)")
     chuan = [h.strip().lower() for h in tieu_de]
     i_email = chuan.index("email") if "email" in chuan else None
     danh_sach = {} if danh_sach is None else danh_sach
@@ -1043,8 +1075,13 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"]}
     theo_ten = {bm._chuan(c["name"]): c for c in de["cau_lac_bo"]}
 
-    def tim_clb(chu):
-        return theo_ma.get(bm.ma_trong_lua_chon(chu)) or theo_ma.get(chu) or theo_ten.get(bm._chuan(chu))
+    def tim_clb(chu, ma_cau):
+        # SG-12: bản đồ của đúng câu này trả lời trước (khớp CHÍNH XÁC chữ); chỉ khi không khớp mới đọc "(mã)" / tên
+        return (theo_ma.get(bm.ma_trong_lua_chon(chu, ban_do, ma_cau)) or theo_ma.get(chu)
+                or theo_ten.get(bm._chuan(chu)))
+
+    for h in cot_la(tieu_de, ban_do):                          # SG-12: báo, không lặng lẽ bỏ
+        canh_bao.append(("", "", "bỏ qua cột %r: không khớp câu nào của biểu mẫu đăng ký" % h))
 
     for so_dong, dong in enumerate(cac_dong, 2):
         if not any(dong):
@@ -1073,7 +1110,7 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
                 muc = dong[i].strip()
                 if not muc:
                     continue
-                clb = tim_clb(muc)
+                clb = tim_clb(muc, "%s-nv%d" % (buoi, k))
                 if clb is None:
                     bao("%s: Nguyện vọng %d %r không phải CLB nào trong de_thi.json — bỏ ô này" % (buoi, k, muc))
                 elif clb["buoi"] != buoi:
@@ -1088,11 +1125,13 @@ def doc_dang_ky_fa_forms(de, tieu_de, cac_dong, tu_do, danh_sach=None):
                 bao("%s: nộp lần nữa — phiếu CUỐI cùng được tính, bỏ phiếu dòng %d" % (buoi, hs["dong_buoi"][buoi]))
             tho_vang = _gia_tri(dong, cot[buoi + "-vang"]) if buoi + "-vang" in cot else ""
             tho_doi = _gia_tri(dong, cot[buoi + "-doi"]) if buoi + "-doi" in cot else ""
-            clb_vang = None if tho_vang in ("", bm.GIU_MAC_DINH_VANG) else tim_clb(tho_vang)
+            clb_vang = None if tho_vang in ("", bm.GIU_MAC_DINH_VANG) else tim_clb(tho_vang, buoi + "-vang")
             vang = clb_vang["club_id"] if clb_vang else ""
             if tho_vang not in ("", bm.GIU_MAC_DINH_VANG) and not vang:
                 bao("%s: huy chương vàng %r không phải CLB nào — giữ mặc định" % (buoi, tho_vang))
-            huy_chuong, canh_bao_hc = dat_huy_chuong_duong_b(xep, tu_do, vang, "" if tho_doi in ("", bm.DOI_KHONG) else tho_doi)
+            huy_chuong, canh_bao_hc = dat_huy_chuong_duong_b(
+                xep, tu_do, vang, "" if tho_doi in ("", bm.DOI_KHONG) else tho_doi,
+                so_clb_nhan=sum(1 for c in de["cau_lac_bo"] if c["buoi"] == buoi and c["club_id"] not in tu_do))
             for nd in canh_bao_hc:
                 bao("%s: %s" % (buoi, nd))
             hs["nguyen_vong"][buoi] = xep
@@ -1119,7 +1158,9 @@ def doc_clb_fa(duong_so_nhap, de):
             canh_bao.append(("", "", "Sổ nhập CLB có %r nhưng de_thi.json không có CLB này — bỏ" % c["name"]))
             continue
         doi_ma[c["club_id"]] = goc["club_id"]
-        clb_fa[goc["club_id"]] = {k: c[k] for k in ("loai", "capacity", "diem_san", "so_toi_thieu", "suc_chua_phong")
+        # SG-6: "gio" / "dia_diem" đi cùng CHỈ khi sổ có và CLB đã khai (không thì không thêm khoá nào).
+        clb_fa[goc["club_id"]] = {k: c[k] for k in ("loai", "capacity", "diem_san", "so_toi_thieu", "suc_chua_phong",
+                                                    "gio", "dia_diem")
                                   if c.get(k) is not None}
     for ma in theo_ma:
         if ma not in clb_fa:
@@ -1369,17 +1410,21 @@ _RE_MA_BAI_THI = re.compile(r"(?!thi-).+-\d+")
 _RE_THE_DAU = re.compile(r"^\s*(?:\d+[.)]\s*)?\[[^\]]+\]\s*")
 
 
-def _ma_cac_cot(tieu_de):
-    return {m for h in tieu_de or () if not str(h).startswith(_BO_QUA_TIEU_DE) for m in [bm.ma_cua_cau(h)] if m}
+def _ma_cac_cot(tieu_de, ban_do=None):
+    return {m for h in tieu_de or () if not str(h).startswith(_BO_QUA_TIEU_DE)
+            for m in [bm.ma_cua_cau(h, ban_do)] if m}
 
 
-def nhan_dien_tep(ten, tieu_de):
+def nhan_dien_tep(ten, tieu_de, de=None):
     """FA-M9 (TH): loại tệp người dùng thả vào, chỉ nhìn tên tệp và dòng tiêu đề (không đọc dữ liệu, không ghi gì).
 
     "sau_ket_qua" = biểu mẫu "Sau khi xem kết quả" (có `[co_sai]`, `[kn_buoi]` hoặc `[kn_ghi_chu]`); "lists" = CSV xuất
     từ List đường A (có đủ cột Email, Thu, NV1); "dang_ky" = Forms đăng ký (có `[<buổi>-nvK]`); "bai_thi" = Forms bài thi
-    (có `[<club_id>-<số>]`); tệp trộn đăng ký với bài thi, tệp .csv không phải List, hoặc không nhận ra gì = "khong_ro"."""
-    ma = _ma_cac_cot(tieu_de)
+    (có `[<club_id>-<số>]`); tệp trộn đăng ký với bài thi, tệp .csv không phải List, hoặc không nhận ra gì = "khong_ro".
+
+    SG-12: tiêu đề thuần (không thẻ `[mã]`) được nhận qua bản đồ dựng từ `de`; không có `de` thì chỉ nhận được các câu không
+    phụ thuộc đề (mã học sinh, phản hồi, khiếu nại)."""
+    ma = _ma_cac_cot(tieu_de, bm.ban_do_chung(de))
     if ma & _MA_KHAI_NAI:
         return "sau_ket_qua"
     cot = {str(h).strip().lower() for h in tieu_de or ()}
@@ -1408,25 +1453,37 @@ def doan_bien_the(de, tieu_de):
     không có câu bài thi) -> None, UI bắt chọn tay. CLB lạ không có trong `de` bị bỏ qua. Không đổi gì ở CLI `--bien-the-tep`."""
     import phan_tich_cau_hoi as pt
     theo_ma = {c["club_id"]: c for c in de["cau_lac_bo"] if c.get("de_thi")}
-    cau = {}                                                  # {club_id: {số câu: chữ câu}}
+    ban_do = bm.ban_do_chung(de)
+    cau = {}                                                  # {club_id: {số câu: (chữ câu, có thẻ mã không)}}
     for h in tieu_de or ():
         if str(h).startswith(_BO_QUA_TIEU_DE):
             continue
-        ma = bm.ma_cua_cau(h)
+        ma = bm.ma_cua_cau(h, ban_do)
         m = _RE_MA_BAI_THI.fullmatch(ma) if ma else None
         if m:
             clb, so = ma.rsplit("-", 1)
             if clb in theo_ma:
-                cau.setdefault(clb, {})[int(so)] = _chuan_cau(h)
+                cau.setdefault(clb, {})[int(so)] = (_chuan_cau(h), bool(_RE_THE_DAU.match(str(h))))
     if not cau:
         return None
+
+    def khop_cau(clb, de_k, so, chu_cau, co_the):
+        """Chữ câu của tệp khớp câu `so` của đề `de_k`? Tệp cũ (có thẻ): so chữ câu; tệp mới (tiêu đề thuần): so với
+        tiêu đề thuần mà bộ sinh ghi cho câu đó (có thể kèm "(tên CLB, câu k)" khi trùng chữ giữa các CLB)."""
+        if not 0 < so <= len(de_k):
+            return False
+        if _chuan_cau(de_k[so - 1]["cau"]) == chu_cau:
+            return True
+        if co_the:
+            return False
+        return bm._khoa(bm.cau_de_thi(dict(theo_ma[clb], de_thi=de_k), so, de).thuan) == bm._khoa(chu_cau)
+
     chung, co_nhieu_de = set(pt.CHU_BIEN_THE), False
     for clb, theo_so in cau.items():
         cac_de = pt.cac_bien_the(theo_ma[clb])
         khop = set()
         for chu, de_k in zip(pt.CHU_BIEN_THE, cac_de):
-            if all(0 < so <= len(de_k) and _chuan_cau(de_k[so - 1]["cau"]) == chu_cau
-                   for so, chu_cau in theo_so.items()):
+            if all(khop_cau(clb, de_k, so, chu_cau, co_the) for so, (chu_cau, co_the) in theo_so.items()):
                 khop.add(chu)
         if len(cac_de) == 1 and khop:
             khop = set(pt.CHU_BIEN_THE)                       # một đề: chữ nào cũng được, converter giữ đề A

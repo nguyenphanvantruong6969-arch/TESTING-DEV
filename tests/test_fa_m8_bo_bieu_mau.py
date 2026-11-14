@@ -198,6 +198,9 @@ def test_bo_duong_b_danh_sach_tep_dung(tmp_path):
             "05_khao_sat_tuan_3/CAI_DAT_FORMS_TUAN_3.md", "05_khao_sat_tuan_3/NHAP_FORMS_TUAN_3.docx",
             "XEM_LAI_DAP_AN.xlsx"]
     mong += ["03_bai_thi/%s%s.docx" % (tm.TIEN_TO_DOCX_MOI_CLB, c) for c in CO_DE]
+    if not bm.dang_giu_ma():      # SG-12: mỗi biểu mẫu của học sinh có MAP_<tên>.json cạnh nó (phiếu CLB của giáo viên thì không)
+        mong += [os.path.dirname(x) + "/MAP_" + os.path.basename(x)[:-5] + ".json"
+                 for x in mong if x.endswith(".docx") and "01_phieu_clb" not in x]
     assert sorted(ra) == sorted(mong)
     assert _tep_md(str(tmp_path)) == sorted(mong)
 
