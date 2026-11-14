@@ -45,6 +45,36 @@ Labels: **[V]** verify in code or with a drill, **[P]** policy question for Truo
   the claim alone; accepting it opens manipulation (link to strategy-proofness, `02_FABLE_BRIEF.md` G-A).
 - S7 [V] Medal placement: default from rank (invariant 2 exception, D2) vs student override done by mistake.
 
+**Students: extended list by stage of the student journey (Truong, 2026-11-14: "more from the student side").**
+Treat these as seeds too; walk the journey yourself and add what is missing (target: ≥ 15 new rows of your own).
+- *Before registration:* S8 misses the announcement or is absent/sick for the whole window; S9 misunderstands the
+  mechanism (ranks a "safe" club first, thinks NV1 is wasted if rejected, misreads medals) — truthful ranking is
+  only useful if students believe it; S10 no device, weak connection, disability or language barrier.
+- *Registration:* S11 ranks only 1–2 clubs and ends unassigned without knowing the risk; S12 same club on two days
+  or a club not offered that day; S13 edits on two devices or the app session times out → draft lost or last write
+  wins; S14 a parent or friend fills it in, or the student copies a friend's list (peer pressure); S15 tries to edit
+  after lock and believes the edit was saved.
+- *Test:* S16 opens the test, closes the tab, never submits (counts as absent?); S17 takes a test before ranking that
+  club, or on the wrong day/campus; S18 someone else takes the test (impersonation), answers shared in a group chat,
+  or answers leaked by a wrong Forms setting; S19 misunderstands the time limit or the gate question; S20 gets a
+  harder quiz variant (fairness between variants, D11); S21 takes more than 5 tests and the extra ones are dropped
+  silently from the student's point of view.
+- *After results:* S22 never reads the result or misses a waitlist invitation deadline (`moi_tiep`) → seat lost;
+  S23 sick for the first sessions → seat released by attendance (`can_giai_phong`); S24 swaps clubs informally with
+  a friend, records no longer match reality; S25 complaint with a mistyped student ID → fuzzy match picks the wrong
+  student (`khop_ma_hoc_sinh`); complaint after the window (`trong_han_khieu_nai`); S26 moves class or campus
+  mid-round, or withdraws then wants back in; S27 two students with the same name, or an ID typo merges two people;
+  S28 leaves a shared school computer logged in → another student sees or changes their result; S29 rejected from
+  every choice, misreads the explanation sentence, distress (welfare: what does the GVCN say, who follows up).
+
+**Required for every student-side row (S1–S29 and your own):** assign a solution, not only a risk. Columns:
+`id | stage | what happens | harm to the student (S 1–5) | likelihood (O, assumption) | detected today by
+(warning code / nothing) | solution: prevent | solution: detect | solution: recover | owner (student, club teacher,
+GVCN, ECA teacher, IT, software) | before or after results | manipulation risk (can a student fake this case to
+gain?) | invariant touched | proposed item FA-SC-n or existing item`. Where the fix is pure communication (wording,
+instructions, a reminder), say so; that is a valid, cheap solution. Where the fix needs software, give a
+`kiem_nhan` acceptance test.
+
 **Club teachers and homeroom teachers (GVCN)**
 - T1 [V] Wrong answer key in Forms (caught: converter rescoring) vs wrong key in `de_thi.json` itself (caught by whom?).
 - T2 [V] Wrong Forms settings: Record name OFF (no email), One response OFF (retakes), Show results ON (answers leak),
@@ -113,7 +143,9 @@ Labels: **[V]** verify in code or with a drill, **[P]** policy question for Truo
 ## 8. Ready-to-paste prompt
 ```
 Read CLAUDE.md, docs/fable/01_PROJECT_CONTEXT.md, docs/fable/02_FABLE_BRIEF.md §1, then
-docs/fable/05_CRISIS_BRIEF.md. Work on FA-SC only. Do step 1 (catalogue) of §4, then STOP and give me the top 5
-human-error risks ranked by harm to real students, with one line of evidence each, in Vietnamese.
+docs/fable/05_CRISIS_BRIEF.md. Work on FA-SC only. Do step 1 (catalogue) of §4. Walk the whole student journey and add at least
+15 student-side scenarios of your own to S1–S29; give EVERY student row a solution (prevent / detect / recover,
+owner, manipulation risk) in the §3 column format. Then STOP and give me the top 5 human-error risks ranked by
+harm to real students, with one line of evidence and the proposed solution each, in Vietnamese.
 Do not change production code. Label all numbers as simulated.
 ```

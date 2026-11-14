@@ -38,3 +38,4 @@ Registry: none yet. Proposed new item **FA-SC** (outside the registry) — await
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-14 | Opus | Wrote FA-SC Fable brief and handoff | docs only |
+| 2026-11-14 | Opus | Brief: student journey S8–S29, solution column required per row, prompt updated | Truong asked for more student-side cases |
