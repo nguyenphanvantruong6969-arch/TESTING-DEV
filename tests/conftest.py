@@ -41,3 +41,18 @@ def khong_ghi_vao_thu_muc_tai_ve_that(tmp_path, monkeypatch):
     cho_tam = tmp_path / "TaiXuong_gia"
     cho_tam.mkdir(exist_ok=True)
     monkeypatch.setenv("RBDA_THU_MUC_TAI_VE", str(cho_tam))
+
+
+@pytest.fixture(autouse=True)
+def tieu_de_giu_ma(request):
+    """SG-12 (opt-in): module nào dựng tệp xuất CÓ MÃ bằng các hàm tên câu của `bieu_mau` thì đặt
+    `pytestmark = pytest.mark.giu_ma` để chạy ở chế độ giữ mã. Mọi test khác chạy ở chế độ mặc định (tiêu đề thuần)."""
+    if not request.node.get_closest_marker("giu_ma"):
+        yield
+        return
+    duong = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mau_forms_thi_clb")
+    if duong not in sys.path:
+        sys.path.insert(0, duong)
+    import bieu_mau
+    with bieu_mau.che_do_giu_ma(True):
+        yield

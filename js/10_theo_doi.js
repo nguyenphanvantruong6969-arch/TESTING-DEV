@@ -94,10 +94,11 @@ function veDiemDanh(d) {
 }
 
 function taiDiemDanh(clubId) {
-  return callApi("get_diem_danh", clubId === undefined ? ddClbDangChon : clubId).then((res) => {
+  return chayTai(callApi("get_diem_danh", clubId === undefined ? ddClbDangChon : clubId), (res) => {
     if (batKhung("diemDanhPanel", res)) veDiemDanh(res.data);
-  }).then(() => (el("diemDanhPanel").hidden ? (el("moiPanel").hidden = true) : taiMoi()))
-    .then(taiKhieuNai).then(() => taiVong2()).then(taiPhanHoi);
+    return noiTiep(() => (el("diemDanhPanel").hidden ? (el("moiPanel").hidden = true) : taiMoi()),
+      taiKhieuNai, taiVong2, taiPhanHoi);
+  });
 }
 
 function veMoi(ds) {
@@ -131,7 +132,7 @@ function veMoi(ds) {
 }
 
 function taiMoi() {
-  return callApi("get_moi_cho_trong").then((res) => {
+  return chayTai(callApi("get_moi_cho_trong"), (res) => {
     if (batKhung("moiPanel", res)) veMoi(res.data.moi);
   });
 }
@@ -191,7 +192,7 @@ function veKhieuNai(d) {
 }
 
 function taiKhieuNai() {
-  return callApi("get_khieu_nai").then((res) => {
+  return chayTai(callApi("get_khieu_nai"), (res) => {
     if (batKhung("khieuNaiPanel", res)) veKhieuNai(res.data);
   });
 }
@@ -243,7 +244,7 @@ function veVong2(d) {
 }
 
 function taiVong2(buoi) {
-  return callApi("get_vong_2", buoi === undefined ? v2Buoi : buoi).then((res) => {
+  return chayTai(callApi("get_vong_2", buoi === undefined ? v2Buoi : buoi), (res) => {
     if (batKhung("vong2Panel", res)) veVong2(res.data);
   });
 }
@@ -255,7 +256,7 @@ function tyLe(x) {
 }
 
 function taiPhanHoi() {
-  return callApi("get_phan_hoi_tong_hop").then((res) => {
+  return chayTai(callApi("get_phan_hoi_tong_hop"), (res) => {
     const bat = batKhung("phanHoiTongPanel", res);
     el("phanHoiPanel").hidden = !bat;
     if (!bat) return;
@@ -278,33 +279,19 @@ function napTepForms(nut, input, tenApi, khiXong) {
       input.value = "";
       return;
     }
-    const chuGoc = nut.textContent;
-    nut.disabled = true;
-    nut.textContent = t("dang_nap");
-    const xong = () => {
-      input.value = "";
-      nut.textContent = chuGoc;
-      nut.disabled = false;
-    };
-    const doc = new FileReader();
-    doc.onerror = () => {
-      showToast(t("loi_giao_dien_ngoai_du_kien"), "error");
-      xong();
-    };
-    doc.onload = () => {
-      Promise.resolve()
-        .then(() => callApi(tenApi, bufferSangBase64(doc.result)))
-        .then((res) => {
-          if (!res.ok) {
-            showErrorToast(res.errors);
-            return null;
-          }
-          return khiXong(res.data);
-        })
-        .catch(() => showToast(t("loi_giao_dien_ngoai_du_kien"), "error"))
-        .finally(xong);
-    };
-    doc.readAsArrayBuffer(tep);
+    /* SG-9: dùng chung chayNut (khoá nút + nhãn "Đang nạp…" đến hết khiXong, lỗi -> thông báo chung). */
+    chayNut(nut, () => new Promise((xong, hong) => {
+      const doc = new FileReader();
+      doc.onerror = () => hong(doc.error);
+      doc.onload = () => xong(callApi(tenApi, bufferSangBase64(doc.result)));
+      doc.readAsArrayBuffer(tep);
+    }), (res) => {
+      if (!res.ok) {
+        showErrorToast(res.errors);
+        return null;
+      }
+      return khiXong(res.data);
+    }, { nhan: "dang_nap", giuDenKhiXong: true, sauCung: () => { input.value = ""; } });
   });
 }
 
@@ -325,8 +312,8 @@ function khoiTaoPhanHoi() {
       el("phKetQua").textContent = t("ph_thieu");
       return;
     }
-    khiBan(e.currentTarget, () => callApi("gui_phan_hoi", ma, Number(phChon.hai_long), phChon.hieu === "1",
-      phChon.kho)).then((res) => {
+    chayNut(e.currentTarget, () => callApi("gui_phan_hoi", ma, Number(phChon.hai_long), phChon.hieu === "1",
+      phChon.kho), (res) => {
       if (!res.ok) {
         showErrorToast(res.errors);
         el("phKetQua").textContent = trErrs(res.errors).join(" ");
@@ -351,7 +338,7 @@ function khoiTaoPhanHoi() {
   /* FA-M6b: MỘT tệp "Sau khi xem kết quả" (phản hồi + khiếu nại). FG-6: toast MỘT câu, chi tiết thành danh sách. */
   napTepForms(el("btnNhapSauKetQua"), el("phTepSauKetQua"), "nhap_sau_ket_qua_forms", (d) => {
     ketQuaNapForms(d, "sau");
-    return taiPhanHoi().then(taiKhieuNai);
+    return noiTiep(taiPhanHoi, taiKhieuNai);
   });
 }
 
@@ -401,7 +388,7 @@ function giaTriChiSo(c) {
 }
 
 function taiDashboard() {
-  return callApi("get_dashboard").then((res) => {
+  return chayTai(callApi("get_dashboard"), (res) => {
     if (!batKhung("dashboardPanel", res)) return;
     const body = el("dbBangBody");
     clear(body);
@@ -432,38 +419,39 @@ function khoiTaoTheoDoi() {
   /* khiBan mở lại nút khi xong; sau một lượt thành công thì khoá lại (vòng 2 chỉ chạy một lượt). */
   el("btnChayVong2").addEventListener("click", (e) => {
     const nut = e.currentTarget;
-    khiBan(nut, () => {
+    chayNut(nut, () => {
       const chon = {};
       document.querySelectorAll("#v2Bang select.v2-chon").forEach((s) => {
         if (s.value) chon[s.dataset.studentId] = [s.value];
       });
       return callApi("chay_vong_2_api", v2Buoi, chon);
-    }).then((res) => {
+    }, (res) => {
       if (!res.ok) {
         showErrorToast(res.errors);
         return null;
       }
       /* taiDiemDanh nạp lại mọi khung (cả vòng 2); ghi kết quả SAU cùng để không bị câu "đã chạy" đè. */
-      return taiDiemDanh().then(() => {
+      return noiTiep(taiDiemDanh, () => {
         nut.disabled = true;
         el("v2KetQua").textContent = t("v2_ket_qua", { n: res.data.xep.length, m: res.data.bo_qua.length });
       });
     });
   });
-  el("btnGuiKhieuNai").addEventListener("click", (e) => khiBan(e.currentTarget, () =>
-    callApi("gui_khieu_nai", el("knMa").value.trim(), el("knBuoi").value, el("knGhiChu").value).then((res) => {
+  el("btnGuiKhieuNai").addEventListener("click", (e) =>
+    chayNut(e.currentTarget, () => callApi("gui_khieu_nai", el("knMa").value.trim(), el("knBuoi").value,
+      el("knGhiChu").value), (res) => {
       if (!res.ok) {
         showErrorToast(res.errors);
         return null;
       }
       el("knGhiChu").value = "";
       return taiKhieuNai();
-    })));
+    }));
   el("knDanhSach").addEventListener("click", (e) => {
     const b = e.target.closest("button.kn-xu-ly");
     if (!b) return;
     b.disabled = true;
-    callApi("xu_ly_khieu_nai", Number(b.dataset.knId), b.dataset.chapNhan === "1", "").then((res) => {
+    chayTai(callApi("xu_ly_khieu_nai", Number(b.dataset.knId), b.dataset.chapNhan === "1", ""), (res) => {
       if (!res.ok) showErrorToast(res.errors);
       return taiKhieuNai();
     });
@@ -476,7 +464,7 @@ function khoiTaoTheoDoi() {
     const b = e.target.closest("button.moi-tra-loi");
     if (!b) return;
     b.disabled = true;
-    callApi("tra_loi_moi", Number(b.dataset.moiId), b.dataset.ketQua).then((res) => {
+    chayTai(callApi("tra_loi_moi", Number(b.dataset.moiId), b.dataset.ketQua), (res) => {
       if (!res.ok) showErrorToast(res.errors);
       return taiDiemDanh();
     });
@@ -485,8 +473,8 @@ function khoiTaoTheoDoi() {
   el("diemDanhBang").addEventListener("change", (e) => {
     const s = e.target.closest("select.dd-o");
     if (!s) return;
-    callApi("luu_diem_danh", ddClbDangChon, s.dataset.studentId, Number(s.dataset.buoiSo), s.value)
-      .then((res) => {
+    chayTai(callApi("luu_diem_danh", ddClbDangChon, s.dataset.studentId, Number(s.dataset.buoiSo), s.value),
+      (res) => {
         if (!res.ok) showErrorToast(res.errors);
         return taiDiemDanh();
       });

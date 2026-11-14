@@ -1285,5 +1285,17 @@ window.I18N_ERROR_MESSAGES = {
   "khieu_nai_chua_co_ket_qua": {
     "vi": "Không nhận được khiếu nại: {person_l} {student_id} chưa có kết quả ở buổi {buoi}.",
     "en": "Appeal not accepted: {person_l} {student_id} has no result for session {buoi} yet."
+  },
+  "forms_cot_la": {
+    "vi": "{n} cột trong tệp không khớp câu hỏi nào của biểu mẫu nên bị bỏ qua, ví dụ: {vi_du}. Hãy kiểm tra xem chữ câu hỏi trên Forms có bị sửa không.",
+    "en": "{n} columns in the file don't match any question of the form and were skipped, for example: {vi_du}. Check whether the question wording was edited in Forms."
+  },
+  "forms_thieu_ban_do": {
+    "vi": "Tệp ghi tên buổi bằng chữ (ví dụ \"Thứ Hai\") nhưng đợt này chưa có đề thi để đối chiếu tên buổi. Hãy nạp đề thi của đợt rồi nạp lại tệp.",
+    "en": "The file writes days by name (for example \"Monday\") but this round has no exam file to match the names against. Load the round's exam file, then load this file again."
+  },
+  "forms_tieu_de_trung": {
+    "vi": "Đề thi có hai câu hoặc hai lựa chọn cùng chữ nên không phân biệt được trên biểu mẫu: {chi_tiet} Hãy đổi tên trong đề thi rồi sinh lại biểu mẫu.",
+    "en": "The exam file has two questions or two options with the same wording, so they can't be told apart on the form: {chi_tiet} Rename them in the exam file, then generate the form again."
   }
 };

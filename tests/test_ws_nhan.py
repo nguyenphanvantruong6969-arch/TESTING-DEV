@@ -75,6 +75,7 @@ MA_MOI_SAU_ANH_CHUP = {
     # (spacer: unchanged line between marker blocks)
 
     # === SG-C: add below ===
+    "forms_cot_la", "forms_thieu_ban_do", "forms_tieu_de_trung",
     # === end SG-C ===
 
     # FG-2: cảnh báo FA gom nhóm ở bước xem trước sổ.

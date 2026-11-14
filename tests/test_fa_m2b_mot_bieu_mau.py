@@ -73,6 +73,7 @@ def test_tung_cau_giong_het_bieu_mau_tung_ngay(de):
 
 
 # ---------------------------------------------------------------- 3-4. sinh tệp
+@pytest.mark.giu_ma
 def test_mot_bieu_mau_ghi_huong_dan_va_dung_mot_docx(de, tmp_path):
     ra = tmf.sinh_dang_ky(de, str(tmp_path), mot_bieu_mau=True)
     ten = sorted(os.path.basename(p) for p in ra)
@@ -83,6 +84,7 @@ def test_mot_bieu_mau_ghi_huong_dan_va_dung_mot_docx(de, tmp_path):
     assert "đề xuất" not in md.lower() and "khuyến nghị" not in md.lower()      # D8 còn mở
 
 
+@pytest.mark.giu_ma
 def test_xoa_tep_cu_khi_doi_che_do(de, tmp_path):
     tmf.sinh_dang_ky(de, str(tmp_path))                                  # từng ngày
     tmf.sinh_dang_ky(de, str(tmp_path), mot_bieu_mau=True)

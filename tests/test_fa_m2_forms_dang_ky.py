@@ -59,11 +59,12 @@ def test_co_thong_tin_hoc_sinh_va_hai_cau_huy_chuong_tuy_chon(de):
     assert "Đổi chỗ huy chương bạc và đồng?" in doi[0]
 
 
+@pytest.mark.giu_ma
 def test_cau_vang_bo_clb_tu_do_khi_de_thi_co_loai(de):
     de2 = copy.deepcopy(de)
     for c in de2["cau_lac_bo"]:
         c["loai"] = "TU_DO" if c["club_id"] == "clb_covua" else "GIOI_HAN"
-    vang = _cau(bm.cac_phan_fa(de2, "thu_2"))[-2]
+    vang = next(c for c in _cau(bm.cac_phan_fa(de2, "thu_2")) if "-vang" in c[0])   # SG-5: ngày 2 CLB không còn câu đổi
     assert not any("clb_covua" in x for x in vang[2])
     assert any("clb_vanhoc" in x for x in vang[2])
 
@@ -135,12 +136,13 @@ def _so_nhap_clb(de, tmp_path, tu_do):
     return p
 
 
+@pytest.mark.giu_ma
 def test_fa_s6_so_nhap_clb_bo_clb_tu_do_khoi_cau_vang(de, tmp_path):
     tu_do = next(c for c in de["cau_lac_bo"])
     sn = _so_nhap_clb(de, tmp_path, tu_do["club_id"])
     de2, _ = tmf.de_theo_so_nhap_clb(de, sn)
     assert "loai" not in tu_do                                       # không sửa de gốc
-    vang = _cau(bm.cac_phan_fa(de2, tu_do["buoi"]))[-2]
+    vang = next(c for c in _cau(bm.cac_phan_fa(de2, tu_do["buoi"])) if "-vang" in c[0])
     assert not any(tu_do["club_id"] in x for x in vang[2])
     assert tmf.main(["--fa-daa", "--so-nhap-clb", sn, "--ra", str(tmp_path / "ra")]) == 0
     md = (tmp_path / "ra" / tmf.TEN_CAI_DAT_DANG_KY).read_text(encoding="utf-8")

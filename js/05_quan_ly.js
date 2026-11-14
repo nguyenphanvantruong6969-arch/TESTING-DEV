@@ -70,7 +70,7 @@ function mucTai(tiLe) {
 }
 
 function loadBuoiOptions() {
-  callApiDocChung("get_danh_sach_buoi").then((res) => {
+  chayTai(callApiDocChung("get_danh_sach_buoi"), (res) => {
     const list = el("buoiOptions");
     if (!list) return;
     clear(list);
@@ -88,7 +88,7 @@ function loadBuoiOptions() {
 function loadTaiTheoBuoi() {
   const panel = el("taiBuoiPanel");
   if (!panel) return;
-  callApiDocChung("get_tai_theo_buoi").then((res) => {
+  chayTai(callApiDocChung("get_tai_theo_buoi"), (res) => {
     const body = el("taiBuoiBody");
     clear(body);
     /* Một buổi thì bảng này không nói được gì: cả trường chỉ có một
@@ -134,7 +134,7 @@ let buoiDangChon = new Set();
 function loadChonBuoi({ datLai = false } = {}) {
   const box = el("chonBuoiBox");
   if (!box) return;
-  callApiDocChung("get_danh_sach_buoi").then((res) => {
+  chayTai(callApiDocChung("get_danh_sach_buoi"), (res) => {
     /* Một buổi thì không có gì để chọn — bộ chọn chỉ làm rối một màn
        hình vốn đã chạy đúng. */
     if (!res.ok || !res.data.nhieu_buoi) {
@@ -226,7 +226,7 @@ function buoiGuiDi() {
 function loadSoBocTham(search) {
   const panel = el("thamPanel");
   if (!panel) return;
-  callApiMoiNhat("so_tham", "get_so_boc_tham_theo_buoi", search || "").then((res) => {
+  chayTai(callApiMoiNhat("so_tham", "get_so_boc_tham_theo_buoi", search || ""), (res) => {
     /* Một buổi thì bảng này không nói thêm gì so với bộ số đã khoá; chưa
        chạy lần nào thì chưa có hạt giống nào để suy ra thứ tự. */
     if (!res.ok || !res.data.nhieu_buoi || !res.data.da_chay) {
@@ -270,7 +270,7 @@ function loadSoBocTham(search) {
 function loadDoPhu() {
   const panel = el("doPhuPanel");
   if (!panel) return;
-  callApiDocChung("get_do_phu").then((res) => {
+  chayTai(callApiDocChung("get_do_phu"), (res) => {
     if (!res.ok || res.data.ds_buoi.length < 2 || !res.data.tong_hoc_sinh) {
       panel.hidden = true;
       return;
@@ -324,12 +324,12 @@ function veChiBaoPhuBuoi(dsClbDaXep) {
      luc xep cho mot em, nen hoi backend mot lan roi dung lai; chon em
      khac thi hoi lai (selectFallbackStudent xoa bo nho nay). */
   if (!buoiTaiCho) {
-    buoiTaiCho = callApiDocChung("get_danh_sach_buoi").then((res) => {
+    buoiTaiCho = chayTai(callApiDocChung("get_danh_sach_buoi"), (res) => {
       if (!res.ok) buoiTaiCho = null;
       return res;
     });
   }
-  buoiTaiCho.then((res) => {
+  chayTai(buoiTaiCho, (res) => {
     if (!res.ok || !res.data.nhieu_buoi) {
       box.hidden = true;
       if (hint) hint.hidden = true;
@@ -369,7 +369,7 @@ function loadAdminTab(giuTrang) {
   loadTaiTheoBuoi();
   taiDashboard(); /* GAP-8 (js/10_theo_doi.js): tự ẩn khi FA tắt */
   if (!giuTrang) adminStudentPage = 1;
-  callApi("get_last_run_info").then((res) => {
+  chayTai(callApi("get_last_run_info"), (res) => {
     adminCoKetQua = !!(res.ok && res.data);
   });
   if (WHARTON_BAT === false) {
@@ -383,7 +383,7 @@ function loadAdminTab(giuTrang) {
 }
 
 function loadAdminClubs() {
-  callApi("list_clubs_admin").then((res) => {
+  chayTai(callApi("list_clubs_admin"), (res) => {
     const body = el("adminClubTableBody");
     const emptyState = el("adminClubEmptyState");
     clear(body);
@@ -414,7 +414,7 @@ function loadAdminClubs() {
       delBtn.dataset.originalLabel = t("btn_delete");
       delBtn.textContent = delBtn.dataset.originalLabel;
       armTwoStepConfirm(delBtn, () => t("confirm_delete_generic"), () => {
-        callApi("delete_club", c.club_id).then((delRes) => {
+        chayTai(callApi("delete_club", c.club_id), (delRes) => {
           if (delRes.ok) {
             const d = delRes.data || {};
             /* Xoá CLB kéo theo điểm đã chấm / ô tick thi: nói rõ số và tệp sao lưu (A13.12, 3.2). */
@@ -471,7 +471,7 @@ function lamMoiSauDoiClb() {
 }
 
 function loadReserveGroupOptions() {
-  callApi("list_reserve_groups_in_use").then((res) => {
+  chayTai(callApi("list_reserve_groups_in_use"), (res) => {
     const list = el("reserveGroupOptions");
     clear(list);
     if (res.ok) {
@@ -486,11 +486,11 @@ function loadReserveGroupOptions() {
 
 function loadAdminStudents() {
   const search = el("adminStudentSearch").value.trim();
-  return Promise.all([
+  return chayTai(Promise.all([
     callApiMoiNhat("ds_hs_quan_ly", "list_students_admin", search, adminStudentPage, ADMIN_PAGE_SIZE,
       el("adminSapXep").value, lopLocThamSo(el("adminLopLoc"))),
     layDsLop(),
-  ]).then(([res, dsLop]) => {
+  ]), ([res, dsLop]) => {
     napOLocLop(el("adminLopLoc"), dsLop);
     const body = el("adminStudentTableBody");
     const emptyState = el("adminStudentEmptyState");
@@ -587,7 +587,7 @@ function loadAdminWharton(giuTrang, giuChu) {
   /* Chu dang go trong man sua duoc giu lai khi ve lai (vd doi ngon ngu). */
   const giu = whQl.sid && (giuChu === undefined ? giuTrang : giuChu)
     ? whartonGiuTamTu(el("whQlSuaKhung")) : null;
-  return callApi("list_wharton_canh_bao").then((res) => {
+  return chayTai(callApi("list_wharton_canh_bao"), (res) => {
     const khoi = el("adminWhartonBlock");
     if (!res.ok) {
       if (whChuaBat(res)) {
@@ -603,7 +603,7 @@ function loadAdminWharton(giuTrang, giuChu) {
     khoi.hidden = false;
     whBoNho.canhBao = res.data;
     veCanhBaoWharton(res.data);
-    return Promise.all([loadWhKhoa(), loadWhLoc(), loadWhBang()]).then(() => {
+    return chayTai(Promise.all([loadWhKhoa(), loadWhLoc(), loadWhBang()]), () => {
       if (whQl.sid) return moManSuaWharton(whQl.sid, giu);
       el("whQlSua").hidden = true;
       return null;
@@ -612,7 +612,7 @@ function loadAdminWharton(giuTrang, giuChu) {
 }
 
 function loadWhKhoa() {
-  return callApi("get_wharton_lock_status").then((res) => {
+  return chayTai(callApi("get_wharton_lock_status"), (res) => {
     if (!res.ok) {
       if (!whChuaBat(res)) showErrorToast(res.errors);
       return;
@@ -675,7 +675,7 @@ function veCanhBaoWharton(ds) {
       nut.dataset.studentId = c.student_id;
       nut.textContent = c.name + " (" + c.student_id + ")";
       nut.addEventListener("click", () => {
-        moManSuaWharton(c.student_id).then(() => {
+        chayTai(moManSuaWharton(c.student_id), () => {
           el("whQlSua").scrollIntoView({ block: "nearest" });
         });
       });
@@ -687,7 +687,7 @@ function veCanhBaoWharton(ds) {
 
 /* Ba o loc buoi / CLB lay tu danh sach CLB; giu lua chon dang co neu con. */
 function loadWhLoc() {
-  return callApi("list_clubs").then((res) => {
+  return chayTai(callApi("list_clubs"), (res) => {
     if (!res.ok) return;
     whBoNho.loc = res.data;
     veLocWh();
@@ -720,9 +720,9 @@ function veLocWh() {
 }
 
 function loadWhBang() {
-  return callApiMoiNhat("wh_bang", "list_wharton_admin",
+  return chayTai(callApiMoiNhat("wh_bang", "list_wharton_admin",
     el("whQlTim").value.trim(), el("whLocQuy").value || null, el("whLocBuoi").value || null,
-    el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG).then((res) => {
+    el("whLocClb").value || null, el("whLocChiLoi").checked, whQl.trang, WH_TRANG), (res) => {
     whBoNho.bang = res.ok ? res.data : null;
     if (res.ok) whQl.trang = res.data.page;   /* trang vượt tổng được kẹp về trang cuối (A13.12, 3.3) */
     veBangWh();
@@ -821,7 +821,7 @@ function dongBangWharton(r) {
   tr.appendChild(tdTt);
 
   tr.addEventListener("click", () => {
-    moManSuaWharton(r.student_id).then(() => {
+    chayTai(moManSuaWharton(r.student_id), () => {
       el("whQlSua").scrollIntoView({ block: "nearest" });
     });
   });
@@ -836,7 +836,7 @@ function capNhatChuaLuuWh() {
 
 function moManSuaWharton(sid, giu) {
   whQl.sid = sid;
-  return callApi("get_student_entry_state", sid).then((res) => {
+  return chayTai(callApi("get_student_entry_state", sid), (res) => {
     if (sid !== whQl.sid) return null;
     if (!res.ok || !res.data.wharton) {
       /* Em da bi xoa o noi khac thi dong man sua im lang; loi khac thi bao. */
@@ -878,7 +878,7 @@ function loadWhNhatKy(them) {
   el("whNkChonEm").hidden = !!sid;
   if (!sid) return Promise.resolve(null);
   if (!them) whQl.nkTrang = 1;
-  return callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG).then((res) => {
+  return chayTai(callApi("get_wharton_nhat_ky", sid, whQl.nkTrang, WH_NK_TRANG), (res) => {
     if (!res.ok) {
       if (sid === whQl.sid && !whChuaBat(res)) showErrorToast(res.errors);
       return;
@@ -964,7 +964,7 @@ function moDanhSachCanXuLy() {
 
 function initWhHangLoat() {
   el("btnWhTaiCanSua").addEventListener("click", () => {
-    khiBan(el("btnWhTaiCanSua"), () => callApi("export_wharton_can_sua")).then((res) => {
+    chayNut(el("btnWhTaiCanSua"), () => callApi("export_wharton_can_sua"), (res) => {
       if (!res.ok) return showErrorToast(res.errors);
       showToast(t("wh_hl_tai_xong", { n: res.data.n_hoc_sinh, path: res.data.path }), "success");
     });
@@ -977,8 +977,8 @@ function initWhHangLoat() {
   });
   el("btnWhPhongHuy").addEventListener("click", dong);
   el("btnWhPhongXn").addEventListener("click", () => {
-    khiBan(el("btnWhPhongXn"), () => callApi("phong_wharton_hang_loat", el("whPhongGo").value.trim()))
-      .then((res) => {
+    chayNut(el("btnWhPhongXn"), () => callApi("phong_wharton_hang_loat", el("whPhongGo").value.trim()),
+      (res) => {
         if (!res.ok) return showErrorToast(res.errors);
         dong();
         whBoQua = res.data.bo_qua;
@@ -1038,7 +1038,7 @@ function initWhartonQuanLy() {
     const sid = whQl.sid;
     if (!sid) return;
     const { w1, w2 } = whartonThuThapTu(el("whQlSuaKhung"));
-    khiBan(el("btnWhLuu"), () => callApi("admin_save_wharton", sid, w1, w2)).then((res) => {
+    chayNut(el("btnWhLuu"), () => callApi("admin_save_wharton", sid, w1, w2), (res) => {
       if (res.ok) {
         feedback(el("whQlSuaPhanHoi"), t("feedback_wharton_saved"), false);
         loadAdminWharton(true, false);
@@ -1051,7 +1051,7 @@ function initWhartonQuanLy() {
   armTwoStepConfirm(el("btnWhXoaMot"), () => t("confirm_wh_xoa_mot"), () => {
     const sid = whQl.sid;
     if (!sid) return;
-    callApi("clear_wharton", sid).then((res) => {
+    chayTai(callApi("clear_wharton", sid), (res) => {
       if (res.ok) {
         showToast(t("toast_wh_xoa_mot", { student_id: sid }), "success");
         loadAdminWharton(true, false);
@@ -1070,7 +1070,7 @@ function initWhartonQuanLy() {
   });
   el("btnWhMoKhoaHuy").addEventListener("click", () => { el("whMoKhoaHop").hidden = true; });
   el("btnWhMoKhoaXn").addEventListener("click", () => {
-    khiBan(el("btnWhMoKhoaXn"), () => callApi("mo_khoa_wharton", el("whMoKhoaGo").value.trim())).then((res) => {
+    chayNut(el("btnWhMoKhoaXn"), () => callApi("mo_khoa_wharton", el("whMoKhoaGo").value.trim()), (res) => {
       if (res.ok) {
         el("whMoKhoaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_mo_khoa", params: {} }), "success");
@@ -1090,7 +1090,7 @@ function initWhartonQuanLy() {
   });
   el("btnWhXoaTatCaHuy").addEventListener("click", () => { el("whXoaTatCaHop").hidden = true; });
   el("btnWhXoaTatCaXn").addEventListener("click", () => {
-    khiBan(el("btnWhXoaTatCaXn"), () => callApi("clear_wharton", null, el("whXoaTatCaGo").value.trim())).then((res) => {
+    chayNut(el("btnWhXoaTatCaXn"), () => callApi("clear_wharton", null, el("whXoaTatCaGo").value.trim()), (res) => {
       if (res.ok) {
         el("whXoaTatCaHop").hidden = true;
         showToast(trErr({ code: "wharton_da_xoa", params: { n: res.data.n_students } }), "success");
@@ -1152,7 +1152,7 @@ function initAdminHandlers() {
       feedback(el("clubFormFeedback"), t("feedback_club_form_required"), true);
       return;
     }
-    khiBan(el("btnSaveClub"), () => callApi("create_or_update_club", id, name || null, capacity, reserveCapacity, reserveGroup, buoi)).then((res) => {
+    chayNut(el("btnSaveClub"), () => callApi("create_or_update_club", id, name || null, capacity, reserveCapacity, reserveGroup, buoi), (res) => {
       if (res.ok) {
         feedback(el("clubFormFeedback"), t("feedback_club_saved", { club_id: id }), false);
         datLaiFormClb();
@@ -1209,7 +1209,7 @@ function initAdminHandlers() {
     /* A14: sửa lớp từng em (gõ tự do). Rỗng = xoá lớp. Lưu ngay khi rời ô; xong vẽ lại để lọc/sắp
        và danh sách lớp cập nhật; hỏng thì vẽ lại để ô quay về giá trị thật. */
     if (o.classList.contains("lop-sua")) {
-      callApi("set_student_class", o.dataset.studentId, o.value).then((res) => {
+      chayTai(callApi("set_student_class", o.dataset.studentId, o.value), (res) => {
         if (res.ok) showToast(t("toast_lop_da_luu"), "success");
         else showErrorToast(res.errors);
         loadAdminStudents();
@@ -1229,7 +1229,7 @@ function initAdminHandlers() {
       showToast(t("toast_no_students_ticked"), "error");
       return;
     }
-    khiBan(el("btnBulkAssign"), () => callApi("bulk_set_reserve_group", ids, group)).then((res) => {
+    chayNut(el("btnBulkAssign"), () => callApi("bulk_set_reserve_group", ids, group), (res) => {
       if (res.ok) {
         showToast(t("toast_bulk_assign_success", { n: res.data.n_updated }), "success");
         loadAdminStudents();
@@ -1280,7 +1280,7 @@ function initAdminHandlers() {
           showToast(t("toast_reset_blocked_busy"), "error");
           return;
         }
-        callApi("reset_data", phamVi, "XOA").then((res) => {
+        chayTai(callApi("reset_data", phamVi, "XOA"), (res) => {
           if (!res.ok) {
             showErrorToast(res.errors);
             return;
@@ -1721,7 +1721,7 @@ function veBangHaiTang(goc, d) {
 
 /* ---- Tab Quản lý ---- */
 function loadAdminDiemChuan() {
-  return callApi("get_diem_chuan").then((res) => {
+  return chayTai(callApi("get_diem_chuan"), (res) => {
     const khoi = el("adminDiemChuanBlock");
     if (!khoi) return null;
     if (!res.ok) {
@@ -1764,7 +1764,7 @@ function loadChiTietDiemChuan() {
     return Promise.resolve(null);
   }
   /* callApiMoiNhat: đổi nhanh CLB A sang B mà phản hồi của A về sau thì bỏ phản hồi của A (A13.12, 3.9). */
-  return callApiMoiNhat("dc_chi_tiet", "get_diem_chuan_clb", dc.chon).then((res) => {
+  return chayTai(callApiMoiNhat("dc_chi_tiet", "get_diem_chuan_clb", dc.chon), (res) => {
     if (!res.ok) {
       hop.hidden = true;
       if (!whChuaBat(res)) showErrorToast(res.errors);

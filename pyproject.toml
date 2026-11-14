@@ -5,6 +5,7 @@
 testpaths = ["tests"]
 # -p no:cacheprovider: khong de .pytest_cache rai vao thu muc du an.
 addopts = "-p no:cacheprovider"
+markers = ["giu_ma: chạy ở chế độ giữ mã trong tiêu đề biểu mẫu (tệp xuất cũ có mã), SG-12"]
 
 [tool.ruff]
 target-version = "py311"

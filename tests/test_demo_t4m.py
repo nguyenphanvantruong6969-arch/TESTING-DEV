@@ -173,6 +173,7 @@ def test_demo_moi_clb_cung_ket_qua_nhu_bieu_mau_chung(tmp_path):
     assert len(rieng["canh_bao"]) >= len(chung["canh_bao"])
 
 
+@pytest.mark.giu_ma
 def test_demo_moi_clb_mot_tep_moi_clb_khong_cau_cong(tmp_path, de):
     ra = tmp_path / "ra"
     kq = demo_t4m.chay_demo(str(ra), so_hs=40, seed=11, moi_clb=True)
