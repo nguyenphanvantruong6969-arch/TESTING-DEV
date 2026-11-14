@@ -29,6 +29,7 @@ Tham số chung: `--seed` (mặc định 42), `--so-hs` (mặc định 120). Cù
 | `d14_khong_co_lop.py` | Không có lớp, xuất theo lớp | S45 |
 | `d15_loi_giua_chung.py` | Lỗi giữa lần chạy (rollback) | bất biến 5 |
 | `d16_den_muon_khong_tranh_cho.py` | Một em đến muộn không tranh chỗ: số bốc thăm theo ngày bị tính lại | I4, F15 |
+| `thu_p1_khoa_so_theo_ngay.py` | Bản THỬ ý tưởng khoá số bốc thăm theo ngày (thay hàm trong tiến trình, không sửa mã sản phẩm); `chay_tat_ca.py` không gọi tệp này | kế hoạch P2-1 |
 
 Đã chạy thêm seed 7 (mọi kịch bản) và seed 11 (riêng d16): hướng kết quả giống seed 42, con số khác (ví dụ d12: 20 em cũ đổi
 CLB ở seed 42, 51 ở seed 7; d16: 18 / 38 / 30).

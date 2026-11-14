@@ -13,6 +13,7 @@ allocation round. Research only (Fable). Brief: `docs/fable/05_CRISIS_BRIEF.md`.
 - [x] Step 3 (brief §4.3): 16 drills on fake data, `du_lieu_test/su_co/` (memo §6).
 - [x] Step 4 (brief §4.4): remedy tables (memo §7), FA-SC-1..9 with `kiem_nhan` sketches (memo §8).
 - [x] Step 5 (brief §4.5): runbook draft `docs/fable/06b_SO_TAY_SU_CO.md` (Vietnamese).
+- [x] Fix plan proposal `docs/fable/07_FA_SC_FIX_PLAN.md` (phases P0 / P1 / P2, recommendations for D-SC2..7).
 - [ ] Truong: decide D-SC2..7, approve FA-SC-n one by one. Then Opus plans, Sonnet codes.
 
 ## Current state (overwrite each handoff)
@@ -30,6 +31,9 @@ allocation round. Research only (Fable). Brief: `docs/fable/05_CRISIS_BRIEF.md`.
 - **Largest finding (F15, D-SC7):** `sinh_stb_theo_buoi` (`stb_ngay`) re-derives every day's order when the head-count
   changes; drill d16: one late student who takes no contested seat moves 18 / 38 / 30 earlier students (seeds 42 / 7 /
   11, 120 fake students). Base lottery order is kept, per-day order on 0 of 5 days. Not fixed; needs Truong (inv. 1, 3).
+- Prototype for D-SC7 (`thu_p1_khoa_so_theo_ngay.py`, in-process patch only): storing each day's order and inserting
+  newcomers per day cuts earlier students moved from 20 → 1 (d12) and 18 → 0 (d16) at seed 42; 51 → 1, 38 → 0 at seed 7.
+  A real fix must cover three callers: the run, `get_so_boc_tham_theo_buoi`, `_du_lieu_vong_2`.
 - No problem found: double import is idempotent; a failure inside the run leaves `match_results`/`run_history` intact.
 - Drill harness: `du_lieu_test/su_co/chung.py` builds a path-B FA round (5 days × SELECTIVE/LIMITED/FREE) and runs
   the real converter and `PipelineAPI`; ~4 s per run, all drills ~100 s.
@@ -44,6 +48,7 @@ allocation round. Research only (Fable). Brief: `docs/fable/05_CRISIS_BRIEF.md`.
 ## Files touched
 - docs/fable/06_CRISIS_MEMO.md: step 1 catalogue.
 - docs/fable/06b_SO_TAY_SU_CO.md: runbook draft.
+- docs/fable/07_FA_SC_FIX_PLAN.md: proposed fix plan (not approved).
 - du_lieu_test/su_co/: drill harness and 16 drills.
 - CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: one entry each.
 - docs/phien/claude__fable-fa-sc.md: this handoff.
@@ -53,3 +58,4 @@ allocation round. Research only (Fable). Brief: `docs/fable/05_CRISIS_BRIEF.md`.
 |---|---|---|---|
 | 2026-11-14 | Fable | Step 1 catalogue memo, handoff | docs only; stopped at STOP |
 | 2026-11-14 | Fable | Drills d01–d15, remedy tables, runbook, CHANGELOG/TIEN_DO | docs + du_lieu_test/su_co only |
+| 2026-11-14 | Fable | Fix plan proposal + per-day lottery prototype | docs + du_lieu_test/su_co only |

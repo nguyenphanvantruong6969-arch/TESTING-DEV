@@ -8,6 +8,8 @@ Chỉ tài liệu và kịch bản diễn tập; **không sửa mã sản phẩm
 - `docs/fable/06b_SO_TAY_SU_CO.md`: bản nháp sổ tay sự cố cho IT và giáo viên.
 - `du_lieu_test/su_co/`: `chung.py`, `d01`…`d16`, `chay_tat_ca.py`, `README.md` (chỉ đọc mã sản phẩm, tất định theo `--seed`).
 - `docs/phien/claude__fable-fa-sc.md`: bàn giao nhánh.
+- `docs/fable/07_FA_SC_FIX_PLAN.md`: kế hoạch sửa đề xuất (3 pha, chưa duyệt) và `du_lieu_test/su_co/thu_p1_khoa_so_theo_ngay.py`
+  (bản thử trong tiến trình: khoá thứ tự theo ngày thì d12 còn 1 em cũ đổi CLB thay vì 20, d16 còn 0 thay vì 18; số mô phỏng).
 - Phát hiện cần Truong quyết (D-SC7, chưa sửa gì): chế độ `stb_ngay` tính lại thứ tự bốc thăm theo ngày của mọi em khi số học
   sinh đổi (`sinh_stb_theo_buoi`); một em đến muộn không tranh chỗ vẫn làm 18–38 em cũ đổi CLB trong dữ liệu giả 120 em.
 
