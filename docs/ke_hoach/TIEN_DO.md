@@ -156,3 +156,4 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
 | FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
 | FA-D7L (giảm may rủi) | chưa | | | | Điểm lẻ 0,1 tuỳ chọn, mặc định tắt |
+| FA-SC (sự cố do con người, ngoài sổ, D-SC1 14/11/2026) — phần nghiên cứu | xong (chờ Truong quyết D-SC2…7 và duyệt FA-SC-1…9; chưa sửa mã) | 2026-11-14 | docs/fable/06_CRISIS_MEMO.md, docs/fable/06b_SO_TAY_SU_CO.md, du_lieu_test/su_co/*, docs/phien/claude__fable-fa-sc.md, CHANGELOG.md | — (kịch bản diễn tập, không phải test) | Số liệu MÔ PHỎNG; điểm S/O/D là giả định |

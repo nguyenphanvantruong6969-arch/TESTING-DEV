@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-11-14 — FA-SC (mục mới ngoài sổ, Truong duyệt D-SC1): sự cố do con người, phần nghiên cứu
+
+Chỉ tài liệu và kịch bản diễn tập; **không sửa mã sản phẩm**, không test mới. Mọi số liệu là MÔ PHỎNG (120 học sinh giả).
+- `docs/fable/06_CRISIS_MEMO.md`: danh mục 48 sự cố phía học sinh + 13 phía giáo viên/IT (điểm S/O/D là giả định), kết quả 16
+  diễn tập, bảng phương án, đề xuất FA-SC-1…9 (chưa mục nào được duyệt), quyết định chờ D-SC2…7.
+- `docs/fable/06b_SO_TAY_SU_CO.md`: bản nháp sổ tay sự cố cho IT và giáo viên.
+- `du_lieu_test/su_co/`: `chung.py`, `d01`…`d16`, `chay_tat_ca.py`, `README.md` (chỉ đọc mã sản phẩm, tất định theo `--seed`).
+- `docs/phien/claude__fable-fa-sc.md`: bàn giao nhánh.
+- Phát hiện cần Truong quyết (D-SC7, chưa sửa gì): chế độ `stb_ngay` tính lại thứ tự bốc thăm theo ngày của mọi em khi số học
+  sinh đổi (`sinh_stb_theo_buoi`); một em đến muộn không tranh chỗ vẫn làm 18–38 em cũ đổi CLB trong dữ liệu giả 120 em.
+
 ## 2026-11-14 — SG-1 … SG-12: sửa sau đợt soát giao diện toàn kiosk (ba người song song, gộp ở claude/sg-sua)
 
 Đặc tả: `docs/ke_hoach/SOAT_GIAO_DIEN_KE_HOACH.md` (D1 = A, D2 = b, D3 = NULL đã duyệt). Cách chạy: `docs/ke_hoach/SG_SONG_SONG.md`

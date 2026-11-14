@@ -9,34 +9,47 @@ allocation round. Research only (Fable). Brief: `docs/fable/05_CRISIS_BRIEF.md`.
 `claude/dreamy-johnson-cgw652` (its handoff holds the Opus plan).
 
 ## Plan (from the Opus plan, brief §4)
-- [x] Step 1: failure catalogue (FMEA-style S×O×D) → `docs/fable/06_CRISIS_MEMO.md`; STOP, top 5 sent to Truong.
-- [ ] Step 2 (brief §4.3): drills on fake data, scripts under `du_lieu_test/su_co/`. WAIT for Truong.
-- [ ] Step 3 (brief §4.4): remedy tables, FA-SC-n with `kiem_nhan`.
-- [ ] Step 4 (brief §4.5): runbook `docs/fable/06b_SO_TAY_SU_CO.md` (Vietnamese).
+- [x] Step 1: failure catalogue (FMEA-style S×O×D) → `docs/fable/06_CRISIS_MEMO.md`; top 5 sent to Truong.
+- [x] Step 3 (brief §4.3): 16 drills on fake data, `du_lieu_test/su_co/` (memo §6).
+- [x] Step 4 (brief §4.4): remedy tables (memo §7), FA-SC-1..9 with `kiem_nhan` sketches (memo §8).
+- [x] Step 5 (brief §4.5): runbook draft `docs/fable/06b_SO_TAY_SU_CO.md` (Vietnamese).
+- [ ] Truong: decide D-SC2..7, approve FA-SC-n one by one. Then Opus plans, Sonnet codes.
 
 ## Current state (overwrite each handoff)
-- Done: memo step 1: 48 student rows (S1–S29 + S30–S48 new), 13 teacher/IT rows, top-10 ranking, 9 proposed
-  sub-items FA-SC-1..9, decisions D-SC2..6. Docs only; no production code, no tests needed.
-- In progress: none. Stopped at the brief's STOP point.
-- Open problems: all S/O/D scores are AI assumptions; no drill run; [hyp] rows unverified (S43 medals after club
-  closing, S45 class source on path B, I6 off-machine backup).
+- Done: all research deliverables of brief §6. Docs and drill scripts only; no production code, no new tests.
+- In progress: none.
+- Open problems: S/O/D scores are AI assumptions. Not drilled: S31, S34, S35, S43, I8, T1, all of path A (Power Apps
+  is not in the repo). Sample data has only 3 clubs per day.
 
 ## Decisions and gotchas (keep short)
 - Facts F1–F14 in memo §2 were read in code by function name; reuse them, do not re-derive.
-- S2 / S9 (valid but mistaken choices) top the RPN but are indistinguishable from intent: prevention only.
-- Attendance (`luu_diem_danh`) releases and re-invites in one click; `fa_sau_xep.KIND` has no reversal kind.
-- Path B: student ID is typed free text; duplicate ID blocks the whole workbook import (`so_nhap_hs_trung`).
-- Citations (DeRosier 2002, Reason 2000, Chen & Sönmez 2006, Hassidim et al. 2017) checked on Crossref.
+- Drill findings: a never-registered student is absent from the kiosk (no fallback); a missed day is silently filled
+  with a FREE club; a typed ID collision refuses the whole workbook; path B has no class, so `export_theo_lop` writes
+  only `_chua_co_lop.xlsx`; one attendance slip releases the seat and invites the next student, correcting the cell
+  does not restore it (`fa_sau_xep.KIND` has no reversal kind); one invalid medal blocks the whole run.
+- **Largest finding (F15, D-SC7):** `sinh_stb_theo_buoi` (`stb_ngay`) re-derives every day's order when the head-count
+  changes; drill d16: one late student who takes no contested seat moves 18 / 38 / 30 earlier students (seeds 42 / 7 /
+  11, 120 fake students). Base lottery order is kept, per-day order on 0 of 5 days. Not fixed; needs Truong (inv. 1, 3).
+- No problem found: double import is idempotent; a failure inside the run leaves `match_results`/`run_history` intact.
+- Drill harness: `du_lieu_test/su_co/chung.py` builds a path-B FA round (5 days × SELECTIVE/LIMITED/FREE) and runs
+  the real converter and `PipelineAPI`; ~4 s per run, all drills ~100 s.
+- `kiem_nhanh.py` item `trung_khit` cannot run in this clone (no `origin/main`); this branch changes no product code.
 
 ## Next steps (ordered)
-1. Truong answers: which of ranks 1–10 to drill; decisions D-SC2..6; approve FA-SC-n one by one.
-2. Then step 3 drills with `python du_lieu_test/demo_t4m.py --ra <scratch> --day-du`.
+1. Truong answers D-SC2..7 (memo §9); D-SC7 first and picks which FA-SC-n to build.
+2. Cheapest first: FA-SC-1 (wording), FA-SC-7 (checklists, already drafted in the runbook §4), then FA-SC-4 / FA-SC-2
+   (converter only), then FA-SC-5 (kiosk, `fa_sau_xep`).
+3. Try memo §10 list on real Microsoft Forms (TH).
 
 ## Files touched
 - docs/fable/06_CRISIS_MEMO.md: step 1 catalogue.
+- docs/fable/06b_SO_TAY_SU_CO.md: runbook draft.
+- du_lieu_test/su_co/: drill harness and 16 drills.
+- CHANGELOG.md, docs/ke_hoach/TIEN_DO.md: one entry each.
 - docs/phien/claude__fable-fa-sc.md: this handoff.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
 |---|---|---|---|
 | 2026-11-14 | Fable | Step 1 catalogue memo, handoff | docs only; stopped at STOP |
+| 2026-11-14 | Fable | Drills d01–d15, remedy tables, runbook, CHANGELOG/TIEN_DO | docs + du_lieu_test/su_co only |
