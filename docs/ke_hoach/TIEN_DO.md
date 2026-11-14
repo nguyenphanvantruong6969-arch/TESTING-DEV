@@ -151,7 +151,7 @@ Claude Code cập nhật tệp này sau mỗi mục. Một dòng mỗi mục.
 | SG-10 (soát giao diện, người A) | xong | 2026-11-13 | api_bao_cao.py, api_xuat.py, js/03_ket_qua.js, js/09_the_xem.js, i18n.js | tests/test_sg10_clb_tu_do.py, test_giao_dien_sg10_clb_tu_do.py | CLB Tự do không có % lấp đầy (M2). |
 | SG-11a (soát giao diện, người A) | xong | 2026-11-13 | style.css, index.html, js/03_ket_qua.js, i18n.js | tests/test_giao_dien_sg11a_ve_sinh.py (15 ca) | M6, M7, L1, L4, L5; bảng nhất quán + bảng từ ngữ của báo cáo chưa áp dụng (không đọc được báo cáo). |
 | SG-11b (soát giao diện, người B) | xong | 2026-11-13 | js/075_workspace.js, index.html | tests/test_giao_dien_sg11b_focus_man_chon.py (9 ca) | Bẫy tiêu điểm + Esc cho hộp chọn không gian làm việc (M4). |
-| SG-12 (soát giao diện, người C) | xong | 2026-11-14 | mau_forms_thi_clb/*.py, fa_sau_xep.py, api_sau_xep.py, api_forms_nap.py, i18n_errors.py | tests/test_sg12_tieu_de_thuan.py (44 ca) | Tiêu đề thuần + MAP_*.json; tệp cũ có mã vẫn đọc được (H2, D2 = b). |
+| SG-12 (soát giao diện, người C) | xong | 2026-11-14 | mau_forms_thi_clb/*.py, fa_sau_xep.py, api_sau_xep.py, api_forms_nap.py, i18n_errors.py | tests/test_sg12_tieu_de_thuan.py (47 ca) | Tiêu đề thuần + MAP_*.json; tệp cũ có mã vẫn đọc được (H2, D2 = b). |
 | SG gộp (người A) | xong | 2026-11-14 | api_bao_cao.py, api_xuat.py, js/09_the_xem.js, CHANGELOG.md, TIEN_DO.md, CLAUDE_CHI_TIET.md | tests/test_sg_tich_hop_tu_do_gio.py (3 ca) | Gộp sg-a, sg-b, sg-c vào claude/sg-sua; giữ cả SG-6 và SG-10. |
 | FA-CT1 (giảm may rủi, Truong 13/11/2026) | chưa | | | | Chia chỗ theo nhu cầu (gợi ý); kế hoạch GIAM_MAY_RUI_KE_HOACH.md |
 | FA-CT2 (giảm may rủi) | chưa | | | | Gợi ý thêm X chỗ + nút xuất cho giáo viên |
