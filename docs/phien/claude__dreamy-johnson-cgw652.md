@@ -28,11 +28,14 @@ Registry: none yet. New item **FA-SC** (outside the registry), approved by Truon
 - Reruns after a correction keep the locked STB (inv. 3) and append to `run_history` (inv. 4).
 
 ## Next steps (ordered)
-1. Fable does brief §4 step 1, stops, reports top 5. Truong decides D-SC2..4.
+1. Fable finished steps 1-5 + fix plan (`docs/fable/07_FA_SC_FIX_PLAN.md` on `claude/fable-fa-sc`).
+2. Phase 1 (L1-L4) runs automatically on `claude/fa-sc-sua` per `docs/phien/FA_SC_GIAO_THUC.md` (lead Opus, writer + checker Sonnet).
+3. Truong decides D-SC2..D-SC7 and Phase 0 / Phase 2 items.
 
 ## Files touched
 - docs/fable/05_CRISIS_BRIEF.md: Fable brief for FA-SC.
 - docs/phien/claude__dreamy-johnson-cgw652.md: this handoff.
+- docs/phien/FA_SC_GIAO_THUC.md: 3-session protocol + prompts for Phase 1.
 
 ## Session log (append only, newest last)
 | Date | Model | What was done | Notes |
@@ -40,3 +43,4 @@ Registry: none yet. New item **FA-SC** (outside the registry), approved by Truon
 | 2026-11-14 | Opus | Wrote FA-SC Fable brief and handoff | docs only |
 | 2026-11-14 | Opus | Brief: student journey S8–S29, solution column required per row, prompt updated | Truong asked for more student-side cases |
 | 2026-11-14 | Opus | D-SC1 approved; started Fable session (brief §8 prompt) | Fable branch claude/fable-fa-sc |
+| 2026-11-14 | Opus | Wrote FA_SC_GIAO_THUC.md; started LEAD session for Phase 1 | Truong: 3 sessions, no input |
